@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: register.php 7773 2014-12-08 10:56:37Z yura $
+ * @version $Id: register.php 7833 2014-12-17 12:17:15Z yura $
  */
 
 /**
@@ -311,6 +311,10 @@ switch( $action )
 					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 				// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
 			}
+		}
+		else
+		{ // Display this message after successful registration and without validation email
+			$Messages->add( T_('You have successfully registered on this site. Welcome!'), 'success' );
 		}
 
 		// Autologin the user. This is more comfortable for the user and avoids

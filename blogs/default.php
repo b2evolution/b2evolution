@@ -44,6 +44,8 @@ require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'evo_distrib_2.css', 'rsc_url' );
 
+add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
+
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -89,7 +91,22 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<a href="http://b2evolution.net/" target="_blank"><img src="rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
-			<span class="floatright"><a href="<?php echo $baseurl ?>">Home</a> &bull; <a href="<?php echo $admin_url ?>">Admin</a> </span>
+			<span class="floatright"><a href="<?php echo $baseurl; ?>"><?php echo T_('Home'); ?></a>
+			<?php
+				if( is_logged_in() )
+				{
+					if( $current_User->check_perm( 'admin', 'restricted' ) &&
+					    $current_User->check_status( 'can_access_admin' ) )
+					{ // User must has an access to backoffice
+						echo ' &bull; <a href="'.$admin_url.'">'.T_('Admin').'</a>';
+					}
+				}
+				else
+				{ // User is not logged in yet
+					echo ' &bull; <a href="'.$admin_url.'">'.T_('Log in').'</a>';
+				}
+			?>
+			</span>
 			&nbsp;
 		<!-- InstanceEndEditable --></div>
 
@@ -120,16 +137,23 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 					{	// There is no blog on this system!
 						echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
 
-						echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
+						if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+						{ // Display this link only for users who can create blog
+							echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
+						}
 					}
 					else
 					{
 						echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
 
 						echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
+
+						if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+						{ // Display this link only for users who can create blog
 						?>
 						<p><a href="<?php echo $admin_url ?>?ctrl=gensettings"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
 						<?php
+						}
 					}
 					?>
 			</div>
@@ -167,7 +191,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	</ul>
 
 		<?php
+		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{ // Display this link only for users who can create blog
 			echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new blog' ).' &raquo;</a></p>';
+		}
 		?>
 		</div>
 		</div>

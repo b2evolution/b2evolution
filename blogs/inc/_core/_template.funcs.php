@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 7771 2014-12-08 08:24:11Z yura $
+ * @version $Id: _template.funcs.php 7901 2014-12-25 14:24:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1117,10 +1117,11 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox: a lightweight Lightbox alternative -- allows zooming on images and slideshows in groups of images
 				// Added by fplanque - (MIT License) - http://colorpowered.com/colorbox/
 
-				global $b2evo_icons_type;
+				global $b2evo_icons_type, $blog;
+				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to display a voting panel
 				$colorbox_voting_params = '{displayVoting: true,
-					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'",
+					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
 					minWidth: 345}';
 				// Colorbox params without voting panel
 				$colorbox_no_voting_params = '{minWidth: 255}';
@@ -1483,7 +1484,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'&'.url_crumb( 'voting' ).'";
+		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
@@ -2693,10 +2694,15 @@ function display_activateinfo( $params )
 	echo '<p>'.sprintf( T_('If you need assistance, please send an email to %s'), '<b><a href="mailto:"'.$notification_email.'"><span class="nowrap">'.$notification_email.'</span></a></b>' ).'</p></li>';
 	echo '</ol>';
 
-	if( (strpos( $user_email, '@hotmail.' ) || strpos( $user_email, '@live.' ) || strpos( $user_email, '@msn.' ))
+	if( ( strpos( $user_email, '@hotmail.' ) || strpos( $user_email, '@live.' ) || strpos( $user_email, '@msn.' ) )
 		&& file_exists( $rsc_path.'img/login_help/hotmail-validation.png' ) )
-	{	// The user is on hotmail and we have a help screen to show him: (needs to be localized and include correct site name)
+	{ // The user is on hotmail and we have a help screen to show him: (needs to be localized and include correct site name)
 		echo '<div class="center" style="margin: 2em auto"><img src="'.$rsc_url.'img/login_help/hotmail-validation.png" /></div>';
+	}
+	elseif( ( strpos( $user_email, '@gmail.com' ) || strpos( $user_email, '@googlemail.com' ) )
+		&& file_exists( $rsc_path.'img/login_help/gmail-validation.png' ) )
+	{ // The user is on hotmail and we have a help screen to show him: (needs to be localized and include correct site name)
+		echo '<div class="center" style="margin: 2em auto"><img src="'.$rsc_url.'img/login_help/gmail-validation.png" /></div>';
 	}
 
 	if( ! $params['inskin'] )

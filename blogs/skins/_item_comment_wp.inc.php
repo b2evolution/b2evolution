@@ -57,7 +57,10 @@ $Comment = & $params['Comment'];
 						) );
 				}
 				$Comment->author();
-				$Comment->msgform_link( $Blog->get('msgformurl') );
+				if( ! $Comment->get_author_User() )
+				{ // Display action icon to message only if this comment is from a visitor
+					$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
+				}
 				$Comment->author_url( '', ' &middot; ', '' );
 				break;
 

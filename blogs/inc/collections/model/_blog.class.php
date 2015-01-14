@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 7754 2014-12-05 07:42:52Z yura $
+ * @version $Id: _blog.class.php 7987 2015-01-14 18:44:48Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -98,7 +98,7 @@ class Blog extends DataObject
 	var $allowtrackbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
-	var $in_bloglist = 1;
+	var $in_bloglist = 'public';
 	var $media_location = 'default';
 	var $media_subdir = '';
 	var $media_fullpath = '';
@@ -339,8 +339,34 @@ class Blog extends DataObject
 		{ // General params:
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
-			$this->set( 'locale',    param( 'blog_locale',    'string', $default_locale ) );
-			$this->set( 'order',     param( 'blog_order',     'integer' ) );
+
+			// Language / locale:
+			if( param( 'blog_locale', 'string', NULL ) !== NULL )
+			{ // These settings can be hidden when only one locale is enaled in the system
+				$this->set_from_Request( 'locale' );
+				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
+				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+			}
+
+			// Collection permissions:
+			$old_advanced_perms = $this->get( 'advanced_perms' );
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
+			$old_allow_access = $this->get_setting( 'allow_access' );
+			$new_allow_access = param( 'blog_allow_access', 'string', '' );
+			if( $old_allow_access != 'members' && $new_allow_access == 'members' )
+			{ // If 'Allow access' is changed to 'Members' we should activate advanced perms automatically
+				$new_advanced_perms = 1;
+			}
+			if( $old_advanced_perms == 1 && $new_advanced_perms == 0 && $old_allow_access == 'members' )
+			{ // If advanced perms are deselected we should also change 'Allow access' back to 'Logged in users'
+				$new_allow_access = 'users';
+			}
+			$this->set( 'advanced_perms', $new_advanced_perms );
+			$this->set_setting( 'allow_access', $new_allow_access );
+
+			// Lists of collections:
+			$this->set( 'order', param( 'blog_order', 'integer' ) );
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
 			$this->set( 'favorite',  param( 'favorite', 'integer', 0 ) );
 		}
 
@@ -560,26 +586,6 @@ class Blog extends DataObject
 		if( in_array( 'authors', $groups ) )
 		{ // we want to load the workflow & permissions params
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
-
-			// Change blog permissions settings
-			$old_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
-
-			$old_allow_access = $this->get_setting( 'allow_access' );
-			$new_allow_access = param( 'blog_allow_access', 'string', '' );
-
-			if( $old_allow_access != 'members' && $new_allow_access == 'members' )
-			{ // If 'Allow access' is changed to 'Members' we should activate advanced perms automatically
-				$new_advanced_perms = 1;
-			}
-
-			if( $old_advanced_perms == 1 && $new_advanced_perms == 0 && $old_allow_access == 'members' )
-			{ // If advanced perms are deselected we should also change 'Allow access' back to 'Logged in users'
-				$new_allow_access = 'users';
-			}
-
-			$this->set( 'advanced_perms', $new_advanced_perms );
-			$this->set_setting( 'allow_access', $new_allow_access );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -706,9 +712,6 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
-			// Public blog list
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'integer', 0 ) );
-
 			// Tracking unread content
 			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
 
@@ -733,6 +736,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
 			$this->set_setting( 'autocomplete_usernames', param( 'autocomplete_usernames', 'integer', '' ) );
+			$this->set_setting( 'display_rating_summary', param( 'display_rating_summary', 'string', '0' ) );
 			$this->set_setting( 'allow_rating_items', param( 'allow_rating_items', 'string', 'never' ) );
 			$this->set_setting( 'rating_question', param( 'rating_question', 'text' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
@@ -1169,7 +1173,6 @@ class Blog extends DataObject
 		{
 			case 'ID':
 			case 'allowtrackbacks':
-			case 'blog_in_bloglist':
 				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 				break;
 
@@ -3292,7 +3295,7 @@ class Blog extends DataObject
 						$other_media_dir = $other_Blog->get_media_dir( false );
 						if( ! empty( $other_media_dir ) && strpos( $new_media_dir, $other_media_dir ) === 0 )
 						{
-							$Messages->add( sprintf( T_('Please use another folder name, because %s cannot be folder or subfolder of other blog media location.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
+							$Messages->add( sprintf( T_('Please use another folder name, because %s is already used for another media location.'), '<b>'.$new_media_dir.'</b>' ), 'error' );
 							return false;
 						}
 					}
@@ -3312,7 +3315,7 @@ class Blog extends DataObject
 				debug_die('Invalid media location setting received!');
 		}
 
-		$Messages->add( T_('The media directory was successfully moved to the new path, with all of its content.'), 'note' );
+		$Messages->add( T_('The media directory and all of its content were successfully moved to the new location.'), 'note' );
 		return true;
 	}
 }

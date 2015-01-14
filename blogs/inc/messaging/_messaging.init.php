@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _messaging.init.php 6422 2014-04-08 06:09:50Z yura $
+ * @version $Id: _messaging.init.php 7873 2014-12-22 17:23:15Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -339,11 +339,15 @@ class messaging_Module extends Module
 					);
 			}
 
-			$right_entries['messaging'] = array(
-				'text' => T_('Messages'),
-				'href' => get_dispctrl_url( 'threads' ),
-				'class' => 'evo_messages_link',
-			);
+			$messages_url = get_dispctrl_url( 'threads' );
+			if( ! empty( $messages_url ) )
+			{ // Display this menu item only when url is available to current user
+				$right_entries['messaging'] = array(
+					'text'  => T_('Messages'),
+					'href'  => $messages_url,
+					'class' => 'evo_messages_link',
+				);
+			}
 
 			// Count unread messages for current user
 			$unread_messages_count = get_unread_messages_count();

@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id$
+ * @version $Id: _init_session.inc.php 7974 2015-01-14 08:00:37Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -127,6 +127,10 @@ $Timer->resume( '_init_session' );
 /*
  * User locale selection. Only override it if not set from REQUEST.
  */
+if( is_logged_in() )
+{
+	$Debuglog->add( 'Login: locale from user profile: '.$current_User->get('locale'), 'locale' );
+}
 if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $locale_from_get )
 { // change locale to users preference
 	/*
@@ -137,7 +141,7 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 	if( $current_locale == $current_User->get('locale') )
 	{
 		$default_locale = $current_locale;
-		$Debuglog->add( 'Login: default_locale from user profile: '.$default_locale, 'locale' );
+		$Debuglog->add( 'Login: changing default_locale to: '.$default_locale, 'locale' );
 	}
 	else
 	{

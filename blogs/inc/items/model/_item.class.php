@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7752 2014-12-04 12:44:33Z yura $
+ * @version $Id: _item.class.php 7839 2014-12-18 11:16:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3338,13 +3338,19 @@ class Item extends ItemLight
 			'rating_summary_star_totals' => 'count' // Possible values: 'count', 'percent' and 'none'
 		), $params );
 
+		$item_Blog = & $this->get_Blog();
+		if( ! $item_Blog->get_setting( 'display_rating_summary' ) )
+		{ // Don't display a rating summary
+			return;
+		}
+
 		// get ratings and active ratings ( active ratings are younger then comment_expiry_delay )
 		list( $ratings, $active_ratings ) = $this->get_ratings();
 		$ratings_count = $ratings['all_ratings'];
 		$active_ratings_count = $active_ratings['all_ratings'];
 		if( $ratings_count == 0 )
-		{	// No Comments
-			return NULL;
+		{ // No Comments
+			return;
 		}
 
 		$average_real = number_format( $ratings["summary"] / $ratings_count, 1, ".", "" );

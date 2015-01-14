@@ -32,7 +32,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _user_subscriptions.form.php 7645 2014-11-14 08:16:13Z yura $
+ * @version $Id: _user_subscriptions.form.php 7919 2014-12-30 18:48:02Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -105,7 +105,8 @@ if( !$user_profile_only )
 $is_admin_page = is_admin_page();
 if( $is_admin_page )
 {
-	$form_title = get_usertab_header( $edited_User, 'subs', T_( 'Edit notifications' ) );
+	$form_text_title = T_( 'Edit notifications' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, 'subs', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	$checklist_params = array();
@@ -117,7 +118,7 @@ else
 	$checklist_params = array( 'wide' => true );
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
@@ -327,7 +328,11 @@ else
 	}
 	if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
 	{	// If a subscribing to new blogs available only for the public blogs
-		$BlogCache_SQL->WHERE_and( 'blog_in_bloglist = 1' );
+		$BlogCache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
+			( blog_in_bloglist = "member" AND (
+				( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$edited_User->ID.' ) OR
+				( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$edited_User->grp_ID.' )
+			) )' );
 	}
 	if( !empty( $subs_blog_IDs ) )
 	{	// Exclude the blogs from the list if user already is subscribed on them

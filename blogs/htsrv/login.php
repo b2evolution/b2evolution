@@ -29,7 +29,7 @@
  *
  * @package htsrv
  *
- * @version $Id: login.php 7606 2014-11-10 15:45:48Z yura $
+ * @version $Id: login.php 7870 2014-12-22 12:12:09Z yura $
  */
 
 /**
@@ -247,11 +247,11 @@ switch( $action )
 		param( 'sessID', 'integer', '' );
 
 		$UserCache = & get_UserCache();
-		$forgetful_User = & $UserCache->get_by_login($login);
+		$forgetful_User = & $UserCache->get_by_login( $login );
 
 		locale_temp_switch( $forgetful_User->locale );
 
-		if( ! $forgetful_User || empty($reqID) )
+		if( ! $forgetful_User || empty( $reqID ) )
 		{ // This was not requested
 			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
 			$action = 'lostpassword';
@@ -295,15 +295,66 @@ switch( $action )
 				$changepwd_url = url_add_param( $Blog->gen_blogurl(), 'disp=pwdchange&reqID='.$reqID );
 			}
 		}
+
+		locale_restore_previous();
+
 		if( empty( $changepwd_url ) )
-		{ // redirect to admin change password form
-			$changepwd_url = url_add_param( $admin_url, 'ctrl=user&user_tab=pwdchange&user_ID='.$forgetful_User->ID.'&reqID='.$reqID, '&' );
+		{ // Display standard(non-skin) form to change password
+			$action = 'changepwd';
+		}
+		else
+		{ // redirect Will save $Messages into Session:
+			header_redirect( $changepwd_url ); // display user's change password tab
+			/* exited */
+		}
+		break;
+
+
+	case 'updatepwd':
+		// Update password(The submit action of the change password form)
+		param( 'reqID', 'string', '' );
+
+		if( ! is_logged_in() )
+		{ // Don't allow not logged in user here, because it must be logged in on the action 'changepwd' above
+			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$action = 'lostpassword';
+			$login_required = true; // Do not display "Without login.." link on the form
+			break;
+		}
+
+		$forgetful_User = & $current_User;
+
+		locale_temp_switch( $forgetful_User->locale );
+
+		if( ! $forgetful_User || empty( $reqID ) )
+		{ // This was not requested
+			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$action = 'lostpassword';
+			$login_required = true; // Do not display "Without login.." link on the form
+			break;
+		}
+
+		// Validate provided reqID against the one stored in the user's session
+		if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+		{
+			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$action = 'lostpassword';
+			$login_required = true; // Do not display "Without login.." link on the form
+			break;
+		}
+
+		$result = $forgetful_User->update_from_request();
+
+		if( $result !== true )
+		{ // Some errors exist on form submit, Display the form again to change them
+			$action = 'changepwd';
+			break;
 		}
 
 		locale_restore_previous();
 
 		// redirect Will save $Messages into Session:
-		header_redirect( $changepwd_url ); // display user's change password tab
+		header_redirect( $baseurl ); // display user's change password tab
 		/* exited */
 		break;
 
@@ -608,6 +659,11 @@ switch( $action )
 		// Send activation link by email (initial form and action)
 		// Display validation form:
 		require $adminskins_path.'login/_validate_form.main.php';
+		break;
+
+	case 'changepwd':
+		// Display form to change password:
+		require $adminskins_path.'login/_password_form.main.php';
 		break;
 
 	default:

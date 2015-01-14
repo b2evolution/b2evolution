@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 7752 2014-12-04 12:44:33Z yura $
+ * @version $Id: _functions_create.php 7919 2014-12-30 18:48:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1096,7 +1096,7 @@ function create_blog(
 	$use_inskin_login = 0,
 	$blog_access_type = 'relative',
 	$allow_html = true,
-	$in_bloglist = 1,
+	$in_bloglist = 'public',
 	$owner_user_ID = 1 )
 {
 	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
@@ -1116,7 +1116,7 @@ function create_blog(
 	$Blog->set( 'tagline', $blog_tagline );
 	$Blog->set( 'longdesc', $blog_longdesc );
 	$Blog->set( 'locale', $default_locale );
-	$Blog->set( 'in_bloglist', (int)$in_bloglist );
+	$Blog->set( 'in_bloglist', $in_bloglist );
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
 	$Blog->set_setting( 'normal_skin_ID', $blog_skin_ID );
 	if( $local_installation )
@@ -1370,7 +1370,7 @@ function create_demo_contents()
 			1,
 			$blog_a_access_type,
 			true,
-			1,
+			'public',
 			$ablogger_ID );
 		$BlogCache = & get_BlogCache();
 		if( $Blog_a = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
@@ -1397,7 +1397,7 @@ function create_demo_contents()
 			0,
 			$blog_b_access_type,
 			true,
-			1,
+			'public',
 			$bblogger_ID );
 	}
 
@@ -1421,7 +1421,7 @@ function create_demo_contents()
 			0,
 			$blog_linkblog_access_type,
 			true,
-			0,
+			'never',
 			$ablogger_ID );
 
 		if( ! empty( $blog_linkblog_ID ) )
@@ -1445,7 +1445,7 @@ function create_demo_contents()
 			T_('This blog shows photos...'),
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 			4, // Skin ID
-			'photo', '', 0, 'relative', true, 1,
+			'photo', '', 0, 'relative', true, 'public',
 			$ablogger_ID );
 	}
 
@@ -1460,7 +1460,7 @@ function create_demo_contents()
 			T_('Tagline for Forums'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			5, // Skin ID
-			'forum', 'any', 1, 'relative', false, 1,
+			'forum', 'any', 1, 'relative', false, 'public',
 			$ablogger_ID );
 	}
 
@@ -1475,7 +1475,7 @@ function create_demo_contents()
 			T_('Tagline for Manual'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			6, // Skin ID
-			'manual', 'any', 1, $default_blog_access_type, false, 1,
+			'manual', 'any', 1, $default_blog_access_type, false, 'public',
 			$ablogger_ID );
 	}
 

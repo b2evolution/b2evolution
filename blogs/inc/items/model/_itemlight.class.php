@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlight.class.php 7112 2014-07-14 05:28:11Z yura $
+ * @version $Id: _itemlight.class.php 7978 2015-01-14 11:21:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -904,11 +904,22 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Template function: Temporarily switch to this post's locale
+	 * Template function: Temporarily switch to this post's locale or to current blog's locale depending on setting
 	 */
 	function locale_temp_switch()
 	{
-		locale_temp_switch( $this->locale );
+		global $Blog;
+
+		if( ! empty( $Blog ) && $Blog->get_setting( 'post_locale_source' ) == 'blog' )
+		{ // Use locale what current blog is using now
+			return;
+		}
+		else
+		{ // Use locale of this post
+			$locale = $this->locale;
+		}
+
+		locale_temp_switch( $locale );
 	}
 
 

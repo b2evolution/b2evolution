@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 7432 2014-10-15 04:26:24Z yura $
+ * @version $Id: _blog_main.inc.php 7962 2015-01-13 13:35:14Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -97,9 +97,11 @@ $is_front = false;	// So far we have not detected that we are displaying the fro
 fp>there is no blog defined in _main and there should not be any
 blueyed> Sure, but that means we should either split it, or use the locale here only, if there's no-one given with higher priority.
 */
-// Activate matching locale:
-$Debuglog->add( 'Activating blog locale: '.$Blog->get('locale'), 'locale' );
-locale_activate( $Blog->get('locale') );
+if( $Blog->get_setting( 'locale_source' ) == 'blog' )
+{ // Activate matching locale:
+	$Debuglog->add( 'Activating blog locale: '.$Blog->get( 'locale' ), 'locale' );
+	locale_activate( $Blog->get( 'locale' ) );
+}
 
 
 // Re-Init charset handling, in case current_charset has changed:

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: __core.init.php 7801 2014-12-11 10:27:12Z yura $
+ * @version $Id: __core.init.php 7964 2015-01-13 15:14:52Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -1378,32 +1378,53 @@ class _core_Module extends Module
 		 */
 		global $localtimenow, $is_admin_page;
 
+		$userprefs_entries = array();
+		$user_profile_url = get_user_profile_url();
+		if( ! empty( $user_profile_url ) )
+		{ // Display this menu item only when url is available to current user
+			$userprefs_entries['profile'] = array(
+					'text' => T_('Edit your profile').'&hellip;',
+					'href' => $user_profile_url,
+				);
+		}
+		$user_avatar_url = get_user_avatar_url();
+		if( ! empty( $user_avatar_url ) )
+		{ // Display this menu item only when url is available to current user
+			$userprefs_entries['avatar'] = array(
+					'text' => T_('Your profile picture').'&hellip;',
+					'href' => $user_avatar_url,
+				);
+		}
+		$user_pwdchange_url = get_user_pwdchange_url();
+		if( ! empty( $user_pwdchange_url ) )
+		{ // Display this menu item only when url is available to current user
+			$userprefs_entries['pwdchange'] = array(
+					'text' => T_('Change password').'&hellip;',
+					'href' => $user_pwdchange_url,
+				);
+		}
+		$user_preferences_url = get_user_preferences_url();
+		if( ! empty( $user_preferences_url ) )
+		{ // Display this menu item only when url is available to current user
+			$userprefs_entries['userprefs'] = array(
+					'text' => T_('Preferences').'&hellip;',
+					'href' => $user_preferences_url,
+				);
+		}
+		$user_subs_url = get_user_subs_url();
+		if( ! empty( $user_subs_url ) )
+		{ // Display this menu item only when url is available to current user
+			$userprefs_entries['subs'] = array(
+					'text' => T_('Notifications').'&hellip;',
+					'href' => $user_subs_url,
+				);
+		}
+	
 		$entries = array(
 			'userprefs' => array(
-					'text' => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
-					'href' => get_user_profile_url(),
-					'entries' => array(
-						'profile' => array(
-								'text' => T_('Edit your profile').'&hellip;',
-								'href' => get_user_profile_url(),
-							),
-						'avatar' => array(
-								'text' => T_('Your profile picture').'&hellip;',
-								'href' => get_user_avatar_url(),
-							),
-						'pwdchange' => array(
-								'text' => T_('Change password').'&hellip;',
-								'href' => get_user_pwdchange_url(),
-							),
-						'userprefs' => array(
-								'text' => T_('Preferences').'&hellip;',
-								'href' => get_user_preferences_url(),
-							),
-						'subs' => array(
-								'text' => T_('Notifications').'&hellip;',
-								'href' => get_user_subs_url(),
-							),
-						),
+					'text'    => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+					'href'    => get_user_profile_url(),
+					'entries' => $userprefs_entries,
 				),
 			'time' => array(
 					'text' => date( locale_shorttimefmt(), $localtimenow ),
@@ -1442,7 +1463,7 @@ class _core_Module extends Module
 				'separator' => true,
 			);
 		$entries['userprefs']['entries']['logout'] = array(
-				'text' => T_('Logout'),
+				'text' => T_('Log out'),
 				'href' => get_user_logout_url(),
 			);
 

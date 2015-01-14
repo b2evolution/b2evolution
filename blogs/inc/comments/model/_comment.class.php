@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.class.php 7752 2014-12-04 12:44:33Z yura $
+ * @version $Id: _comment.class.php 7885 2014-12-24 08:27:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3028,11 +3028,18 @@ class Comment extends DataObject
 	 * - draft
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Params
 	 * @return string Status
 	 */
-	function get_status( $format = 'htmlbody' )
+	function get_status( $format = 'htmlbody', $params = array() )
 	{
-		$r = '';
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+			), $params );
+
+		$r = $params['before'];
 
 		switch( $format )
 		{
@@ -3049,6 +3056,8 @@ class Comment extends DataObject
 				break;
 		}
 
+		$r .= $params['after'];
+
 		return $r;
 	}
 
@@ -3064,10 +3073,17 @@ class Comment extends DataObject
 	 * - draft
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Params
 	 */
-	function status( $format = 'htmlbody' )
+	function status( $format = 'htmlbody', $params = array() )
 	{
-		echo $this->get_status( $format );
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+			), $params );
+
+		echo $this->get_status( $format, $params );
 	}
 
 

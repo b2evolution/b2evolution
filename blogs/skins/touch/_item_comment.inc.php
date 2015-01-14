@@ -51,7 +51,10 @@ $Comment = & $params['Comment'];
 				'link_to'		   => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 				'link_text'    => $params['author_link_text'],
 			) );
-		$Comment->msgform_link( $Blog->get('msgformurl') );
+		if( ! $Comment->get_author_User() )
+		{ // Display action icon to message only if this comment is from a visitor
+			$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
+		}
 		echo '</div>';
 	?>
 		<div class="comdater">

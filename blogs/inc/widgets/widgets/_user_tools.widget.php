@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _user_tools.widget.php 7964 2015-01-13 15:14:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -208,7 +208,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Logout' ),
+				'defaultvalue' => T_( 'Log out' ),
 			),
 		), parent::get_param_definitions( $params )	);
 
@@ -361,7 +361,7 @@ class user_tools_Widget extends ComponentWidget
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new owner, new skin)
-				'loggedin' => (is_logged_in() ? 1 : 0),  // Is a user logged in at the time this widget is cached/displayed
+				'loggedin' => (is_logged_in() ? 1 : 0),
 				// fp> note: if things get tough in the future, use a per User caching scheme:
 				// 'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 			);

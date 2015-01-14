@@ -58,7 +58,8 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = get_usertab_header( $edited_User, 'avatar', T_( 'Edit profile picture' ) );
+	$form_text_title = T_( 'Edit profile picture' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, 'avatar', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
@@ -71,7 +72,7 @@ else
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	$Form->add_crumb( 'user' );
 	if( $is_admin )

@@ -16,7 +16,7 @@
  * @author fplanque: Francois Planque
  * @author PhiBo: Philipp Seidel (since version 0.6)
  *
- * @version $Id: _tinymce.plugin.php 7423 2014-10-14 07:52:43Z yura $
+ * @version $Id: _tinymce.plugin.php 7914 2014-12-29 11:37:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -487,6 +487,17 @@ class tinymce_plugin extends Plugin
 										var value = params.before + sel + params.after;
 									}
 									inst.selection.setContent(value);
+
+									return true;
+								} );
+
+							// add a callback, that replaces a string
+							b2evo_Callbacks.register_callback( "str_replace_for_itemform_post_content", function(params) {
+									var inst = tinymce.get("<?php echo $this->tmce_editor_id ?>");
+									if( ! inst ) return null;
+
+									// Replace substring with new value
+									inst.setContent( inst.getContent().replace( params.search, params.replace ) );
 
 									return true;
 								} );

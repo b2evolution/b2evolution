@@ -8,9 +8,9 @@
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage photoalbum
+ * @subpackage photoalbums
  *
- * @version $Id: index.main.php 7789 2014-12-09 16:35:43Z yura $
+ * @version $Id: index.main.php 7979 2015-01-14 12:18:49Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -18,6 +18,8 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
+
+global $Skin;
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -27,6 +29,7 @@ require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
+		'viewport_tag'    => '#responsive#',
 		'auto_pilot'      => 'seo_title',
 		'arcdir_text'     => T_('Index'),
 		'catdir_text'     => T_('Galleries'),
@@ -119,6 +122,14 @@ if( $disp == 'single' )
 				'text'      => get_icon( 'edit' ),
 				'title'     => T_('Edit title/description...'),
 			) );
+		if( $Skin->enabled_status_banner( $Item->status ) )
+		{ // Status banner
+			$single_Item->status( array(
+					'before' => '<div class="post_status">',
+					'after'  => '</div>',
+					'format' => 'styled'
+				) );
+		}
 	?>
 	</span>
 
@@ -214,13 +225,11 @@ if( $disp == 'single' )
 
 		if( $Item )
 		{
-			echo '<div id="styled_content_block">';
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
-			echo '</div>';
 		}
 	} // ---------------------------------- END OF A POST ------------------------------------
 	?>
@@ -233,9 +242,9 @@ if( $disp == 'single' )
 				'disp_page'   => '', // We already handled this case above
 				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
 				'author_link_text'     => 'preferredname',
-				'login_page_before'    => '<div class="bPostContent login_block"><div class="bDetails">',
+				'login_page_before'    => '<div class="login_block"><div class="bDetails">',
 				'login_page_after'     => '</div></div>',
-				'register_page_before' => '<div class="bPostContent login_block"><div class="bDetails">',
+				'register_page_before' => '<div class="login_block"><div class="bDetails">',
 				'register_page_after'  => '</div></div>',
 				'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
 			) );
@@ -246,6 +255,8 @@ if( $disp == 'single' )
 </div>
 
 <?php
+if( $disp != 'front' )
+{ // Don't display the pages on disp=front because we don't have a limit by page there
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(
 			'block_start' => '<div class="nav_pages">',
@@ -254,6 +265,7 @@ if( $disp == 'single' )
 			'next_text' => '&gt;&gt;',
 		) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+}
 ?>
 
 <?php

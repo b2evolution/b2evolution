@@ -1070,6 +1070,8 @@ switch( $action )
 				{
 					$AdminUI->disp_payload_begin();
 				}
+				$window_width = param( 'window_width', 'integer' );
+				$window_height = param( 'window_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

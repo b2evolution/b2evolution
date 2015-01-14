@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7769 2014-12-08 06:45:10Z attila $
+ * @version $Id: _misc.funcs.php 7978 2015-01-14 11:21:30Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3082,12 +3082,14 @@ function debug_info( $force = false, $force_clean = false )
 				}
 				$log_container_head .= implode( ' | ', $log_head_links );
 
-				echo format_to_output(
-					$sess_Debuglog->display( array(
-							'container' => array( 'string' => $log_container_head, 'template' => false ),
-							'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
-						'', false, $log_categories ),
-					'htmlbody' );
+				echo '<div style="border:1px solid #F00;background:#aaa">'.
+					format_to_output(
+						$sess_Debuglog->display( array(
+								'container' => array( 'string' => $log_container_head, 'template' => false ),
+								'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
+							'', false, $log_categories ),
+						'htmlbody' ).
+					'</div>';
 			}
 		}
 
@@ -6814,8 +6816,22 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="overlay_wrap" style="width:' + width + '"><div id="overlay_layout"><div id="overlay_page"' + style_height + '></div></div></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#overlay_page' ).html( body_html ).addClass( overlay_class );
-	jQuery( document ).on( 'click', '#close_button, #screen_mask', function()
+	jQuery( document ).on( 'click', '#close_button, #screen_mask, #overlay_page', function( e )
 	{
+		if( jQuery( this ).attr( 'id' ) == 'overlay_page' )
+		{
+			var form_obj = jQuery( '#overlay_page form' );
+			if( form_obj.length )
+			{
+				var top = form_obj.position().top + jQuery( '#overlay_wrap' ).position().top;
+				var bottom = top + form_obj.height();
+				if( ! ( e.clientY > top && e.clientY < bottom ) )
+				{
+					closeModalWindow();
+				}
+			}
+			return false;
+		}
 		closeModalWindow();
 		return false;
 	} );

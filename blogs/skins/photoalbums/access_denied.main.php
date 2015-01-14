@@ -8,9 +8,9 @@
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage photoalbum
+ * @subpackage photoalbums
  *
- * @version $Id: access_denied.main.php 7791 2014-12-10 06:42:00Z yura $
+ * @version $Id: access_denied.main.php 7979 2015-01-14 12:18:49Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,7 +28,8 @@ skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-		'auto_pilot' => 'seo_title',
+		'viewport_tag' => '#responsive#',
+		'auto_pilot'   => 'seo_title',
 	) );
 // Note: You can customize the default HTML header by copying the
 // _html_header.inc.php file into the current skin folder.

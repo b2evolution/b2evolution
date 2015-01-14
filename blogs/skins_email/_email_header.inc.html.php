@@ -8,11 +8,16 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: _email_header.inc.html.php 7639 2014-11-13 15:07:37Z yura $
+ * @version $Id: _email_header.inc.html.php 7827 2014-12-17 07:04:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $Settings, $emailskins_path;
+
+// Default params:
+$params = array_merge( array(
+		'include_greeting' => true
+	), $params );
 ?>
 <html>
 <head>
@@ -48,4 +53,9 @@ else
 <?php } ?>
 
 <div<?php echo emailskin_style( 'div.email_payload' ); ?>>
+<?php
+if( $params['include_greeting'] )
+{ // Display the greeting message
+?>
 <p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $login$ !' ); ?></p>
+<?php } ?>

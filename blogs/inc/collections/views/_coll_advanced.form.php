@@ -23,7 +23,7 @@
  * @package admin
  *
  *
- * @version $Id: _coll_advanced.form.php 7523 2014-10-27 10:19:17Z yura $
+ * @version $Id: _coll_advanced.form.php 7938 2015-01-09 13:28:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,17 +49,6 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Blog Permissions').get_manual_link('coll-permission-settings') );
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
-	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
-			array(
-				array( 'public', T_('Everyone (Public Blog)') ),
-				array( 'users', T_('Logged in users') ),
-				array( 'members', T_('Members') ),
-		), T_('Allow access to'), true );
 $Form->end_fieldset();
 
 

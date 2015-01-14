@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _translation.funcs.php 7952 2015-01-12 16:28:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -276,9 +276,14 @@ function translation_generate_pot_file()
 
 	foreach( $translation_strings as $string => $files )
 	{ // Format the translation strings to write in .POT file
+		if( isset( $files['trans'] ) )
+		{ // Text of "TRANS: ..." helper
+			$pot_content[] = '#. '.$files['trans'];
+			unset( $files['trans'] );
+		}
 		foreach( $files as $file )
-		{
-			$pot_content[] = '#: '.$file;
+		{ // File name and line number where string exists
+			$pot_content[] = '#: '.$file[1].':'.$file[0];
 		}
 		$pot_content[] = 'msgid "'.$string.'"';
 		$pot_content[] = 'msgstr ""';
@@ -286,7 +291,7 @@ function translation_generate_pot_file()
 	}
 
 	// Write to .POT file
-	$ok = save_to_file( implode("\r\n", $pot_content), $pot_file_name, 'w+' );
+	$ok = save_to_file( implode( "\n", $pot_content ), $pot_file_name, 'w+' );
 
 	return (bool) $ok;
 }
@@ -323,19 +328,35 @@ function translation_scandir( $path, & $translation_strings )
  */
 function translation_find_T_strings( $file, & $translation_strings )
 {
-	if( preg_match_all( '/(NT|T|TS)_\( ?\'([^\)]+)\' ?\)/i', file_get_contents( $file ), $t_matches ) )
-	{	// The matches is found
-		global $basepath;
+	// Split file content with lines in order to know line number of each string
+	$file_lines = explode( "\n", file_get_contents( $file ) );
+	foreach( $file_lines as $line_number => $line_string )
+	{
+		if( preg_match_all( '/(\/\* ?TRANS:[^\*]+\*\/ ?)?(NT|T|TS)_\(\s*[\'"](.*?)[\'"]\s*\)/i', $line_string, $t_matches ) )
+		{ // The matches is found
+			global $basepath;
 
-		foreach( $t_matches[2] as $t_m )
-		{
-			$t_m = str_replace( array( "\r\n", '\n' ), array( '\n', '\n"'."\r\n".'"' ), $t_m );
+			foreach( $t_matches[3] as $t_index => $t_m )
+			{
+				$t_m = str_replace( array( '"', "\'", "\r\n", '\n' ), array( '\"', "'", '\n', '\n"'."\n".'"' ), $t_m );
+				if( strpos( $t_m, "\n" ) )
+				{ // Add empty new line before multiline string
+					$t_m = '"'."\n".'"'.$t_m;
+				}
 
-			if( !isset( $translation_strings[ $t_m ] ) )
-			{	// Set array for each string in order to store the file paths where this string is found
-				$translation_strings[ $t_m ] = array();
+				if( !isset( $translation_strings[ $t_m ] ) )
+				{ // Set array for each string in order to store the file paths where this string is found
+					$translation_strings[ $t_m ] = array();
+				}
+				if( ! isset( $translation_strings[ $t_m ]['trans'] ) && ! empty( $t_matches[1][ $t_index ] ) )
+				{ // Text of "TRANS: ..." helper
+					$translation_strings[ $t_m ]['trans'] = trim( $t_matches[1][ $t_index ], ' /*' );
+				}
+				$translation_strings[ $t_m ][] = array(
+						$line_number + 1, // Line number
+						str_replace( $basepath, '../../../', $file ), // String
+					);
 			}
-			$translation_strings[ $t_m ][] = str_replace( $basepath, '/', $file );
 		}
 	}
 }

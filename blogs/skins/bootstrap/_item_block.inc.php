@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id: _item_block.inc.php 7115 2014-07-14 14:08:25Z yura $
+ * @version $Id: _item_block.inc.php 7936 2015-01-09 12:54:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,7 +57,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		$Item->issue_time( array(
 				'before'      => T_('posted on '),
 				'after'       => ' ',
-				'time_format' => '#short_time',
+				'time_format' => 'M j, Y',
 			) );
 
 		// Author

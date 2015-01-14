@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7818 2014-12-15 14:41:11Z yura $
+ * @version $Id: _user.funcs.php 7964 2015-01-13 15:14:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -612,8 +612,8 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Logout');
-	if( $link_title == '#' ) $link_title = T_('Logout from your account');
+	if( $link_text == '' ) $link_text = T_('Log out');
+	if( $link_title == '#' ) $link_title = T_('Log out from your account');
 
 	$r = $before;
 	$r .= '<a href="'.get_user_logout_url().'"';
@@ -948,11 +948,12 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
  * @param integer User ID
  * @param string Name of user tab in backoffice ( values: profile, avatar, pwdchange, userprefs, advanced, admin, blogs,
  *               'userpage' to get url of frontoffice )
+ * @param integer|NULL Blog ID or NULL to use current blog
  * @return string Url
  */
-function get_user_identity_url( $user_ID, $user_tab = 'profile' )
+function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL )
 {
-	global $current_User, $Blog, $Settings;
+	global $current_User, $Settings;
 
 	if( $user_ID == NULL )
 	{
@@ -974,7 +975,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 
 	if( !is_logged_in() || $user_tab == 'userpage' )
 	{ // user is not logged in
-		return $User->get_userpage_url();
+		return $User->get_userpage_url( $blog_ID );
 	}
 
 	if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
@@ -989,12 +990,12 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 
 	if( !is_admin_page() )
 	{ // can't display the profile form, display the front office User form
-		return $User->get_userpage_url();
+		return $User->get_userpage_url( $blog_ID );
 	}
 
-	if( $current_User->check_status( 'can_access_admin' ) && ( ($current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
+	if( $current_User->check_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
 	{	// Go to backoffice profile:
-		return get_user_settings_url( $user_tab, $user_ID );
+		return get_user_settings_url( $user_tab, $user_ID, $blog_ID );
 	}
 
 	// can't show anything:
@@ -1049,20 +1050,61 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		$current_Blog = & $Blog;
 	}
 
+	if( empty( $current_Blog ) )
+	{ // Use base url when current blog is not defined yet
+		global $baseurl;
+		$blog_url = $baseurl;
+		$blog_exists = false;
+	}
+	else
+	{ // Use home page of the current blog
+		$blog_url = $current_Blog->gen_blogurl();
+		$blog_exists = true;
+	}
+
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
-		if( ( $current_User->ID != $user_ID ) && ( ! $current_User->check_perm( 'users', 'view' ) ) )
-		{
-			return NULL;
+		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
+		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
+		{ // Use blog url when user has no access to backoffice 
+			if( ! $blog_exists )
+			{ // Check if system has at least one blog
+				$BlogCache = & get_BlogCache();
+				$BlogCache->clear();
+				$blog_cache_SQL = $BlogCache->get_SQL_object();
+				$blog_cache_SQL->LIMIT( 1 );
+				$BlogCache->load_by_sql( $blog_cache_SQL );
+				if( count( $BlogCache->cache ) > 0 )
+				{
+					$blog_exists = true;
+					if( $current_Blog = & $BlogCache->get_next() )
+					{
+						$blog_url = $current_Blog->gen_blogurl();
+					}
+				}
+			}
+
+			if( $blog_exists )
+			{ // We should use blog url when at least one blog exist 
+				if( $is_admin_tab )
+				{ // Deny all admin tabs for such users
+					$user_tab = 'user';
+				}
+				return url_add_param( $blog_url, 'disp='.$user_tab );
+			}
+			else
+			{ // No blogs exist in system
+				return NULL;
+			}
 		}
 		if( ( $user_tab == 'admin' ) && ( $current_User->grp_ID != 1 ) )
-		{
+		{ // Only users of the first group can use the admin tab
 			$user_tab = 'profile';
 		}
 		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
 	}
 
-	return url_add_param( $current_Blog->gen_blogurl(), 'disp='.$user_tab );
+	return url_add_param( $blog_url, 'disp='.$user_tab );
 }
 
 
@@ -3470,22 +3512,33 @@ function get_user_quick_search_form( $params = array() )
 function display_voting_form( $params = array() )
 {
 	$params = array_merge( array(
-			'vote_type'             => 'link',
-			'vote_ID'               => 0,
-			'display_like'          => true,
-			'display_noopinion'     => true,
-			'display_dontlike'      => true,
-			'display_inappropriate' => true,
-			'display_spam'          => true,
-			'title_text'            => T_('My vote:'),
-			'title_like'            => T_('I like this picture'),
-			'title_like_voted'      => T_('You like this!'),
-			'title_noopinion'       => T_('I have no opinion'),
-			'title_noopinion_voted' => T_('You have no opinion on this.'),
-			'title_dontlike'        => T_('I don\'t like this picture'),
-			'title_dontlike_voted'  => T_('You don\'t like this.'),
-			'title_inappropriate'   => T_('I think the content of this picture is inappropriate'),
-			'title_spam'            => T_('I think this picture was posted by a spammer'),
+			'vote_type'              => 'link',
+			'vote_ID'                => 0,
+			'display_like'           => true,
+			'display_noopinion'      => true,
+			'display_dontlike'       => true,
+			'display_inappropriate'  => true,
+			'display_spam'           => true,
+			'title_text'             => T_('My vote:'),
+			'title_like'             => T_('I like this picture'),
+			'title_like_voted'       => T_('You like this!'),
+			'title_noopinion'        => T_('I have no opinion'),
+			'title_noopinion_voted'  => T_('You have no opinion on this.'),
+			'title_dontlike'         => T_('I don\'t like this picture'),
+			'title_dontlike_voted'   => T_('You don\'t like this.'),
+			'title_inappropriate'    => T_('I think the content of this picture is inappropriate'),
+			'title_spam'             => T_('I think this picture was posted by a spammer'),
+			// Number of votes
+			'display_numbers'        => false,
+			'msg_no_votes'           => T_('No likes yet'),
+			'msg_1_like'             => T_('1 person likes this'),
+			'msg_x_likes'            => T_('%d people like this'),
+			'msg_1_dislike'          => T_('1 person dislikes this'),
+			'msg_x_dislikes'         => T_('%d people dislike this'),
+			'msg_1_like_1_dislike'   => T_('1 like - 1 dislike'),
+			'msg_x_likes_1_dislike'  => T_('%d likes - 1 dislike'),
+			'msg_1_like_x_dislikes'  => T_('1 like - %d dislikes'),
+			'msg_x_likes_x_dislikes' => T_('%d likes - %d dislikes'),
 		), $params );
 
 	if( !is_logged_in() || empty( $params['vote_ID'] ) )
@@ -3493,7 +3546,7 @@ function display_voting_form( $params = array() )
 		return;
 	}
 
-	global $current_User, $DB;
+	global $current_User, $DB, $b2evo_icons_type, $blog;
 
 	$params_like = array(
 			'id' => 'votingLike',
@@ -3516,8 +3569,10 @@ function display_voting_form( $params = array() )
 			'title' => $params['title_spam']
 		);
 
+	$vote_numbers = '';
+
 	switch( $params['vote_type'] )
-	{	// Get a voting results for current user
+	{ // Get a voting results for current user
 		case 'link':
 			// Picture
 			$SQL = new SQL( 'Get file voting for current user' );
@@ -3528,6 +3583,59 @@ function display_voting_form( $params = array() )
 			$vote = $DB->get_row( $SQL->get() );
 
 			$params_spam['class'] = 'cboxCheckbox';
+
+			// Number of votes
+			if( $params['display_numbers'] )
+			{ // Calculate the numbers of votes for current link
+				$SQL = new SQL( 'Get number of votes for the link #'.$params['vote_ID'] );
+				$SQL->SELECT( 'SUM( IF( lvot_like = 1, 1, 0 ) ) AS num_likes, SUM( IF( lvot_like = -1, 1, 0 ) ) AS num_dislikes' );
+				$SQL->FROM( 'T_links__vote' );
+				$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $params['vote_ID'] ) );
+				$SQL->WHERE_and( 'lvot_like = "1" OR lvot_like = "-1"' );
+				$number_votes = $DB->get_row( $SQL->get() );
+
+				$num_likes = intval( $number_votes->num_likes );
+				$num_dislikes = intval( $number_votes->num_dislikes );
+
+				if( $num_likes == 0 && $num_dislikes == 0 )
+				{ // No votes
+					$vote_numbers = $params['msg_no_votes'];
+				}
+				elseif( $num_likes == 1 && $num_dislikes == 0 )
+				{ // Only 1 like
+					$vote_numbers = $params['msg_1_like'];
+				}
+				elseif( $num_likes > 1 && $num_dislikes == 0 )
+				{ // Only X likes
+					$vote_numbers = sprintf( $params['msg_x_likes'], $num_likes );
+				}
+				elseif( $num_likes == 0 && $num_dislikes == 1 )
+				{ // Only 1 dislike
+					$vote_numbers = $params['msg_1_dislike'];
+				}
+				elseif( $num_likes == 0 && $num_dislikes > 1 )
+				{ // Only X dislikes
+					$vote_numbers = sprintf( $params['msg_x_dislikes'], $num_dislikes );
+				}
+				elseif( $num_likes == 1 && $num_dislikes == 1 )
+				{ // 1 like and 1 dislike
+					$vote_numbers = $params['msg_1_like_1_dislike'];
+				}
+				elseif( $num_likes > 1 && $num_dislikes == 1 )
+				{ // X likes and 1 dislike
+					$vote_numbers = sprintf( $params['msg_x_likes_1_dislike'], $num_likes );
+				}
+				elseif( $num_likes == 1 && $num_dislikes > 1 )
+				{ // 1 like and X dislikes
+					$vote_numbers = sprintf( $params['msg_1_like_x_dislikes'], $num_dislikes );
+				}
+				elseif( $num_likes > 1 && $num_dislikes > 1 )
+				{ // X likes and X dislike
+					$vote_numbers = sprintf( $params['msg_x_likes_x_dislikes'], $num_likes, $num_dislikes );
+				}
+
+				$vote_numbers .= empty( $vote_numbers ) ? '' : ' - ';
+			}
 
 			break;
 
@@ -3604,10 +3712,13 @@ function display_voting_form( $params = array() )
 		}
 	}
 
-	echo '<span class="vote_title">'.$params['title_text'].'</span>';
+	echo '<span class="vote_title">'.$vote_numbers.$params['title_text'].'</span>';
 
+	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled
-	$url = get_secure_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].'&'.url_crumb( 'voting' );
+	$url = get_secure_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
+	// Save action url here in order to have new crumb on every voting form loading
+	echo '<input type="hidden" id="voting_action" value="'.$url.'&b2evo_icons_type='.$b2evo_icons_type.'" />';
 	$redirect_to = regenerate_url();
 	if( strpos( $redirect_to, 'async.php' ) === false )
 	{	// Append a redirect param
@@ -3889,6 +4000,7 @@ echo_modalwindow_js();
 		{
 			user_tab_from = 'avatar';
 		}
+		var window_width = jQuery( window ).width();
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 			'auto', '',
 			true,
@@ -3903,6 +4015,8 @@ echo_modalwindow_js();
 				<?php echo $ajax_params; ?>
 				'user_ID': user_ID,
 				'file_ID': file_ID,
+				'window_width'  : Math.round( window_width > 790 ? ( window_width * 0.9 - 128 ): window_width ),
+				'window_height' : Math.round( jQuery( window ).height() * 0.8 ),
 				'display_mode': 'js',
 				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 			},

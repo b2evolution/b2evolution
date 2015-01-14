@@ -21,7 +21,7 @@
  *
  * @package evocore
  *
- * @version $Id: anon_async.php 7707 2014-11-28 12:44:38Z yura $
+ * @version $Id: anon_async.php 7908 2014-12-26 14:58:07Z yura $
  */
 
 
@@ -368,15 +368,19 @@ switch( $action )
 	case 'voting':
 		// Actions for voting by AJAX
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'voting' );
-
 		if( !is_logged_in( false ) )
 		{ // Only active logged in users can vote
 			break;
 		}
 
 		param( 'vote_action', 'string', '' );
+
+		if( !empty( $vote_action ) )
+		{ // Use crumb checking only for actions
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'voting' );
+		}
+
 		param( 'vote_type', 'string', '' );
 		param( 'vote_ID', 'string', 0 );
 		param( 'checked', 'integer', 0 );
@@ -432,6 +436,21 @@ switch( $action )
 				if( empty( $vote_action ) || in_array( $vote_action, array( 'like', 'noopinion', 'dontlike' ) ) )
 				{ // Display a voting form if no action
 					// or Refresh a voting form only for these actions (in order to disable icons)
+					if( ! empty( $blog_ID ) )
+					{ // If blog is defined we should check if we can display info about number of votes
+						$BlogCache = & get_BlogCache();
+						if( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) &&
+						    $blog_skin_ID = $Blog->get_skin_ID() )
+						{
+							$LinkOwner = & $Link->get_LinkOwner();
+							$SkinCache = & get_SkinCache();
+							if( $Skin = & $SkinCache->get_by_ID( $blog_skin_ID, false, false ) &&
+							    $Skin->get_setting( 'colorbox_vote_'.$LinkOwner->get( 'name' ).'_numbers' ) )
+							{ // Display number of votes for current link type if it is enabled by blog skin
+								$voting_form_params['display_numbers'] = true;
+							}
+						}
+					}
 					display_voting_form( $voting_form_params );
 				}
 				break;
@@ -1155,6 +1174,9 @@ switch( $action )
 
 		$display_mode = 'js';
 		$form_action = get_secure_htsrv_url().'profile_update.php';
+
+		$window_width = param( 'window_width', 'integer' );
+		$window_height = param( 'window_height', 'integer' );
 
 		require $inc_path.'users/views/_user_crop.form.php';
 		break;

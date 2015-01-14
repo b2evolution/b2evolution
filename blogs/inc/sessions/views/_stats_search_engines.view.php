@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_search_engines.view.php 7975 2015-01-14 08:24:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,10 +34,10 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $blog, $admin_url, $rsc_url;
 
 
-// TOP REFERING SEARCH ENGINES
+// TOP REFERRING SEARCH ENGINES
 ?>
 
-<h3><?php echo T_('Top refering search engines').get_manual_link( 'top-refering-search-engines' ) ?></h3>
+<h3><?php echo T_('Top referring search engines').get_manual_link( 'top-referring-search-engines' ) ?></h3>
 
 <?php
 global $res_stats, $row_stats;

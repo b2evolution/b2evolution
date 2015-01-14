@@ -9,9 +9,12 @@
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
+ * @subpackage photoalbums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $Skin;
 
 // Default params:
 $params = array_merge( array(
@@ -37,9 +40,12 @@ $Comment = & $params['Comment'];
 <?php
 	$Comment->anchor();
 	echo $params['comment_start'];
-	if( $Comment->status != 'published' )
-	{
-		$Comment->status( 'styled' );
+	if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
+	{ // Don't display status for previewed comments
+		$Comment->status( 'styled', array(
+				'before' => '<div class="comment_status">',
+				'after'  => '</div>',
+			) );
 	}
 ?>
 	<div class="bCommentTitle">
@@ -47,18 +53,9 @@ $Comment = & $params['Comment'];
 		switch( $Comment->get( 'type' ) )
 		{
 			case 'comment': // Display a comment:
-				if( empty($Comment->ID) )
-				{	// PREVIEW comment
-					echo T_('PREVIEW Comment from:').' ';
-				}
-				else
-				{	// Normal comment
-					$Comment->permanent_link( array(
-							'before'    => '',
-							'after'     => ' '.T_('from:').' ',
-							'text'      => T_('Comment'),
-							'nofollow'  => true,
-						) );
+				if( empty( $Comment->ID ) )
+				{ // PREVIEW comment
+					echo T_('PREVIEW Comment from:').'<br />';
 				}
 				$Comment->author2( array(
 						'before'       => ' ',
@@ -77,33 +74,16 @@ $Comment = & $params['Comment'];
 				break;
 
 			case 'trackback': // Display a trackback:
-				$Comment->permanent_link( array(
-						'before'    => '',
-						'after'     => ' '.T_('from:').' ',
-						'text' 			=> T_('Trackback'),
-						'nofollow'	=> true,
-					) );
-				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
-				break;
-
 			case 'pingback': // Display a pingback:
-				$Comment->permanent_link( array(
-						'before'    => '',
-						'after'     => ' '.T_('from:').' ',
-						'text' 			=> T_('Pingback'),
-						'nofollow'	=> true,
-					) );
 				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 				break;
 		}
 	?>
 	</div>
-	<?php
-	$Comment->rating();
-	?>
 	<div class="bCommentText">
 		<?php
 			$Comment->avatar();
+			$Comment->rating();
 			$Comment->content( 'htmlbody', false, true, $params );
 		?>
 	</div>
@@ -112,11 +92,25 @@ $Comment = & $params['Comment'];
 			$commented_Item = & $Comment->get_Item();
 			$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
 			$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
-		?>
 
-		<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
-		<?php $Comment->reply_link(); /* Link for replying to the Comment */ ?>
-		<?php $Comment->vote_helpful( '', '', '&amp;', true, true );?>
+			if( ! empty( $Comment->ID ) )
+			{ // Get comment permanent url
+				$comment_permanent_url = $Comment->get_permanent_url();
+			}
+
+			if( ! empty( $comment_permanent_url ) )
+			{ // Use a linked date/time if it is available
+				echo '<a href="'.$comment_permanent_url.'" class="datetime">';
+			}
+			$Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
+			if( ! empty( $comment_permanent_url ) )
+			{ // Use a linked date/time if it is available
+				echo '</a>';
+			}
+
+			$Comment->reply_link(); /* Link for replying to the Comment */
+			$Comment->vote_helpful( '', '', '&amp;', true, true );
+		?>
 	</div>
 <?php
 	echo $params['comment_end'];

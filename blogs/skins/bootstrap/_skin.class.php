@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage bootstrap
  *
- * @version $Id: _skin.class.php 7498 2014-10-23 07:38:52Z yura $
+ * @version $Id: _skin.class.php 7894 2014-12-25 12:23:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -59,15 +59,33 @@ class bootstrap_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'colorbox_vote_post_numbers' => array(
+					'label' => T_('Display Votes'),
+					'note' => T_('Check to display number of likes and dislikes'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'colorbox_vote_comment' => array(
 					'label' => T_('Voting on Comment Images'),
 					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'colorbox_vote_comment_numbers' => array(
+					'label' => T_('Display Votes'),
+					'note' => T_('Check to display number of likes and dislikes'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'colorbox_vote_user' => array(
 					'label' => T_('Voting on User Images'),
 					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+				'colorbox_vote_user_numbers' => array(
+					'label' => T_('Display Votes'),
+					'note' => T_('Check to display number of likes and dislikes'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),

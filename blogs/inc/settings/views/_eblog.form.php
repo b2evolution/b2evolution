@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _eblog.form.php 6456 2014-04-13 10:52:48Z manuel $
+ * @version $Id: _eblog.form.php 7952 2015-01-12 16:28:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,8 +48,7 @@ $Form->begin_fieldset( T_('Test saved settings') );
 		echo '<div style="margin-top:25px"></div>';
 		if( $action == 'test_2' )
 		{
-			echo '<div class="red center">'.T_('This is just a test run. Nothing will be posted to the database nor
- will your inbox be altered').'</div>';
+			echo '<div class="red center">'.T_('This is just a test run. Nothing will be posted to the database nor will your inbox be altered').'</div>';
 		}
 		// Display scrollable div
 		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$eblog_test_output.'</div>';

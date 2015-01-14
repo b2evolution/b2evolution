@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _hitlist.class.php 7958 2015-01-13 08:02:21Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -137,13 +137,27 @@ class Hitlist
 				);
 		}
 
+		// Get tables info
+		global $db_config;
+		$tables = array();
+		$tables_info = $DB->get_results( 'SHOW TABLE STATUS WHERE Name IN ( '.$DB->quote( array( 'T_hitlog', 'T_sessions', 'T_basedomains' ) ).' )' );
+		foreach( $tables_info as $table_info )
+		{
+			$tables[ $table_info->Name ] = array(
+					'type' => $table_info->Engine,
+					'rows' => $table_info->Rows
+				);
+		}
+
 		// Init Timer for hitlist
-		// Note: Don't use a global $Timer because it works only in debug mode
+		// Note: Don't use global $Timer because it works only in debug mode
 		load_class( '_core/model/_timer.class.php', 'Timer' );
 		$hitlist_Timer = new Timer( 'prune_hits' );
 
 		$time_prune_before = ( $localtimenow - ( $Settings->get( 'auto_prune_stats' ) * 86400 ) ); // 1 day = 86400 seconds
 
+
+		// PRUNE HITLOG:
 		$hitlist_Timer->start( 'hitlog' );
 		$hitlog_rows_affected = $DB->query( "
 			DELETE FROM T_hitlog
@@ -151,21 +165,28 @@ class Hitlist
 		$hitlist_Timer->stop( 'hitlog' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$hitlog_rows_affected.' rows from T_hitlog.', 'request' );
 
+
+		// PREPARE PRUNING SESSIONS: 
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
+		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
+		// So if session timeout is really long (2 years for example), the sessions table won't be pruned as small as expected from the pruning delay.
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
+
 		// allow plugins to prune session based data
 		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
 
+		// PRUNE SESSIONS:
 		$hitlist_Timer->start( 'sessions' );
 		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $smaller_time ) ), 'Autoprune sessions' );
 		$hitlist_Timer->stop( 'sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
 
+
+		// PRUNE BASEDOMAINS:
 		// Prune non-referrered basedomains (where the according hits got deleted)
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
 		//     info is useful when we get hit again.
-		// Note: MySQL server version >= 4 is required for multi-table deletes, but v 4.1 is now a requirement for b2evolution:
 		$hitlist_Timer->start( 'basedomains' );
 		$basedomains_rows_affected = $DB->query( "
 			DELETE T_basedomains
@@ -176,12 +197,20 @@ class Hitlist
 		$hitlist_Timer->stop( 'basedomains' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$basedomains_rows_affected.' rows from T_basedomains.', 'request' );
 
-		// Optimizing tables
-		$hitlist_Timer->start( 'optimize' );
+
+		// OPTIMIZE TABLES:
+		$hitlist_Timer->start( 'optimize_hitlog' );
 		$DB->query('OPTIMIZE TABLE T_hitlog');
+		$hitlist_Timer->stop( 'optimize_hitlog' );
+
+		$hitlist_Timer->start( 'optimize_sessions' );
 		$DB->query('OPTIMIZE TABLE T_sessions');
+		$hitlist_Timer->stop( 'optimize_sessions' );
+
+		$hitlist_Timer->start( 'optimize_basedomains' );
 		$DB->query('OPTIMIZE TABLE T_basedomains');
-		$hitlist_Timer->stop( 'optimize' );
+		$hitlist_Timer->stop( 'optimize_basedomains' );
+
 
 		// Stop total hitlist timer
 		$hitlist_Timer->stop( 'prune_hits' );
@@ -192,12 +221,30 @@ class Hitlist
 		$Messages->add( T_('The old hits & sessions have been pruned.'), 'success' );
 		return array(
 				'result'  => 'ok',
-				'message' => T_('The following data have been autopruned:')."\n"
-					.sprintf( T_( '%s rows from T_hitlog, Execution time: %s seconds' ), $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"
-					.sprintf( T_( '%s rows from T_sessions, Execution time: %s seconds' ), $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) )."\n"
-					.sprintf( T_( '%s rows from T_basedomains, Execution time: %s seconds' ), $basedomains_rows_affected, $hitlist_Timer->get_duration( 'basedomains' ) )."\n"
-					.sprintf( T_( 'Execution time for tables optimizing: %s seconds' ), $hitlist_Timer->get_duration( 'optimize' ) )."\n"
-					.sprintf( T_( 'Total execution time: %s seconds' ), $hitlist_Timer->get_duration( 'prune_hits' ) )
+				// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
+				'message' =>
+					'STATUS:'."\n"
+					.sprintf( 'T_hitlog: %s - %s rows',
+						$tables[ $db_config['aliases']['T_hitlog'] ]['type'],
+						$tables[ $db_config['aliases']['T_hitlog'] ]['rows'] )."\n"
+					.sprintf( 'T_sessions: %s - %s rows',
+						$tables[ $db_config['aliases']['T_sessions'] ]['type'],
+						$tables[ $db_config['aliases']['T_sessions'] ]['rows'] )."\n"
+					.sprintf( 'T_basedomains: %s - %s rows',
+						$tables[ $db_config['aliases']['T_basedomains'] ]['type'],
+						$tables[ $db_config['aliases']['T_basedomains'] ]['rows'] )."\n"
+					."\n"
+					.'PRUNING:'."\n"
+					.sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"
+					.sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) )."\n"
+					.sprintf( '%s rows from T_basedomains, Execution time: %s seconds', $basedomains_rows_affected, $hitlist_Timer->get_duration( 'basedomains' ) )."\n"
+					."\n"
+					.'OPTIMIZING:'."\n"
+					.sprintf( 'T_hitlog: %s seconds', $hitlist_Timer->get_duration( 'optimize_hitlog' ) )."\n"
+					.sprintf( 'T_sessions: %s seconds', $hitlist_Timer->get_duration( 'optimize_sessions' ) )."\n"
+					.sprintf( 'T_basedomains: %s seconds', $hitlist_Timer->get_duration( 'optimize_basedomains' ) )."\n"
+					."\n"
+					.sprintf( 'Total execution time: %s seconds', $hitlist_Timer->get_duration( 'prune_hits' ) )
 			);
 	}
 }

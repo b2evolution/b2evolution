@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: campaigns.ctrl.php 7825 2014-12-16 16:32:09Z yura $
+ * @version $Id: campaigns.ctrl.php 7827 2014-12-17 07:04:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -361,7 +361,7 @@ switch( $action )
 			case 'html':
 				if( $edited_EmailCampaign->get( 'email_html' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_html', '<p>This is our newsletter...</p>' );
+					$edited_EmailCampaign->set( 'email_html', '<p>Hello $login$ !</p>'."\r\n\r\n".'<p>This is our newsletter...</p>' );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_html.form.php' );
 				break;

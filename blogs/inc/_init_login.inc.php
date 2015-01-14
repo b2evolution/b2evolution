@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_login.inc.php 7207 2014-08-04 07:58:23Z yura $
+ * @version $Id: _init_login.inc.php 7944 2015-01-12 05:39:08Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -280,7 +280,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 			if( empty( $current_User->salt ) )
 			{
-				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
+				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>. This will allow to re-encrypt your password in our database in a more secure way.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
 			}
 
 			$current_user_locale = $current_User->get( 'locale' );
@@ -291,7 +291,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				{ // Update user locale to the default, and add warning message about the update
 					$current_User->set( 'locale', $def_locale );
 					$current_User->dbupdate();
-					$Messages->add( T_('Your locale was invalid, now it was automitcally updated to the default locale.'), 'warning' );
+					$Messages->add( T_('Your preferred language/locale is no longer available on this site. You are now using the default language/locale.'), 'warning' );
 				}
 			}
 

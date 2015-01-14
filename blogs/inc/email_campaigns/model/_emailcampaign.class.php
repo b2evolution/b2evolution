@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _emailcampaign.class.php 7825 2014-12-16 16:32:09Z yura $
+ * @version $Id: _emailcampaign.class.php 7827 2014-12-17 07:04:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -293,18 +293,28 @@ class EmailCampaign extends DataObject
 	function send_email( $user_ID, $email_address = '', $mode = '' )
 	{
 		$newsletter_params = array(
-				'message_html' => $this->get( 'email_html' ),
-				'message_text' => $this->get( 'email_text' ),
+				'include_greeting' => false,
+				'message_html'     => $this->get( 'email_html' ),
+				'message_text'     => $this->get( 'email_text' ),
 			);
 
 		if( $mode == 'test' )
 		{ // Send a test newsletter
-			$template_params['boundary'] = 'b2evo-'.md5( rand() );
-			$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
-			$message = mail_template( 'newsletter', 'auto', $template_params );
-			$message = str_replace( '$login$', $email_address, $message );
+			global $current_User;
 
-			return send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+			$newsletter_params['boundary'] = 'b2evo-'.md5( rand() );
+			$headers = array( 'Content-Type' => 'multipart/mixed; boundary="'.$newsletter_params['boundary'].'"' );
+
+			$UserCache = & get_UserCache();
+			if( $test_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+			{ // Send a test email only when test user exists
+				$message = mail_template( 'newsletter', 'auto', $newsletter_params, $test_User );
+				return send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+			}
+			else
+			{ // No test user found
+				return false;
+			}
 		}
 		else
 		{ // Send a newsletter to real user

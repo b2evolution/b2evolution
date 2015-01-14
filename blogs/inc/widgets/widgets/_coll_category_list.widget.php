@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_category_list.widget.php 7821 2014-12-16 10:17:27Z yura $
+ * @version $Id: _coll_category_list.widget.php 7867 2014-12-22 07:59:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,6 +129,13 @@ class coll_category_list_Widget extends ComponentWidget
 					'label' => T_('Exclude categories'),
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
 				),
+			'start_level' => array(
+					'type' => 'text',
+					'label' => T_('Start level'),
+					'note' => '',
+					'defaultvalue' => 1,
+					'size' => 2,
+				),
 			'level' => array(
 					'type' => 'text',
 					'label' => T_('Recurse'),
@@ -147,6 +154,12 @@ class coll_category_list_Widget extends ComponentWidget
 					'label' => '',
 					'defaultvalue' => 1,
 					'note' => T_('Mark descendants (children of first selected cat)'),
+				),
+			'mark_parents' => array(
+					'type' => 'checkbox',
+					'label' => '',
+					'defaultvalue' => 1,
+					'note' => T_('Mark ancestors (ancestors of highest level cat)'),
 				),
 
 			// Hidden, used by the item list sidebar in the backoffice.
@@ -224,13 +237,21 @@ class coll_category_list_Widget extends ComponentWidget
 			echo '<form method="get" action="'.$Blog->gen_blogurl().'">';
 		}
 
+		// Set depth level
+		$depth_level = intval( $this->disp_params['level'] );
+		$start_level = intval( $this->disp_params['start_level'] );
+		if( $depth_level > 0 )
+		{ // Don't limit if depth is null
+			$depth_level += $start_level > 1 ? $start_level - 1 : 0;
+		}
+
 		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 		if( empty($aggregate_coll_IDs) )
 		{ // ____________________ We want to display cats for ONE blog ____________________
 			$tmp_disp = '';
 
-			if( $this->disp_params['option_all'] )
-			{	// We want to display a link to all cats:
+			if( $this->disp_params['option_all'] && intval( $this->disp_params['start_level'] ) < 2 )
+			{ // We want to display a link to all cats:
 				$tmp_disp .= $this->add_cat_class_attr( $this->disp_params['item_start'], 'all' );
 				$tmp_disp .= '<a href="';
 				if( $this->disp_params['link_type'] == 'context' )
@@ -245,7 +266,7 @@ class coll_category_list_Widget extends ComponentWidget
 				$tmp_disp .= $this->disp_params['item_end'];
 			}
 
-			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID, NULL, 0, intval( $this->disp_params['level'] ) );
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID, NULL, 0, $depth_level );
 
 			if( ! empty($r) )
 			{
@@ -302,7 +323,7 @@ class coll_category_list_Widget extends ComponentWidget
 					echo $this->disp_params['coll_end'];
 				}
 
-				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID );
+				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID, NULL, 0, $depth_level );
 
 				if( ! empty($r) )
 				{
@@ -389,26 +410,61 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 
 		// ID of the current selected category
-		$selected_cat = isset( $cat_array[0] ) ? $cat_array[0] : 0;
+		$first_selected_cat_ID = isset( $cat_array[0] ) ? $cat_array[0] : 0;
 
-		$first_parent_cat_ID = 0;
-		if( ! $this->disp_params['mark_children'] && // Don't find the first parent category because it is selected with children categories together
-		    $this->disp_params['mark_first_selected'] && $selected_cat )
-		{ // Try to find first/root parent category in order to select it because of widget setting is enabled
-			$ChapterCache = & get_ChapterCache();
-			$parent_Chapter = & $ChapterCache->get_by_ID( $selected_cat, false, false );
-			while( $parent_Chapter !== NULL )
-			{ // Go up to the first/root category
-				if( $parent_Chapter = & $parent_Chapter->get_parent_Chapter() )
-				{
-					$first_parent_cat_ID = $parent_Chapter->ID;
+		//if( $this->disp_params['mark_parents'] && ! isset( $this->current_parents ) )
+		if( ! isset( $this->current_parents ) )
+		{ // Try to find the parent categories in order to select it because of widget setting is enabled
+			$this->current_all_cats = array(); // All children of the root parent of the selcted category
+			$this->current_parents = array(); // All parents of the selected category
+			$this->current_selected_level = 0; // Level of the selected category
+			if( $first_selected_cat_ID > 0 )
+			{
+				$this->current_selected_level++;
+				$ChapterCache = & get_ChapterCache();
+				$parent_Chapter = & $ChapterCache->get_by_ID( $first_selected_cat_ID, false, false );
+
+				while( $parent_Chapter !== NULL )
+				{ // Go up to the first/root category
+					$root_parent_ID = $parent_Chapter->ID;
+					if( $parent_Chapter = & $parent_Chapter->get_parent_Chapter() )
+					{
+						$this->current_parents[] = $parent_Chapter->ID;
+						$this->current_all_cats[] = $parent_Chapter->ID;
+						$this->current_selected_level++;
+					}
 				}
+
+				// Load all categories of the current selected path (these categories should be visible on page)
+				$this->current_all_cats = $cat_array;
+				$this->load_category_children( $root_parent_ID, $this->current_all_cats, $this->current_parents );
 			}
 		}
 
-		if( $Chapter->ID == $selected_cat || // Current category
-		    $Chapter->ID == $first_parent_cat_ID || // First parent category that should be selected because of widget setting
-		    ( $this->disp_params['mark_children'] && in_array( $Chapter->ID, $cat_array ) ) ) // Select all children of the current category because of widget setting
+		$parent_cat_is_visible = $this->parent_cat_is_visible;
+		$start_level = intval( $this->disp_params['start_level'] );
+		if( $start_level > 1 &&
+		    ( $start_level > $level + 1 ||
+		      ( ! in_array( $Chapter->ID, $this->current_all_cats ) && ! $this->parent_cat_is_visible ) ||
+		      ( $this->current_selected_level < $level && ! $this->parent_cat_is_visible )
+		    ) )
+		{ // Don't show this item because of level restriction
+			$this->parent_cat_is_visible = false;
+			//return '<span style="font-size:10px">hidden: ('.$level.'|'.$this->current_selected_level.')</span>';
+			return '';
+		}
+		elseif( ! isset( $this->current_cat_level ) )
+		{ // Save level of the current selected category
+			$this->current_cat_level = $level;
+			$this->parent_cat_is_visible = true;
+		}
+
+		if( // First category that should be selected:
+		    ( $this->disp_params['mark_first_selected'] && $Chapter->ID == $first_selected_cat_ID ) ||
+		    // OR Select only children of the current category(don't select parent category):
+		    ( $this->disp_params['mark_children'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $cat_array ) ) ||
+		    // OR Select only parents of the current category(don't select current category):
+		    ( $this->disp_params['mark_parents'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $this->current_parents ) ) )
 		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
 		}
@@ -426,6 +482,12 @@ class coll_category_list_Widget extends ComponentWidget
 			$start_tag = $this->add_cat_class_attr( $start_tag, 'meta' );
 		}
 
+		/*$r = $start_tag.'<span style="font-size:10px">visible: (level='.$level
+			.'|visible_level='.$this->visible_level
+			.'|cats='.implode( ',', $this->current_all_cats )
+			.'|cond='.intval( $start_level > $level + 1 ).','
+							 .intval( ! in_array( $Chapter->ID, $this->current_all_cats ) ).','
+							 .intval( $this->current_selected_level < $level && ! $parent_cat_is_visible ).')</span>';*/
 		$r = $start_tag;
 
 		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
@@ -483,6 +545,16 @@ class coll_category_list_Widget extends ComponentWidget
 	 */
 	function cat_no_children( $Chapter, $level )
 	{
+		$start_level = intval( $this->disp_params['start_level'] );
+		if( $start_level > 1 &&
+		    ( $start_level > $level + 1 ||
+		      ( ! in_array( $Chapter->ID, $this->current_all_cats ) && ! $this->parent_cat_is_visible ) ||
+		      ( $this->current_selected_level < $level && ! $this->parent_cat_is_visible )
+		    ) )
+		{ // Don't show this item because of level restriction
+			return;
+		}
+
 		// End current line:
 		return $this->disp_params['item_end'];
 	}
@@ -496,12 +568,16 @@ class coll_category_list_Widget extends ComponentWidget
 	 */
 	function cat_before_level( $level )
 	{
-		$r = '';
-		if( $level > 0 )
-		{	// If this is not the root:
-			$r .= $this->disp_params['group_start'];
+		$start_level = intval( $this->disp_params['start_level'] );
+		if( $start_level > 1 && $this->current_cat_level >= $level )
+		{ // Don't show a start of group because of level restriction
+			return;
 		}
-		return $r;
+
+		if( $level > 0 )
+		{ // If this is not the root:
+			return $this->disp_params['group_start'];
+		}
 	}
 
 
@@ -513,14 +589,18 @@ class coll_category_list_Widget extends ComponentWidget
 	 */
 	function cat_after_level( $level )
 	{
-		$r = '';
-		if( $level > 0 )
-		{	// If this is not the root:
-			$r .= $this->disp_params['group_end'];
-			// End current (parent) line:
-			$r .= $this->disp_params['item_end'];
+		$start_level = intval( $this->disp_params['start_level'] );
+		if( $start_level > 1 && $this->current_cat_level >= $level )
+		{ // Don't show a start of group because of level restriction
+			return;
 		}
-		return $r;
+
+		if( $level > 0 )
+		{ // If this is not the root:
+			return $this->disp_params['group_end']
+				// End current (parent) line:
+				.$this->disp_params['item_end'];
+		}
 	}
 
 
@@ -540,6 +620,36 @@ class coll_category_list_Widget extends ComponentWidget
 		else
 		{ // Add new attribute for meta class
 			return preg_replace( '/^<([^\s>]+)/', '<$1 class="'.$class_name.'"', $start_tag );
+		}
+	}
+
+
+	/**
+	 * Load the children with restriction by level depth first level
+	 *
+	 * @param integer Parent category ID
+	 * @param array Array with children categories that modified by reference
+	 * @param array We should load children only of these categories (these parents is the selected path)
+	 */
+	function load_category_children( $cat_ID, & $cats, $allowed_parents = array() )
+	{
+		global $DB;
+
+		// Try to get all children of the given category
+		$SQL = new SQL();
+		$SQL->SELECT( 'cat_ID' );
+		$SQL->FROM( 'T_categories' );
+		$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $cat_ID ) );
+
+		$category_children = $DB->get_col( $SQL->get() );
+
+		foreach( $category_children as $category_child_ID )
+		{
+			$cats[] = $category_child_ID;
+			if( in_array( $category_child_ID, $allowed_parents ) )
+			{ // Load children if it is not restricted by level depth
+				$this->load_category_children( $category_child_ID, $cats, $allowed_parents );
+			}
 		}
 	}
 }

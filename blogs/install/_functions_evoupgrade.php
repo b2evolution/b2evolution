@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 7752 2014-12-04 12:44:33Z yura $
+ * @version $Id: _functions_evoupgrade.php 7919 2014-12-30 18:48:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -5354,7 +5354,33 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		//set_upgrade_checkpoint( '11320' );
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		set_upgrade_checkpoint( '11320' );
+	}
+
+	if( $old_db_version < 11330 )
+	{ // part 18.b trunk aka 4th part of "i7"
+
+		task_begin( 'Upgrade table blogs... ' );
+		$DB->query( 'ALTER TABLE T_blogs
+			MODIFY blog_in_bloglist ENUM( "public", "logged", "member", "never" ) NOT NULL DEFAULT "public"' );
+		$DB->query( 'UPDATE T_blogs
+			  SET blog_in_bloglist = "never"
+			WHERE blog_in_bloglist = ""' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		//set_upgrade_checkpoint( '11330' );
 	}
 
 	/*

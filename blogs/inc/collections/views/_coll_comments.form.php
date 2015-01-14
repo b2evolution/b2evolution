@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id: _coll_comments.form.php 7423 2014-10-14 07:52:43Z yura $
+ * @version $Id: _coll_comments.form.php 7839 2014-12-18 11:16:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -158,13 +158,15 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Voting options') . get_manual_link('comment-voting-options'), array( 'class' => 'feedback_details_container' ) );
 
+	$Form->checkbox( 'display_rating_summary', $edited_Blog->get_setting( 'display_rating_summary' ), T_('Display summary'), T_('Display a summary of ratings above the comments') );
+
 	$Form->radio( 'allow_rating_items', $edited_Blog->get_setting( 'allow_rating_items' ),
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow star ratings from'), true );
 
 	$Form->textarea_input( 'rating_question', $edited_Blog->get_setting( 'rating_question' ), 3, T_('Star rating question') );
 
-	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_("Allow users to say if a comment was helpful or not.") );
+	$Form->checkbox( 'allow_rating_comment_helpfulness', $edited_Blog->get_setting( 'allow_rating_comment_helpfulness' ), T_('Allow helpful/not helpful'), T_('Allow users to say if a comment was helpful or not.') );
 
 $Form->end_fieldset();
 

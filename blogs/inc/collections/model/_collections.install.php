@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * @version $Id: _collections.install.php 6920 2014-06-18 07:04:30Z yura $
+ * @version $Id: _collections.install.php 7919 2014-12-30 18:48:02Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -63,7 +63,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
-			blog_in_bloglist     TINYINT(1) NOT NULL DEFAULT 1,
+			blog_in_bloglist     ENUM( 'public', 'logged', 'member', 'never' ) NOT NULL DEFAULT 'public',
 			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
 			blog_media_location  ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_general_ci DEFAULT 'default' NOT NULL,
 			blog_media_subdir    VARCHAR( 255 ) NULL,

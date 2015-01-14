@@ -31,7 +31,7 @@
  * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
  * @todo Currently if you change the name of a blog it gets not reflected in the blog list buttons!
  *
- * @version $Id$
+ * @version $Id: coll_settings.ctrl.php 7944 2015-01-12 05:39:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -319,11 +319,6 @@ switch( $action )
 		$setting = param( 'setting', 'string', '' );
 		switch( $setting )
 		{
-			case 'plist':
-				// Blog in public list
-				$setting_name = 'in_bloglist';
-				break;
-
 			case 'fav':
 				// Favorite Blog
 				$setting_name = 'favorite';
@@ -339,7 +334,7 @@ switch( $action )
 		$edited_Blog->set( $setting_name, $setting_value );
 		$edited_Blog->dbupdate();
 
-		$Messages->add( T_('The blog setting has been updated'), 'success' );
+		$Messages->add( T_('The blog setting has been updated.'), 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $update_redirect_url, 303 ); // Will EXIT
 

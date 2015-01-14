@@ -31,7 +31,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _genericcategorycache.class.php 7776 2014-12-08 13:42:00Z yura $
+ * @version $Id: _genericcategorycache.class.php 7842 2014-12-18 16:50:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -323,15 +323,6 @@ class GenericCategoryCache extends GenericCache
 
 		$r = '';
 
-		if( is_array( $callbacks['before_level'] ) )
-		{ // object callback:
-			$r .= $callbacks['before_level'][0]->{$callbacks['before_level'][1]}( $level ); // <ul>
-		}
-		else
-		{
-			$r .= $callbacks['before_level']( $level ); // <ul>
-		}
-
 		foreach( $cat_array as $cat )
 		{
 			if( is_array( $callbacks['line'] ) )
@@ -355,7 +346,6 @@ class GenericCategoryCache extends GenericCache
 			{
 				$r .= $callbacks['no_children']( $cat, $level ); // </li>
 			}
-
 		}
 
 		if( !empty( $cat->parent_ID ) && !empty( $callbacks['posts'] ) )
@@ -370,13 +360,28 @@ class GenericCategoryCache extends GenericCache
 			}
 		}
 
-		if( is_array( $callbacks['after_level'] ) )
-		{ // object callback:
-			$r .= $callbacks['after_level'][0]->{$callbacks['after_level'][1]}( $level ); // </ul>
-		}
-		else
+		if( ! empty( $r ) )
 		{
-			$r .= $callbacks['after_level']( $level ); // </ul>
+			$r_before = '';
+			if( is_array( $callbacks['before_level'] ) )
+			{ // object callback:
+				$r_before .= $callbacks['before_level'][0]->{$callbacks['before_level'][1]}( $level ); // <ul>
+			}
+			else
+			{
+				$r_before .= $callbacks['before_level']( $level ); // <ul>
+			}
+
+			$r = $r_before.$r;
+
+			if( is_array( $callbacks['after_level'] ) )
+			{ // object callback:
+				$r .= $callbacks['after_level'][0]->{$callbacks['after_level'][1]}( $level ); // </ul>
+			}
+			else
+			{
+				$r .= $callbacks['after_level']( $level ); // </ul>
+			}
 		}
 
 		return $r;

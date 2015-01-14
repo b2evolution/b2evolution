@@ -38,6 +38,9 @@ div.filters {
 div.filters form {
 	min-height: 22px;
 }
+div.filters .field_error {
+	display: inline;
+}
 a.filters_title {
 	text-decoration:none;
 }

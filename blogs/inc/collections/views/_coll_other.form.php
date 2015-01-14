@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id: _coll_other.form.php 6461 2014-04-14 11:13:25Z yura $
+ * @version $Id: _coll_other.form.php 7987 2015-01-14 18:44:48Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,10 +48,6 @@ $Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other
 	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('List of public blogs').get_manual_link( 'public-blogs-other' ) );
-	$Form->checkbox( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ), T_('Include in public blog list'), T_('Check this if you want this blog to be advertised in the list of all public blogs on this system.') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Tracking').get_manual_link( 'tracking-other' ) );
@@ -92,7 +88,7 @@ $Form->begin_fieldset( T_('Archives').get_manual_link( 'archives-other' ) );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Download display').get_manual_link( 'download-display-other' ) );
+$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-other' ) );
 	$Form->text_input( 'download_delay', $edited_Blog->get_setting( 'download_delay' ), 2, T_('Download delay') );
 $Form->end_fieldset();
 

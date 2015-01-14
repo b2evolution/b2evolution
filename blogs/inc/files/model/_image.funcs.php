@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _image.funcs.php 7702 2014-11-26 17:32:42Z yura $
+ * @version $Id: _image.funcs.php 7910 2014-12-29 08:55:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -481,9 +481,11 @@ function rotate_image( $File, $degrees )
  * @param integer Y coordinate (in percents)
  * @param integer Width (in percents)
  * @param integer Height (in percents)
+ * @param integer Min size of width or height (in pixels), 0 - to don't limit
+ * @param integer Max size of width or height (in pixels), 0 - to don't limit
  * @return boolean TRUE if cropping is successful
  */
-function crop_image( $File, $x, $y, $width, $height )
+function crop_image( $File, $x, $y, $width, $height, $min_size = 0, $max_size = 0 )
 {
 	$Filetype = & $File->get_Filetype();
 	if( ! $Filetype )
@@ -504,6 +506,26 @@ function crop_image( $File, $x, $y, $width, $height )
 	$y = $src_height * ( $y / 100 );
 	$width = $src_width * ( $width / 100 );
 	$height = $src_height * ( $height / 100 );
+
+	if( $max_size > 0 )
+	{ // Check if we should limit by max size
+		$width = $width > $max_size ? $max_size : $width;
+		$height = $height > $max_size ? $max_size : $height;
+	}
+	if( $min_size > 0 )
+	{ // Check if we should limit by min size
+		$width = $width < $min_size ? $min_size : $width;
+		$height = $height < $min_size ? $min_size : $height;
+	}
+
+	if( $x + $width > $src_width )
+	{ // Shift a crop X position to the left if the crop width is over image width
+		$x = $src_width - $width;
+	}
+	if( $y + $height > $src_height )
+	{ // Shift a crop Y position to the top if the crop height is over image height
+		$y = $src_height - $height;
+	}
 
 	$dst_imh = imagecreatetruecolor( $width, $height );
 

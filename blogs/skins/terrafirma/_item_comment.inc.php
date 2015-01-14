@@ -58,7 +58,10 @@ $Comment = & $params['Comment'];
 						) );
 				}
 				$Comment->author( '', '', '', '#', 'htmlbody', true, 'preferredname' );
-				$Comment->msgform_link( $Blog->get('msgformurl') );
+				if( ! $Comment->get_author_User() )
+				{ // Display action icon to message only if this comment is from a visitor
+					$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
+				}
 				break;
 
 			case 'trackback': // Display a trackback:

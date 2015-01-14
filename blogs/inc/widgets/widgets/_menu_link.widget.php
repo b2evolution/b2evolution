@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _menu_link.widget.php 7816 2014-12-15 13:05:21Z yura $
+ * @version $Id: _menu_link.widget.php 7933 2015-01-09 12:12:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,9 +52,10 @@ $menu_link_widget_link_types = array(
 		'avatar' => T_('Edit profile picture'),
 
 		'item' => T_('Any item (post, page, etc...)'),
-		'url' => T_('Any URL'),
+		'postnew' => T_('New Item'),
 
-		'postnew' => T_('Write a new post'),
+		'admin' => T_('Admin / Back-Office link'),
+		'url' => T_('Any URL'),
 	);
 
 /**
@@ -372,7 +373,7 @@ class menu_link_Widget extends ComponentWidget
 					return false;
 				}
 				$url = get_user_logout_url( $current_Blog->ID );
-				$text = T_('Logout');
+				$text = T_('Log out');
 				break;
 
 			case 'register':
@@ -492,6 +493,17 @@ class menu_link_Widget extends ComponentWidget
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
+				break;
+
+			case 'admin':
+				global $current_User;
+				if( ! ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) ) )
+				{ // Don't allow admin url for users who have no access to backoffice
+					return false;
+				}
+				global $admin_url;
+				$url = $admin_url;
+				$text = T_('Admin').' &raquo;';
 				break;
 
 			case 'home':

@@ -24,7 +24,7 @@
  *
  * @package evocore
  *
- * @version $Id: async.php 7713 2014-12-01 06:35:17Z yura $
+ * @version $Id: async.php 7926 2015-01-09 06:59:52Z yura $
  */
 
 
@@ -540,7 +540,7 @@ switch( $action )
 		$field = param( 'field', 'string' );
 		if( ! in_array( $field, array( 'priority', 'status', 'assigned' ) ) )
 		{ // Invalid field
-			$Ajaxlog->add( sprintf( T_('Invalid the edited field: %s'), $field ), 'error' );
+			$Ajaxlog->add( sprintf( 'Invalid field: %s', $field ), 'error' );
 			break;
 		}
 

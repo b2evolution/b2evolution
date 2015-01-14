@@ -34,7 +34,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user_password.form.php 6134 2014-03-08 07:48:07Z manuel $
+ * @version $Id: _user_password.form.php 7879 2014-12-23 12:08:16Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -101,7 +101,8 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = get_usertab_header( $edited_User, 'pwdchange', T_( 'Change password' ) );
+	$form_text_title = T_( 'Change password' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, 'pwdchange', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
@@ -114,7 +115,7 @@ else
 $has_full_access = $current_User->check_perm( 'users', 'edit' );
 
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();

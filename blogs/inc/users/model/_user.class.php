@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7796 2014-12-10 13:45:51Z yura $
+ * @version $Id: _user.class.php 7933 2015-01-09 12:12:17Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1414,9 +1414,10 @@ class User extends DataObject
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
 				'use_style'      => false, // true - to use attr "style" instead of "class", e.g. on email templates
+				'blog_ID'        => NULL,
 			), $params );
 
-		$identity_url = get_user_identity_url( $this->ID, $params['user_tab'] );
+		$identity_url = get_user_identity_url( $this->ID, $params['user_tab'], $params['blog_ID'] );
 
 		$attr_bubbletip = '';
 		if( $params['display_bubbletip'] )
@@ -1913,13 +1914,26 @@ class User extends DataObject
 	/**
 	 * Get user page url
 	 *
+	 * @param integer|NULL Blog ID or NULL to use current blog
 	 * @return string
 	 */
-	function get_userpage_url()
+	function get_userpage_url( $blog_ID = NULL )
 	{
-		global $Blog, $Settings;
+		global $Settings;
 
-		if( empty( $Blog ) || empty( $Settings ) )
+		if( ! empty( $blog_ID ) )
+		{ // Use blog from param by ID
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{ // Use current blog
+			global $Blog;
+			$current_Blog = & $Blog;
+		}
+
+		if( empty( $current_Blog ) || empty( $Settings ) )
 		{ // Wrong request
 			return NULL;
 		}
@@ -1932,7 +1946,7 @@ class User extends DataObject
 			}
 			else
 			{ // Use an user page if url is not defined
-				return url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+				return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
 			}
 		}
 		else
@@ -1947,7 +1961,7 @@ class User extends DataObject
 				}
 				elseif( $Settings->get( 'allow_anonymous_user_profiles' ) )
 				{ // Use an user page if url is not defined and this is enabled by setting for anonymous users
-					return url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+					return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
 				}
 			}
 		}
@@ -4633,10 +4647,10 @@ class User extends DataObject
 			return $error_code;
 		}
 
-		global $Messages;
+		global $Messages, $Settings;
 		load_funcs( 'files/model/_image.funcs.php' );
 
-		if( ! crop_image( $File, $x, $y, $width, $height ) )
+		if( ! crop_image( $File, $x, $y, $width, $height, intval( $Settings->get( 'min_picture_size' ) ), 1024 ) )
 		{ // Some errors were during rotate the avatar
 			$Messages->add( T_('Profile picture could not be cropped!'), 'error' );
 			return 'crop_error';
@@ -4668,7 +4682,8 @@ class User extends DataObject
 		// Init links to rotate avatar
 		if( is_admin_page() )
 		{ // Back-office
-			$url_crop = regenerate_url( 'user_tab', 'user_tab=crop&user_ID='.$this->ID.'&file_ID='.$file_ID.'&'.url_crumb( 'user' ), '', '&' );
+			//$url_crop = regenerate_url( 'user_tab', 'user_tab=crop&user_ID='.$this->ID.'&file_ID='.$file_ID.'&'.url_crumb( 'user' ), '', '&' );
+			$url_crop = '#';
 		}
 		else
 		{ // Front-office

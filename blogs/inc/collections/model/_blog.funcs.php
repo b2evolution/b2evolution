@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7696 2014-11-24 07:44:18Z yura $
+ * @version $Id: _blog.funcs.php 7944 2015-01-12 05:39:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1421,14 +1421,14 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_plist'] )
-	{ // Display P.List column
+	{ // Display Listed column
 		$blogs_Results->cols[] = array(
-				'th' => T_('P.List'),
+				'th' => T_('Listed'),
 				'th_title' => T_('Public List'),
 				'order' => 'blog_in_bloglist',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_setting( #blog_ID#, "plist", #blog_in_bloglist# )%',
+				'td' => '%blog_row_listed( #blog_in_bloglist# )%',
 			);
 	}
 
@@ -1530,11 +1530,35 @@ function blog_row_order( $blog_ID, $blog_order )
 
 
 /**
+ * Gat title of value for the blog field "blog_in_bloglist"
+ *
+ * @param integer Value
+ * @return string Title
+ */
+function blog_row_listed( $value )
+{
+	switch( $value )
+	{
+		case 'public':
+			return T_('Always');
+		case 'logged':
+			return T_('Logged in');
+		case 'member':
+			return T_('Members');
+		case 'never':
+			return T_('Never');
+	}
+
+	return $value;
+}
+
+
+/**
  * Get an icon to show that blog setting is enabled or disabled
  * Make a link to switch setting value if user has permissions to edit blog settings
  *
  * @param integer Blog ID
- * @param boolean Blog setting name: 'plist', 'favorite'
+ * @param boolean Blog setting name: 'favorite'
  * @param boolean Blog setting value: 0, 1
  * @return string Icon or Link to change setting
  */
@@ -1544,18 +1568,11 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 
 	switch( $setting_name )
 	{
-		case'plist':
-			// Blog in public list
-			$title = $setting_value ?
-					T_('The blog is in public blog list.') :
-					T_('The blog is not in public blog list.');
-			break;
-
 		case'fav':
 			// Favorite Blog
 			$title = $setting_value ?
-					T_('The blog is favorite.') :
-					T_('The blog is not favorite.');
+					T_('The blog is a favorite.') :
+					T_('The blog is not a favorite.');
 			break;
 
 		default:

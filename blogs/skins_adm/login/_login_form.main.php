@@ -39,7 +39,7 @@ if( $Session->has_User() )
 			$redirect_to = $baseurl;
 		}
 		$Messages->add( sprintf( T_('Note: You are already logged in as %s!'), $tmp_User->get('login') )
-			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').' &raquo;</a>', 'note' );
+			.' <a href="'.htmlspecialchars($redirect_to).'">'.T_('Continue').'&nbsp;&raquo;</a>', 'note' );
 	}
 	unset($tmp_User);
 }

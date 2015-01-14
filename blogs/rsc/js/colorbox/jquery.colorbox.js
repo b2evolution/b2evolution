@@ -686,6 +686,7 @@
 				if( settings.displayVoting && settings.votingUrl != '' )
 				{	// If voting panel is enabled
 					voting_height = $voting.outerHeight()
+					$voting.css( 'bottom', '9px' );
 				}
 				$title.css( 'margin-bottom', voting_height + $close.outerHeight() - 3 );
 				title_height = 15;
@@ -693,6 +694,7 @@
 			else
 			{	// No title
 				title_height = -15;
+				$voting.css( 'bottom', '25px' );
 			}
 			$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + title_height );
 			loadedHeight += title_height;

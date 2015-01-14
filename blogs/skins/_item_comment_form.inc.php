@@ -21,7 +21,7 @@ global $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
-		'disp_comment_form'	   =>	true,
+		'disp_comment_form'    => true,
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
 		'form_title_text'      => T_('Leave a comment'),
@@ -43,6 +43,7 @@ $params = array_merge( array(
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
 		'form_comment_redirect_to' => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
+		'comment_image_size'   => 'fit-400x320',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -88,6 +89,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
 						'author_link_text'     => $params['author_link_text'],
+						'image_size'           => $params['comment_image_size'],
 					) );
 				// Note: You can customize the default item comment by copying the generic
 				// /skins/_item_comment.inc.php file into the current skin folder.
@@ -217,8 +219,7 @@ function validateCommentForm(form)
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
 		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
-				'link_text' => $params['author_link_text'] ) ).'</strong> '
-				.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
+				'link_text' => $params['author_link_text'] ) ).'</strong>' );
 	}
 	else
 	{ // User is not logged in or not activated:

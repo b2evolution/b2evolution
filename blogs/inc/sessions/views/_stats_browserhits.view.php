@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_browserhits.view.php 6480 2014-04-16 07:33:09Z yura $
+ * @version $Id: _stats_browserhits.view.php 7975 2015-01-14 08:24:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -151,7 +151,7 @@ if( count($res_hits) )
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Refering searches') );
+	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Referring searches') );
 	array_unshift( $chart[ 'chart_data' ][ 2 ], T_('Referers') );
 	array_unshift( $chart[ 'chart_data' ][ 3 ], T_('Direct accesses') );	// Translations need to be UTF-8
 	array_unshift( $chart[ 'chart_data' ][ 4 ], T_('Self referred') );
@@ -205,7 +205,7 @@ if( count($res_hits) )
 		<tr>
 			<th class="firstcol"><?php echo T_('Date') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['session'] ?>"><?php echo T_('Sessions') ?></th>
-			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Refering searches') ?></th>
+			<th style="background-color: #<?php echo $referer_type_color['search'] ?>"><?php echo T_('Referring searches') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['referer'] ?>"><?php echo T_('Referers') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['direct'] ?>"><?php echo T_('Direct accesses') ?></th>
 			<th style="background-color: #<?php echo $referer_type_color['self'] ?>"><?php echo T_('Self referred') ?></th>

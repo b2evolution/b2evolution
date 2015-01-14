@@ -32,13 +32,13 @@
  * @todo Make it a class / global object!
  *        - Provide (static) functions to extract .po files / generate _global.php files (single quoted strings!)
  *
- * @version $Id: _locale.funcs.php 7596 2014-11-07 13:33:16Z yura $
+ * @version $Id: _locale.funcs.php 7966 2015-01-14 03:03:56Z fplanque $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
 // DEBUG: (Turn switch on or off to log debug info for specified category)
-$GLOBALS['debug_locale'] = false;
+$GLOBALS['debug_locale'] = true;
 
 
 // LOCALIZATION:
@@ -124,6 +124,8 @@ if( isset( $use_l10n ) && $use_l10n )
 
 		if( ! isset( $trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
+			$Debuglog->add( 'We need to load a new translation file to translate: "'. $string.'"', 'locale' );
+
 			if ( $params['alt_basedir'] != '' )
 			{	// Load the translation file from the alternative base dir:
 				//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );

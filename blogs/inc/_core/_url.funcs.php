@@ -21,7 +21,7 @@
  * @author blueyed: Daniel HAHLER
  * @author Danny Ferguson
  *
- * @version $Id: _url.funcs.php 7616 2014-11-12 14:50:13Z yura $
+ * @version $Id: _url.funcs.php 7873 2014-12-22 17:23:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -886,9 +886,17 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 	}
 
 	if( is_admin_page() || empty( $Blog ) )
-	{	// Backoffice part
-		global $admin_url;
-		return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
+	{ // Backoffice part
+		global $current_User;
+		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
+		{ // User must has an access to backoffice
+			global $admin_url;
+			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
+		}
+		else
+		{ // Return empty because user has no access
+			return NULL;
+		}
 	}
 
 	return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params );

@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _coll_seo.form.php 7987 2015-01-14 18:44:48Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -333,7 +333,7 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 			), T_('Help page'), true );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Download display').get_manual_link( 'download-display-seo' ) );
+$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
 	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
 $Form->end_fieldset();

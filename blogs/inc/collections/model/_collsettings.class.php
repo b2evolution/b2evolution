@@ -25,7 +25,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _collsettings.class.php 7435 2014-10-15 07:21:31Z yura $
+ * @version $Id: _collsettings.class.php 7978 2015-01-14 11:21:30Z yura $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -87,6 +87,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
+			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
 			'allow_rating_items' => 'never',
 			'allow_rating_comment_helpfulness' => '0',
 			'comments_orderdir' => 'ASC',
@@ -186,6 +187,8 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
+			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 
 		// Other settings:
 			'image_size_user_list' => 'crop-top-32x32', // Used in disp = users

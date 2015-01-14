@@ -34,7 +34,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _user_preferences.form.php 7879 2014-12-23 12:08:16Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -105,7 +105,8 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = get_usertab_header( $edited_User, 'userprefs', T_( 'Edit preferences' ) );
+	$form_text_title = T_( 'Edit preferences' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, 'userprefs', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
@@ -115,7 +116,7 @@ else
 	$form_class = 'bComment';
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();

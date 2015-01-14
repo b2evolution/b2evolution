@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: cronjobs.ctrl.php 6895 2014-06-13 10:05:46Z yura $
+ * @version $Id: cronjobs.ctrl.php 7949 2015-01-12 10:44:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -230,7 +230,7 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Scheduler'), '?ctrl=crontab' );
 
-if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy' ) ) )
+if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy', 'list' ) ) )
 { // Initialize date picker for cronjob.form.php
 	init_datepicker_js();
 }

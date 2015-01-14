@@ -31,7 +31,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _user_deldata.form.php 7704 2014-11-27 13:16:05Z yura $
+ * @version $Id: _user_deldata.form.php 7879 2014-12-23 12:08:16Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -81,10 +81,11 @@ if( $display_mode != 'js' )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_title = get_usertab_header( $edited_User, '', T_( 'Report User' ) );
+	$form_text_title = T_( 'Delete user data' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 $Form->add_crumb( 'user' );
 $Form->hidden_ctrl();

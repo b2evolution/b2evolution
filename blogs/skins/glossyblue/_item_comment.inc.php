@@ -51,7 +51,10 @@ $Comment = & $params['Comment'];
 					'nofollow' => true,
 				) );
 				$Comment->author( '', '', '', '&#174;', 'htmlbody', true, 'preferredname' );
-				$Comment->msgform_link( $Blog->get('msgformurl') );
+				if( ! $Comment->get_author_User() )
+				{ // Display action icon to message only if this comment is from a visitor
+					$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
+				}
 
 				$commented_Item = & $Comment->get_Item();
 				echo ' '.T_('said on :').' <small class="commentmetadata">';

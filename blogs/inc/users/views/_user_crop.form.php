@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _user_crop.form.php 7709 2014-11-28 15:40:17Z yura $
+ * @version $Id: _user_crop.form.php 7910 2014-12-29 08:55:15Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -43,6 +43,8 @@ global $current_User;
  * @var File that should be cropped
  */
 global $cropped_File;
+
+global $window_width, $window_height;
 
 if( $display_mode != 'js' )
 {
@@ -81,10 +83,14 @@ if( $display_mode != 'js' && is_admin_page() )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_title = get_usertab_header( $edited_User, '', T_( 'Crop profile picture' ) );
+	$form_text_title = T_( 'Crop profile picture' ); // used for js confirmation message on leave the changed form
+	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
-$Form->begin_form( $form_class, $form_title );
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
+
+// Display this error when JS is not enabled
+echo '<noscript><p class="error">'.T_('Please activate Javascript in your browser in order to use this feature.').'</p></noscript>';
 
 if( is_admin_page() )
 {
@@ -110,21 +116,20 @@ if( $display_mode == 'js' )
 { // Display a close link for popup window
 	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
-$Form->begin_fieldset( T_('Crop profile picture').$close_icon, array( 'class' => 'fieldset clear' ) );
+$Form->begin_fieldset( T_('Crop profile picture').$close_icon, array( 'class' => 'fieldset clear', 'id' => 'image_crop' ) );
 
-$cropped_image_tag = $cropped_File->get_tag( '', '', '', '', ( is_admin_page() || $display_mode == 'js' ? 'fit-640x480' : 'fit-400x320' ), '' );
+$cropped_image_tag = $cropped_File->get_tag( '', '', '', '', 'original', '' );
 
-echo '<table><tr valign="top"><td>';
+echo '<p class="crop_button top">';
+$Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton' ) );
+echo '</p>';
+
+echo '<div id="image_crop_block"'.( ( ! is_admin_page() && $display_mode != 'js' ) ? ' class="short_width"' : '' ).'><div>';
 
 // Main image
 echo '<div id="target_cropped_image">'.$cropped_image_tag.'</div>';
 
-echo '</td>';
-if( ! is_admin_page() && $display_mode != 'js' )
-{
-	echo '</tr><tr>';
-}
-echo '<td>';
+echo '</div><div>';
 
 // Preview thumbnails
 echo '<div class="preview_cropped_images">';
@@ -134,9 +139,9 @@ echo '<div class="preview_cropped_images">';
 	echo '<div class="preview_cropped_image circle" style="width:64px;height:64px">'.$cropped_image_tag.'</div>';
 echo '</div>';
 
-echo '</td></tr></table>';
+echo '</div></div>';
 
-echo '<p class="center" style="max-width:800px">';
+echo '<p class="crop_button bottom">';
 $Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton' ) );
 echo '</p>';
 
@@ -144,6 +149,21 @@ $Form->end_fieldset();
 
 $Form->end_form();
 
+// Get min size(width or height) of the image
+$file_size = $cropped_File->get_image_size( 'widthheight' );
+$file_size = min( $file_size[0], $file_size[1] );
+
+if( ! empty( $window_width ) && ! empty( $window_height ) )
+{ // Limit the cropping image with window size
+?>
+<style>
+#target_cropped_image img {
+	max-width: <?php echo $window_width; ?>px !important;
+	max-height: <?php echo $window_height; ?>px !important;
+}
+</style>
+<?php
+}
 ?>
 <script type="text/javascript">
 if( typeof( target_cropped_image_is_loaded ) != 'undefined' && target_cropped_image_is_loaded == true )
@@ -162,10 +182,16 @@ function init_jcrop_tool( image_obj )
 	target_cropped_image_width = image_obj.width();
 	target_cropped_image_height = image_obj.height();
 
+	var min_width = Math.floor( <?php echo intval( $Settings->get( 'min_picture_size' ) ); ?> * Math.min( target_cropped_image_width, target_cropped_image_height ) / <?php echo $file_size; ?> );
+	var min_height = min_width;
+
+	var max_width = Math.floor( 1024 * Math.min( target_cropped_image_width, target_cropped_image_height ) / <?php echo $file_size; ?> );
+	var max_height = max_width;
+
 	// Set default selected crop area
 	if( target_cropped_image_width == target_cropped_image_height )
 	{ // Square image
-		if( target_cropped_image_width > <?php echo intval( $Settings->get( 'min_picture_size' ) ); ?> )
+		if( target_cropped_image_width > min_width )
 		{
 			var x1 = target_cropped_image_width * 0.05;
 			var x2 = target_cropped_image_width * 0.95;
@@ -174,8 +200,9 @@ function init_jcrop_tool( image_obj )
 		{
 			var x1 = 0;
 			var x2 = target_cropped_image_width;
+			min_width = x2;
 		}
-		if( target_cropped_image_height > <?php echo intval( $Settings->get( 'min_picture_size' ) ); ?> )
+		if( target_cropped_image_height > min_height )
 		{
 			var y1 = target_cropped_image_height * 0.05;
 			var y2 = target_cropped_image_height * 0.95;
@@ -184,6 +211,7 @@ function init_jcrop_tool( image_obj )
 		{
 			var y1 = 0;
 			var y2 = target_cropped_image_height;
+			min_height = y2;
 		}
 	}
 	else if( target_cropped_image_width > target_cropped_image_height )
@@ -204,6 +232,9 @@ function init_jcrop_tool( image_obj )
 	// Initialize the crop tool
 	image_obj.Jcrop(
 	{
+		aspectRatio: 1,
+		minSize: [ min_width, min_height ],
+		maxSize: [ max_width, max_height ],
 		setSelect: [ x1, y1, x2, y2 ],
 		onChange: show_preview_cropped_image,
 		onSelect: show_preview_cropped_image,
