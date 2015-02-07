@@ -333,7 +333,7 @@ if( !$Messages->has_errors() )
 
 				if( $any_plugin_settings_updated )
 				{
-					$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
+					$Messages->add( T_('Plugin user settings have been updated.'), 'success' );
 				}
 			}
 
@@ -427,7 +427,7 @@ if( !$Messages->has_errors() )
 			}
 			if( $any_plugin_settings_updated )
 			{
-				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
+				$Messages->add( T_('Plugin user settings have been updated.'), 'success' );
 			}
 
 			// Always display the profile again:
@@ -636,7 +636,7 @@ if( !$Messages->has_errors() )
 						$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
 					}
 				}
-				$Messages->add( T_('The user was repoted.').$blocked_message, 'success' );
+				$Messages->add( T_('The user was reported.').$blocked_message, 'success' );
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:

@@ -34,13 +34,16 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-	?>
 
-	<h3 class="bTitle linked"><?php
-		$Item->title( array(
-				'link_type' => 'permalink'
-			) );
-	?></h3>
+		if( $disp != 'single' && $disp != 'page' )
+		{ // Don't display this on disp=single because there is already title header in h2
+			$Item->title( array(
+					'before'    => '<h3 class="bTitle linked">',
+					'after'     => '</h3>',
+					'link_type' => 'permalink'
+				) );
+		}
+	?>
 
 	<div class="bSmallHead">
 	<?php
@@ -96,11 +99,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 	<div class="bSmallPrint">
 		<?php
-			// Permalink:
-			$Item->permanent_link( array(
-					'class' => 'permalink_right',
-				) );
-
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
 							'type' => 'comments',

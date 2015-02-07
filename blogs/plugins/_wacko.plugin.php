@@ -69,7 +69,7 @@ class wacko_plugin extends Plugin
 ==== h4 ====<br />
 ===== h5 =====<br />
 ====== h6 ======<br />
---- (horinzontal rule)<br />
+--- (horizontal rule)<br />
 %%%codeblock%%%<br />');
 	}
 

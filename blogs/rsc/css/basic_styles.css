@@ -7,6 +7,12 @@ code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
 	/* font-size: 107%; */
 }
+pre, code {
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
 .nobr,
 .nowrap,
 .line {

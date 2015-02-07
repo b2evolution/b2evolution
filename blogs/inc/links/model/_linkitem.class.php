@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id$
+ * @version $Id: $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -84,9 +84,9 @@ class LinkItem extends LinkOwner
 		}
 
 		return array_merge( array(
-				'teaser'    => T_( 'Teaser' ),
-				'aftermore' => T_( 'After "more"' ),
-				'inline'    => T_( 'Inline' ),
+				'teaser'    => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content */ T_( 'Teaser' ),
+				'aftermore' => /* TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator */ T_( 'After "more"' ), T_( 'After "more"' ),
+				'inline'    => /* TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text */ T_( 'Inline' ),
 			), $additional_positions );
 	}
 

@@ -22,7 +22,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: upgrade.ctrl.php 7357 2014-10-02 16:34:27Z yura $
+ * @version $Id: upgrade.ctrl.php 8115 2015-01-30 13:03:47Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -74,9 +74,8 @@ $AdminUI->disp_body_top();
 
 $AdminUI->disp_payload_begin();
 
-echo '<h2 class="red">WARNING: EXPERIMENTAL FEATURE!</h2>';
+echo '<h2 class="red">'.T_('WARNING: USE WITH CAUTION!').'</h2>';
 
-echo '<h3>Use for testing only at this point!</h3>';
 evo_flush();
 
 /**
@@ -121,6 +120,9 @@ switch( $action )
 					echo '<p>'.$extra_msg.'</p>';
 				}
 			}
+
+			$block_item_Widget->disp_template_replaced( 'block_end' );
+			unset( $block_item_Widget );
 
 			// Extract array of info about available update:
 			$updates = $global_Cache->get( 'updates' );
@@ -168,7 +170,7 @@ switch( $action )
 		$success = param_check_url( 'upd_url', 'download_src', NULL );
 		if( $success && ! preg_match( '#\.zip$#i', $download_url ) )
 		{ // Check the download url is a .zip or .ZIP
-			param_error( 'upd_url', sprintf( T_( 'The URL "%s" must be an URL to ZIP archive.' ), $download_url ) );
+			param_error( 'upd_url', sprintf( T_( 'The URL "%s" must point to a ZIP archive.' ), $download_url ) );
 		}
 
 		if( $Messages->count() )
@@ -193,7 +195,7 @@ switch( $action )
 			{ // Try to delete previous package if the downloading is forced
 				if( ! @unlink( $upgrade_file ) )
 				{
-					echo '<p class="red">'.sprintf( T_('Unable to delete previous downloaded package %s before forcing the download.'), '<b>'.$upgrade_file.'</b>' ).'</p>';
+					echo '<p class="red">'.sprintf( T_('Unable to delete previously downloaded package %s before forcing the download.'), '<b>'.$upgrade_file.'</b>' ).'</p>';
 					$action_success = false;
 				}
 			}
@@ -368,8 +370,10 @@ switch( $action )
 		}
 
 		echo '<p>'
-			.T_( 'If you continue, the following sequence will be carried out automatically (trying to minimize "maintenance time" for the site):' )
-			.'<ul><li>'.T_( 'The site will switch to maintenance mode' ).'</li>'
+			.sprintf( T_( 'If you continue, the following sequence will be carried out automatically (trying to minimize "<a %s>maintenance time</a>" for the site):' ),
+				'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' )
+			.'<ul><li>'.sprintf( T_( 'The site will switch to <a %s>maintenance mode</a>' ),
+						'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' ).'</li>'
 				.'<li>'.T_( 'A backup will be performed' ).'</li>'
 				.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
 				.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
@@ -418,6 +422,7 @@ switch( $action )
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
 			if( $upgrade_name === NULL )
 			{ // Get an upgrade name from url (Used for auto-upgrade, not svn)
+				forget_param( 'upd_name' );
 				$download_url = param( 'upd_url', 'string', '', true );
 				$upgrade_name = pathinfo( $download_url );
 				$upgrade_name = $upgrade_name['filename'];
@@ -425,6 +430,12 @@ switch( $action )
 
 			$success = true;
 		}
+
+		// Load Backup class (PHP4) and backup all of the folders and files
+		load_class( 'maintenance/model/_backup.class.php', 'Backup' );
+		$Backup = new Backup();
+		// Memorize all form params in order t oresubmit form if some errors exist
+		$Backup->load_from_Request( true );
 
 		// Enable maintenance mode
 		$success = ( $success && switch_maintenance_mode( true, 'upgrade', T_( 'System upgrade is in progress. Please reload this page in a few minutes.' ) ) );
@@ -447,12 +458,6 @@ switch( $action )
 
 			if( $success && empty( $read_only_list ) )
 			{ // We can backup files and database
-
-				// Load Backup class (PHP4) and backup all of the folders and files
-				load_class( 'maintenance/model/_backup.class.php', 'Backup' );
-				$Backup = new Backup();
-				$Backup->load_from_Request();
-
 				if( ! function_exists( 'gzopen' ) )
 				{
 					$Backup->pack_backup_files = false;
@@ -514,6 +519,16 @@ switch( $action )
 		{ // Disable maintenance mode
 			switch_maintenance_mode( false, 'upgrade' );
 			echo '<h4 style="color:red">'.T_( 'Upgrade failed!' ).'</h4>';
+
+			// Display a form to resubmit a previous form
+			$block_item_Widget->disp_template_replaced( 'block_end' );
+			$Form = new Form( NULL, 'upgrade_form', 'post' );
+			$Form->add_crumb( 'upgrade_is_launched' ); // In case we want to continue
+			$Form->hiddens_by_key( get_memorized( 'action' ) );
+			$Form->begin_form( 'fform' );
+			$Form->begin_fieldset( T_( 'Actions' ) );
+			$Form->end_form( array( array( 'submit', 'actionArray['.$action.']', T_('Retry'), 'SaveButton' ) ) );
+			unset( $block_item_Widget );
 		}
 		break;
 

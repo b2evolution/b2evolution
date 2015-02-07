@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _translation.funcs.php 7042 2014-07-02 05:37:27Z yura $
+ * @version $Id: _translation.funcs.php 8100 2015-01-28 13:15:31Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -116,7 +116,7 @@ function translation_update_table_po( $locale )
 	if( !file_exists( $po_file_name ) )
 	{	// No locale file, Exit here
 		global $Messages;
-		$Messages->add( T_('No found .PO file'), 'error' );
+		$Messages->add( T_('No .PO file found'), 'error' );
 		return false;
 	}
 
@@ -249,9 +249,15 @@ function translation_generate_po_file( $locale )
 	}
 
 	// Write to .PO file
-	$ok = save_to_file( implode("\r\n", $po_content), $po_file_name, 'w+' );
+	$ok = (bool) save_to_file( implode("\r\n", $po_content), $po_file_name, 'w+' );
 
-	return (bool) $ok;
+	if( ! $ok )
+	{ // Inform user about no permission to write PO file
+		global $Messages;
+		$Messages->add( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$po_file_name.'</b>' ), 'error' );
+	}
+
+	return $ok;
 }
 
 
@@ -277,13 +283,34 @@ function translation_generate_pot_file()
 	foreach( $translation_strings as $string => $files )
 	{ // Format the translation strings to write in .POT file
 		if( isset( $files['trans'] ) )
-		{ // Text of "TRANS: ..." helper
-			$pot_content[] = '#. '.$files['trans'];
+		{ // Text of TRANS info
+			if( is_array( $files['trans'] ) )
+			{ // Multiline TRANS info
+				foreach( $files['trans'] as $ft => $files_trans )
+				{
+					$pot_content[] = '#. '.( $ft == 0 ? 'TRANS: ' : '' ).$files_trans;
+				}
+			}
+			else
+			{ // Single TRANS info
+				$pot_content[] = '#. TRANS: '.$files['trans'];
+			}
 			unset( $files['trans'] );
 		}
 		foreach( $files as $file )
 		{ // File name and line number where string exists
 			$pot_content[] = '#: '.$file[1].':'.$file[0];
+		}
+		if( strpos( $string, '%' ) !== false )
+		{ // Char '%' is detected in the string
+			if( preg_match( '/%(s|\d*d)/', $string ) )
+			{ // The string contains a mask like %s or %d
+				$pot_content[] = '#, php-format';
+			}
+			else
+			{ // The string contains a simple char '%'
+				$pot_content[] = '#, no-php-format';
+			}
 		}
 		$pot_content[] = 'msgid "'.$string.'"';
 		$pot_content[] = 'msgstr ""';
@@ -291,9 +318,15 @@ function translation_generate_pot_file()
 	}
 
 	// Write to .POT file
-	$ok = save_to_file( implode( "\n", $pot_content ), $pot_file_name, 'w+' );
+	$ok = (bool) save_to_file( implode( "\n", $pot_content ), $pot_file_name, 'w+' );
 
-	return (bool) $ok;
+	if( ! $ok )
+	{ // Inform user about no permission to write POT file
+		global $Messages;
+		$Messages->add( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$pot_file_name.'</b>' ), 'error' );
+	}
+
+	return $ok;
 }
 
 
@@ -321,6 +354,40 @@ function translation_scandir( $path, & $translation_strings )
 
 
 /**
+ * Get substring from the selected position with shift
+ *
+ * @param string Source string
+ * @param integer Current index
+ * @param integer Shift
+ * @return string
+ */
+function translation_get_chars( $line_string, $index, $shift )
+{
+	$char = '';
+
+	if( $shift > 0 )
+	{ // Get next chars
+		if( strlen( $line_string ) > $index + $shift )
+		{
+			$char = substr( $line_string, $index + 1, $shift );
+		}
+	}
+	elseif( $shift < 0 )
+	{ // Get previous chars
+		if( $index + $shift >= 0 )
+		{
+			$char = substr( $line_string, $index + $shift, 0 - $shift );
+		}
+	}
+	else
+	{ // Current char
+		$char = $line_string[ $index ];
+	}
+
+	return $char;
+}
+
+/**
  * Find the translation strings in the file
  *
  * @param string File path
@@ -328,36 +395,144 @@ function translation_scandir( $path, & $translation_strings )
  */
 function translation_find_T_strings( $file, & $translation_strings )
 {
+	global $basepath;
+
+	$line_is_multiple = false;
+
 	// Split file content with lines in order to know line number of each string
 	$file_lines = explode( "\n", file_get_contents( $file ) );
+
+	$T_line_number = 0;
+	$T_string_is_opened = false;
+	$T_string_text = '';
+	$T_string_quote_sign = "'";
+	$TRANS_is_opened = false;
+	$TRANS_text = '';
+
+	$prev_line_number = -1;
 	foreach( $file_lines as $line_number => $line_string )
 	{
-		if( preg_match_all( '/(\/\* ?TRANS:[^\*]+\*\/ ?)?(NT|T|TS)_\(\s*[\'"](.*?)[\'"]\s*\)/i', $line_string, $t_matches ) )
-		{ // The matches is found
-			global $basepath;
+		if( ! $T_string_is_opened && strpos( $line_string, 'T_' ) === false && strpos( $line_string, 'TS_' ) === false  &&
+		    ! $TRANS_is_opened && strpos( $line_string, 'TRANS:' ) === false )
+		{ // This line doesn't contain any T_ string AND TRANS info, Skip it
+			continue;
+		}
 
-			foreach( $t_matches[3] as $t_index => $t_m )
-			{
-				$t_m = str_replace( array( '"', "\'", "\r\n", '\n' ), array( '\"', "'", '\n', '\n"'."\n".'"' ), $t_m );
-				if( strpos( $t_m, "\n" ) )
+		for( $l = 0; $l <= strlen( $line_string ); $l++ )
+		{
+			$char = $line_string[ $l ];
+
+			/************ T_ strings ************/
+			$char_prev3 = translation_get_chars( $line_string, $l, -3 );
+			$char_prev2 = translation_get_chars( $line_string, $l, -2 );
+
+			if( ! $T_string_is_opened &&
+			    ( $char_prev2 == 'T_' || $char_prev3 == 'TS_' || $char_prev3 == 'NT_' ) )
+			{ // T_ string is detected
+				$char_next1 = translation_get_chars( $line_string, $l, 1 );
+				$char_next2 = translation_get_chars( $line_string, $l, 2 );
+
+				if( $char == '(' &&
+				    ( $char_next1 == '"' || $char_next1 == "'" ||
+				      $char_next2 == ' "' || $char_next2 == " '" ) )
+				{ // OPEN T_ string
+					$T_string_quote_sign = ( $char_next1 == '"' || $char_next2 == ' "' ) ? '"' : "'";
+					$l += ( $char_next1 == '"' || $char_next1 == "'" ) ? 1 : 2;
+					$T_line_number = $line_number + 1;
+					$T_string_is_opened = true;
+					$TRANS_is_opened = false;
+					continue;
+				}
+			}
+
+			$char_prev1 = translation_get_chars( $line_string, $l, -1 );
+			if( $T_string_is_opened && $char_prev1 != '\\' && $char == $T_string_quote_sign )
+			{ // CLOSE T_ string
+
+				// Save T_ string to array
+				$T_string_text = str_replace( array( '"', "\'", "\r\n", "\n", '\n', "\t" ), array( '\"', "'", '\n', '\n', '\n"'."\n".'"', '\t' ), $T_string_text );
+				if( strpos( $T_string_text, "\n" ) !== false )
 				{ // Add empty new line before multiline string
-					$t_m = '"'."\n".'"'.$t_m;
+					$T_string_text = '"'."\n".'"'.$T_string_text;
 				}
-
-				if( !isset( $translation_strings[ $t_m ] ) )
+				if( !isset( $translation_strings[ $T_string_text ] ) )
 				{ // Set array for each string in order to store the file paths where this string is found
-					$translation_strings[ $t_m ] = array();
+					$translation_strings[ $T_string_text ] = array();
 				}
-				if( ! isset( $translation_strings[ $t_m ]['trans'] ) && ! empty( $t_matches[1][ $t_index ] ) )
-				{ // Text of "TRANS: ..." helper
-					$translation_strings[ $t_m ]['trans'] = trim( $t_matches[1][ $t_index ], ' /*' );
+				if( ! empty( $TRANS_text ) && ! isset( $translation_strings[ $T_string_text ]['trans'] ) )
+				{ // Text of TRANS info
+					if( strpos( $TRANS_text, "\n" ) !== false )
+					{
+						$TRANS_text = explode( "\n", $TRANS_text );
+						foreach( $TRANS_text as $t_i => $TRANS_text_value )
+						{
+							$TRANS_text[ $t_i ] = trim( $TRANS_text_value, ' 	' );
+						}
+					}
+					$translation_strings[ $T_string_text ]['trans'] = $TRANS_text;
 				}
-				$translation_strings[ $t_m ][] = array(
-						$line_number + 1, // Line number
+				$translation_strings[ $T_string_text ][] = array(
+						$T_line_number, // Line number
 						str_replace( $basepath, '../../../', $file ), // String
 					);
+
+				// Reset vars for next T_ string
+				$T_line_number = 0;
+				$T_string_text = '';
+				$T_string_is_opened = false;
+				$TRANS_text = '';
+			}
+
+			if( $T_string_is_opened )
+			{ // Store chars of the current opened T_ string
+				if( $prev_line_number != $line_number )
+				{ // String is multiline
+					if( $T_string_text != '' )
+					{
+						$T_string_text .= "\n";
+					}
+					$prev_line_number = $line_number;
+				}
+				$T_string_text .= $line_string[ $l ];
+			}
+
+			/************ TRANS info ************/
+			if( $T_string_is_opened )
+			{ // T_ is opened skip this
+				continue;
+			}
+
+			// Try to find TRANS
+			$char_prev5 = translation_get_chars( $line_string, $l, -5 );
+			if( $char == ':' && $char_prev5 == 'TRANS' && ( strpos( $line_string, '//' ) !== false || strpos( $line_string, '/*' ) !== false ) )
+			{ // TRANS info is opened
+				$TRANS_is_opened = true;
+				$prev_line_number = $line_number;
+				$l++;
+				continue;
+			}
+
+			$char_next2 = translation_get_chars( $line_string, $l, 2 );
+			if( $TRANS_is_opened &&
+			    ( $char_next2 == '*/' ||
+			      ( $prev_line_number != $line_number &&
+			        ( strpos( $line_string, 'T_' ) !== false || strpos( $line_string, 'TS_' ) !== false ) ) ) )
+			{ // CLOSE TRANS info
+				$TRANS_is_opened = false;
+			}
+
+			if( $TRANS_is_opened )
+			{ // Store chars of the current opened TRANS info
+				if( $prev_line_number != $line_number )
+				{
+					$TRANS_text .= "\n";
+					$prev_line_number = $line_number;
+				}
+				$TRANS_text .= $line_string[ $l ];
 			}
 		}
+
+		$prev_line_number = $line_number;
 	}
 }
 

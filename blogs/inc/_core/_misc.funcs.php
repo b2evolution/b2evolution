@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7756 2014-12-05 09:42:11Z yura $
+ * @version $Id: _misc.funcs.php 8048 2015-01-22 10:35:31Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -472,7 +472,7 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 				// Get the chars as an array in case of utf8 charset from the cropped string to be able to get chars by position ( in case of 'iso-8859-1' charset one char is one byte )
 				$str_cropped_chars = ( $current_charset == 'iso-8859-1' ) ? $str_cropped : preg_split( '//u', $str_cropped, -1, PREG_SPLIT_NO_EMPTY );
 				$i = evo_strlen( $str_cropped );
-				while( $i && ! ctype_space( $str_cropped_chars[--$i] ) )
+				while( $i && isset( $str_cropped_chars[ --$i ] ) && ! ctype_space( $str_cropped_chars[ $i ] ) )
 				{}
 				if( $i )
 				{

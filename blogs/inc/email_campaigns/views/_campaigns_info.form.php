@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _campaigns_info.form.php 7922 2015-01-06 23:29:21Z fplanque $
+ * @version $Id: _campaigns_info.form.php 8039 2015-01-21 11:33:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,8 +57,8 @@ $Form->begin_fieldset( T_('Newsletter recipients') );
 		$Form->info( T_('Number of active accounts in filterset'), $users_numbers['active'] );
 	}
 	$Form->info( T_('Number of active accounts which accept newsletter email'), $edited_EmailCampaign->get_users_count(), '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
-	$Form->info( T_('Number of accounts which already accepted newsletter email'), $edited_EmailCampaign->get_users_count( 'accept' ) );
-	$Form->info( T_('Number of accounts which still wait newsletter email'), $edited_EmailCampaign->get_users_count( 'wait' ) );
+	$Form->info( T_('Number of accounts that were already sent this campaign'), $edited_EmailCampaign->get_users_count( 'accept' ) );
+	$Form->info( T_('Number of accounts that were not sent this campaign yet'), $edited_EmailCampaign->get_users_count( 'wait' ) );
 $Form->end_fieldset();
 
 $buttons = array();

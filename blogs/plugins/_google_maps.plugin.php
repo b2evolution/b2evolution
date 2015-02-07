@@ -22,7 +22,7 @@
  *
  * @package plugins
  *
- * @version $Id$
+ * @version $Id: _google_maps.plugin.php 8174 2015-02-06 03:26:12Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,7 +63,7 @@ class google_maps_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Google Maps plugin');
-		$this->long_desc = T_('This plugin responds to positioning users');
+		$this->long_desc = T_('This plugin displays positions on a map.');
 	}
 
 

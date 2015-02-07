@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 7948 2015-01-12 10:35:50Z yura $
+ * @version $Id: _param.funcs.php 8076 2015-01-26 15:41:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -215,14 +215,14 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// Make sure the string is a single line
-				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
-				// strip out any html:
-				$GLOBALS[$var] = trim( strip_tags( $GLOBALS[$var] ) );
 				// Decode url:
 				$GLOBALS[$var] = urldecode( $GLOBALS[$var] );
+				// strip out any html:
+				$GLOBALS[$var] = trim( strip_tags( $GLOBALS[$var] ) );
+				// Remove new line chars and double quote from url
+				$GLOBALS[$var] = preg_replace( '~\r|\n|"~', '', $GLOBALS[$var] );
 
-				if( ( !empty( $GLOBALS[$var] ) ) && ( ( strpos( $GLOBALS[$var], '"' ) !== false ) || ( ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) ) ) )
+				if( ! empty( $GLOBALS[$var] ) && ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) )
 				{ // We cannot accept this MISMATCH:
 					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 				}
@@ -460,9 +460,9 @@ function param_arrayindex( $param_name, $default = '' )
 	$value = array_pop( $array );
 	if( is_string($value) )
 	{
-		$value = substr( strip_tags($value), 0, 50 );  // sanitize it
+		$value = evo_substr( strip_tags( $value ), 0, 50 );  // sanitize it
 	}
-	elseif( !empty($value) )
+	elseif( ! empty( $value ) )
 	{ // this is probably a numeric index from '<input name="array[]" .. />'
 		debug_die( 'Invalid array param!' );
 	}
@@ -1422,27 +1422,28 @@ function check_is_phone( $phone )
 function param_check_passwords( $var1, $var2, $required = false, $min_length = 6, $params = array() )
 {
 	$params = array_merge( array(
+			'msg_pass_wrong' => T_('Passwords cannot contain the characters &lt;, &gt; and &amp;.'),
 			'msg_pass_new'   => T_('Please enter your new password.'),
 			'msg_pass_twice' => T_('Please enter your new password twice.'),
 			'msg_pass_diff'  => T_('You typed two different passwords.'),
 			'msg_pass_min'   => T_('The minimum password length is %d characters.'),
 		), $params );
 
-	$pass1 = get_param($var1);
-	$pass2 = get_param($var2);
+	$pass1 = get_param( $var1 );
+	$pass2 = get_param( $var2 );
 
-	if( ! strlen($pass1) && ! strlen($pass2) && ! $required )
+	if( ! strlen( $pass1 ) && ! strlen( $pass2 ) && ! $required )
 	{ // empty is OK:
 		return true;
 	}
 
-	if( ! strlen($pass1) )
+	if( ! strlen( $pass1 ) )
 	{
 		param_error( $var1, $params['msg_pass_new'] );
 		param_error( $var2, $params['msg_pass_twice'] );
 		return false;
 	}
-	if( ! strlen($pass2) )
+	if( ! strlen( $pass2 ) )
 	{
 		param_error( $var2, $params['msg_pass_twice'] );
 		return false;
@@ -1455,9 +1456,15 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 		return false;
 	}
 
-	if( evo_strlen($pass1) < $min_length )
-	{
+	if( evo_strlen( $pass1 ) < $min_length )
+	{ // Checking min length
 		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
+		return false;
+	}
+
+	if( preg_match( '/[<>&]/', $_POST[ $var1 ] ) )
+	{ // Checking the not allowed chars
+		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_wrong'] );
 		return false;
 	}
 

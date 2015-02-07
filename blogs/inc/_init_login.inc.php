@@ -33,7 +33,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_login.inc.php 7943 2015-01-11 00:41:53Z fplanque $
+ * @version $Id: _init_login.inc.php 8003 2015-01-15 11:48:40Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -68,21 +68,21 @@ $pass = NULL;
 $pass_md5 = NULL;
 $email_login = false;
 
-if( isset($_POST[ $dummy_fields[ 'login' ] ] ) && isset($_POST[ $dummy_fields[ 'pwd' ] ] ) )
+if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
 { // Trying to log in with a POST
 	$login = $_POST[ $dummy_fields[ 'login' ] ];
 	$pass = $_POST[ $dummy_fields[ 'pwd' ] ];
-	unset($_POST[ $dummy_fields[ 'pwd' ] ]); // password will be hashed below
+	unset( $_POST[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
-elseif( isset($_GET[ $dummy_fields[ 'login' ] ] ) )
+elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
 { // Trying to log in with a GET; we might only provide a user here.
 	$login = $_GET[ $dummy_fields[ 'login' ] ];
-	$pass = isset($_GET[ $dummy_fields[ 'pwd' ] ]) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
-	unset($_GET[ $dummy_fields[ 'pwd' ] ]); // password will be hashed below
+	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
+	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
 
-$Debuglog->add( 'Login: login: '.var_export($login, true), '_init_login' );
-$Debuglog->add( 'Login: pass: '.( empty($pass) ? '' : 'not' ).' empty', '_init_login' );
+$Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
+$Debuglog->add( 'Login: pass: '.( empty( $pass ) ? '' : 'not' ).' empty', '_init_login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = param_arrayindex( 'login_action' );
@@ -126,8 +126,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
-	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
-	$pass = strip_tags(remove_magic_quotes($pass));
+	$login = evo_strtolower( strip_tags( remove_magic_quotes( $login ) ) );
+	$pass = strip_tags( remove_magic_quotes( $pass ) );
 	$pass_md5 = md5( $pass );
 
 
@@ -135,7 +135,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	 * Handle javascript-hashed password:
 	 * If possible, the login form will hash the entered password with a salt that changes everytime.
 	 */
-	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
+	param( 'pwd_salt', 'string', '' ); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
 	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true), '_init_login' );

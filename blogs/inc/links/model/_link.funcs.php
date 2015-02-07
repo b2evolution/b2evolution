@@ -130,7 +130,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
  */
 function display_attachments( & $LinkOwner, $params = array() )
 {
-	global $current_User, $samedomain_htsrv_url;
+	global $current_User, $samedomain_htsrv_url, $redirect_to;
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
@@ -143,6 +143,8 @@ function display_attachments( & $LinkOwner, $params = array() )
 	{ // there are no attachments
 		return;
 	}
+
+	$redirect_to = urlencode( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to );
 
 	echo $params[ 'block_start' ];
 	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">';
@@ -168,7 +170,6 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo '</td><td class="shrinkwrap">';
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
-			$redirect_to = urlencode( regenerate_url( '', '', '', '&' ) );
 			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
 			echo action_icon( T_( 'Delete' ), 'delete', $delete_url );
 		}

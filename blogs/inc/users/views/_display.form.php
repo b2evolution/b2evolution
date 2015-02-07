@@ -24,7 +24,7 @@
  * @package evocore
 
  *
- * @version $Id: _display.form.php 7172 2014-07-22 08:07:56Z yura $
+ * @version $Id: _display.form.php 8020 2015-01-19 08:18:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,7 +66,7 @@ $Form->begin_fieldset( T_('Profile pictures').get_manual_link('profile-picture-s
 	$default_avatar_unknown = get_default_avatar_url();
 	$default_avatar_men = get_default_avatar_url( 'M' );
 	$default_avatar_women = get_default_avatar_url( 'F' );
-	$default_images_info = '<br />'.T_('For unknow gender').': <a href="'.$default_avatar_unknown.'" target="_blank">'.$default_avatar_unknown.'</a>';
+	$default_images_info = '<br />'.T_('For unknown gender').': <a href="'.$default_avatar_unknown.'" target="_blank">'.$default_avatar_unknown.'</a>';
 	$default_images_info .= '<br />'.T_('For men').': <a href="'.$default_avatar_men.'" target="_blank">'.$default_avatar_men.'</a>';
 	$default_images_info .= '<br />'.T_('For women').': <a href="'.$default_avatar_women.'" target="_blank">'.$default_avatar_women.'</a>';
 	$Form->radio( 'default_gravatar', $Settings->get('default_gravatar'),

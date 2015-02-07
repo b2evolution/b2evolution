@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7802 2014-12-11 10:41:39Z yura $
+ * @version $Id: _user.funcs.php 8123 2015-02-01 13:02:59Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1213,7 +1213,7 @@ function user_preferredname( $user_ID )
  */
 function profile_check_params( $params, $User = NULL )
 {
-	global $Messages, $Settings;
+	global $Messages, $Settings, $dummy_fields;
 
 	foreach( $params as $k => $v )
 	{
@@ -1318,6 +1318,10 @@ function profile_check_params( $params, $User = NULL )
 			elseif( isset($User) && $params['pass1'][0] == $User->get('nickname') )
 			{
 				param_error( $params['pass1'][1], T_('The password must be different from your nickname.') );
+			}
+			elseif( preg_match( '/[<>&]/', $_POST[ $dummy_fields[ $params['pass1'][1] ] ] ) )
+			{ // Checking the not allowed chars
+				param_error_multiple( array( $dummy_fields[ $params['pass1'][1] ], $dummy_fields[ $params['pass2'][1] ] ), T_('Passwords cannot contain the characters &lt;, &gt; and &amp;.') );
 			}
 		}
 	}
@@ -3561,7 +3565,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	// Display info about last error only when such data exists
 	$email_last_sent_ts = ( empty( $EmailAddress ) ? '' : $EmailAddress->get( 'last_sent_ts' ) );
 	$last_error_info = empty( $email_last_sent_ts ) ? '' :
-		sprintf( T_( ' (last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
+		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
 
 	switch( $email_status )
 	{

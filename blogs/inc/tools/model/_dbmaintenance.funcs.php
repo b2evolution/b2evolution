@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _dbmaintenance.funcs.php 1500 2012-07-10 11:38:31Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -298,7 +298,7 @@ function dbm_delete_broken_posts()
 
 	$num_deleted = 0;
 
-	echo T_('Removing of the broken posts that have no matching category... ');
+	echo T_('Removing broken posts that have no matching category... ');
 	evo_flush();
 
 	// Delete the posts only by these IDs
@@ -324,7 +324,7 @@ function dbm_delete_broken_posts()
 			}
 			else
 			{ // Post was NOT deleted
-				echo '<p class="red">'.sprintf( T_('Cannot delete a post ID=%s'), $broken_Item->ID ).'</p>';
+				echo '<p class="red">'.sprintf( T_('Cannot delete post with ID %s'), $broken_Item->ID ).'</p>';
 			}
 			if( $r % 100 == 0 )
 			{ // Display a log dot after each 100 processed posts
@@ -470,8 +470,8 @@ function dbm_delete_orphan_files()
 	}
 
 	echo 'OK<p>';
-	echo sprintf( T_('The number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
-	echo sprintf( T_('The number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
+	echo sprintf( T_('Number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
+	echo sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
 
 	if( $count_files_invalid )
 	{ // There are invalid files in the database
@@ -492,7 +492,7 @@ function dbm_delete_orphan_file_roots()
 {
 	global $DB, $media_path;
 
-	echo T_('Removing of the orphan file roots recursively with all of the content... ');
+	echo T_('Removing orphan file roots recursively with all of their content... ');
 	evo_flush();
 
 	// Store all directories that must be deleted
@@ -819,6 +819,7 @@ function dbm_convert_item_content_separators()
 	global $DB;
 
 	// Display process status
+	// TRANS: "more", "teaserbreak", "nextpage" and "pagebreak" must NOT be translated.
 	echo T_( 'Convert item content separators from &lt;!--more--&gt; to [teaserbreak] and &lt;!--nextpage--&gt; to [pagebreak]...' );
 	evo_flush();
 

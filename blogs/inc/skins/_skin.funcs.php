@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 7127 2014-07-15 13:43:26Z yura $
+ * @version $Id: _skin.funcs.php 8150 2015-02-03 15:12:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -556,8 +556,9 @@ var downloadInterval = setInterval( function()
 		case 'edit':
 			global $current_User, $post_ID;
 
-			// Post ID, go from $_GET when we edit post from Front-office
-			$post_ID = param( 'p', 'integer', 0, true );
+			// Post ID, go from $_GET when we edit a post from Front-office
+			//          or from $_POST when we switch from Back-office
+			$post_ID = param( 'p', 'integer', ( empty( $post_ID ) ? 0 : $post_ID ), true );
 
 			if( !is_logged_in() )
 			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: register.php 8076 2015-01-26 15:41:38Z yura $
  */
 
 /**
@@ -121,8 +121,12 @@ switch( $action )
 		/*
 		 * Do the registration:
 		 */
-		$pass1 = param( $dummy_fields[ 'pass1' ], 'raw', '' );
-		$pass2 = param( $dummy_fields[ 'pass2' ], 'raw', '' );
+		$pass1 = param( $dummy_fields['pass1'], 'string', '' );
+		$pass2 = param( $dummy_fields['pass2'], 'string', '' );
+
+		// Remove the invalid chars from password vars
+		$pass1 = preg_replace( '/[<>&]/', '', $pass1 );
+		$pass2 = preg_replace( '/[<>&]/', '', $pass2 );
 
 		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 		$Plugins->trigger_event( 'RegisterFormSent', array(

@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _eblog.form.php 7950 2015-01-12 16:22:31Z yura $
+ * @version $Id: _eblog.form.php 7996 2015-01-15 06:52:23Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -105,7 +105,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Posting settings').get_manual_link('post-by-email-posting-settings') );
 
 	// TODO: provide a list of categories to choose from
-	$Form->text_input( 'eblog__default_category', $Settings->get('eblog_default_category'), 5,
+	$Form->text_input( 'eblog_default_category', $Settings->get('eblog_default_category'), 5,
 				T_('Default Category ID'), sprintf( T_('This is a default category for your posts.').'<br />'.
 				T_('You can use the following code in message body to define categories: %s. In this example 2 will be main category and 5, 47 extra categories.'), '<b>&lt;category&gt;2, 5, 47&lt;/category&gt;</b>' ), array( 'maxlength' => 6 ) );
 

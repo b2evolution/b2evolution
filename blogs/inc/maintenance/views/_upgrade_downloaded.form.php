@@ -43,7 +43,7 @@ elseif( $download_success )
 }
 else
 { // Init a button to back step
-	$form_buttons[] = array( 'submit', 'actionArray[start]', T_( 'Back to select package' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[start]', T_( 'Back to Package Selection' ), 'SaveButton' );
 }
 
 $Form->end_form( $form_buttons );

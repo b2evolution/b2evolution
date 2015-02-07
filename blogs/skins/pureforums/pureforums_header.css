@@ -13,9 +13,9 @@
 }
 .header .header_top {
   background-color: #242D36;
-  background-image: -webkit-linear-gradient(#1e252d, #2b3540);
-  background-image: -moz-linear-gradient(#1e252d, #2b3540);
-  background-image: linear-gradient(#1e252d, #2b3540);
+  background-image: -webkit-linear-gradient(#1E252D, #2B3540);
+  background-image: -moz-linear-gradient(#1E252D, #2B3540);
+  background-image: linear-gradient(#1E252D, #2B3540);
   height: 36px;
   line-height: 36px;
   color: #9FB5C9;
@@ -23,10 +23,10 @@
 }
 .header .header_bottom {
   background-color: #3C597F;
-  background-image: -webkit-linear-gradient(#50739b, #283f63);
-  background-image: -moz-linear-gradient(#50739b, #283f63);
-  background-image: linear-gradient(#50739b, #283f63);
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5d8cb7 inset;
+  background-image: -webkit-linear-gradient(#50739B, #283F63);
+  background-image: -moz-linear-gradient(#50739B, #283F63);
+  background-image: linear-gradient(#50739B, #283F63);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5D8CB7 inset;
   text-align: center;
 }
 .header .header_bottom .layout_width {
@@ -68,9 +68,9 @@
 }
 .header .widget_core_coll_search_form form .search_field {
   background-color: #EAECF1;
-  background-image: -webkit-linear-gradient(white, #d5d9e3);
-  background-image: -moz-linear-gradient(white, #d5d9e3);
-  background-image: linear-gradient(white, #d5d9e3);
+  background-image: -webkit-linear-gradient(#FFFFFF, #D5D9E3);
+  background-image: -moz-linear-gradient(#FFFFFF, #D5D9E3);
+  background-image: linear-gradient(#FFFFFF, #D5D9E3);
   border: medium none;
   border-radius: 5px;
   box-shadow: 0 1px 2px rgba(36, 44, 51, 0.5);

@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id$
+ * @version $Id: _email_header.inc.html.php 8027 2015-01-19 11:58:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -47,4 +47,4 @@ else
 <?php } ?>
 
 <div class="email_payload">
-<p><?php echo T_( 'Hello $login$ !' ); ?></p>
+<p><?php echo T_( 'Hello $login$!' ); ?></p>

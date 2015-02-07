@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7506 2014-10-24 05:23:37Z yura $
+ * @version $Id: _item.class.php 8179 2015-02-06 07:31:34Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -4934,12 +4934,12 @@ class Item extends ItemLight
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
-		// pre_dump($this->dbchanges);
+		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
 		if( isset($this->dbchanges['post_status'])
 			|| isset($this->dbchanges['post_title'])
 			|| isset($this->dbchanges['post_content']) )
-		{	// One of the fields we track in the revision history has changed:
+		{ // One of the fields we track in the revision history has changed:
 			// Save the "current" (soon to be "old") data as a version before overwriting it in parent::dbupdate:
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
@@ -4954,7 +4954,7 @@ class Item extends ItemLight
 				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_datemodified, post_status, post_title, post_content
 					FROM T_items__item
 				 WHERE post_ID = '.$this->ID;
-			$DB->query( $sql, 'Save a version of the Item' );
+			$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
 		}
 
 		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
@@ -4963,7 +4963,7 @@ class Item extends ItemLight
 			$this->set_param( 'last_touched_ts', 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
 
-		if( $result = ( parent::dbupdate( $auto_track_modification ) !== false ) )
+		if( $result && ( parent::dbupdate( $auto_track_modification ) !== false ) )
 		{ // We could update the item object:
 
 			// Let's handle the extracats:
@@ -4995,6 +4995,8 @@ class Item extends ItemLight
 			}
 		}
 
+		// Check if there were failed nested transaction
+		$result = $result && ( ! $DB->has_failed_transaction() );
 		if( $result === false )
 		{ // Update failed
 			$DB->rollback();
@@ -5471,8 +5473,8 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'todo' );
 		}
 
-		// Save the new processing status to DB
-		$this->dbupdate();
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt
+		$this->dbupdate( false, false, false );
 
 		return true;
 	}
@@ -6688,7 +6690,7 @@ class Item extends ItemLight
 				}
 				else
 				{ // Display error if file is not an image
-					$content = str_replace( $current_link_tag, '<div class="error">'.sprintf( T_('This file is not image: %s'), $current_link_tag ).'</div>', $content );
+					$content = str_replace( $current_link_tag, '<div class="error">'.T_('This File is not an image:').' '.$current_link_tag.'</div>', $content );
 				}
 			}
 		}

@@ -32,7 +32,7 @@
  * @todo Make it a class / global object!
  *        - Provide (static) functions to extract .po files / generate _global.php files (single quoted strings!)
  *
- * @version $Id: _locale.funcs.php 7437 2014-10-15 11:18:00Z yura $
+ * @version $Id: _locale.funcs.php 8080 2015-01-27 06:26:04Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -814,18 +814,20 @@ function locale_updateDB()
 	$disabled_locales = array();
 	$saved_params = array();
 
+	$current_default_locale = $Settings->get( 'default_locale' );
+
 	$lnr = 0;
 	// Loop through list of all HTTP POSTed params:
 	foreach( $_POST as $pkey => $pval )
 	{
-		if( ! preg_match('/loc_(\d+)_(.*)/', $pkey, $matches) )
+		if( ! preg_match( '/loc_(\d+)_(.*)/', $pkey, $matches ) )
 		{
 			continue;
 		}
 
 		// This is a locale related parameter, get it now:
 		$pval = param( $pkey, 'string', '' );
-		$saved_params[$pkey] = $pval;
+		$saved_params[ $pkey ] = $pval;
 
 		$lfield = $matches[2];
 
@@ -836,7 +838,7 @@ function locale_updateDB()
 
 			if( $templocales[ $plocale ]['enabled'] )
 			{ // Collect previously enabled locales
-				$disabled_locales[$plocale] = $plocale;
+				$disabled_locales[ $plocale ] = $plocale;
 			}
 			// checkboxes default to 0
 			$templocales[ $plocale ]['enabled'] = 0;
@@ -849,21 +851,21 @@ function locale_updateDB()
 			}
 			if( $lfield == 'enabled' )
 			{ // This locale is enabled, remove from the list of the disabled locales
-				unset( $disabled_locales[$plocale] );
+				unset( $disabled_locales[ $plocale ] );
 			}
-			$templocales[$plocale][$lfield] = $pval;
+			elseif( $plocale == $current_default_locale && isset( $disabled_locales[ $plocale ] ) && ! isset( $_POST['loc_'.$lnr.'_enabled'] ) )
+			{ // The default locale must be always enabled
+				unset( $disabled_locales[ $plocale ] );
+				// Force the default locale to be enabled
+				$templocales[ $plocale ]['enabled'] = 1;
+				// Inform user about this action
+				$Messages->add( sprintf( T_('The locale %s was re-enabled automatically because it\'s currently the default locale. The default locale must be a valid and enabled locale.'), '<b>'.$current_default_locale.'</b>' ), 'warning' );
+			}
+			$templocales[ $plocale ][ $lfield ] = $pval;
 		}
 	}
 
 	$locales = $templocales;
-
-	// Make sure the default locale is enabled
-	$current_default_locale = $Settings->get('default_locale');
-	if( isset( $current_default_locale ) && ( ! $locales[$current_default_locale]['enabled'] ) )
-	{ // The default locale is not enabled, we do not allow to update locales in this case
-		$Messages->add( T_('Updating locales are not enabled until default locale is not valid!'), 'error' );
-		return false;
-	}
 
 	// Check the usage of the disabled locales
 	$disabled_locales = ( count( $disabled_locales ) > 0 ) ? $DB->quote( $disabled_locales ) : false;

@@ -34,7 +34,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user_preferences.form.php 7878 2014-12-23 11:54:05Z yura $
+ * @version $Id: _user_preferences.form.php 8153 2015-02-04 06:52:00Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -205,10 +205,19 @@ if( $action != 'view' )
 		// Note: because using jQuery leads to 'timeout_sessions_container' flash for 'default duration' on page load.
 		$fieldstart = $Form->fieldstart;
 		if( $timeout_sessions_selected == 'default' )
-		{
+		{ // Hide the field to customize a session duration when default duration is selected
 			$Form->fieldstart = str_replace( '>', ' style="display:none">', $Form->fieldstart );
 		}
-		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1 ) );
+		if( $timeout_sessions > $Settings->get( 'auto_prune_stats' ) * 86400 &&
+		    $timeout_sessions > $def_timeout_session )
+		{ // Display a warning if the user session can be deleted earlier
+			$timeout_sessions_warning = '<br /><span class="red">'.sprintf( T_('WARNING: The session will actually die earlier because the sessions table is pruned after %d days.'), intval( $Settings->get( 'auto_prune_stats' ) ) ).'</span>';
+		}
+		else
+		{ // No warning, because the custom user session duration will be used
+			$timeout_sessions_warning = '';
+		}
+		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1, 'note' => $timeout_sessions_warning ) );
 		$Form->fieldstart = $fieldstart;
 	}
 	else

@@ -18,7 +18,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_general.form.php 8020 2015-01-19 08:18:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -70,7 +70,7 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link('collection-type') 
 		if( $edited_Blog->ID > 0 )
 		{
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
-					.T_('Change collection type / Reset &raquo;')
+					.T_('Change collection type / Reset')
 			.'</a></p>';
 		}
 	}

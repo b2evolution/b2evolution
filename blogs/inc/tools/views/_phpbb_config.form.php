@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _misc_tools.view.php 505 2011-12-09 20:54:21Z fplanque $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -58,7 +58,7 @@ $Form->begin_fieldset( T_('Select a blog for import') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

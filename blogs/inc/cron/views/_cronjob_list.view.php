@@ -21,7 +21,7 @@
  *
  * @package admin
  *
- * @version $Id: _cronjob_list.view.php 7954 2015-01-13 05:56:27Z yura $
+ * @version $Id: _cronjob_list.view.php 8007 2015-01-15 12:33:19Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -105,12 +105,14 @@ if( ! empty( $s ) )
 if( ! empty( $datestart ) )
 { // Filter by start date
 	$timestart_value = empty( $timestart ) ? '00:00:00' : $timestart;
-	$SQL->WHERE_and( 'ctsk_start_datetime >= '.$DB->quote( $datestart.' '.$timestart_value ) );
+	$SQL->WHERE_and( '( ctsk_start_datetime >= '.$DB->quote( $datestart.' '.$timestart_value ).'
+		OR clog_realstart_datetime >= '.$DB->quote( $datestart.' '.$timestart_value ).' )' );
 }
 if( ! empty( $datestop ) )
 { // Filter by end date
 	$timestop_value = empty( $timestop ) ? '23:59:59' : $timestop;
-	$SQL->WHERE_and( 'ctsk_start_datetime <= '.$DB->quote( $datestop.' '.$timestop_value ) );
+	$SQL->WHERE_and( '( ctsk_start_datetime <= '.$DB->quote( $datestop.' '.$timestop_value ).'
+		OR clog_realstop_datetime <= '.$DB->quote( $datestop.' '.$timestop_value ).' )' );
 }
 $SQL->ORDER_BY( '*, ctsk_ID' );
 
@@ -150,11 +152,11 @@ function filter_crontab( & $Form )
 	// Date/time filters:
 	$Form->date_input( 'datestartinput', $datestart, T_('Start Date') );
 	echo T_('at').' &nbsp;';
-	$Form->time_input( 'timestart', $datestart.' '.$timestart, '' );
+	$Form->time_input( 'timestart', '           '.$timestart, '' );
 
 	$Form->date_input( 'datestopinput', $datestop, T_('End Date') );
 	echo T_('at').' &nbsp;';
-	$Form->time_input( 'timestop', $datestop.' '.$timestop, '' );
+	$Form->time_input( 'timestop', '           '.$timestop, '' );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_crontab',

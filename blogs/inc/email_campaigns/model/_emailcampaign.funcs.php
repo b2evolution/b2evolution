@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _emailcampaign.funcs.php 8039 2015-01-21 11:33:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -151,7 +151,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 
 	$url = $edit_url.$glue.'tab=text';
 	$modes['text'] = array(
-		'text' => T_('Plain Text message'),
+		'text' => T_('Plain-text message'),
 		'href' => $url
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )

@@ -10,7 +10,7 @@
  *
  * @package plugins
  *
- * @version $Id: _infodots.plugin.php 7043 2014-07-02 08:35:45Z yura $
+ * @version $Id: _infodots.plugin.php 8171 2015-02-06 02:55:42Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -74,7 +74,7 @@ class infodots_plugin extends Plugin
 						'type' => 'integer',
 						'size' => 4,
 						'defaultvalue' => 400,
-						'note' => T_('Enter the minimum pixel width an image must have the dots.')
+						'note' => T_('Enter the minimum pixel width an image must have for dots to be displayed.')
 					),
 			)
 		);

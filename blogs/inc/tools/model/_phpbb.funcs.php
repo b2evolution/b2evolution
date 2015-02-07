@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _phpbb.funcs.php 78 2011-10-26 16:29:49Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -537,7 +537,7 @@ function phpbb_import_users()
 				continue;
 			}
 
-			if( $phpbb_user->username == '¥åßßå' )
+			if( $phpbb_user->username == 'Â¥Ã¥ÃŸÃŸÃ¥' )
 			{	// Special rule for this username
 				$user_login = 'yabba';
 			}
@@ -552,7 +552,7 @@ function phpbb_import_users()
 			{	// The user has the duplicate email
 				if( !empty( $phpbb_emails_duplicated[$phpbb_user->user_email] ) )
 				{	// The other user already was imported with such email
-					phpbb_log( '<br />'.sprintf( T_( 'The phbBB users "%s" and "%s" have the same email address "%s" and will be merged in b2evolution as just "%s"' ) ,
+					phpbb_log( '<br />'.sprintf( T_( 'The phpBB users "%s" and "%s" have the same email address "%s" and will be merged in b2evolution as just "%s"' ),
 							$phpbb_emails_duplicated[$phpbb_user->user_email]['username'], // Username of the first user
 							$user_login, // Username of the second user (duplicate)
 							$phpbb_user->user_email, // The same email address
@@ -2068,7 +2068,7 @@ function phpbb_check_step( $step_name )
 	{	// User tries open previous step that already been processed
 		phpbb_log( T_('This import step has already been processed.'), 'error', ' ' );
 		// Continue button
-		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue !') : T_('Go to Forum') ).'" name="submit" />';
+		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue!') : T_('Go to Forum') ).'" name="submit" />';
 		return false;
 	}
 

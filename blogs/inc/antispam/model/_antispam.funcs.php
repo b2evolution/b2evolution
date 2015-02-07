@@ -35,7 +35,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id$
+ * @version $Id: _antispam.funcs.php 8020 2015-01-19 08:18:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -283,7 +283,7 @@ function antispam_poll_abuse()
 		}
 		else
 		{
-			$Messages->add( T_('Invalid reponse.'), 'error' );
+			$Messages->add( T_('Invalid response.'), 'error' );
 			$ret = false;
 		}
 	}

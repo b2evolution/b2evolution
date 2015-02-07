@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _phpbb_users.form.php 505 2011-12-09 20:54:21Z fplanque $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' )/*,
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' )/*,
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=groups\'' )*/ ) );
 
 $Form->end_form();

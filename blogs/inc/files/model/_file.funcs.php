@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _file.funcs.php 8181 2015-02-06 07:52:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -112,30 +112,35 @@ function get_filenames( $path, $params = array() )
 	global $Settings;
 
 	$params = array_merge( array(
-			'inc_files'		=> true,	// include files (not only directories)
-			'inc_dirs'		=> true,	// include directories (not the directory itself!)
-			'flat'			=> true,	// return a one-dimension-array
-			'recurse'		=> true,	// recurse into subdirectories
-			'basename'		=> false,	// get the basename only
-			'trailing_slash'=> false,	// add trailing slash
-			'inc_hidden'    => true,	// inlcude hidden files, directories and content
-			'inc_evocache'	=> false,	// exclude evocache directories and content
+			'inc_files'      => true,  // include files (not only directories)
+			'inc_dirs'       => true,  // include directories (not the directory itself!)
+			'flat'           => true,  // return a one-dimension-array
+			'recurse'        => true,  // recurse into subdirectories
+			'basename'       => false, // get the basename only
+			'trailing_slash' => false, // add trailing slash
+			'inc_hidden'     => true,  // inlcude hidden files, directories and content
+			'inc_evocache'   => false, // exclude evocache directories and content
+			'inc_temp'       => true,  // include temporary files and directories
 		), $params );
 
 	$r = array();
 
 	$path = trailing_slash( $path );
 
-	if( $dir = @opendir($path) )
+	if( $dir = @opendir( $path ) )
 	{
-		while( ( $file = readdir($dir) ) !== false )
+		while( ( $file = readdir( $dir ) ) !== false )
 		{
 			if( $file == '.' || $file == '..' )
+			{ // Skip these reserved names
 				continue;
+			}
 
 			// asimo> Also check if $Settings is not empty because this function is called from the install srcipt too, where $Settings is not initialized yet
-			if( ! $params['inc_evocache'] && ! empty( $Settings ) && $file == $Settings->get('evocache_foldername') )
+			if( ! $params['inc_evocache'] && ! empty( $Settings ) && $file == $Settings->get( 'evocache_foldername' ) )
+			{ // Do not load evocache directories
 				continue;
+			}
 
 			// Check for hidden status...
 			if( ( ! $params['inc_hidden'] ) && ( substr( $file, 0, 1 ) == '.' ) )
@@ -143,7 +148,13 @@ function get_filenames( $path, $params = array() )
 				continue;
 			}
 
-			if( is_dir($path.$file) )
+			// Check for temp directories/files
+			if( ! $params['inc_temp'] && $file == 'upload-tmp' )
+			{ // Do not load temporary files and directories
+				continue;
+			}
+
+			if( is_dir( $path.$file ) )
 			{
 				if( $params['flat'] )
 				{
@@ -168,7 +179,7 @@ function get_filenames( $path, $params = array() )
 				}
 				else
 				{
-					$r[$file] = get_filenames( $path.$file, $params );
+					$r[ $file ] = get_filenames( $path.$file, $params );
 				}
 			}
 			elseif( $params['inc_files'] )
@@ -176,7 +187,7 @@ function get_filenames( $path, $params = array() )
 				$r[] = $params['basename'] ? $file : $path.$file;
 			}
 		}
-		closedir($dir);
+		closedir( $dir );
 	}
 	else
 	{
@@ -2500,5 +2511,57 @@ function is_empty_directory( $dir, $recursive = true )
 	closedir( $handle );
 
 	return $result;
+}
+
+
+/**
+ * Open temporary file
+ *
+ * @param string Name of the temporary file (changed by reference)
+ * @return resource|string File handle OR Error text
+ */
+function open_temp_file( & $temp_file_name )
+{
+	$temp_handle = tmpfile();
+
+	if( $temp_handle === false )
+	{ // Error on create a temp file on system temp dir
+		global $media_path;
+
+		$temp_path = $media_path.'upload-tmp/';
+
+		$temp_folder_exists = file_exists( $temp_path );
+		if( ! $temp_folder_exists )
+		{ // Temp folder doesn't exist yet
+			// Try to create it
+			$temp_folder_exists = @mkdir( $temp_path, 0755 );
+			if( $temp_folder_exists )
+			{ // If temp folder has been created try to create .htaccess to prevent listing
+				if( $htaccess_handle = @fopen( $temp_path.'.htaccess', 'w+' ) )
+				{
+					fwrite( $htaccess_handle, 'deny from all' );
+					fclose( $htaccess_handle );
+				}
+			}
+		}
+
+		if( $temp_folder_exists )
+		{ // Try to create a temp file on media temp path
+			$temp_file_name = tempnam( $temp_path, 'qck_' );
+		}
+
+		if( ! $temp_folder_exists || $temp_file_name === false )
+		{ // Error on create a temp file on media temp path
+			return sprintf( T_( 'Unable to create temporary upload file. PHP needs write permissions on %s or %s.' ),
+				'<b>'.sys_get_temp_dir().'</b>',
+				'<b>'.$temp_path.'</b>' );
+		}
+
+		// Create a file handle for new temp file on media path
+		$temp_handle = fopen( $temp_file_name, 'r+' );
+	}
+
+	// File handle
+	return $temp_handle;
 }
 ?>

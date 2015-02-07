@@ -162,7 +162,7 @@ class user_login_Widget extends ComponentWidget
 					'size' => 30,
 					'note' => T_( 'Greeting text to display' ),
 					'type' => 'text',
-					'defaultvalue' => T_( 'Hello $login$ !' ),
+					'defaultvalue' => T_( 'Hello $login$!' ),
 				),
 			), parent::get_param_definitions( $params ) );
 

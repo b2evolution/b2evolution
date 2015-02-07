@@ -70,19 +70,19 @@ class markdown_plugin extends Plugin
 				'links' => array(
 						'label' => T_( 'Links' ),
 						'type' => 'checkbox',
-						'note' => T_( 'Create the links.' ),
+						'note' => T_( 'Detect and convert markdown link markup.' ),
 						'defaultvalue' => 0,
 					),
 				'images' => array(
 						'label' => T_( 'Images' ),
 						'type' => 'checkbox',
-						'note' => T_( 'Create the images.' ),
+						'note' => T_( 'Detect and convert markdown image markup.' ),
 						'defaultvalue' => 0,
 					),
 				'text_styles' => array(
 						'label' => T_( 'Italic & Bold styles' ),
 						'type' => 'checkbox',
-						'note' => T_( 'Create bold and italic styles for text formatting.' ),
+						'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
 						'defaultvalue' => 0,
 					),
 			)
@@ -390,7 +390,7 @@ class markdown_plugin extends Plugin
 			);
 
 		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_codespan','codespan', '<?php echo TS_('Code span') ?>',
+				'mrkdwn_codespan','codespan', '<?php echo TS_('Codespan') ?>',
 				'`','`',
 				'', -1
 			);

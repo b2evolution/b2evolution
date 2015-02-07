@@ -39,7 +39,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _hitlog.funcs.php 7495 2014-10-22 10:30:38Z yura $
+ * @version $Id: _hitlog.funcs.php 8062 2015-01-25 21:06:15Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1111,7 +1111,8 @@ function extract_keyphrase_from_hitlogs()
 
 	if( $DB->get_var( 'SELECT IS_FREE_LOCK( '.$DB->quote( $lock_name ).' )' ) === '0' )
 	{ // The "exctract_keyphrase" process is already running on a different request, do not start it again
-		return T_( 'A process to extract keyphrases from hits is already running in a different request. It was not executed now.');
+		// Do not translate.
+		return 'Keyphrase extraction is already in progress in a different process. This new request would duplicate the effort so it is aborted.';
 	}
 
 	// Important: If a two or more different simultanious process will arrive to this point at the same time, only one of them will acquire the lock!

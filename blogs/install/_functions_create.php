@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 7347 2014-10-01 11:52:15Z yura $
+ * @version $Id: _functions_create.php 8168 2015-02-06 02:50:21Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1511,7 +1511,7 @@ function create_demo_contents()
 	{	// Insert three ADVERTISEMENTS for each blog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-pros.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -1519,7 +1519,7 @@ function create_demo_contents()
 
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-better.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -1527,7 +1527,7 @@ function create_demo_contents()
 
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo : The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $adv_cat_ID,
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $adv_cat_ID,
 			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-other.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -1946,16 +1946,19 @@ a school bus stop where you wouldn\'t really expect it!
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$Item_Forum_welcome_ID = $edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
+	$Item_Forum_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+			T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
 <li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
-<li><strong>Photos</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
+<li><strong>Blog B</strong>: You can access it from the link at the top of the page. It contains information about more advanced features. Note that it is deliberately using a different skin from Blog A to give you an idea of what's possible.</li>
+<li><strong>Photos</strong>: This collection is an example of how you can use b2evolution to showcase photos, with photos grouped into photo albums.</li>
+<li><strong>Forums</strong>: This collection is a discussion forum (a.k.a. bulletin board) allowing your users to discuss among themselves.</li>
+<li><strong>Manual</strong>: This showcases how b2evolution can be used to publish structured content such as an online manual or book.</li>
+
 </ul>
 
-<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_forums_ann );
+<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_forums_ann );
 	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$LinkOwner = new LinkItem( $edited_Item );
 	$edit_File->link_to_Object( $LinkOwner );
@@ -2059,16 +2062,19 @@ a school bus stop where you wouldn\'t really expect it!
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$Item_Manual_welcome_ID = $edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
+	$Item_Manual_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+			T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
 <li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
-<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
-<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
-<li><strong>Photos</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
+<li><strong>Blog B</strong>: You can access it from the link at the top of the page. It contains information about more advanced features. Note that it is deliberately using a different skin from Blog A to give you an idea of what's possible.</li>
+<li><strong>Photos</strong>: This collection is an example of how you can use b2evolution to showcase photos, with photos grouped into photo albums.</li>
+<li><strong>Forums</strong>: This collection is a discussion forum (a.k.a. bulletin board) allowing your users to discuss among themselves.</li>
+<li><strong>Manual</strong>: This showcases how b2evolution can be used to publish structured content such as an online manual or book.</li>
+
 </ul>
 
-<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_manual_ann, array( $cat_manual_life ),
+<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_ann, array( $cat_manual_life ),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
 	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$LinkOwner = new LinkItem( $edited_Item );

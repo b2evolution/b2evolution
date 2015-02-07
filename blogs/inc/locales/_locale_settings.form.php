@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed: Daniel HAHLER.
  *
- * @version $Id: _locale_settings.form.php 7489 2014-10-22 06:54:36Z yura $
+ * @version $Id: _locale_settings.form.php 8046 2015-01-22 07:33:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -183,8 +183,7 @@ if( $action == 'edit' )
 		<?php echo T_('Z - timezone offset in seconds (i.e. "-43200" to "43200"). The offset for timezones west of UTC is always negative, and for those east of UTC is always positive.') ?>
 		</p>
 		<?php echo T_('isoZ - full ISO 8601 format, equivalent to Y-m-d\TH:i:s\Z') ?><br />
-		<p><?php echo T_('Unrecognized characters in the format string will be printed as-is.<br />
-		You can escape characters by preceding them with a \ to print them as-is.') ?></p>
+		<p><?php echo T_('Unrecognized characters in the format string will be printed as-is.<br />You can escape characters by preceding them with a \ to print them as-is.') ?></p>
 	</div>
 <?php
 }
@@ -244,9 +243,18 @@ else
 	{
 		global $messages_pot_file_info;
 		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+		$messages_DB_info = $DB->get_var( 'SELECT COUNT(iost_ID) FROM T_i18n_original_string' );
 
-		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a><br />';
-		echo sprintf( T_('Number of strings in .POT file: %s'), $messages_pot_file_info['all'] ).'<br />';
+		echo '<a href="'.$pagenow.'?ctrl=locales&amp;loc_transinfo=0">' . T_('Hide translation info'), '</a><br /><br />';
+
+		$Form->output = false;
+		$button_generate_POT_file = $Form->button( array( 'submit', 'actionArray[generate_pot]', T_('(Re)generate POT file'), 'SaveButton' ) );
+		$button_import_POT_file = $Form->button( array( 'submit', 'actionArray[import_pot]', T_('(Re)import POT file'), 'SaveButton' ) );
+		$Form->output = true;
+		echo sprintf( T_('# strings in .POT file: %s - # strings in DB: %s '),
+				$messages_pot_file_info['all'].' '.$button_generate_POT_file,
+				$messages_DB_info.' '.$button_import_POT_file
+			).'<br />';
 		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
 		{
 			echo '<span class="notes">';
@@ -410,7 +418,7 @@ else
 			$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/messages.po';
 			if( ! is_file( $po_file ) )
 			{
-				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No language file...').'</a></td>';
+				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No PO file').'</a></td>';
 			}
 			else
 			{ // File exists:
@@ -421,7 +429,7 @@ else
 
 				$percent_done = $po_file_info['percent'];
 				$color = sprintf( '%02x%02x00', 255 - round( $percent_done * 2.55 ), round( $percent_done * 2.55 ) );
-				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">". $percent_done ." %</a></td>";
+				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">".sprintf( T_('%d%% in PO'), $percent_done )."</a></td>";
 			}
 
 			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )

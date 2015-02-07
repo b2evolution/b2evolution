@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7633 2014-11-13 09:57:07Z yura $
+ * @version $Id: _user.class.php 8076 2015-01-26 15:41:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -817,12 +817,19 @@ class User extends DataObject
 		{
 			$reqID = param( 'reqID', 'string', '' );
 
+			global $edited_user_pass1, $edited_user_pass2;
+
+			$edited_user_pass1 = param( 'edited_user_pass1', 'string', true );
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+
+			// Remove the invalid chars from password vars
+			$edited_user_pass1 = preg_replace( '/[<>&]/', '', $edited_user_pass1 );
+			$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+
 			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
 			{ // current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
-				param( 'edited_user_pass1', 'string', true );
-				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
 				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 				{ // We can set password
@@ -832,8 +839,6 @@ class User extends DataObject
 			else
 			{
 				// ******* Password edit form ****** //
-				param( 'edited_user_pass1', 'string', true );
-				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
 				$current_user_pass = param( 'current_user_pass', 'string', true );
 
