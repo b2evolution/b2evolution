@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: translation.ctrl.php 8047 2015-01-22 07:36:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,17 +48,6 @@ if( $locales[$edit_locale]['charset'] == 'utf-8' && $io_charset != 'utf-8' )
 
 switch( $action )
 {
-	case 'import_pot':
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'translation' );
-
-		if( translation_update_table_pot() )
-		{
-			$Messages->add( T_('The file .POT was imported into database successfully'), 'success' );
-		}
-		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
-		break;
-
 	case 'import_po':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'translation' );
@@ -66,17 +55,6 @@ switch( $action )
 		if( translation_update_table_po( $edit_locale ) )
 		{
 			$Messages->add( T_('The file .PO was imported into database successfully'), 'success' );
-		}
-		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
-		break;
-
-	case 'generate_pot':
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'translation' );
-
-		if( translation_generate_pot_file() )
-		{
-			$Messages->add( T_('The file .POT was generated successfully'), 'success' );
 		}
 		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		break;

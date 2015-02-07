@@ -28,17 +28,11 @@ div.log_container {
 	height: 100%;
 	min-height: 100%;
 	padding: 0 40px;
-	position: relative;
+	display: table;
 }
 .wrap {
-	width: 400px;
-	margin: 0 auto;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;
+	display: table-cell;
+	vertical-align: middle;
 }
 
 .panel {
@@ -57,6 +51,9 @@ div.log_container {
 }
 .form-login fieldset {
 	margin-bottom: 20px;
+}
+.form-login fieldset:last-child {
+	margin-bottom: 0;
 }
 .form-login input[type=text], .form-login input[type=password] {
 	width: 100%;
@@ -89,6 +86,9 @@ div#p-status {
 }
 .control-label .label_field_required {
 	display: none;
+}
+.form-horizontal fieldset div.input .btn {
+	margin-bottom: 20px;
 }
 
 .form-lostpass .controls {

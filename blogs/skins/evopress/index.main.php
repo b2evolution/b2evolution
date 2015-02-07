@@ -33,7 +33,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF HEADER --------------------------------
 ?>
 
@@ -46,13 +46,15 @@ skin_include( '_body_header.inc.php' );
 		// Display container and contents:
 		skin_container( NT_('Menu'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '',
-				'block_end' => '',
+				'block_start'         => '',
+				'block_end'           => '',
 				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
+				'list_start'          => '',
+				'list_end'            => '',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
+				'item_title_before'   => '',
+				'item_title_after'    => '',
 			) );
 		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>
@@ -99,8 +101,8 @@ skin_include( '_body_header.inc.php' );
 <?php
 // ------------------------- SIDEBAR INCLUDED HERE --------------------------
 skin_include( '_sidebar.inc.php' );
-// Note: You can customize the default BODY footer by copying the
-// _body_footer.inc.php file into the current skin folder.
+// Note: You can customize the sidebar by copying the
+// _sidebar.inc.php file into the current skin folder.
 // ----------------------------- END OF SIDEBAR -----------------------------
 
 

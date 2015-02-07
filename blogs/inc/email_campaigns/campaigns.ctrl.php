@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: campaigns.ctrl.php 7827 2014-12-17 07:04:16Z yura $
+ * @version $Id: campaigns.ctrl.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -69,7 +69,7 @@ switch( $action )
 		$new_EmailCampaign->dbinsert();
 		$Session->set( 'edited_campaign_ID', $new_EmailCampaign->ID );
 
-		$Messages->add( T_('The email campaign was created, please select the users.'), 'success' );
+		$Messages->add( T_('The email campaign was created. Please select the recipients.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
@@ -115,7 +115,7 @@ switch( $action )
 	case 'change_users':
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
-		$Messages->add( T_('Please select new users for email campaign.'), 'success' );
+		$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
 
 		// Redirect to select users:
 		header_redirect( '?ctrl=users', 303 ); // Will EXIT
@@ -361,7 +361,7 @@ switch( $action )
 			case 'html':
 				if( $edited_EmailCampaign->get( 'email_html' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_html', '<p>Hello $login$ !</p>'."\r\n\r\n".'<p>This is our newsletter...</p>' );
+					$edited_EmailCampaign->set( 'email_html', '<p>Hello $login$!</p>'."\r\n\r\n".'<p>This is our newsletter...</p>' );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_html.form.php' );
 				break;

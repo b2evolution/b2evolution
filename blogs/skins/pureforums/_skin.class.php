@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage pureforums
  *
- * @version $Id: _skin.class.php 7894 2014-12-25 12:23:01Z yura $
+ * @version $Id: _skin.class.php 8186 2015-02-06 22:24:19Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -119,7 +119,7 @@ class pureforums_Skin extends Skin
 				),
 				'autocomplete_usernames' => array(
 					'label' => T_('Autocomplete usernames'),
-					'note' => T_('Check to enable autocomplete usernames after entered sign "@" in the comment form'),
+					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),

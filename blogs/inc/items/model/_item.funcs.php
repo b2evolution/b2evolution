@@ -32,7 +32,7 @@
  * @author tswicegood: Travis SWICEGOOD.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _item.funcs.php 7583 2014-11-06 11:59:03Z yura $
+ * @version $Id: _item.funcs.php 8151 2015-02-03 15:15:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -131,7 +131,7 @@ function init_inskin_editing()
 		check_categories_nosave ( $post_category, $post_extracats );
 		$post_extracats = postcats_get_byID( $post_ID );
 
-		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' );
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit&p='.$post_ID, '&' );
 		$tab_switch_params .= '&amp;p='.$edited_Item->ID;
 	}
 	elseif( $copy_post_ID > 0 )
@@ -153,7 +153,7 @@ function init_inskin_editing()
 
 		check_categories_nosave ( $post_category, $post_extracats );
 
-		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 	elseif( empty( $action ) )
 	{	// Create new post (from Front-office)
@@ -175,7 +175,7 @@ function init_inskin_editing()
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ false, /* creating? */ true );
 
-		$redirect_to = url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID, '&' );
+		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 
 	// Used in the edit form:

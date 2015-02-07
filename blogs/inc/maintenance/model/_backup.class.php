@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _backup.class.php 8182 2015-02-06 07:53:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -168,8 +168,10 @@ class Backup
 
 	/**
 	 * Load settings from request
+	 *
+	 * @param boolean TRUE to memorize all params
 	 */
-	function load_from_Request()
+	function load_from_Request( $memorize_params = false )
 	{
 		global $backup_paths, $backup_tables, $Messages;
 
@@ -178,17 +180,17 @@ class Backup
 		{
 			if( array_key_exists( 'label', $settings ) && !is_null( $settings['label'] ) )
 			{	// We can set param
-				$this->backup_paths[$name] = param( 'bk_'.$name, 'boolean' );
+				$this->backup_paths[$name] = param( 'bk_'.$name, 'boolean', 0, $memorize_params );
 			}
 		}
 
 		// Load tables settings from request
 		foreach( $backup_tables as $name => $settings )
 		{
-			$this->backup_tables[$name] = param( 'bk_'.$name, 'boolean' );
+			$this->backup_tables[$name] = param( 'bk_'.$name, 'boolean', 0, $memorize_params );
 		}
 
-		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0 );
+		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0, $memorize_params );
 
 		// Check are there something to backup
 		if( !$this->has_included( $this->backup_paths ) && !$this->has_included( $this->backup_tables ) )
@@ -272,10 +274,11 @@ class Backup
 		if( $root_included = $this->backup_paths['application_files'] )
 		{
 			$filename_params = array(
-					'recurse'			=> false,
-					'basename'			=> true,
-					'trailing_slash'	=> true,
-					//'inc_evocache'	=> true, // Uncomment to backup ?evocache directories
+					'recurse'        => false,
+					'basename'       => true,
+					'trailing_slash' => true,
+					//'inc_evocache' => true, // Uncomment to backup ?evocache directories
+					'inc_temp'       => false,
 				);
 			$included_files = get_filenames( $basepath, $filename_params );
 		}
@@ -302,7 +305,7 @@ class Backup
 		$included_files = array_diff( $included_files, $excluded_files );
 
 		if( $this->pack_backup_files )
-		{	// Create ZIPped backup
+		{ // Create ZIPped backup
 			$zip_filepath = $backup_dirpath.'files.zip';
 
 			// Pack using 'zlib' extension and PclZip wrapper
@@ -549,6 +552,7 @@ class Backup
 
 	/**
 	 * Copy directory recursively
+	 *
 	 * @param string source directory
 	 * @param string destination directory
 	 * @param array excluded directories
@@ -567,22 +571,29 @@ class Backup
 			}
 			while( false !== ( $file = readdir( $dir ) ) )
 			{
-				if( ( $file != '.' ) && ( $file != '..' ) )
+				if( $file == '.' || $file == '..' )
+				{ // Skip these reserved names
+					continue;
+				}
+
+				if( $file == 'upload-tmp' )
+				{ // Skip temp folder
+					continue;
+				}
+
+				$srcfile = $src.'/'.$file;
+				if( is_dir( $srcfile ) )
 				{
-					$srcfile = $src.'/'.$file;
-					if( is_dir( $srcfile ) )
-					{
-						if( $root )
-						{ // progressive display of what backup is doing
-							echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
-							evo_flush();
-						}
-						$this->recurse_copy( $srcfile, $dest . '/' . $file, false );
+					if( $root )
+					{ // progressive display of what backup is doing
+						echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
+						evo_flush();
 					}
-					else
-					{ // Copy file
-						copy( $srcfile, $dest.'/'. $file );
-					}
+					$this->recurse_copy( $srcfile, $dest . '/' . $file, false );
+				}
+				else
+				{ // Copy file
+					copy( $srcfile, $dest.'/'. $file );
 				}
 			}
 			closedir( $dir );

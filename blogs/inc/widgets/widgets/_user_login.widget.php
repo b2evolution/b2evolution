@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _user_login.widget.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _user_login.widget.php 8028 2015-01-19 12:03:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -162,7 +162,7 @@ class user_login_Widget extends ComponentWidget
 					'size' => 30,
 					'note' => T_( 'Greeting text to display' ),
 					'type' => 'text',
-					'defaultvalue' => T_( 'Hello $login$ !' ),
+					'defaultvalue' => T_( 'Hello $login$!' ),
 				),
 			), parent::get_param_definitions( $params ) );
 

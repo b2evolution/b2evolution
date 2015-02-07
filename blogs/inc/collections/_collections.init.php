@@ -212,7 +212,7 @@ function & get_ItemStatusCache()
 
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
-		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', NT_(\'No status\') )' );
 	}
 
 	return $ItemStatusCache;

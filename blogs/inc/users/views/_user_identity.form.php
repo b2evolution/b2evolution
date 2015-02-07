@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _user_identity.form.php 7879 2014-12-23 12:08:16Z yura $
+ * @version $Id: _user_identity.form.php 8141 2015-02-03 10:30:27Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -189,46 +189,66 @@ if( $action != 'view' )
 
 	if( $action != 'new' )
 	{
-		if( is_admin_page() && $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
+		// Get other pictures (not main avatar)
+		$user_avatars = $edited_User->get_avatar_Links();
+
+		$forbid_link = '';
+		if( is_admin_page() )
 		{
 			$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
-
-			$forbid_link = '';
 			if( $current_User->can_moderate_user( $edited_User->ID ) )
 			{
 				$forbid_link = action_icon( T_('Forbid using as main profile picture'), 'move_down_orange', $ctrl_param.'&amp;action=forbid_avatar&amp;'.url_crumb( 'user' ), ' '.T_('Forbid using as main profile picture'), 3, 4 ).'<br />';
 			}
-
-			$user_pictures = '<div class="avatartag main">'
-					.$edited_User->get_avatar_imgtag( 'crop-top-160x160', 'avatar', 'top', true, '', 'user' )
-					.'<div class="avatar_actions">'
-						.action_icon( T_('Change &raquo;'), 'edit', get_user_settings_url( 'avatar', $edited_User->ID ), ' '.T_('Change &raquo;'), 3, 4 ).'<br />'
-						.action_icon( T_('No longer use this as main profile picture'), 'move_down', $ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' ), ' '.T_('No longer use this as main profile picture'), 3, 4 ).'<br />'
-						.$forbid_link
-						.action_icon( T_('Delete this profile picture'), 'xross', $ctrl_param.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' ), ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
-						.$edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
-								'before'   => '',
-								'after'    => '<br />',
-								'text'     => ' '.T_('Rotate'),
-								'user_tab' => 'avatar',
-							) )
-						.$edited_User->get_crop_avatar_icon( $edited_User->avatar_file_ID, array(
-								'before'   => '',
-								'after'    => '',
-								'text'     => ' '.T_('Crop'),
-								'user_tab' => 'avatar',
-								'onclick'  => 'return user_crop_avatar( '.$edited_User->ID.', '.$edited_User->avatar_file_ID.', \'avatar\' )'
-							) )
-					.'</div><div class="clear"></div>'
-				.'</div>';
+			$remove_picture_url = $ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
+			$delete_picture_url = $ctrl_param.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
 		}
 		else
 		{
-			$user_pictures = '<div class="avatartag">'.$edited_User->get_avatar_imgtag( 'crop-top-80x80', 'avatar', 'top', true, '', 'user' ).'</div>';
+			$remove_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
+			$delete_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
 		}
 
-		// Get other pictures:
-		$user_avatars = $edited_User->get_avatar_Links();
+		if( $edited_User->has_avatar() || count( $user_avatars ) )
+		{ // If user uploaded at least one profile picture
+			$change_picture_title = T_('Change &raquo;');
+			$change_picture_icon = 'edit';
+		}
+		else
+		{ // If user has no profile picture yet
+			$change_picture_title = T_('Upload now &raquo;');
+			$change_picture_icon = 'move_up_green';
+		}
+
+		// Main profile picture with action icons to modify it
+		$user_pictures = '<div class="avatartag main">'
+				.$edited_User->get_avatar_imgtag( 'crop-top-160x160', 'avatar', 'top', true, '', 'user' )
+				.'<div class="avatar_actions">'
+					.action_icon( $change_picture_title, $change_picture_icon, get_user_settings_url( 'avatar', $edited_User->ID ), ' '.$change_picture_title, 3, 4 );
+		if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
+		{ // Display these actions only for existing avatar file
+			$user_pictures .= '<br />'
+					.action_icon( T_('No longer use this as main profile picture'), 'move_down', $remove_picture_url, ' '.T_('No longer use this as main profile picture'), 3, 4 ).'<br />'
+					.$forbid_link
+					.action_icon( T_('Delete this profile picture'), 'xross', $delete_picture_url, ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
+					.$edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
+							'before'   => '',
+							'after'    => '<br />',
+							'text'     => ' '.T_('Rotate'),
+							'user_tab' => 'avatar',
+						) )
+					.$edited_User->get_crop_avatar_icon( $edited_User->avatar_file_ID, array(
+							'before'   => '',
+							'after'    => '',
+							'text'     => ' '.T_('Crop'),
+							'user_tab' => 'avatar',
+							'onclick'  => 'return user_crop_avatar( '.$edited_User->ID.', '.$edited_User->avatar_file_ID.', \'avatar\' )'
+						) );
+		}
+		$user_pictures .= '</div><div class="clear"></div>'
+			.'</div>';
+
+		// Append the other pictures to main avatar
 		foreach( $user_avatars as $user_Link )
 		{
 			$user_pictures .= $user_Link->get_tag( array(
@@ -242,17 +262,6 @@ if( $action != 'view' )
 				) );
 		}
 
-		if( $edited_User->has_avatar() )
-		{ // Change an existing avatar
-			if( ! is_admin_page() )
-			{
-				$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'">'.T_('Change &raquo;').'</a>';
-			}
-		}
-		else
-		{ // Upload a new avatar
-			$user_pictures = $user_pictures.' <a href="'.get_user_settings_url( 'avatar', $edited_User->ID ).'"> '.T_('Upload now &raquo;').'</a>';
-		}
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 

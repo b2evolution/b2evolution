@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: userfields.ctrl.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -259,9 +259,9 @@ switch( $action )
 			WHERE ufdf_ID = '.$edited_Userfield->ID );
 
 		// Update order of near field
-		$result = ( $result !== false ) && $DB->query( 'UPDATE T_users__fielddefs
+		$result = ( $result !== false ) && ( $DB->query( 'UPDATE T_users__fielddefs
 			SET ufdf_order = '.$edited_Userfield->order.'
-			WHERE ufdf_ID = '.$switched_Userfield->ufdf_ID );
+			WHERE ufdf_ID = '.$switched_Userfield->ufdf_ID ) !== false );
 
 		if( $result !== false )
 		{ // Update was successful

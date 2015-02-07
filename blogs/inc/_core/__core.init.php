@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: __core.init.php 7964 2015-01-13 15:14:52Z yura $
+ * @version $Id: __core.init.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -159,7 +159,7 @@ function & get_CountryCache( $allow_none_text = NULL )
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		if( ! isset( $allow_none_text ) )
 		{
-			$allow_none_text = T_('Unknown');
+			$allow_none_text = NT_('Unknown');
 		}
 		$CountryCache = new DataObjectCache( 'Country', true, 'T_regional__country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', $allow_none_text );
 	}
@@ -180,7 +180,7 @@ function & get_RegionCache()
 	if( ! isset( $RegionCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'regional/model/_region.class.php', 'Region' );
-		$RegionCache = new DataObjectCache( 'Region', false, 'T_regional__region', 'rgn_', 'rgn_ID', 'rgn_name', 'rgn_name', T_('Unknown') );
+		$RegionCache = new DataObjectCache( 'Region', false, 'T_regional__region', 'rgn_', 'rgn_ID', 'rgn_name', 'rgn_name', NT_('Unknown') );
 	}
 
 	return $RegionCache;
@@ -199,7 +199,7 @@ function & get_SubregionCache()
 	if( ! isset( $SubregionCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
-		$SubregionCache = new DataObjectCache( 'Subregion', false, 'T_regional__subregion', 'subrg_', 'subrg_ID', 'subrg_name', 'subrg_name', T_('Unknown') );
+		$SubregionCache = new DataObjectCache( 'Subregion', false, 'T_regional__subregion', 'subrg_', 'subrg_ID', 'subrg_name', 'subrg_name', NT_('Unknown') );
 	}
 
 	return $SubregionCache;
@@ -218,7 +218,7 @@ function & get_CityCache()
 	if( ! isset( $CityCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'regional/model/_city.class.php', 'City' );
-		$CityCache = new DataObjectCache( 'City', false, 'T_regional__city', 'city_', 'city_ID', 'city_name', 'city_name', T_('Unknown') );
+		$CityCache = new DataObjectCache( 'City', false, 'T_regional__city', 'city_', 'city_ID', 'city_name', 'city_name', NT_('Unknown') );
 	}
 
 	return $CityCache;
@@ -247,7 +247,7 @@ function & get_CurrencyCache()
  * Get the GroupCache
  *
  * @param boolean TRUE to ignore cached object and create new cache object
- * @param string The text that gets used for the "None" option in the objects options list (Default: T_('No group')).
+ * @param string The text that gets used for the "None" option in the objects options list (Default: NT_('No group')).
  * @return GroupCache
  */
 function & get_GroupCache( $force_cache = false, $allow_none_text = NULL )
@@ -259,7 +259,7 @@ function & get_GroupCache( $force_cache = false, $allow_none_text = NULL )
 	{ // Cache doesn't exist yet:
 		if( is_null( $allow_none_text ) )
 		{ // Set default value for "None" option
-			$allow_none_text = T_('No group');
+			$allow_none_text = NT_('No group');
 		}
 		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'grp_level DESC, grp_name ASC\', \''.str_replace( "'", "\'", $allow_none_text ).'\' )' );
 	}
@@ -486,7 +486,7 @@ function & get_CronjobCache()
 	if( ! isset( $CronjobCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'cron/model/_cronjob.class.php', 'Cronjob' );
-		$CronjobCache = new DataObjectCache( 'Cronjob', false, 'T_cron__task', 'ctsk_', 'ctsk_ID', 'ctsk_name', 'ctsk_name', T_('Unknown') );
+		$CronjobCache = new DataObjectCache( 'Cronjob', false, 'T_cron__task', 'ctsk_', 'ctsk_ID', 'ctsk_name', 'ctsk_name', NT_('Unknown') );
 	}
 
 	return $CronjobCache;

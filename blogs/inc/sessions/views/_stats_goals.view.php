@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _stats_goals.view.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -87,7 +87,7 @@ function filter_goals( & $Form )
 	$Form->checkbox_basic_input( 'final', get_param('final'), /* TODO: please add context for translators.. */ T_('Final only').' &bull;' );
 	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
 
-	$GoalCategoryCache = & get_GoalCategoryCache( T_('All') );
+	$GoalCategoryCache = & get_GoalCategoryCache( NT_('All') );
 	$GoalCategoryCache->load_all();
 	$Form->select_input_object( 'cat', get_param('cat'), $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
 }

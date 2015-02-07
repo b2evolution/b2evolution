@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file.funcs.php 7808 2014-12-12 11:45:53Z yura $
+ * @version $Id: _file.funcs.php 8182 2015-02-06 07:53:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -112,30 +112,35 @@ function get_filenames( $path, $params = array() )
 	global $Settings;
 
 	$params = array_merge( array(
-			'inc_files'		=> true,	// include files (not only directories)
-			'inc_dirs'		=> true,	// include directories (not the directory itself!)
-			'flat'			=> true,	// return a one-dimension-array
-			'recurse'		=> true,	// recurse into subdirectories
-			'basename'		=> false,	// get the basename only
-			'trailing_slash'=> false,	// add trailing slash
-			'inc_hidden'    => true,	// inlcude hidden files, directories and content
-			'inc_evocache'	=> false,	// exclude evocache directories and content
+			'inc_files'      => true,  // include files (not only directories)
+			'inc_dirs'       => true,  // include directories (not the directory itself!)
+			'flat'           => true,  // return a one-dimension-array
+			'recurse'        => true,  // recurse into subdirectories
+			'basename'       => false, // get the basename only
+			'trailing_slash' => false, // add trailing slash
+			'inc_hidden'     => true,  // inlcude hidden files, directories and content
+			'inc_evocache'   => false, // exclude evocache directories and content
+			'inc_temp'       => true,  // include temporary files and directories
 		), $params );
 
 	$r = array();
 
 	$path = trailing_slash( $path );
 
-	if( $dir = @opendir($path) )
+	if( $dir = @opendir( $path ) )
 	{
-		while( ( $file = readdir($dir) ) !== false )
+		while( ( $file = readdir( $dir ) ) !== false )
 		{
 			if( $file == '.' || $file == '..' )
+			{ // Skip these reserved names
 				continue;
+			}
 
 			// asimo> Also check if $Settings is not empty because this function is called from the install srcipt too, where $Settings is not initialized yet
-			if( ! $params['inc_evocache'] && ! empty( $Settings ) && $file == $Settings->get('evocache_foldername') )
+			if( ! $params['inc_evocache'] && ! empty( $Settings ) && $file == $Settings->get( 'evocache_foldername' ) )
+			{ // Do not load evocache directories
 				continue;
+			}
 
 			// Check for hidden status...
 			if( ( ! $params['inc_hidden'] ) && ( substr( $file, 0, 1 ) == '.' ) )
@@ -143,7 +148,13 @@ function get_filenames( $path, $params = array() )
 				continue;
 			}
 
-			if( is_dir($path.$file) )
+			// Check for temp directories/files
+			if( ! $params['inc_temp'] && $file == 'upload-tmp' )
+			{ // Do not load temporary files and directories
+				continue;
+			}
+
+			if( is_dir( $path.$file ) )
 			{
 				if( $params['flat'] )
 				{
@@ -168,7 +179,7 @@ function get_filenames( $path, $params = array() )
 				}
 				else
 				{
-					$r[$file] = get_filenames( $path.$file, $params );
+					$r[ $file ] = get_filenames( $path.$file, $params );
 				}
 			}
 			elseif( $params['inc_files'] )
@@ -176,7 +187,7 @@ function get_filenames( $path, $params = array() )
 				$r[] = $params['basename'] ? $file : $path.$file;
 			}
 		}
-		closedir($dir);
+		closedir( $dir );
 	}
 	else
 	{
@@ -979,20 +990,27 @@ function evo_mkdir( $dir_path, $chmod = NULL, $recursive = false )
 /**
  * Copy directory recursively or one file
  *
- * @param mixed Source path
- * @param mixed Destination path
+ * @param string Source path
+ * @param string Destination path
+ * @param string Name of folder name for the copied folder, Use NULL to get a folder name from source
+ * @param array What directories should be excluded
+ * @return boolean TRUE on success, FALSE when no permission
  */
-function copy_r( $source, $dest )
+function copy_r( $source, $dest, $new_folder_name = NULL, $exclude_dirs = array() )
 {
 	$result = true;
 
 	if( is_dir( $source ) )
 	{ // Copy directory recusively
+		if( in_array( basename( $source ), $exclude_dirs ) )
+		{ // Don't copy this folder
+			return true;
+		}
 		if( ! ( $dir_handle = @opendir( $source ) ) )
 		{ // Unable to open dir
 			return false;
 		}
-		$source_folder = basename( $source );
+		$source_folder = is_null( $new_folder_name ) ? basename( $source ) : $new_folder_name;
 		if( ! mkdir_r( $dest.'/'.$source_folder ) )
 		{ // No rights to create a dir
 			return false;
@@ -1003,7 +1021,7 @@ function copy_r( $source, $dest )
 			{
 				if( is_dir( $source.'/'.$file ) )
 				{ // Copy the files of subdirectory
-					$result = copy_r( $source.'/'.$file, $dest.'/'.$source_folder ) && $result;
+					$result = copy_r( $source.'/'.$file, $dest.'/'.$source_folder, NULL, $exclude_dirs ) && $result;
 				}
 				else
 				{ // Copy one file of the directory
@@ -1809,7 +1827,7 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
  * @param integer remove files older than the given hour, default NULL will remove all
  * @return integer the number of removed files
  */
-function remove_orphan_files( $file_ids = NULL, $older_than = NULL )
+function remove_orphan_files( $file_ids = NULL, $older_than = NULL, $remove_empty_comment_folders = false )
 {
 	global $DB, $localtimenow;
 	// asimo> This SQL query should use file class delete_restrictions array (currently T_links and T_users is explicitly used)
@@ -1831,6 +1849,11 @@ function remove_orphan_files( $file_ids = NULL, $older_than = NULL )
 		$sql .= ' AND ( file_path LIKE "comments/p%" OR file_path LIKE "anonymous_comments/p%" )';
 	}
 
+	if( $remove_empty_comment_folders )
+	{ // init "folders to delete" array
+		$delete_folders = array();
+	}
+
 	$result = $DB->get_col( $sql );
 	$FileCache = & get_FileCache();
 	$FileCache->load_list( $result );
@@ -1846,12 +1869,37 @@ function remove_orphan_files( $file_ids = NULL, $older_than = NULL )
 				continue;
 			}
 		}
+
+		if( $remove_empty_comment_folders )
+		{
+			$rel_path = $File->get_rdfp_rel_path();
+			$folder_path = dirname( $File->get_full_path() );
+		}
+
 		// delete the file
 		if( $File->unlink() )
 		{
 			$count++;
+			if( $remove_empty_comment_folders && ! in_array( $folder_path, $delete_folders )
+				&& preg_match( '/^(anonymous_)?comments\/p(\d+)\/.*$/', $rel_path ) )
+			{ // Collect comment attachments folders to delete the empty folders later
+				$delete_folders[] = $folder_path;
+			}
 		}
 	}
+
+	// Delete the empty folders
+	if( $remove_empty_comment_folders && count( $delete_folders ) )
+	{
+		foreach( $delete_folders as $delete_folder )
+		{
+			if( file_exists( $delete_folder ) )
+			{ // Delete folder only if it is empty, Hide an error if folder is not empty
+				@rmdir( $delete_folder );
+			}
+		}
+	}
+
 	// Clear FileCache to save memory
 	$FileCache->clear();
 
@@ -2476,7 +2524,7 @@ function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_na
 
 /**
  * Check if directory is empty
- * 
+ *
  * @param string Directory path
  * @param boolean TRUE - to decide when dir is not empty if at least one file exists in subdirectories,
  *                FALSE - to decide - if dir contains even only empty subdirectories
@@ -2517,5 +2565,57 @@ function is_empty_directory( $dir, $recursive = true )
 	closedir( $handle );
 
 	return $result;
+}
+
+
+/**
+ * Open temporary file
+ *
+ * @param string Name of the temporary file (changed by reference)
+ * @return resource|string File handle OR Error text
+ */
+function open_temp_file( & $temp_file_name )
+{
+	$temp_handle = tmpfile();
+
+	if( $temp_handle === false )
+	{ // Error on create a temp file on system temp dir
+		global $media_path;
+
+		$temp_path = $media_path.'upload-tmp/';
+
+		$temp_folder_exists = file_exists( $temp_path );
+		if( ! $temp_folder_exists )
+		{ // Temp folder doesn't exist yet
+			// Try to create it
+			$temp_folder_exists = @mkdir( $temp_path, 0755 );
+			if( $temp_folder_exists )
+			{ // If temp folder has been created try to create .htaccess to prevent listing
+				if( $htaccess_handle = @fopen( $temp_path.'.htaccess', 'w+' ) )
+				{
+					fwrite( $htaccess_handle, 'deny from all' );
+					fclose( $htaccess_handle );
+				}
+			}
+		}
+
+		if( $temp_folder_exists )
+		{ // Try to create a temp file on media temp path
+			$temp_file_name = tempnam( $temp_path, 'qck_' );
+		}
+
+		if( ! $temp_folder_exists || $temp_file_name === false )
+		{ // Error on create a temp file on media temp path
+			return sprintf( T_( 'Unable to create temporary upload file. PHP needs write permissions on %s or %s.' ),
+				'<b>'.sys_get_temp_dir().'</b>',
+				'<b>'.$temp_path.'</b>' );
+		}
+
+		// Create a file handle for new temp file on media path
+		$temp_handle = fopen( $temp_file_name, 'r+' );
+	}
+
+	// File handle
+	return $temp_handle;
 }
 ?>

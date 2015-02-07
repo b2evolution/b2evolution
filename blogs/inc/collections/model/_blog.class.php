@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 7987 2015-01-14 18:44:48Z fplanque $
+ * @version $Id: _blog.class.php 8132 2015-02-02 14:05:18Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -3304,8 +3304,15 @@ class Blog extends DataObject
 				{ // The media folder was not used before, create the new media folder
 					return $this->get_media_dir( true );
 				}
-				if( ! @rename( $old_media_dir, $new_media_dir ) )
-				{ // Some error on renaming
+				if( copy_r( $old_media_dir, $new_media_dir, '', array( '_evocache', '.evocache' ) ) )
+				{ // The file have been copied to new folder successfully
+					if( ! rmdir_r( $old_media_dir ) )
+					{ // Display a warning if old folder could not be deleted
+						$Messages->add( sprintf( T_('Could not delete the old media folder "%s", please try to delete it manually.'), '<b>'.$old_media_dir.'</b>' ), 'warning' );
+					}
+				}
+				else
+				{ // Display a message if some error on copying
 					$Messages->add( sprintf( T_('Could not move the media folder content from "%s" to the new "%s" location.'), '<b>'.$old_media_dir.'</b>', '<b>'.$new_media_dir.'</b>' ), 'error' );
 					return false;
 				}

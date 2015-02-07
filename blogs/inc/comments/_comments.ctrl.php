@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comments.ctrl.php 7423 2014-10-14 07:52:43Z yura $
+ * @version $Id: _comments.ctrl.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -325,15 +325,15 @@ switch( $action )
 			{ // Check new entered comment ID
 				if( ! empty( $edited_Comment->ID ) && $in_reply_to_cmt_ID == $edited_Comment->ID )
 				{ // Restrict such brake case
-					$Messages->add( T_('You cannot use current comment ID for the field "In reply to comment ID".'), 'error' );
+					$Messages->add( T_('This comment cannot be a reply to itself.'), 'error' );
 				}
 				elseif( ! ( $Comment = & $CommentCache->get_by_ID( $in_reply_to_cmt_ID, false, false ) ) )
 				{ // No comment exists
-					$Messages->add( T_('Field "In reply to comment ID" has an unexisting comment ID.'), 'error' );
+					$Messages->add( T_('The ID of the parent comment you entered does not exist.'), 'error' );
 				}
 				elseif( $Comment->item_ID != $edited_Comment_Item->ID )
 				{ // Item of new reply comment is not same
-					$Messages->add( T_('Use a comment for field "In reply to comment ID" only from the same post.'), 'error' );
+					$Messages->add( T_('The ID of the parent comment must belong to the same post.'), 'error' );
 				}
 			}
 			else
@@ -526,11 +526,11 @@ switch( $action )
 						LEFT OUTER JOIN T_comments ON post_ID = comment_item_ID
 					WHERE comment_status = "trash" AND blog_ID = '.$blog_ID;
 			$comment_ids = $DB->query->get_col( $query, 'get trash comment ids' );
-			$result = comments_delete_where( NULL, $comment_ids );
+			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = comments_delete_where( 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )

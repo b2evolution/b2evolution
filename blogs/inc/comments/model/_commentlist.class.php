@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _commentlist.class.php 6574 2014-04-29 12:35:33Z yura $
+ * @version $Id: _commentlist.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -820,7 +820,7 @@ class CommentList2 extends DataObjectList2
 
 		$time_prune_before = $localtimenow - ( $Settings->get('auto_empty_trash') * 86400 ); // 1 day = 86400 seconds
 
-		$rows_affected = comments_delete_where( 'comment_status = "trash"
+		$rows_affected = Comment::db_delete_where( 'Comment', 'comment_status = "trash"
 			AND comment_last_touched_ts < '.$DB->quote( date2mysql( $time_prune_before ) ) );
 		$Debuglog->add( 'CommentList2::dbprune(): autopruned '.$rows_affected.' rows from T_comments.', 'request' );
 

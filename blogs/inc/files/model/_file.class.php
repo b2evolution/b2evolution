@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file.class.php 7808 2014-12-12 11:45:53Z yura $
+ * @version $Id: _file.class.php 8134 2015-02-03 06:41:12Z attila $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -263,6 +263,30 @@ class File extends DataObject
 				$this->load_meta();
 			}
 		}
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $file_db_config;
+
+		if( !isset( $file_db_config ) )
+		{
+			$file_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_files',
+					'dbprefix'           => 'file_',
+					'dbIDname'           => 'file_ID',
+				)
+			);
+		}
+
+		return $file_db_config;
 	}
 
 
@@ -1690,9 +1714,15 @@ class File extends DataObject
 					'File %s could not be deleted';
 		}
 
+		$file_exists = file_exists( $this->_adfp_full_path );
+		if( ! $unlinked && ! $file_exists )
+		{ // Add additional message which shows that unlink was unsuccesful becuse the file didn't exist
+			$syslog_message .= ' - not exists';
+		}
+
 		syslog_insert( sprintf( $syslog_message, '<b>'.$old_file_name.'</b>' ), 'info', 'file', $old_file_ID );
 
-		if( ! $unlinked )
+		if( $file_exists )
 		{
 			if( $use_transactions )
 			{

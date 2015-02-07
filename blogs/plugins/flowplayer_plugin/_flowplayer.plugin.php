@@ -10,7 +10,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @package plugins
- * @version $Id: _flowplayer.plugin.php 7752 2014-12-04 12:44:33Z yura $
+ * @version $Id: _flowplayer.plugin.php 8110 2015-01-29 10:35:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -47,7 +47,7 @@ class flowplayer_plugin extends Plugin
 	{
 		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 		require_js( '#flowplayer#', $relative_to );
-		add_js_headline( 'flowplayer.conf.flashfit = true;' );
+		add_js_headline( 'flowplayer.conf = { flashfit: true, embed: false }' );
 		$this->require_skin();
 		add_css_headline( '.flowplayer_block {
 	margin: 1em auto 0;
@@ -155,7 +155,7 @@ class flowplayer_plugin extends Plugin
 		}
 		else
 		{ // Set width from blog plugin setting
-			$width = 'max-width:'.$width.'px;';
+			$width = 'width:'.$width.'px;max-width:100%;';
 		}
 
 		// Set height from blog plugin setting
@@ -202,7 +202,7 @@ class flowplayer_plugin extends Plugin
 				$video_placeholder_attr = '';
 			}
 
-			$params['data'] .= '<div class="flowplayer '.$this->get_skin( $item_Blog ).'" style="'.$width.$height.'"><video'.$video_placeholder_attr.'>';
+			$params['data'] .= '<div class="flowplayer '.$this->get_skin( $item_Blog ).'" style="background-color:inherit;'.$width.$height.'"><video'.$video_placeholder_attr.'>';
 			foreach( $sources as $source )
 			{
 				$params['data'] .= '<source'.get_field_attribs_as_string( $source, false ).' />'."\n";

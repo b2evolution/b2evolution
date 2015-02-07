@@ -16,7 +16,7 @@
  *
  * @package admin
  *
- * @version $Id: _coll_comments.form.php 7839 2014-12-18 11:16:15Z yura $
+ * @version $Id: _coll_comments.form.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -140,7 +140,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 	}
 
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
-		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable autocomplete usernames after entered sign "@" in the comment form' ) );
+		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable auto-completion of usernames entered after a "@" sign in the comment forms' ) );
 
 	echo '</div>';
 

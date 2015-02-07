@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _messaging.init.php 7873 2014-12-22 17:23:15Z yura $
+ * @version $Id: _messaging.init.php 8143 2015-02-03 11:42:41Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -457,12 +457,13 @@ class messaging_Module extends Module
 		}
 
 		if( ( $disp != 'contacts' ) && ( $thrd_ID = param( 'thrd_ID', 'integer', '', true ) ) )
-		{// Load thread from cache:
+		{ // Load thread from cache:
 			$ThreadCache = & get_ThreadCache();
-			if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
-			{	unset( $edited_Thread );
+			if( ( $edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false ) ) === false )
+			{ // Thread doesn't exists with this ID
+				unset( $edited_Thread );
 				forget_param( 'thrd_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+				$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
 				$action = 'nil';
 			}
 		}

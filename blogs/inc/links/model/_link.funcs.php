@@ -12,7 +12,7 @@
  *
  * @package evocore
  *
- * @version $Id: _link.funcs.php 7804 2014-12-11 15:11:50Z yura $
+ * @version $Id: _link.funcs.php 8151 2015-02-03 15:15:48Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -118,8 +118,12 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold ) );
 
-	echo '<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID()
-				.'" name="'.$iframe_name.'" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
+	echo '<div id="attachmentframe_wrapper">'
+				.'<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type
+					.'&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name
+					.'&amp;link_object_ID='.$LinkOwner->get_ID().'" name="'.$iframe_name.'"'
+					.' width="100%" marginwidth="0" height="100%" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>'
+			.'</div>';
 
 	$Form->end_fieldset();
 
@@ -156,6 +160,30 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 	} );
 	return false;
 }
+
+jQuery( document ).ready( function()
+{
+	jQuery( '#attachmentframe' ).load( function()
+	{ // Expand the frame height if it is more than wrapper height (but max height is 320px)
+		if( this.contentWindow.document.body.offsetHeight > jQuery( '#attachmentframe_wrapper' ).height() )
+		{
+			jQuery( '#attachmentframe_wrapper' ).css( 'height', this.contentWindow.document.body.offsetHeight < 320 ? this.contentWindow.document.body.offsetHeight : 320 );
+		}
+	} );
+	jQuery( '#attachmentframe_wrapper' ).resizable(
+	{ // Make the frame wrapper resizable
+		minHeight: 80,
+		handles: 's',
+		start: function( e, ui )
+		{ // Create a temp div to disable the mouse over events inside the frame
+			ui.element.append( '<div id="attachmentframe_disabler"></div>' );
+		},
+		stop: function( e, ui )
+		{ // Remove the temp div element
+			ui.element.find( '#attachmentframe_disabler' ).remove();
+		}
+	} );
+} );
 </script>
 <?php
 }
@@ -169,7 +197,7 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
  */
 function display_attachments( & $LinkOwner, $params = array() )
 {
-	global $current_User, $samedomain_htsrv_url;
+	global $current_User, $samedomain_htsrv_url, $redirect_to;
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
@@ -182,6 +210,8 @@ function display_attachments( & $LinkOwner, $params = array() )
 	{ // there are no attachments
 		return;
 	}
+
+	$redirect_to = urlencode( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to );
 
 	echo $params[ 'block_start' ];
 	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">';
@@ -207,7 +237,6 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo '</td><td class="shrinkwrap">';
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
-			$redirect_to = urlencode( regenerate_url( '', '', '', '&' ) );
 			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
 			echo action_icon( T_( 'Delete' ), 'delete', $delete_url );
 		}

@@ -54,7 +54,7 @@ class html5_videojs_plugin extends Plugin
 		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
 		$width = empty( $width ) ? '100%' : $width.'px';
 		$height = intval( $this->get_coll_setting( 'height', $Blog ) );
-		add_css_headline( '.video-js{ width: '.$width.' !important; height: '.$height.'px !important; margin: auto; }
+		add_css_headline( '.video-js{ width: '.$width.' !important; max-width: 100% !important; height: '.$height.'px !important; margin: auto; }
 .videojs_block {
 	margin: 0 auto 1em;
 }

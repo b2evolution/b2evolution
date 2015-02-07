@@ -31,7 +31,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Include page header:
  */
 $page_title = T_('Registration Currently Disabled');
-$wrap_height = '170px';
 
 require dirname(__FILE__).'/_html_header.inc.php';
 

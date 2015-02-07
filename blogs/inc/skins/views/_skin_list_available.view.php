@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _skin_list_available.view.php 8121 2015-02-01 00:21:12Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -45,13 +45,13 @@ $Form->hidden( 'kind', get_param( 'kind' ) );
 $Form->switch_layout( 'linespan' );
 $Form->begin_form();
 $Form->select_input_array( 'skin_type', $skin_type, array(
-		''        => T_('All skin types'),
-		'normal'  => T_('Normal skin types'),
-		'mobile'  => T_('Mobile skin types'),
-		'tablet'  => T_('Tablet skin types'),
-		'feed'    => T_('Feed skin types'),
-		'sitemap' => T_('Sitemap skin types'),
-	), T_('Show skins of type'), '', array(
+		''        => T_('All skins'),
+		'normal'  => T_('Normal skins'),
+		'mobile'  => T_('Mobile skins'),
+		'tablet'  => T_('Tablet skins'),
+		'feed'    => T_('Feed skins'),
+		'sitemap' => T_('Sitemap skins'),
+	), T_('Show'), '', array(
 		'force_keys_as_values' => true,
 		'onchange' => 'this.form.submit()'
 	) );

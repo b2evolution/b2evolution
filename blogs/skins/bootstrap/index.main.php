@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id$
+ * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -102,6 +102,8 @@ siteskin_include( '_site_body_header.inc.php' );
 				'item_end'            => '</li>',
 				'item_selected_start' => '<li class="active">',
 				'item_selected_end'   => '</li>',
+				'item_title_before'   => '',
+				'item_title_after'    => '',
 			) );
 		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>
@@ -328,7 +330,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'after'       => ' &bull; ',
 				) );
 
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ptyp_ID though..?!
 		?>
 
 		<?php

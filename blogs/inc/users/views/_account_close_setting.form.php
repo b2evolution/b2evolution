@@ -24,7 +24,7 @@
  * @package evocore
 
  *
- * @version $Id$
+ * @version $Id: _account_close_setting.form.php 8124 2015-02-01 13:05:17Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -56,7 +56,7 @@ $Form->begin_fieldset( T_('Account closing').get_manual_link('account-closing-se
 
 	$Form->checkbox_input( 'account_close_enabled', $Settings->get( 'account_close_enabled' ), T_('Allow closing'), array( 'note' => T_('check to allow users to close their account themselves.') ) );
 
-	$Form->textarea( 'account_close_intro', $Settings->get( 'account_close_intro' ), 5, T_('Intro text'), T_('Enter a message to display to user who want to close their account.'), 60 );
+	$Form->textarea( 'account_close_intro', $Settings->get( 'account_close_intro' ), 5, T_('Intro text'), T_('Enter a message to display to users who want to close their account.'), 60 );
 
 	$Form->textarea( 'account_close_reasons', $Settings->get( 'account_close_reasons' ), 5, T_('Closing reasons'), T_('Enter one possible reason per line. There will always be an "Other" reason added at the end.'), 60 );
 

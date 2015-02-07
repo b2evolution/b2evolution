@@ -24,7 +24,7 @@
  *
  * @package evocore
  *
- * @version $Id: async.php 7926 2015-01-09 06:59:52Z yura $
+ * @version $Id: async.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 
 
@@ -673,7 +673,7 @@ switch( $action )
 
 		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 )
 		{ // Incorrect format of status param
-			$Ajaxlog->add( T_('Incorrect request to accept organization!'), 'error' );
+			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
 			break;
 		}
 

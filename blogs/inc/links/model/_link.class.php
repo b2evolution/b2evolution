@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _link.class.php 7262 2014-08-27 05:56:02Z yura $
+ * @version $Id: _link.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -93,6 +93,30 @@ class Link extends DataObject
 		{	// New object:
 
 		}
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $link_db_config;
+
+		if( !isset( $link_db_config ) )
+		{
+			$link_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_links',
+					'dbprefix'           => 'link_',
+					'dbIDname'           => 'link_ID',
+				)
+			);
+		}
+
+		return $link_db_config;
 	}
 
 

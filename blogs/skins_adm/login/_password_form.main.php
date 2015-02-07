@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _password_form.main.php 7870 2014-12-22 12:12:09Z yura $
+ * @version $Id: _password_form.main.php 8056 2015-01-23 10:30:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,7 +37,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 $page_title = T_('Change password');
 $wrap_width = '650px';
-$wrap_height = '310px';
 
 require dirname(__FILE__).'/_html_header.inc.php';
 

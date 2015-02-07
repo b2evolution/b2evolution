@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _message.class.php 7677 2014-11-18 12:41:27Z yura $
+ * @version $Id: _message.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,6 +91,43 @@ class Message extends DataObject
 			$this->text              = $db_row->msg_text;
 			$this->renderers         = $db_row->msg_renderers;
 		}
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $message_db_config;
+
+		if( !isset( $message_db_config ) )
+		{
+			$message_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_messaging__message',
+					'dbprefix'           => 'msg_',
+					'dbIDname'           => 'msg_ID',
+				)
+			);
+		}
+
+		return $message_db_config;
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_messaging__prerendering', 'fk'=>'mspr_msg_ID', 'msg'=>T_('%d prerendered content') )
+			);
 	}
 
 
@@ -474,66 +511,81 @@ class Message extends DataObject
 
 
 	/**
+	 * Delete those messages from the database which corresponds to the given condition or to the given ids array
+	 * Note: the delete cascade arrays are handled!
+	 *
+	 * @param string the name of this class
+	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
+	 * @param string where condition
+	 * @param array object ids
+	 * @return mixed # of rows affected or false if error
+	 */
+	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( ! empty( $sql_where ) )
+		{
+			$object_ids = $DB->get_col( 'SELECT msg_ID FROM T_messaging__message WHERE '.$sql_where );
+		}
+
+		if( ! $object_ids )
+		{ // There is no comment to delete
+			$DB->commit();
+			return;
+		}
+
+		$message_ids_to_delete = implode( ', ', $object_ids );
+
+		// Update thread statuses first unread message IDs
+		$result = $DB->query( 'UPDATE T_messaging__threadstatus
+				SET tsta_first_unread_msg_ID =
+				( SELECT message1.msg_ID
+					FROM T_messaging__message as message1
+					WHERE message1.msg_thread_ID = tsta_thread_ID
+						AND message1.msg_datetime > ( SELECT MAX( message2.msg_datetime)
+							FROM T_messaging__message as message2
+							WHERE message2.msg_ID IN ( '.$message_ids_to_delete.' )
+								AND message2.msg_thread_ID = tsta_thread_ID
+						)
+					ORDER BY message1.msg_datetime ASC
+					LIMIT 1
+				)
+				WHERE tsta_first_unread_msg_ID IN ( '.$message_ids_to_delete.')' ) !== false;
+
+		if( $result )
+		{ // Remove messages with all of its delete cascade relations
+			$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+		}
+
+		if( $result !== false )
+		{ // Delete those threads where all of the messages were deleted
+			load_class( 'messaging/model/_thread.class.php', 'Thread' );
+			if( Thread::db_delete_where( 'Thread', 'thrd_ID NOT IN ( SELECT DISTINCT( msg_thread_ID ) FROM T_messaging__message )' ) === false )
+			{ // Deleting threads was unsuccessful
+				$result = false;
+			}
+		}
+
+		// Commit or rollback the transaction
+		( $result !== false ) ? $DB->commit() : $DB->rollback();
+
+		return $result;
+	}
+
+
+	/**
 	 * Delete message and dependencies from database
 	 *
 	 * @param Log Log object where output gets added (by reference).
 	 */
 	function dbdelete()
 	{
-		global $DB;
-
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
-		// Remember IDs, because parent method resets it to 0
-		$thread_ID = $this->thread_ID;
-		$message_ID = $this->ID;
-
-		$DB->begin();
-
-		// UPDATE last unread msg_ID on this thread statuses from this message ID to the next message ID or NULL if there is no next message
-		$DB->query( 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID =
-							( SELECT msg_ID
-								FROM T_messaging__message
-								WHERE msg_thread_ID = '.$thread_ID.' AND msg_datetime > '.$DB->quote( $this->datetime ).'
-								ORDER BY msg_datetime ASC
-								LIMIT 1
-							)
-						WHERE tsta_first_unread_msg_ID = '.$this->ID );
-
-		// Delete Message
-		if( ! parent::dbdelete() )
-		{
-			$DB->rollback();
-
-			return false;
-		}
-
-		// Get a count of the messages in the current thread
-		$SQL = new SQL();
-		$SQL->SELECT( 'COUNT( msg_ID )' );
-		$SQL->FROM( $this->dbtablename );
-		$SQL->WHERE( 'msg_thread_ID = '.$DB->quote( $thread_ID ) );
-		$msg_count = $DB->get_var( $SQL->get() );
-
-		if( $msg_count == 0 )
-		{	// Last message was deleted from thread now, We should also delete this thread
-			load_class( 'messaging/model/_thread.class.php', 'Thread' );
-			$ThreadCache = & get_ThreadCache();
-			$Thread = & $ThreadCache->get_by_ID( $thread_ID );
-			$Thread->dbdelete();
-		}
-
-		// re-set the ID for the functions below
-		$this->ID = $message_ID;
-
-		$this->delete_prerendered_content();
-
-		$this->ID = 0;
-
-		$DB->commit();
-
-		return true;
+		return parent::dbdelete();
 	}
 
 

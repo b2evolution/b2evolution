@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _phpbb_groups.form.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _phpbb_groups.form.php 8021 2015-01-19 08:25:12Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -98,7 +98,7 @@ $Form->begin_fieldset( T_('Select the forums which will be imported') );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' ),
+$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ),
 											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport\'' ) ) );
 
 $Form->end_form();

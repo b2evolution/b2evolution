@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _thread.class.php 6697 2014-05-15 10:51:11Z yura $
+ * @version $Id: _thread.class.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -151,6 +151,45 @@ class Thread extends DataObject
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $thread_db_config;
+
+		if( !isset( $thread_db_config ) )
+		{
+			$thread_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_messaging__thread',
+					'dbprefix'           => 'thrd_',
+					'dbIDname'           => 'thrd_ID',
+				)
+			);
+		}
+
+		return $thread_db_config;
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_messaging__message', 'fk'=>'msg_thread_ID', 'msg'=>T_('%d messages in thread'),
+						'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php' ),
+				array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_thread_ID', 'msg'=>T_('%d read statuses in thread') ),
+			);
 	}
 
 
@@ -417,29 +456,9 @@ class Thread extends DataObject
 	 */
 	function dbdelete()
 	{
-		global $DB;
-
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
-		$DB->begin();
-
-		// Delete Messages
-		$ret = $DB->query( 'DELETE FROM T_messaging__message
-												WHERE msg_thread_ID='.$this->ID );
-		// Delete Statuses
-		$ret = $DB->query( 'DELETE FROM T_messaging__threadstatus
-												WHERE tsta_thread_ID='.$this->ID );
-		// Delete Thread
-		if( ! parent::dbdelete() )
-		{
-			$DB->rollback();
-
-			return false;
-		}
-
-		$DB->commit();
-
-		return true;
+		return parent::dbdelete();
 	}
 
 

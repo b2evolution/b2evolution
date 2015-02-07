@@ -25,7 +25,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comment.funcs.php 7247 2014-08-20 12:36:46Z yura $
+ * @version $Id: _comment.funcs.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -945,132 +945,6 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 
 	// Clear a comment cache
 	$CommentCache->clear();
-}
-
-
-/**
- * Delete the comments by the given condition with all of it's cascade objects
- *
- * @param string SQL "where" clause
- * @param array comment ids to delete - it should be set when the ids are known instead of the "where" clause
- * @return mixed integer the number of the deleted comments on success, false on failure
- */
-function comments_delete_where( $sql_where, $comment_ids = NULL )
-{
-	global $DB;
-
-	if( !empty( $sql_where ) )
-	{ // Get all comments that should be deleted
-		$comments_SQL = new SQL();
-		$comments_SQL->SELECT( 'comment_ID' );
-		$comments_SQL->FROM( 'T_comments' );
-		$comments_SQL->WHERE( $sql_where );
-		$delete_comment_ids = $comments_SQL->get();
-	}
-	elseif( !empty( $comment_ids ) )
-	{
-		$delete_comment_ids = implode( ', ', $comment_ids );
-		$sql_where = 'comment_ID IN ( '.$delete_comment_ids.' )';
-	}
-	else
-	{ // Delete condition was not set
-		return 0;
-	}
-
-	$DB->begin();
-
-	// Get the files of these comments
-	$files_SQL = new SQL();
-	$files_SQL->SELECT( 'link_file_ID' );
-	$files_SQL->FROM( 'T_links' );
-	$files_SQL->WHERE( 'link_cmt_ID IN ( '.$delete_comment_ids.' )' );
-	$files_IDs = $DB->get_col( $files_SQL->get() );
-
-	// Delete the comment data from the related tables
-	$comment_delete_cascades = Comment::get_delete_cascades();
-	if( ! empty( $comment_delete_cascades ) )
-	{
-		foreach( $comment_delete_cascades as $cascade )
-		{
-			$DB->query( 'DELETE
-				 FROM '.$cascade['table'].'
-				WHERE '.$cascade['fk'].' IN ( '.$delete_comment_ids.' )',
-				'Delete the related records of the comments' );
-		}
-	}
-
-	if( count( $files_IDs ) )
-	{ // The deleted comments have some files, we can delete the files only if they are not used by other side
-		$used_files_SQL = new SQL();
-		$used_files_SQL->SELECT( 'link_file_ID' );
-		$used_files_SQL->FROM( 'T_links' );
-		$used_files_SQL->WHERE( 'link_file_ID IN ( '.implode( ', ', $files_IDs ).' )' );
-		$used_files_IDs = $DB->get_col( $used_files_SQL->get() );
-
-		$delete_folders = array();
-		$unused_files_IDs = array_diff( $files_IDs, $used_files_IDs );
-		if( count( $unused_files_IDs ) )
-		{
-			$FileCache = & get_FileCache();
-			$index = 0; // use this counter to load only a portion of files into the cache
-			foreach( $unused_files_IDs as $unused_file_ID )
-			{
-				if( ( $index % 100 ) == 0 )
-				{ // Clear the cache to save memory and load the next portion list of files
-					$FileCache->clear();
-					$FileCache->load_list( array_slice( $unused_files_IDs, $index, 100 ) );
-				}
-				$index++;
-				if( $comment_File = & $FileCache->get_by_ID( $unused_file_ID, false ) )
-				{ // Delete a file from disk and from DB
-					$rdfp_rel_path = $comment_File->get_rdfp_rel_path();
-					$folder_path = dirname( $comment_File->get_full_path() );
-					if( $comment_File->unlink( false ) &&
-						( preg_match( '/^(anonymous_)?comments\/p(\d+)\/.*$/', $rdfp_rel_path ) ) &&
-					    ! in_array( $folder_path, $delete_folders ) )
-					{ // Collect comment attachments folders to delete the empty folders later
-						$delete_folders[] = $folder_path;
-					}
-				}
-			}
-		}
-
-		// Delete the empty folders
-		if( count( $delete_folders ) )
-		{
-			foreach( $delete_folders as $delete_folder )
-			{
-				if( file_exists( $delete_folder ) )
-				{ // Delete folder only if it is empty, Hide an error if folder is not empty
-					@rmdir( $delete_folder );
-				}
-			}
-		}
-	}
-
-	// Delete the comment prerendering contents
-	$DB->query( 'DELETE
-		 FROM T_comments__prerendering
-		WHERE cmpr_cmt_ID IN ( '.$delete_comment_ids.' )',
-		'Delete the comment prerendering contents' );
-
-	// Delete all comments
-	// asimo> If a comment with this keyword content was inserted here, the user will not even observe that (This is good)
-	$r = $DB->query( 'DELETE
-		 FROM T_comments
-		WHERE '.$sql_where,
-		'Delete the comments by where clause' );
-
-	if( $r !== false )
-	{ // Success on delete the comments
-		$DB->commit();
-		return $r;
-	}
-	else
-	{ // Failed
-		$DB->rollback();
-		return false;
-	}
 }
 
 

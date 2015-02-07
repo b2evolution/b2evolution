@@ -20,7 +20,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _messaging.funcs.php 6287 2014-03-21 08:40:25Z attila $
+ * @version $Id: _messaging.funcs.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1566,10 +1566,10 @@ function mark_as_read_by_user( $thrd_ID, $user_ID )
 /**
  * Delete orphan threads
  *
- * @param integer user_ID - to delete those orphan threads where this user was involved, leave it to NULL to delete all orphan threads
+ * @param integer or array of integers - one or multiple user ids - to delete those orphan threads where only the given user(s) was/were involved, leave it to NULL to delete all orphan threads
  * @return boolean true on success
  */
-function delete_orphan_threads( $user_ID = NULL )
+function delete_orphan_threads( $user_ids = NULL )
 {
 	global $DB;
 
@@ -1583,40 +1583,42 @@ function delete_orphan_threads( $user_ID = NULL )
 	$sub_query = 'SELECT DISTINCT ( tsta_thread_ID )
 					FROM T_messaging__threadstatus
 					INNER JOIN T_users ON user_ID = tsta_user_ID';
-	if( empty( $user_ID ) )
+
+	// Set the query where condition based on the received param value
+	if( empty( $user_ids ) )
 	{
 		$SQL->WHERE( 'tsta_thread_ID NOT IN ( '.$sub_query.' )' );
 	}
+	elseif( is_array( $user_ids ) )
+	{
+		$users = implode( ', ', $user_ids );
+		$SQL->WHERE( 'tsta_user_ID IN ( '.$users.' )' );
+		$SQL->WHERE_and( 'tsta_thread_ID NOT IN ( '.$sub_query.' AND tsta_user_ID NOT IN ( '.$users.' ) )' );
+	}
+	elseif( is_number( $user_ids ) )
+	{
+		$SQL->WHERE( 'tsta_user_ID = '.$user_ids );
+		$SQL->WHERE_and( 'tsta_thread_ID NOT IN ( '.$sub_query.' AND tsta_user_ID <> '.$user_ids.' )' );
+	}
 	else
 	{
-		$SQL->WHERE( 'tsta_user_ID = '.$user_ID );
-		$SQL->WHERE_and( 'tsta_thread_ID NOT IN ( '.$sub_query.' AND tsta_user_ID <> '.$user_ID.' )' );
+		debug_die( 'Invalid user ids param received!' );
 	}
 
-	$thread_ids = implode( ', ', $DB->get_col( $SQL->get(), 0, 'Get orphan threads' ) );
-	if( empty( $thread_ids ) )
-	{ // orphan threads not exists
-		$DB->commit();
-		return true;
+	$thread_ids = $DB->get_col( $SQL->get(), 0, 'Get orphan threads' );
+	if( ! empty( $thread_ids ) )
+	{ // There are orphan threads ( or orphan thread targets )
+		load_class( 'messaging/model/_thread.class.php', 'Thread' );
+		// Delete all orphan threads with all cascade relations
+		if( Thread::db_delete_where( 'Thread', NULL, $thread_ids, array( 'use_transaction' => false ) ) === false )
+		{ // Deleting orphan threads failed
+			$DB->rollback();
+			return false;
+		}
 	}
 
-	// Delete Messages
-	$ret = $DB->query( 'DELETE FROM T_messaging__message WHERE msg_thread_ID IN ( '.$thread_ids.')' );
-
-	// Delete Statuses
-	$ret = $ret && $DB->query( 'DELETE FROM T_messaging__threadstatus WHERE tsta_thread_ID IN ( '.$thread_ids.')' );
-
-	// Delete Threads
-	$ret = $ret && $DB->query( 'DELETE FROM T_messaging__thread WHERE thrd_ID IN ( '.$thread_ids.')' );
-
-	if( $ret )
-	{
-		$DB->commit();
-		return true;
-	}
-
-	$DB->rollback();
-	return false;
+	$DB->commit();
+	return true;
 }
 
 

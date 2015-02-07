@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id$
+ * @version $Id: _antispam_settings.form.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -85,7 +85,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Suspect users').get_manual_link('antispam-settings-suspect-users') );
 
-	$GroupCache = & get_GroupCache( true, T_('Don\'t move suspect users') );
+	$GroupCache = & get_GroupCache( true, NT_('Don\'t move suspect users') );
 	$Form->select_object( 'antispam_suspicious_group', $Settings->get('antispam_suspicious_group'), $GroupCache, T_('Move suspect users to'), '', true );
 
 	$trust_groups = $Settings->get('antispam_trust_groups') != '' ? explode( ',', $Settings->get('antispam_trust_groups') ) : array();

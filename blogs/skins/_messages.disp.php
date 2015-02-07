@@ -39,6 +39,12 @@ if( !is_logged_in() )
 // Check minimum permission:
 $current_User->check_perm( 'perm_messaging', 'reply', true );
 
+// Save to know if errors already exist
+$error_messages_exist = $Messages->has_errors();
+
+// Clear messages to avoid duplicate appearence, since they were already displayed
+$Messages->clear();
+
 $thread_is_missed = false;
 if( ! empty( $thrd_ID ) )
 { // Load thread from cache:
@@ -47,18 +53,24 @@ if( ! empty( $thrd_ID ) )
 	{ // Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+		if( ! $error_messages_exist )
+		{ // Display this error only when no error above
+			$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+		}
 		$thread_is_missed = true;
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) )
 	{ // Current user is not recipient of this thread
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
+		if( ! $error_messages_exist )
+		{ // Display this error only when no error above
+			$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
+		}
 	}
 }
 
-if( ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
+if( ! $error_messages_exist && ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
 { // Display this error only when no error above
 	$Messages->add( T_('Can\'t show messages without thread!'), 'error' );
 	$thread_is_missed = true;

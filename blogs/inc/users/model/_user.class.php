@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 7933 2015-01-09 12:12:17Z yura $
+ * @version $Id: _user.class.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -247,6 +247,30 @@ class User extends DataObject
 
 
 	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $user_db_config;
+
+		if( !isset( $user_db_config ) )
+		{
+			$user_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_users',
+					'dbprefix'           => 'user_',
+					'dbIDname'           => 'user_ID',
+				)
+			);
+		}
+
+		return $user_db_config;
+	}
+
+
+	/**
 	 * Get delete restriction settings
 	 *
 	 * @return array
@@ -254,6 +278,10 @@ class User extends DataObject
 	static function get_delete_restrictions()
 	{
 		// fp> These settings should probably be merged with the global database description used by the installer/upgrader. However I'm not sure about how compelx plugins would be able to integrate then...
+		// asimo> Delete cascades and restrictions handling can't be handled globally in all circumstances because in a few places there is a logic behind the deletion:
+		//        e.g. Delete user as spammer or simply delete the user
+		// asimo> For sure in those cases when the cascade has no condition it would be faster to handled in on the db level.
+		//        The current db_delete_where solution handles the delete cascade generally and handle the speciel cases in the cascaded classes as well ( e.g. delete files )
 		return array(
 				array( 'table'=>'T_blogs', 'fk'=>'blog_owner_user_ID', 'msg'=>T_('%d blogs owned by this user') ),
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
@@ -274,11 +302,13 @@ class User extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_users__usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
-				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
+				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user'),
+						'class'=>'Session', 'class_path'=>'sessions/model/_session.class.php' ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
 				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_user_ID', 'msg'=>T_('%d user votes on comments') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d blog subscriptions') ),
-				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user'),
+						'class'=>'Item', 'class_path'=>'items/model/_item.class.php' ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_user_ID', 'msg'=>T_('%d post subscriptions') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_to_user_ID', 'msg'=>T_('%d contacts from other users contact list') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_from_user_ID', 'msg'=>T_('%d contacts from this user contact list') ),
@@ -287,11 +317,39 @@ class User extends DataObject
 				array( 'table'=>'T_pluginusersettings', 'fk'=>'puset_user_ID', 'msg'=>T_('%d user settings on plugins') ),
 				array( 'table'=>'T_users__fields', 'fk'=>'uf_user_ID', 'msg'=>T_('%d user fields') ),
 				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_user_ID', 'msg'=>T_('%d user post read statuses') ),
-				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user') ),
-				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
-				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
+				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
 			);
+	}
+
+
+	/**
+	 * Initialize relations for restrict and cascade deletion.
+	 * Spammer user's deletion will cascade more items.
+	 *
+	 * @param boolean Is this user spammer
+	 */
+	function init_relations( $is_spammer = false )
+	{
+		if( ! is_null( $this->delete_cascades ) || ! is_null( $this->delete_restrictions ) )
+		{ // Initialize the relations only once
+			return;
+		}
+
+		parent::init_relations();
+
+		if( $is_spammer )
+		{
+			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d message by this user'),
+					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php' );
+			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read status about this user') );
+			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
+					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php' );
+			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
+					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
+		}
 	}
 
 
@@ -888,12 +946,19 @@ class User extends DataObject
 		{
 			$reqID = param( 'reqID', 'string', '' );
 
+			global $edited_user_pass1, $edited_user_pass2;
+
+			$edited_user_pass1 = param( 'edited_user_pass1', 'string', true );
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+
+			// Remove the invalid chars from password vars
+			$edited_user_pass1 = preg_replace( '/[<>&]/', '', $edited_user_pass1 );
+			$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+
 			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
 			{ // current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
-				param( 'edited_user_pass1', 'string', true );
-				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
 				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 				{ // We can set password
@@ -903,8 +968,6 @@ class User extends DataObject
 			else
 			{
 				// ******* Password edit form ****** //
-				param( 'edited_user_pass1', 'string', true );
-				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
 				$current_user_pass = param( 'current_user_pass', 'string', true );
 
@@ -3179,6 +3242,72 @@ class User extends DataObject
 
 
 	/**
+	 * Delete those users from the database which corresponds to the given condition or to the given ids array
+	 * Note: the delete cascade arrays are handled!
+	 *
+	 * @param string the name of this class
+	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
+	 * @param string where condition
+	 * @param array object ids
+	 * @return mixed # of rows affected or false if error
+	 */
+	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( ! empty( $sql_where ) )
+		{
+			$object_ids = $DB->get_col( 'SELECT user_ID FROM T_users WHERE '.$sql_where );
+		}
+
+		if( ! $object_ids )
+		{ // There is no user to delete
+			$DB->commit();
+			return;
+		}
+
+		// Delete orphan threads per users
+		$result = delete_orphan_threads( $object_ids );
+
+		// Remove deleted user(s) from posts where it was as last edit user
+		$user_ids = implode( ',', $object_ids );
+		$result = $result && ( $DB->query( 'UPDATE T_items__item
+								    SET post_lastedit_user_ID = NULL
+								  WHERE post_lastedit_user_ID IN ( '.$user_ids.' )' ) !== false );
+		$result = $result && ( $DB->query( 'UPDATE T_items__version
+								    SET iver_edit_user_ID = NULL
+								  WHERE iver_edit_user_ID IN ( '.$user_ids.' )' ) !== false );
+
+		// Remove this user from links where it was as last edit user
+		$result = $result && ( $DB->query( 'UPDATE T_links
+								    SET link_lastedit_user_ID = NULL
+								  WHERE link_lastedit_user_ID IN ( '.$user_ids.' )' ) !== false );
+
+		if( $result )
+		{ // Delete the user(s) with all of the cascade objects
+			$params['use_transaction'] = false; // no need to start a new transaction
+			$result = parent::db_delete_where( $class_name, $sql_where, $object_ids, $params );
+		}
+
+		if( $result !== false )
+		{ // delete the users' media folders recursively, for all deleted users
+			$FileRootCache = & get_FileRootCache();
+			foreach( $object_ids as $user_ID )
+			{
+				$root_directory = $FileRootCache->get_root_dir( 'user', $user_ID );
+				rmdir_r( $root_directory );
+			}
+		}
+
+		( $result !== false ) ? $DB->commit() : $DB->rollback();
+
+		return $result;
+	}
+
+
+	/**
 	 * Delete user and dependencies from database
 	 *
 	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
@@ -3197,7 +3326,7 @@ class User extends DataObject
 
 		if( $deltype == 'spammer' )
 		{ // If we delete user as spammer we should delete private messaged of this user
-			$this->delete_messages();
+			$this->init_relations( true );
 		}
 		else
 		{ // If we delete user as not spammer we keep his comments as from anonymous user
@@ -3214,69 +3343,6 @@ class User extends DataObject
 			}
 		}
 
-		// Get list of posts that are going to be deleted (3.23)
-		$post_list = implode( ',', $DB->get_col( '
-				SELECT post_ID
-				  FROM T_items__item
-				 WHERE post_creator_user_ID = '.$this->ID ) );
-
-		if( !empty( $post_list ) )
-		{
-			// Delete comments
-			$ret = $DB->query( "DELETE FROM T_comments
-													WHERE comment_item_ID IN ($post_list)" );
-			if( is_a( $Log, 'log' ) )
-			{
-				$Log->add( sprintf( 'Deleted %d comments on user\'s posts.', $ret ), 'note' );
-			}
-
-			// Delete post extracats
-			$ret = $DB->query( "DELETE FROM T_postcats
-													WHERE postcat_post_ID IN ($post_list)" );
-			if( is_a( $Log, 'log' ) )
-			{
-				$Log->add( sprintf( 'Deleted %d extracats of user\'s posts\'.', $ret ) ); // TODO: geeky wording.
-			}
-
-			// Posts will we auto-deleted by parent method
-		}
-		else
-		{ // no posts
-			if( is_a( $Log, 'log' ) )
-			{
-				$Log->add( 'No posts to delete.', 'note' );
-			}
-		}
-
-		// Get list of sessions that are going to be deleted
-		$sessions_SQL = new SQL();
-		$sessions_SQL->SELECT( 'sess_ID' );
-		$sessions_SQL->FROM( 'T_sessions' );
-		$sessions_SQL->WHERE( 'sess_user_ID = '.$this->ID );
-		$sessions_list = $DB->get_col( $sessions_SQL->get() );
-
-		if( !empty( $sessions_list ) )
-		{ // Delete all hit logs of this user
-			$DB->query( 'DELETE FROM T_hitlog
-					WHERE hit_sess_ID IN ( '.$DB->quote( $sessions_list ).' )' );
-		}
-
-		// delete user involved ophan threads
-		delete_orphan_threads( $this->ID );
-
-		// Remove this user from posts where it was as last edit user
-		$DB->query( 'UPDATE T_items__item
-								    SET post_lastedit_user_ID = NULL
-								  WHERE post_lastedit_user_ID = '.$this->ID );
-		$DB->query( 'UPDATE T_items__version
-								    SET iver_edit_user_ID = NULL
-								  WHERE iver_edit_user_ID = '.$this->ID );
-
-		// Remove this user from links where it was as last edit user
-		$DB->query( 'UPDATE T_links
-								    SET link_lastedit_user_ID = NULL
-								  WHERE link_lastedit_user_ID = '.$this->ID );
-
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 		$old_email = $this->get( 'email' );
@@ -3289,11 +3355,6 @@ class User extends DataObject
 			$Log->add( 'User has not been deleted.', 'error' );
 			return false;
 		}
-
-		// user was deleted, also delete this user's media folder recursively
-		$FileRootCache = & get_FileRootCache();
-		$root_directory = $FileRootCache->get_root_dir( 'user', $old_ID );
-		rmdir_r( $root_directory );
 
 		if( $deltype == 'spammer' )
 		{ // User was deleted as spammer, we should mark email of this user as 'Spammer'
@@ -4565,7 +4626,7 @@ class User extends DataObject
 
 		if( empty( $file_ID ) )
 		{ // File ID is empty
-			$Messages->add( T_('You have selected wrong file of this user!'), 'error' );
+			$Messages->add( T_('You did not specify a file.'), 'error' );
 			$error_code = 'wrong_file';
 			return false;
 		}
@@ -4574,14 +4635,14 @@ class User extends DataObject
 		$File = & $FileCache->get_by_ID( $file_ID, false, false );
 		if( empty( $File ) )
 		{ // File does't exist
-			$Messages->add( T_('You have selected wrong file of this user!'), 'error' );
+			$Messages->add( T_('The requested file does not exist!'), 'error' );
 			$error_code = 'wrong_file';
 			return false;
 		}
 
 		if( $File->_FileRoot->type != 'user' || ( $File->_FileRoot->in_type_ID != $this->ID && ! $can_moderate_user ) )
 		{ // don't allow use the pictures from other users
-			$Messages->add( T_('You have selected wrong file of this user!'), 'error' );
+			$Messages->add( T_('The requested file doesn\'t belong to this user.'), 'error' );
 			$error_code = 'other_user';
 			return false;
 		}

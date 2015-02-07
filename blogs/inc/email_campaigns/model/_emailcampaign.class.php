@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _emailcampaign.class.php 7827 2014-12-17 07:04:16Z yura $
+ * @version $Id: _emailcampaign.class.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -201,24 +201,24 @@ class EmailCampaign extends DataObject
 	{
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
 		{ // Name
-			param_string_not_empty( 'ecmp_name', T_('Please enter campaign name.') );
+			param_string_not_empty( 'ecmp_name', T_('Please enter a campaign name.') );
 			$this->set_from_Request( 'name' );
 		}
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )
 		{ // Email title
-			param_string_not_empty( 'ecmp_email_title', T_('Please enter email title.') );
+			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
 			$this->set_from_Request( 'email_title' );
 		}
 
 		if( param( 'ecmp_email_html', 'html', NULL ) !== NULL )
 		{ // Email HTML message
-			param_check_html( 'ecmp_email_html', T_('Please enter HTML message.') );
+			param_check_html( 'ecmp_email_html', T_('Please enter an HTML message.') );
 			$this->set_from_Request( 'email_html' );
 		}
 
 		if( param( 'ecmp_email_text', 'text', NULL ) !== NULL )
-		{ // Email Plain Text message
+		{ // Email Plain- Text message
 			$this->set_from_Request( 'email_text' );
 		}
 
@@ -246,7 +246,7 @@ class EmailCampaign extends DataObject
 		{ // Email title is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter email title'), 'error' );
+				$Messages->add( T_('Please enter an email title.'), 'error' );
 			}
 			$result = false;
 		}
@@ -255,7 +255,7 @@ class EmailCampaign extends DataObject
 		{ // Email html message is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter email HTML message'), 'error' );
+				$Messages->add( T_('Please enter an HTML message.'), 'error' );
 			}
 			$result = false;
 		}
@@ -264,7 +264,7 @@ class EmailCampaign extends DataObject
 		{ // Email text message is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter email Plain Text message'), 'error' );
+				$Messages->add( T_('Please enter a plain-text message.'), 'error' );
 			}
 			$result = false;
 		}
@@ -273,7 +273,7 @@ class EmailCampaign extends DataObject
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
-				$Messages->add( T_('No users found to send email newsletters'), 'error' );
+				$Messages->add( T_('No recipients found for this campaign.'), 'error' );
 			}
 			$result = false;
 		}

@@ -226,11 +226,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 				( '.$blog_id.', "Sidebar", 40, "plugin", "evo_Calr", NULL )';
 			}
 			$widgets_insert_sql .= ',
-				( '.$blog_id.', "Sidebar", 50, "core", "coll_title", NULL ),
-				( '.$blog_id.', "Sidebar", 60, "core", "coll_longdesc", NULL ),
-				( '.$blog_id.', "Sidebar", 70, "core", "coll_common_links", NULL ),
-				( '.$blog_id.', "Sidebar", 80, "core", "coll_search_form", NULL ),
-				( '.$blog_id.', "Sidebar", 90, "core", "coll_category_list", NULL )';
+				( '.$blog_id.', "Sidebar", 50, "core", "coll_longdesc", "'.$DB->escape( serialize( array( 'title' => '$title$' ) ) ).'" ),
+				( '.$blog_id.', "Sidebar", 60, "core", "coll_common_links", NULL ),
+				( '.$blog_id.', "Sidebar", 70, "core", "coll_search_form", NULL ),
+				( '.$blog_id.', "Sidebar", 80, "core", "coll_category_list", NULL )';
 			$DB->query( $widgets_insert_sql );
 
 			if( $blog_id == $blog_linkblog_ID )
@@ -248,24 +247,24 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 						'thumb_size' => 'fit-160x160',
 					);
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									VALUES( '.$blog_id.', "Sidebar", 100, "core", "coll_item_list", "'.$DB->escape( serialize( $advertisement_params ) ).'" )' );
+									VALUES( '.$blog_id.', "Sidebar", 90, "core", "coll_item_list", "'.$DB->escape( serialize( $advertisement_params ) ).'" )' );
 			}
 
 			if( $blog_id != $blog_b_ID )
 			{
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									VALUES( '.$blog_id.', "Sidebar", 110, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
+									VALUES( '.$blog_id.', "Sidebar", 100, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
 			}
 			if( ! empty( $blog_linkblog_ID ) && $blog_id <= $blog_b_ID )
 			{
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									VALUES( '.$blog_id.', "Sidebar", 120, "core", "linkblog", "'.$DB->escape( serialize( array( 'blog_ID' => $blog_linkblog_ID ) ) ).'" )' );
+									VALUES( '.$blog_id.', "Sidebar", 110, "core", "linkblog", "'.$DB->escape( serialize( array( 'blog_ID' => $blog_linkblog_ID ) ) ).'" )' );
 			}
 		}
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							VALUES( '.$blog_id.', "Sidebar", 130, "core", "coll_xml_feeds" )' );
+							VALUES( '.$blog_id.', "Sidebar", 120, "core", "coll_xml_feeds" )' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-			VALUES ( '.$blog_id.', "Sidebar", 140, "core", "mobile_skin_switcher" )' );
+			VALUES ( '.$blog_id.', "Sidebar", 130, "core", "mobile_skin_switcher" )' );
 
 		/* Sidebar 2 */
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )

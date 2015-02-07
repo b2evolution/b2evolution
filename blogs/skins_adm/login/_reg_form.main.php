@@ -37,7 +37,6 @@ load_class( 'regional/model/_country.class.php', 'Country' );
  */
 $page_title = T_('New account creation');
 $wrap_width = '580px';
-$wrap_height = '630px';
 
 require dirname(__FILE__).'/_html_header.inc.php';
 

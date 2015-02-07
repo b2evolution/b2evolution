@@ -40,7 +40,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author mfollett:  Matt FOLLETT - {@link http://www.mfollett.com/}.
  *
- * @version $Id$
+ * @version $Id: _session.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -109,7 +109,7 @@ class Session
 
 	/**
 	 * The user device from where this session was created
-	 * 
+	 *
 	 * @var string
 	 */
 	var $sess_device;
@@ -278,6 +278,62 @@ class Session
 			$Debuglog->add( 'Session: ID (generated): '.$this->ID, 'request' );
 			$Debuglog->add( 'Session: Cookie sent.', 'request' );
 		}
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $session_db_config;
+
+		if( !isset( $session_db_config ) )
+		{
+			$session_db_config = array(
+				'dbtablename'        => 'T_sessions',
+				'dbprefix'           => 'sess_',
+				'dbIDname'           => 'sess_ID',
+			);
+		}
+
+		return $session_db_config;
+	}
+
+
+	/**
+	 * Delete sessions from database based on where condition or by object ids
+	 *
+	 * @return array
+	 */
+	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( ! empty( $sql_where ) )
+		{
+			$object_ids = $DB->get_col( 'SELECT sess_ID FROM T_sessions WHERE '.$sql_where );
+		}
+
+		if( ! $object_ids )
+		{ // There is no session to delete
+			$DB->commit();
+			return;
+		}
+
+		$session_ids_to_delete = implode( ', ', $object_ids );
+
+		$result = $DB->query( 'DELETE FROM T_hitlog WHERE hit_sess_ID IN ( '.$session_ids_to_delete.' )' );
+
+		$result = ( $result !== false ) ? $DB->query( 'DELETE FROM T_sessions WHERE sess_ID IN ( '.$session_ids_to_delete.')' ) : $result;
+
+		( $result !== false ) ? $DB->commit() : $DB->rollback();
+
+		return $result;
 	}
 
 

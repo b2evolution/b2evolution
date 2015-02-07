@@ -12,6 +12,7 @@ body {
 }
 
 div#skin_wrapper div.sitewide_header {
+	border-bottom: none;
 	margin-bottom: 0;
 }
 
@@ -48,6 +49,13 @@ div#pageFooter {
 #pageFooter a, .nav_pages a {
 	color: #aaa;
 }
+#pageFooter .footer_container {
+	text-align: center;
+	padding-top: 6ex;
+}
+#pageFooter .footer_container > div {
+	margin-bottom: 1ex;
+}
 p.baseline, .nav_pages {
 	text-align: center;
 	font-size: 84%;
@@ -57,6 +65,7 @@ p.baseline, .nav_pages {
 
 
 div.pageHeader {
+	font: 16px/25px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
 	padding: 5px;
 	border-bottom: 1px solid #666;
 	background: #333;
@@ -66,7 +75,7 @@ div.pageHeader {
 h1#pageTitle {
 	float: left;
 	font-size: 100%;
-	font-weight: bold;
+	font-weight: normal;
 	letter-spacing: 2px;
 	margin: 0 10px 0 0;
 	padding: 0;
@@ -143,7 +152,7 @@ h2 {
 }
 .posts_list .bPost {
 	display: inline-block;
-	margin: 25px 45px;
+	margin: 25px 44px;
 	vertical-align: top;
 }
 .posts_list .bPost img, .posts_list .bPost b {
@@ -270,6 +279,15 @@ div.mediajs_block, div.videojs_block, div.flowplayer_block {
 	font-weight: bold;
 	color: #f8f8f8;
 	float: left;
+}
+@media only screen and (max-width: 500px) {
+	.nav_album_number, .nav_album_arrows {
+		display: none;
+	}
+	.nav_album_title {
+		float: right;
+		margin: 0 10px 0 0;
+	}
 }
 @media only screen and (max-width: 666px) {
 	.bPosts {
@@ -443,6 +461,7 @@ div.tabs div.selected a {
 }
 
 .nav_album {
+	font: 16px/25px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
 	background: #373737;
 	border-bottom: 1px solid #252525;
 	padding: 5px 0;
@@ -476,7 +495,6 @@ div.tabs div.selected a {
 	color: #333;
 }
 .nav_album .nav_album_title {
-	font: 16px/25px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
 	margin-left: 120px;
 }
 .nav_album .nav_album_number {
@@ -656,6 +674,7 @@ div.tabs div.selected a {
 
 .flowplayer_block, .videojs_block, .mediajs_block {
 	width: 658px;
+	max-width: 100%;
 }
 .flowplayer_block > div, .videojs_block > div, .mediajs_block > div {
 	margin: 0 auto;

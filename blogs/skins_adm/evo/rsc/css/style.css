@@ -760,6 +760,9 @@ div#ffield_item_tags ul.token-input-list-facebook {
 	padding: 0 1px;
 	margin: 1px;
 }
+#attachmentframe_wrapper .ui-resizable-s {
+	background: #bbb;
+}
 
 ul.widget_container {
 	border-color: #BBB;

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _generalsettings.class.php 7564 2014-11-03 13:12:45Z yura $
+ * @version $Id: _generalsettings.class.php 8087 2015-01-27 17:49:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -102,6 +102,7 @@ class GeneralSettings extends AbstractSettings
 
 		'newusers_canregister' => 'no',
 		'registration_is_public' => '1',
+		'quick_registration' => '0',
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '1',
 		'validation_process' => 'easy',

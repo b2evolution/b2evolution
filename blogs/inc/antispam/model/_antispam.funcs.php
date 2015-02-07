@@ -35,7 +35,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _antispam.funcs.php 6697 2014-05-15 10:51:11Z yura $
+ * @version $Id: _antispam.funcs.php 8184 2015-02-06 13:12:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -158,19 +158,20 @@ function antispam_report_abuse( $abuse_string )
 	if( ! $Settings->get('antispam_report_to_central') )
 	{
 		$Messages->add( 'Reporting is disabled.', 'error' );  // NO TRANS necessary
-		return;
+		return false;
 	}
 
 	if( preg_match( '#^http://localhost[/:]#', $baseurl) && ( $antispamsrv_host != 'localhost' ) && empty( $antispam_test_for_real )  )
 	{ // Local install can only report to local test server
 		$Messages->add( T_('Reporting abuse to b2evolution aborted (Running on localhost).'), 'error' );
-		return(false);
+		return false;
 	}
 
 	// Construct XML-RPC client:
-	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
-	$client->debug = $debug;
+	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
+	// $client->debug = $debug;
 
 	// Construct XML-RPC message:
 	$message = new xmlrpcmsg(
@@ -183,7 +184,7 @@ function antispam_report_abuse( $abuse_string )
 									new xmlrpcval($baseurl,'string'),         // The base URL of this b2evo
 								)
 							);
-	$result = $client->send($message);
+	$result = $client->send( $message );
 	if( $ret = xmlrpc_logresult( $result, $Messages, false ) )
 	{ // Remote operation successful:
 		antispam_update_source( $abuse_string, 'reported' );
@@ -195,7 +196,7 @@ function antispam_report_abuse( $abuse_string )
 		$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
 	}
 
-	return($ret);
+	return $ret;
 }
 
 
@@ -210,8 +211,9 @@ function antispam_poll_abuse()
 
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port);
-	$client->debug = $debug;
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
+	// $client->debug = $debug;
 
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
@@ -234,14 +236,14 @@ function antispam_poll_abuse()
 
 	$Messages->add( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note' );
 
-	$result = $client->send($message);
+	$result = $client->send( $message );
 
 	if( $ret = xmlrpc_logresult( $result, $Messages, false ) )
 	{ // Response is not an error, let's process it:
 		$response = $result->value();
 		if( $response->kindOf() == 'struct' )
 		{ // Decode struct:
-			$response = xmlrpc_decode_recurse($response);
+			$response = xmlrpc_decode_recurse( $response );
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
 				$Messages->add( T_('Incomplete reponse.'), 'error' );
@@ -250,14 +252,14 @@ function antispam_poll_abuse()
 			else
 			{ // Start registering strings:
 				$value = $response['strings'];
-				if( count($value) == 0 )
+				if( count( $value ) == 0 )
 				{
 					$Messages->add( T_('No new blacklisted strings are available.'), 'note' );
 				}
 				else
 				{ // We got an array of strings:
 					$Messages->add( T_('Adding strings to local blacklist:'), 'note' );
-					foreach($value as $banned_string)
+					foreach( $value as $banned_string )
 					{
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
@@ -272,7 +274,7 @@ function antispam_poll_abuse()
 						}
 					}
 					// Store latest timestamp:
-					$endedat = date('Y-m-d H:i:s', iso8601_decode($response['lasttimestamp']) );
+					$endedat = date('Y-m-d H:i:s', iso8601_decode( $response['lasttimestamp'] ) );
 					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note' );
 
 					$Settings->set( 'antispam_last_update', $endedat );
@@ -283,12 +285,12 @@ function antispam_poll_abuse()
 		}
 		else
 		{
-			$Messages->add( T_('Invalid reponse.'), 'error' );
+			$Messages->add( T_('Invalid response.'), 'error' );
 			$ret = false;
 		}
 	}
 
-	return($ret);
+	return $ret ;
 }
 
 

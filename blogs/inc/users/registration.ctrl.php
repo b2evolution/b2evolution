@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: registration.ctrl.php 7409 2014-10-10 05:33:41Z yura $
+ * @version $Id: registration.ctrl.php 8087 2015-01-27 17:49:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,6 +53,7 @@ switch ( $action )
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'string', 'no' );
 		param( 'registration_is_public', 'integer', 0 );
+		param( 'quick_registration', 'integer', 0 );
 		param( 'newusers_grp_ID', 'integer', true );
 
 		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
@@ -124,6 +125,7 @@ switch ( $action )
 		$Settings->set_array( array(
 					 array( 'newusers_canregister', $newusers_canregister ),
 					 array( 'registration_is_public', $registration_is_public ),
+					 array( 'quick_registration', $quick_registration ),
 					 array( 'newusers_grp_ID', $newusers_grp_ID ),
 					 array( 'newusers_level', $newusers_level ),
 					 array( 'def_enable_PM', $enable_PM ),

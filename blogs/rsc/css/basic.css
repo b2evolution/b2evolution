@@ -171,6 +171,10 @@ img.avatar_above_login {
 .duplicated_avatars a.user img {
 	vertical-align: text-top;
 }
+div.avatartag.main > img:first-child {
+	float: left;
+	margin-right: 25px;
+}
 
 /* Image crop window */
 #image_crop_block {
@@ -263,7 +267,11 @@ div#evo_toolbar {
    Don't fix a position of the evo toolbar */
 @media only screen and (max-device-width: 1024px) {
 	div#evo_toolbar {
-		position: absolute;
+		position: relative;
+		height: auto;
+	}
+	div#skin_wrapper.skin_wrapper_loggedin {
+		margin-top: 0;
 	}
 }
 div.skin_wrapper_loggedin {
@@ -272,6 +280,7 @@ div.skin_wrapper_loggedin {
 }
 div#evo_toolbar .actions_left {
 	padding: 1px 4px;
+	float: left;
 }
 div#evo_toolbar .actions_right {
 	padding: 1px 4px;
@@ -337,7 +346,7 @@ ul.sf-menu li li li.sfHover ul {
 
 /*** DEMO SKIN ***/
 .sf-menu {
-	margin-bottom:	1em;
+	float: left;
 }
 .sf-menu a {
 	border: 1px solid ThreeDFace;

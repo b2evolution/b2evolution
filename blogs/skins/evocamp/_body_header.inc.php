@@ -58,13 +58,15 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Menu'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start' => '',
-					'block_end' => '',
+					'block_start'         => '',
+					'block_end'           => '',
 					'block_display_title' => false,
-					'list_start' => '',
-					'list_end' => '',
-					'item_start' => '<li>',
-					'item_end' => '</li>',
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => '<li>',
+					'item_end'            => '</li>',
+					'item_title_before'   => '',
+					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _sessions.init.php 7415 2014-10-13 08:12:59Z yura $
+ * @version $Id: _sessions.init.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -105,7 +105,7 @@ function & get_GoalCategoryCache( $allow_none_text = NULL )
 	{ // Cache doesn't exist yet:
 		if( ! isset( $allow_none_text ) )
 		{
-			$allow_none_text = T_('None');
+			$allow_none_text = NT_('None');
 		}
 		load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
 		$GoalCategoryCache = new DataObjectCache( 'GoalCategory', false, 'T_track__goalcat', 'gcat_', 'gcat_ID', 'gcat_name', 'gcat_name', $allow_none_text ); // COPY (FUNC)

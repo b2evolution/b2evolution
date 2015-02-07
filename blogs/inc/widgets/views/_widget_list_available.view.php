@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _widget_list_available.view.php 7933 2015-01-09 12:12:17Z yura $
+ * @version $Id: _widget_list_available.view.php 8087 2015-01-27 17:49:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -54,6 +54,7 @@ $core_componentwidget_defs = array(
 			'colls_list_owner',
 			'user_tools',
 			'user_login',
+			'user_register',
 			'user_avatars',
 			'online_users',
 			'member_count',

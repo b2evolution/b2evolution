@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: voting.js 7894 2014-12-25 12:23:01Z yura $
+ * @version $Id: voting.js 8013 2015-01-16 15:22:35Z yura $
  */
 
 /**
@@ -17,6 +17,15 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 	// Update the colorbox width and position when new voting panel is loaded
 	function update_colorbox_position()
 	{
+		if( voting_layout.closest( '#colorbox' ).width() <= 480 )
+		{
+			jQuery( '#colorbox .vote_title_text' ).hide();
+		}
+		else
+		{
+			jQuery( '#colorbox .vote_title_text' ).show();
+		}
+
 		if( voting_layout.attr( 'id' ) == 'cboxVoting' )
 		{
 			var colorbox_width = jQuery( '#colorbox' ).width();

@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlight.class.php 7978 2015-01-14 11:21:30Z yura $
+ * @version $Id: _itemlight.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -189,16 +189,38 @@ class ItemLight extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
+				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
-				array( 'table'=>'T_comments', 'fk'=>'comment_item_ID', 'msg'=>T_('%d comments'), 'delete_where_callback' => 'comments_delete_where' ),
+				array( 'table'=>'T_comments', 'fk'=>'comment_item_ID', 'msg'=>T_('%d comments'),
+						'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php' ),
 				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
 				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
 				array( 'table'=>'T_items__itemtag', 'fk'=>'itag_itm_ID', 'msg'=>T_('%d links to tags') ),
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
+				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
 				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d user post read statuses') ),
 			);
+	}
+
+
+	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		return array(
+			'dbtablename'        => 'T_items__item',
+			'dbprefix'           => 'post_',
+			'dbIDname'           => 'post_ID',
+			'datecreated_field'  => '',
+			'datemodified_field' => 'datemodified',
+			'creator_field'      => '',
+			'lasteditor_field'   => '',
+		);
 	}
 
 

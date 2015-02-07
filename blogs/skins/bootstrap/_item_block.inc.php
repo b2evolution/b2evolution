@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id: _item_block.inc.php 7936 2015-01-09 12:54:22Z yura $
+ * @version $Id: _item_block.inc.php 8011 2015-01-15 16:43:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,13 +34,16 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-	?>
 
-	<h3 class="bTitle linked"><?php
-		$Item->title( array(
-				'link_type' => 'permalink'
-			) );
-	?></h3>
+		if( $disp != 'single' && $disp != 'page' )
+		{ // Don't display this on disp=single because there is already title header in h2
+			$Item->title( array(
+					'before'    => '<h3 class="bTitle linked">',
+					'after'     => '</h3>',
+					'link_type' => 'permalink'
+				) );
+		}
+	?>
 
 	<div class="bSmallHead">
 	<?php
@@ -98,11 +101,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 	<div class="bSmallPrint">
 		<?php
-			// Permalink:
-			$Item->permanent_link( array(
-					'class' => 'permalink_right',
-				) );
-
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
 							'type' => 'comments',

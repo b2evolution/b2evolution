@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _usercache.class.php 6697 2014-05-15 10:51:11Z yura $
+ * @version $Id: _usercache.class.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,7 +63,7 @@ class UserCache extends DataObjectCache
 	function UserCache()
 	{
 		parent::DataObjectCache( 'User', false, 'T_users', 'user_', 'user_ID', NULL, '',
-			/* TRANS: "None" select option */ T_('No user') );
+			/* TRANS: "None" select option */ NT_('No user') );
 	}
 
 
@@ -312,7 +312,7 @@ class UserCache extends DataObjectCache
 			return false;
 		}
 
-		$this->none_option_text = T_('No user');
+		$this->none_option_text = NT_('No user');
 
 		// Clear previous users to get only the members of this blog
 		$this->clear();

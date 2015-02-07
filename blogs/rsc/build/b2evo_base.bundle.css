@@ -9,6 +9,12 @@ code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
 	/* font-size: 107%; */
 }
+pre, code {
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
 .nobr,
 .nowrap,
 .line {
@@ -677,6 +683,10 @@ img.avatar_above_login {
 .duplicated_avatars a.user img {
 	vertical-align: text-top;
 }
+div.avatartag.main > img:first-child {
+	float: left;
+	margin-right: 25px;
+}
 
 /* Image crop window */
 #image_crop_block {
@@ -769,7 +779,11 @@ div#evo_toolbar {
    Don't fix a position of the evo toolbar */
 @media only screen and (max-device-width: 1024px) {
 	div#evo_toolbar {
-		position: absolute;
+		position: relative;
+		height: auto;
+	}
+	div#skin_wrapper.skin_wrapper_loggedin {
+		margin-top: 0;
 	}
 }
 div.skin_wrapper_loggedin {
@@ -778,6 +792,7 @@ div.skin_wrapper_loggedin {
 }
 div#evo_toolbar .actions_left {
 	padding: 1px 4px;
+	float: left;
 }
 div#evo_toolbar .actions_right {
 	padding: 1px 4px;
@@ -843,7 +858,7 @@ ul.sf-menu li li li.sfHover ul {
 
 /*** DEMO SKIN ***/
 .sf-menu {
-	margin-bottom:	1em;
+	float: left;
 }
 .sf-menu a {
 	border: 1px solid ThreeDFace;
@@ -1999,25 +2014,30 @@ div.container_menu_top input.search_field {
 	width: 160px;	/* There is typically more space here */
 }
 
-/* User login widget */
-.widget_core_user_login #login_form{
+/* User login/register widget */
+.widget_core_user_login #login_form,
+.widget_core_user_register #register_form {
 	margin-top: 5px;
 }
-.widget_core_user_login fieldset{
+.widget_core_user_login fieldset,
+.widget_core_user_register fieldset {
 	border: none;
 	padding: 0;
 	margin: 0;
 }
-.widget_core_user_login .field_login_btn{
+.widget_core_user_login .field_login_btn,
+.widget_core_user_register .field_register_btn {
 	margin: 5px 0;
 }
 .widget_core_user_login #ffield_pwd{
 	margin-top: 5px;
 }
-.widget_core_user_login .input_text{
+.widget_core_user_login .input_text,
+.widget_core_user_register .input_text {
 	width: 96%;
 }
-.widget_core_user_login .submit{
+.widget_core_user_login .submit,
+.widget_core_user_register .submit {
 	font-size: 10px;
 }
 .widget_core_user_login .register_link {
@@ -2084,7 +2104,6 @@ div.tabs div.selected a {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
-	vertical-align: top;
 }
 .title_action_icons {
 	float: right;
@@ -2579,6 +2598,10 @@ input.btn-lg {
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-khtml-border-radius: 3px;
+}
+
+.top_menu div.item_title {
+	display: inline-block;
 }
 /**
  * item_base.css 

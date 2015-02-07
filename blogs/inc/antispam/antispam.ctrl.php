@@ -32,7 +32,7 @@
  *
  * @todo Allow applying / re-checking of the known data, not just after an update!
  *
- * @version $Id: antispam.ctrl.php 7944 2015-01-12 05:39:08Z yura $
+ * @version $Id: antispam.ctrl.php 8184 2015-02-06 13:12:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -107,62 +107,79 @@ switch( $action )
 
 		// Check if the string is too short,
 		// it has to be a minimum of 5 characters to avoid being too generic
-		if( utf8_strlen($keyword) < 5 )
+		if( utf8_strlen( $keyword ) < 5 )
 		{
-			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars($keyword) ), 'error' );
+			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars( $keyword ) ), 'error' );
+			break;
+		}
+
+		if( empty( $confirm ) )
+		{ // No confirmed action, Execute the ban actions only after confirmation
 			break;
 		}
 
 		if( $delhits )
 		{ // Delete all banned hit-log entries
-			$r = $DB->query('DELETE FROM T_hitlog
-												WHERE hit_referer LIKE '.$DB->quote('%'.$keyword.'%'),
+			$r = $DB->query( 'DELETE FROM T_hitlog
+												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
 		}
 
 		if( $delcomments )
 		{ // select banned comments
 			$del_condition = blog_restrict( $delstatuses );
-			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-							OR comment_author_email LIKE '.$DB->quote('%'.utf8_strtolower( $keyword ).'%').'
-							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-							OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').')';
+			$keyword_cond = '(comment_author LIKE '.$DB->quote( '%'.$keyword.'%' ).'
+							OR comment_author_email LIKE '.$DB->quote( '%'.utf8_strtolower( $keyword ).'%' ).'
+							OR comment_author_url LIKE '.$DB->quote( '%'.$keyword.'%' ).'
+							OR comment_content LIKE '.$DB->quote( '%'.$keyword.'%' ).')';
 			// asimo> we don't need transaction here 
-			if( $display_mode == 'js' )
-			{
-				$query = 'SELECT comment_ID FROM T_comments
-							  WHERE '.$keyword_cond.$del_condition;
-				$deleted_ids = implode( ',', $DB->get_col($query, 0, 'Get comment ids awaiting for delete') );
-			}
+			$query = 'SELECT comment_ID FROM T_comments
+							WHERE '.$keyword_cond.$del_condition;
+			$deleted_ids = $DB->get_col( $query, 0, 'Get comment ids awaiting for delete' );
+			$r = count( $deleted_ids );
+			$deleted_ids = implode( ',', $deleted_ids );
 
 			// Delete all comments data from DB
-			$r = comments_delete_where( $keyword_cond.$del_condition );
+			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
-			{
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
-				// Redirect so that a reload doesn't write to the DB twice:
-				if( $display_mode != 'js' )
-				{
-					header_redirect( '?ctrl=antispam', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-				}
+			{ // Success
+				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success' );
 			}
 			else
-			{ // TODO: message?
+			{ // Failed
+				$Messages->add( sprintf( T_('Failed to add the keyword %s to black list locally.'), '<b>'.htmlspecialchars( $keyword ).'</b>' ), 'error' );
 			}
 		}
 
 		if( $report )
-		{ // Report this keyword as abuse:
+		{ // Report this keyword as abuse remotely:
 			antispam_report_abuse( $keyword );
+		}
+
+		if( ! $blacklist_locally && ! $report && ! $delhits && ! $delcomments )
+		{ // If no action has been selected
+			$Messages->add( T_('Please select at least one action to ban the keyword.' ), 'error' );
+		}
+
+		if( $display_mode != 'js' && ! $Messages->has_errors() )
+		{
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=antispam', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+
+		if( $Messages->has_errors() )
+		{ // Reset js display mode in order to display a correct view after confirmation
+			$display_mode = '';
+			$mode = '';
 		}
 
 		param( 'request', 'string', '' );
@@ -605,7 +622,7 @@ switch( $tab3 )
 
 	case 'blacklist':
 	default:
-		if( $action == 'ban' && !$Messages->has_errors() && !( $delhits || $delcomments || $blacklist_locally || $report ) )
+		if( $action == 'ban' && ( ! $Messages->has_errors() || ! empty( $confirm ) ) && !( $delhits || $delcomments ) )
 		{	// Nothing to do, ask user:
 			$AdminUI->disp_view( 'antispam/views/_antispam_ban.form.php' );
 		}

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id: _results.class.php 7801 2014-12-11 10:27:12Z yura $
+ * @version $Id: _results.class.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -389,7 +389,7 @@ class Results extends Table
 						}
 					}
 					// Add a message to inform user about this order type is not allowed in this case
-					$this->add_message( sprintf( T_( 'You cannot sort by %s when there are more than %s results.' ), $order_request_title, number_format( $this->force_order_by_count, 0, '', ' ' ) ) );
+					$this->add_message( sprintf( T_( 'In order to maintain good performance, you cannot sort by %s when there are more than %s results.' ), $order_request_title, number_format( $this->force_order_by_count, 0, '', ' ' ) ) );
 				}
 			}
 		}

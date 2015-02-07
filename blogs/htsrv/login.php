@@ -29,7 +29,7 @@
  *
  * @package htsrv
  *
- * @version $Id: login.php 7870 2014-12-22 12:12:09Z yura $
+ * @version $Id: login.php 8056 2015-01-23 10:30:37Z yura $
  */
 
 /**
@@ -640,7 +640,6 @@ switch( $action )
 		$page_icon = 'login';
 		$hidden_params = array( 'redirect_to' => url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
 		$wrap_width = '480px';
-		$wrap_height = '430px';
 		// Include page header:
 		require $adminskins_path.'login/_html_header.inc.php';
 		// Display form:

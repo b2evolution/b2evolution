@@ -18,7 +18,7 @@
  *
  * @package evocore
  *
- * @version $Id: _init_hit.inc.php 7982 2015-01-14 15:07:11Z yura $
+ * @version $Id: _init_hit.inc.php 8032 2015-01-20 06:13:33Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -165,6 +165,15 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 
 
 /**
+ * Activate default locale:
+ */
+locale_activate( $default_locale );
+
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $current_charset );
+
+
+/**
  * The Hit class
  */
 load_class( 'sessions/model/_hit.class.php', 'Hit' );
@@ -192,16 +201,6 @@ if( is_logged_in() )
 		$current_User->dbupdate();
 	}
 }
-else
-{
-	/**
-	 * Activate default locale only when user is not logged in:
-	 */
-	locale_activate( $default_locale );
-}
-
-// Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
 
 $Timer->resume( '_init_hit' );
 

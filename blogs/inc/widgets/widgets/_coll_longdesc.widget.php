@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_longdesc.widget.php 8011 2015-01-15 16:43:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -86,7 +86,7 @@ class coll_longdesc_Widget extends ComponentWidget
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
-					'note' => T_( 'Title to display in your skin.' ),
+					'note' => T_( 'Title to display in your skin. Use $title$ to display the collection title.' ),
 					'size' => 40,
 					'defaultvalue' => '',
 				),
@@ -110,6 +110,12 @@ class coll_longdesc_Widget extends ComponentWidget
 
 		// Collection long description:
 		echo $this->disp_params['block_start'];
+
+		if( strpos( $this->disp_params['title'], '$title$' ) !== false )
+		{ // Replace mask $title$ with real blog name with link to blog home page as it does widget coll_title
+			$this->disp_params['title'] = str_replace( '$title$',
+				'<a href="'.$Blog->get( 'url', 'raw' ).'">'.$Blog->dget( 'name', 'htmlbody' ).'</a>', $this->disp_params['title'] );
+		}
 
 		// Display title if requested
 		$this->disp_title();

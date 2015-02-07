@@ -96,11 +96,12 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 
 			if( $debug )
 			{
-				echo '<div style="position:relative;left:5px;top:-7px;color:#999;z-index:-1;">'.$request_transaction_name.'</div>';
+				echo '<div style="float:left;line-height:18px;color:#666;z-index:-1;">'.$request_transaction_name.'</div>';
 			}
 		}
 		?>
 	</div>
+	<div class="clear"></div>
 </div>
 
 <?php

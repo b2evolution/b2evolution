@@ -18,7 +18,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _link_list.inc.php 8148 2015-02-03 13:36:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -152,7 +152,7 @@ if( $current_User->check_perm( 'files', 'view', false, $blog ) )
 		if( $LinkOwner->check_perm( 'edit', false ) )
 		{	// Check that we have permission to edit LinkOwner object:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
-			                  regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
+			                  regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
 		}
 
 		return $r;

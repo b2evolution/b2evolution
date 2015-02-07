@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _email_settings.form.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _email_settings.form.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -66,7 +66,7 @@ if( $Settings->get( 'smtp_enabled' ) )
 				array( 'mail', T_('Regular PHP "mail" function'), ),
 				array( 'smtp', T_('SMTP gateway'), ),
 			), T_('Preferred email service'), true );
-	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the preferred email service is not available then the secondary option will be used.') );
+	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the preferred email service is not available, the secondary option will be used.') );
 
 	$Form->end_fieldset();
 }

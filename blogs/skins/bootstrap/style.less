@@ -1,19 +1,84 @@
-// Login Form
-.widget_core_user_login #login_form {
-	.form-group {
-		margin: 0;
+// Login widget form
+.widget_core_user_login {
+	#login_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
 	}
-	label {
-		text-align: left;
-		width: 160px;
-		padding-left: 0;
+	.submit {
+		font-size: 12px;
 	}
-	.controls {
-		padding: 0;
-		width: 100%;
+	.field_login_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
 	}
-	.form_text_input.form-control {
-		width: 100%;
+	.register_link {
+		display: block;
+		padding-top: 10px;
+	}
+}
+
+// Register widget form
+.widget_core_user_register {
+	#register_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+	.submit {
+		font-size: 12px;
+	}
+	.field_register_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
 	}
 }
 
@@ -53,11 +118,6 @@ div.extended_search_form {
 		margin-right: 3px;
 		width: 500px;
 	}
-}
-
-// A login button
-.widget_core_user_login .submit {
-	font-size: 12px;
 }
 
 // Table for select categories of item
@@ -134,7 +194,12 @@ form.bComment {
 		margin: 0;
 	}
 	.bSmallHead {
-		margin-bottom: 10px;
+		margin: 4px 0 10px;
+		font-size: 84%;
+		color: #999;
+		a, a .glyphicon {
+			color: #999;
+		}
 	}
 }
 
@@ -219,23 +284,6 @@ div.bSideItem {
 }
 .form_footer_notes {
 	margin-top: 0;
-}
-// Login widget form:
-.field_login_btn {
-	.panel {
-		margin: 0;
-		border: none;
-		border-radius: 0;
-		box-shadow: none;
-		.panel-body {
-			padding-left: 0;
-			padding-right: 0;
-			padding-bottom: 0;
-			#submit_login_form {
-				margin-right: 10px;
-			}
-		}
-	}
 }
 
 // Status banners

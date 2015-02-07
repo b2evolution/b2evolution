@@ -18,7 +18,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_general.form.php 7978 2015-01-14 11:21:30Z yura $
+ * @version $Id: _coll_general.form.php 8021 2015-01-19 08:25:12Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -70,7 +70,7 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type' 
 		if( $edited_Blog->ID > 0 )
 		{
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
-					.T_('Change collection type / Reset &raquo;')
+					.T_('Change collection type / Reset')
 			.'</a></p>';
 		}
 	}
@@ -128,7 +128,7 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 		$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
 				array(
 					array( 'post', T_('Always force to post locale') ),
-					array( 'blog', T_('Follow collection locale') ),
+					array( 'blog', T_('Follow navigation locale') ),
 			), T_('Content Display'), true );
 	}
 	else

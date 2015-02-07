@@ -34,7 +34,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _dataobjectcache.class.php 7189 2014-07-31 06:58:37Z yura $
+ * @version $Id: _dataobjectcache.class.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -111,6 +111,8 @@ class DataObjectCache
 	 * The text that gets used for the "None" option in the objects options list.
 	 *
 	 * This is especially useful for i18n, because there are several "None"s!
+	 * 
+	 * !!! NOTE !!! Do NOT use T_() for this value, Use only NT_()
 	 *
 	 * @var string
 	 */
@@ -141,7 +143,8 @@ class DataObjectCache
 	 * @param string Name of the ID field (including prefix)
 	 * @param string Name of the name field (including prefix)
 	 * @param string Name of the order field or NULL to use name field
-	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
+	 * @param string The text that gets used for the "None" option in the objects options list (Default: NT_('None')).
+	 *               !!! NOTE !!! Do NOT use T_() for this value, Use only NT_()
 	 * @param mixed  The value that gets used for the "None" option in the objects options list.
 	 * @param string Additional part for SELECT clause of sql query
 	 */
@@ -178,7 +181,7 @@ class DataObjectCache
 		}
 		else
 		{
-			$this->none_option_text = /* TRANS: the default value for option lists where "None" is allowed */ T_('None');
+			$this->none_option_text = /* TRANS: the default value for option lists where "None" is allowed */ NT_('None');
 		}
 	}
 
@@ -788,7 +791,7 @@ class DataObjectCache
 		{
 			$r .= '<option value="'.$this->none_option_value.'"';
 			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
+			$r .= '>'.format_to_output( T_( $this->none_option_text ) ).'</option>'."\n";
 		}
 
 		foreach( $this->cache as $loop_Obj )
@@ -844,7 +847,7 @@ class DataObjectCache
 		{	// we set current value of a country if it is sent to function
 			$r .= '<option value="'.$this->none_option_value.'"';
 			if( empty($default) ) $r .= ' selected="selected"';
-			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
+			$r .= '>'.format_to_output( T_( $this->none_option_text ) ).'</option>'."\n";
 		}
 
 		$pref_countries = array(); //preferred countries.

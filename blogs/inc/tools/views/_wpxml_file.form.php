@@ -15,7 +15,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _wpxml_file.form.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _wpxml_file.form.php 8021 2015-01-19 08:25:12Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -166,7 +166,7 @@ if( ! empty( $import_files ) )
 
 	$Form->end_fieldset();
 
-	$Form->buttons( array( array( 'submit', 'submit', T_('Continue !'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ) ) );
 }
 
 $Form->end_form();

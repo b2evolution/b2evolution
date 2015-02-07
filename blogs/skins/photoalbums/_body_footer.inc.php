@@ -8,9 +8,9 @@
  * This is meant to be included in a page template.
  *
  * @package evoskins
- * @subpackage photoalbum
+ * @subpackage photoalbums
  *
- * @version $Id$
+ * @version $Id: _body_footer.inc.php 8013 2015-01-16 15:22:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -18,8 +18,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 <!-- =================================== START OF FOOTER =================================== -->
 <div id="pageFooter">
-
-	<p class="baseline">
+	<div class="footer_container">
+	<?php
+		// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		skin_container( NT_('Footer') );
+		// ----------------------------- END OF "Footer" CONTAINER -----------------------------
+	?>
+	</div>
+	<p class="baseline" style="padding-top:0">
 		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
@@ -61,8 +68,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		<?php
 			// Display additional credits:
- 			// If you can add your own credits without removing the defaults, you'll be very cool :))
-		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+			// If you can add your own credits without removing the defaults, you'll be very cool :))
+			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
 					'list_start'  => ' | ',
 					'list_end'    => '',

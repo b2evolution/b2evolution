@@ -23,7 +23,7 @@
  *
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id$
+ * @version $Id: _skincache.class.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,7 +55,7 @@ class SkinCache extends DataObjectCache
 	function SkinCache()
 	{
 		parent::DataObjectCache( 'Skin', false, 'T_skins__skin', 'skin_', 'skin_ID', 'skin_name', NULL,
-			/* TRANS: "None" select option */ T_('No skin') );
+			/* TRANS: "None" select option */ NT_('No skin') );
 	}
 
 

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author blueyed
  *
- * @version $Id: system.ctrl.php 7543 2014-10-29 08:48:17Z yura $
+ * @version $Id: system.ctrl.php 8099 2015-01-28 12:37:21Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -87,8 +87,7 @@ function disp_system_check( $condition, $message = '' )
 }
 
 $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
-	.T_('b2evolution includes additional measures in order not to be affected by this.
-	However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
+	.T_('b2evolution includes additional measures in order not to be affected by this. However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
 $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
@@ -140,6 +139,10 @@ $block_item_Widget = new Widget( 'block_item' );
 $block_item_Widget->title = 'b2evolution';
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+// Instance name:
+init_system_check( T_('Instance name'), $instance_name );
+disp_system_check( 'note' );
+
 // Version:
 $app_timestamp = mysql2timestamp( $app_date );
 init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
@@ -172,7 +175,7 @@ else
 	}
 	elseif( $app_age > 6 )
 	{
-		$msg .= '<p>'.sprintf( T_('Furthermore, this version is aging. You may want to check for newer releases on %s..'),
+		$msg .= '<p>'.sprintf( T_('Furthermore, this version is aging. You may want to check for newer releases on %s.'),
 			'<a href="http://b2evolution.net/downloads/">b2evolution.net</a>' ).'</p>';
 	}
 

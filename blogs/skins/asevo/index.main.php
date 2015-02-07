@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage asevo
  *
- * @version $Id$
+ * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -48,13 +48,15 @@ siteskin_include( '_site_body_header.inc.php' );
 		// Note: this container is designed to be a single <ul> list
 		skin_container( NT_('Menu'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '',
-				'block_end' => '',
+				'block_start'         => '',
+				'block_end'           => '',
 				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
+				'list_start'          => '',
+				'list_end'            => '',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
+				'item_title_before'   => '',
+				'item_title_after'    => '',
 			) );
 		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>

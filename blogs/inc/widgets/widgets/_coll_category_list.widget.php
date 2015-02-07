@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_category_list.widget.php 7867 2014-12-22 07:59:50Z yura $
+ * @version $Id: _coll_category_list.widget.php 8124 2015-02-01 13:05:17Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -109,7 +109,7 @@ class coll_category_list_Widget extends ComponentWidget
 					'note' => T_('Add checkboxes to allow selection of multiple categories.'),
 				),
 			'default_match' => array(
-					'label' => T_('Default Match'),
+					'label' => /* TRANS: here we ask to select 'OR', 'NOR' or 'AND' */ T_('Default combining'),
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
@@ -145,7 +145,7 @@ class coll_category_list_Widget extends ComponentWidget
 				),
 			'mark_first_selected' => array(
 					'type' => 'checkbox',
-					'label' => T_('Show selected'),
+					'label' => T_('Show as selected'),
 					'defaultvalue' => 1,
 					'note' => T_('Mark first selected cat (highest level selected cat)'),
 				),
@@ -351,7 +351,7 @@ class coll_category_list_Widget extends ComponentWidget
 			}
 		?>
 		<div class="multiple_cat_match_options">
-			<p class="multiple_cat_match_title"><?php echo T_('Retain only results that match:'); ?></p>
+			<p class="multiple_cat_match_title"><?php echo /* Any/None/All of the selected categories */ T_('Retain only results that match:'); ?></p>
 			<div class="tile">
 				<input type="radio" name="cat" value="|" id="cat_or" class="radio"<?php if( $cat_modifier_selected == 'or' ) echo ' checked="checked"'; ?> />
 				<label for="cat_or"><?php echo T_( 'Any selected category (OR)' ); ?></label>

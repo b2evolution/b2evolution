@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _stats_goalhits.view.php 7384 2014-10-08 06:21:06Z yura $
+ * @version $Id: _stats_goalhits.view.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -131,7 +131,7 @@ function filter_goal_hits( & $Form )
 	$Form->text_input( 'sess_ID', get_param('sess_ID'), 15, T_('Session ID'), '', array( 'maxlength'=>20 ) );
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 
-	$GoalCategoryCache = & get_GoalCategoryCache( T_('All') );
+	$GoalCategoryCache = & get_GoalCategoryCache( NT_('All') );
 	$GoalCategoryCache->load_all();
 	$Form->select_input_object( 'goal_cat', get_param('goal_cat'), $GoalCategoryCache, T_('Goal category'), array( 'allow_none' => true ) );
 }

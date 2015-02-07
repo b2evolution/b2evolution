@@ -57,7 +57,7 @@
  * @author fplanque: Francois PLANQUE
  * @author Justin VINCENT
  *
- * @version $Id: _db.class.php 7292 2014-09-08 10:57:23Z yura $
+ * @version $Id: _db.class.php 8163 2015-02-05 07:40:43Z attila $
  * @todo transaction support
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -789,10 +789,13 @@ class DB
 
 			if( preg_match( '~^\s*(UPDATE\s+)(.*?)(\sSET\s.*)$~is', $query, $match ) )
 			{ // replace only between UPDATE and SET, but check subqueries:
-				if( preg_match( '~^(.*SELECT.*FROM\s+)(.*?)(\s.*)$~is', $match[3], $subquery_match ) )
+				$subquery_result = '';
+				while( preg_match( '~^(.*SELECT.*FROM\s+)(.*?)(\s.*)$~is', $match[3], $subquery_match ) )
 				{ // replace in subquery
-					$match[3] = $subquery_match[1].preg_replace( $this->dbaliases, $this->dbreplaces, $subquery_match[2] ).$subquery_match[3];
+					$match[3] = $subquery_match[1];
+					$subquery_result = preg_replace( $this->dbaliases, $this->dbreplaces, $subquery_match[2] ).$subquery_match[3].$subquery_result;
 				}
+				$match[3] = $match[3].$subquery_result;
 				if( preg_match( '~^(.*SELECT.*JOIN\s+)(.*?)(\s.*)$~is', $match[3], $subquery_match ) )
 				{ // replace in whole subquery, there can be any number of JOIN:
 					$match[3] = preg_replace( $this->dbaliases, $this->dbreplaces, $match[3] );
@@ -1592,19 +1595,23 @@ class DB
 
 	/**
 	 * Commit current transaction
+	 *
+	 * @return boolean true on success, false otherwise - when a nested transaction called rollback
 	 */
 	function commit()
 	{
 		if( !$this->use_transactions )
 		{ // don't use transactions at all
-			return;
+			return true;
 		}
 
+		$result = true;
 		if( $this->transaction_nesting_level == 1 )
 		{ // Only COMMIT if there are no remaining nested transactions:
 			if( $this->rollback_nested_transaction )
 			{
 				$this->query( 'ROLLBACK', 'ROLLBACK transaction because there was a failure somewhere in the nesting of transactions' );
+				$result = false;
 			}
 			else
 			{
@@ -1617,6 +1624,8 @@ class DB
 		{ // decrease transaction nesting level
 			$this->transaction_nesting_level--;
 		}
+
+		return $result;
 	}
 
 
@@ -1643,6 +1652,15 @@ class DB
 		{
 			$this->transaction_nesting_level--;
 		}
+	}
+
+
+	/**
+	 * Check if some nesed transaction failed
+	 */
+	function has_failed_transaction()
+	{
+		return $this->rollback_nested_transaction;
 	}
 
 

@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: index.main.php 7106 2014-07-11 11:58:53Z yura $
+ * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -146,6 +146,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'list_end'            => '',
 					'item_start'          => '<li>',
 					'item_end'            => '</li>',
+					'item_title_before'   => '',
+					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 

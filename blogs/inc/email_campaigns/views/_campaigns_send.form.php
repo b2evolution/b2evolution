@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _campaigns_send.form.php 7827 2014-12-17 07:04:16Z yura $
+ * @version $Id: _campaigns_send.form.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -47,7 +47,7 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
 if( !empty( $template_action ) && $template_action == 'send_campaign' )
 { // Execute action to send campaign to all users
-	$Form->begin_fieldset( T_('Report of sending...') );
+	$Form->begin_fieldset( T_('Send report') );
 	$edited_EmailCampaign->send_all_emails();
 	$Form->end_fieldset();
 }
@@ -65,7 +65,7 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';
-	echo '<p><b>'.T_('Plain Text message').':</b></p>';
+	echo '<p><b>'.T_('Plain-text message').':</b></p>';
 	echo '<div style="font-family:monospace;overflow:auto">'.nl2br( mail_template( 'newsletter', 'text', array( 'message_text' => $edited_EmailCampaign->get( 'email_text' ), 'include_greeting' => false ), $current_User ) ).'</div>';
 	echo '</div>';
 echo '</div>';

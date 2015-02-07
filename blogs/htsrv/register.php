@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: register.php 7833 2014-12-17 12:17:15Z yura $
+ * @version $Id: register.php 8094 2015-01-28 10:18:41Z yura $
  */
 
 /**
@@ -61,16 +61,22 @@ if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'
 $registration_require_country = (bool)$Settings->get('registration_require_country');
 // Check if firstname is required
 $registration_require_firstname = (bool)$Settings->get('registration_require_firstname');
+// Check if firstname is required (It can be required for quick registration by widget)
+$registration_require_lastname = false;
 // Check if gender is required
 $registration_require_gender = $Settings->get('registration_require_gender');
 // Check if registration ask for locale
 $registration_ask_locale = $Settings->get('registration_ask_locale');
+// Check what subscriptions should be activated (It can be used for quick registration by widget)
+$auto_subscribe_posts = false;
+$auto_subscribe_comments = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 param( 'action', 'string', '' );
 param( 'country', 'integer', '' );
 param( 'firstname', 'string', '' );
+param( 'lastname', 'string', '' );
 param( 'gender', 'string', NULL );
 param( 'locale', 'string', '' );
 param( 'source', 'string', '' );
@@ -115,29 +121,90 @@ if( $register_user = $Session->get('core.register_user') )
 switch( $action )
 {
 	case 'register':
+	case 'quick_register':
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
 
-		/*
-		 * Do the registration:
-		 */
-		$pass1 = param( $dummy_fields[ 'pass1' ], 'raw', '' );
-		$pass2 = param( $dummy_fields[ 'pass2' ], 'raw', '' );
+		// Use this boolean var to know when quick registration is used
+		$is_quick = ( $action == 'quick_register' );
 
-		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
-		$Plugins->trigger_event( 'RegisterFormSent', array(
-				'login'     => & $login,
-				'email'     => & $email,
-				'country'   => & $country,
-				'firstname' => & $firstname,
-				'gender'    => & $gender,
-				'locale'    => & $locale,
-				'pass1'     => & $pass1,
-				'pass2'     => & $pass2,
-			) );
+		if( $is_quick )
+		{ // Check if we can use a quick registration now:
+			if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
+			{ // Display error message when quick registration is disabled
+				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				break;
+			}
+
+			param( 'widget', 'integer', 0 );
+
+			if( empty( $Blog ) || empty( $widget ) )
+			{ // Don't use a quick registration if the request goes from not blog page
+				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				break;
+			}
+
+			$WidgetCache = & get_WidgetCache();
+			if( ! $user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false ) ||
+			    $user_register_Widget->code != 'user_register' ||
+			    $user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
+			{ // Wrong or hacked request!
+				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				break;
+			}
+
+			if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ) ) )
+			{ // Don't allow the duplicate emails
+				$Messages->add( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+					'href="'.$Blog->get( 'loginurl' ).'"',
+					'href="'.url_add_param( $Blog->gen_blogurl(), 'disp=lostpassword' ).'"' ), 'warning' );
+				break;
+			}
+
+			// Initialize the widget settings
+			$user_register_Widget->init_display( array() );
+
+			// Get a source from widget setting
+			$source = $user_register_Widget->disp_params['source'];
+
+			// Check what fields should be required by current widget
+			$registration_require_country = false;
+			$registration_require_gender = false;
+			$registration_require_firstname = ( $user_register_Widget->disp_params['ask_firstname'] == 'required' );
+			$registration_require_lastname = ( $user_register_Widget->disp_params['ask_lastname'] == 'required' );
+
+			// Check what subscriptions should be activated by current widget
+			$auto_subscribe_posts = ! empty( $user_register_Widget->disp_params['subscribe_post'] );
+			$auto_subscribe_comments = ! empty( $user_register_Widget->disp_params['subscribe_comment'] );
+		}
+
+		if( ! $is_quick )
+		{
+			/*
+			 * Do the registration:
+			 */
+			$pass1 = param( $dummy_fields['pass1'], 'string', '' );
+			$pass2 = param( $dummy_fields['pass2'], 'string', '' );
+
+			// Remove the invalid chars from password vars
+			$pass1 = preg_replace( '/[<>&]/', '', $pass1 );
+			$pass2 = preg_replace( '/[<>&]/', '', $pass2 );
+
+			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
+			$Plugins->trigger_event( 'RegisterFormSent', array(
+					'login'     => & $login,
+					'email'     => & $email,
+					'country'   => & $country,
+					'firstname' => & $firstname,
+					'gender'    => & $gender,
+					'locale'    => & $locale,
+					'pass1'     => & $pass1,
+					'pass2'     => & $pass2,
+				) );
+		}
 
 		if( $Messages->has_errors() )
 		{ // a Plugin has added an error
@@ -145,12 +212,19 @@ switch( $action )
 		}
 
 		// Set params:
-		$paramsList = array(
-			'login'   => $login,
-			'pass1'   => $pass1,
-			'pass2'   => $pass2,
-			'email'   => $email,
-			'pass_required' => true );
+		if( $is_quick )
+		{ // For quick registration
+			$paramsList = array( 'email' => $email );
+		}
+		else
+		{ // For normal registration
+			$paramsList = array(
+				'login'   => $login,
+				'pass1'   => $pass1,
+				'pass2'   => $pass2,
+				'email'   => $email,
+				'pass_required' => true );
+		}
 
 		if( $registration_require_country )
 		{
@@ -160,6 +234,11 @@ switch( $action )
 		if( $registration_require_firstname )
 		{
 			$paramsList['firstname'] = $firstname;
+		}
+
+		if( $registration_require_lastname )
+		{
+			$paramsList['lastname'] = $lastname;
 		}
 
 		if( $registration_require_gender == 'required' )
@@ -175,17 +254,51 @@ switch( $action )
 		// Check profile params:
 		profile_check_params( $paramsList );
 
-		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-		$login = utf8_strtolower( $login );
+		if( $is_quick && ! $Messages->has_errors() )
+		{ // Generate a login and password for quick registration
+			$pass1 = generate_random_passwd( 10 );
 
-		$UserCache = & get_UserCache();
-		if( $UserCache->get_by_login( $login ) )
-		{ // The login is already registered
-			param_error( $dummy_fields[ 'login' ], sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
+			// Get the login from email address:
+			$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+			$login = preg_replace( '/[\'"><@\s]/', '', $login );
+			if( $Settings->get( 'strict_logins' ) )
+			{ // We allow only the plain ACSII characters, digits, the chars _ and .
+				$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+			}
+			else
+			{ // We allow any character that is not explicitly forbidden in Step 1
+				// Enforce additional limitations
+				$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+				$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+			}
+			$login = preg_replace( '/^usr_/i', '', $login );
+
+			// Check and search free login name if current is busy
+			$login_name = $login;
+			$login_number = 1;
+			$UserCache = & get_UserCache();
+			while( empty( $login_name ) || $UserCache->get_by_login( $login_name ) )
+			{
+				$login_name = $login.$login_number;
+				$login_number++;
+			}
+			$login = $login_name;
+		}
+
+		if( ! $is_quick )
+		{
+			// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$login = utf8_strtolower( $login );
+
+			$UserCache = & get_UserCache();
+			if( $UserCache->get_by_login( $login ) )
+			{ // The login is already registered
+				param_error( $dummy_fields[ 'login' ], sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
+			}
 		}
 
 		if( $Messages->has_errors() )
-		{
+		{ // Stop registration if the errors exist
 			break;
 		}
 
@@ -196,6 +309,7 @@ switch( $action )
 		$new_User->set_password( $pass1 );
 		$new_User->set( 'ctry_ID', $country );
 		$new_User->set( 'firstname', $firstname );
+		$new_User->set( 'lastname', $lastname );
 		$new_User->set( 'gender', $gender );
 		$new_User->set( 'source', $source );
 		$new_User->set_email( $email );
@@ -266,6 +380,13 @@ switch( $action )
 		$UserSettings->set( 'user_domain', $Hit->get_remote_host( true ), $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
+
+		// Auto subscribe new user to current collection posts/comments:
+		if( $auto_subscribe_posts || $auto_subscribe_comments )
+		{ // If at least one option is enabled
+			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+		}
 
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
@@ -355,6 +476,20 @@ switch( $action )
 		exit(0);
 }
 
+if( ! empty( $is_quick ) )
+{ // Redirect to previous page everytime when quick registration is used, even when errors exist
+	if( ! empty( $param_input_err_messages ) )
+	{ // Save all param errors in Session because of the redirect below
+		$Session->set( 'param_input_err_messages_'.$widget, $param_input_err_messages );
+	}
+	$param_input_values = array(
+			$dummy_fields['email'] => $email,
+			'firstname'            => $firstname,
+			'lastname'             => $lastname
+		);
+	$Session->set( 'param_input_values_'.$widget, $param_input_values );
+	header_redirect( $redirect_to );
+}
 
 /*
  * Default: registration form:

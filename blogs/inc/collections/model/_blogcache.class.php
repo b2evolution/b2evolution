@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blogcache.class.php 7919 2014-12-30 18:48:02Z yura $
+ * @version $Id: _blogcache.class.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -62,7 +62,7 @@ class BlogCache extends DataObjectCache
 	function BlogCache( $order_by = 'blog_order' )
 	{
 		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, $order_by,
-			/* TRANS: "None" select option */ T_('No blog'), 0 );
+			/* TRANS: "None" select option */ NT_('No blog'), 0 );
 	}
 
 

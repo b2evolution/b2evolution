@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _misc.funcs.php 7978 2015-01-14 11:21:30Z yura $
+ * @version $Id: _misc.funcs.php 8050 2015-01-22 10:58:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -474,7 +474,7 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 				// Get the chars as an array from the cropped string to be able to get chars by position
 				$str_cropped_chars = preg_split('//u',$str_cropped, -1, PREG_SPLIT_NO_EMPTY);
 				$i = utf8_strlen($str_cropped);
-				while( $i && ! ctype_space($str_cropped_chars[--$i]) )
+				while( $i && isset( $str_cropped_chars[ --$i ] ) && ! ctype_space( $str_cropped_chars[ $i ] ) )
 				{}
 				if( $i )
 				{

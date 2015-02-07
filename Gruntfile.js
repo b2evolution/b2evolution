@@ -49,6 +49,7 @@ module.exports = function(grunt) {
 			development: {
 				options: {
 					style: 'expanded',
+					sourcemap: 'none'
 				},
 				files: {
 					// target.css file: source.scss file

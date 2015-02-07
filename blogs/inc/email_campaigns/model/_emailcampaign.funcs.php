@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _emailcampaign.funcs.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -29,10 +29,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Get number of users for newsletter from UserList filterset
  *
- * @return array 
- * 		'all' - Number of accounts in filterset
- * 		'active' - Number of active accounts in filterset
- * 		'newsletter' - Number of active accounts which accept newsletter email
+ * @return array Numbers of users:
+ *     'all' - Currently selected recipients (Accounts which accept newsletter emails)
+ *     'active' - Already received (Accounts which have already been sent this newsletter)
+ *     'newsletter' - Ready to send (Accounts which have not been sent this newsletter yet)
  */
 function get_newsletter_users_numbers()
 {
@@ -151,7 +151,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 
 	$url = $edit_url.$glue.'tab=text';
 	$modes['text'] = array(
-		'text' => T_('Plain Text message'),
+		'text' => T_('Plain-text message'),
 		'href' => $url
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )

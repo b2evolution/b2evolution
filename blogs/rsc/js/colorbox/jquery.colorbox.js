@@ -473,17 +473,14 @@
 				setTimeout(function(){  // small delay before binding onresize due to an IE8 bug.
 					$window.bind('resize.' + prefix, publicMethod.position);
 				}, 1);
+
+				( $wrap.parent().width() <= 480 ) ? $current.hide() : $current.show();
+				( $wrap.parent().width() < 380 ) ? $slideshow.hide() : $slideshow.show();
 			},
 			step: function () {
 				modalDimensions(this);
 			}
 		});
-
-		if( $loaded.width() < 380 )
-		{
-			$current.hide();
-			$slideshow.hide();
-		}
 	};
 
 	publicMethod.resize = function (options) {
@@ -705,6 +702,10 @@
 		{ // Initialize the actions for the voting controls
 			if( $voting.data( 'voting_positions_done' ) == 0 )
 			{ // Fix positions of the control elements
+				if( loadedHeight == 0 )
+				{ // Fix height because sometimes it doesn't have a time for initialization
+					loadedHeight = $loaded.outerHeight(true);
+				}
 				loadedHeight += $voting.outerHeight();
 				$voting.data( 'voting_positions_done', 1 );
 			}

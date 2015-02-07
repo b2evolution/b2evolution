@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _item_expert.form.php 7741 2014-12-03 12:13:50Z yura $
+ * @version $Id: _item_expert.form.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -507,7 +507,7 @@ $Form->begin_form( '', '', $params );
 		$item_goal_cat_ID = $item_Goal->gcat_ID;
 	}
 
-	$GoalCategoryCache = & get_GoalCategoryCache( T_( 'No Category' ) );
+	$GoalCategoryCache = & get_GoalCategoryCache( NT_( 'No Category' ) );
 	$GoalCategoryCache->load_all();
 	$Form->select_input_object( 'goal_cat_ID', $item_goal_cat_ID, $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
 

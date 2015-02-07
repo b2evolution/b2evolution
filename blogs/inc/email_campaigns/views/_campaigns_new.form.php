@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _campaigns_new.form.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -43,6 +43,6 @@ $Form->begin_fieldset( T_('New campaign') );
 	$Form->text_input( 'ecmp_name', '', 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Create campaign and select users'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Create campaign and select recipients'), 'SaveButton' ) ) );
 
 ?>

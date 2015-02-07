@@ -9,7 +9,7 @@
  *
  * @package admin
  *
- * @version $Id: _goal_hitsummary.view.php 7369 2014-10-06 11:22:41Z yura $
+ * @version $Id: _goal_hitsummary.view.php 7999 2015-01-15 08:24:44Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -149,7 +149,7 @@ function filter_goal_hitsummary( & $Form )
 	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final') );
 	$Form->text_input( 'goal_name', get_param('goal_name'), 20, T_('Goal names starting with'), '', array( 'maxlength'=>50 ) );
 
-	$GoalCategoryCache = & get_GoalCategoryCache( T_('All') );
+	$GoalCategoryCache = & get_GoalCategoryCache( NT_('All') );
 	$GoalCategoryCache->load_all();
 	$Form->select_input_object( 'goal_cat', get_param('goal_cat'), $GoalCategoryCache, T_('Goal category'), array( 'allow_none' => true ) );
 }

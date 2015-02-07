@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbums
  *
- * @version $Id: index.main.php 7979 2015-01-14 12:18:49Z yura $
+ * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -84,15 +84,17 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Menu'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start' => '',
-					'block_end' => '',
+					'block_start'         => '',
+					'block_end'           => '',
 					'block_display_title' => false,
-					'list_start' => '',
-					'list_end' => '',
-					'item_start' => ' <span class="menu_link">',
-					'item_end' => '</span> ',
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => ' <span class="menu_link">',
+					'item_end'            => '</span> ',
 					'item_selected_start' => ' <span class="menu_link">',
-					'item_selected_end' => '</span>',
+					'item_selected_end'   => '</span>',
+					'item_title_before'   => '',
+					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
@@ -162,7 +164,7 @@ if( $disp == 'single' )
 	}
 } // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- ?>
 
-<div class="bPosts<?php echo in_array( $disp, array( 'front', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' full_width' : '' ?>">
+<div class="bPosts<?php echo in_array( $disp, array( 'catdir', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' full_width' : '' ?>">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 
@@ -185,7 +187,7 @@ if( $disp == 'single' )
 				'title_single_disp' => false,
 				'format'      => 'htmlbody',
 				'arcdir_text' => T_('Index'),
-				'catdir_text' => T_('Galleries'),
+				'catdir_text' => '',
 				'category_text' => T_('Gallery').': ',
 				'categories_text' => T_('Galleries').': ',
 			) );
@@ -255,8 +257,8 @@ if( $disp == 'single' )
 </div>
 
 <?php
-if( $disp != 'front' )
-{ // Don't display the pages on disp=front because we don't have a limit by page there
+if( $disp != 'catdir' )
+{ // Don't display the pages on disp=catdir because we don't have a limit by page there
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(
 			'block_start' => '<div class="nav_pages">',

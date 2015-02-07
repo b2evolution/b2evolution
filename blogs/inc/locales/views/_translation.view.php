@@ -12,7 +12,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _translation.view.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _translation.view.php 8047 2015-01-22 07:36:36Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,15 +91,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	global $locales_path, $locales;
 
 	$buttons = array();
-	$buttons[] = array( 'submit', 'actionArray[import_pot]', T_('Import .POT file into DB'), 'SaveButton' );
 	if( is_file( $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po' ) )
 	{
 		$buttons[] = array( 'submit', 'actionArray[import_po]', T_('Import .PO file into DB'), 'SaveButton' );
 	}
-	$buttons[] = array( 'submit', 'actionArray[generate_pot]', T_('Generate .POT file'), 'SaveButton' );
 	$buttons[] = array( 'submit', 'actionArray[generate_po]', T_('Generate .PO file'), 'SaveButton' );
 
-	$Form->end_form( $buttons ) ;
+	$Form->end_form( $buttons );
 }
 
 ?>

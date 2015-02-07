@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id: quick_upload.php 6335 2014-03-25 13:19:27Z yura $
+ * @version $Id: quick_upload.php 8182 2015-02-06 07:53:38Z yura $
  */
 
 
@@ -34,31 +34,62 @@ class qqUploadedFileXhr
 	 */
 	function save( $path )
 	{
-		$input = fopen("php://input", "r");
-		$temp = tmpfile();
-		$realSize = stream_copy_to_stream($input, $temp);
-		fclose($input);
+		$input = fopen( 'php://input', 'r' );
+		$temp_file_name = '';
+		$temp = open_temp_file( $temp_file_name );
+		if( is_string( $temp ) )
+		{ // Error on create a temp file
+			return array(
+					'text'   => '<span class="result_error"> '.$temp.'</span>',
+					'status' => 'error',
+				);
+		}
 
-		if ($realSize != $this->getSize()){
+		$realSize = stream_copy_to_stream( $input, $temp );
+		fclose( $input );
+
+		if( $realSize != $this->getSize() )
+		{
 			return false;
 		}
 
-		$target = fopen($path, "w");
-		fseek($temp, 0, SEEK_SET);
-		stream_copy_to_stream($temp, $target);
-		fclose($target);
+		$target = fopen( $path, 'w' );
+		fseek( $temp, 0, SEEK_SET );
+		stream_copy_to_stream( $temp, $target );
+		fclose( $target );
+
+		fclose( $temp );
+
+		if( ! empty( $temp_file_name ) )
+		{ // Unlink the temp file
+			@unlink( $temp_file_name );
+		}
 
 		return true;
 	}
 
+	/**
+	 * Get a content of the uploaded file
+	 *
+	 * @return string|array Content OR array with errors
+	 */
 	function get_content()
 	{
-		$input = fopen("php://input", "rb");
-		$temp = tmpfile();
+		$input = fopen( 'php://input', 'rb' );
+		$temp_file_name = '';
+		$temp = open_temp_file( $temp_file_name );
+		if( is_string( $temp ) )
+		{ // Error on create a temp file
+			return array(
+					'text'   => '<span class="result_error"> '.$temp.'</span>',
+					'status' => 'error',
+				);
+		}
+
 		stream_copy_to_stream( $input, $temp );
 		fclose( $input );
 
-		fseek($temp, 0, SEEK_SET);
+		fseek( $temp, 0, SEEK_SET );
 		$contents = '';
 
 		load_funcs( 'tools/model/_system.funcs.php' );
@@ -70,25 +101,37 @@ class qqUploadedFileXhr
 			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
-				return false;
+				return array(
+						'text'   => '<span class="result_error"> '.T_( 'The server (PHP script) has not enough available memory to receive this large file!' ).'</span>',
+						'status' => 'error',
+					);
 			}
 			$contents .= fread( $temp, 8192 );
 		}
+
 		fclose( $temp );
+
+		if( ! empty( $temp_file_name ) )
+		{ // Unlink the temp file
+			@unlink( $temp_file_name );
+		}
+
 		return $contents;
 	}
-
-
 
 	function getName()
 	{
 		return $_GET['qqfile'];
 	}
+
 	function getSize()
 	{
-		if (isset($_SERVER["CONTENT_LENGTH"])){
+		if( isset( $_SERVER["CONTENT_LENGTH"] ) )
+		{
 			return (int)$_SERVER["CONTENT_LENGTH"];
-		} else {
+		}
+		else
+		{
 			throw new Exception('Getting content length is not supported.');
 		}
 	}
@@ -103,9 +146,9 @@ class qqUploadedFileForm
 	 * Save the file to the specified path
 	 * @return boolean TRUE on success
 	 */
-	function save($path)
+	function save( $path )
 	{
-		if( !move_uploaded_file($_FILES['qqfile']['tmp_name'], $path) )
+		if( ! move_uploaded_file( $_FILES['qqfile']['tmp_name'], $path ) )
 		{
 			return false;
 		}
@@ -150,22 +193,21 @@ class qqUploadedFileForm
 
 function out_echo( $message ,$specialchars )
 {
-	$message['text'] = base64_encode($message['text']);
+	$message['text'] = base64_encode( $message['text'] );
 	if( $specialchars == 1 )
 	{
 		$message['specialchars'] = 1;
-		echo htmlspecialchars(evo_json_encode(array('success'=>$message)));
+		echo htmlspecialchars( evo_json_encode( array( 'success' => $message ) ) );
 	}
 	else
 	{
 		$message['specialchars'] = 0;
-		echo (evo_json_encode(array('success'=>$message)));
+		echo ( evo_json_encode( array( 'success' => $message ) ) );
 	}
-
 }
 
 $specialchars = 0;
-if( isset($_FILES['qqfile']) )
+if( isset( $_FILES['qqfile'] ) )
 {
 	$specialchars = 1;
 }
@@ -204,45 +246,44 @@ if( strpos( $root_and_path, '::' ) )
 
 if( $upload_path === false )
 {
-	$message['text'] = '#'.$root_and_path.'#<span class="result_error">Bad request. Unknown upload location!</span>'; // NO TRANS!!
+	$message['text'] = '#'.$root_and_path.'#<span class="result_error"> Bad request. Unknown upload location!</span>'; // NO TRANS!!
 	$message['status'] = 'error';
-	out_echo($message, $specialchars);
+	out_echo( $message, $specialchars );
 	exit();
 }
 
 if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 {
-	$message['text'] = '<span class="result_error">'.T_( 'You don\'t have permission to upload on this file root.' ).'</span>';
+	$message['text'] = '<span class="result_error"> '.T_( 'You don\'t have permission to upload on this file root.' ).'</span>';
 	$message['status'] = 'error';
-	out_echo($message, $specialchars);
+	out_echo( $message, $specialchars );
 	exit();
 }
 
 if( $upload )
 {	// Create the object and assign property
 
-	if( isset($_GET['qqfile']) )
+	if( isset( $_GET['qqfile'] ) )
 	{
 		$file = new qqUploadedFileXhr();
 	}
-	elseif( isset($_FILES['qqfile']) )
+	elseif( isset( $_FILES['qqfile'] ) )
 	{
 		$file = new qqUploadedFileForm();
-
 	}
 	else
 	{
 		$file = false;
 	}
 
-	if( $Settings->get( 'upload_maxkb' ) && ( $file->getSize() > $Settings->get( 'upload_maxkb' )*1024 ) )
+	if( $Settings->get( 'upload_maxkb' ) && ( $file->getSize() > $Settings->get( 'upload_maxkb' ) * 1024 ) )
 	{
-		$message['text'] = '<span class="result_error">'.
+		$message['text'] = '<span class="result_error"> '.
 		// fp>vitaliy : call function to make human readable sized in kB MB etc.
-		sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), bytesreadable($file->getSize()), bytesreadable($Settings->get( 'upload_maxkb' )*1024) )
+		sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), bytesreadable( $file->getSize() ), bytesreadable( $Settings->get( 'upload_maxkb' ) * 1024 ) )
 		. '</span>';
 		$message['status'] = 'error';
-		out_echo($message, $specialchars);
+		out_echo( $message, $specialchars );
 		exit();
 	}
 
@@ -253,23 +294,31 @@ if( $upload )
 	{ // Not a file name or not an allowed extension
 		$message['text'] = '<span class="result_error"> '.$error_filename.'</span>';
 		$message['status'] = 'error';
-		out_echo($message, $specialchars);
+		out_echo( $message, $specialchars );
 		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
 		exit();
 	}
+
 	// Process a name of old name
 	process_filename( $oldName );
 
+	if( empty( $fm_FileRoot ) )
+	{ // Stop when this object is NULL, it can happens when media path has no rights to write
+		$message['text'] = '<span class="result_error"> '.sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' ).'</span>';
+		$message['status'] = 'error';
+		out_echo( $message, $specialchars );
+		exit;
+	}
+
 	list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
-	$newName = $newFile->get('name');
+	$newName = $newFile->get( 'name' );
 
 	// If everything is ok, save the file somewhere
 	$file_content = $file->get_content();
-	if( $file_content === false )
-	{ // No memory enough to upload file
-		$message['text'] = '<span class="result_error">'.T_( 'The server (PHP script) has not enough available memory to receive this large file!' ).'</span>';
-		$message['status'] = 'error';
-		out_echo($message, $specialchars);
+	if( is_array( $file_content ) )
+	{ // Error on upload
+		$message = array_merge( $message, $file_content );
+		out_echo( $message, $specialchars );
 		exit();
 	}
 	elseif( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
@@ -330,7 +379,7 @@ if( $upload )
 					'newname' => $newName,
 					'path'    => rawurlencode( $newFile->get_rdfp_rel_path() ),
 				);
-			out_echo($message, $specialchars);
+			out_echo( $message, $specialchars );
 			exit();
 		}
 		else
@@ -340,22 +389,22 @@ if( $upload )
 			$message['status'] = 'success';
 			$message['newname'] = $newName;
 			$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
-			out_echo($message, $specialchars);
+			out_echo( $message, $specialchars );
 			exit();
 		}
 
 	}
 
-	$message['text'] = '<span class="result_error">'.T_( 'The file could not be saved!' ).'</span>';
+	$message['text'] = '<span class="result_error"> '.T_( 'The file could not be saved!' ).'</span>';
 	$message['status'] = 'error';
-	out_echo($message, $specialchars);
+	out_echo( $message, $specialchars );
 	exit();
 
 }
 
 $message['text'] =  '<span class="error">Invalid upload param</span>';
 $message['status'] = 'error';
-out_echo($message, $specialchars);
+out_echo( $message, $specialchars );
 exit();
 
 ?>

@@ -9,7 +9,7 @@
  * @author fplanque: Francois PLANQUE.
  *
  * @package plugins
- * @version $Id: _html5_mediaelementjs.plugin.php 7750 2014-12-04 11:34:18Z yura $
+ * @version $Id: _html5_mediaelementjs.plugin.php 8110 2015-01-29 10:35:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -68,11 +68,22 @@ class html5_mediaelementjs_plugin extends Plugin
 }' );
 
 		// Initialize a player
-		add_js_headline( 'jQuery( document ).ready( function() {
+		add_js_headline(
+			( $width == "100%" ?
+			// Use 100% width
+			'' :
+			// Check to make video width <= window width
+			'var html5_mediaelementjs_video_width = parseInt( "'.$width.'" );
+			if( jQuery( window ).width() < html5_mediaelementjs_video_width )
+			{
+				html5_mediaelementjs_video_width = jQuery( window ).width();
+			}'
+			).'
+			jQuery( document ).ready( function() {
 				jQuery( "video.html5_mediaelementjs_video" ).mediaelementplayer( {
-					defaultVideoWidth: "'.$width.'",
+					defaultVideoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_video_width' ).',
 					defaultVideoHeight: "'.$height.'",
-					videoWidth: "'.$width.'",
+					videoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_video_width' ).',
 					videoHeight: "'.$height.'",
 				} );
 			} );' );

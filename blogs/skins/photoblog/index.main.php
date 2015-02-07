@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoblog
  *
- * @version $Id: index.main.php 7115 2014-07-14 14:08:25Z yura $
+ * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -67,15 +67,17 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Menu'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start' => '',
-					'block_end' => '',
+					'block_start'         => '',
+					'block_end'           => '',
 					'block_display_title' => false,
-					'list_start' => '',
-					'list_end' => '',
-					'item_start' => ' <span class="menu_link">',
-					'item_end' => '</span> ',
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => ' <span class="menu_link">',
+					'item_end'            => '</span> ',
 					'item_selected_start' => ' <span class="menu_link">',
-					'item_selected_end' => '</span>',
+					'item_selected_end'   => '</span>',
+					'item_title_before'   => '',
+					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>

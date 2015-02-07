@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 7964 2015-01-13 15:14:52Z yura $
+ * @version $Id: _user.funcs.php 8124 2015-02-01 13:05:17Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1282,6 +1282,8 @@ function user_preferredname( $user_ID )
  *     - 'icq': must be a number
  *     - 'email': mandatory, must be well formed
  *     - 'country': check for non-empty
+ *     - 'firstname': check for non-empty
+ *     - 'lastname': check for non-empty
  *     - 'url': must be well formed, in allowed scheme, not blacklisted
  *     - 'pass1' / 'pass2': passwords (twice), must be the same and not == login (if given)
  *     - 'pass_required': false/true (default is true)
@@ -1289,14 +1291,14 @@ function user_preferredname( $user_ID )
  */
 function profile_check_params( $params, $User = NULL )
 {
-	global $Messages, $Settings;
+	global $Messages, $Settings, $dummy_fields;
 
 	foreach( $params as $k => $v )
 	{
 		// normalize params:
-		if( $k != 'pass_required' && ! is_array($v) )
+		if( $k != 'pass_required' && ! is_array( $v ) )
 		{
-			$params[$k] = array($v, $k);
+			$params[ $k ] = array( $v, $k );
 		}
 	}
 
@@ -1310,58 +1312,64 @@ function profile_check_params( $params, $User = NULL )
 	}
 
 	// checking login has been typed:
-	if( isset($params['login'][0]) )
+	if( isset( $params['login'][0] ) )
 	{
 		if( empty( $params['login'][0] ) )
 		{ // login can't be empty
-			param_error( $params['login'][1], T_('Please enter your login.') );
+			param_error( $dummy_fields[ $params['login'][1] ], T_('Please enter your login.') );
 		}
 		else
 		{
-			param_check_valid_login( 'login' );
+			param_check_valid_login( $dummy_fields[ $params['login'][1] ] );
 		}
 	}
 
 	// checking e-mail address
-	if( isset($params['email'][0]) )
+	if( isset( $params['email'][0] ) )
 	{
-		if( empty($params['email'][0]) )
+		if( empty( $params['email'][0] ) )
 		{
-			param_error( $params['email'][1], T_('Please enter your e-mail address.') );
+			param_error( $dummy_fields[ $params['email'][1] ], T_('Please enter your e-mail address.') );
 		}
-		elseif( !is_email($params['email'][0]) )
+		elseif( ! is_email( $params['email'][0] ) )
 		{
-			param_error( $params['email'][1], T_('The email address is invalid.') );
+			param_error( $dummy_fields[ $params['email'][1] ], T_('The email address is invalid.') );
 		}
 	}
 
 	// Checking country
-	if( isset($params['country']) && empty($params['country'][0]) )
+	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
 	{
-		param_error( 'country', T_('Please select country.') );
+		param_error( $params['country'][1], T_('Please select country.') );
 	}
 
 	// Checking first name
-	if( isset($params['firstname']) && empty($params['firstname'][0]) )
+	if( isset( $params['firstname'] ) && empty( $params['firstname'][0] ) )
 	{
-		param_error( 'firstname', T_('Please enter your first name.') );
+		param_error( $params['firstname'][1], T_('Please enter your first name.') );
+	}
+
+	// Checking last name
+	if( isset( $params['lastname'] ) && empty( $params['lastname'][0] ) )
+	{
+		param_error( $params['lastname'][1], T_('Please enter your last name.') );
 	}
 
 	// Checking gender
-	if( isset($params['gender']) )
+	if( isset( $params['gender'] ) )
 	{
-		if( empty($params['gender'][0]) )
+		if( empty( $params['gender'][0] ) )
 		{
-			param_error( 'gender', T_('Please select gender.') );
+			param_error( $params['gender'][1], T_('Please select gender.') );
 		}
 		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
 		{
-			param_error( 'gender', 'Gender value is invalid' );
+			param_error( $params['gender'][1], 'Gender value is invalid' );
 		}
 	}
 
 	// Checking URL:
-	if( isset($params['url']) )
+	if( isset( $params['url'] ) )
 	{
 		if( $error = validate_url( $params['url'][0], 'commenting' ) )
 		{
@@ -1373,36 +1381,40 @@ function profile_check_params( $params, $User = NULL )
 
 	$pass_required = isset( $params['pass_required'] ) ? $params['pass_required'] : true;
 
-	if( isset($params['pass1'][0]) && isset($params['pass2'][0]) )
+	if( isset( $params['pass1'][0] ) && isset( $params['pass2'][0] ) )
 	{
-		if( $pass_required || !empty($params['pass1'][0]) || !empty($params['pass2'][0]) )
+		if( $pass_required || ! empty( $params['pass1'][0] ) || ! empty( $params['pass2'][0] ) )
 		{ // Password is required or was given
 			// checking the password has been typed twice
-			if( empty($params['pass1'][0]) || empty($params['pass2'][0]) )
+			if( empty( $params['pass1'][0] ) || empty( $params['pass2'][0] ) )
 			{
-				param_error( $params['pass2'][1], T_('Please enter your password twice.') );
+				param_error( $dummy_fields[ $params['pass2'][1] ], T_('Please enter your password twice.') );
 			}
 
 			// checking the password has been typed twice the same:
 			if( $params['pass1'][0] !== $params['pass2'][0] )
 			{
-				param_error( $params['pass1'][1], T_('You typed two different passwords.') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('You typed two different passwords.') );
 			}
-			elseif( $Settings->get('passwd_special') && !preg_match('~[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]~', $params['pass1'][0] )  )
+			elseif( $Settings->get('passwd_special') && ! preg_match( '~[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]~', $params['pass1'][0] ) )
 			{
-				param_error( $params['pass1'][1], T_('Your password should contain at least one special character (like & ! $ * - _ + etc.)') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('Your password should contain at least one special character (like & ! $ * - _ + etc.)') );
 			}
-			elseif( utf8_strlen($params['pass1'][0]) < $Settings->get('user_minpwdlen') )
+			elseif( utf8_strlen( $params['pass1'][0] ) < $Settings->get( 'user_minpwdlen' ) )
 			{
-				param_error( $params['pass1'][1], sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen')) );
+				param_error( $dummy_fields[ $params['pass1'][1] ], sprintf( T_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) ) );
 			}
-			elseif( isset($User) && $params['pass1'][0] == $User->get('login') )
+			elseif( isset( $User ) && $params['pass1'][0] == $User->get( 'login' ) )
 			{
-				param_error( $params['pass1'][1], T_('The password must be different from your login.') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('The password must be different from your login.') );
 			}
-			elseif( isset($User) && $params['pass1'][0] == $User->get('nickname') )
+			elseif( isset( $User ) && $params['pass1'][0] == $User->get( 'nickname' ) )
 			{
-				param_error( $params['pass1'][1], T_('The password must be different from your nickname.') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('The password must be different from your nickname.') );
+			}
+			elseif( preg_match( '/[<>&]/', $_POST[ $dummy_fields[ $params['pass1'][1] ] ] ) )
+			{ // Checking the not allowed chars
+				param_error_multiple( array( $dummy_fields[ $params['pass1'][1] ], $dummy_fields[ $params['pass2'][1] ] ), T_('Passwords cannot contain the characters &lt;, &gt; and &amp;.') );
 			}
 		}
 	}
@@ -2889,7 +2901,7 @@ function callback_filter_userlist( & $Form )
 		}
 		else
 		{ // User can browse other users from other country
-			$CountryCache = & get_CountryCache( T_('All') );
+			$CountryCache = & get_CountryCache( NT_('All') );
 			$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
 			$location_filter_displayed = true;
 		}
@@ -3712,7 +3724,7 @@ function display_voting_form( $params = array() )
 		}
 	}
 
-	echo '<span class="vote_title">'.$vote_numbers.$params['title_text'].'</span>';
+	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled
@@ -3882,7 +3894,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	// Display info about last error only when such data exists
 	$email_last_sent_ts = ( empty( $EmailAddress ) ? '' : $EmailAddress->get( 'last_sent_ts' ) );
 	$last_error_info = empty( $email_last_sent_ts ) ? '' :
-		sprintf( T_( ' (last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
+		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
 
 	switch( $email_status )
 	{

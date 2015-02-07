@@ -27,7 +27,7 @@
  * @author efy-maxim: Evo Factory / Maxim.
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version $Id: _subregion_list.view.php 7999 2015-01-15 08:24:44Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -147,7 +147,7 @@ $Results->cols[] = array(
 function filter_subregions( & $Form )
 {
 	load_class( 'regional/model/_country.class.php', 'Country' );
-	$CountryCache = & get_CountryCache( T_('All') );
+	$CountryCache = & get_CountryCache( NT_('All') );
 	$Form->select_country( 'c', get_param('c'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
 	
 	$Form->select_input_options( 'r', get_regions_option_list( get_param('c'), get_param('r') ), T_('Region') );

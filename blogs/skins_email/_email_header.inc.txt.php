@@ -8,7 +8,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
- * @version $Id: _email_header.inc.txt.php 7827 2014-12-17 07:04:16Z yura $
+ * @version $Id: _email_header.inc.txt.php 8028 2015-01-19 12:03:16Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -20,6 +20,6 @@ $params = array_merge( array(
 
 if( $params['include_greeting'] )
 { // Display the greeting message
-	echo T_( 'Hello $login$ !' )."\n\n";
+	echo T_( 'Hello $login$!' )."\n\n";
 }
 ?>

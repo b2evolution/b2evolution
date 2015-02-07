@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 7901 2014-12-25 14:24:30Z yura $
+ * @version $Id: _template.funcs.php 8030 2015-01-19 16:21:03Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1122,7 +1122,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox params to display a voting panel
 				$colorbox_voting_params = '{displayVoting: true,
 					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
-					minWidth: 345}';
+					minWidth: 305}';
 				// Colorbox params without voting panel
 				$colorbox_no_voting_params = '{minWidth: 255}';
 
@@ -1161,8 +1161,8 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				add_js_headline(
 					// General settings:
 					'var b2evo_colorbox_params = {
-						maxWidth: "95%",
-						maxHeight: "90%",
+						maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
+						maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
 						slideshow: true,
 						slideshowAuto: false
 					};

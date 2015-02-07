@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.class.php 7885 2014-12-24 08:27:08Z yura $
+ * @version $Id: _comment.class.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -260,6 +260,30 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $comment_db_config;
+
+		if( !isset( $comment_db_config ) )
+		{
+			$comment_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_comments',
+					'dbprefix'           => 'comment_',
+					'dbIDname'           => 'comment_ID',
+				)
+			);
+		}
+
+		return $comment_db_config;
+	}
+
+
+	/**
 	 * Get delete cascade settings
 	 *
 	 * @return array
@@ -267,9 +291,67 @@ class Comment extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments') ),
+				array( 'table'=>'T_links', 'fk'=>'link_cmt_ID', 'msg'=>T_('%d links to destination comments'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_cmt_ID', 'msg'=>T_('%d votes on comment') ),
+				array( 'table'=>'T_comments__prerendering', 'fk'=>'cmpr_cmt_ID', 'msg'=>T_('%d prerendered content') ),
 			);
+	}
+
+
+	/**
+	 * Delete those comments from the database which corresponds to the given condition or to the given ids array
+	 * Note: the delete cascade arrays are handled!
+	 *
+	 * @param string the name of this class
+	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
+	 * @param string where condition
+	 * @param array object ids
+	 * @return mixed # of rows affected or false if error
+	 */
+	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	{
+		global $DB;
+
+		$use_transaction = ( isset( $params['use_transaction'] ) ) ? $params['use_transaction'] : true;
+		if( $use_transaction )
+		{
+			$DB->begin();
+			$params['use_transaction'] = false;
+		}
+
+		if( ! empty( $sql_where ) )
+		{
+			$object_ids = $DB->get_col( 'SELECT comment_ID FROM T_comments WHERE '.$sql_where );
+		}
+
+		if( ! $object_ids )
+		{ // There is no comment to delete
+			if( $use_transaction )
+			{ // Commit transaction if it was started
+				$DB->commit();
+			}
+			return;
+		}
+
+		$query_get_attached_file_ids = 'SELECT link_file_ID FROM T_links
+			WHERE link_cmt_ID IN ( '.implode( ', ', $object_ids ).' )';
+		$attached_file_ids = $DB->get_col( $query_get_attached_file_ids );
+
+		$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+
+		if( ( $result !== false ) && ( ! empty( $attached_file_ids ) ) )
+		{ // Delete orphan attachments and empty comment attachment folders
+			load_funcs( 'files/model/_file.funcs.php' );
+			remove_orphan_files( $attached_file_ids, NULL, true );
+		}
+
+		if( $use_transaction )
+		{ // Commit or rollback the transaction
+			( $result !== false ) ? $DB->commit() : $DB->rollback();
+		}
+
+		return $result;
 	}
 
 
@@ -2471,49 +2553,6 @@ class Comment extends DataObject
 
 
 	/**
-	 * Delete the attached files if they are not connected to other objects.
-	 * If the folders containing the deleted files are empty the folder will be also deleted.
-	 *
-	 * @param array the ids of the attached files
-	 */
-	function delete_orphan_attachments( $file_ids )
-	{
-		if( empty( $file_ids ) )
-		{ // This comment has no attachments
-			return;
-		}
-
-		// Remove deleted comment not linked attachments
-		remove_orphan_files( $file_ids );
-
-		// Delete empty folder of the comment attachments
-		$FileRootCache = & get_FileRootCache();
-		if( $this->author_user_ID > 0 )
-		{ // registered user
-			$root_ID = FileRoot::gen_ID( 'user', $this->author_user_ID );
-			$path = 'comments/p'.$this->item_ID;
-		}
-		else
-		{ // anonymous user
-			$commented_Item = & $this->get_Item();
-			if( empty( $commented_Item ) )
-			{ // Don't execute the following code because this comment is broken
-				return;
-			}
-			$commented_Item->load_Blog();
-			$root_ID = FileRoot::gen_ID( 'collection', $commented_Item->Blog->ID );
-			$path = 'anonymous_comments/p'.$commented_Item->ID;
-		}
-
-		if( $comment_FileRoot = & $FileRootCache->get_by_ID( $root_ID ) &&
-		    file_exists( $comment_FileRoot->ads_path.$path ) )
-		{ // Delete folder only if it is empty, Hide an error if folder is not empty
-			@rmdir( $comment_FileRoot->ads_path.$path );
-		}
-	}
-
-
-	/**
 	 * Unset any prerendered content for this item (in PHP cache).
 	 */
 	function delete_prerendered_content()
@@ -2705,7 +2744,7 @@ class Comment extends DataObject
 				// $attachment is a File in preview mode, but it is a Link in normal mode
 				$doc_File = empty( $this->ID ) ? $attachment : $attachment->get_File();
 				echo '<li>';
-				if( empty( $doc_File ) ) 
+				if( empty( $doc_File ) )
 				{ // Broken File object
 					$attachment_download_link = '';
 					$attachment_name = empty( $attachment ) ? '' : T_( 'Link ID' ).'#'.$attachment->ID;
@@ -3368,9 +3407,9 @@ class Comment extends DataObject
 					break;
 
 				default:
-					/* TRANS: Subject of the mail to send on new comments. */
-					// In case of full notification the first %s is blog name, the second %s is the item's title.
-					// In case of short notification the first %s is author login, the second %s is the item's title.
+					/* TRANS: Subject of the mail to send on new comments.
+					   In case of full notification the first %s is blog name, the second %s is the item's title.
+					   In case of short notification the first %s is author login, the second %s is the item's title. */
 					$subject = $notify_full ? T_('[%s] New comment on "%s"') : T_( '%s posted a new comment on "%s"' );
 					if( $only_moderators )
 					{
@@ -3653,21 +3692,10 @@ class Comment extends DataObject
 			// remember ID, because parent method resets it to 0
 			$old_ID = $this->ID;
 
-			// Select comment attachment ids
-			$result = $DB->get_col( '
-				SELECT link_file_ID
-					FROM T_links
-				 WHERE link_cmt_ID = '.$this->ID );
-
 			if( $r = parent::dbdelete() )
 			{
-				// Delete comment attachments if they are not attached to anything else
-				$this->delete_orphan_attachments( $result );
-
 				// re-set the ID for the Plugin event
 				$this->ID = $old_ID;
-
-				$this->delete_prerendered_content();
 
 				$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
 

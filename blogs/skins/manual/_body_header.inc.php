@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage manual
  *
- * @version $Id$
+ * @version $Id: _body_header.inc.php 8096 2015-01-28 12:19:24Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -86,6 +86,8 @@ if( isset( $_COOKIE[ $cookie_skin_width_name ] ) )
 				'list_end'            => '',
 				'item_start'          => '<li>',
 				'item_end'            => '</li>',
+				'item_title_before'   => '',
+				'item_title_after'    => '',
 			) );
 		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 	?>

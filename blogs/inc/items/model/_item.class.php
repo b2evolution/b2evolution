@@ -31,7 +31,7 @@
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * @version $Id: _item.class.php 7839 2014-12-18 11:16:15Z yura $
+ * @version $Id: _item.class.php 8178 2015-02-06 07:27:11Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -5011,12 +5011,12 @@ class Item extends ItemLight
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
-		// pre_dump($this->dbchanges);
+		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
 		if( isset($this->dbchanges['post_status'])
 			|| isset($this->dbchanges['post_title'])
 			|| isset($this->dbchanges['post_content']) )
-		{	// One of the fields we track in the revision history has changed:
+		{ // One of the fields we track in the revision history has changed:
 			// Save the "current" (soon to be "old") data as a version before overwriting it in parent::dbupdate:
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
@@ -5031,7 +5031,7 @@ class Item extends ItemLight
 				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_datemodified, post_status, post_title, post_content
 					FROM T_items__item
 				 WHERE post_ID = '.$this->ID;
-			$DB->query( $sql, 'Save a version of the Item' );
+			$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
 		}
 
 		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
@@ -5039,7 +5039,7 @@ class Item extends ItemLight
 			$this->set_last_touched_ts();
 		}
 
-		if( $result = ( parent::dbupdate( $auto_track_modification ) !== false ) )
+		if( $result && ( parent::dbupdate( $auto_track_modification ) !== false ) )
 		{ // We could update the item object:
 
 			// Let's handle the extracats:
@@ -5074,6 +5074,8 @@ class Item extends ItemLight
 			$this->update_last_touched_date( false, false );
 		}
 
+		// Check if there were failed nested transaction
+		$result = $result && ( ! $DB->has_failed_transaction() );
 		if( $result === false )
 		{ // Update failed
 			$DB->rollback();
@@ -5169,12 +5171,6 @@ class Item extends ItemLight
 	{
 		global $DB, $Plugins;
 
-		// Get list of comments that are going to be deleted
-		$comments_list = implode( ',', $DB->get_col( '
-			SELECT comment_ID
-			  FROM T_comments
-			 WHERE comment_item_ID = '.$DB->quote( $this->ID ) ) );
-
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
 
@@ -5187,14 +5183,6 @@ class Item extends ItemLight
 		{
 			// re-set the ID for the Plugin event & for a deleting of the prerendered content
 			$this->ID = $old_ID;
-
-			$this->delete_prerendered_content();
-
-			if( !empty( $comments_list ) )
-			{	// Delete dependencies of the comments
-				$DB->query( "DELETE FROM T_comments__votes
-				  WHERE cmvt_cmt_ID IN ($comments_list)" );
-			}
 
 			$DB->commit();
 
@@ -5549,8 +5537,8 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'todo' );
 		}
 
-		// Save the new processing status to DB
-		$this->dbupdate();
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt
+		$this->dbupdate( false, false, false );
 
 		return true;
 	}

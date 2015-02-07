@@ -40,20 +40,7 @@ $last_activation_email_date = $UserSettings->get( 'last_activation_email', $curr
  * Include page header:
  */
 $page_title = T_( 'Account activation' );
-$wrap_width = '500px';
-if( $force_request || empty( $last_activation_email_date ) )
-{
-	$wrap_height = 235;
-}
-else
-{
-	$wrap_height = 410;
-}
-if( $current_User->grp_ID == 1 )
-{
-	$wrap_height += 100;
-}
-$wrap_height .= 'px';
+$wrap_width = '530px';
 
 require dirname(__FILE__).'/_html_header.inc.php';
 

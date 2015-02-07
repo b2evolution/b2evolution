@@ -155,9 +155,24 @@ fieldset#itemform_createlinks td {
 fieldset#itemform_links {
 	padding: 0;
 }
-div#iframe_wrapper {
-	background-color: #F1F6F8;
+#attachmentframe_wrapper {
+	width: 100%;
 	height: 160px;
+	position: relative;
+	overflow: hidden;
+	padding-bottom: 6px;
+}
+#attachmentframe_wrapper .ui-resizable-s {
+	background: #9db0bc;
+	height: 6px;
+	bottom: 0;
+}
+#attachmentframe_wrapper > #attachmentframe_disabler {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 }
 
 
@@ -588,7 +603,8 @@ div.avatartag.main > a {
 	float: left;
 }
 .avatar_main_frame > a:first-child,
-div.avatartag.main a:first-child {
+div.avatartag.main > a:first-child,
+div.avatartag.main > img:first-child {
 	margin-right: 25px;
 }
 .avatar_main_frame .avatar_actions {

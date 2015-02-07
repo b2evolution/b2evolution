@@ -67,6 +67,8 @@ siteskin_include( '_site_body_header.inc.php' );
 								'list_end'            => '',
 								'item_start'          => '<li>',
 								'item_end'            => '</li>',
+								'item_title_before'   => '',
+								'item_title_after'    => '',
 							) );
 						// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 					?>

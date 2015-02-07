@@ -31,7 +31,7 @@
  *
  * @todo separate object inits and permission checks
  *
- * @version $Id: users.ctrl.php 7564 2014-11-03 13:12:45Z yura $
+ * @version $Id: users.ctrl.php 8134 2015-02-03 06:41:12Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -190,13 +190,8 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			if( param( 'deltype', 'string', '', true ) == 'spammer' )
-			{ // If we delete user as spammer we also should remove the comments and the messages
-				$edited_User->add_relations( 'cascades', array(
-						array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user') ),
-						array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d private messages sent by this user') ),
-					) );
-			}
+			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
+			$edited_User->init_relations( param( 'deltype', 'string', '', true ) == 'spammer' );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
@@ -219,21 +214,23 @@ if( !$Messages->has_errors() )
 				$deleted_user_ID = $edited_User->ID;
 				$deleted_user_email = $edited_User->get( 'email' );
 				$deleted_user_login = $edited_User->get( 'login' );
-				$edited_User->dbdelete( $Messages );
-				unset( $edited_User );
-				forget_param( 'user_ID' );
-				$Messages->add( $msg, 'success' );
+				if( $edited_User->dbdelete( $Messages ) !== false )
+				{ // User has been deleted successfully
+					unset( $edited_User );
+					forget_param( 'user_ID' );
+					$Messages->add( $msg, 'success' );
 
-				// Find other users with the same email address
-				$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );
-				if( $message_same_email_users !== false )
-				{
-					$Messages->add( $message_same_email_users, 'note' );
-				}
+					// Find other users with the same email address
+					$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );
+					if( $message_same_email_users !== false )
+					{
+						$Messages->add( $message_same_email_users, 'note' );
+					}
 
-				if( $send_reportpm )
-				{ // Send an info message to users who reported this deleted user
-					user_send_report_message( $report_user_IDs, $deleted_user_login );
+					if( $send_reportpm )
+					{ // Send an info message to users who reported this deleted user
+						user_send_report_message( $report_user_IDs, $deleted_user_login );
+					}
 				}
 
 				$action = 'list';

@@ -78,15 +78,9 @@ $login_form_params = array(
 headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 
 $wrap_styles = array();
-$container_styles = array();
 if( isset( $wrap_width ) )
 { // Set width for wrap
 	$wrap_styles[] = 'width:'.$wrap_width;
-}
-if( isset( $wrap_height ) )
-{ // Set height for wrap
-	$wrap_styles[] = 'height:'.$wrap_height;
-	$container_styles[] = 'min-height:'.$wrap_height;
 }
 
 // Display these parts before and after form
@@ -107,7 +101,7 @@ $form_after = '</div></div>';
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>
-<div class="container"<?php echo empty( $container_styles ) ? '' : ' style="'.implode( ';', $container_styles ).'"';?>>
+<div class="container">
 	<div class="wrap"<?php echo empty( $wrap_styles ) ? '' : ' style="'.implode( ';', $wrap_styles ).'"';?>>
 <?php
 if( ! empty( $login_error ) )

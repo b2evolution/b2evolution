@@ -27,7 +27,7 @@
  * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _registration.form.php 7767 2014-12-07 08:03:58Z yura $
+ * @version $Id: _registration.form.php 8087 2015-01-27 17:49:20Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -71,7 +71,7 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 	{ // Disable the field below when registration is not allowed 
 		$disabled_param_links['disabled'] = 'disabled';
 	}
-	$Form->checkbox_input( 'registration_is_public', $Settings->get('registration_is_public'), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
+	$Form->checkbox_input( 'registration_is_public', $Settings->get( 'registration_is_public' ), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
 
 	$disabled_param_grouplevel = array();
 	if( $Settings->get( 'newusers_canregister' ) != 'yes' )
@@ -79,10 +79,12 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 		$disabled_param_grouplevel['disabled'] = 'disabled';
 	}
 
-	$GroupCache = & get_GroupCache();
-	$Form->select_input_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
+	$Form->checkbox_input( 'quick_registration', $Settings->get( 'quick_registration' ), T_('Quick registration'), array_merge( array( 'note' => T_('Check to allow registering with email only (no username, no password) using the quick registration widget.' ) ), $disabled_param_grouplevel ) );
 
-	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
+	$GroupCache = & get_GroupCache();
+	$Form->select_input_object( 'newusers_grp_ID', $Settings->get( 'newusers_grp_ID' ), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
+
+	$Form->text_input( 'newusers_level', $Settings->get( 'newusers_level' ), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
 
 $Form->end_fieldset();
 
@@ -98,11 +100,11 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 	$Form->checklist( $messaging_options, 'default_user_msgform', T_( 'Other users can send me' ) );
 
 	$notify_options = array(
-		array( 'notify_messages', 1, T_( 'I receive a private message.' ),  $Settings->get( 'def_notify_messages' ) ),
-		array( 'notify_unread_messages', 1, T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
-		array( 'notify_published_comments', 1, T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
-		array( 'notify_comment_moderation', 1, T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
-		array( 'notify_post_moderation', 1, T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
+		array( 'notify_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I receive a private message.' ),  $Settings->get( 'def_notify_messages' ) ),
+		array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
+		array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
+		array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
+		array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
 	);
 	$Form->checklist( $notify_options, 'default_user_notification', T_( 'Notify me by email whenever' ) );
 
@@ -217,11 +219,11 @@ jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
 	if( jQuery( this ).val() == 'yes' )
 	{
-		jQuery( '#newusers_grp_ID, #newusers_level' ).removeAttr( 'disabled' );
+		jQuery( '#newusers_grp_ID, #newusers_level, #quick_registration' ).removeAttr( 'disabled' );
 	}
 	else
 	{
-		jQuery( '#newusers_grp_ID, #newusers_level' ).attr( 'disabled', 'disabled' );
+		jQuery( '#newusers_grp_ID, #newusers_level, #quick_registration' ).attr( 'disabled', 'disabled' );
 	}
 
 	if( jQuery( this ).val() == 'no' )

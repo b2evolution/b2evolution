@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _campaigns_text.form.php 7827 2014-12-17 07:04:16Z yura $
+ * @version $Id: _campaigns_text.form.php 8042 2015-01-21 14:49:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -43,7 +43,7 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( T_('Plain Text message') );
+$Form->begin_fieldset( T_('Plain-text message') );
 	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
@@ -60,7 +60,7 @@ $Form->begin_fieldset( T_('Plain Text message') );
 	{ // No permission
 		$button_to_extract = '';
 	}
-	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('Plain Text Message'), array( 'required' => true, 'input_prefix' => $button_to_extract ) );
+	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('Plain-text Message'), array( 'required' => true, 'input_prefix' => $button_to_extract ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );
@@ -72,7 +72,7 @@ $Form->end_fieldset();
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save Plain Text message'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save Plain-text message'), 'SaveButton' );
 }
 $Form->end_form( $buttons );
 

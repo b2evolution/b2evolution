@@ -49,7 +49,7 @@ if( $Session->has_User() )
  * Include page header (also displays Messages):
  */
 $page_title = T_('Log in to your account');
-$wrap_height = '300px';
+$wrap_width = '380px';
 
 /*
   fp> The login page is small. Let's use it as a preloader for the backoffice (which is awfully slow to initialize)
