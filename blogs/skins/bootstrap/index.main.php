@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
+ * @version $Id: index.main.php 8213 2015-02-10 08:59:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -113,7 +113,8 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
-		<div class="col-md-9">
+		<div class="<?php echo ( $Skin->get_setting( 'layout' ) == 'single_column' ? 'col-md-12' : 'col-md-9' ); ?>"<?php
+				echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:right;"' : '' ); ?>>
 
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -264,9 +265,12 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 		</div>
-
+	<?php
+	if( $Skin->get_setting( 'layout' ) != 'single_column' )
+	{
+	?>
 <!-- =================================== START OF SIDEBAR =================================== -->
-		<div class="col-md-3">
+		<div class="col-md-3"<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:left;"' : '' ); ?>>
 
 	<?php
 		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -294,6 +298,10 @@ siteskin_include( '_site_body_header.inc.php' );
 				// This will enclose (foot)notes:
 				'notes_start' => '<div class="notes">',
 				'notes_end' => '</div>',
+				// Widget 'Search form':
+				'search_class'         => 'input-group',
+				'search_submit_before' => '<span class="input-group-btn">',
+				'search_submit_after'  => '</span>',
 			) );
 		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>
@@ -310,6 +318,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 	?>
 		</div>
+	<?php } ?>
 	</div>
 
 <!-- =================================== START OF FOOTER =================================== -->

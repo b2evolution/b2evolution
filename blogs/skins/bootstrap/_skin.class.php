@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage bootstrap
  *
- * @version $Id: _skin.class.php 8188 2015-02-07 02:07:55Z fplanque $
+ * @version $Id: _skin.class.php 8213 2015-02-10 08:59:43Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,7 +25,7 @@ class bootstrap_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'bootstrap';
+		return 'Bootstrap Blog';
 	}
 
 
@@ -47,6 +47,17 @@ class bootstrap_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => '',
+					'defaultvalue' => 'right_sidebar',
+					'options' => array(
+							'single_column' => T_('Single column'),
+							'left_sidebar'  => T_('Left Sidebar'),
+							'right_sidebar' => T_('Right Sidebar'),
+						),
+					'type' => 'select',
+				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),

@@ -481,7 +481,7 @@ function install_basic_skins( $install_mobile_skins = true )
 	task_begin( 'Installing default skins... ' );
 
 	// Note: Skin #1 will we used by Blog A
-	skin_install( 'evopress' );
+	skin_install( 'bootstrap' );
 
 	// Note: Skin #2 will we used by Blog B
 	skin_install( 'evocamp' );
@@ -499,9 +499,9 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'manual' );
 
 	skin_install( 'asevo' );
-	skin_install( 'bootstrap' );
 	skin_install( 'custom' );
 	skin_install( 'dating_mood' );
+	skin_install( 'evopress' );
 	skin_install( 'forums' );
 	skin_install( 'glossyblue' );
 	skin_install( 'intense' );

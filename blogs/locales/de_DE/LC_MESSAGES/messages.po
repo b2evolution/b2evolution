@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2015-02-07 02:57+0100\n"
-"PO-Revision-Date: 2015-02-07 01:57+0000\n"
+"POT-Creation-Date: 2015-02-10 22:27+0100\n"
+"PO-Revision-Date: 2015-02-10 21:27+0000\n"
 "Last-Translator: Francois Planque\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/b2evolution/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
@@ -56,7 +56,7 @@ msgstr "Kategorien"
 #: ../../../inc/items/views/_item_list_full.view.php:255
 #: ../../../skins/_edit.disp.php:271 ../../../skins/_item_block.inc.php:89
 #: ../../../skins/asevo/_item_block.inc.php:83
-#: ../../../skins/bootstrap/_item_block.inc.php:96
+#: ../../../skins/bootstrap/_item_block.inc.php:102
 #: ../../../skins/colourise/_item_block.inc.php:96
 #: ../../../skins/colourise/single.main.php:140
 #: ../../../skins/custom/_item_block.inc.php:104
@@ -94,7 +94,7 @@ msgstr "Tags"
 #: ../../../inc/skins/model/_skin.class.php:856
 #: ../../../skins/asevo/index.main.php:162
 #: ../../../skins/basic/index.main.php:261
-#: ../../../skins/bootstrap/_skin.class.php:232
+#: ../../../skins/bootstrap/_skin.class.php:243
 #: ../../../skins/forums/_posts.disp.php:62
 #: ../../../skins/forums/_posts.disp.php:201
 #: ../../../skins/manual/posts.main.php:255
@@ -127,7 +127,7 @@ msgstr "Vorherige"
 #: ../../../inc/skins/model/_skin.class.php:857
 #: ../../../skins/asevo/index.main.php:163
 #: ../../../skins/basic/index.main.php:262
-#: ../../../skins/bootstrap/_skin.class.php:233
+#: ../../../skins/bootstrap/_skin.class.php:244
 #: ../../../skins/forums/_posts.disp.php:63
 #: ../../../skins/forums/_posts.disp.php:202
 #: ../../../skins/manual/posts.main.php:256
@@ -440,7 +440,7 @@ msgstr "+"
 #: ../../../inc/plugins/views/_plugin_settings.form.php:85
 #: ../../../inc/slugs/views/_slug.form.php:45
 #: ../../../skins/asevo/_body_footer.inc.php:40
-#: ../../../skins/bootstrap/index.main.php:348
+#: ../../../skins/bootstrap/index.main.php:357
 #: ../../../skins/colourise/_body_footer.inc.php:40
 #: ../../../skins/custom/index.main.php:302
 #: ../../../skins/dating_mood/index.main.php:283
@@ -1544,7 +1544,7 @@ msgstr "Die Datei ist zu groß: %s, aber das erlaubte Maximum ist %s."
 #, php-format
 msgid ""
 "We cannot open the folder %s. PHP needs execute permissions on this folder."
-msgstr ""
+msgstr "Wir können den Ordner %s nicht öffnen. PHP benötigt für diesen Ordner Ausführungsberechtigungen."
 
 #: ../../../htsrv/quick_upload.php:351
 #, php-format
@@ -1581,14 +1581,14 @@ msgstr "Die Datei konnte nicht gespeichert werden!"
 #: ../../../htsrv/register.php:155
 #: ../../../inc/widgets/widgets/_user_register.widget.php:173
 msgid "Quick registration is currently disabled on this system."
-msgstr ""
+msgstr "Die Schnellregistrierung ist auf diesem System zur Zeit deaktiviert."
 
 #: ../../../htsrv/register.php:161
 #, php-format
 msgid ""
 "You already registered on this site. You can <a %s>log in here</a>. If you "
 "don't know or have forgotten it, you can <a %s>set your password here</a>."
-msgstr ""
+msgstr "Sie haben sich bereits auf dieser Seite registriert. Sie können sich<a %s>hier einloggen</a>. Sollten Sie Ihr Passwort nicht kennen, oder es vergessen haben, können Sie es <a %s>hier einstellen</a>."
 
 #: ../../../htsrv/register.php:296
 #, php-format
@@ -1989,6 +1989,7 @@ msgstr "Zur Zeit ist kein Blog ausgewählt"
 #: ../../../inc/tools/views/_wpxml_import.form.php:33
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:92
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:98
+#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:132
 #: ../../../skins_email/account_activated.html.php:85
 #: ../../../skins_email/account_activated.txt.php:82
 #: ../../../skins_email/account_new.html.php:82
@@ -2765,7 +2766,7 @@ msgstr "Sie haben zu viele Daten (zu große Dateien?) gesendet, die der Server n
 #: ../../../inc/collections/model/_blog.class.php:289
 #: ../../../inc/collections/model/_blog.funcs.php:361
 #: ../../../inc/cron/_cron.funcs.php:197
-#: ../../../install/_functions_create.php:2071 ../../../install/debug.php:390
+#: ../../../install/_functions_create.php:2079 ../../../install/debug.php:390
 #: ../../../install/index.php:627 ../../../install/index.php:1018
 msgid "Manual"
 msgstr "Handbuch"
@@ -3121,7 +3122,7 @@ msgstr "Eintrags-Index"
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/sessions/views/_stats_goals.view.php:88
 #: ../../../inc/users/views/_userfields.view.php:124
-#: ../../../inc/widgets/_widgets.funcs.php:199
+#: ../../../inc/widgets/_widgets.funcs.php:170
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:209
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:89
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:261
@@ -3787,11 +3788,11 @@ msgstr "Letzte Änderung von %s"
 msgid "Last mod on %s"
 msgstr "Letzte Änderung am %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:875
+#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:877
 msgid "Frequent countries"
 msgstr "Häufige Länder"
 
-#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:888
+#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:890
 msgid "Other countries"
 msgstr "Andere Länder"
 
@@ -3952,7 +3953,7 @@ msgstr "zu"
 msgid ""
 "In order to maintain good performance, you cannot sort by %s when there are "
 "more than %s results."
-msgstr ""
+msgstr "Damit eine gute Leistung gewährleistet werden kann, können Sie nicht nach %s sortieren, wenn es mehr als %s Ergebnisse gibt."
 
 #: ../../../inc/_core/ui/results/_results.class.php:1717
 #: ../../../inc/widgets/views/_widget_list.view.php:158
@@ -4327,11 +4328,11 @@ msgstr "Das Stichwort &laquo;%s&raquo; wurde lokal auf die Blacklist gesetzt."
 #: ../../../inc/antispam/antispam.ctrl.php:158
 #, php-format
 msgid "Failed to add the keyword %s to black list locally."
-msgstr ""
+msgstr "Das Stichwort %s konnte der lokalen Blacklist nicht hinzugefügt werden."
 
 #: ../../../inc/antispam/antispam.ctrl.php:169
 msgid "Please select at least one action to ban the keyword."
-msgstr ""
+msgstr "Bitte wählen Sie mindestens eine Aktion aus, um das Stichwort zu blockieren."
 
 #: ../../../inc/antispam/antispam.ctrl.php:212
 #, php-format
@@ -5665,9 +5666,8 @@ msgstr "Seitenstruktur"
 #: ../../../inc/dashboard/dashboard.ctrl.php:465
 #: ../../../inc/skins/views/_skin_list.view.php:60
 #: ../../../inc/users/model/_user.funcs.php:4749
-#: ../../../inc/users/views/_group.form.php:185
-#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:132
-#: ../../../install/debug.php:271 ../../../install/index.php:292
+#: ../../../inc/users/views/_group.form.php:185 ../../../install/debug.php:271
+#: ../../../install/index.php:292
 msgid "Blogs"
 msgstr "Blogs"
 
@@ -6386,7 +6386,7 @@ msgstr "Bitte verwenden Sie einen anderen Ordnernamen, weil %s bereits für eine
 msgid ""
 "Could not delete the old media folder \"%s\", please try to delete it "
 "manually."
-msgstr ""
+msgstr "Der alte Medienordner \"%s\" konnte nicht gelöscht werden. Bitte versuchen Sie es manuell."
 
 #: ../../../inc/collections/model/_blog.class.php:3316
 #, php-format
@@ -7120,7 +7120,7 @@ msgstr "Anzeigereihenfolge"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:79
 msgid "Check to enable hierarchical threads of comments."
-msgstr "Auswählen, um die hierarchische Themenanzeige der Kommentare zu aktivieren"
+msgstr "Auswählen, um die hierarchische Thread-Anzeige der Kommentare zu aktivieren"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:79
 msgid "Threaded comments"
@@ -7239,7 +7239,7 @@ msgstr "Benutzernamen im Back-Office automatisch vervollständigen"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:143
 #: ../../../skins/asevo/_skin.class.php:106
-#: ../../../skins/bootstrap/_skin.class.php:106
+#: ../../../skins/bootstrap/_skin.class.php:117
 #: ../../../skins/colourise/_skin.class.php:112
 #: ../../../skins/custom/_skin.class.php:131
 #: ../../../skins/dating_mood/_skin.class.php:112
@@ -7263,7 +7263,7 @@ msgstr "Benutzernamen im Back-Office automatisch vervollständigen"
 msgid ""
 "Check to enable auto-completion of usernames entered after a \"@\" sign in "
 "the comment forms"
-msgstr ""
+msgstr "Auswählen, um die automatische Vervollständigung von Benutzernamen nach der Eingabe von \"@\" in den Kommentarformularen zu aktivieren"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:159
 msgid "Voting options"
@@ -7994,9 +7994,9 @@ msgstr "Nur für Mitglieder"
 
 #: ../../../inc/collections/views/_coll_general.form.php:184
 msgid ""
-"Select how you want this blog to be advertised in the list of all public "
-"blogs on this system."
-msgstr "Wählen Sie aus, wie dieser Blog in der Liste der öffentlichen Blogs auf diesem System beworben werden soll."
+"Select when you want this blog to appear in the list of blogs on this "
+"system."
+msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:184
 msgid "Show in front-office list"
@@ -9483,7 +9483,7 @@ msgstr "%d abgegebene Stimmen für den Kommentar"
 #: ../../../inc/messaging/model/_message.class.php:129
 #, php-format
 msgid "%d prerendered content"
-msgstr ""
+msgstr "%d vorgerenderter Inhalt"
 
 #: ../../../inc/comments/model/_comment.class.php:696
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:730
@@ -10112,7 +10112,7 @@ msgstr "ODER"
 
 #: ../../../inc/comments/views/_comments_sidebar.view.php:118
 #: ../../../inc/items/views/_item_list_sidebar.view.php:147
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:169
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:174
 msgid "Entire phrase"
 msgstr "Ganzer Satz"
 
@@ -12124,7 +12124,7 @@ msgstr "%s wurde durch die neue Version ersetzt!"
 msgid ""
 "Unable to create temporary upload file. PHP needs write permissions on %s or"
 " %s."
-msgstr ""
+msgstr "Temporäre Upload-Datei konnte nicht erstellt werden. PHP benötigt für %s oder %s Schreibberechtigungen."
 
 #: ../../../inc/files/model/_filelist.class.php:339
 #, php-format
@@ -14512,7 +14512,7 @@ msgid "(Separate by space)"
 msgstr "(durch Leerzeichen trennen)"
 
 #: ../../../inc/items/views/_item_expert.form.php:386
-#: ../../../install/_functions_create.php:1744
+#: ../../../install/_functions_create.php:1748
 msgid "Featured post"
 msgstr "Sondereintrag"
 
@@ -15210,7 +15210,7 @@ msgstr "Das Gebietsschema war nicht länger gültig und wurde auf %s eingestellt
 msgid ""
 "The locale %s was re-enabled automatically because it's currently the "
 "default locale. The default locale must be a valid and enabled locale."
-msgstr ""
+msgstr "Das Gebietsschema %s wurde wieder aktiviert, da es derzeit als Standard-Gebietsschema verwendet wird. Das Standard-Gebietsschema muss immer gültig und aktiviert sein."
 
 #: ../../../inc/locales/_locale.funcs.php:951
 #, php-format
@@ -16575,7 +16575,7 @@ msgstr "Missbrauchverwaltung"
 
 #: ../../../inc/messaging/_messaging.init.php:219
 msgid "Maximum number of new threads per day"
-msgstr "Maximale Anzahl neuer Themen pro Tag"
+msgstr "Maximale Anzahl neuer Threads pro Tag"
 
 #: ../../../inc/messaging/_messaging.init.php:223
 msgid "Leave empty for no limit"
@@ -16589,7 +16589,7 @@ msgstr "Erinnerungen für ungelesene Nachrichten senden"
 #: ../../../inc/messaging/messages.ctrl.php:70
 #: ../../../skins/_messages.disp.php:58
 msgid "The requested thread does not exist any longer."
-msgstr "Das angeforderte Thema existiert nicht mehr."
+msgstr "Der angeforderte Thread existiert nicht mehr."
 
 #: ../../../inc/messaging/_messaging.init.php:521
 #: ../../../inc/messaging/abuse.ctrl.php:60
@@ -16649,13 +16649,13 @@ msgstr "Thread"
 #: ../../../inc/messaging/threads.ctrl.php:148
 #, php-format
 msgid "Cannot delete thread &laquo;%s&raquo;"
-msgstr "Thema &laquo;%s&raquo; nicht löschbar"
+msgstr "Thread &laquo;%s&raquo; nicht löschbar"
 
 #: ../../../inc/messaging/abuse.ctrl.php:106
 #: ../../../inc/messaging/threads.ctrl.php:207
 #, php-format
 msgid "Delete thread &laquo;%s&raquo;?"
-msgstr "Thema &laquo;%s&raquo; löschen?"
+msgstr "Thread &laquo;%s&raquo; löschen?"
 
 #: ../../../inc/messaging/contacts.ctrl.php:85
 #: ../../../skins/contacts.main.php:130
@@ -16680,7 +16680,7 @@ msgstr "Sie dürfen keine Nachrichten ansehen."
 #: ../../../inc/messaging/messages.ctrl.php:77
 #: ../../../skins/_messages.disp.php:68
 msgid "You are not allowed to view this thread."
-msgstr "Sie dürfen dieses Thema nicht ansehen."
+msgstr "Sie dürfen diesen Thread nicht ansehen."
 
 #: ../../../inc/messaging/messages.ctrl.php:89
 msgid "The requested message does not exist any longer."
@@ -16689,7 +16689,7 @@ msgstr "Die angeforderte Nachricht existiert nicht mehr."
 #: ../../../inc/messaging/messages.ctrl.php:96
 #: ../../../skins/_messages.disp.php:75
 msgid "Can't show messages without thread!"
-msgstr "Anzeigen von Nachrichten ohne Thema nicht möglich!"
+msgstr "Anzeigen von Nachrichten ohne Thread nicht möglich!"
 
 #: ../../../inc/messaging/messages.ctrl.php:166
 msgid "Cannot delete message."
@@ -16913,12 +16913,12 @@ msgstr "Nachrichten anzeigen..."
 #: ../../../inc/messaging/model/_thread.class.php:189
 #, php-format
 msgid "%d messages in thread"
-msgstr ""
+msgstr "%d Nachrichten im Thread"
 
 #: ../../../inc/messaging/model/_thread.class.php:191
 #, php-format
 msgid "%d read statuses in thread"
-msgstr ""
+msgstr "%d Status im Thread"
 
 #: ../../../inc/messaging/model/_thread.class.php:209
 msgid "Please enter a subject"
@@ -16931,7 +16931,7 @@ msgstr "Bitte Nachricht eingeben"
 #: ../../../inc/messaging/model/_thread.class.php:283
 #, php-format
 msgid "You cannot send threads to yourself: %s"
-msgstr "Sie können sich selbst keine Themen schicken: %s"
+msgstr "Sie können sich selbst keine Threads schicken: %s"
 
 #: ../../../inc/messaging/model/_thread.class.php:405
 msgid "See manual"
@@ -16964,7 +16964,7 @@ msgstr "Sie sind nicht in der Lage %d individuelle Nachrichten zu senden, weil d
 
 #: ../../../inc/messaging/model/_thread.class.php:536
 msgid "You cannot post a message in a thread you're not involved in."
-msgstr "Sie können keine Nachricht in ein Thema eintragen, in dem Sie nicht involviert sind."
+msgstr "Sie können keine Nachricht in ein Thread eintragen, in dem Sie nicht involviert sind."
 
 #: ../../../inc/messaging/model/_thread.class.php:559
 msgid ""
@@ -19881,8 +19881,8 @@ msgstr "Eine Vorschau des Blogs mit diesem Skin in einem neuen Fenster zeigen"
 
 #: ../../../inc/skins/model/_skin.class.php:860
 #: ../../../inc/skins/model/_skin.class.php:861
-#: ../../../skins/bootstrap/_skin.class.php:236
-#: ../../../skins/bootstrap/_skin.class.php:237
+#: ../../../skins/bootstrap/_skin.class.php:247
+#: ../../../skins/bootstrap/_skin.class.php:248
 #: ../../../skins/pureforums/_skin.class.php:498
 #: ../../../skins/pureforums/_skin.class.php:499
 #: ../../../skins_adm/_adminUI_general.class.php:1023
@@ -20057,27 +20057,27 @@ msgstr "Installierbare Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:48
 msgid "All skins"
-msgstr ""
+msgstr "Alle Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:49
 msgid "Normal skins"
-msgstr ""
+msgstr "Normale Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:50
 msgid "Mobile skins"
-msgstr ""
+msgstr "Handy-Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:51
 msgid "Tablet skins"
-msgstr ""
+msgstr "Tablet-Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:52
 msgid "Feed skins"
-msgstr ""
+msgstr "Feed-Skins"
 
 #: ../../../inc/skins/views/_skin_list_available.view.php:53
 msgid "Sitemap skins"
-msgstr ""
+msgstr "Sitemap-Skins"
 
 #: ../../../inc/slugs/model/_slug.class.php:71
 #: ../../../inc/slugs/model/_slug.class.php:72
@@ -20349,12 +20349,12 @@ msgstr "Datenbanktabelle %s unterstützt Optimierung nicht und wird stattdessen 
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:327
 msgid "Removing broken posts that have no matching category... "
-msgstr ""
+msgstr "Kaputte Einträge und zugehörige Kategorie entfernen..."
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:353
 #, php-format
 msgid "Cannot delete post with ID %s"
-msgstr ""
+msgstr "Eintrag mit der ID %s nicht löschbar"
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:363
 #, php-format
@@ -20383,12 +20383,12 @@ msgstr "Lösche die Orphan-Datei-Objekte aus der Datenbank..."
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:499
 #, php-format
 msgid "Number of deleted orphan File objects: %d."
-msgstr ""
+msgstr "Anzahl der gelöschten Orphan-Datei-Objekte: %d"
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:500
 #, php-format
 msgid "Number of valid File objects in the database: %d."
-msgstr ""
+msgstr "Anzahl der gültigen Datei-Objekte in der Datenbank: %d"
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:506
 #, php-format
@@ -20409,7 +20409,7 @@ msgstr "Es wird strengstens empfohlen, auch das Tool &lt;<a %s>Orphan-Datei-Root
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:521
 msgid "Removing orphan file roots recursively with all of their content... "
-msgstr ""
+msgstr "Die Orphan-Datei-Roots mit sämtlichem Inhalt rekursiv entfernen..."
 
 #: ../../../inc/tools/model/_dbmaintenance.funcs.php:543
 #, php-format
@@ -20888,7 +20888,7 @@ msgstr "Es müssen mindestens zwei Benutzer in der DB existieren, um Nachrichten
 #: ../../../inc/tools/model/_tool.funcs.php:411
 #, php-format
 msgid "%d threads and %d messages have been created."
-msgstr "%d Themen und %d Nachrichten wurden erstellt."
+msgstr "%d Threads und %d Nachrichten wurden erstellt."
 
 #: ../../../inc/tools/model/_tool.funcs.php:422
 msgid "Sleeping for 1 second..."
@@ -21802,7 +21802,7 @@ msgstr "Senden von E-Mails erzwingen"
 msgid ""
 "If the preferred email service is not available, the secondary option will "
 "be used."
-msgstr ""
+msgstr "Wenn der bevorzugte E-Mail-Service nicht verfügbar ist, wird die sekundäre Option verwendet."
 
 #: ../../../inc/tools/views/_email_settings.form.php:74
 msgid "Email notifications"
@@ -22633,12 +22633,12 @@ msgstr "%d Newsletter-E-Mails für diesen Benutzer"
 #: ../../../inc/users/model/_user.class.php:345
 #, php-format
 msgid "%d message by this user"
-msgstr ""
+msgstr "%d Nachricht von diesem Benutzer"
 
 #: ../../../inc/users/model/_user.class.php:347
 #, php-format
 msgid "%d message read status about this user"
-msgstr ""
+msgstr "%d gelesene Status über diesen Benutzer"
 
 #: ../../../inc/users/model/_user.class.php:348
 #, php-format
@@ -22975,15 +22975,15 @@ msgstr "Profilbild wurde geändert."
 
 #: ../../../inc/users/model/_user.class.php:4629
 msgid "You did not specify a file."
-msgstr ""
+msgstr "Sie haben keine Datei spezifiziert."
 
 #: ../../../inc/users/model/_user.class.php:4638
 msgid "The requested file does not exist!"
-msgstr ""
+msgstr "Die angeforderte Datei existiert nicht!"
 
 #: ../../../inc/users/model/_user.class.php:4645
 msgid "The requested file doesn't belong to this user."
-msgstr ""
+msgstr "Die angeforderte Datei gehört nicht zu diesem Benutzer."
 
 #: ../../../inc/users/model/_user.class.php:4679
 msgid "Profile picture could not be rotated!"
@@ -23545,7 +23545,7 @@ msgstr "%d gefällt mir - %d gefällt mir nicht"
 #: ../../../inc/users/model/_user.funcs.php:3897
 #, php-format
 msgid "(last error was detected on %s)"
-msgstr ""
+msgstr "(letzter Fehler wurde entdeckt am %s)"
 
 #: ../../../inc/users/model/_user.funcs.php:3905
 #, php-format
@@ -23737,7 +23737,7 @@ msgstr "Letzter Besuch"
 #: ../../../skins/_body_footer.inc.php:23 ../../../skins/_user.disp.php:261
 #: ../../../skins/asevo/_body_footer.inc.php:33
 #: ../../../skins/basic/index.main.php:277
-#: ../../../skins/bootstrap/index.main.php:341
+#: ../../../skins/bootstrap/index.main.php:350
 #: ../../../skins/colourise/_body_footer.inc.php:33
 #: ../../../skins/custom/index.main.php:295
 #: ../../../skins/dating_mood/index.main.php:276
@@ -23925,7 +23925,7 @@ msgstr "Sie können die Demo-Profile von Benutzern und Admins im Demo-Modus nich
 
 #: ../../../inc/users/user.ctrl.php:407 ../../../inc/users/user.ctrl.php:501
 msgid "Plugin user settings have been updated."
-msgstr ""
+msgstr "Plugin-Benutzereinstellungen wurden aktualisiert"
 
 #: ../../../inc/users/user.ctrl.php:537
 msgid "All blogs of the user were deleted."
@@ -24211,7 +24211,7 @@ msgstr "Auswählen, um Benutzern zu erlauben ihre Konten selbst zu schließen."
 
 #: ../../../inc/users/views/_account_close_setting.form.php:59
 msgid "Enter a message to display to users who want to close their account."
-msgstr ""
+msgstr "Geben Sie eine Nachricht ein, die erscheinen soll, wenn Benutzer selbst ihre Konten schließen."
 
 #: ../../../inc/users/views/_account_close_setting.form.php:59
 #: ../../../inc/widgets/widgets/_user_register.widget.php:93
@@ -24304,7 +24304,7 @@ msgstr "Geschlecht im Back-Office anzeigen"
 
 #: ../../../inc/users/views/_display.form.php:92
 #: ../../../skins/asevo/_skin.class.php:94
-#: ../../../skins/bootstrap/_skin.class.php:94
+#: ../../../skins/bootstrap/_skin.class.php:105
 #: ../../../skins/colourise/_skin.class.php:100
 #: ../../../skins/custom/_skin.class.php:119
 #: ../../../skins/dating_mood/_skin.class.php:100
@@ -24335,7 +24335,7 @@ msgstr "Benutzernamen-Anzeige in Back-Office"
 #: ../../../inc/users/views/_display.form.php:100
 #: ../../../inc/users/views/_display.form.php:141
 #: ../../../skins/asevo/_skin.class.php:100
-#: ../../../skins/bootstrap/_skin.class.php:100
+#: ../../../skins/bootstrap/_skin.class.php:111
 #: ../../../skins/colourise/_skin.class.php:106
 #: ../../../skins/custom/_skin.class.php:125
 #: ../../../skins/dating_mood/_skin.class.php:106
@@ -24361,7 +24361,7 @@ msgstr "Auswählen, um Hilfsblasen für Benutzernamen anzuzeigen"
 
 #: ../../../inc/users/views/_display.form.php:100
 #: ../../../skins/asevo/_skin.class.php:99
-#: ../../../skins/bootstrap/_skin.class.php:99
+#: ../../../skins/bootstrap/_skin.class.php:110
 #: ../../../skins/colourise/_skin.class.php:105
 #: ../../../skins/custom/_skin.class.php:124
 #: ../../../skins/dating_mood/_skin.class.php:105
@@ -24713,7 +24713,7 @@ msgstr "Registrierungslinks"
 msgid ""
 "Check to allow registering with email only (no username, no password) using "
 "the quick registration widget."
-msgstr ""
+msgstr "Auswählen, um nur die Registrierung per E-Mail zu erlauben (kein Benutzername, kein Passwort), indem das Schnellregistrierungs-Widget verwendet wird."
 
 #: ../../../inc/users/views/_registration.form.php:82
 msgid "Quick registration"
@@ -25638,7 +25638,7 @@ msgstr "Aktuelles Passwort eingeben"
 msgid ""
 "We ask for <b>your</b> (%s) <i>current</i> password as an additional "
 "security measure."
-msgstr ""
+msgstr "Wir fragen als zusätzliche Sicherheitsmaßnahme nach <b>Ihrem</b> (%s) <i>aktuellen</i> Passwort."
 
 #: ../../../inc/users/views/_user_password.form.php:163
 #: ../../../skins_adm/login/_password_form.main.php:67
@@ -25687,7 +25687,7 @@ msgstr "Angepasste Dauer verwenden..."
 msgid ""
 "WARNING: The session will actually die earlier because the sessions table is"
 " pruned after %d days."
-msgstr ""
+msgstr "WARNUNG: Die Session wird tatsächlich früher enden, weil die Session-Tabelle nach %d Tagen bereinigt wird."
 
 #: ../../../inc/users/views/_user_preferences.form.php:220
 msgid "Custom duration"
@@ -26087,24 +26087,24 @@ msgstr "Diese Benutzerfeld-Gruppe löschen!"
 msgid "Order number"
 msgstr "Sortierungszahl"
 
-#: ../../../inc/widgets/_widgets.funcs.php:146
-#: ../../../install/_functions_create.php:1491
-#: ../../../install/_functions_create.php:1526
-#: ../../../install/_functions_create.php:1539
+#: ../../../inc/widgets/_widgets.funcs.php:108
+#: ../../../install/_functions_create.php:1495
+#: ../../../install/_functions_create.php:1530
+#: ../../../install/_functions_create.php:1543
 msgid "News"
 msgstr "Neuigkeiten"
 
-#: ../../../inc/widgets/_widgets.funcs.php:150
+#: ../../../inc/widgets/_widgets.funcs.php:112
 #: ../../../skins/forums/index.main.php:59
 #: ../../../skins/pureforums/index.main.php:64
 msgid "Latest topics"
 msgstr "Neueste Themen"
 
-#: ../../../inc/widgets/_widgets.funcs.php:151
+#: ../../../inc/widgets/_widgets.funcs.php:113
 msgid "Latest replies"
 msgstr "Neueste Antworten"
 
-#: ../../../inc/widgets/_widgets.funcs.php:179
+#: ../../../inc/widgets/_widgets.funcs.php:152
 #: ../../../skins/photoalbums/index.main.php:34
 #: ../../../skins/photoalbums/index.main.php:189
 #: ../../../skins/photoblog/index.main.php:29
@@ -26112,11 +26112,11 @@ msgstr "Neueste Antworten"
 msgid "Index"
 msgstr "Index"
 
-#: ../../../inc/widgets/_widgets.funcs.php:198
+#: ../../../inc/widgets/_widgets.funcs.php:169
 msgid "Search this forum:"
 msgstr "Diese Forum durchsuchen:"
 
-#: ../../../inc/widgets/_widgets.funcs.php:205
+#: ../../../inc/widgets/_widgets.funcs.php:176
 #: ../../../skins/manual/404_not_found.main.php:129
 msgid "Search this manual:"
 msgstr "Dieses Handbuch durchsuchen:"
@@ -26355,7 +26355,7 @@ msgstr "Ankreuzfelder (Checkboxen) anzeigen, um die Auswahl mehrerer Kategorien 
 #. TRANS: here we ask to select 'OR', 'NOR' or 'AND'
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:112
 msgid "Default combining"
-msgstr ""
+msgstr "Standard-Kombination"
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:117
 msgid "NOR"
@@ -26393,7 +26393,7 @@ msgstr "Level"
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:148
 msgid "Show as selected"
-msgstr ""
+msgstr "Wie ausgewählt anzeigen"
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:150
 msgid "Mark first selected cat (highest level selected cat)"
@@ -26508,6 +26508,7 @@ msgstr "Ganzen Kommentar lesen"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:93
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:99
+#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:133
 msgid "ID of the blog to use, leave empty for the current blog."
 msgstr "ID des zu benutzenden Blogs; leer lassen, um den aktuellen Blog zu benutzen."
 
@@ -26520,7 +26521,7 @@ msgid "List of comments; click goes to comment."
 msgstr "Liste von Kommentaren; Klick ruft den Kommentar auf."
 
 #. TRANS: date
-#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:191
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:193
 #: ../../../skins/evocamp/_item_block.inc.php:60
 #: ../../../skins/evocamp/single.main.php:103
 msgid "on "
@@ -26843,7 +26844,7 @@ msgstr "Universelle Elementliste"
 msgid "Can list Items (Posts/Pages/Links...) in a variety of ways."
 msgstr "Kann Elemente (Einträge/Seiten/Links) auf verschiedene Arten anzeigen"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:269
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:271
 msgid "The requested Blog doesn't exist any more!"
 msgstr "Der angeforderte Blog existiert nicht mehr!"
 
@@ -26901,6 +26902,7 @@ msgstr "Thumbnail-Größe"
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:92
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:76
+#: ../../../skins/bootstrap/_skin.class.php:51
 msgid "Layout"
 msgstr "Layout"
 
@@ -26928,12 +26930,6 @@ msgstr "Auswählen, um Bildtitel anzuzeigen. Es wir auf den Eintragstitel zurüc
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:84
 msgid "Number of columns in grid mode."
 msgstr "Anzahl der Spalten im Gittermodus"
-
-#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:133
-msgid ""
-"IDs of the blogs to use, leave empty for the current blog. Separate multiple"
-" blogs by commas."
-msgstr "IDs der zu benutzenden Blogs; für den aktuellen Blog leer lassen. Unterteilen Sie mehrere Blogs mit Kommata."
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:165
 msgid "Index of photos; click goes to original image post."
@@ -27011,15 +27007,15 @@ msgstr "Sammlungs-ID"
 msgid "Leave empty for current collection."
 msgstr "Für aktuelle Sammlung leer lassen."
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:167
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:172
 msgid "All words"
 msgstr "Alle Wörter"
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:168
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:173
 msgid "Some word"
 msgstr "Einige Wörter"
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:174
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:179
 msgid "Enter text to search for"
 msgstr "Textsuche eingeben für"
 
@@ -27405,8 +27401,8 @@ msgid "My Profile Menu link"
 msgstr "Mein Profilmenü-Link"
 
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:72
-msgid "Current user profile menu link"
-msgstr "Aktueller Link für Benutzerprofilmenü"
+msgid "Current user profile menu link with picture"
+msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:66
 msgid "Random Users"
@@ -27556,11 +27552,11 @@ msgstr "Hallo $login$!"
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:55
 msgid "Email capture / Quick registration widget"
-msgstr ""
+msgstr "E-Mail-Capture / Schnellregistrierungs-Widget"
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:73
 msgid "Display a quick registration form."
-msgstr ""
+msgstr "Ein Schnellregistrierungsformular anzeigen."
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:90
 msgid "Get our newsletter!"
@@ -27584,11 +27580,11 @@ msgstr "Automatisch einschreiben"
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:128
 msgid "check to auto subscribe new user to current collection posts"
-msgstr ""
+msgstr "Auswählen, damit neue Benutzer automatisch die aktuellen Sammlungseinträge abonnieren."
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:134
 msgid "check to auto subscribe new user to current collection comments"
-msgstr ""
+msgstr "Auswählen, damit neue Benutzer automatisch die aktuellen Kommentare zu Sammlungseinträgen abonnieren."
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:139
 msgid "Button title"
@@ -27596,11 +27592,11 @@ msgstr "Button-Name"
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:140
 msgid "Title of a button to submit a form."
-msgstr ""
+msgstr "Button-Titel zum Versenden eines Formulars."
 
 #: ../../../inc/widgets/widgets/_user_register.widget.php:142
 msgid "Sign up!"
-msgstr ""
+msgstr "Jetzt registrieren!"
 
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:62
 msgid "User tools"
@@ -27735,207 +27731,207 @@ msgstr "Standard geplante Jobs erstellen..."
 msgid "Create default scheduled jobs"
 msgstr "Standard geplante Jobs erstellen"
 
-#: ../../../install/_functions_create.php:1342
+#: ../../../install/_functions_create.php:1346
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
 msgstr "Dies ist eine lange Beschreibung für den Blog namens '%s'. %s"
 
-#: ../../../install/_functions_create.php:1362
+#: ../../../install/_functions_create.php:1366
 msgid "Blog A Title"
 msgstr "Blog A Titel"
 
-#: ../../../install/_functions_create.php:1365
+#: ../../../install/_functions_create.php:1369
 msgid "Tagline for Blog A"
 msgstr "Slogan für Blog A"
 
-#: ../../../install/_functions_create.php:1389
+#: ../../../install/_functions_create.php:1393
 msgid "Blog B Title"
 msgstr "Blog B Titel"
 
-#: ../../../install/_functions_create.php:1392
+#: ../../../install/_functions_create.php:1396
 msgid "Tagline for Blog B"
 msgstr "Slogan für Blog B"
 
-#: ../../../install/_functions_create.php:1411
+#: ../../../install/_functions_create.php:1415
 msgid ""
 "The main purpose for this blog is to be included as a side item to other "
 "blogs where it will display your favorite/related links."
 msgstr "Der Hauptzweck dieses Blogs ist es, als ein Seitenleistenelement in anderen Blogs eingefügt zu werden und dort Ihre favorisierten/verwandten Links anzuzeigen."
 
-#: ../../../install/_functions_create.php:1416
+#: ../../../install/_functions_create.php:1420
 msgid "Information about this site"
 msgstr "Informationen über diese Seite"
 
-#: ../../../install/_functions_create.php:1440
+#: ../../../install/_functions_create.php:1444
 msgid "This is a photoblog, optimized for displaying photos."
 msgstr "Ein für das Anzeigen von Fotos optimierter Foto-Blog."
 
-#: ../../../install/_functions_create.php:1445
+#: ../../../install/_functions_create.php:1449
 msgid "This blog shows photos..."
 msgstr "Dieser Blog zeigt Fotos..."
 
-#: ../../../install/_functions_create.php:1457
+#: ../../../install/_functions_create.php:1461
 msgid "Forums Title"
 msgstr "Forumtitel"
 
-#: ../../../install/_functions_create.php:1460
+#: ../../../install/_functions_create.php:1464
 msgid "Tagline for Forums"
 msgstr "Slogan für Foren"
 
-#: ../../../install/_functions_create.php:1472
+#: ../../../install/_functions_create.php:1476
 msgid "Manual Title"
 msgstr "Handbuchtitel"
 
-#: ../../../install/_functions_create.php:1475
+#: ../../../install/_functions_create.php:1479
 msgid "Tagline for Manual"
 msgstr "Slogan für Handbuch"
 
-#: ../../../install/_functions_create.php:1490
-#: ../../../install/_functions_create.php:1522
-#: ../../../install/_functions_create.php:1538
+#: ../../../install/_functions_create.php:1494
+#: ../../../install/_functions_create.php:1526
+#: ../../../install/_functions_create.php:1542
 msgid "Welcome"
 msgstr "Willkommen"
-
-#: ../../../install/_functions_create.php:1492
-#: ../../../install/_functions_create.php:1527
-#: ../../../install/_functions_create.php:1540
-msgid "Background"
-msgstr "Hintergrund"
-
-#: ../../../install/_functions_create.php:1493
-#: ../../../install/_functions_create.php:1528
-msgid "Fun"
-msgstr "Spaß"
-
-#: ../../../install/_functions_create.php:1494
-#: ../../../install/_functions_create.php:1529
-#: ../../../install/_functions_create.php:1542
-msgid "In real life"
-msgstr "Im echten Leben"
-
-#: ../../../install/_functions_create.php:1495
-#: ../../../install/_functions_create.php:1530
-#: ../../../install/_functions_create.php:1543
-msgid "On the web"
-msgstr "Im Web"
 
 #: ../../../install/_functions_create.php:1496
 #: ../../../install/_functions_create.php:1531
 #: ../../../install/_functions_create.php:1544
-msgid "Sports"
-msgstr "Sport"
+msgid "Background"
+msgstr "Hintergrund"
 
 #: ../../../install/_functions_create.php:1497
 #: ../../../install/_functions_create.php:1532
-#: ../../../install/_functions_create.php:1545
-msgid "Movies"
-msgstr "Filme"
+msgid "Fun"
+msgstr "Spaß"
 
 #: ../../../install/_functions_create.php:1498
 #: ../../../install/_functions_create.php:1533
 #: ../../../install/_functions_create.php:1546
+msgid "In real life"
+msgstr "Im echten Leben"
+
+#: ../../../install/_functions_create.php:1499
+#: ../../../install/_functions_create.php:1534
+#: ../../../install/_functions_create.php:1547
+msgid "On the web"
+msgstr "Im Web"
+
+#: ../../../install/_functions_create.php:1500
+#: ../../../install/_functions_create.php:1535
+#: ../../../install/_functions_create.php:1548
+msgid "Sports"
+msgstr "Sport"
+
+#: ../../../install/_functions_create.php:1501
+#: ../../../install/_functions_create.php:1536
+#: ../../../install/_functions_create.php:1549
+msgid "Movies"
+msgstr "Filme"
+
+#: ../../../install/_functions_create.php:1502
+#: ../../../install/_functions_create.php:1537
+#: ../../../install/_functions_create.php:1550
 msgid "Music"
 msgstr "Musik"
 
-#: ../../../install/_functions_create.php:1503
+#: ../../../install/_functions_create.php:1507
 msgid "Announcements"
 msgstr "Ankündigungen"
 
-#: ../../../install/_functions_create.php:1504
+#: ../../../install/_functions_create.php:1508
 msgid "b2evolution Tips"
 msgstr "b2evolution Tipps"
 
-#: ../../../install/_functions_create.php:1505
+#: ../../../install/_functions_create.php:1509
 msgid "Get additional skins"
 msgstr "Zusätzliche Skins erhalten"
 
-#: ../../../install/_functions_create.php:1511
+#: ../../../install/_functions_create.php:1515
 msgid "Contributors"
 msgstr "Beitragende"
 
-#: ../../../install/_functions_create.php:1516
-msgid "Monument Valley"
-msgstr "Monument Valley"
+#: ../../../install/_functions_create.php:1520
+msgid "Landscapes"
+msgstr ""
 
-#: ../../../install/_functions_create.php:1521
+#: ../../../install/_functions_create.php:1525
 msgid "A forum group"
 msgstr "Eine Forumgruppe"
 
-#: ../../../install/_functions_create.php:1522
-#: ../../../install/_functions_create.php:1538
+#: ../../../install/_functions_create.php:1526
+#: ../../../install/_functions_create.php:1542
 msgid "Welcome description"
 msgstr "Willkommensbeschreibung"
 
-#: ../../../install/_functions_create.php:1523
+#: ../../../install/_functions_create.php:1527
 msgid "A forum"
 msgstr "Ein Forum"
 
-#: ../../../install/_functions_create.php:1523
-#: ../../../install/_functions_create.php:1524
+#: ../../../install/_functions_create.php:1527
+#: ../../../install/_functions_create.php:1528
 msgid "Short description of this forum"
 msgstr "Kurze Beschreibung dieses Forums"
 
-#: ../../../install/_functions_create.php:1524
+#: ../../../install/_functions_create.php:1528
 msgid "Another forum"
 msgstr "Anderes Forum"
 
-#: ../../../install/_functions_create.php:1525
+#: ../../../install/_functions_create.php:1529
 msgid "Another group"
 msgstr "Andere Gruppe"
 
-#: ../../../install/_functions_create.php:1526
-#: ../../../install/_functions_create.php:1539
+#: ../../../install/_functions_create.php:1530
+#: ../../../install/_functions_create.php:1543
 msgid "News description"
 msgstr "Neuigkeitenbeschreibung"
 
-#: ../../../install/_functions_create.php:1527
-#: ../../../install/_functions_create.php:1540
+#: ../../../install/_functions_create.php:1531
+#: ../../../install/_functions_create.php:1544
 msgid "Background description"
 msgstr "Hintergrundbeschreibung"
 
-#: ../../../install/_functions_create.php:1528
+#: ../../../install/_functions_create.php:1532
 msgid "Fun description"
 msgstr "Spaßbeschreibung"
 
-#: ../../../install/_functions_create.php:1541
+#: ../../../install/_functions_create.php:1545
 msgid "Cat with intro post"
 msgstr "Kat. mit Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:1541
+#: ../../../install/_functions_create.php:1545
 msgid "Description of cat with intro post"
 msgstr "Beschreibung von Kat. mit Intro-Eintrag"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1564
+#: ../../../install/_functions_create.php:1568
 msgid "The software for blog pros!"
 msgstr "Die Software für Blog-Profis!"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1564
+#: ../../../install/_functions_create.php:1568
 msgid "b2evo: The software for blog pros!"
 msgstr "b2evo: Die Software für Blog-Profis!"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1572
+#: ../../../install/_functions_create.php:1576
 msgid "Better Blog Software!"
 msgstr "Die bessere Blog-Software!"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1572
+#: ../../../install/_functions_create.php:1576
 msgid "b2evo: Better Blog Software!"
 msgstr "b2evo: Die bessere Blog-Software!"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1580
+#: ../../../install/_functions_create.php:1584
 msgid "The other blog tool!"
 msgstr "Das etwas andere Blog-Tool!"
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1580
+#: ../../../install/_functions_create.php:1584
 msgid "b2evo: The other blog tool!"
 msgstr "b2evo: Das etwas andere Blog-Tool!"
 
-#: ../../../install/_functions_create.php:1587
+#: ../../../install/_functions_create.php:1591
 #, php-format
 msgid ""
 "<p>This blog is powered by b2evolution.</p>\n"
@@ -27947,7 +27943,7 @@ msgid ""
 "<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr "<p>Dieses Blogsystem wird mit b2evolution betrieben.</p>\n\n<p>Sie sehen sich gerade eine Infoseite über %s an.</p>\n\n<p>Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten in der Seitenleiste.</p>\n\n<p>Falls benötigt, können Infoseiten unter Verwendung eines Evoskins anders als reguläre Einträge formatiert werden.</p>"
 
-#: ../../../install/_functions_create.php:1601
+#: ../../../install/_functions_create.php:1605
 #, php-format
 msgid ""
 "<p>This is the intro post for the front page of Blog A.</p>\n"
@@ -27960,117 +27956,117 @@ msgid ""
 "</ul>"
 msgstr "<p>Dies ist der Intro-Eintrag für die Startseite von Blog A.\n\n</p> <p>Blog A ist momentan so konfiguriert, dass er eine Startseite wie diese anzeigt, anstatt direkt die Einträge des Blogs anzuzeigen.</p>\n\n<ul>\n<li>Um die Einträge des Blogs zu sehen, klicken Sie oben in dem Menü auf \"Neuigkeiten\".</li> <li>Wenn Sie so eine Startseite nicht haben möchten, können Sie sie in den Blog-Einstellungen > Features > <a %s>Startseite</a> ändern. In Blog B können Sie ein Beispiel dafür sehen, wie ein Blog ohne Startseite aussieht.</li>\n</ul>"
 
-#: ../../../install/_functions_create.php:1601
+#: ../../../install/_functions_create.php:1605
 msgid "Welcome to Blog A"
 msgstr "Willkommen zu Blog A"
 
-#: ../../../install/_functions_create.php:1614
+#: ../../../install/_functions_create.php:1618
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr "<p>Das ist der erste Eintrag.</p>\n\n<p>Er erscheint in einer einzelnen Kategorie.</p>"
 
-#: ../../../install/_functions_create.php:1614
+#: ../../../install/_functions_create.php:1618
 msgid "First Post"
 msgstr "Erster Eintrag"
 
-#: ../../../install/_functions_create.php:1621
+#: ../../../install/_functions_create.php:1625
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr "<p>Das ist der zweite Eintrag.</p>\n\n<p>Er erscheint in mehreren Kategorien.</p>"
 
-#: ../../../install/_functions_create.php:1621
+#: ../../../install/_functions_create.php:1625
 msgid "Second post"
 msgstr "Zweiter Eintrag"
 
-#: ../../../install/_functions_create.php:1628
+#: ../../../install/_functions_create.php:1632
 msgid "About Blog A"
 msgstr "Über Blog A"
 
-#: ../../../install/_functions_create.php:1628 ../../../install/index.php:622
+#: ../../../install/_functions_create.php:1632 ../../../install/index.php:622
 msgid "Blog A"
 msgstr "Blog A"
 
-#: ../../../install/_functions_create.php:1634
+#: ../../../install/_functions_create.php:1638
 msgid ""
 "<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr "<p>Dieser Eintrag hat ein angehängtes Foto. Das Foto wird automatisch in der Größe angepasst, so dass es zum aktuellen Skin passt. Sie können heranzoomen, indem Sie auf den Thumbnail klicken.</p>\n\n<p>Schauen Sie sich den Foto-Blog (erreichbar über die Links oben auf der Seite) an, um einen komplett anderen, mehr auf die Fotos als den Blog-Text konzentrierten Skin zu sehen.</p>"
 
-#: ../../../install/_functions_create.php:1634
+#: ../../../install/_functions_create.php:1638
 msgid "Image post"
 msgstr "Bildeintrag"
 
-#: ../../../install/_functions_create.php:1644
+#: ../../../install/_functions_create.php:1648
 msgid ""
 "<p>This is page 1 of a multipage post.</p>\n"
 "\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr "<p>Dies ist Seite 1 eines mehrseitigen Eintrags.<p>\n\n<p>Sie können die anderen Seiten sehen, indem Sie auf die Links unter dem Text klicken.<p>"
 
-#: ../../../install/_functions_create.php:1644
+#: ../../../install/_functions_create.php:1648
 msgid "This is a multipage post"
 msgstr "Dies ist ein mehrseitiger Eintrag"
 
-#: ../../../install/_functions_create.php:1650
 #: ../../../install/_functions_create.php:1654
 #: ../../../install/_functions_create.php:1658
-#: ../../../install/_functions_create.php:1995
-#: ../../../install/_functions_create.php:1999
+#: ../../../install/_functions_create.php:1662
 #: ../../../install/_functions_create.php:2003
-#: ../../../install/_functions_create.php:2354
-#: ../../../install/_functions_create.php:2358
+#: ../../../install/_functions_create.php:2007
+#: ../../../install/_functions_create.php:2011
 #: ../../../install/_functions_create.php:2362
+#: ../../../install/_functions_create.php:2366
+#: ../../../install/_functions_create.php:2370
 #, php-format
 msgid "<p>This is page %d.</p>"
 msgstr "<p>Dies ist Seite %d.<p>"
 
-#: ../../../install/_functions_create.php:1660
-#: ../../../install/_functions_create.php:2005
-#: ../../../install/_functions_create.php:2364
+#: ../../../install/_functions_create.php:1664
+#: ../../../install/_functions_create.php:2013
+#: ../../../install/_functions_create.php:2372
 msgid "<p>It is the last page.</p>"
 msgstr "<p>Dies ist die letzte Seite.<p>"
 
-#: ../../../install/_functions_create.php:1665
+#: ../../../install/_functions_create.php:1669
 msgid ""
 "<p>This is an extended post with no teaser. This means that you won't see "
 "this teaser any more when you click the \"more\" link.</p>"
 msgstr "<p>Dies ist ein erweiterter Eintrag ohne Teaser. Das bedeutet, dass Sie diesen Teaser nicht mehr sehen werden, wenn Sie auf den Link \"mehr\" klicken.<p>"
 
-#: ../../../install/_functions_create.php:1665
+#: ../../../install/_functions_create.php:1669
 msgid "Extended post with no teaser"
 msgstr "Erweiterter Eintrag ohne Teaser"
 
-#: ../../../install/_functions_create.php:1668
-#: ../../../install/_functions_create.php:1678
+#: ../../../install/_functions_create.php:1672
+#: ../../../install/_functions_create.php:1682
 msgid ""
 "<p>This is the extended text. You only see it when you have clicked the "
 "\"more\" link.</p>"
 msgstr "<p>Dies ist ein erweiterter Text. Sie sehen diesen nur, wenn Sie auf den Link \"mehr\" geklickt haben.<p>"
 
-#: ../../../install/_functions_create.php:1675
+#: ../../../install/_functions_create.php:1679
 msgid ""
 "<p>This is an extended post. This means you only see this small teaser by "
 "default and you must click on the link below to see more.</p>"
 msgstr "<p>Dies ist ein erweiterter Eintrag. Das bedeutet, dass Sie standardmäßig nur diesen kleinen Teaser sehen. Um mehr zu sehen, müssen Sie auf den Link unten klicken.<p>"
 
-#: ../../../install/_functions_create.php:1675
+#: ../../../install/_functions_create.php:1679
 msgid "Extended post"
 msgstr "Erweiterter Eintrag"
 
-#: ../../../install/_functions_create.php:1683
-#: ../../../install/_functions_create.php:2030
-#: ../../../install/_functions_create.php:2392
+#: ../../../install/_functions_create.php:1687
+#: ../../../install/_functions_create.php:2038
+#: ../../../install/_functions_create.php:2400
 msgid "Welcome to your b2evolution-powered website!"
 msgstr "Willkommen bei Ihrer mit b2evolution betriebenen Website!"
 
-#: ../../../install/_functions_create.php:1684
-#: ../../../install/_functions_create.php:2031
-#: ../../../install/_functions_create.php:2393
+#: ../../../install/_functions_create.php:1688
+#: ../../../install/_functions_create.php:2039
+#: ../../../install/_functions_create.php:2401
 msgid ""
 "<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>\n"
 "\n"
@@ -28086,45 +28082,45 @@ msgid ""
 "<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"
 msgstr "<p>Damit Sie beginnen können, hat der Installer automatisch mehrere Beispielsammlungen erstellt und sie mit einigen Beispielinhalten gefüllt. Natürlich können Sie diese Startstruktur nach eigenen Wünschen bearbeiten. Bis Sie dies tun, werden Sie Folgendes auf dieser Seite finden:<p>\n\n<ul>\n<li><strong>Blog A</strong>: Diesen sehen Sie gerade. Er enthält ein paar Beispieleinträge mit simplen Features von b2evolution.</li>\n<li><strong>Blog B</strong>: Auf diesen greifen Sie mit dem Link oben auf der Seite zu. Er enthält Informationen über erweiterte Features. Denken Sie daran, dass hier absichtlich ein anderer Skin als bei Blog A verwendet wird, damit Sie eine Vorstellung davon bekommen, was möglich ist.<li>\n<li><strong>Fotos</strong>: Diese Sammlung ist ein Beispiel dafür, wie Sie b2evolution benutzen können, um Fotos, die in Fotoalben zusammengeführt sind, zu präsentieren.\n<li><strong>Foren</strong>: Diese Sammlung ist ein Diskussionsforum (auch bekannt als Schwarzes Brett), die es Benutzern erlaubt miteinander zu diskutieren.<li>\n<li><strong>Anleitung</strong>: Dies ist ein Beispiel dafür, wie b2evolution verwendet werden kann, um strukturierte Inhalte, wie zum Beispiel ein Online-Handbuch oder ein Buch, zu veröffentlichen.</li>\n\n</ul>\n\n<p>Sie können Sammlungen jeder Art hinzufügen (Blogs, Fotos, Foren etc.), ungewollte löschen und bereits existierende Sammlungen im Administrationsbereich anpassen (Titel, Seitenleiste, Blog-Skin, Widgets etc.)<p>"
 
-#: ../../../install/_functions_create.php:1711
+#: ../../../install/_functions_create.php:1715
 msgid "b2evo skins repository"
 msgstr "b2evo Skin-Repository"
 
-#: ../../../install/_functions_create.php:1716
+#: ../../../install/_functions_create.php:1720
 msgid "About Blog B"
 msgstr "Über Blog B"
 
-#: ../../../install/_functions_create.php:1716 ../../../install/index.php:623
+#: ../../../install/_functions_create.php:1720 ../../../install/index.php:623
 msgid "Blog B"
 msgstr "Blog B"
 
-#: ../../../install/_functions_create.php:1722
+#: ../../../install/_functions_create.php:1726
 msgid "Main Intro post"
 msgstr "Haupt-Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:1722
+#: ../../../install/_functions_create.php:1726
 msgid "This is the main intro post. It appears on the homepage only."
 msgstr "Das ist der Haupt-Intro-Eintrag. Er erscheint nur auf der Homepage."
 
-#: ../../../install/_functions_create.php:1728
+#: ../../../install/_functions_create.php:1732
 msgid ""
 "This uses post type \"Intro-Cat\" and is attached to the desired "
 "Category(ies)."
 msgstr "Dies benutzt den Eintragstyp \"Intro-Kat.\" und ist in die gewünschte(n) Kategorie(n) eingeordnet."
 
-#: ../../../install/_functions_create.php:1728
+#: ../../../install/_functions_create.php:1732
 msgid "b2evolution tips category &ndash; Sub Intro post"
 msgstr "b2evolution-Tipps-Kategorie &ndash; untergeordneter Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:1734
+#: ../../../install/_functions_create.php:1738
 msgid "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
 msgstr "Dies benutzt den Eintragstyp \"Intro-Tag\" und ist mit den gewünschten Tags versehen."
 
-#: ../../../install/_functions_create.php:1734
+#: ../../../install/_functions_create.php:1738
 msgid "Widgets tag &ndash; Sub Intro post"
 msgstr "Widgets-Tag &ndash; untergeordneter Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:1744
+#: ../../../install/_functions_create.php:1748
 msgid ""
 "<p>This is a demo of a featured post.</p>\n"
 "\n"
@@ -28133,7 +28129,7 @@ msgid ""
 "<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"
 msgstr "<p>Das ist ein Beispiel eines Sondereintrags.</p>\n\n<p>Er wird angezeigt, wenn wir keinen bestimmten \"Intro\"-Artikel für die aktuelle Anfrage haben. Um ein Beispiel zu sehen, versuchen Sie, die \"Ankündigungen\"-Kategorie anzuzeigen.</p>\n\n<p>Beachten Sie auch, dass Sondereinträge nicht in der normalen Artikelabfolge erscheinen.</p>"
 
-#: ../../../install/_functions_create.php:1756
+#: ../../../install/_functions_create.php:1760
 #, php-format
 msgid ""
 "<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>\n"
@@ -28141,11 +28137,11 @@ msgid ""
 "<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"
 msgstr "</p>b2evolution verfügt über eine <code>.htaccess</code> Datei, die dazu bestimmt ist, den Vorgang zu optimieren wie b2evolution von Ihrem Webserver gehandhabt wird (wenn Sie Apache verwenden). Unter gewissen Umständen kann es vorkommen, dass die Datei nicht gleich beim Einrichten aktiviert wird. Bitte sehen Sie sich diesbezüglich die Hauptseite über <a %s>Kniffliges Zeug</a> für mehr Informationen an.</p>\n\n</p>Für weitere Optimierung lesen Sie bitte die Handbuchseite über <a %s>Performance-Optimierung</a>. Je nachdem wie Ihre aktuelle Konfiguration ist und was Ihnen Ihre  <a %s>Web Hosting</a> Firma erlaubt, können Sie möglicherweise die Geschwindigkeit von b2evolution bis um das 10-fache erhöhen!</p>"
 
-#: ../../../install/_functions_create.php:1756
+#: ../../../install/_functions_create.php:1760
 msgid "Apache optimization..."
 msgstr "Apache-Optimierung..."
 
-#: ../../../install/_functions_create.php:1767
+#: ../../../install/_functions_create.php:1771
 msgid ""
 "<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>\n"
 "\n"
@@ -28162,11 +28158,11 @@ msgid ""
 "<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"
 msgstr "<p>Standardmäßig werden Blogs mit Hilfe eines evoskins angezeigt. (Mehr Informationen zu Skins gibt es in einem anderen Eintrag.)</p>\n\n<p>Das bedeutet, dass Blogs über die '<code>index.php</code>'-Datei aufgerufen werden, welche Standardparameter aus der Datenbank lädt und dann die Aufgabe des Anzeigens an einen Skin übergibt.</p>\n\n<p>Alternativ, wenn Sie nicht die Standard-DB-Parameter nutzen möchten und, sagen wir, einen Skin, eine Kategorie oder einen bestimmten Link-Blog erzwingen wollen, können Sie eine Stub-Datei wie die bereitgestellte '<code>a_stub.php</code>'-Datei erzeugen und Ihr Blog über ein Stub anstatt über index.php aufrufen.</p>\n\n<p>Wenn Sie nun letztendlich einige sehr spezielle Anpassungen an Ihrem Blog vornehmen möchten, können Sie reine Templates anstatt Skins benutzen. Rufen Sie Ihren Blog in diesem Fall über ein vollständiges Template wie die bereitgestellte '<code>a_noskin.php</code>'-Datei auf.</p>\n\n<p>Wenn Sie ein b2evolution-Blog in eine komplexe Webseite integrieren wollen, möchten Sie das möglicherweise tun, indem Sie Code aus <code>a_noskin.php</code> kopieren und in eine Seite Ihrer Webseite einfügen.</p>\n\n<p>Mehr Informationen finden Sie in den eigentlichen Stub-/Template-Dateien. Öffnen Sie sie in einem Texteditor und lesen Sie die enthaltenen Kommentare.</p>\n\n<p>Wie auch immer, stellen Sie sicher, dass Sie im Blog-Administrationsbereich die richtige Zugriffsmethode/die richtigee URL für Ihren Blog einstellen - sonst werden Permalinks nicht ordnungsgemäß funktionieren.</p>"
 
-#: ../../../install/_functions_create.php:1767
+#: ../../../install/_functions_create.php:1771
 msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr "Skins, Stubs, Templates &amp; Webseiten-Integration..."
 
-#: ../../../install/_functions_create.php:1787
+#: ../../../install/_functions_create.php:1791
 msgid ""
 "<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>\n"
 "\n"
@@ -28175,11 +28171,11 @@ msgid ""
 "<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
 msgstr "<p>In b2evolution Blogs sind bereits ein paar grundlegende Widgets installiert. Zum Beispiel enthält die Seitenleiste dieses Blogs Widgets wie einen Kalender, ein Suchfeld, eine Liste von Kategorien, eine Liste von XML Feeds etc.<p>\n\n<p>Sie können Widgets in den Blog-Einstellungen im Administrationsbereich hinzufügen, entfernen und neu anordnen.<p>\n\n<p>Hinweis: Damit Widgets angezeigt werden, werden Sie in Containern platziert. Jeder Container taucht an einem bestimmen Ort in einem Evoskin auf. Wenn Sie den Blog-Skin ändern, verwendet der neue Skin möglicherweise nicht die gleichen Container wie der vorherige. Sorgen Sie dafür, dass Ihre Widgets in Containern platziert werden, die in dem bestimmten Skin existieren, den Sie verwenden.<p>"
 
-#: ../../../install/_functions_create.php:1787
+#: ../../../install/_functions_create.php:1791
 msgid "About widgets..."
 msgstr "Über Widgets..."
 
-#: ../../../install/_functions_create.php:1799
+#: ../../../install/_functions_create.php:1803
 #, php-format
 msgid ""
 "<p>By default, b2evolution blogs are displayed using an evoskin.</p>\n"
@@ -28195,11 +28191,11 @@ msgid ""
 "<p>And, of course, read the <a href=\"%s\" target=\"_blank\">manual on skins</a>!</p>"
 msgstr "<p>b2evolution Blogs werden standardmäßig mit einem Evoskin angezeigt.<p>\n\n<p>Sie können den Skin eines jeden Blogs ändern, indem Sie die Blog-Einstellungen im Administrationsbereich bearbeiten.<p>\n\n<p>Sie können zusätzliche Skins auf der <a href=\"http://skins.b2evolution.net/\" target=\"_blank\">Skin-Seite</a> herunterladen. Um sie zu installieren, entpacken Sie sie in das Verzeichnis /blogs/skins und gehen Sie anschließend auf Allgemeine Einstellungen &gt; Skins im Administrationsbereich und klicken Sie auf \"Neue installieren\".</p>\n\n<p>Sie können auch Ihre eigenen Skins erstellen, indem Sie bereits existierende Skin-Ordner im Verzeichnis /blogs/skins des Blogs duplizieren, umbenennen und anpassen.<p>\n\n<p>Um mit der Anpassung eines Skins zu beginnen, öffnen Sie seine \"<code>index.main.php</code>\" Datei in einem Editor und lesen Sie dort die Kommentare. Hinweis: Sie können Skins auch im Tab \"Dateien\" des Administrationsbereich bearbeiten.\"<p>\n\n<p>Und lesen Sie natürlich das<a href=\"%s\" target=\"_blank\">Handbuch für Skins</a>!</p>"
 
-#: ../../../install/_functions_create.php:1799
+#: ../../../install/_functions_create.php:1803
 msgid "About skins..."
 msgstr "Über Skins..."
 
-#: ../../../install/_functions_create.php:1860
+#: ../../../install/_functions_create.php:1859
 msgid ""
 "<p>This blog platform is powered by b2evolution.</p>\n"
 "\n"
@@ -28210,15 +28206,19 @@ msgid ""
 "<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr "</p>Diese Blog-Plattform wird mit b2evolution betrieben.</p>\n\n</p>Sie sehen gerade eine Info-Seite für diese Seite.</p>\n\nInfoseiten sind normalen Einträgen sehr ähnlich, mit dem Unterschied, dass sie nicht zwischen normalen Einträgen angezeigt wird. Stattdessen tauchen sie als Info-Seiten in der Seitenleiste auf.</p>\n\n</p>Falls benötigt, können Infoseiten unter Verwendung eines Evoskins anders als reguläre Einträge formatiert werden.</p>"
 
-#: ../../../install/_functions_create.php:1860
+#: ../../../install/_functions_create.php:1859
 msgid "About this site"
 msgstr "Über diese Seite"
 
-#: ../../../install/_functions_create.php:1879
+#: ../../../install/_functions_create.php:1878
+msgid "Sunset"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1887
 msgid "Bus Stop Ahead"
 msgstr "Bushaltestelle voraus"
 
-#: ../../../install/_functions_create.php:1915
+#: ../../../install/_functions_create.php:1923
 msgid ""
 "Heading\n"
 "=======\n"
@@ -28258,69 +28258,69 @@ msgid ""
 "The rain---not the reign---in Spain."
 msgstr "Überschrift\n=======\n\nUnter-Überschrift\n-----------\n\n### H3 Überschrift\n\n#### H4 Überschrift####\n\n> Spitze Klammern im E-Mail-Stil\n> werden für Blockzitate verwendet.\n\n> > Und sie können verschachtelt werden.\n\n> ##### Überschriften in Blockzitaten\n>\n> * Sie können eine Liste zitieren.\n> * Etc.\n\n[Dies ist ein Link](http://b2evolution.net/) wenn in den Markdown\nPlugin-Einstellungen Links eingeschaltet sind\n\nAbsätze werden durch eine leere Zeile getrennt.\n\nDies ist ein vorformatierter\nCodeblock.\n\nTextattribute *Italic*, **bold**, `monospace`.\n\nEinkaufsliste:\n\n* Äpfel\n* Orangen\n* Birnen\n\nDer Regen---nicht die Regierung---in Spanien"
 
-#: ../../../install/_functions_create.php:1959
+#: ../../../install/_functions_create.php:1967
 msgid "About Forums"
 msgstr "Über Foren"
 
-#: ../../../install/_functions_create.php:1959 ../../../install/debug.php:390
+#: ../../../install/_functions_create.php:1967 ../../../install/debug.php:390
 #: ../../../install/index.php:626 ../../../install/index.php:1018
 msgid "Forums"
 msgstr "Forum"
 
-#: ../../../install/_functions_create.php:1965
-#: ../../../install/_functions_create.php:2077
+#: ../../../install/_functions_create.php:1973
+#: ../../../install/_functions_create.php:2085
 msgid ""
 "<p>This is the first topic.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr "<p>Dies ist das erste Thema.<p>\n\n<p>Es erscheint in einer einzelnen Kategorie.<p>"
 
-#: ../../../install/_functions_create.php:1965
-#: ../../../install/_functions_create.php:2077
+#: ../../../install/_functions_create.php:1973
+#: ../../../install/_functions_create.php:2085
 msgid "First Topic"
 msgstr "Erstes Thema"
 
-#: ../../../install/_functions_create.php:1972
-#: ../../../install/_functions_create.php:2085
+#: ../../../install/_functions_create.php:1980
+#: ../../../install/_functions_create.php:2093
 msgid ""
 "<p>This is the second topic.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr "<p>Dies ist das zweite Thema.<p>\n\n<p>Es erscheint in mehreren Kategorien.<p>"
 
-#: ../../../install/_functions_create.php:1972
-#: ../../../install/_functions_create.php:2085
+#: ../../../install/_functions_create.php:1980
+#: ../../../install/_functions_create.php:2093
 msgid "Second topic"
 msgstr "Zweites Thema"
 
-#: ../../../install/_functions_create.php:1979
-#: ../../../install/_functions_create.php:2337
+#: ../../../install/_functions_create.php:1987
+#: ../../../install/_functions_create.php:2345
 msgid ""
 "<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr "<p>Diesem Thema ist ein Bild angehängt. Die Größe des Bilds wird automatisch angepasst, damit es auf den aktuellen Blog-Skin passt. Indem Sie auf den Thumbnail klicken, können Sie ranzoomen.<p>\n\n<p>Sehen Sie sich den Foto-Blog an (zugänglich über die Links oben), um einen ganz anderen Skin zu sehen, bei dem der Fokus eher auf Fotos, als auf Blog-Texten liegt.<p>"
 
-#: ../../../install/_functions_create.php:1979
-#: ../../../install/_functions_create.php:2337
+#: ../../../install/_functions_create.php:1987
+#: ../../../install/_functions_create.php:2345
 msgid "Image topic"
 msgstr "Bildthema"
 
-#: ../../../install/_functions_create.php:1989
-#: ../../../install/_functions_create.php:2348
+#: ../../../install/_functions_create.php:1997
+#: ../../../install/_functions_create.php:2356
 msgid ""
 "<p>This is page 1 of a multipage topic.</p>\n"
 "\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr "<p>Dies ist Seite 1 eines mehrseitigen Themas.<p>\n\n<p>Sie können die anderen Seiten sehen, indem Sie auf die Links unter dem Text klicken.<p>"
 
-#: ../../../install/_functions_create.php:1989
-#: ../../../install/_functions_create.php:2348
+#: ../../../install/_functions_create.php:1997
+#: ../../../install/_functions_create.php:2356
 msgid "This is a multipage topic"
 msgstr "Dies ist ein mehrseitiges Thema"
 
-#: ../../../install/_functions_create.php:2010
-#: ../../../install/_functions_create.php:2370
+#: ../../../install/_functions_create.php:2018
+#: ../../../install/_functions_create.php:2378
 msgid ""
 "<p>This is an extended topic with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>\n"
 "\n"
@@ -28329,13 +28329,13 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr "<p>Dies ist ein erweitertes Thema ohne Teaser. Das bedeutet, dass Sie diesen Teaser nicht mehr sehen werden, wenn Sie auf den Link \"mehr\" klicken.<p>\n\n[teaserbreak]\n\n<p>Dies ist ein erweiterter Text. Sie sehen ihn nur, wenn Sie auf den Link \"mehr\" geklickt haben.<p>"
 
-#: ../../../install/_functions_create.php:2010
-#: ../../../install/_functions_create.php:2370
+#: ../../../install/_functions_create.php:2018
+#: ../../../install/_functions_create.php:2378
 msgid "Extended topic with no teaser"
 msgstr "Erweitertes Thema ohne Teaser"
 
-#: ../../../install/_functions_create.php:2021
-#: ../../../install/_functions_create.php:2382
+#: ../../../install/_functions_create.php:2029
+#: ../../../install/_functions_create.php:2390
 msgid ""
 "<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>\n"
 "\n"
@@ -28344,73 +28344,73 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr "<p>Dies ist ein erweitertes Thema. Das bedeutet, dass Sie standardmäßig nur diesen kleinen Teaser sehen. Um mehr zu sehen, müssen Sie auf den Link unten klicken.<p>\n\n[teaserbreak]\n\n<p>Dies ist ein erweiterter Text. Sie sehen diesen nur, wenn Sie auf den Link \"mehr\" geklickt haben.<p>"
 
-#: ../../../install/_functions_create.php:2021
-#: ../../../install/_functions_create.php:2382
+#: ../../../install/_functions_create.php:2029
+#: ../../../install/_functions_create.php:2390
 msgid "Extended topic"
 msgstr "Erweitertes Thema"
 
-#: ../../../install/_functions_create.php:2050
-#: ../../../install/_functions_create.php:2429
+#: ../../../install/_functions_create.php:2058
+#: ../../../install/_functions_create.php:2437
 msgid "Markdown examples"
 msgstr "Markdown Beispiele"
 
-#: ../../../install/_functions_create.php:2059
+#: ../../../install/_functions_create.php:2067
 msgid "Manual main intro"
 msgstr "Haupt-Intro für Handbuch"
 
-#: ../../../install/_functions_create.php:2059
+#: ../../../install/_functions_create.php:2067
 msgid "This is the main introduction for the manual"
 msgstr "Dies ist das Haupt-Intro für das Handbuch"
 
-#: ../../../install/_functions_create.php:2065
+#: ../../../install/_functions_create.php:2073
 msgid "Cat intro post"
 msgstr "Kat. Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:2065
+#: ../../../install/_functions_create.php:2073
 msgid "This is an intro-cat post for the category with intro post"
 msgstr "Dies ist ein Kat. Intro-Eintrag für die Kategorie mit Intro-Eintrag"
 
-#: ../../../install/_functions_create.php:2071
+#: ../../../install/_functions_create.php:2079
 msgid "About Manual"
 msgstr "Handbuchanleitung"
 
-#: ../../../install/_functions_create.php:2093
+#: ../../../install/_functions_create.php:2101
 msgid "Wiki Tables"
 msgstr "Wiki-Tabellen"
 
-#: ../../../install/_functions_create.php:2413
+#: ../../../install/_functions_create.php:2421
 msgid ""
 "<p>This is the sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr "<p>Dies ist der Sport-Eintrag.<p>\n\n<p>Er erscheint in der Sport-Kategorie.<p>"
 
-#: ../../../install/_functions_create.php:2413
+#: ../../../install/_functions_create.php:2421
 msgid "Sports post"
 msgstr "Sport-Eintrag"
 
-#: ../../../install/_functions_create.php:2421
+#: ../../../install/_functions_create.php:2429
 msgid ""
 "<p>This is the second sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr "<p>Dies ist der zweite Sport-Eintrag.<p>\n\n<p>Er erscheint in der Sport-Kategorie.<p>"
 
-#: ../../../install/_functions_create.php:2421
+#: ../../../install/_functions_create.php:2429
 msgid "Second sports post"
 msgstr "Zweiter Sport-Eintrag"
 
-#: ../../../install/_functions_create.php:2446
-#: ../../../install/_functions_create.php:2471
-#: ../../../install/_functions_create.php:2496
+#: ../../../install/_functions_create.php:2454
+#: ../../../install/_functions_create.php:2479
+#: ../../../install/_functions_create.php:2504
 msgid ""
 "Hi, this is a comment.<br />To delete a comment, just log in, and view the "
 "posts' comments, there you will have the option to edit or delete them."
 msgstr "Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu löschen, melden Sie sich einfach an und betrachten die Kommentare des Eintrags, von dort aus können Sie sie bearbeiten oder löschen."
 
-#: ../../../install/_functions_create.php:2457
-#: ../../../install/_functions_create.php:2482
-#: ../../../install/_functions_create.php:2507
+#: ../../../install/_functions_create.php:2465
+#: ../../../install/_functions_create.php:2490
+#: ../../../install/_functions_create.php:2515
 msgid "Hi, this is my comment."
 msgstr "Hi, das ist mein Kommentar."
 
@@ -29626,7 +29626,7 @@ msgstr "Google Maps Plugin"
 
 #: ../../../plugins/_google_maps.plugin.php:66
 msgid "This plugin displays positions on a map."
-msgstr ""
+msgstr "Dieses Plugin zeigt Positionen auf einer Karte an."
 
 #: ../../../plugins/_google_maps.plugin.php:85
 msgid "Map height on edit post page"
@@ -30403,7 +30403,7 @@ msgstr "Dieses Plugin erlaubt es Infodots über Bilder zu rendern, indem es zum 
 #: ../../../plugins/infodots_plugin/_infodots.plugin.php:77
 msgid ""
 "Enter the minimum pixel width an image must have for dots to be displayed."
-msgstr ""
+msgstr "Geben Sie die minimale Pixelbreite ein, die ein Bild haben muss, damit die Punkte angezeigt werden."
 
 #: ../../../plugins/infodots_plugin/_infodots.plugin.php:239
 msgid "Invalid Link ID"
@@ -30431,11 +30431,11 @@ msgstr "Akzeptierte Formate:<br />\n# h1<br />\n## h2<br />\n### h3<br />\n#### 
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:73
 msgid "Detect and convert markdown link markup."
-msgstr ""
+msgstr "Markdown Link-Markup erkennen und konvertieren"
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:79
 msgid "Detect and convert markdown image markup."
-msgstr ""
+msgstr "Markdown Bild-Markup erkennen und konvertieren"
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:83
 msgid "Italic & Bold styles"
@@ -30443,7 +30443,7 @@ msgstr "Kursiv- & Fettschrift-Stile"
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:85
 msgid "Detect and convert markdown italics and bold markup."
-msgstr ""
+msgstr "Markdown Kursiv- und Fettdruck-Markup erkennen und konvertieren."
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:93
 msgid ""
@@ -30952,7 +30952,7 @@ msgstr "Weitläufiges Scrollen"
 #: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:35
 msgid ""
 "This plugin allows to horizontally scroll through blocs of wide content."
-msgstr ""
+msgstr "Mit diesem Plugin können horizontal durch Blöcke weitläufigen Inhalts scrollen."
 
 #: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:126
 msgid "Wide scroll:"
@@ -30976,7 +30976,7 @@ msgstr "Sie können Tabellen mit akzeptieren Formaten erstellen:<br />\n{| table
 #: ../../../skins/_body_footer.inc.php:24
 #: ../../../skins/asevo/_body_footer.inc.php:34
 #: ../../../skins/basic/index.main.php:278
-#: ../../../skins/bootstrap/index.main.php:342
+#: ../../../skins/bootstrap/index.main.php:351
 #: ../../../skins/colourise/_body_footer.inc.php:34
 #: ../../../skins/custom/index.main.php:296
 #: ../../../skins/dating_mood/index.main.php:277
@@ -31480,7 +31480,7 @@ msgid "You must log in before you can activate your account."
 msgstr "Sie müssen sich einloggen, bevor Sie Ihr Konto aktivieren können."
 
 #: ../../../skins/asevo/_skin.class.php:51
-#: ../../../skins/bootstrap/_skin.class.php:51
+#: ../../../skins/bootstrap/_skin.class.php:62
 #: ../../../skins/colourise/_skin.class.php:57
 #: ../../../skins/custom/_skin.class.php:76
 #: ../../../skins/dating_mood/_skin.class.php:57
@@ -31505,7 +31505,7 @@ msgid "Colorbox Image Zoom"
 msgstr "Farbbox Bildzoom"
 
 #: ../../../skins/asevo/_skin.class.php:52
-#: ../../../skins/bootstrap/_skin.class.php:52
+#: ../../../skins/bootstrap/_skin.class.php:63
 #: ../../../skins/colourise/_skin.class.php:58
 #: ../../../skins/custom/_skin.class.php:77
 #: ../../../skins/dating_mood/_skin.class.php:58
@@ -31531,7 +31531,7 @@ msgid ""
 msgstr "Auswählen, um JavaScript zu ermöglichen auf Bilder zu zoomen (mit Verwendung des Farbbox-Scripts)"
 
 #: ../../../skins/asevo/_skin.class.php:57
-#: ../../../skins/bootstrap/_skin.class.php:57
+#: ../../../skins/bootstrap/_skin.class.php:68
 #: ../../../skins/colourise/_skin.class.php:63
 #: ../../../skins/custom/_skin.class.php:82
 #: ../../../skins/dating_mood/_skin.class.php:63
@@ -31558,9 +31558,9 @@ msgstr "Abstimmung für Eintragsbilder"
 #: ../../../skins/asevo/_skin.class.php:58
 #: ../../../skins/asevo/_skin.class.php:70
 #: ../../../skins/asevo/_skin.class.php:82
-#: ../../../skins/bootstrap/_skin.class.php:58
-#: ../../../skins/bootstrap/_skin.class.php:70
-#: ../../../skins/bootstrap/_skin.class.php:82
+#: ../../../skins/bootstrap/_skin.class.php:69
+#: ../../../skins/bootstrap/_skin.class.php:81
+#: ../../../skins/bootstrap/_skin.class.php:93
 #: ../../../skins/colourise/_skin.class.php:64
 #: ../../../skins/colourise/_skin.class.php:76
 #: ../../../skins/colourise/_skin.class.php:88
@@ -31627,9 +31627,9 @@ msgstr "Auswählen, um AJAX-Abstimmungsschaltflächen in der Farbbox Zoom-Ansich
 #: ../../../skins/asevo/_skin.class.php:63
 #: ../../../skins/asevo/_skin.class.php:75
 #: ../../../skins/asevo/_skin.class.php:87
-#: ../../../skins/bootstrap/_skin.class.php:63
-#: ../../../skins/bootstrap/_skin.class.php:75
-#: ../../../skins/bootstrap/_skin.class.php:87
+#: ../../../skins/bootstrap/_skin.class.php:74
+#: ../../../skins/bootstrap/_skin.class.php:86
+#: ../../../skins/bootstrap/_skin.class.php:98
 #: ../../../skins/colourise/_skin.class.php:69
 #: ../../../skins/colourise/_skin.class.php:81
 #: ../../../skins/colourise/_skin.class.php:93
@@ -31696,9 +31696,9 @@ msgstr "Stimmen anzeigen"
 #: ../../../skins/asevo/_skin.class.php:64
 #: ../../../skins/asevo/_skin.class.php:76
 #: ../../../skins/asevo/_skin.class.php:88
-#: ../../../skins/bootstrap/_skin.class.php:64
-#: ../../../skins/bootstrap/_skin.class.php:76
-#: ../../../skins/bootstrap/_skin.class.php:88
+#: ../../../skins/bootstrap/_skin.class.php:75
+#: ../../../skins/bootstrap/_skin.class.php:87
+#: ../../../skins/bootstrap/_skin.class.php:99
 #: ../../../skins/colourise/_skin.class.php:70
 #: ../../../skins/colourise/_skin.class.php:82
 #: ../../../skins/colourise/_skin.class.php:94
@@ -31763,7 +31763,7 @@ msgid "Check to display number of likes and dislikes"
 msgstr "Auswählen, um die Anzahl der \"Gefällt mir\" und \"Gefällt mir nicht\" Angaben anzuzeigen"
 
 #: ../../../skins/asevo/_skin.class.php:69
-#: ../../../skins/bootstrap/_skin.class.php:69
+#: ../../../skins/bootstrap/_skin.class.php:80
 #: ../../../skins/colourise/_skin.class.php:75
 #: ../../../skins/custom/_skin.class.php:94
 #: ../../../skins/dating_mood/_skin.class.php:75
@@ -31788,7 +31788,7 @@ msgid "Voting on Comment Images"
 msgstr "Abstimmung für Inhaltsbilder"
 
 #: ../../../skins/asevo/_skin.class.php:81
-#: ../../../skins/bootstrap/_skin.class.php:81
+#: ../../../skins/bootstrap/_skin.class.php:92
 #: ../../../skins/colourise/_skin.class.php:87
 #: ../../../skins/custom/_skin.class.php:106
 #: ../../../skins/dating_mood/_skin.class.php:87
@@ -31813,7 +31813,7 @@ msgid "Voting on User Images"
 msgstr "Abstimmung für Benutzerbilder"
 
 #: ../../../skins/asevo/_skin.class.php:93
-#: ../../../skins/bootstrap/_skin.class.php:93
+#: ../../../skins/bootstrap/_skin.class.php:104
 #: ../../../skins/colourise/_skin.class.php:99
 #: ../../../skins/custom/_skin.class.php:118
 #: ../../../skins/dating_mood/_skin.class.php:99
@@ -31838,7 +31838,7 @@ msgid "Display gender"
 msgstr "Geschlecht anzeigen"
 
 #: ../../../skins/asevo/_skin.class.php:105
-#: ../../../skins/bootstrap/_skin.class.php:105
+#: ../../../skins/bootstrap/_skin.class.php:116
 #: ../../../skins/colourise/_skin.class.php:111
 #: ../../../skins/custom/_skin.class.php:130
 #: ../../../skins/dating_mood/_skin.class.php:111
@@ -31884,7 +31884,7 @@ msgid "Header"
 msgstr "Überschrift"
 
 #: ../../../skins/asevo/index.main.php:189
-#: ../../../skins/bootstrap/index.main.php:274
+#: ../../../skins/bootstrap/index.main.php:278
 #: ../../../skins/colourise/_sidebar.inc.php:23
 #: ../../../skins/custom/index.main.php:231
 #: ../../../skins/dating_mood/index.main.php:213
@@ -31979,12 +31979,24 @@ msgstr "eingetragen am"
 msgid "in"
 msgstr "in"
 
-#: ../../../skins/bootstrap/index.main.php:244
+#: ../../../skins/bootstrap/_skin.class.php:55
+msgid "Single column"
+msgstr ""
+
+#: ../../../skins/bootstrap/_skin.class.php:56
+msgid "Left Sidebar"
+msgstr ""
+
+#: ../../../skins/bootstrap/_skin.class.php:57
+msgid "Right Sidebar"
+msgstr ""
+
+#: ../../../skins/bootstrap/index.main.php:245
 #: ../../../skins_adm/login/_login_form.main.php:51
 msgid "Log in to your account"
 msgstr "In Ihr Konto einloggen"
 
-#: ../../../skins/bootstrap/index.main.php:320
+#: ../../../skins/bootstrap/index.main.php:329
 #: ../../../skins/custom/index.main.php:274
 #: ../../../skins/dating_mood/index.main.php:257
 #: ../../../skins/forums/index.main.php:289
@@ -33563,7 +33575,7 @@ msgstr "Kommentar bearbeiten"
 msgid ""
 "You are a moderator of this blog and you are receiving notifications when a "
 "comment may need moderation."
-msgstr ""
+msgstr "Sie sind ein Moderator für diesen Blog und erhalten Benachrichtigungen, wenn ein Kommentar möglicherweise moderiert werden muss."
 
 #: ../../../skins_email/comment_new.html.php:139
 msgid ""

@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author fsaya: Fabrice SAYA-GASNIER / PROGIDISTRI
  *
- * @version $Id: _results.class.php 8188 2015-02-07 02:07:55Z fplanque $
+ * @version $Id: _results.class.php 8199 2015-02-09 09:00:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -346,7 +346,7 @@ class Results extends Table
 
 		if( $this->limit == -1 || empty( $this->limit ) )
 		{	// Set a default value
-			$this->limit = is_null( $default_limit ) ? $UserSettings->get( 'results_per_page' ) : $default_limit;
+			$this->limit = is_null( $default_limit ) ? $UserSettings->get( 'results_per_page' ) : intval( $default_limit );
 		}
 	}
 

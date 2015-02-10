@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id$
+ * @version $Id: _coll_comment_list.widget.php 8199 2015-02-09 09:00:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -133,19 +133,21 @@ class coll_comment_list_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		$this->init_display( $params );
-
 		global $Blog;
 
+		$this->init_display( $params );
+
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+
 		$blogCache = & get_BlogCache();
-		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
+		$listBlog = ( $blog_ID ? $blogCache->get_by_ID( $blog_ID ) : $Blog );
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$limit = $this->disp_params[ 'limit' ];
-		$order = $this->disp_params[ 'disp_order' ];
+		$limit = intval( $this->disp_params['limit'] );
+		$order = $this->disp_params['disp_order'];
 
-		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_');
+		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_' );
 
 		$filters = array(
 				'types' => array( 'comment','trackback','pingback' ),

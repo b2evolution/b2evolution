@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id: _coll_media_index.widget.php 6826 2014-06-02 05:53:26Z yura $
+ * @version $Id: _coll_media_index.widget.php 8199 2015-02-09 09:00:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,8 +129,8 @@ class coll_media_index_Widget extends ComponentWidget
 				'defaultvalue' => 'DESC',
 			),
 			'blog_ID' => array(
-				'label' => T_( 'Blogs' ),
-				'note' => T_( 'IDs of the blogs to use, leave empty for the current blog. Separate multiple blogs by commas.' ),
+				'label' => T_('Blog'),
+				'note' => T_('ID of the blog to use, leave empty for the current blog.'),
 				'size' => 4,
 			),
 		), parent::get_param_definitions( $params )	);
@@ -173,12 +173,15 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $localtimenow, $DB;
+		global $localtimenow, $DB, $Blog;
 
 		$this->init_display( $params );
 
-		global $Blog;
-		$blog_ID = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( empty( $blog_ID ) )
+		{ // Use current blog by default
+			$blog_ID = $Blog->ID;
+		}
 
 		$BlogCache = & get_BlogCache();
 		if( ! $BlogCache->get_by_ID( $blog_ID, false, false ) )
@@ -352,11 +355,17 @@ class coll_media_index_Widget extends ComponentWidget
 	{
 		global $Blog;
 
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( empty( $blog_ID ) )
+		{ // Use current blog by default
+			$blog_ID = $Blog->ID;
+		}
+
 		return array(
-				'wi_ID'         => $this->ID,  // Have the widget settings changed?
-				'set_coll_ID'   => $Blog->ID,  // Have the settings of the blog changed? (ex: new skin)
-				'cont_coll_ID'  => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'],  // Has the content of the displayed blog changed?
-				'media_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], 	// Have some media files attached to one of the blogs item?
+				'wi_ID'         => $this->ID, // Have the widget settings changed?
+				'set_coll_ID'   => $Blog->ID, // Have the settings of the blog changed? (ex: new skin)
+				'cont_coll_ID'  => $blog_ID,  // Has the content of the displayed blog changed?
+				'media_coll_ID' => $blog_ID,  // Have some media files attached to one of the blogs item?
 			);
 	}
 }

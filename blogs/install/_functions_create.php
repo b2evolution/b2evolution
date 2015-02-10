@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 8188 2015-02-07 02:07:55Z fplanque $
+ * @version $Id: _functions_create.php 8220 2015-02-10 21:26:50Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1112,6 +1112,10 @@ function create_blog(
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_text_styles', '1' );
 	}
+	if( $kind == 'photo' )
+	{ // Display category directory on front page for photo blogs
+		$Blog->set_setting( 'front_disp', 'catdir' );
+	}
 
 	$Blog->set( 'tagline', $blog_tagline );
 	$Blog->set( 'longdesc', $blog_longdesc );
@@ -1513,7 +1517,7 @@ function create_demo_contents()
 
 	if( $install_collection_photos )
 	{ // Create categories for photoblog
-		$cat_photo_album = cat_create( T_('Monument Valley'), 'NULL', $blog_photoblog_ID );
+		$cat_photo_album = cat_create( T_('Landscapes'), 'NULL', $blog_photoblog_ID );
 	}
 
 	if( $install_collection_forums )
@@ -1827,11 +1831,6 @@ function create_demo_contents()
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Alex', '', $now, $cat_linkblog_contrib, array(), 'published', 'ru-RU', '', 'http://b2evo.sonorth.com/', 'disabled', array() );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
 		$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 		// Insert a post into linkblog:
@@ -1872,6 +1871,15 @@ function create_demo_contents()
 
 	if( $install_collection_photos )
 	{ // ---------------- Insert the POSTS for Photos blog ---------------- //
+
+		// Insert a post into photoblog:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_('Sunset'), '',
+			$now, $cat_photo_album, array(), 'published','en-US' );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File = new File( 'shared', 0, 'sunset/sunset.jpg' );
+		$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
 
 		// Insert a post into photoblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);

@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 8132 2015-02-02 14:05:18Z yura $
+ * @version $Id: _blog.class.php 8202 2015-02-09 14:26:00Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -252,7 +252,7 @@ class Blog extends DataObject
 				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
-				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'front_disp', 'posts' );
 				break;
 
 			case 'group':

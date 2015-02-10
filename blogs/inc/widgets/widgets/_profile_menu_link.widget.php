@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _profile_menu_link.widget.php 7933 2015-01-09 12:12:17Z yura $
+ * @version $Id: _profile_menu_link.widget.php 8220 2015-02-10 21:26:50Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -69,7 +69,7 @@ class profile_menu_link_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Current user profile menu link');
+		return T_('Current user profile menu link with picture');
 	}
 
 

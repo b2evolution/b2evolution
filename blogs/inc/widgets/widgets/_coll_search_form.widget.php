@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_search_form.widget.php 7225 2014-08-06 10:03:13Z yura $
+ * @version $Id: _coll_search_form.widget.php 8211 2015-02-10 07:59:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -126,6 +126,11 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		$params = array_merge( array(
+				'search_submit_before' => '',
+				'search_submit_after'  => '',
+			), $params );
+
 		$this->init_display( $params );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
@@ -155,12 +160,12 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 		else
 		{ // Use class from params
-			$search_form_class = $this->disp_params[ 'search_class' ];
+			$search_form_class = $this->disp_params['search_class'];
 		}
 
 		echo '<div class="'.$search_form_class.'">';
 
-		if( $this->disp_params[ 'disp_search_options' ] )
+		if( $this->disp_params['disp_search_options'] )
 		{
 			$sentence = get_param( 'sentence' );
 			echo '<div class="search_options">';
@@ -171,14 +176,17 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars( $s ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
 
-		if( $this->disp_params[ 'use_search_disp' ] )
+		echo $this->disp_params['search_submit_before'];
+		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
+		echo $this->disp_params['search_submit_after'];
+
+		echo '</div>';
+		if( $this->disp_params['use_search_disp'] )
 		{
 			echo '<input type="hidden" name="disp" value="search" />';
 		}
-		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
-		echo '</div>';
 		echo '</form>';
 
 		echo $this->disp_params['block_body_end'];

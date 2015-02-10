@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2015-02-07 02:57+0100\n"
+"POT-Creation-Date: 2015-02-10 22:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgstr ""
 #: ../../../inc/items/views/_item_list_full.view.php:255
 #: ../../../skins/_edit.disp.php:271 ../../../skins/_item_block.inc.php:89
 #: ../../../skins/asevo/_item_block.inc.php:83
-#: ../../../skins/bootstrap/_item_block.inc.php:96
+#: ../../../skins/bootstrap/_item_block.inc.php:102
 #: ../../../skins/colourise/_item_block.inc.php:96
 #: ../../../skins/colourise/single.main.php:140
 #: ../../../skins/custom/_item_block.inc.php:104
@@ -90,7 +90,7 @@ msgstr ""
 #: ../../../inc/skins/model/_skin.class.php:856
 #: ../../../skins/asevo/index.main.php:162
 #: ../../../skins/basic/index.main.php:261
-#: ../../../skins/bootstrap/_skin.class.php:232
+#: ../../../skins/bootstrap/_skin.class.php:243
 #: ../../../skins/forums/_posts.disp.php:62
 #: ../../../skins/forums/_posts.disp.php:201
 #: ../../../skins/manual/posts.main.php:255
@@ -124,7 +124,7 @@ msgstr ""
 #: ../../../inc/skins/model/_skin.class.php:857
 #: ../../../skins/asevo/index.main.php:163
 #: ../../../skins/basic/index.main.php:262
-#: ../../../skins/bootstrap/_skin.class.php:233
+#: ../../../skins/bootstrap/_skin.class.php:244
 #: ../../../skins/forums/_posts.disp.php:63
 #: ../../../skins/forums/_posts.disp.php:202
 #: ../../../skins/manual/posts.main.php:256
@@ -441,7 +441,7 @@ msgstr ""
 #: ../../../inc/plugins/views/_plugin_settings.form.php:85
 #: ../../../inc/slugs/views/_slug.form.php:45
 #: ../../../skins/asevo/_body_footer.inc.php:40
-#: ../../../skins/bootstrap/index.main.php:348
+#: ../../../skins/bootstrap/index.main.php:357
 #: ../../../skins/colourise/_body_footer.inc.php:40
 #: ../../../skins/custom/index.main.php:302
 #: ../../../skins/dating_mood/index.main.php:283
@@ -1937,6 +1937,7 @@ msgstr ""
 #: ../../../inc/tools/views/_wpxml_import.form.php:33
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:92
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:98
+#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:132
 #: ../../../skins_email/account_activated.html.php:85
 #: ../../../skins_email/account_activated.txt.php:82
 #: ../../../skins_email/account_new.html.php:82
@@ -2710,7 +2711,7 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.class.php:289
 #: ../../../inc/collections/model/_blog.funcs.php:361
 #: ../../../inc/cron/_cron.funcs.php:197
-#: ../../../install/_functions_create.php:2071
+#: ../../../install/_functions_create.php:2079
 #: ../../../install/debug.php:390 ../../../install/index.php:627
 #: ../../../install/index.php:1018
 msgid "Manual"
@@ -3064,7 +3065,7 @@ msgstr ""
 #: ../../../inc/regional/views/_subregion_list.view.php:155
 #: ../../../inc/sessions/views/_stats_goals.view.php:88
 #: ../../../inc/users/views/_userfields.view.php:124
-#: ../../../inc/widgets/_widgets.funcs.php:199
+#: ../../../inc/widgets/_widgets.funcs.php:170
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:209
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:89
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:261
@@ -3718,11 +3719,11 @@ msgstr ""
 msgid "Last mod on %s"
 msgstr ""
 
-#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:875
+#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:877
 msgid "Frequent countries"
 msgstr ""
 
-#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:888
+#: ../../../inc/_core/model/dataobjects/_dataobjectcache.class.php:890
 msgid "Other countries"
 msgstr ""
 
@@ -5536,7 +5537,6 @@ msgstr ""
 #: ../../../inc/skins/views/_skin_list.view.php:60
 #: ../../../inc/users/model/_user.funcs.php:4749
 #: ../../../inc/users/views/_group.form.php:185
-#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:132
 #: ../../../install/debug.php:271 ../../../install/index.php:292
 msgid "Blogs"
 msgstr ""
@@ -7039,7 +7039,7 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_comments.form.php:143
 #: ../../../skins/asevo/_skin.class.php:106
-#: ../../../skins/bootstrap/_skin.class.php:106
+#: ../../../skins/bootstrap/_skin.class.php:117
 #: ../../../skins/colourise/_skin.class.php:112
 #: ../../../skins/custom/_skin.class.php:131
 #: ../../../skins/dating_mood/_skin.class.php:112
@@ -7777,7 +7777,7 @@ msgid "For members only"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:184
-msgid "Select how you want this blog to be advertised in the list of all public blogs on this system."
+msgid "Select when you want this blog to appear in the list of blogs on this system."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:184
@@ -9853,7 +9853,7 @@ msgstr ""
 
 #: ../../../inc/comments/views/_comments_sidebar.view.php:118
 #: ../../../inc/items/views/_item_list_sidebar.view.php:147
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:169
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:174
 msgid "Entire phrase"
 msgstr ""
 
@@ -14163,7 +14163,7 @@ msgid "(Separate by space)"
 msgstr ""
 
 #: ../../../inc/items/views/_item_expert.form.php:386
-#: ../../../install/_functions_create.php:1744
+#: ../../../install/_functions_create.php:1748
 msgid "Featured post"
 msgstr ""
 
@@ -19328,8 +19328,8 @@ msgstr ""
 
 #: ../../../inc/skins/model/_skin.class.php:860
 #: ../../../inc/skins/model/_skin.class.php:861
-#: ../../../skins/bootstrap/_skin.class.php:236
-#: ../../../skins/bootstrap/_skin.class.php:237
+#: ../../../skins/bootstrap/_skin.class.php:247
+#: ../../../skins/bootstrap/_skin.class.php:248
 #: ../../../skins/pureforums/_skin.class.php:498
 #: ../../../skins/pureforums/_skin.class.php:499
 #: ../../../skins_adm/_adminUI_general.class.php:1023
@@ -23003,7 +23003,7 @@ msgstr ""
 #: ../../../skins/_body_footer.inc.php:23 ../../../skins/_user.disp.php:261
 #: ../../../skins/asevo/_body_footer.inc.php:33
 #: ../../../skins/basic/index.main.php:277
-#: ../../../skins/bootstrap/index.main.php:341
+#: ../../../skins/bootstrap/index.main.php:350
 #: ../../../skins/colourise/_body_footer.inc.php:33
 #: ../../../skins/custom/index.main.php:295
 #: ../../../skins/dating_mood/index.main.php:276
@@ -23547,7 +23547,7 @@ msgstr ""
 
 #: ../../../inc/users/views/_display.form.php:92
 #: ../../../skins/asevo/_skin.class.php:94
-#: ../../../skins/bootstrap/_skin.class.php:94
+#: ../../../skins/bootstrap/_skin.class.php:105
 #: ../../../skins/colourise/_skin.class.php:100
 #: ../../../skins/custom/_skin.class.php:119
 #: ../../../skins/dating_mood/_skin.class.php:100
@@ -23578,7 +23578,7 @@ msgstr ""
 #: ../../../inc/users/views/_display.form.php:100
 #: ../../../inc/users/views/_display.form.php:141
 #: ../../../skins/asevo/_skin.class.php:100
-#: ../../../skins/bootstrap/_skin.class.php:100
+#: ../../../skins/bootstrap/_skin.class.php:111
 #: ../../../skins/colourise/_skin.class.php:106
 #: ../../../skins/custom/_skin.class.php:125
 #: ../../../skins/dating_mood/_skin.class.php:106
@@ -23604,7 +23604,7 @@ msgstr ""
 
 #: ../../../inc/users/views/_display.form.php:100
 #: ../../../skins/asevo/_skin.class.php:99
-#: ../../../skins/bootstrap/_skin.class.php:99
+#: ../../../skins/bootstrap/_skin.class.php:110
 #: ../../../skins/colourise/_skin.class.php:105
 #: ../../../skins/custom/_skin.class.php:124
 #: ../../../skins/dating_mood/_skin.class.php:105
@@ -25278,24 +25278,24 @@ msgstr ""
 msgid "Order number"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:146
-#: ../../../install/_functions_create.php:1491
-#: ../../../install/_functions_create.php:1526
-#: ../../../install/_functions_create.php:1539
+#: ../../../inc/widgets/_widgets.funcs.php:108
+#: ../../../install/_functions_create.php:1495
+#: ../../../install/_functions_create.php:1530
+#: ../../../install/_functions_create.php:1543
 msgid "News"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:150
+#: ../../../inc/widgets/_widgets.funcs.php:112
 #: ../../../skins/forums/index.main.php:59
 #: ../../../skins/pureforums/index.main.php:64
 msgid "Latest topics"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:151
+#: ../../../inc/widgets/_widgets.funcs.php:113
 msgid "Latest replies"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:179
+#: ../../../inc/widgets/_widgets.funcs.php:152
 #: ../../../skins/photoalbums/index.main.php:34
 #: ../../../skins/photoalbums/index.main.php:189
 #: ../../../skins/photoblog/index.main.php:29
@@ -25303,11 +25303,11 @@ msgstr ""
 msgid "Index"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:198
+#: ../../../inc/widgets/_widgets.funcs.php:169
 msgid "Search this forum:"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:205
+#: ../../../inc/widgets/_widgets.funcs.php:176
 #: ../../../skins/manual/404_not_found.main.php:129
 msgid "Search this manual:"
 msgstr ""
@@ -25690,6 +25690,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:93
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:99
+#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:133
 msgid "ID of the blog to use, leave empty for the current blog."
 msgstr ""
 
@@ -25702,7 +25703,7 @@ msgid "List of comments; click goes to comment."
 msgstr ""
 
 #. TRANS: date
-#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:191
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:193
 #: ../../../skins/evocamp/_item_block.inc.php:60
 #: ../../../skins/evocamp/single.main.php:103
 msgid "on "
@@ -26022,7 +26023,7 @@ msgstr ""
 msgid "Can list Items (Posts/Pages/Links...) in a variety of ways."
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:269
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:271
 msgid "The requested Blog doesn't exist any more!"
 msgstr ""
 
@@ -26078,6 +26079,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:92
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:76
+#: ../../../skins/bootstrap/_skin.class.php:51
 msgid "Layout"
 msgstr ""
 
@@ -26102,10 +26104,6 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:106
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:84
 msgid "Number of columns in grid mode."
-msgstr ""
-
-#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:133
-msgid "IDs of the blogs to use, leave empty for the current blog. Separate multiple blogs by commas."
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:165
@@ -26184,15 +26182,15 @@ msgstr ""
 msgid "Leave empty for current collection."
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:167
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:172
 msgid "All words"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:168
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:173
 msgid "Some word"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:174
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:179
 msgid "Enter text to search for"
 msgstr ""
 
@@ -26578,7 +26576,7 @@ msgid "My Profile Menu link"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:72
-msgid "Current user profile menu link"
+msgid "Current user profile menu link with picture"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:66
@@ -26906,205 +26904,205 @@ msgstr ""
 msgid "Create default scheduled jobs"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1342
+#: ../../../install/_functions_create.php:1346
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1362
+#: ../../../install/_functions_create.php:1366
 msgid "Blog A Title"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1365
+#: ../../../install/_functions_create.php:1369
 msgid "Tagline for Blog A"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1389
+#: ../../../install/_functions_create.php:1393
 msgid "Blog B Title"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1392
+#: ../../../install/_functions_create.php:1396
 msgid "Tagline for Blog B"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1411
+#: ../../../install/_functions_create.php:1415
 msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1416
+#: ../../../install/_functions_create.php:1420
 msgid "Information about this site"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1440
+#: ../../../install/_functions_create.php:1444
 msgid "This is a photoblog, optimized for displaying photos."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1445
+#: ../../../install/_functions_create.php:1449
 msgid "This blog shows photos..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1457
+#: ../../../install/_functions_create.php:1461
 msgid "Forums Title"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1460
+#: ../../../install/_functions_create.php:1464
 msgid "Tagline for Forums"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1472
+#: ../../../install/_functions_create.php:1476
 msgid "Manual Title"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1475
+#: ../../../install/_functions_create.php:1479
 msgid "Tagline for Manual"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1490
-#: ../../../install/_functions_create.php:1522
-#: ../../../install/_functions_create.php:1538
-msgid "Welcome"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1492
-#: ../../../install/_functions_create.php:1527
-#: ../../../install/_functions_create.php:1540
-msgid "Background"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1493
-#: ../../../install/_functions_create.php:1528
-msgid "Fun"
-msgstr ""
-
 #: ../../../install/_functions_create.php:1494
-#: ../../../install/_functions_create.php:1529
+#: ../../../install/_functions_create.php:1526
 #: ../../../install/_functions_create.php:1542
-msgid "In real life"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1495
-#: ../../../install/_functions_create.php:1530
-#: ../../../install/_functions_create.php:1543
-msgid "On the web"
+msgid "Welcome"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1496
 #: ../../../install/_functions_create.php:1531
 #: ../../../install/_functions_create.php:1544
-msgid "Sports"
+msgid "Background"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1497
 #: ../../../install/_functions_create.php:1532
-#: ../../../install/_functions_create.php:1545
-msgid "Movies"
+msgid "Fun"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1498
 #: ../../../install/_functions_create.php:1533
 #: ../../../install/_functions_create.php:1546
+msgid "In real life"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1499
+#: ../../../install/_functions_create.php:1534
+#: ../../../install/_functions_create.php:1547
+msgid "On the web"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1500
+#: ../../../install/_functions_create.php:1535
+#: ../../../install/_functions_create.php:1548
+msgid "Sports"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1501
+#: ../../../install/_functions_create.php:1536
+#: ../../../install/_functions_create.php:1549
+msgid "Movies"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1502
+#: ../../../install/_functions_create.php:1537
+#: ../../../install/_functions_create.php:1550
 msgid "Music"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1503
+#: ../../../install/_functions_create.php:1507
 msgid "Announcements"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1504
+#: ../../../install/_functions_create.php:1508
 msgid "b2evolution Tips"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1505
+#: ../../../install/_functions_create.php:1509
 msgid "Get additional skins"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1511
+#: ../../../install/_functions_create.php:1515
 msgid "Contributors"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1516
-msgid "Monument Valley"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1521
-msgid "A forum group"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1522
-#: ../../../install/_functions_create.php:1538
-msgid "Welcome description"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1523
-msgid "A forum"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1523
-#: ../../../install/_functions_create.php:1524
-msgid "Short description of this forum"
-msgstr ""
-
-#: ../../../install/_functions_create.php:1524
-msgid "Another forum"
+#: ../../../install/_functions_create.php:1520
+msgid "Landscapes"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1525
-msgid "Another group"
+msgid "A forum group"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1526
-#: ../../../install/_functions_create.php:1539
-msgid "News description"
+#: ../../../install/_functions_create.php:1542
+msgid "Welcome description"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1527
-#: ../../../install/_functions_create.php:1540
-msgid "Background description"
+msgid "A forum"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1527
+#: ../../../install/_functions_create.php:1528
+msgid "Short description of this forum"
 msgstr ""
 
 #: ../../../install/_functions_create.php:1528
+msgid "Another forum"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1529
+msgid "Another group"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1530
+#: ../../../install/_functions_create.php:1543
+msgid "News description"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1531
+#: ../../../install/_functions_create.php:1544
+msgid "Background description"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1532
 msgid "Fun description"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1541
+#: ../../../install/_functions_create.php:1545
 msgid "Cat with intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1541
+#: ../../../install/_functions_create.php:1545
 msgid "Description of cat with intro post"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1564
+#: ../../../install/_functions_create.php:1568
 msgid "The software for blog pros!"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1564
+#: ../../../install/_functions_create.php:1568
 msgid "b2evo: The software for blog pros!"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1572
+#: ../../../install/_functions_create.php:1576
 msgid "Better Blog Software!"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1572
+#: ../../../install/_functions_create.php:1576
 msgid "b2evo: Better Blog Software!"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1580
+#: ../../../install/_functions_create.php:1584
 msgid "The other blog tool!"
 msgstr ""
 
 #. TRANS: sample ad content
-#: ../../../install/_functions_create.php:1580
+#: ../../../install/_functions_create.php:1584
 msgid "b2evo: The other blog tool!"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1587
+#: ../../../install/_functions_create.php:1591
 #, php-format
 msgid ""
 "<p>This blog is powered by b2evolution.</p>\n"
@@ -27116,7 +27114,7 @@ msgid ""
 "<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1601
+#: ../../../install/_functions_create.php:1605
 #, php-format
 msgid ""
 "<p>This is the intro post for the front page of Blog A.</p>\n"
@@ -27129,112 +27127,112 @@ msgid ""
 "</ul>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1601
+#: ../../../install/_functions_create.php:1605
 msgid "Welcome to Blog A"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1614
+#: ../../../install/_functions_create.php:1618
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1614
+#: ../../../install/_functions_create.php:1618
 msgid "First Post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1621
+#: ../../../install/_functions_create.php:1625
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1621
+#: ../../../install/_functions_create.php:1625
 msgid "Second post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1628
+#: ../../../install/_functions_create.php:1632
 msgid "About Blog A"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1628
+#: ../../../install/_functions_create.php:1632
 #: ../../../install/index.php:622
 msgid "Blog A"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1634
+#: ../../../install/_functions_create.php:1638
 msgid ""
 "<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1634
+#: ../../../install/_functions_create.php:1638
 msgid "Image post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1644
+#: ../../../install/_functions_create.php:1648
 msgid ""
 "<p>This is page 1 of a multipage post.</p>\n"
 "\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1644
+#: ../../../install/_functions_create.php:1648
 msgid "This is a multipage post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1650
 #: ../../../install/_functions_create.php:1654
 #: ../../../install/_functions_create.php:1658
-#: ../../../install/_functions_create.php:1995
-#: ../../../install/_functions_create.php:1999
+#: ../../../install/_functions_create.php:1662
 #: ../../../install/_functions_create.php:2003
-#: ../../../install/_functions_create.php:2354
-#: ../../../install/_functions_create.php:2358
+#: ../../../install/_functions_create.php:2007
+#: ../../../install/_functions_create.php:2011
 #: ../../../install/_functions_create.php:2362
+#: ../../../install/_functions_create.php:2366
+#: ../../../install/_functions_create.php:2370
 #, php-format
 msgid "<p>This is page %d.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1660
-#: ../../../install/_functions_create.php:2005
-#: ../../../install/_functions_create.php:2364
+#: ../../../install/_functions_create.php:1664
+#: ../../../install/_functions_create.php:2013
+#: ../../../install/_functions_create.php:2372
 msgid "<p>It is the last page.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1665
+#: ../../../install/_functions_create.php:1669
 msgid "<p>This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1665
+#: ../../../install/_functions_create.php:1669
 msgid "Extended post with no teaser"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1668
-#: ../../../install/_functions_create.php:1678
+#: ../../../install/_functions_create.php:1672
+#: ../../../install/_functions_create.php:1682
 msgid "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1675
+#: ../../../install/_functions_create.php:1679
 msgid "<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1675
+#: ../../../install/_functions_create.php:1679
 msgid "Extended post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1683
-#: ../../../install/_functions_create.php:2030
-#: ../../../install/_functions_create.php:2392
+#: ../../../install/_functions_create.php:1687
+#: ../../../install/_functions_create.php:2038
+#: ../../../install/_functions_create.php:2400
 msgid "Welcome to your b2evolution-powered website!"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1684
-#: ../../../install/_functions_create.php:2031
-#: ../../../install/_functions_create.php:2393
+#: ../../../install/_functions_create.php:1688
+#: ../../../install/_functions_create.php:2039
+#: ../../../install/_functions_create.php:2401
 msgid ""
 "<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>\n"
 "\n"
@@ -27250,44 +27248,44 @@ msgid ""
 "<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1711
+#: ../../../install/_functions_create.php:1715
 msgid "b2evo skins repository"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1716
+#: ../../../install/_functions_create.php:1720
 msgid "About Blog B"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1716
+#: ../../../install/_functions_create.php:1720
 #: ../../../install/index.php:623
 msgid "Blog B"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1722
+#: ../../../install/_functions_create.php:1726
 msgid "Main Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1722
+#: ../../../install/_functions_create.php:1726
 msgid "This is the main intro post. It appears on the homepage only."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1728
+#: ../../../install/_functions_create.php:1732
 msgid "This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1728
+#: ../../../install/_functions_create.php:1732
 msgid "b2evolution tips category &ndash; Sub Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1734
+#: ../../../install/_functions_create.php:1738
 msgid "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1734
+#: ../../../install/_functions_create.php:1738
 msgid "Widgets tag &ndash; Sub Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1744
+#: ../../../install/_functions_create.php:1748
 msgid ""
 "<p>This is a demo of a featured post.</p>\n"
 "\n"
@@ -27296,7 +27294,7 @@ msgid ""
 "<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1756
+#: ../../../install/_functions_create.php:1760
 #, php-format
 msgid ""
 "<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>\n"
@@ -27304,11 +27302,11 @@ msgid ""
 "<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1756
+#: ../../../install/_functions_create.php:1760
 msgid "Apache optimization..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1767
+#: ../../../install/_functions_create.php:1771
 msgid ""
 "<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>\n"
 "\n"
@@ -27325,11 +27323,11 @@ msgid ""
 "<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1767
+#: ../../../install/_functions_create.php:1771
 msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1787
+#: ../../../install/_functions_create.php:1791
 msgid ""
 "<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>\n"
 "\n"
@@ -27338,11 +27336,11 @@ msgid ""
 "<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1787
+#: ../../../install/_functions_create.php:1791
 msgid "About widgets..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1799
+#: ../../../install/_functions_create.php:1803
 #, php-format
 msgid ""
 "<p>By default, b2evolution blogs are displayed using an evoskin.</p>\n"
@@ -27358,11 +27356,11 @@ msgid ""
 "<p>And, of course, read the <a href=\"%s\" target=\"_blank\">manual on skins</a>!</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1799
+#: ../../../install/_functions_create.php:1803
 msgid "About skins..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1860
+#: ../../../install/_functions_create.php:1859
 msgid ""
 "<p>This blog platform is powered by b2evolution.</p>\n"
 "\n"
@@ -27373,15 +27371,19 @@ msgid ""
 "<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1860
+#: ../../../install/_functions_create.php:1859
 msgid "About this site"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1879
+#: ../../../install/_functions_create.php:1878
+msgid "Sunset"
+msgstr ""
+
+#: ../../../install/_functions_create.php:1887
 msgid "Bus Stop Ahead"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1915
+#: ../../../install/_functions_create.php:1923
 msgid ""
 "Heading\n"
 "=======\n"
@@ -27421,70 +27423,70 @@ msgid ""
 "The rain---not the reign---in Spain."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1959
+#: ../../../install/_functions_create.php:1967
 msgid "About Forums"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1959
+#: ../../../install/_functions_create.php:1967
 #: ../../../install/debug.php:390 ../../../install/index.php:626
 #: ../../../install/index.php:1018
 msgid "Forums"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1965
-#: ../../../install/_functions_create.php:2077
+#: ../../../install/_functions_create.php:1973
+#: ../../../install/_functions_create.php:2085
 msgid ""
 "<p>This is the first topic.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1965
-#: ../../../install/_functions_create.php:2077
+#: ../../../install/_functions_create.php:1973
+#: ../../../install/_functions_create.php:2085
 msgid "First Topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1972
-#: ../../../install/_functions_create.php:2085
+#: ../../../install/_functions_create.php:1980
+#: ../../../install/_functions_create.php:2093
 msgid ""
 "<p>This is the second topic.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1972
-#: ../../../install/_functions_create.php:2085
+#: ../../../install/_functions_create.php:1980
+#: ../../../install/_functions_create.php:2093
 msgid "Second topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1979
-#: ../../../install/_functions_create.php:2337
+#: ../../../install/_functions_create.php:1987
+#: ../../../install/_functions_create.php:2345
 msgid ""
 "<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1979
-#: ../../../install/_functions_create.php:2337
+#: ../../../install/_functions_create.php:1987
+#: ../../../install/_functions_create.php:2345
 msgid "Image topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1989
-#: ../../../install/_functions_create.php:2348
+#: ../../../install/_functions_create.php:1997
+#: ../../../install/_functions_create.php:2356
 msgid ""
 "<p>This is page 1 of a multipage topic.</p>\n"
 "\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1989
-#: ../../../install/_functions_create.php:2348
+#: ../../../install/_functions_create.php:1997
+#: ../../../install/_functions_create.php:2356
 msgid "This is a multipage topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2010
-#: ../../../install/_functions_create.php:2370
+#: ../../../install/_functions_create.php:2018
+#: ../../../install/_functions_create.php:2378
 msgid ""
 "<p>This is an extended topic with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>\n"
 "\n"
@@ -27493,13 +27495,13 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2010
-#: ../../../install/_functions_create.php:2370
+#: ../../../install/_functions_create.php:2018
+#: ../../../install/_functions_create.php:2378
 msgid "Extended topic with no teaser"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2021
-#: ../../../install/_functions_create.php:2382
+#: ../../../install/_functions_create.php:2029
+#: ../../../install/_functions_create.php:2390
 msgid ""
 "<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>\n"
 "\n"
@@ -27508,71 +27510,71 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2021
-#: ../../../install/_functions_create.php:2382
+#: ../../../install/_functions_create.php:2029
+#: ../../../install/_functions_create.php:2390
 msgid "Extended topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2050
-#: ../../../install/_functions_create.php:2429
+#: ../../../install/_functions_create.php:2058
+#: ../../../install/_functions_create.php:2437
 msgid "Markdown examples"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2059
+#: ../../../install/_functions_create.php:2067
 msgid "Manual main intro"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2059
+#: ../../../install/_functions_create.php:2067
 msgid "This is the main introduction for the manual"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2065
+#: ../../../install/_functions_create.php:2073
 msgid "Cat intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2065
+#: ../../../install/_functions_create.php:2073
 msgid "This is an intro-cat post for the category with intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2071
+#: ../../../install/_functions_create.php:2079
 msgid "About Manual"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2093
+#: ../../../install/_functions_create.php:2101
 msgid "Wiki Tables"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2413
+#: ../../../install/_functions_create.php:2421
 msgid ""
 "<p>This is the sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2413
+#: ../../../install/_functions_create.php:2421
 msgid "Sports post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2421
+#: ../../../install/_functions_create.php:2429
 msgid ""
 "<p>This is the second sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2421
+#: ../../../install/_functions_create.php:2429
 msgid "Second sports post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2446
-#: ../../../install/_functions_create.php:2471
-#: ../../../install/_functions_create.php:2496
+#: ../../../install/_functions_create.php:2454
+#: ../../../install/_functions_create.php:2479
+#: ../../../install/_functions_create.php:2504
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2457
-#: ../../../install/_functions_create.php:2482
-#: ../../../install/_functions_create.php:2507
+#: ../../../install/_functions_create.php:2465
+#: ../../../install/_functions_create.php:2490
+#: ../../../install/_functions_create.php:2515
 msgid "Hi, this is my comment."
 msgstr ""
 
@@ -29944,7 +29946,7 @@ msgstr ""
 #: ../../../skins/_body_footer.inc.php:24
 #: ../../../skins/asevo/_body_footer.inc.php:34
 #: ../../../skins/basic/index.main.php:278
-#: ../../../skins/bootstrap/index.main.php:342
+#: ../../../skins/bootstrap/index.main.php:351
 #: ../../../skins/colourise/_body_footer.inc.php:34
 #: ../../../skins/custom/index.main.php:296
 #: ../../../skins/dating_mood/index.main.php:277
@@ -30430,7 +30432,7 @@ msgid "You must log in before you can activate your account."
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:51
-#: ../../../skins/bootstrap/_skin.class.php:51
+#: ../../../skins/bootstrap/_skin.class.php:62
 #: ../../../skins/colourise/_skin.class.php:57
 #: ../../../skins/custom/_skin.class.php:76
 #: ../../../skins/dating_mood/_skin.class.php:57
@@ -30455,7 +30457,7 @@ msgid "Colorbox Image Zoom"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:52
-#: ../../../skins/bootstrap/_skin.class.php:52
+#: ../../../skins/bootstrap/_skin.class.php:63
 #: ../../../skins/colourise/_skin.class.php:58
 #: ../../../skins/custom/_skin.class.php:77
 #: ../../../skins/dating_mood/_skin.class.php:58
@@ -30480,7 +30482,7 @@ msgid "Check to enable javascript zooming on images (using the colorbox script)"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:57
-#: ../../../skins/bootstrap/_skin.class.php:57
+#: ../../../skins/bootstrap/_skin.class.php:68
 #: ../../../skins/colourise/_skin.class.php:63
 #: ../../../skins/custom/_skin.class.php:82
 #: ../../../skins/dating_mood/_skin.class.php:63
@@ -30507,9 +30509,9 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:58
 #: ../../../skins/asevo/_skin.class.php:70
 #: ../../../skins/asevo/_skin.class.php:82
-#: ../../../skins/bootstrap/_skin.class.php:58
-#: ../../../skins/bootstrap/_skin.class.php:70
-#: ../../../skins/bootstrap/_skin.class.php:82
+#: ../../../skins/bootstrap/_skin.class.php:69
+#: ../../../skins/bootstrap/_skin.class.php:81
+#: ../../../skins/bootstrap/_skin.class.php:93
 #: ../../../skins/colourise/_skin.class.php:64
 #: ../../../skins/colourise/_skin.class.php:76
 #: ../../../skins/colourise/_skin.class.php:88
@@ -30576,9 +30578,9 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:63
 #: ../../../skins/asevo/_skin.class.php:75
 #: ../../../skins/asevo/_skin.class.php:87
-#: ../../../skins/bootstrap/_skin.class.php:63
-#: ../../../skins/bootstrap/_skin.class.php:75
-#: ../../../skins/bootstrap/_skin.class.php:87
+#: ../../../skins/bootstrap/_skin.class.php:74
+#: ../../../skins/bootstrap/_skin.class.php:86
+#: ../../../skins/bootstrap/_skin.class.php:98
 #: ../../../skins/colourise/_skin.class.php:69
 #: ../../../skins/colourise/_skin.class.php:81
 #: ../../../skins/colourise/_skin.class.php:93
@@ -30645,9 +30647,9 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:64
 #: ../../../skins/asevo/_skin.class.php:76
 #: ../../../skins/asevo/_skin.class.php:88
-#: ../../../skins/bootstrap/_skin.class.php:64
-#: ../../../skins/bootstrap/_skin.class.php:76
-#: ../../../skins/bootstrap/_skin.class.php:88
+#: ../../../skins/bootstrap/_skin.class.php:75
+#: ../../../skins/bootstrap/_skin.class.php:87
+#: ../../../skins/bootstrap/_skin.class.php:99
 #: ../../../skins/colourise/_skin.class.php:70
 #: ../../../skins/colourise/_skin.class.php:82
 #: ../../../skins/colourise/_skin.class.php:94
@@ -30712,7 +30714,7 @@ msgid "Check to display number of likes and dislikes"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:69
-#: ../../../skins/bootstrap/_skin.class.php:69
+#: ../../../skins/bootstrap/_skin.class.php:80
 #: ../../../skins/colourise/_skin.class.php:75
 #: ../../../skins/custom/_skin.class.php:94
 #: ../../../skins/dating_mood/_skin.class.php:75
@@ -30737,7 +30739,7 @@ msgid "Voting on Comment Images"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:81
-#: ../../../skins/bootstrap/_skin.class.php:81
+#: ../../../skins/bootstrap/_skin.class.php:92
 #: ../../../skins/colourise/_skin.class.php:87
 #: ../../../skins/custom/_skin.class.php:106
 #: ../../../skins/dating_mood/_skin.class.php:87
@@ -30762,7 +30764,7 @@ msgid "Voting on User Images"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:93
-#: ../../../skins/bootstrap/_skin.class.php:93
+#: ../../../skins/bootstrap/_skin.class.php:104
 #: ../../../skins/colourise/_skin.class.php:99
 #: ../../../skins/custom/_skin.class.php:118
 #: ../../../skins/dating_mood/_skin.class.php:99
@@ -30787,7 +30789,7 @@ msgid "Display gender"
 msgstr ""
 
 #: ../../../skins/asevo/_skin.class.php:105
-#: ../../../skins/bootstrap/_skin.class.php:105
+#: ../../../skins/bootstrap/_skin.class.php:116
 #: ../../../skins/colourise/_skin.class.php:111
 #: ../../../skins/custom/_skin.class.php:130
 #: ../../../skins/dating_mood/_skin.class.php:111
@@ -30833,7 +30835,7 @@ msgid "Header"
 msgstr ""
 
 #: ../../../skins/asevo/index.main.php:189
-#: ../../../skins/bootstrap/index.main.php:274
+#: ../../../skins/bootstrap/index.main.php:278
 #: ../../../skins/colourise/_sidebar.inc.php:23
 #: ../../../skins/custom/index.main.php:231
 #: ../../../skins/dating_mood/index.main.php:213
@@ -30927,12 +30929,24 @@ msgstr ""
 msgid "in"
 msgstr ""
 
-#: ../../../skins/bootstrap/index.main.php:244
+#: ../../../skins/bootstrap/_skin.class.php:55
+msgid "Single column"
+msgstr ""
+
+#: ../../../skins/bootstrap/_skin.class.php:56
+msgid "Left Sidebar"
+msgstr ""
+
+#: ../../../skins/bootstrap/_skin.class.php:57
+msgid "Right Sidebar"
+msgstr ""
+
+#: ../../../skins/bootstrap/index.main.php:245
 #: ../../../skins_adm/login/_login_form.main.php:51
 msgid "Log in to your account"
 msgstr ""
 
-#: ../../../skins/bootstrap/index.main.php:320
+#: ../../../skins/bootstrap/index.main.php:329
 #: ../../../skins/custom/index.main.php:274
 #: ../../../skins/dating_mood/index.main.php:257
 #: ../../../skins/forums/index.main.php:289

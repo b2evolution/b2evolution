@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _widget_list_available.view.php 8087 2015-01-27 17:49:20Z yura $
+ * @version $Id: _widget_list_available.view.php 8199 2015-02-09 09:00:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -116,7 +116,7 @@ if( ! empty($Plugin_array) )
 	{
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).'<strong>'.$Plugin->name.'</strong>';
+		echo get_icon( 'new' ).' <strong>'.$Plugin->name.'</strong>';
 		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
 		echo '</li>';
 	}

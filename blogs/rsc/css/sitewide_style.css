@@ -10,6 +10,7 @@ body {
 div.sitewide_header,
 div.sitewide_footer {
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
+	line-height: normal;
 	color: #ccc;
 	margin: 0;
 	clear: both;
