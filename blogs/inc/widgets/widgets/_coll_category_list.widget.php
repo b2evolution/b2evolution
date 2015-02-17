@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_category_list.widget.php 8124 2015-02-01 13:05:17Z fplanque $
+ * @version $Id: _coll_category_list.widget.php 8236 2015-02-12 06:17:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -128,6 +128,8 @@ class coll_category_list_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Exclude categories'),
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
 			'start_level' => array(
 					'type' => 'text',

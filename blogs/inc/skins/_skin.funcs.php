@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.funcs.php 8151 2015-02-03 15:15:48Z yura $
+ * @version $Id: _skin.funcs.php 8256 2015-02-13 06:50:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1075,6 +1075,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_useritems'      => '_useritems.disp.php',
 				'disp_usercomments'   => '_usercomments.disp.php',
 				'disp_download'       => '_download.disp.php',
+				'disp_access_denied'  => '_access_denied.disp.php',
 			);
 
 		// Add plugin disp handlers:

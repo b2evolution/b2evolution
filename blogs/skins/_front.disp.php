@@ -22,8 +22,6 @@ $params = array_merge( array(
 // Display container and contents:
 skin_container( NT_('Front Page Main Area'), array(
 		// The following params will be used as defaults for widgets included in this container:
-		'block_start' => '',
-		'block_end' => '',
 		'author_link_text' => $params['author_link_text']
 	) );
 // --------------------- END OF "Front Page Main Area" CONTAINER -----------------------

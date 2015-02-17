@@ -19,7 +19,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo.
  *
- * @version $Id: _msg_settings.form.php 7564 2014-11-03 13:12:45Z yura $
+ * @version $Id: _msg_settings.form.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -76,7 +76,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_( 'Info message to reporters after account deletion' ) );
 
-	$Form->checkbox_input( 'reportpm_enabled', $Settings->get( 'reportpm_enabled' ), T_('Send delete info PM'), array( 'note' => T_('Check to allow sending a message to users who have reported an account whenever that account is deleted by a moderator.' ) ) );
+	$Form->checkbox_input( 'reportpm_enabled', $Settings->get( 'reportpm_enabled' ), /* TRANS: Send a Private Message to reporters when an account is deleted by a moderator */ T_('Send delete notification'), array( 'note' => T_('Check to allow sending a message to users who have reported an account whenever that account is deleted by a moderator.' ) ) );
 
 	$UserCache = & get_UserCache();
 	$User = $UserCache->get_by_login( $Settings->get( 'reportpm_from' ) );

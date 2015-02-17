@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _menu_link.widget.php 7933 2015-01-09 12:12:17Z yura $
+ * @version $Id: _menu_link.widget.php 8247 2015-02-12 12:24:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -149,9 +149,10 @@ class menu_link_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 				'blog_ID' => array(
-					'label' => T_('Blog ID'),
-					'note' => T_( 'Leave empty for current blog.' ),
-					'type' => 'text',
+					'label' => T_('Collection ID'),
+					'note' => T_( 'Leave empty for current collection.' ),
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -159,7 +160,8 @@ class menu_link_Widget extends ComponentWidget
 				'item_ID' => array(
 					'label' => T_('Item ID'),
 					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ),
-					'type' => 'text',
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -342,7 +344,7 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$text = T_('Contact');
 				// Is this the current display?
-				if( $disp == 'msgform' )
+				if( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) )
 				{ // Let's display the link as selected
 					// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
 					// odds are there is no other link to highlight in this case

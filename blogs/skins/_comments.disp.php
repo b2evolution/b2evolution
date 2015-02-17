@@ -19,7 +19,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'author_link_text' => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'display_comment_avatar' => true,
+		'display_comment_avatar'  => true,
+		'comment_avatar_position' => 'before_title', // 'before_title', 'before_text'
+		'comment_start'        => '<div class="bComment">',
+		'comment_end'          => '</div>',
+		'comment_post_before'  => '<h3 class="bTitle">',
+		'comment_post_after'   => '</h3>',
+		'comment_title_before' => '<div class="bCommentTitle">',
+		'comment_title_after'  => '</div>',
+		'comment_rating_before'=> '<div class="comment_rating">',
+		'comment_rating_after' => '</div>',
+		'comment_text_before'  => '<div class="bCommentText">',
+		'comment_text_after'   => '</div>',
+		'comment_info_before'  => '<div class="bCommentSmallPrint">',
+		'comment_info_after'   => '</div>',
 	), $params );
 
 
@@ -48,52 +61,64 @@ while( $Comment = & $CommentList->get_next() )
 	$Comment->get_Item();
 	?>
 	<!-- ========== START of a COMMENT ========== -->
-	<?php $Comment->anchor() ?>
-	<div class="bComment">
-		<?php
-		if( $Comment->status != 'published' )
-		{
-			$Comment->status( 'styled' );
-		}
-		if( $params['display_comment_avatar'] )
-		{
-			$Comment->avatar();
-		}
-		?>
-		<h3 class="bTitle">
-			<?php echo T_('In response to:') ?>
-			<?php $Comment->Item->title( array(
-					'link_type' => 'permalink',
-				) ); ?>
-		</h3>
-		<div class="bCommentTitle">
-			<?php $Comment->author(
-				/* before: */ '',
-				/* after: */ '#',
-				/* before_user: */ '',
-				/* after_user: */ '#',
-				/* format: */ 'htmlbody',
-				/* makelink: */ true,
-				/* linkt_text*/ $params['author_link_text'] ) ?>
-			<?php /* $Comment->author_url( '', ' &middot; ', '' ) */ ?>
-		</div>
-		<div class="bCommentText">
-			<?php
-			$Comment->content();
-			?>
-		</div>
-		<div class="bCommentSmallPrint">
-			<?php
-				$Comment->permanent_link( array(
-						'class'    => 'permalink_right',
-						'nofollow' => true,
-					) );
-			?>
-			<?php $Comment->date() ?> @ <?php $Comment->time( '#short_time' ) ?>
-			<?php $Comment->edit_link( ' &middot; ' ) /* Link to backoffice for editing */ ?>
-			<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
-		</div>
-	</div>
+	<?php
+	$Comment->anchor();
+
+	echo $params['comment_start'];
+	if( $Comment->status != 'published' )
+	{
+		$Comment->status( 'styled' );
+	}
+	if( $params['display_comment_avatar'] && $params['comment_avatar_position'] == 'before_title' )
+	{ // Avatar before title
+		$Comment->avatar();
+	}
+
+	// Post title
+	echo $params['comment_post_before'];
+	echo T_('In response to:').' ';
+	$Comment->Item->title( array(
+			'link_type' => 'permalink',
+		) );
+	echo $params['comment_post_after'];
+
+	// Title
+	echo $params['comment_title_before'];
+	$Comment->author(
+			/* before: */ '',
+			/* after: */ '#',
+			/* before_user: */ '',
+			/* after_user: */ '#',
+			/* format: */ 'htmlbody',
+			/* makelink: */ true,
+			/* linkt_text*/ $params['author_link_text'] );
+	echo $params['comment_title_after'];
+
+	// Text
+	echo $params['comment_text_before'];
+	if( $params['display_comment_avatar'] && $params['comment_avatar_position'] == 'before_text' )
+	{ // Avatar before text
+		$Comment->avatar();
+	}
+	$Comment->content();
+	echo $params['comment_text_after'];
+
+	// Info
+	echo $params['comment_info_before'];
+
+	$Comment->permanent_link( array(
+			'class'    => 'permalink_right',
+			'nofollow' => true,
+		) );
+
+	$Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
+	$Comment->edit_link( ' &middot; ' ); /* Link to backoffice for editing */
+	$Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */
+
+	echo $params['comment_info_after'];
+
+	echo $params['comment_end'];
+	?>
 	<!-- ========== END of a COMMENT ========== -->
 	<?php
 }	// End of comment loop.

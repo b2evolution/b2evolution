@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _itemquery.class.php 8228 2015-02-11 09:25:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -229,8 +229,9 @@ class ItemQuery extends SQL
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
+	 * @param string Collection IDs
 	 */
-	function where_chapter2( & $Blog, $cat_array, $cat_modifier, $cat_focus = 'wide' )
+	function where_chapter2( & $Blog, $cat_array, $cat_modifier, $cat_focus = 'wide', $coll_IDs = NULL )
 	{
 		// Save for future use (permission checks..)
 		$this->blog = $Blog->ID;
@@ -252,13 +253,17 @@ class ItemQuery extends SQL
 			$cat_ID_field = 'post_main_cat_ID';
 		}
 
-		if( $cat_focus == 'main' )
+		if( ! empty( $coll_IDs ) )
+		{ // Force to aggregate the collection IDs from current param and not from blog setting
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID', $coll_IDs ) );
+		}
+		elseif( $cat_focus == 'main' )
 		{ // We are requesting a narrow search
 			$this->WHERE_and( 'cat_blog_ID = '.$Blog->ID );
 		}
 		else
-		{
-			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID') );
+		{ // Aggregate the collections IDs from blog setting
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 		}
 
 

@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_page_list.widget.php 8035 2015-01-20 11:14:03Z yura $
+ * @version $Id: _coll_page_list.widget.php 8261 2015-02-13 09:36:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -62,6 +62,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		$r['item_type']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
+		$r['blog_ID']['defaultvalue'] = '-'; // Display the pages only of the current blog and exclude the aggregated blogs
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
 		$r['disp_excerpt']['no_edit'] = true;

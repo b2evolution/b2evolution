@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 8202 2015-02-09 14:26:00Z yura $
+ * @version $Id: _blog.class.php 8258 2015-02-13 08:16:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -239,12 +239,27 @@ class Blog extends DataObject
 
 
 	/**
-	 * @param string
+	 * Initialize blog setting by kind
+	 *
+	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual'
+	 * @param string Name
+	 * @param string Short name
+	 * @param string Url/slug
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
 		switch( $kind )
 		{
+			case 'main':
+				$this->set( 'type', 'main' );
+				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
+				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
+				$this->set( 'urlname', empty( $urlname ) ? 'main' : $urlname );
+				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'aggregate_coll_IDs', '*' );
+				$this->set_setting( 'in_skin_login', '1' );
+				break;
+
 			case 'photo':
 				$this->set( 'type', 'photo' );
 				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
@@ -2898,22 +2913,32 @@ class Blog extends DataObject
 	 *  - other: as present in DB
 	 *
 	 * @param string SQL field name
+	 * @param string Force current blog setting 'aggregate_coll_IDs'
 	 * @return string e.g. "$field IN (1,5)". It will return " 1 ", when all blogs/cats are aggregated.
 	 */
-	function get_sql_where_aggregate_coll_IDs( $field )
+	function get_sql_where_aggregate_coll_IDs( $field, $force_coll_IDs = NULL )
 	{
-		$aggregate_coll_IDs = $this->get_setting('aggregate_coll_IDs');
-		if( empty( $aggregate_coll_IDs ) )
-		{	// We only want posts from the current blog:
-			return " $field = $this->ID ";
-		}
-		elseif( $aggregate_coll_IDs == '*' )
-		{
-			return " 1 ";
+		if( is_null( $force_coll_IDs ) )
+		{ // Use collection IDs from blog setting
+			$aggregate_coll_IDs = $this->get_setting( 'aggregate_coll_IDs' );
 		}
 		else
-		{	// We are aggregating posts from several blogs:
-			return " $field IN ($aggregate_coll_IDs)";
+		{ // Force collections IDs
+			$aggregate_coll_IDs = $force_coll_IDs;
+		}
+
+		if( empty( $aggregate_coll_IDs ) || $aggregate_coll_IDs == '-' )
+		{ // We only want posts from the current blog:
+			return ' '.$field.' = '.$this->ID.' ';
+		}
+		elseif( $aggregate_coll_IDs == '*' )
+		{ // We are aggregating all blogs
+			return ' 1 ';
+		}
+		else
+		{ // We are aggregating posts from several blogs:
+			global $DB;
+			return ' '.$field.' IN ( '.$DB->quote( explode( ',', $aggregate_coll_IDs ) ).' )';
 		}
 	}
 
@@ -3183,6 +3208,10 @@ class Blog extends DataObject
 			$error_message = NT_('You are not a member of this collection, therefore you are not allowed to access it.');
 			$template = 'access_denied.main.php';
 			$has_access = $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID );
+			if( ! $has_access )
+			{ // Force disp to restrict access for current user
+				$disp = 'access_denied';
+			}
 			// If skin template files don't exist - the template "/skins_site/access_denied.main.php" will be used
 			$use_site_skin = true;
 		}

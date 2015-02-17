@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _profile_menu_link.widget.php 8220 2015-02-10 21:26:50Z fplanque $
+ * @version $Id: _profile_menu_link.widget.php 8236 2015-02-12 06:17:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -92,9 +92,10 @@ class profile_menu_link_Widget extends ComponentWidget
 					'defaultvalue' => 'crop-top-15x15',
 				),
 				'blog_ID' => array(
-					'label' => T_('Blog ID'),
-					'note' => T_('Leave empty for current blog.'),
-					'type' => 'text',
+					'label' => T_('Collection ID'),
+					'note' => T_('Leave empty for current collection.'),
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),

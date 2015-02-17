@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7944 2015-01-12 05:39:08Z yura $
+ * @version $Id: _blog.funcs.php 8273 2015-02-16 16:19:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -341,6 +341,10 @@ function get_collection_kinds( $kind = NULL )
 	global $Plugins;
 
 	$kinds = array(
+		'main' => array(
+				'name' => T_('Main'),
+				'desc' => T_('A collection optimized to be used for the site homepage as well as for generic functions such as messaging, user profiles, etc.'),
+			),
 		'std' => array(
 				'name' => T_('Standard blog'),
 				'desc' => T_('A standard blog with the most common features.'),
@@ -777,23 +781,20 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 
 	$BlogCache = & get_BlogCache();
 
-	if( is_null($blog_ids) )
+	if( is_null( $blog_ids ) )
 	{
 		global $blog;
 		$blog_ids = $blog;
 	}
 
-	if( is_array($blog_ids) )
-	{	// Get quoted ID list
-		$blog_ids = $DB->quote($blog_ids);
-		$where_cats = 'cat_blog_ID IN ('.$blog_ids.')';
+	if( is_array( $blog_ids ) )
+	{ // Get quoted ID list
+		$where_cats = 'cat_blog_ID IN ('.$DB->quote( $blog_ids ).')';
 	}
 	else
-	{
-		$Blog = & $BlogCache->get_by_ID($blog_ids);
-
-		// Get list of relevant blogs
-		$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+	{ // Get list of relevant blogs
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
+		$where_cats = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
 	// fp> verrry dirty and params; TODO: clean up
@@ -804,41 +805,38 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	// build query, only joining categories, if not using all.
 	$sql = 'SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count, tag_ID, cat_blog_ID
 			FROM T_items__tag
-			INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID';
+			INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
+			INNER JOIN T_items__item ON itag_itm_ID = post_ID';
 
 	if( $where_cats != '1' )
-	{	// we have to join the cats
+	{ // we have to join the cats
 		$sql .= '
 		 INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 		 INNER JOIN T_categories ON postcat_cat_ID = cat_ID';
 	}
+	else
+	{ // Join categories table because we need the field cat_blog_ID
+		$sql .= '
+		 INNER JOIN T_categories ON post_main_cat_ID = cat_ID';
+	}
 
-	$sql .= "
-		 INNER JOIN T_items__item ON itag_itm_ID = post_ID
-		 WHERE $where_cats
-		   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'";
+	$sql .= '
+		 WHERE '.$where_cats.'
+		   AND post_status = "published" AND post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) );
 
 	if( $skip_intro_posts )
 	{
-		$sql .= ' AND post_ptyp_ID NOT IN ('.implode(',',$posttypes_specialtypes).')';
+		$sql .= ' AND post_ptyp_ID NOT IN ( '.implode( ', ', $posttypes_specialtypes ).' )';
 	}
 
-	if( !empty($filter_list) )
-	{	// Filter tags
-		$filter_list = explode( ',', $filter_list ) ;
-
-		$filter_tags = array();
-		foreach( $filter_list as $l_tag )
-		{
-			$filter_tags[] = '"'.$DB->escape(trim($l_tag)).'"';
-		}
-
-		$sql .= ' AND tag_name NOT IN ('.implode(', ', $filter_tags).')';
+	if( ! empty( $filter_list ) )
+	{ // Filter tags
+		$sql .= ' AND tag_name NOT IN ( '.$DB->quote( explode( ', ', $filter_list ) ).' )';
 	}
 
 	$sql .= ' GROUP BY tag_name ORDER BY tag_count DESC';
 
-	if( !empty($limit) )
+	if( ! empty( $limit ) )
 	{
 		$sql .= ' LIMIT '.$limit;
 	}

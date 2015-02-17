@@ -16,7 +16,7 @@ body {
 	margin: 0;
 	background-color: #F5F5F5;
 	color: #000;
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	-webkit-font-smoothing: subpixel-antialiased;
 }
 
 div.log_container {

@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbums
  *
- * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
+ * @version $Id: index.main.php 8256 2015-02-13 06:50:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -178,6 +178,8 @@ if( $disp == 'single' )
 	?>
 
 	<?php
+	if( empty( $template ) && $template != 'access_requires_login.main.php' )
+	{ // Don't display page title on access restricted pages
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		request_title( array(
 				'title_before'=> '<h2>',
@@ -192,6 +194,7 @@ if( $disp == 'single' )
 				'categories_text' => T_('Galleries').': ',
 			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
+	}
 	?>
 
 	<?php

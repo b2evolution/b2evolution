@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_search_form.widget.php 8211 2015-02-10 07:59:22Z yura $
+ * @version $Id: _coll_search_form.widget.php 8269 2015-02-16 08:55:37Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -109,7 +109,8 @@ class coll_search_form_Widget extends ComponentWidget
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
 					'note' => T_('Leave empty for current collection.'),
-					'type' => 'text',
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -127,6 +128,8 @@ class coll_search_form_Widget extends ComponentWidget
 	function display( $params )
 	{
 		$params = array_merge( array(
+				'search_input_before'  => '',
+				'search_input_after'   => '',
 				'search_submit_before' => '',
 				'search_submit_after'  => '',
 			), $params );
@@ -154,7 +157,7 @@ class coll_search_form_Widget extends ComponentWidget
 
 		form_formstart( $widget_Blog->gen_blogurl(), 'search', 'SearchForm' );
 
-		if( empty( $this->disp_params[ 'search_class' ] ) )
+		if( empty( $this->disp_params['search_class'] ) )
 		{ // Class name is not defined, Use class depend on serach options
 			$search_form_class = $this->disp_params[ 'disp_search_options' ] ? 'extended_search_form' : 'compact_search_form';
 		}
@@ -165,8 +168,16 @@ class coll_search_form_Widget extends ComponentWidget
 
 		echo '<div class="'.$search_form_class.'">';
 
+		echo $this->disp_params['search_input_before'];
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars( get_param( 's' ) ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
+		echo $this->disp_params['search_input_after'];
+
+		echo $this->disp_params['search_submit_before'];
+		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
+		echo $this->disp_params['search_submit_after'];
+
 		if( $this->disp_params['disp_search_options'] )
-		{
+		{ // Display the search options
 			$sentence = get_param( 'sentence' );
 			echo '<div class="search_options">';
 			echo '<div class="search_option"><input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All words').'</label></div>';
@@ -175,14 +186,8 @@ class coll_search_form_Widget extends ComponentWidget
 			echo '</div>';
 		}
 
-		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars( $s ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
-
-		echo $this->disp_params['search_submit_before'];
-		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
-		echo $this->disp_params['search_submit_after'];
-
 		echo '</div>';
+
 		if( $this->disp_params['use_search_disp'] )
 		{
 			echo '<input type="hidden" name="disp" value="search" />';

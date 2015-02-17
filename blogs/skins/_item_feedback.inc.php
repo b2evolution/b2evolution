@@ -41,6 +41,14 @@ $params = array_merge( array(
 		'comment_list_end'     => "\n\n",
 		'comment_start'        => '<div class="bComment">',
 		'comment_end'          => '</div>',
+		'comment_title_before' => '<div class="bCommentTitle">',
+		'comment_title_after'  => '</div>',
+		'comment_rating_before'=> '<div class="comment_rating">',
+		'comment_rating_after' => '</div>',
+		'comment_text_before'  => '<div class="bCommentText">',
+		'comment_text_after'   => '</div>',
+		'comment_info_before'  => '<div class="bCommentSmallPrint">',
+		'comment_info_after'   => '</div>',
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'preview_end'          => '</div>',
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
@@ -280,14 +288,22 @@ if( $Item->can_see_comments( true ) )
 
 			// ------------------ COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
-					'Comment'          => & $Comment,
-					'comment_start'    => $params['comment_start'],
-					'comment_end'      => $params['comment_end'],
-					'author_link_text' => $params['author_link_text'],
-					'link_to'          => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-					'author_link_text' => $params['author_link_text'],
-					'comment_number'   => $comment_number,
-					'image_size'       => $params['comment_image_size'],
+					'Comment'               => & $Comment,
+					'comment_start'         => $params['comment_start'],
+					'comment_end'           => $params['comment_end'],
+					'comment_title_before'  => $params['comment_title_before'],
+					'comment_title_after'   => $params['comment_title_after'],
+					'comment_rating_before' => $params['comment_rating_before'],
+					'comment_rating_after'  => $params['comment_rating_after'],
+					'comment_text_before'   => $params['comment_text_before'],
+					'comment_text_after'    => $params['comment_text_after'],
+					'comment_info_before'   => $params['comment_info_before'],
+					'comment_info_after'    => $params['comment_info_after'],
+					'author_link_text'      => $params['author_link_text'],
+					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+					'author_link_text'      => $params['author_link_text'],
+					'comment_number'        => $comment_number,
+					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.

@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlistlight.class.php 7757 2014-12-05 09:51:26Z yura $
+ * @version $Id: _itemlistlight.class.php 8228 2015-02-11 09:25:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -137,6 +137,7 @@ class ItemListLight extends DataObjectList2
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
+				'coll_IDs' => NULL, // empty: current blog only; "*": all blogs; "1,2,3": blog IDs separated by comma; "-": current blog only and exclude the aggregated blogs
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
@@ -578,7 +579,7 @@ class ItemListLight extends DataObjectList2
 		if( !is_null( $this->Blog ) )
 		{ // Get the posts only for current Blog
 			$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
-																			$this->filters['cat_focus'] );
+																			$this->filters['cat_focus'], $this->filters['coll_IDs'] );
 		}
 		else // $this->Blog == NULL
 		{ // If we want to get the posts from all blogs
@@ -818,7 +819,7 @@ class ItemListLight extends DataObjectList2
 		 * filtering stuff:
 		 */
 		$lastpost_ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
-																				 $this->filters['cat_focus']  );
+																				 $this->filters['cat_focus'], $this->filters['coll_IDs'] );
 		$lastpost_ItemQuery->where_author( $this->filters['authors'] );
 		$lastpost_ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );

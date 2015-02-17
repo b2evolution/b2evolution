@@ -16,7 +16,12 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 $params = array_merge( array(
-		'pagination' => array(),
+		'pagination'           => array(),
+		'search_class'         => 'extended_search_form',
+		'search_input_before'  => '',
+		'search_input_after'   => '',
+		'search_submit_before' => '',
+		'search_submit_after'  => '',
 	), $params );
 
 // --------------------------------- START OF COMMON LINKS --------------------------------
@@ -24,12 +29,16 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'coll_search_form',
 		// Optional display params
-		'block_start' => '',
-		'block_end' => '',
-		'block_display_title' => false,
-		'disp_search_options' => 0,
-		'search_class' => 'extended_search_form',
-		'use_search_disp' => 1,
+		'block_start'          => '',
+		'block_end'            => '',
+		'block_display_title'  => false,
+		'disp_search_options'  => 0,
+		'search_class'         => $params['search_class'],
+		'search_input_before'  => $params['search_input_before'],
+		'search_input_after'   => $params['search_input_after'],
+		'search_submit_before' => $params['search_submit_before'],
+		'search_submit_after'  => $params['search_submit_after'],
+		'use_search_disp'      => 1,
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 

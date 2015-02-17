@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _plugin.funcs.php 7268 2014-08-28 10:12:16Z yura $
+ * @version $Id: _plugin.funcs.php 8228 2015-02-11 09:25:58Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -832,8 +832,13 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 	}
 
 
-	if( isset($meta['type']) )
+	if( isset( $meta['type'] ) )
 	{
+		if( isset( $meta['allow_empty'] ) && $meta['allow_empty'] && empty( $value ) )
+		{ // Allow an empty value
+			return true;
+		}
+
 		switch( $meta['type'] )
 		{
 			case 'integer':

@@ -619,9 +619,9 @@ switch( $action )
 					<?php
 						// Display the collections to select which install
 						$collections = array(
+								'home'   => T_('Home'),
 								'a'      => T_('Blog A'),
 								'b'      => T_('Blog B'),
-								'info'   => T_('Info'),
 								'photos' => T_('Photos'),
 								'forums' => T_('Forums'),
 								'manual' => T_('Manual'),

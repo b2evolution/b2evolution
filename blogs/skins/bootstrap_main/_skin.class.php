@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage bootstrap
+ * @subpackage bootstrap_main
  *
  * @version $Id: _skin.class.php 8273 2015-02-16 16:19:27Z yura $
  */
@@ -17,19 +17,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class bootstrap_Skin extends Skin
+class bootstrap_main_Skin extends Skin
 {
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Blog';
+		return 'Bootstrap Main';
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
@@ -39,25 +39,60 @@ class bootstrap_Skin extends Skin
 
 
 	/**
-   * Get definitions for editable params
-   *
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top' ),
+				'_item_block.inc.php' => array( 'item_single' ),
+			) );
+	}
+
+
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				'layout' => array(
-					'label' => T_('Layout'),
-					'note' => '',
-					'defaultvalue' => 'right_sidebar',
-					'options' => array(
-							'single_column' => T_('Single column'),
-							'left_sidebar'  => T_('Left Sidebar'),
-							'right_sidebar' => T_('Right Sidebar'),
-						),
-					'type' => 'select',
+				// Front page
+				'front_bg_image' => array(
+					'label' => T_('Front page background image'),
+					'defaultvalue' => 'shared/global/sunset/sunset.jpg',
+					'type' => 'text',
+					'size' => '50'
 				),
+				'front_title_color' => array(
+					'label' => T_('Front page title color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#F0F0F0',
+					'type' => 'color',
+				),
+				'front_text_color' => array(
+					'label' => T_('Front page text color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#FFFFFF',
+					'type' => 'color',
+				),
+				'front_link_color' => array(
+					'label' => T_('Front page link color'),
+					'note' => T_('E-g: #0000ff for blue'),
+					'defaultvalue' => '#FFFFFF',
+					'type' => 'color',
+				),
+				'front_bg_color' => array(
+					'label' => T_('Front page main area background color '),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#999999',
+					'type' => 'color',
+				),
+				// Colorbox
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
@@ -100,6 +135,7 @@ class bootstrap_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				// Other settings
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -131,7 +167,7 @@ class bootstrap_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages;
+		global $Messages, $disp;
 
 		// call parent:
 		parent::display_init();
@@ -155,6 +191,50 @@ class bootstrap_Skin extends Skin
 				'class_note'     => 'alert alert-info fade in',
 				'before_message' => '<button class="close" data-dismiss="alert">&times;</button>',
 			) );
+
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied' ) ) )
+		{
+			global $media_url, $media_path;
+
+			// Add custom CSS:
+			$custom_css = '';
+
+			$bg_image = $this->get_setting( 'front_bg_image' );
+			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+			{ // Custom body background image:
+				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
+			}
+
+			if( $color = $this->get_setting( 'front_bg_color' ) )
+			{ // Custom body background color:
+				$custom_css .= 'body.pictured { background-color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'front_title_color' ) )
+			{ // Custom title color:
+				$custom_css .= 'body.pictured .widget_core_coll_title h1 a { color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'front_text_color' ) )
+			{ // Custom text color:
+				$custom_css .= 'body.pictured { color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'front_link_color' ) )
+			{ // Custom link color:
+				$custom_css .= 'body.pictured a { color: '.$color." }\n";
+			}
+
+			if( !empty( $custom_css ) )
+			{
+				$custom_css = '<style type="text/css">
+	<!--
+	'.$custom_css.'
+	-->
+	</style>';
+				add_headline( $custom_css );
+			}
+		}
 	}
 
 

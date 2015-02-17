@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id: _coll_comment_list.widget.php 8199 2015-02-09 09:00:39Z yura $
+ * @version $Id: _coll_comment_list.widget.php 8236 2015-02-12 06:17:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -89,9 +89,11 @@ class coll_comment_list_Widget extends ComponentWidget
 				'type' => 'text',
 			),
 			'blog_ID' => array(
-				'label' => T_( 'Blog' ),
-				'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
+				'label' => T_( 'Collection' ),
+				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
 				'size' => 4,
+				'type' => 'integer',
+				'allow_empty' => true,
 			),
 		), parent::get_param_definitions( $params )	);
 

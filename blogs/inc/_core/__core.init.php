@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: __core.init.php 7999 2015-01-15 08:24:44Z yura $
+ * @version $Id: __core.init.php 8259 2015-02-13 08:30:06Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -939,6 +939,7 @@ class _core_Module extends Module
 					),
 				'tools' => array(
 						'text' => T_('More'),
+						'href' => $admin_url.'#',
 						'disabled' => true,
 					),
 			);
@@ -964,6 +965,7 @@ class _core_Module extends Module
 			}
 			$entries[ 'tools' ] = array(
 				'text' => T_('More'),
+				'href' => $admin_url.'#',
 				'disabled' => true,
 			);
 		}

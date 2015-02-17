@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 8220 2015-02-10 21:26:50Z fplanque $
+ * @version $Id: _functions_create.php 8241 2015-02-12 11:10:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1228,7 +1228,7 @@ function create_demo_contents()
 	global $random_password, $query;
 	global $timestamp, $admin_email;
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
+	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
 	global $Plugins;
@@ -1341,21 +1341,50 @@ function create_demo_contents()
 	task_end();
 
 	global $default_locale, $query, $timestamp;
-	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID;
+	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID;
 
-	$default_blog_longdesc = T_("This is the long description for the blog named '%s'. %s");
+	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
 	$default_blog_access_type = 'relative';
 
 	// Array contains which collections should be installed
 	$collections = param( 'collections', 'array:string', array() );
+	$install_collection_home = in_array( 'home', $collections );
 	$install_collection_bloga = in_array( 'a', $collections );
 	$install_collection_blogb = in_array( 'b', $collections );
-	$install_collection_info = in_array( 'info', $collections );
 	$install_collection_photos = in_array( 'photos', $collections );
 	$install_collection_forums = in_array( 'forums', $collections );
 	$install_collection_manual = in_array( 'manual', $collections );
 
 	task_begin( 'Creating default blogs... ' );
+
+	if( $install_collection_home )
+	{ // Install Home blog
+		$blog_shortname = T_('Home');
+		$blog_home_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_more_longdesc = '<br />
+<br />
+<strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
+		$blog_home_ID = create_blog(
+			T_('Homepage Title'),
+			$blog_shortname,
+			'home',
+			T_('Change this as you like'),
+			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+			1, // Skin ID
+			'main',
+			'any',
+			1,
+			$blog_home_access_type,
+			true,
+			'never',
+			$ablogger_ID );
+
+		if( ! empty( $blog_home_ID ) )
+		{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
+			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+				VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
+		}
+	}
 
 	if( $install_collection_bloga )
 	{ // Install Blog A
@@ -1368,7 +1397,7 @@ function create_demo_contents()
 			$blog_stub,
 			T_('Tagline for Blog A'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			1, // Skin ID
+			2, // Skin ID
 			'std',
 			'any',
 			1,
@@ -1395,7 +1424,7 @@ function create_demo_contents()
 			$blog_stub,
 			T_('Tagline for Blog B'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			2, // Skin ID
+			3, // Skin ID
 			'std',
 			'',
 			0,
@@ -1403,36 +1432,6 @@ function create_demo_contents()
 			true,
 			'public',
 			$bblogger_ID );
-	}
-
-	if( $install_collection_info )
-	{ // Install Info blog
-		$blog_shortname = 'Info';
-		$blog_linkblog_access_type = ( $test_install_all_features ) ? 'extrapath' : $default_blog_access_type;
-		$blog_stub = 'info';
-		$blog_more_longdesc = '<br />
-<br />
-<strong>'.T_("The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.").'</strong>';
-		$blog_linkblog_ID = create_blog(
-			'Info',
-			$blog_shortname,
-			$blog_stub,
-			T_('Information about this site'),
-			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-			3, // Skin ID
-			'std',
-			'any',
-			0,
-			$blog_linkblog_access_type,
-			true,
-			'never',
-			$ablogger_ID );
-
-		if( ! empty( $blog_linkblog_ID ) )
-		{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
-			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
-				VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_linkblog_ID ).' )' );
-		}
 	}
 
 	if( $install_collection_photos )
@@ -1509,10 +1508,10 @@ function create_demo_contents()
 		$cat_additional_skins = cat_create( T_('Get additional skins'), 'NULL', $blog_b_ID );
 	}
 
-	if( $install_collection_info )
+	if( $install_collection_home )
 	{ // Create categories for linkblog
-		$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_linkblog_ID );
-		$cat_linkblog_contrib = cat_create( T_('Contributors'), 'NULL', $blog_linkblog_ID );
+		$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_home_ID );
+		$cat_linkblog_contrib = cat_create( T_('Contributors'), 'NULL', $blog_home_ID );
 	}
 
 	if( $install_collection_photos )
@@ -1557,7 +1556,7 @@ function create_demo_contents()
 
 	// Define here all categories which should have the advertisement banners
 	$adv_cats = array();
-	if( $install_collection_info )
+	if( $install_collection_home )
 	{
 		$adv_cats['linkblog'] = $cat_linkblog_b2evo; // b2evolution
 	}
@@ -1817,7 +1816,7 @@ function create_demo_contents()
 		// $edited_Item->insert_update_tags( 'update' );
 	}
 
-	if( $install_collection_info )
+	if( $install_collection_home )
 	{ // ---------------- Insert the POSTS for Info blog ---------------- //
 
 		// Insert a post into info blog:
@@ -1826,32 +1825,32 @@ function create_demo_contents()
 		$timestamp++;
 		$now = date('Y-m-d H:i:s',$timestamp + 59);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array() );
+		$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array(), 3000 );
 
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
+		$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array(), 3000 );
 
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
+		$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array(), 3000 );
 
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
+		$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array(), 3000 );
 
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array() );
+		$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array(), 3000 );
 
 		// Insert a post into linkblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array() );
+		$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array(), 3000 );
 
 		// Insert a PAGE:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1867,6 +1866,16 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
+
+		// Insert a post:
+		$now = date( 'Y-m-d H:i:s', $timestamp++ ); // A year ago
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_('Homepage post'), T_('<p>This is the Homepage of this site.</p>
+
+<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Home". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
+
+<p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
+			$now, $cat_linkblog_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 1400 );
 	}
 
 	if( $install_collection_photos )
@@ -2549,6 +2558,10 @@ Hello
 		);
 
 	$gp_blogs_IDs = array();
+	if( $install_collection_home )
+	{ // Install permissions for Info blog
+		$gp_blogs_IDs[] = $blog_home_ID;
+	}
 	if( $install_collection_bloga )
 	{ // Install permissions for Blog A
 		$gp_blogs_IDs[] = $blog_a_ID;
@@ -2556,10 +2569,6 @@ Hello
 	if( $install_collection_blogb )
 	{ // Install permissions for Blog B
 		$gp_blogs_IDs[] = $blog_b_ID;
-	}
-	if( $install_collection_info )
-	{ // Install permissions for Info blog
-		$gp_blogs_IDs[] = $blog_linkblog_ID;
 	}
 	if( $install_collection_photos )
 	{ // Install permissions for Photos blog

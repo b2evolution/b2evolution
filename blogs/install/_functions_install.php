@@ -480,14 +480,14 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	task_begin( 'Installing default skins... ' );
 
-	// Note: Skin #1 will we used by Blog A
+	// Note: Skin #1 will we used by Home
+	skin_install( 'bootstrap_main' );
+
+	// Note: Skin #2 will we used by Blog A
 	skin_install( 'bootstrap' );
 
-	// Note: Skin #2 will we used by Blog B
+	// Note: Skin #3 will we used by Blog B
 	skin_install( 'evocamp' );
-
-	// Note: Skin #3 will we used by Linkblog
-	skin_install( 'miami_blue' );
 
 	// Note: Skin #4 will we used by Photos
 	skin_install( 'photoalbums' );

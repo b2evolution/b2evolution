@@ -39,7 +39,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _hitlog.funcs.php 8064 2015-01-26 06:36:40Z yura $
+ * @version $Id: _hitlog.funcs.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -679,7 +679,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	if( empty( $links_count ) )
 	{
 		global $Messages;
-		$Messages->add( T_( 'Do not have blog links to generate statistics' ) );
+		$Messages->add( 'Cannot generate statistics without collection links.' );
 		return;
 	}
 
@@ -697,7 +697,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	if( empty( $users_count ) )
 	{
-		$Messages->add('Do not have valid users to generate statistics');
+		$Messages->add( 'Cannot generate statistics without valid users.' );
 		break;
 	}
 

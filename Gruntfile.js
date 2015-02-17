@@ -6,6 +6,7 @@
 //   each of the required packages with "npm install xxx" for each of the Dependencies listed in package.json
 // - then, in order to be able to invoke 'grunt' on your system, type "sudo npm install -g grunt-cli". This will make
 //   grunt available from the Command Line Interface.
+// - ONCE IN A WHILE: run "npm update" to update all youe packages
 // In order to use Sass:
 // - Make sur Ruby is installed on your system (should be preinstalled on MacOSX. On windows: http://rubyinstaller.org)
 // - Type: "sudo gem install sass"
@@ -40,6 +41,7 @@ module.exports = function(grunt) {
 					'blogs/skins_adm/bootstrap/rsc/css/style.css': 'blogs/skins_adm/bootstrap/rsc/css/style.less',
 					'blogs/rsc/css/bootstrap/b2evo.css': 'blogs/rsc/css/bootstrap/b2evo.less',
 					'blogs/skins/bootstrap/style.css': 'blogs/skins/bootstrap/style.less',
+					'blogs/skins/bootstrap_main/style.css': 'blogs/skins/bootstrap_main/style.less',
 				}
 			}
 		},
@@ -49,7 +51,6 @@ module.exports = function(grunt) {
 			development: {
 				options: {
 					style: 'expanded',
-					sourcemap: 'none'
 				},
 				files: {
 					// target.css file: source.scss file

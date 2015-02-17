@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage pureforums
  *
- * @version $Id: _edit_comment.disp.php 7645 2014-11-14 08:16:13Z yura $
+ * @version $Id: _edit_comment.disp.php 8271 2015-02-16 11:20:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -68,7 +68,7 @@ $Form->begin_form( 'inskin', '', $display_params );
 	$Form->hidden( 'mname', 'collections' );
 	$Form->hidden( 'action_type', 'comment' );
 	$Form->hidden( 'comment_ID', $edited_Comment->ID );
-	$Form->hidden( 'redirect_to', url_add_tail( $comment_Item->get_permanent_url(), '#c'.$edited_Comment->ID ) );
+	$Form->hidden( 'redirect_to', $edited_Comment->get_permanent_url() );
 
 	$Form->info( T_('In response to'), $comment_Item->get_title() );
 

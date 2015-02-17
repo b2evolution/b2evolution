@@ -23,7 +23,7 @@
  * @package admin
  *
  *
- * @version $Id: _coll_advanced.form.php 7938 2015-01-09 13:28:52Z yura $
+ * @version $Id: _coll_advanced.form.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -108,7 +108,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']'.get_manual_link('collection_aggregation_settings') );
-		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by , or use * for all blogs'), 255 );
+		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List collection IDs separated by , or use * for all collections'), 255 );
 	$Form->end_fieldset();
 
 

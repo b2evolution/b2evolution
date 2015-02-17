@@ -32,7 +32,7 @@
  * @author tswicegood: Travis SWICEGOOD.
  * @author vegarg: Vegar BERG GULDAL.
  *
- * @version $Id: _item.funcs.php 8151 2015-02-03 15:15:48Z yura $
+ * @version $Id: _item.funcs.php 8232 2015-02-11 15:33:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -210,9 +210,16 @@ function init_inskin_editing()
 /**
  * Return an Item if an Intro or a Featured item is available for display in current disp.
  *
+ * @param string Name of $disp where we should display it
+ * @param string Collection Ids:
+ *                 NULL: depend on blog setting "Blogs to aggregate"
+ *                 empty: current blog only
+ *                 "*": all blogs
+ *                 "1,2,3":blog IDs separated by comma
+ *                 "-": current blog only and exclude the aggregated blogs
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts' )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 {
 	global $Blog;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
@@ -273,6 +280,7 @@ function & get_featured_Item( $restrict_disp = 'posts' )
 		}
 
 		$FeaturedList->set_filters( array(
+				'coll_IDs' => $coll_IDs,
 				'types' => $restrict_to_types,
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
@@ -285,6 +293,7 @@ function & get_featured_Item( $restrict_disp = 'posts' )
 			$FeaturedList->reset();
 
 			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
 					'featured' => 1,  // Featured posts only (TODO!)
 					// Types will already be reset to defaults here
 				), false /* Do NOT memorize!! */ );

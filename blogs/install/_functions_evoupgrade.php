@@ -14,7 +14,7 @@
  *
  * @package install
  *
- * @version $Id: _functions_evoupgrade.php 8050 2015-01-22 10:58:06Z yura $
+ * @version $Id: _functions_evoupgrade.php 8232 2015-02-11 15:33:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -5468,7 +5468,24 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		//set_upgrade_checkpoint( '11330' );
+		set_upgrade_checkpoint( '11330' );
+	}
+
+	if( $old_db_version < 11340 )
+	{ // part 18.c trunk aka 5th part of "i7"
+
+		task_begin( 'Upgrading blogs table...' );
+		$DB->query( "ALTER TABLE T_blogs
+			MODIFY blog_type ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL" );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		//set_upgrade_checkpoint( '11340' );
 	}
 
 	/*

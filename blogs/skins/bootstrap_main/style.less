@@ -1,3 +1,79 @@
+// Header
+.pageHeader {
+	margin-bottom: 30px;
+}
+div.sitewide_header {
+	margin-bottom: 0 !important;
+}
+
+// Footer
+.footer {
+	background-color: #FFF;
+	width: 100%;
+	p {
+		margin-top: 10px;
+	}
+}
+body.pictured .footer {
+	color: #666;
+	a {
+		color: #666;
+	}
+}
+
+// Body content
+body {
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+html, body, #skin_wrapper {
+	height: 100%;
+}
+#skin_wrapper {
+	display: table;
+	width: 100%;
+}
+.container.body {
+	height: 100%;
+	min-height: 100%;
+}
+div.col-half-width {
+	width: 500px;
+	max-width: 100%;
+}
+body.pictured .panel {
+	color: #333;
+}
+#bg_picture {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center 0;
+	z-index: -999999;
+	img {
+		display: none;
+		width: 100%;
+	}
+}
+@media only screen and (max-width: 640px) {
+	body.disp_front {
+		#bg_picture {
+			position: relative;
+			height: auto;
+			img {
+				display: block;
+			}
+		}
+		div.col-half-width {
+			width: auto;
+		}
+	}
+}
+
 // Login widget form
 .widget_core_user_login {
 	#login_form {
@@ -351,7 +427,31 @@ div.bSideItem {
 	margin: 0;
 }
 
+// Current filters
+.filter_item div {
+	height: 22px;
+}
+
 // Messages
 div.action_messages, div.log_container {
 	margin: 0;
+}
+
+// Media Index Plugin
+div.widget_core_coll_media_index {
+	ul {
+		margin: 0;
+		padding: 1px 0 50px;
+	}
+
+	li {
+		list-style: none;
+		display: inline-block;
+		margin: 2px;
+		padding: 0;
+	}
+
+	img {
+		border-radius: 3px;
+	}
 }

@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _coll_sel_skin.view.php 8263 2015-02-15 04:27:31Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,7 +19,7 @@ global $kind, $admin_url, $action, $AdminUI;
 
 $kind_title = get_collection_kinds( $kind );
 
-echo action_icon( sprintf( T_('Abort New %s'), $kind_title ), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3, array( 'class' => 'action_icon floatright' ) );
+echo action_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3, array( 'class' => 'action_icon floatright' ) );
 
 echo '<h2>'.sprintf( T_('New %s'), $kind_title ).':</h2>';
 

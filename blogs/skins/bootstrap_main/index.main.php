@@ -12,9 +12,9 @@
  * to handle the request (based on $disp).
  *
  * @package evoskins
- * @subpackage bootstrap
+ * @subpackage bootstrap_main
  *
- * @version $Id: index.main.php 8273 2015-02-16 16:19:27Z yura $
+	 * @version $Id: index.main.php 8273 2015-02-16 16:19:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,10 +28,15 @@ if( version_compare( $app_version, '5.0' ) < 0 )
 skin_init( $disp );
 
 
+// Check if current page has a big picture as background
+$is_pictured_page = in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied' ) );
+
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
 	'html_tag' => '<!DOCTYPE html>'."\r\n"
 	             .'<html lang="'.locale_lang( false ).'">',
+	'viewport_tag' => '#responsive#',
+	'body_class' => ( $is_pictured_page ? 'pictured' : '' ),
 ) );
 // Note: You can customize the default HTML header by copying the generic
 // /skins/_html_header.inc.php file into the current skin folder.
@@ -42,11 +47,21 @@ skin_include( '_html_header.inc.php', array(
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
+
+if( $is_pictured_page )
+{ // Display a picture from skin setting as background image
+	global $media_path, $media_url;
+	$bg_image = $Skin->get_setting( 'front_bg_image' );
+	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+	{ // If it exists in media folder
+		echo '<div id="bg_picture"><img src="'.$media_url.$bg_image.'" /></div>';
+	}
+}
 ?>
 
-<div class="container">
+<div class="container body">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-12<?php echo $disp == 'front' ? ' col-half-width' : ''; ?>">
 
 <div class="PageTop">
 	<?php
@@ -84,37 +99,9 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-tabs">
-	<?php
-		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		// Note: this container is designed to be a single <ul> list
-		skin_container( NT_('Menu'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '',
-				'block_end'           => '',
-				'block_display_title' => false,
-				'list_start'          => '',
-				'list_end'            => '',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
-				'item_selected_start' => '<li class="active">',
-				'item_selected_end'   => '</li>',
-				'item_title_before'   => '',
-				'item_title_after'    => '',
-			) );
-		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-	?>
-			</ul>
-		</div>
-	</div>
-
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
-		<div class="<?php echo ( $Skin->get_setting( 'layout' ) == 'single_column' ? 'col-md-12' : 'col-md-9' ); ?>"<?php
-				echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:right;"' : '' ); ?>>
+		<div class="col-md-12<?php echo $disp == 'front' ? ' col-half-width' : ''; ?>">
 
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -303,67 +290,17 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 		</div>
-	<?php
-	if( $Skin->get_setting( 'layout' ) != 'single_column' )
-	{
-	?>
-<!-- =================================== START OF SIDEBAR =================================== -->
-		<div class="col-md-3"<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:left;"' : '' ); ?>>
-
-	<?php
-		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
-		// Display container contents:
-		skin_container( NT_('Sidebar'), array(
-				// The following (optional) params will be used as defaults for widgets included in this container:
-				// This will enclose each widget in a block:
-				'block_start' => '<div class="panel panel-default $wi_class$">',
-				'block_end' => '</div>',
-				// This will enclose the title of each widget:
-				'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-				'block_title_end' => '</h4></div>',
-				// This will enclose the body of each widget:
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end' => '</div>',
-				// If a widget displays a list, this will enclose that list:
-				'list_start' => '<ul>',
-				'list_end' => '</ul>',
-				// This will enclose each item in a list:
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-				// This will enclose sub-lists in a list:
-				'group_start' => '<ul>',
-				'group_end' => '</ul>',
-				// This will enclose (foot)notes:
-				'notes_start' => '<div class="notes">',
-				'notes_end' => '</div>',
-				// Widget 'Search form':
-				'search_class'         => 'compact_search_form',
-				'search_input_before'  => '<div class="input-group">',
-				'search_input_after'   => '',
-				'search_submit_before' => '<span class="input-group-btn">',
-				'search_submit_after'  => '</span></div>',
-			) );
-		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
-	?>
-
-	<?php
-		// Please help us promote b2evolution and leave this logo on your blog:
-		powered_by( array(
-				'block_start' => '<div class="powered_by">',
-				'block_end'   => '</div>',
-				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-				'img_width'   => 120,
-				'img_height'  => 32,
-			) );
-	?>
-		</div>
-	<?php } ?>
 	</div>
+</div>
+
+<!-- End of skin_wrapper -->
+</div>
 
 <!-- =================================== START OF FOOTER =================================== -->
-	<div class="row">
-		<div class="col-md-12 center">
+<div class="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 center">
 	<?php
 		// Display container and contents:
 		skin_container( NT_("Footer"), array(
@@ -375,26 +312,26 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			// Display footer text (text can be edited in Blog Settings):
 			$Blog->footer_text( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
+					'before' => '',
+					'after'  => ' &bull; ',
 				) );
 
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ptyp_ID though..?!
+		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
 		?>
 
 		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
+					'before' => '',
+					'after'  => ' &bull; ',
 					'text'   => T_('Contact'),
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 			// Display a link to help page:
 			$Blog->help_link( array(
-					'before'      => ' ',
-					'after'       => ' &bull; ',
-					'text'        => T_('Help'),
+					'before' => ' ',
+					'after'  => ' &bull; ',
+					'text'   => T_('Help'),
 				) );
 		?>
 
@@ -405,14 +342,15 @@ siteskin_include( '_site_body_header.inc.php' );
 			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => '&bull;',
-					'list_end'    => ' ',
-					'separator'   => '&bull;',
-					'item_start'  => ' ',
-					'item_end'    => ' ',
+					'list_start' => '&bull;',
+					'list_end'   => ' ',
+					'separator'  => '&bull;',
+					'item_start' => ' ',
+					'item_end'   => ' ',
 				) );
 		?>
 	</p>
+			</div>
 		</div>
 	</div>
 </div>

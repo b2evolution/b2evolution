@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id: _coll_media_index.widget.php 8199 2015-02-09 09:00:39Z yura $
+ * @version $Id: _coll_media_index.widget.php 8263 2015-02-15 04:27:31Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,9 +129,11 @@ class coll_media_index_Widget extends ComponentWidget
 				'defaultvalue' => 'DESC',
 			),
 			'blog_ID' => array(
-				'label' => T_('Blog'),
-				'note' => T_('ID of the blog to use, leave empty for the current blog.'),
+				'label' => T_('Collection'),
+				'note' => T_('ID of the collection to use, leave empty for the current collection.'),
 				'size' => 4,
+				'type' => 'integer',
+				'allow_empty' => true,
 			),
 		), parent::get_param_definitions( $params )	);
 
@@ -306,7 +308,7 @@ class coll_media_index_Widget extends ComponentWidget
 		// Exit if no files found
 		if( empty($r) ) return;
 
-		echo $this->disp_params[ 'block_start'];
+		echo $this->disp_params['block_start'];
 
 		// Display title if requested
 		$this->disp_title();

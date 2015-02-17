@@ -25,7 +25,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _comment.funcs.php 8134 2015-02-03 06:41:12Z attila $
+ * @version $Id: _comment.funcs.php 8273 2015-02-16 16:19:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -713,24 +713,21 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 
 			if( ! empty( $Comment->ID ) )
 			{ // Comment from DB
-				skin_include( $params['comment_template'], array(
+				skin_include( $params['comment_template'], array_merge( $params, array(
 						'Comment'          => & $Comment,
-						'comment_start'    => $comment_start,
-						'comment_end'      => $params['comment_end'],
-						'link_to'          => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-						'author_link_text' => $params['author_link_text'],
-					) );
+						'comment_start'    => $comment_start
+					) ) );
 			}
 			else
 			{ // PREVIEW comment
-				skin_include( $params['comment_template'], array(
+				skin_include( $params['comment_template'], array_merge( $params, array(
 						'Comment'              => & $Comment,
 						'comment_block_start'  => $Comment->email_is_detected ? '' : $params['preview_block_start'],
 						'comment_start'        => $comment_start,
 						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
 						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
 						'author_link_text'     => $params['author_link_text'],
-					) );
+					) ) );
 			}
 
 			// Display the rest replies recursively

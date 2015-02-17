@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_featured_intro.widget.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -111,6 +111,15 @@ class coll_featured_intro_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'original',
 				),
+				'blog_ID' => array(
+					'label' => T_('Collections'),
+					'note' => T_('List collection IDs separated by , or use * for all collections'),
+					'size' => 4,
+					'type' => 'text',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Collection IDs.') ),
+					'defaultvalue' => '-',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -156,7 +165,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = get_featured_Item( 'front' ) )
+		if( $Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( $this->disp_params['skin_template'].'.inc.php', array(

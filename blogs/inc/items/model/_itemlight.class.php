@@ -28,7 +28,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlight.class.php 8134 2015-02-03 06:41:12Z attila $
+ * @version $Id: _itemlight.class.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -119,6 +119,14 @@ class ItemLight extends DataObject
 	 */
 	var $tags = NULL;
 
+	/**
+	 * Array of dbchanges flag to be able to check modifications, and execute update queries only when required
+	 * Note: Only those updates needs to be tracked in this var which are saved in a relational table ( e.g. tags, extracats )
+	 * @access protected
+	 * @var array
+	 */
+	var $dbchanges_flags = array();
+
 
 	/**
 	 * Constructor
@@ -200,7 +208,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d user post read statuses') ),
+				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d recordings of a post having been read') ),
 			);
 	}
 
@@ -1357,9 +1365,8 @@ class ItemLight extends DataObject
 		{
 			case 'main_cat_ID':
 				$r = $this->set_param( 'main_cat_ID', 'number', $parvalue, false );
-				// make sure main cat is in extracat list and there are no duplicates
-				$this->extra_cat_IDs[] = $this->main_cat_ID;
-				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
+				// re-set the extracat ids to make sure main cat is in extracat list and there are no duplicates
+				$this->set( 'extra_cat_IDs', $this->extra_cat_IDs, false );
 				// Invalidate derived property:
 				$this->blog_ID = NULL;
 				unset($this->main_Chapter); // dereference
@@ -1374,7 +1381,9 @@ class ItemLight extends DataObject
 				// make sure main cat is in extracat list and there are no duplicates
 				$this->extra_cat_IDs[] = $this->main_cat_ID;
 				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
-				break;
+				// Mark that extracats has been updated
+				$this->dbchanges_flags['extra_cat_IDs'] = true;
+				return true; // always return true, since we don't know what was the previous value
 
 			case 'issue_date':
 			case 'datestart':

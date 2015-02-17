@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_list.widget.php 8199 2015-02-09 09:00:39Z yura $
+ * @version $Id: _coll_item_list.widget.php 8274 2015-02-17 01:29:58Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -95,14 +95,21 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => 'no',
 				),
 				'blog_ID' => array(
-					'label' => T_( 'Blog' ),
-					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
+					'label' => T_('Collections'),
+					'note' => T_('List collection IDs separated by , or use * for all collections'),
 					'size' => 4,
+					'type' => 'text',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Collection IDs.') ),
+					'defaultvalue' => '',
 				),
 				'cat_IDs' => array(
-					'label' => T_( 'Categories' ),
-					'note' => T_( 'List category IDs separated by ,' ),
+					'label' => T_('Categories'),
+					'note' => T_('List category IDs separated by ,'),
 					'size' => 15,
+					'type' => 'text',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
 				'item_group_by' => array(
 					'label' => T_('Group by'),
@@ -140,7 +147,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => true,
 				),
 				'item_title_link_type' => array(
-					'label' => T_('Link titles'),
+					'label' => /* TRANS: Where should titles be linked to? */ T_('Link titles to'),
 					'note' => T_('Where should titles be linked to?'),
 					'type' => 'select',
 					'options' => array(
@@ -149,7 +156,7 @@ class coll_item_list_Widget extends ComponentWidget
 							'linkto_url'  => T_('Item URL'),
 							'none'        => T_('Nowhere'),
 						),
-					'defaultvalue' => 'auto',
+					'defaultvalue' => 'permalink',
 				),
 				'attached_pics' => array(
 					'label' => T_('Attached pictures'),
@@ -157,8 +164,8 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'radio',
 					'options' => array(
 							array( 'none', T_('None') ),
-							array( 'first', T_('Display first') ),
-							array( 'all', T_('Display all') ) ),
+							array( 'first', T_('Display first picture') ),
+							array( 'all', T_('Display all pictures') ) ),
 					'defaultvalue' => 'none',
 				),
 				'thumb_size' => array(
@@ -307,9 +314,10 @@ class coll_item_list_Widget extends ComponentWidget
 		// Filter list:
 		$filters = array(
 				'cat_array' => $cat_array, // Restrict to selected categories
-				'orderby' => $this->disp_params['order_by'],
-				'order' => $this->disp_params['order_dir'],
-				'unit' => 'posts', // We want to advertise all items (not just a page or a day)
+				'orderby'   => $this->disp_params['order_by'],
+				'order'     => $this->disp_params['order_dir'],
+				'unit'      => 'posts', // We want to advertise all items (not just a page or a day)
+				'coll_IDs'  => $this->disp_params['blog_ID'],
 			);
 
 		if( isset( $this->disp_params['page'] ) )

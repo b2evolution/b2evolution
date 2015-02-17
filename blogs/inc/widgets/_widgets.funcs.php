@@ -78,10 +78,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	$basic_widgets_insert_sql_rows = array();
 
 	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_a_ID, $blog_b_ID, $blog_linkblog_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );
-	$blog_linkblog_ID = intval( $blog_linkblog_ID );
 	$blog_photoblog_ID = intval( $blog_photoblog_ID );
 	$blog_forums_ID = intval( $blog_forums_ID );
 	$blog_manual_ID = intval( $blog_manual_ID );
@@ -194,8 +194,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_search_form', 'core', 50 );
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_category_list', 'core', 60 );
 
-		if( $blog_id == $blog_linkblog_ID )
-		{ // Advertisements, Install only for blog #3 linkblog/infoblog
+		if( $blog_id == $blog_home_ID )
+		{ // Advertisements, Install only for blog #1 home blog
 			add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 70, array(
 					'title' => 'Advertisement (Demo)',
 					'item_type' => 4000,
@@ -214,9 +214,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		{
 			add_basic_widget( $blog_id, 'Sidebar', 'coll_media_index', 'core', 80, 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 		}
-		if( ! empty( $blog_linkblog_ID ) && $blog_id <= $blog_b_ID )
+		if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
 		{
-			add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_linkblog_ID ) );
+			add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_home_ID, 'item_type' => '3000' ) );
 		}
 	}
 	add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
@@ -233,9 +233,22 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 
 	/* Front Page Main Area */
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10 );
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20 );
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
+	$featured_intro_params = NULL;
+	if( $kind == 'main' )
+	{ // Hide a title of the front intro post
+		$featured_intro_params = array( 'disp_title' => 0 );
+	}
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
+	$post_list_params = NULL;
+	if( $kind == 'main' )
+	{ // Display the posts from all other blogs if it is allowed by blogs setting "Blogs to aggregate"
+		$post_list_params = array( 'blog_ID' => '', 'limit' => 50 );
+	}
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );
+	if( $kind != 'main' )
+	{ // Don't install the "Recent Commnets" widget for Main blogs
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
+	}
 
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );

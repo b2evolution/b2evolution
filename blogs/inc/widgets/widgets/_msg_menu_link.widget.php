@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id: _msg_menu_link.widget.php 7816 2014-12-15 13:05:21Z yura $
+ * @version $Id: _msg_menu_link.widget.php 8247 2015-02-12 12:24:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -127,9 +127,10 @@ class msg_menu_link_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 				'blog_ID' => array(
-					'label' => T_('Blog ID'),
-					'note' => T_('Leave empty for current blog.'),
-					'type' => 'text',
+					'label' => T_('Collection ID'),
+					'note' => T_('Leave empty for current collection.'),
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -245,7 +246,7 @@ class msg_menu_link_Widget extends ComponentWidget
 				// set allow blockcache to 0, this way make sure block cache is never allowed for messages
 				$this->disp_params[ 'allow_blockcache' ] = 0;
 				// Is this the current display?
-				if( $disp == 'threads' || $disp == 'messages' )
+				if( ( $disp == 'threads' && ( ! isset( $_GET['disp'] ) || $_GET['disp'] != 'msgform' ) ) || $disp == 'messages' )
 				{ // The current page is currently displaying the messages:
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];

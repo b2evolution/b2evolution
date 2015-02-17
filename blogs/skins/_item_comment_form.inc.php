@@ -83,13 +83,21 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			{ // Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
 				// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 				skin_include( $params['comment_template'], array(
-						'Comment'              => & $Comment,
-						'comment_block_start'  => $Comment->email_is_detected ? '' : $params['preview_block_start'],
-						'comment_start'        => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
-						'comment_end'          => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
-						'comment_block_end'    => $Comment->email_is_detected ? '' : $params['preview_block_end'],
-						'author_link_text'     => $params['author_link_text'],
-						'image_size'           => $params['comment_image_size'],
+						'Comment'               => & $Comment,
+						'comment_block_start'   => $Comment->email_is_detected ? '' : $params['preview_block_start'],
+						'comment_start'         => $Comment->email_is_detected ? $params['comment_error_start'] : $params['preview_start'],
+						'comment_end'           => $Comment->email_is_detected ? $params['comment_error_end'] : $params['preview_end'],
+						'comment_block_end'     => $Comment->email_is_detected ? '' : $params['preview_block_end'],
+						'comment_title_before'  => $params['comment_title_before'],
+						'comment_title_after'   => $params['comment_title_after'],
+						'comment_rating_before' => $params['comment_rating_before'],
+						'comment_rating_after'  => $params['comment_rating_after'],
+						'comment_text_before'   => $params['comment_text_before'],
+						'comment_text_after'    => $params['comment_text_after'],
+						'comment_info_before'   => $params['comment_info_before'],
+						'comment_info_after'    => $params['comment_info_after'],
+						'author_link_text'      => $params['author_link_text'],
+						'image_size'            => $params['comment_image_size'],
 					) );
 				// Note: You can customize the default item comment by copying the generic
 				// /skins/_item_comment.inc.php file into the current skin folder.
