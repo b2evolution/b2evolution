@@ -20,9 +20,22 @@ We are planing to transition the SVN development branches to GitHub also but hav
 
 ### Requirements
 
-PHP 5 + MySQL 5. Optimized for Apache 2.
+PHP 5.2+. MySQL 5+. Optimized for Apache 2+.
 
 More info: http://b2evolution.net/man/installation-upgrade/system_requirements
+
+### Download
+
+#### Bower
+
+Just type `bower install b2evolution` .
+
+#### Manual Download
+
+You can download releases either from GitHub or from b2evolution.net :
+
+- https://github.com/b2evolution/b2evolution/releases
+- http://b2evolution.net/downloads/
 
 ### Installation
 
@@ -34,6 +47,14 @@ More info: http://b2evolution.net/man/installation-upgrade/new-install/installat
 
 ### Upgrade
 
-The installation script will also detect a current installation (any version) and offer to upgrade it to the current version.
+#### Automatic
+
+b2evolution includes an automatic upgrade feature which you can use to automatically download the lastest stable version and perform the upgrade operations.
+
+#### Manual
+
+You can download any newer version (including beta releases), overwrite the files of your current install (after backup) and then run the install script.
+
+The installation script will detect that the b2evolution database is already installed (any version) and offer to upgrade it to the current version.
 
 More info: http://b2evolution.net/man/installation-upgrade/upgrading/
