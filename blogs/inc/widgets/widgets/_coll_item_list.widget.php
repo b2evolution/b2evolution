@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_list.widget.php 7815 2014-12-15 13:03:31Z yura $
+ * @version $Id: _coll_item_list.widget.php 8265 2015-02-15 04:34:35Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -105,12 +105,17 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_( 'Blog' ),
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
 					'size' => 4,
+					'type' => 'integer',
+					'allow_empty' => true,
 				),
 /* TODO: filter this out from all "SIMPLE" lists and keep it only in universal list
 				'cat_IDs' => array(
 					'label' => T_( 'Categories' ),
 					'note' => T_( 'List category IDs separated by ,' ),
 					'size' => 15,
+					'type' => 'text',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
 */
 				'item_group_by' => array(
@@ -149,7 +154,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => true,
 				),
 				'item_title_link_type' => array(
-					'label' => T_('Link titles'),
+					'label' => /* TRANS: Where should titles be linked to? */ T_('Link titles to'),
 					'note' => T_('Where should titles be linked to?'),
 					'type' => 'select',
 					'options' => array(
@@ -166,8 +171,8 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'radio',
 					'options' => array(
 							array( 'none', T_('None') ),
-							array( 'first', T_('Display first') ),
-							array( 'all', T_('Display all') ) ),
+							array( 'first', T_('Display first picture') ),
+							array( 'all', T_('Display all pictures') ) ),
 					'defaultvalue' => 'none',
 				),
 				'item_pic_link_type' => array(
@@ -256,9 +261,11 @@ class coll_item_list_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $BlogCache->get_by_ID( $this->disp_params[ 'blog_ID' ], false ) : $Blog );
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
 
-		if( empty($listBlog) )
+		$listBlog = ( $blog_ID ? $BlogCache->get_by_ID( $blog_ID, false ) : $Blog );
+
+		if( empty( $listBlog ) )
 		{
 			echo $this->disp_params['block_start'];
 			echo $this->disp_params['block_body_start'];
@@ -270,7 +277,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$limit = $this->disp_params[ 'limit' ];
+		$limit = intval( $this->disp_params['limit'] );
 
 		if( $this->disp_params['disp_teaser'] )
 		{ // We want to show some of the post content, we need to load more info: use ItemList2
@@ -287,8 +294,8 @@ class coll_item_list_Widget extends ComponentWidget
 		// Filter list:
 		$filters = array(
 //				'cat_array' => $cat_array, // Restrict to selected categories
-				'orderby' => $this->disp_params[ 'order_by' ],
-				'order' => $this->disp_params[ 'order_dir' ],
+				'orderby' => $this->disp_params['order_by'],
+				'order' => $this->disp_params['order_dir'],
 				'unit' => 'posts', // We want to advertise all items (not just a page or a day)
 			);
 
@@ -316,7 +323,7 @@ class coll_item_list_Widget extends ComponentWidget
 				return false;
 			}
 
-			$filters['tags'] = implode(',',$all_tags);
+			$filters['tags'] = implode( ',', $all_tags );
 
 			if( !empty($Item) )
 			{	// Exclude current Item
@@ -603,10 +610,12 @@ class coll_item_list_Widget extends ComponentWidget
 	{
 		global $Blog;
 
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+
 		return array(
-				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
-				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], 	// Has the content of the displayed blog changed ?
+				'wi_ID'        => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $blog_ID ) ? $Blog->ID : $blog_ID, // Has the content of the displayed blog changed ?
 			);
 	}
 }

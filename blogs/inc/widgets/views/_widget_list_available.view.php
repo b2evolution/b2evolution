@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version $Id: _widget_list_available.view.php 8214 2015-02-10 10:17:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -26,6 +26,15 @@ $core_componentwidget_defs = array(
 			'free_html',
 			'coll_logo',
 			'coll_avatar',
+		'*'.T_('Blog navigation'),
+			'menu_link',
+			'msg_menu_link',
+			'profile_menu_link',
+			'coll_tag_cloud',
+			'coll_category_list',
+			'coll_common_links',
+			'coll_search_form',
+			'coll_xml_feeds',
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_item_list',			// Universal Item List
 			'coll_post_list',			// Simple List
@@ -36,14 +45,6 @@ $core_componentwidget_defs = array(
 			'coll_media_index',
 			'coll_comment_list',
 			'coll_featured_intro',
-		'*'.T_('Blog navigation'),
-			'coll_tag_cloud',
-			'coll_category_list',
-			'coll_common_links',
-			'coll_search_form',
-			'coll_xml_feeds',
-			'menu_link',
-			'msg_menu_link',
 		'*'.T_('Meta info for the blog'),
 			'coll_title',
 			'coll_tagline',
@@ -78,7 +79,7 @@ foreach( $core_componentwidget_defs as $code )
 
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).'<strong>'.$ComponentWidget->get_name().'</strong>';
+		echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
 		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span>';
 		echo '</li>';
 	}
@@ -113,7 +114,7 @@ if( ! empty($Plugin_array) )
 	{
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).'<strong>'.$Plugin->name.'</strong>';
+		echo get_icon( 'new' ).' <strong>'.$Plugin->name.'</strong>';
 		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
 		echo '</li>';
 	}

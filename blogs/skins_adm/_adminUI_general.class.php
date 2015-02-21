@@ -26,7 +26,7 @@
  *
  * @todo dh> Refactor to allow easier contributions!
  *
- * @version $Id$
+ * @version $Id: _adminUI_general.class.php 8214 2015-02-10 10:17:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1475,9 +1475,9 @@ class AdminUI_general extends Menu
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.$secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $secure_htsrv_url)).'">'.T_('Logout').'</a>
+					.'<a href="'.$secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $secure_htsrv_url)).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
-					.T_('Logout').'" /></a>
+					.T_('Log out').'" /></a>
 				</span>
 
 				'.$app_shortname.' v <strong>'.$app_version.'</strong>

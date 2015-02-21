@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _coll_tag_cloud.widget.php 8237 2015-02-12 06:24:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -107,6 +107,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Include blogs'),
 					'note' => T_('A comma-separated list of Blog IDs.'),
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*)?$/',
+																		'error'   => T_('Invalid list of Blog IDs.') ),
 				),
 			'max_tags' => array(
 					'type' => 'integer',

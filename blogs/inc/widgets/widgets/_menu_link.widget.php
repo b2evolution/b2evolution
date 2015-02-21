@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _menu_link.widget.php 7815 2014-12-15 13:03:31Z yura $
+ * @version $Id: _menu_link.widget.php 8237 2015-02-12 06:24:52Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -150,7 +150,8 @@ class menu_link_Widget extends ComponentWidget
 				'blog_ID' => array(
 					'label' => T_('Blog ID'),
 					'note' => T_( 'Leave empty for current blog.' ),
-					'type' => 'text',
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -158,7 +159,8 @@ class menu_link_Widget extends ComponentWidget
 				'item_ID' => array(
 					'label' => T_('Item ID'),
 					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ),
-					'type' => 'text',
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),
@@ -372,7 +374,7 @@ class menu_link_Widget extends ComponentWidget
 					return false;
 				}
 				$url = get_user_logout_url( $current_Blog->ID );
-				$text = T_('Logout');
+				$text = T_('Log out');
 				break;
 
 			case 'register':

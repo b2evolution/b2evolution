@@ -10,6 +10,7 @@ body {
 div.sitewide_header,
 div.sitewide_footer {
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
+	line-height: normal;
 	color: #ccc;
 	margin: 0;
 	clear: both;
@@ -69,7 +70,7 @@ div.sitewide_header a.swhead_sitename {
 	font-weight: 400;
 }
 div.sitewide_header a.swhead_item_selected,
-div.sitewide_header a.swhead_item:hover {	
+div.sitewide_header a.swhead_item:hover {
 	text-decoration: none;
 	text-shadow: 0px 0 3px #FFF;
 	color: #FFF;
@@ -79,8 +80,38 @@ div.sitewide_header a.swhead_item:hover {
 	background: -ms-linear-gradient(top, #696c72, #333334);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 }
+div.sitewide_header .floatright a.swhead_item_selected,
+div.sitewide_header .floatright a.swhead_item:hover {
+	text-decoration: underline;
+	background: none;
+	text-shadow: none;
+	filter: none;
+}
+div.sitewide_header a.swhead_item.swhead_item_white {
+	background: #FFF;
+	border-radius: 3px;
+	margin: 4px 15px 4px 0;
+	padding: 8px 9px;
+	color: #000;
+}
+div.sitewide_header a.swhead_item.swhead_item_white.swhead_item_selected,
+div.sitewide_header a.swhead_item.swhead_item_white:hover {
+	background: #FFF;
+}
+div.sitewide_header a.swhead_item.user {
+	position: relative;
+	padding-left: 49px;
+	font-weight: normal;
+}
+div.sitewide_header a.swhead_item.user img {
+	position: absolute;
+	top: 0;
+	left: 12px;
+	bottom: 0;
+	margin: auto;
+}
 
-div.sitewide_header a.swhead_sitename:hover {	
+div.sitewide_header a.swhead_sitename:hover {
 	text-decoration: none;
 	text-shadow: 0px 0 3px #FFF;
 	color: #FFF;

@@ -58,7 +58,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 		// We want to display the post time:
 		$Item->issue_time( array(
-				'before'      => T_('posted on '),
+				'before'      => ' '.T_('posted on '),
 				'after'       => ' ',
 				'time_format' => 'M j, Y',
 			) );
@@ -78,6 +78,12 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 			'include_other'   => true,
 			'include_external'=> true,
 			'link_categories' => true,
+		) );
+
+		// Link for editing
+		$Item->edit_link( array(
+			'before'    => ' &bull; ',
+			'after'     => '',
 		) );
 	?>
 	</div>
@@ -122,11 +128,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_title' => '#',
 							'use_popup' => false,
 						) );
-
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before'    => ' &bull; ',
-					'after'     => '',
-				) );
 		?>
 	</div>
 

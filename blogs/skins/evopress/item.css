@@ -78,6 +78,9 @@ content: "\00BB \0020";
 #sidebar ul li.widget_core_coll_item_list.nobullets ul li:before {
 	content: none;
 }
+#sidebar ul ul li div.item_title {
+	display: inline;
+}
 
 .bText ol {
 padding: 0 0 0 35px;

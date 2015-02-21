@@ -28,6 +28,9 @@ skin_widget( array(
 		'block_end' => '',
 		'block_display_title' => false,
 		'disp_search_options' => 1,
+		'search_class'         => 'extended_search_form input-group',
+		'search_submit_before' => '<span class="input-group-btn">',
+		'search_submit_after'  => '</span>',
 		'use_search_disp' => 1,
 	) );
 // ---------------------------------- END OF COMMON LINKS ---------------------------------

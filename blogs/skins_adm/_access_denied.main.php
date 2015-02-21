@@ -21,7 +21,7 @@ headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (
 	</div>
 	<p style="text-align:center;"><?php
 		$secure_httsrv_url = get_secure_htsrv_url();
-		echo '<a href="'.$secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($ReqURL, $secure_httsrv_url)).'">'.T_('Logout').'</a>
+		echo '<a href="'.$secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($ReqURL, $secure_httsrv_url)).'">'.T_('Log out').'</a>
 					&bull;
 					<a href="'.$baseurl.'">'.T_('Exit to blogs').'</a>';
 	?></p>

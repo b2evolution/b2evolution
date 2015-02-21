@@ -32,7 +32,7 @@
  * @author jeffbearer: Jeff BEARER - {@link http://www.jeffbearer.com/}.
  * @author jupiterx: Jordan RUNNING.
  *
- * @version $Id: _user.funcs.php 8123 2015-02-01 13:02:59Z fplanque $
+ * @version $Id: _user.funcs.php 8214 2015-02-10 10:17:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -586,8 +586,8 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Logout');
-	if( $link_title == '#' ) $link_title = T_('Logout from your account');
+	if( $link_text == '' ) $link_text = T_('Log out');
+	if( $link_title == '#' ) $link_title = T_('Log out from your account');
 
 	$r = $before;
 	$r .= '<a href="'.get_user_logout_url().'"';
@@ -920,11 +920,12 @@ function get_user_identity_link( $user_login, $user_ID = NULL, $profile_tab = 'p
  *
  * @param integer User ID
  * @param string Name of user tab in backoffice ( values: profile, avatar, pwdchange, userprefs, advanced, admin, blogs )
+ * @param integer|NULL Blog ID or NULL to use current blog
  * @return string Url
  */
-function get_user_identity_url( $user_ID, $user_tab = 'profile' )
+function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL )
 {
-	global $current_User, $Blog, $Settings;
+	global $current_User, $Settings;
 
 	if( $user_ID == NULL )
 	{
@@ -946,7 +947,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 
 	if( !is_logged_in() )
 	{ // user is not logged in
-		return $User->get_userpage_url();
+		return $User->get_userpage_url( $blog_ID );
 	}
 
 	if( !$current_User->check_perm( 'user', 'view', false, $User ) )
@@ -956,12 +957,12 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile' )
 
 	if( !is_admin_page() )
 	{ // can't display the profile form, display the front office User form
-		return $User->get_userpage_url();
+		return $User->get_userpage_url( $blog_ID );
 	}
 
-	if( $current_User->check_status( 'can_access_admin' ) && ( ($current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
+	if( $current_User->check_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
 	{	// Go to backoffice profile:
-		return get_user_settings_url( $user_tab, $user_ID );
+		return get_user_settings_url( $user_tab, $user_ID, $blog_ID );
 	}
 
 	// can't show anything:

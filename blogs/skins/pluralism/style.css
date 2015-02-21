@@ -352,6 +352,9 @@ padding: 0;
 #sidebar ul ul li:before {
 content: "\00BB \0020";
 }
+#sidebar ul ul li div.item_title {
+	display: inline;
+}
 
 .submit, .preview, .SaveButton, .ResetButton {
 	padding: 1px;

@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap
  *
- * @version $Id$
+ * @version $Id: index.main.php 4716 2013-09-12 08:07:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -167,7 +167,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
-	if( $disp != 'front' && $disp != 'download' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'search' )
 	{
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
@@ -292,6 +292,10 @@ siteskin_include( '_site_body_header.inc.php' );
 				// This will enclose (foot)notes:
 				'notes_start' => '<div class="notes">',
 				'notes_end' => '</div>',
+				// Widget 'Search form':
+				'search_class'         => 'input-group',
+				'search_submit_before' => '<span class="input-group-btn">',
+				'search_submit_after'  => '</span>',
 			) );
 		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>

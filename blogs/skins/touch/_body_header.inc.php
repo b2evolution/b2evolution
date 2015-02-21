@@ -99,7 +99,7 @@ global $dummy_fields;
 			<li><a href="<?php echo get_user_pwdchange_url(); ?>"><?php echo T_('Change password'); ?></a></li>
 			<li><a href="<?php echo get_user_preferences_url(); ?>"><?php echo T_('Preferences'); ?></a></li>
 			<li><a href="<?php echo get_user_subs_url(); ?>"><?php echo T_('Notifications'); ?></a></li>
-			<li><a href="<?php echo get_user_logout_url(); ?>"><?php echo T_('Logout'); ?></a></li>
+			<li><a href="<?php echo get_user_logout_url(); ?>"><?php echo T_('Log out'); ?></a></li>
 		</ul>
 	</div>
 	<?php } ?>

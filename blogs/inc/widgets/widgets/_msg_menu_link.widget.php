@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author efy-asimo: Attila Simo
  *
- * @version $Id: _msg_menu_link.widget.php 7815 2014-12-15 13:03:31Z yura $
+ * @version $Id: _msg_menu_link.widget.php 8229 2015-02-11 09:41:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -129,7 +129,8 @@ class msg_menu_link_Widget extends ComponentWidget
 				'blog_ID' => array(
 					'label' => T_('Blog ID'),
 					'note' => T_('Leave empty for current blog.'),
-					'type' => 'text',
+					'type' => 'integer',
+					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
 				),

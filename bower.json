@@ -1,0 +1,27 @@
+{
+  "name": "b2evolution",
+  "version": "5.2.2",
+  "description": "Multiblog/CMS + user community + email marketing + social network + everything you need to run and maintain a modern website (PHP/MySQL).",
+  "authors": [
+    "Francois Planque <fplanque@users.noreply.github.com>"
+  ],
+  "main": "blogs/install/index.php",
+  "keywords": [
+    "cms",
+    "blog",
+    "forum",
+    "php",
+    "mysql"
+  ],
+  "license": "GPL-2.0+",
+  "homepage": "http://b2evolution.net",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "gettext",
+    "Templates"
+  ]
+}

@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _user_tools.widget.php 8214 2015-02-10 10:17:40Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -208,7 +208,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Logout' ),
+				'defaultvalue' => T_( 'Log out' ),
 			),
 		), parent::get_param_definitions( $params )	);
 

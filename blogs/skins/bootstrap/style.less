@@ -44,14 +44,23 @@ input.search_field {
 	margin-bottom: 0;
 	display: inline-block;
 }
-div.compact_search_form input.search_field {
-	width: 183px;
+form.search .search_options {
+	display: table-row;
+	.search_option input {
+		margin-right: 5px;
+	}
 }
 div.extended_search_form {
 	text-align: center;
-	input.search_field {
-		margin-right: 3px;
-		width: 500px;
+	margin: 0 auto 2em auto;
+	max-width: 530px;
+	.search_options {
+		width: 100%;
+		text-align: center;
+		.search_option {
+			display: inline-block;
+			margin-right: 10px;
+		}
 	}
 }
 
@@ -141,6 +150,9 @@ form.bComment {
 			color: #999;
 		}
 	}
+}
+form#user_checkchanges.bComment{
+	border: none;
 }
 
 div.bSideItem {

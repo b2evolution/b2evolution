@@ -25,7 +25,7 @@ class bootstrap_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'bootstrap';
+		return 'Bootstrap Blog';
 	}
 
 

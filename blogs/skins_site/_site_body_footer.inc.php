@@ -9,6 +9,11 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $baseurl;
+
+$site_footer_text = $Settings->get( 'site_footer_text' );
+
+if( ! empty( $site_footer_text ) )
+{ // Display site footer only when it has a text
 ?>
 
 <div class="sitewide_footer">
@@ -21,3 +26,6 @@ global $baseurl;
 		echo str_replace( array_keys( $site_footer_vars ), $site_footer_vars, $Settings->get( 'site_footer_text' ) );
 	?></p>
 </div>
+<?php
+}
+?>

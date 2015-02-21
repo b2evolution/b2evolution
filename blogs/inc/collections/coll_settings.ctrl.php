@@ -31,7 +31,7 @@
  * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
  * @todo Currently if you change the name of a blog it gets not reflected in the blog list buttons!
  *
- * @version $Id: coll_settings.ctrl.php 7942 2015-01-11 00:28:14Z fplanque $
+ * @version $Id: coll_settings.ctrl.php 8225 2015-02-11 07:22:22Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -376,24 +376,28 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->breadcrumbpath_add( T_('Front page'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'collection-front-page-settings' );
 		break;
 
 	case 'features':
 		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->breadcrumbpath_add( T_('Posts'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'post-features' );
 		break;
 
 	case 'comments':
 		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=features' );
 		$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'comment-features' );
 		break;
 
 	case 'other':
 		$AdminUI->set_path( 'blogs', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=features' );
 		$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'features-others' );
 		break;
 
 	case 'skin':

@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: __core.init.php 7685 2014-11-19 10:05:48Z yura $
+ * @version $Id: __core.init.php 8214 2015-02-10 10:17:40Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -1386,7 +1386,7 @@ class _core_Module extends Module
 				'separator' => true,
 			);
 		$entries['userprefs']['entries']['logout'] = array(
-				'text' => T_('Logout'),
+				'text' => T_('Log out'),
 				'href' => get_user_logout_url(),
 			);
 

@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 8168 2015-02-06 02:50:21Z fplanque $
+ * @version $Id: _functions_create.php 8219 2015-02-10 21:25:08Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1470,7 +1470,7 @@ function create_demo_contents()
 	$cat_linkblog_contrib = cat_create( T_('Contributors'), 'NULL', $blog_linkblog_ID );
 
 	// Create categories for photoblog
-	$cat_photo_album = cat_create( T_('Monument Valley'), 'NULL', $blog_photoblog_ID );
+	$cat_photo_album = cat_create( T_('Landscapes'), 'NULL', $blog_photoblog_ID );
 
 	// Create categories for forums
 	$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_forums_ID, NULL, false, NULL, true );
@@ -1580,6 +1580,15 @@ function create_demo_contents()
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
+	$edited_Item->insert( 1, T_('Sunset'), '',
+		$now, $cat_photo_album, array(), 'published','en-US' );
+	$LinkOwner = new LinkItem( $edited_Item );
+	$edit_File = new File( 'shared', 0, 'sunset/sunset.jpg' );
+	$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'.
 ( $test_install_all_features ? '
 [infodot:5:191:36:100px]School bus [b]here[/b]
@@ -1617,11 +1626,6 @@ a school bus stop where you wouldn\'t really expect it!
 	$now = date('Y-m-d H:i:s',$timestamp + 59);
 	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = new Item();
-	$edited_Item->insert( 1, 'Alex', '', $now, $cat_linkblog_contrib, array(), 'published', 'ru-RU', '', 'http://b2evo.sonorth.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);

@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _blog.funcs.php 7942 2015-01-11 00:28:14Z fplanque $
+ * @version $Id: _blog.funcs.php 8299 2015-02-19 12:10:05Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -777,23 +777,20 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 
 	$BlogCache = & get_BlogCache();
 
-	if( is_null($blog_ids) )
+	if( is_null( $blog_ids ) )
 	{
 		global $blog;
 		$blog_ids = $blog;
 	}
 
-	if( is_array($blog_ids) )
-	{	// Get quoted ID list
-		$blog_ids = $DB->quote($blog_ids);
-		$where_cats = 'cat_blog_ID IN ('.$blog_ids.')';
+	if( is_array( $blog_ids ) )
+	{ // Get quoted ID list
+		$where_cats = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
-	{
-		$Blog = & $BlogCache->get_by_ID($blog_ids);
-
-		// Get list of relevant blogs
-		$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+	{ // Get list of relevant blogs
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
+		$where_cats = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
 	// fp> verrry dirty and params; TODO: clean up
@@ -801,49 +798,46 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	//     It worked locally somehow, but not live.
 	//     This takes up to ~50% (but more likely 15%) off the total SQL time. With the query being cached, it would be far better.
 
-	// build query, only joining categories, if not using all.
-	$sql = 'SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count, tag_ID, cat_blog_ID
-			FROM T_items__tag
-			INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID';
+	// Build query to get the tags:
+	$tags_SQL = new SQL();
+	$tags_SQL->SELECT( 'LOWER( tag_name ) AS tag_name, post_datestart, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	$tags_SQL->FROM( 'T_items__tag' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 
 	if( $where_cats != '1' )
-	{	// we have to join the cats
-		$sql .= '
-		 INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
-		 INNER JOIN T_categories ON postcat_cat_ID = cat_ID';
+	{ // we have to join the cats
+		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	}
+	else
+	{ // Join categories table because we need the field cat_blog_ID everytime
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 	}
 
-	$sql .= "
-		 INNER JOIN T_items__item ON itag_itm_ID = post_ID
-		 WHERE $where_cats
-		   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'";
+	$tags_SQL->WHERE( $where_cats );
+	$tags_SQL->WHERE_and( 'post_status = "published"' );
+	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
 	if( $skip_intro_posts )
-	{
-		$sql .= ' AND post_ptyp_ID NOT IN ('.implode(',',$posttypes_specialtypes).')';
+	{ // Skip "Intro" posts
+		$tags_SQL->WHERE_and( 'post_ptyp_ID NOT IN ( '.implode( ', ', $posttypes_specialtypes ).' )' );
 	}
 
-	if( !empty($filter_list) )
-	{	// Filter tags
-		$filter_list = explode( ',', $filter_list ) ;
-
-		$filter_tags = array();
-		foreach( $filter_list as $l_tag )
-		{
-			$filter_tags[] = '"'.$DB->escape(trim($l_tag)).'"';
-		}
-
-		$sql .= ' AND tag_name NOT IN ('.implode(', ', $filter_tags).')';
+	if( ! empty( $filter_list ) )
+	{ // Filter tags
+		$tags_SQL->WHERE_and( 'tag_name NOT IN ( '.$DB->quote( explode( ', ', $filter_list ) ).' )' );
 	}
 
-	$sql .= ' GROUP BY tag_name ORDER BY tag_count DESC';
+	$tags_SQL->GROUP_BY( 'tag_name' );
+	$tags_SQL->ORDER_BY( 'tag_count DESC' );
 
-	if( !empty($limit) )
-	{
-		$sql .= ' LIMIT '.$limit;
+	if( ! empty( $limit ) )
+	{ // Limit
+		$tags_SQL->LIMIT( $limit );
 	}
 
-	return $DB->get_results( $sql, OBJECT, 'Get tags' );
+	return $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags' );
 }
 
 

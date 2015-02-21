@@ -34,7 +34,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _dataobjectcache.class.php 7189 2014-07-31 06:58:37Z yura $
+ * @version $Id: _dataobjectcache.class.php 8198 2015-02-09 08:58:14Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -545,9 +545,11 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		if( empty($req_ID) )
+		$req_ID = intval( $req_ID );
+
+		if( empty( $req_ID ) )
 		{
-			if($halt_on_empty)
+			if( $halt_on_empty )
 			{
 				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
 			}
@@ -571,7 +573,7 @@ class DataObjectCache
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
 				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
 				$SQL = $this->get_SQL_object();
-				$SQL->WHERE_and("$this->dbIDname = $req_ID");
+				$SQL->WHERE_and( $this->dbIDname.' = '.$DB->quote( $req_ID ) );
 				if( $row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
 					if( ! $this->instantiate( $row ) )

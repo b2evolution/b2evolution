@@ -18,7 +18,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_general.form.php 8020 2015-01-19 08:18:22Z yura $
+ * @version $Id: _coll_general.form.php 8265 2015-02-15 04:34:35Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -39,7 +39,7 @@ if( $edited_Blog->ID == 0 )
 	$kind_title = get_collection_kinds( $kind );
 	$form_title = sprintf( T_('New %s'), $kind_title ).':';
 
-	$Form->global_icon( sprintf( T_('Abort New %s'), $kind_title ), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
+	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
 }
 
 $Form->begin_form( 'fform', $form_title );
