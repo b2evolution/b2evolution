@@ -8,7 +8,7 @@
  * @package skins
  * @subpackage bootstrap_main
  *
- * @version $Id: _skin.class.php 8273 2015-02-16 16:19:27Z yura $
+ * @version $Id: _skin.class.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -87,10 +87,22 @@ class bootstrap_main_Skin extends Skin
 					'type' => 'color',
 				),
 				'front_bg_color' => array(
-					'label' => T_('Front page main area background color '),
+					'label' => T_('Front page main area background color'),
 					'note' => T_('E-g: #ff0000 for red'),
-					'defaultvalue' => '#999999',
+					'defaultvalue' => '#000000',
 					'type' => 'color',
+				),
+				'front_bg_opacity' => array(
+					'label' => T_('Front page main area background opacity'),
+					'note' => '%',
+					'size' => '2',
+					'maxlength' => '3',
+					'defaultvalue' => '10',
+					'type' => 'integer',
+					'valid_range' => array(
+						'min' => 0, // from 0%
+						'max' => 100, // to 100%
+					),
 				),
 				// Colorbox
 				'colorbox' => array(
@@ -169,9 +181,6 @@ class bootstrap_main_Skin extends Skin
 	{
 		global $Messages, $disp;
 
-		// call parent:
-		parent::display_init();
-
 		require_js( '#jquery#', 'blog' );
 
 		// Use glyph icons, @see get_icon()
@@ -180,16 +189,35 @@ class bootstrap_main_Skin extends Skin
 
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );
-		require_css( '#bootstrap_theme_css#', 'blog' );
-		require_css( 'bootstrap/b2evo.css', 'blog' );
+		// require_css( '#bootstrap_theme_css#', 'blog' );
+
+		// rsc/less/bootstrap-basic_styles.less
+		// rsc/less/bootstrap-basic.less
+		// rsc/less/bootstrap-blog_base.less
+		// rsc/less/bootstrap-item_base.less
+		// rsc/less/bootstrap-evoskins.less
+		// rsc/build/bootstrap-b2evo_base.bundle.css // CSS concatenation of the above
+		require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+
+		// Make sure standard CSS is called ahead of custom CSS generated below:
+		require_css( 'style.css', true );
+
+		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+		if( $this->get_setting( 'colorbox' ) )
+		{
+			require_js_helper( 'colorbox', 'blog' );
+		}
+
+		// JS to init tooltip (E.g. on comment form for allowed file extensions)
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
 
 		// Set bootstrap classes for messages
 		$Messages->set_params( array(
-				'class_success'  => 'alert alert-success fade in',
-				'class_warning'  => 'alert fade in',
-				'class_error'    => 'alert alert-danger fade in',
-				'class_note'     => 'alert alert-info fade in',
-				'before_message' => '<button class="close" data-dismiss="alert">&times;</button>',
+				'class_success'  => 'alert alert-dismissible alert-success fade in',
+				'class_warning'  => 'alert alert-dismissible alert-warning fade in',
+				'class_error'    => 'alert alert-dismissible alert-danger fade in',
+				'class_note'     => 'alert alert-dismissible alert-info fade in',
+				'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
 			) );
 
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied' ) ) )
@@ -207,7 +235,21 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_bg_color' ) )
 			{ // Custom body background color:
-				$custom_css .= 'body.pictured { background-color: '.$color." }\n";
+				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
+				$color = substr( $color, 1 );
+				if( strlen( $color ) == '6' )
+				{ // Color value in format #FFFFFF
+					$color = str_split( $color, 2 );
+				}
+				else
+				{ // Color value in format #FFF
+					$color = str_split( $color, 1 );
+					foreach( $color as $c => $v )
+					{
+						$color[ $c ] = $v.$v;
+					}
+				}
+				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
 			}
 
 			if( $color = $this->get_setting( 'front_title_color' ) )
@@ -225,11 +267,18 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured a { color: '.$color." }\n";
 			}
 
-			if( !empty( $custom_css ) )
+			if( ! empty( $custom_css ) )
 			{
+				if( $disp == 'front' )
+				{ // Use standard bootstrap style on width <= 640px only for disp=front
+					$custom_css = '@media only screen and (min-width: 641px)
+						{
+							'.$custom_css.'
+						}';
+				}
 				$custom_css = '<style type="text/css">
 	<!--
-	'.$custom_css.'
+		'.$custom_css.'
 	-->
 	</style>';
 				add_headline( $custom_css );
@@ -258,7 +307,7 @@ class bootstrap_main_Skin extends Skin
 						'header_text_single' => '',
 					'header_end' => '',
 					'head_title' => '<div class="panel-heading">$title$<span class="pull-right">$global_icons$</span></div>'."\n",
-					'filters_start' => '<div class="panel-body form-inline">',
+					'filters_start' => '<div class="filters panel-body form-inline">',
 					'filters_end' => '</div>',
 					'messages_start' => '<div class="messages form-inline">',
 					'messages_end' => '</div>',
@@ -337,32 +386,144 @@ class bootstrap_main_Skin extends Skin
 				);
 				break;
 
+			case 'blockspan_form':
+				// Form settings for filter area:
+				return array(
+					'layout'         => 'blockspan',
+					'formclass'      => 'form-inline',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '$title$'."\n",
+					'no_title_fmt'   => '',
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+																.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end'   => '</fieldset>'."\n",
+					'fieldstart'     => '<div class="form-group form-group-sm" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => 'control-label',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '<label></label>',
+					'inputstart'     => '',
+					'inputend'       => "\n",
+					'infostart'      => '<p class="form-control-static">',
+					'infoend'        => "</p>\n",
+					'buttonsstart'   => '<div class="form-group form-group-sm">',
+					'buttonsend'     => "</div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
+					'fieldend_checkbox'      => "</div>\n\n",
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '',
+					'inputend_checkbox'      => "\n",
+					'checkbox_newline_start' => '',
+					'checkbox_newline_end'   => "\n",
+					// - radio
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '',
+					'radio_newline_end'      => "\n",
+					'radio_oneline_start'    => '',
+					'radio_oneline_end'      => "\n",
+				);
+
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
 				return array(
-					'layout' => 'fieldset',
-					'formstart' => '',
-					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'layout'         => 'fieldset',
+					'formclass'      => 'form-horizontal',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body">'."\n",
-					'fieldset_end' => '</div></div></fieldset></div>'."\n",
-					'fieldstart' => '<div class="form-group" $ID$>'."\n",
-					'labelclass' => 'control-label col-xs-3',
-					'labelstart' => '',
-					'labelend' => "\n",
-					'labelempty' => '<label class="control-label col-xs-3"></label>',
-					'inputstart' => '<div class="controls col-xs-9">',
-					'infostart' => '<div class="form-control-static col-xs-9">',
-					'inputend' => "</div>\n",
-					'fieldend' => "</div>\n\n",
-					'buttonsstart' => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-xs-9">',
-					'buttonsend' => "</div></div>\n\n",
-					'customstart' => '<div class="custom_content">',
-					'customend' => "</div>\n",
-					'note_format' => ' <span class="help-inline">%s</span>',
-					'formend' => '',
+															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => 'control-label col-sm-3',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '<label class="control-label col-sm-3"></label>',
+					'inputstart'     => '<div class="controls col-sm-9">',
+					'inputend'       => "</div>\n",
+					'infostart'      => '<div class="controls col-sm-9"><p class="form-control-static">',
+					'infoend'        => "</p></div>\n",
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
+					'buttonsend'     => "</div></div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
+					'inputend_checkbox'      => "</label></div></div>\n",
+					'checkbox_newline_start' => '<div class="checkbox">',
+					'checkbox_newline_end'   => "</div>\n",
+					// - radio
+					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
+					'fieldend_radio'         => "</div>\n\n",
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_end'      => "</label></div>\n",
+					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_end'      => "</label>\n",
+				);
+
+			case 'linespan_form':
+				// Linespan form:
+				return array(
+					'layout'         => 'linespan',
+					'formclass'      => 'form-horizontal',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => '',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '',
+					'inputstart'     => '<div class="controls">',
+					'inputend'       => "</div>\n",
+					'infostart'      => '<div class="controls"><p class="form-control-static">',
+					'infoend'        => "</p></div>\n",
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
+					'buttonsend'     => "</div></div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '<div class="controls"><div class="checkbox"><label>',
+					'inputend_checkbox'      => "</label></div></div>\n",
+					'checkbox_newline_start' => '<div class="checkbox">',
+					'checkbox_newline_end'   => "</div>\n",
+					'checkbox_basic_start'   => '<div class="checkbox"><label>',
+					'checkbox_basic_end'     => "</label></div>\n",
+					// - radio
+					'fieldstart_radio'       => '',
+					'fieldend_radio'         => '',
+					'inputstart_radio'       => '<div class="controls">',
+					'inputend_radio'         => "</div>\n",
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_end'      => "</label></div>\n",
+					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_end'      => "</label>\n",
 				);
 
 			case 'user_navigation':

@@ -1,0 +1,467 @@
+	/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+
+ul, ol {
+	margin: 0 0 10px 25px;
+	padding: 0;
+}
+
+// Style of bootstrap form
+.form-horizontal {
+	.control-label {
+		padding-left: 0;
+	}
+	// Info field that uses full width
+	.info_full {
+		padding: 0 20px;
+		.control-label {
+			width: auto;
+			padding: 0;
+		}
+		.controls-info {
+			margin: 0 5px;
+		}
+	}
+	// Part after label where input elements
+	.controls {
+		padding-left: 0;
+		padding-right: 0;
+		.help-inline {
+			color: #999;
+			font-size: 84%;
+		}
+		.form-control {
+			display: inline-block;
+			width: auto;
+			max-width: 100%;
+		}
+		span.help-inline {
+			a.btn {
+				margin-top: -5px;
+			}
+		}
+		// Every textareas and spec inputs should be full width
+		input.large, textarea.form_textarea_input {
+			width: 97%;
+		}
+	}
+	.radio-group .controls > .help-inline {
+		padding-top: 10px;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.field_inline label {
+		width: auto;
+		input {
+			width: auto;
+			display: inline-block;
+		}
+	}
+	.field_wide {
+		label {
+			width: 100%;
+			text-align: left;
+		}
+		.controls {
+			margin-left: 40px;
+		}
+	}
+	// Form layout "linespan"
+	div.tile, div.tile label {
+		display: inline-block;
+		white-space: nowrap;
+	}
+	input[type=radio], input[type=checkbox] {
+		display: inline-block;
+	}
+	.control-buttons {
+		padding-left: 0;
+	}
+	// Don't use bold for radio/checkbox text
+	label.radio-inline {
+		font-weight: normal;
+	}
+	div.radio, div.checkbox {
+		label {
+			font-weight: normal;
+		}
+	}
+	// Fix for text input elements that go after radio inputs on one line
+	div.radio label .form_text_input {
+		vertical-align: top;
+		margin-left: 7px;
+	}
+	// Table on the edit post form where Title/Language  & Advanced Properties are located
+	.compose_layout {
+		td {
+			padding: 0 2px 2px 0;
+			vertical-align: middle;
+		}
+		td.label {
+			display: table-cell;
+			label {
+				margin: 0;
+			}
+		}
+		td.input div.tile label {
+			display: none;
+		}
+	}
+	// Properties block on edit post form
+	#itemform_edit_timestamp > input[type=text] {
+		display: inline-block;
+		width: auto;
+	}
+	#itemform_extra, #itemform_edit_timestamp {
+		#itemform_edit_timestamp {
+			padding: 10px 0;
+		}
+		padding: 10px 0;
+		label {
+			padding-left: 20px;
+			margin-right: 5px;
+			position: relative;
+			input[type=radio] {
+				margin: 4px 0 0;
+				position: absolute;
+				left: 0;
+			}
+		}
+		.form-group {
+			display: inline-block;
+			margin: 0 0 2px;
+			input[type=text] {
+				max-width: 85px;
+			}
+		}
+		td {
+			vertical-align: middle;
+			padding-right: 5px;
+		}
+	}
+	// Text Renderers block on edit post form
+	#itemform_renderers {
+		div[id^="block_renderer_"] {
+			padding-left: 20px;
+			position: relative;
+			input[type=checkbox] {
+				margin: 4px 0 0;
+				position: absolute;
+				left: 0;
+			}
+		}
+	}
+	// Fix wrong height for radio and checkbox inputs
+	input.checkbox, input.radio {
+		min-height: 0;
+	}
+}
+// Inline form (E.g. filters of the Results table)
+.form-inline {
+	.form-control {
+		display: inline-block;
+		width: auto;
+	}
+	.form-group {
+		margin-top: 2px;
+	}
+}
+// Fix password fields and indicator on register forms
+#register_form {
+	div#ffield_m {
+		margin-bottom: 4px;
+	}
+	div#p-status {
+		margin-left: 5px;
+	}
+	#pass2_status .icon {
+		margin-top: -2px;
+	}
+	// make password indicator scaleable on small screens
+	#p-container {
+		max-width: 100%;
+	}
+	input[name^="captcha_qstn_"] {
+		width: 250px;
+	}
+}
+
+// Used to set a font size of action icons to normal view
+a.action_icon {
+	font-size: 12px;
+}
+
+// Field to enter multi usernames
+ul.token-input-list-facebook {
+	width: auto;
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+	transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+	border-radius: 4px;
+	input, input:focus {
+		box-shadow: none;
+	}
+	li {
+		margin-left: 1px;
+	}
+}
+
+// Results table
+div.results {
+	margin-top: 20px;
+	div.table_scroll {
+		overflow: auto;
+		width: 100%;
+	}
+	.table-bordered {
+		border-left: none;
+		border-right: none;
+		td.firstcol, th.firstcol {
+			border-left: none;
+		}
+		td.lastcol, th.lastcol {
+			border-right: none;
+		}
+		th {
+			border-bottom: none;
+		}
+	}
+}
+// Filters in results table
+div.filters {
+	margin-bottom: 0;
+	background: none;
+	border: none;
+	> div {
+		margin-left: 0;
+	}
+	// Align a filter button to the right
+	input.filter {
+		float: right;
+		padding: 4px 12px;
+	}
+	// Set vertical spaces between the filter inputs
+	.block {
+		display: inline-block;
+		margin: 2px;
+	}
+}
+.table_scroll .table {
+	margin-bottom: 0;
+}
+div.messages{
+	border-bottom: 1px solid #bbb;
+}
+
+// Shift a popover window to the right on 35px to don't hide a plus icon
+.popover.right.popover-userfield {
+	margin-left: 35px !important;
+	cursor: pointer;
+}
+
+// Glyphicons
+.glyphicon {
+	font-size: 12px;
+	color: #428BCA;
+}
+a:hover .glyphicon {
+	color: #2A6496;
+}
+.glyphicon:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	text-align: center;
+}
+
+// Table for select categories of item
+table.catselect {
+	tr.even, tr.even input{
+		background: none !important;
+	}
+	th, td {
+		border-left: none;
+		border-bottom: none;
+		background: none !important;
+	}
+	input#new_category_name {
+		width: 92% !important;
+	}
+}
+
+// The voting panel of pictures
+#colorbox #cboxVoting {
+	label {
+		display: inline;
+		font-size: 10px !important;
+		line-height: 0;
+		margin: 0;
+		input {
+			margin-top: 0;
+		}
+	}
+}
+
+// Make a label inline
+#itemform_renderers, #itemform_edit_timestamp, table.catselect {
+	label {
+		display: inline-block;
+		margin-right: 5px;
+		input {
+			margin: 0 2px 4px 0;
+		}
+	}
+}
+
+// Navigation menu
+.nav {
+	margin: 20px 0;
+}
+.well {
+	background: #F5F5F5;
+	.nav {
+		padding: 0 15px;
+		margin: 0;
+		li > a {
+			padding: 3px 15px;
+			margin: 0 -15px;
+		}
+		.active > a, .active > a:hover {
+			background-color: #0088CC;
+			color: #FFFFFF;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+		}
+	}
+}
+
+// Highlight the required fields
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+	color: #b94a48;
+	border-color: #ee5f5b;
+}
+input:focus:invalid:focus,
+textarea:focus:invalid:focus,
+select:focus:invalid:focus {
+	border-color: #e9322d;
+	-webkit-box-shadow: 0 0 6px #f8b9b7;
+	-moz-box-shadow: 0 0 6px #f8b9b7;
+	box-shadow: 0 0 6px #f8b9b7;
+}
+#login_form {
+	input:focus:invalid:focus,
+	textarea:focus:invalid:focus,
+	select:focus:invalid:focus {
+		border-color: #66afe9;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+	}
+}
+
+// Panels
+.panel-heading h4 {
+	margin: 0;
+}
+legend.panel-heading {
+	font-size: 16px;
+	font-weight: normal;
+	margin-bottom: 0;
+}
+.panel-title .icon {
+	vertical-align: middle;
+	position: relative;
+	top: -1px;
+}
+
+// Form to add contacts
+.form_add_contacts {
+	display: block;
+	padding-top: 5px;
+	.label {
+		color: #333;
+		font-size: 100%;
+		padding-left: 0;
+	}
+	.controls {
+		padding-left: 0;
+	}
+	.control-label {
+		width: auto;
+		padding-left: 0;
+		line-height: 24px;
+	}
+}
+
+.form-horizontal .controls {
+	input.large,
+	.form-control.form_textarea_input {
+		display: block;
+	}
+}
+div.comment_toolbars div.edit_toolbar,
+div.message_toolbars div.edit_toolbar {
+	width: 97%;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+
+// Remove borders from badge
+.badge {
+	border: none;
+	background-color: #F00;
+}
+a.evo_messages_link .badge {
+	font-size: 10px;
+	margin: -2px 2px;
+	padding: 2px 7px 3px;
+}
+
+// Fix colorbox sizes
+#colorbox,
+#colorbox *,
+#colorbox *:before,
+#colorbox *:after {
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
+.modal-dialog {
+	width: 100%;
+	height: 100%;
+	.modal-content {
+		height: 100%;
+		.modal-body {
+			height: 90%;
+		}
+	}
+}
+.modal_fixed_height .modal-dialog {
+	height: auto;
+}
+
+// Typeahead plugin
+.tt-dropdown-menu {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	padding: 8px 0;
+	.tt-suggestion {
+		font-size: 18px;
+		line-height: 24px;
+		padding: 3px 20px;
+		&.tt-cursor {
+			background-color: #0097CF;
+			color: #FFFFFF;
+		}
+		p {
+			margin: 0;
+		}
+	}
+}

@@ -64,14 +64,19 @@ if( $disp == 'front' )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-// Add CSS:
-require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
-require_css( 'basic.css', 'rsc_url' ); // Basic styles
 // Bootstrap
 require_js( '#bootstrap#', 'rsc_url' );
 require_css( '#bootstrap_css#', 'rsc_url' );
-require_css( '#bootstrap_theme_css#', 'rsc_url' );
-require_css( 'bootstrap/b2evo.css', 'rsc_url' );
+// require_css( '#bootstrap_theme_css#', 'rsc_url' );
+
+// rsc/less/bootstrap-basic_styles.less
+// rsc/less/bootstrap-basic.less
+// rsc/less/bootstrap-blog_base.less
+// rsc/less/bootstrap-item_base.less
+// rsc/less/bootstrap-evoskins.less
+// rsc/build/bootstrap-b2evo_base.bundle.css // CSS concatenation of the above
+require_css( 'bootstrap-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
+
 add_css_headline( '
 .navbar-collapse .nav {
 	margin: 0;

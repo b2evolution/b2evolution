@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois Planque.
  *
- * @version $Id: _syslog_list.view.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _syslog_list.view.php 8281 2015-02-18 01:21:13Z fplanque $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -90,47 +90,47 @@ $Results->title = T_('System log');
  */
 function filter_syslog_list( & $Form )
 {
-	$Form->text_input( 'user_login', get_param( 'user_login' ), 10, T_('User login'), '', array( 'maxlength' => 20 ) );
+	$Form->text_input( 'user_login', get_param( 'user_login' ), 10, 'User login', '', array( 'maxlength' => 20 ) );
 
 	$field_options = array (
-			'0'              => T_('All'),
-			'info'           => T_('Info'),
-			'warning'        => T_('Warning'),
-			'error'          => T_('Error'),
-			'critical_error' => T_('Critical Error'),
+			'0'              => 'All',
+			'info'           => 'Info',
+			'warning'        => 'Warning',
+			'error'          => 'Error',
+			'critical_error' => 'Critical Error',
 		);
-	$Form->select_input_array( 'type', get_param( 'type' ), $field_options, T_('Log type'), '', array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'type', get_param( 'type' ), $field_options, 'Log type', '', array( 'force_keys_as_values' => true ) );
 
 	$field_options = array (
-			'0'      => T_('All'),
-			'core'   => T_('Core'),
-			'plugin' => T_('Plugin'),
+			'0'      => 'All',
+			'core'   => 'Core',
+			'plugin' => 'Plugin',
 		);
-	$Form->select_input_array( 'origin', get_param( 'origin' ), $field_options, T_('Origin type'), '', array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'origin', get_param( 'origin' ), $field_options, 'Origin type', '', array( 'force_keys_as_values' => true ) );
 
-	$Form->text_input( 'origin_ID', get_param( 'origin_ID' ), 5, T_('Origin ID'), '', array( 'maxlength' => 11 ) );
+	$Form->text_input( 'origin_ID', get_param( 'origin_ID' ), 5, 'Origin ID', '', array( 'maxlength' => 11 ) );
 
 	$field_options = array (
-			'0'       => T_('All'),
-			'comment' => T_('Comment'),
-			'item'    => T_('Item'),
-			'user'    => T_('User'),
-			'file'    => T_('File')
+			'0'       => 'All',
+			'comment' => 'Comment',
+			'item'    => 'Item',
+			'user'    => 'User',
+			'file'    => 'File'
 		);
-	$Form->select_input_array( 'object', get_param( 'object' ), $field_options, T_('Object type'), '', array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'object', get_param( 'object' ), $field_options, 'Object type', '', array( 'force_keys_as_values' => true ) );
 
-	$Form->text_input( 'object_ID', get_param( 'object_ID' ), 5, T_('Object ID'), '', array( 'maxlength' => 11 ) );
+	$Form->text_input( 'object_ID', get_param( 'object_ID' ), 5, 'Object ID', '', array( 'maxlength' => 11 ) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_syslog_list',
 	'url_ignore' => 'results_slg_per_page,results_slg_page',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=syslog' ),
+		'all' => array( 'All', '?ctrl=syslog' ),
 		)
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Date Time'),
+		'th' => 'Date Time',
 		'order' => 'slg_ID',
 		'default_dir' => 'D',
 		'td' => '%mysql2localedatetime_spans( #slg_timestamp#, "M-d" )%',
@@ -139,7 +139,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Type'),
+		'th' => 'Type',
 		'order' => 'slg_type',
 		'td' => '$slg_type$',
 		'th_class' => 'shrinkwrap',
@@ -147,7 +147,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('User'),
+		'th' => 'User',
 		'order' => 'user_login',
 		'td' => '%get_user_identity_link( 0, #slg_user_ID# )%',
 		'th_class' => 'shrinkwrap',
@@ -155,7 +155,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Origin'),
+		'th' => 'Origin',
 		'order' => 'slg_origin',
 		'td' => '$slg_origin$',
 		'th_class' => 'shrinkwrap',
@@ -163,7 +163,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Origin ID'),
+		'th' => 'Origin ID',
 		'order' => 'slg_origin_ID',
 		'td' => '$slg_origin_ID$',
 		'th_class' => 'shrinkwrap',
@@ -171,7 +171,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Object'),
+		'th' => 'Object',
 		'order' => 'slg_object',
 		'td' => '$slg_object$',
 		'th_class' => 'shrinkwrap',
@@ -179,7 +179,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Object ID'),
+		'th' => 'Object ID',
 		'order' => 'slg_object_ID',
 		'td' => '$slg_object_ID$',
 		'th_class' => 'shrinkwrap',
@@ -187,7 +187,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Message'),
+		'th' => 'Message',
 		'order' => 'slg_message',
 		'td' => '%format_to_output( #slg_message#, \'htmlspecialchars\' )%' // Escape syslog messages because it may contain special characters
 	);
@@ -207,7 +207,7 @@ function syslog_object_link( $object_type, $object_ID )
 
 	if( empty( $object_ID ) )
 	{ // Invalid object ID
-		return T_('Empty object ID');
+		return 'Empty object ID';
 	}
 
 	switch( $object_type )
@@ -225,7 +225,7 @@ function syslog_object_link( $object_type, $object_ID )
 			}
 			else
 			{ // Comment was deleted or ID is incorrect
-				$link = T_('No comment');
+				$link = 'No comment';
 			}
 			break;
 
@@ -241,7 +241,7 @@ function syslog_object_link( $object_type, $object_ID )
 			}
 			else
 			{ // Item was deleted or ID is incorrect
-				$link = T_('No item');
+				$link = 'No item';
 			}
 			break;
 
@@ -256,7 +256,7 @@ function syslog_object_link( $object_type, $object_ID )
 				}
 				else
 				{ // User was deleted or ID is incorrect
-					$link = T_('No user');
+					$link = 'No user';
 				}
 			}
 			break;
@@ -271,7 +271,7 @@ function syslog_object_link( $object_type, $object_ID )
 			}
 			else
 			{ // User was deleted or ID is incorrect
-				$link = T_('No file');
+				$link = 'No file';
 			}
 			break;
 	}
@@ -279,7 +279,7 @@ function syslog_object_link( $object_type, $object_ID )
 	return $link;
 }
 $Results->cols[] = array(
-		'th' => T_('Object Link'),
+		'th' => 'Object Link',
 		'td' => '%syslog_object_link( #slg_object#, #slg_object_ID# )%',
 	);
 

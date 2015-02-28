@@ -233,6 +233,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 
 	/* Front Page Main Area */
+	if( $kind == 'main' )
+	{ // Display blog title and tagline for main blogs
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_title', 'core', 1 );
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_tagline', 'core', 2 );
+	}
 	$featured_intro_params = NULL;
 	if( $kind == 'main' )
 	{ // Hide a title of the front intro post
@@ -241,7 +246,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
 	$post_list_params = NULL;
 	if( $kind == 'main' )
-	{ // Display the posts from all other blogs if it is allowed by blogs setting "Blogs to aggregate"
+	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array( 'blog_ID' => '', 'limit' => 50 );
 	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );

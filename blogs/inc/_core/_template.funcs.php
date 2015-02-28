@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _template.funcs.php 8030 2015-01-19 16:21:03Z yura $
+ * @version $Id: _template.funcs.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -849,11 +849,11 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  */
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $version = '#' )
 {
-	global $library_local_urls, $library_cdn_urls, $debug, $rsc_url;
+	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
 	global $Blog, $baseurl, $assets_baseurl;
 
 	// Check if we have a public CDN we want to use for this library file:
-	if( ! empty( $library_cdn_urls[ $lib_file ] ) )
+	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
 	{ // Rewrite local urls with public CDN urls if they are defined in _advanced.php
 		$library_local_urls[ $lib_file ] = $library_cdn_urls[ $lib_file ];
 		// Don't append version for global CDN urls
@@ -2592,15 +2592,16 @@ function display_activateinfo( $params )
 	}
 
 	$params = array_merge( array(
-			'form_before' => '',
-			'form_after' => '',
-			'form_action' => $secure_htsrv_url.'login.php',
-			'form_name' => 'form_validatemail',
-			'form_class' => 'fform',
-			'form_layout' => 'fieldset',
-			'form_template' => NULL,
-			'form_title' => '',
-			'inskin' => false,
+			'use_form_wrapper' => true,
+			'form_before'      => '',
+			'form_after'       => '',
+			'form_action'      => $secure_htsrv_url.'login.php',
+			'form_name'        => 'form_validatemail',
+			'form_class'       => 'fform',
+			'form_layout'      => 'fieldset',
+			'form_template'    => NULL,
+			'form_title'       => '',
+			'inskin'           => false,
 		), $params );
 
 	// init force request new email address param
@@ -2611,7 +2612,7 @@ function display_activateinfo( $params )
 
 	if( $force_request || empty( $last_activation_email_date ) )
 	{ // notification email was not sent yet, or user needs another one ( forced request )
-		echo $params['form_before'];
+		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
@@ -2660,7 +2661,7 @@ function display_activateinfo( $params )
 
 		$Form->end_form();
 
-		echo $params['form_after'];
+		echo $params['use_form_wrapper'] ? $params['form_after'] : '';
 
 		return;
 	}
@@ -2711,6 +2712,41 @@ function display_activateinfo( $params )
 	}
 
 	echo $params['form_after'];
+
+	if( $current_User->grp_ID == 1 )
+	{ // allow admin users to validate themselves by a single click:
+
+		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
+
+		$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
+
+		if( ! empty( $params['form_template'] ) )
+		{ // Switch layout to template from array
+			$Form->switch_template_parts( $params['form_template'] );
+		}
+
+		$Form->begin_form( 'form-login' );
+
+		$Form->add_crumb( 'validateform' );
+		$Form->hidden( 'action', 'validatemail' );
+		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
+		$Form->hidden( 'reqID', 1 );
+		$Form->hidden( 'sessID', $Session->ID );
+
+		echo '<p>'.sprintf( T_('Since you are an admin user, you can activate your account (%s) by a single click.' ), $current_User->email ).'</p>';
+		// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
+		$Form->end_form( array( array(
+				'name'  => 'form_validatemail_admin_submit',
+				'value' => T_('Activate my account!'),
+				'class' => 'ActionButton btn btn-primary'
+			) ) ); // display hidden fields etc
+
+		echo $params['use_form_wrapper'] ? $params['form_after'] : '';
+	}
+
+	echo '<div class="form-login-links floatright">';
+	user_logout_link();
+	echo '</div>';
 }
 
 

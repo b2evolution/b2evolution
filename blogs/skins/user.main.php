@@ -8,7 +8,7 @@
  *
  * @package evoskins
  *
- * @version $Id: user.main.php 7818 2014-12-15 14:41:11Z yura $
+ * @version $Id: user.main.php 8286 2015-02-18 07:58:24Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -32,7 +32,7 @@ if( !is_logged_in() )
 		}
 	}
 
-	if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level )
+	if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level || empty( $user_ID ) )
 	{ // If this user is not available for anonymous users
 		$Messages->add( T_('You must log in to view this user profile.') );
 		header_redirect( get_login_url('cannot see user'), 302 );

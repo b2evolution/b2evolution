@@ -284,7 +284,7 @@ save_message_params_to_session( $unsaved_message_params );
 
 if( param_errors_detected() || empty( $redirect_to ) )
 {
-	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id );
+	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$recipient_id, '&' );
 }
 header_redirect( $redirect_to );
 //exited here

@@ -34,7 +34,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user_password.form.php 8145 2015-02-03 12:07:34Z yura $
+ * @version $Id: _user_password.form.php 8355 2015-02-27 10:18:59Z yura $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -66,17 +66,25 @@ global $current_User;
 
 global $Session;
 
+// check if reqID exists. If exists it means that this form is displayed because a password change request by email.
+$reqID = param( 'reqID', 'string', '' );
+
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'          => array(),
+		'display_abandon_link'      => true,
+		'button_class'              => '',
+		'form_button_action'        => 'update',
+		'form_hidden_crumb'         => 'user',
+		'form_hidden_reqID'         => $reqID,
 	);
 
 if( isset( $params ) )
-{	// Merge with default params
+{ // Merge with default params
 	$params = array_merge( $default_params, $params );
 }
 else
-{	// Use a default params
+{ // Use a default params
 	$params = $default_params;
 }
 
@@ -85,9 +93,6 @@ user_prevnext_links( array(
 		'user_tab' => 'pwdchange'
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
-
-// check if reqID exists. If exists it means that this form is displayed because a password change request by email.
-$reqID = param( 'reqID', 'string', '' );
 
 $Form = new Form( $form_action, 'user_checkchanges' );
 
@@ -117,7 +122,7 @@ $has_full_access = $current_User->check_perm( 'users', 'edit' );
 
 $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
-	$Form->add_crumb( 'user' );
+	$Form->add_crumb( $params['form_hidden_crumb'] );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'user_tab', 'pwdchange' );
 	$Form->hidden( 'password_form', '1' );
@@ -160,10 +165,13 @@ if( $action != 'view' )
 
 if( $action != 'view' )
 { // Edit buttons
-	$Form->buttons( array( array( '', 'actionArray[update]', T_('Change password!'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( '', 'actionArray['.$params['form_button_action'].']', T_('Change password!'), 'SaveButton'.$params['button_class'] ) ) );
 }
 
+if( $params['display_abandon_link'] )
+{ // Display a link to go away from this form
 	$Form->info( '', '<div><a href="'.regenerate_url( 'disp', 'disp=profile' ).'">'.T_( 'Abandon password change' ).'</a></div>' );
+}
 
 
 $Form->end_form();

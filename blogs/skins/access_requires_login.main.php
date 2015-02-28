@@ -9,12 +9,12 @@
  *
  * @package evoskin
  *
- * @version $Id: access_requires_login.main.php 8256 2015-02-13 06:50:39Z yura $
+ * @version $Id: access_requires_login.main.php 8293 2015-02-19 08:04:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Blog, $skin_links, $francois_links;
 
 // Display in-skin login form
 $disp = 'login';

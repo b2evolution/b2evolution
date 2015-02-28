@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id$
+ * @version $Id: _widget.class.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -393,7 +393,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
 					'block_title_start' => '<h3>',
@@ -425,6 +425,10 @@ class ComponentWidget extends DataObject
 					'grid_colend' => '</tr>',
 					'grid_cellstart' => '<td>',
 					'grid_cellend' => '</td>',
+					'flow_start' => '<div class="widget_flow_blocks">',
+					'flow_end' => '</div>',
+					'flow_block_start' => '<div>',
+					'flow_block_end' => '</div>',
 					'thumb_size' => 'crop-80x80',
 					// 'thumb_size' => 'fit-160x120',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
@@ -508,7 +512,7 @@ class ComponentWidget extends DataObject
 			{	// DEBUG:
 				echo '<div class="debug_widget"><div class="debug_widget_name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'"><span class="debug_container_action"><a href="'
-							.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>CACHE OFF: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+							.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>CACHE OFF: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
 			}
 
 			$this->display( $params );
@@ -536,7 +540,7 @@ class ComponentWidget extends DataObject
 				if( $show_debug_containers )
 				{	// DEBUG:
 					echo '<div class="debug_widget widget_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
-								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>FROM CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>FROM CACHE: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
 				}
 
 				echo $content;
@@ -553,7 +557,7 @@ class ComponentWidget extends DataObject
 				if( $show_debug_containers )
 				{	// DEBUG:
 					echo '<div class="debug_widget widget_not_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
-								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>NOT IN CACHE: '.$this->get_name().'</div><div class="$wi_class$">'."\n";
+								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>NOT IN CACHE: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
 				}
 
 				$this->BlockCache->start_collect();

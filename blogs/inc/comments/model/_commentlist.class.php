@@ -23,7 +23,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _commentlist.class.php 8134 2015-02-03 06:41:12Z attila $
+ * @version $Id: _commentlist.class.php 8310 2015-02-20 11:50:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -466,8 +466,13 @@ class CommentList2 extends DataObjectList2
 		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
 		$sql_item_IDs = 'SELECT DISTINCT post_ID'
-						.$this->ItemQuery->get_from()
-						.$this->ItemQuery->get_where();
+						.$this->ItemQuery->get_from();
+		if( strpos( $this->ItemQuery->get_from(), 'T_categories' ) === false &&
+		    strpos( $this->ItemQuery->get_where(), 'cat_blog_ID' ) !== false )
+		{ // Join categories table because it is required here for the field "cat_blog_ID"
+			$sql_item_IDs .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID ';
+		}
+		$sql_item_IDs .= $this->ItemQuery->get_where();
 		$item_IDs = $DB->get_col( $sql_item_IDs, 0, 'Get CommentQuery Item IDs' );
 		if( empty( $item_IDs ) )
 		{ // There is no item which belongs to the given blog and user may view it, so there are no comments either

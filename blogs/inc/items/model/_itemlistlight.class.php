@@ -27,7 +27,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemlistlight.class.php 8228 2015-02-11 09:25:58Z yura $
+ * @version $Id: _itemlistlight.class.php 8307 2015-02-20 11:15:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -603,7 +603,7 @@ class ItemListLight extends DataObjectList2
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$this->ItemQuery->where_datecreated( $this->filters['ts_created_max'] );
-		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
+		$this->ItemQuery->where_visibility( $this->filters['visibility_array'], $this->filters['coll_IDs'] );
 		$this->ItemQuery->where_featured( $this->filters['featured'] );
 
 

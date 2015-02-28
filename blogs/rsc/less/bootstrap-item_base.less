@@ -1,0 +1,81 @@
+/**
+ * item_base.css 
+ * These are the default styles that are used INSIDE of a blog post.
+ * Override this with an item.css file in your skin folder.
+ */
+
+blockquote {
+	border: 2px dotted #ccc;
+	background-color: #eee;
+	margin: 1em 2em;
+	padding: 0 1ex;
+}
+
+pre {
+	overflow:hidden;
+}
+
+samp, .codespan, pre.codeblock {
+	background-color: #F2F1F0;
+	border: 1px solid #CCCCCC;
+	border-radius: 2px 2px 2px 2px;
+	padding: 0 .5ex;
+}
+pre.codeblock {
+	overflow: auto;
+	padding: .5ex 2ex;
+}
+pre.codeblock code {
+	display: block;
+	font-size: 110%;
+}
+
+div.codeblock {
+	background-color: #FBFAF9;
+	border: 1px solid #CCCCCC;
+	border-radius: 2px 2px 2px 2px;
+	box-shadow: 0 0 5px #CCCCCC inset;
+	margin: 1ex 0;
+	padding: 6px;
+	overflow: auto;
+}
+div.codeblock_with_title {
+	margin-top: 0;
+}
+div.codeblock pre {
+	margin: 0;
+}
+p.codeblock_title,
+.bText p.codeblock_title {
+	font-family: Verdana, sans-serif;
+	letter-spacing: 110%;
+	line-height: 95%;
+	font-weight:bold;
+	font-size: 72%;
+	color: #ABAAA9;
+	margin: 1ex 3px 0;
+}
+div.codeblock > p {
+	display: none;
+}
+
+div.videoblock {
+	text-align: center;
+	margin:auto;
+	overflow: auto;
+}
+
+div.podplayer {
+	margin: 1em 0;
+}
+
+.bMore {
+	text-align: left;
+}
+.bMore a {
+	font-weight: bold;
+}
+
+span.NonExistentWikiWord {
+	border-bottom: 1px dotted #ccc;
+}

@@ -42,48 +42,21 @@ $last_activation_email_date = $UserSettings->get( 'last_activation_email', $curr
 $page_title = T_( 'Account activation' );
 $wrap_width = '530px';
 
+// Header
 require dirname(__FILE__).'/_html_header.inc.php';
 
-display_activateinfo( array(
-		'form_before' => str_replace( '$title$', $page_title, $form_before ),
-		'form_after' => $form_after,
-		'form_class'    => 'form-login',
-		'form_template' => $login_form_params,
-		'redirect_to'   => url_rel_to_same_host( $redirect_to, $secure_htsrv_url )
-	) );
+// Activate form
+$params = array(
+	'skin_form_before'     => $login_form_params['formstart'],
+	'skin_form_after'      => $login_form_params['formend'],
+	'activate_form_title'  => $page_title,
+	'form_class_login'     => 'wrap-form-login',
+	'activate_form_params' => $login_form_params,
+	'use_form_wrapper'     => false,
+);
+require $skins_path.'_activateinfo.disp.php';
 
-if( $current_User->grp_ID == 1 )
-{ // allow admin users to validate themselves by a single click:
-
-	echo str_replace( '$title$', $page_title, $form_before );
-
-	$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
-
-	$Form->switch_template_parts( $login_form_params );
-
-	$Form->begin_form( 'form-login' );
-
-	$Form->add_crumb( 'validateform' );
-	$Form->hidden( 'action', 'validatemail');
-	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
-	$Form->hidden( 'reqID', 1 );
-	$Form->hidden( 'sessID', $Session->ID );
-
-	echo '<p>'.sprintf( T_('Since you are an admin user, you can activate your account (%s) by a single click.' ), $current_User->email ).'</p>';
-	// TODO: the form submit value is too wide (in Konqueror and most probably in IE!)
-	$Form->end_form( array(array( 'name'=>'form_validatemail_admin_submit', 'value'=>T_('Activate my account!'), 'class'=>'ActionButton' )) ); // display hidden fields etc
-
-	echo $form_after;
-}
-?>
-
-<div class="form-login-links floatright">
-	<?php
-	user_logout_link();
-	?>
-</div>
-
-<?php
+// Footer
 require dirname(__FILE__).'/_html_footer.inc.php';
 
 ?>

@@ -26,7 +26,7 @@
  *
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _captcha_qstn.plugin.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _captcha_qstn.plugin.php 8347 2015-02-25 13:42:34Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -454,7 +454,12 @@ class captcha_qstn_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Captcha question'), $question->cptq_question );
-		$Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ), 10, $this->T_('Captcha answer'), $this->T_('Please answer on question above.') );
+		$Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
+				10, $this->T_('Captcha answer'), ( $params['use_placeholders'] ? '' : $this->T_('Please answer on question above').'.' ),
+				array(
+						'placeholder' => $params['use_placeholders'] ? T_('Please answer on question above') : '',
+					)
+			);
 
 		if( ! isset($params['Form']) )
 		{	// there's no Form where we add to, but our own form:

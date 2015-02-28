@@ -29,7 +29,7 @@
  * @author fplanque: Francois PLANQUE
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _user.class.php 8274 2015-02-17 01:29:58Z fplanque $
+ * @version $Id: _user.class.php 8316 2015-02-20 22:16:26Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -342,9 +342,9 @@ class User extends DataObject
 
 		if( $is_spammer )
 		{
-			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d message by this user'),
+			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d messages from this user'),
 					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php' );
-			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read status about this user') );
+			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read statuses from this user') );
 			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
 					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php' );
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
@@ -3077,7 +3077,7 @@ class User extends DataObject
 				return 'email';
 			}
 			if( $this->accepts_pm() )
-			{ // no email option try to log in and send private message (just registered users can send PM)
+			{ // no email option - try to log in and send private message (only registered users can send PM)
 				return 'login';
 			}
 		}
@@ -5398,7 +5398,7 @@ class User extends DataObject
 		$params = array_merge( array(
 				'view_type'     => 'simple', // 'simple', 'extended'
 				'text_simple'   => T_( '%s has posted %s comments (%s%% of which are public). %s of these comments have been found useful by %s different users.' ),
-				'text_extended' => T_( '%s has posted %s comments (%s%% of which are public).<br />%s voted useful by %s different users.<br />%s voted NOT useful by %s different users.<br />%s considered OK by %s different users.<br />%s considered SPAM by %s different users.</span>' ),
+				'text_extended' => T_( '%s has posted %s comments (%s%% of which are public).<br />%s voted useful by %s different users.<br />%s voted NOT useful by %s different users.<br />%s considered OK by %s different users.<br />%s considered SPAM by %s different users.' ),
 			), $params );
 
 		$total_num_comments = $this->get_num_comments();

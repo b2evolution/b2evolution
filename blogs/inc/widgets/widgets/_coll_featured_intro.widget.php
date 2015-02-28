@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_featured_intro.widget.php 8274 2015-02-17 01:29:58Z fplanque $
+ * @version $Id: _coll_featured_intro.widget.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -113,7 +113,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collections'),
-					'note' => T_('List collection IDs separated by , or use * for all collections'),
+					'note' => T_('List collection IDs separated by \',\', \'*\' for all collections, \'-\' for current collection without aggregation or leave empty for current collection including aggregation.'),
 					'size' => 4,
 					'type' => 'text',
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
@@ -168,6 +168,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		if( $Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+			echo $this->disp_params['block_start'];
 			skin_include( $this->disp_params['skin_template'].'.inc.php', array(
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
@@ -179,7 +180,8 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
 				) );
-			// ----------------------------END ITEM BLOCK  ----------------------------
+			echo $this->disp_params['block_end'];
+		// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
 	}

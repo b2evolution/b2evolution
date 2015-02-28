@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_list.widget.php 8274 2015-02-17 01:29:58Z fplanque $
+ * @version $Id: _coll_item_list.widget.php 8321 2015-02-21 20:13:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -79,6 +79,16 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+				'item_visibility' => array(
+					'label' => T_('Item visibility'),
+					'note' => T_('What item statuses should be included in the list?'),
+					'type' => 'radio',
+					'field_lines' => true,
+					'options' => array(
+							array( 'public', T_('show public posts') ),
+							array( 'all', T_('show all posts the current user is allowed to see') ) ),
+					'defaultvalue' => 'all',
+				),
 				'item_type' => array(
 					'label' => T_('Item type'),
 					'note' => T_('What kind of items do you want to list?'),
@@ -96,7 +106,7 @@ class coll_item_list_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collections'),
-					'note' => T_('List collection IDs separated by , or use * for all collections'),
+					'note' => T_('List collection IDs separated by \',\', \'*\' for all collections, \'-\' for current collection without aggregation or leave empty for current collection including aggregation.'),
 					'size' => 4,
 					'type' => 'text',
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
@@ -319,6 +329,10 @@ class coll_item_list_Widget extends ComponentWidget
 				'unit'      => 'posts', // We want to advertise all items (not just a page or a day)
 				'coll_IDs'  => $this->disp_params['blog_ID'],
 			);
+		if( $this->disp_params['item_visibility'] == 'public' )
+		{ // Get only the public items
+			$filters['visibility_array'] = array( 'published' );
+		}
 
 		if( isset( $this->disp_params['page'] ) )
 		{

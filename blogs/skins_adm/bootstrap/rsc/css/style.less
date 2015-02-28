@@ -76,19 +76,6 @@ div.status_icon {
 	}
 }
 
-// Filters in results table
-.filters {
-	// Align a filter button to the right
-	.filter {
-		float: right;
-	}
-	// Set vertical spaces between the filter inputs
-	.block {
-		display: inline-block;
-		margin: 2px;
-	}
-}
-
 // Profile picture
 div.avatartag {
 	display: inline-block;
@@ -348,8 +335,13 @@ div.skinshot {
 		width: 160px;
 	}
 }
-#itemform_extra input {
-	max-width: 80px;
+#itemform_extra {
+	input {
+		max-width: 80px;
+	}
+	> div.fieldset > label {
+		display: block;
+	}
 }
 #itemform_adv_props {
 	div.controls {
@@ -369,6 +361,7 @@ div.skinshot {
 	}
 	select {
 		width: 90px;
+		display: inline-block;
 	}
 }
 #itemform_links {
@@ -378,6 +371,9 @@ div.skinshot {
 	.panel-body {
 		padding: 0;
 	}
+}
+#itemform_goals td {
+	padding-bottom: 2px;
 }
 #attachmentframe_wrapper {
 	width: 100%;
@@ -389,6 +385,14 @@ div.skinshot {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
+		&:after {
+			content: "...";
+			font-size: 10px;
+			top: -7px;
+			position: relative;
+			text-align: center;
+			display: block;
+		}
 	}
 	#attachmentframe_disabler {
 		position: absolute;

@@ -73,32 +73,39 @@ if( $transmit_hashed_password )
 	require_js( 'build/sha1_md5.bmin.js' );
 }
 
-/**
- * Login header
- */
+// Header
 require dirname(__FILE__).'/_html_header.inc.php';
 
+// Login form
 $params = array(
-	'form_before' => str_replace( '$title$', $page_title, $form_before ),
-	'form_after' => $form_after,
-	'form_action' => $secure_htsrv_url.'login.php',
-	'form_layout' => 'fieldset',
-	'form_class' => 'form-login',
-	'source' => param( 'source', 'string', 'std login form' ),
-	'inskin' => false,
-	'inskin_urls' => false,
-	'redirect_to' => $redirect_to,
-	'login' => utf8_strtolower( $login ),
-	'login_required' => $login_required,
-	'validate_required' => $validate_required,
-	'action' => $action,
-	'reqID' => isset( $reqID ) ? $reqID : NULL,
-	'sessID' => isset( $sessID ) ? $sessID : NULL,
+	'skin_form_before'         => $login_form_params['formstart'],
+	'skin_form_after'          => $login_form_params['formend'],
+	'form_title_login'         => $page_title,
+	'form_class_login'         => 'wrap-form-login',
+	'login_page_before'        => '',
+	'login_page_after'         => '',
+	'login_form_action'        => $secure_htsrv_url.'login.php',
+	'login_form_name'          => 'login_form',
+	'login_form_title'         => '',
+	'login_form_layout'        => 'fieldset',
+	'login_form_class'         => 'form-horizontal form-login',
+	'login_form_source'        => param( 'source', 'string', 'std login form' ),
+	'login_form_inskin'        => false,
+	'login_form_inskin_urls'   => false,
+	'login_form_required'      => $login_required,
+	'login_validate_required'  => $validate_required,
+	'login_form_redirect_to'   => $redirect_to,
+	'login_form_login'         => utf8_strtolower( $login ),
+	'login_action_value'       => $action,
+	'login_form_reqID'         => isset( $reqID ) ? $reqID : NULL,
+	'login_form_sessID'        => isset( $sessID ) ? $sessID : NULL,
 	'transmit_hashed_password' => $transmit_hashed_password,
+	'display_abort_link'       => true,
+	'login_form_footer'        => false,
 );
+require $skins_path.'_login.disp.php';
 
-display_login_form( $params );
-
+// Footer
 require dirname(__FILE__).'/_html_footer.inc.php';
 
 ?>

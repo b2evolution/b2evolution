@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: register.php 8094 2015-01-28 10:18:41Z yura $
+ * @version $Id: register.php 8353 2015-02-26 17:12:23Z yura $
  */
 
 /**
@@ -471,7 +471,11 @@ switch( $action )
 		/*
 		 * Registration disabled:
 		 */
-		require $adminskins_path.'login/_reg_disabled.main.php';
+		$params = array(
+				'register_form_title' => T_('Registration Currently Disabled'),
+				'wrap_width'          => '350px',
+			);
+		require $adminskins_path.'login/_reg_form.main.php';
 
 		exit(0);
 }

@@ -38,7 +38,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _param.funcs.php 8077 2015-01-26 15:44:20Z yura $
+ * @version $Id: _param.funcs.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -486,10 +486,10 @@ function param_action( $default = '', $memorize = false )
 {
 	if( ! isset($_POST['actionArray']) )
 	{ // if actionArray is POSTed, use this instead of any "action" (which might come via GET)
-		$action = param( 'action', 'string', NULL, $memorize );
+		$action = param( 'action', 'string', $default, $memorize );
 	}
 
-	if( ! isset($action) )
+	if( ! isset( $action ) )
 	{ // Check $actionArray
 		$action = param_arrayindex( 'actionArray', $default );
 

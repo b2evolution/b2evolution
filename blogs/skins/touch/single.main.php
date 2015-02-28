@@ -131,7 +131,7 @@ while( $Item = & mainlist_get_item() )
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',

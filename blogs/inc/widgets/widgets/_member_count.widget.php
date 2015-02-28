@@ -18,7 +18,7 @@
  *
  * @package evocore
  *
- * @version $Id: _member_count.widget.php 7801 2014-12-11 10:27:12Z yura $
+ * @version $Id: _member_count.widget.php 8321 2015-02-21 20:13:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,7 +57,7 @@ class member_count_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a count of the blog members.');
+		return T_('Display a count of the collection members.');
 	}
 
 

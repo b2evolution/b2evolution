@@ -11,7 +11,7 @@
  * @package evoskins
  * @subpackage pixelgreen
  *
- * @version $Id: index.main.php 8096 2015-01-28 12:19:24Z yura $
+ * @version $Id: index.main.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -46,7 +46,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				// Display container and contents:
 				skin_container( NT_('Page Top'), array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start' => '<div class="$wi_class$">',
+						'block_start' => '<div class="widget $wi_class$">',
 						'block_end' => '</div>',
 						'block_display_title' => false,
 						'list_start' => '<ul>',
@@ -62,7 +62,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Header'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="$wi_class$">',
+					'block_start'       => '<div class="widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
@@ -208,7 +208,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		// Display container and contents:
 		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="col float-left $wi_class$">',
+				'block_start'       => '<div class="col float-left widget $wi_class$">',
 				'block_end'         => '</div>',
 				'block_title_start' => '<h1>',
 				'block_title_end'   => '</h1>',

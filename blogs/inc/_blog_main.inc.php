@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 7962 2015-01-13 13:35:14Z yura $
+ * @version $Id: _blog_main.inc.php 8293 2015-02-19 08:04:06Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -682,6 +682,10 @@ $Timer->pause( '_BLOG_MAIN.inc');
 $Timer->log_duration( '_BLOG_MAIN.inc' );
 
 
+// Init global vars which may be required for any skin
+skin_init_global_vars();
+
+
 // Check if current user has acces to this blog
 $Blog->check_access();
 
@@ -695,7 +699,7 @@ $Blog->check_access();
 
 // Trigger plugin event:
 // fp> TODO: please doc with example of what this can be used for
-$Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
+$Plugins->trigger_event( 'BeforeBlogDisplay', array( 'skin' => $skin ) );
 
 if( !empty( $skin ) )
 { // We want to display with a skin now:
@@ -715,12 +719,9 @@ if( !empty( $skin ) )
 	{	// Cache miss, we have to generate:
 		$Timer->pause( 'PageCache' );
 
-		// Init global vars which may be required for any skin
-		skin_init_global_vars();
-
-		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
+		if( $skin_provided_by_plugin = skin_provided_by_plugin( $skin ) )
 		{
-			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array( 'skin' => $skin ) );
 		}
 		else
 		{

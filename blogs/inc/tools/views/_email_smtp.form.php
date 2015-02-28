@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _email_smtp.form.php 7044 2014-07-02 08:55:10Z yura $
+ * @version $Id: _email_smtp.form.php 8281 2015-02-18 01:21:13Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -76,7 +76,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Settings to connect with SMTP Server').get_manual_link('smtp-email-gateway') );
+$Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-gateway-settings') );
 
 	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled'),
 		array( 'note' => sprintf(T_('Note: This feature needs PHP version 5.2 or higher ( Currently installed: %s )' ), phpversion() ) ) );

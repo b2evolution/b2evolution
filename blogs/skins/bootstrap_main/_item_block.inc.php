@@ -12,7 +12,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
- * @version $Id: _item_block.inc.php 8273 2015-02-16 16:19:27Z yura $
+ * @version $Id: _item_block.inc.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -101,7 +101,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',

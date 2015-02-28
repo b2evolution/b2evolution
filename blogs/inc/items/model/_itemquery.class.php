@@ -24,7 +24,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _itemquery.class.php 8228 2015-02-11 09:25:58Z yura $
+ * @version $Id: _itemquery.class.php 8307 2015-02-20 11:15:56Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -296,17 +296,53 @@ class ItemQuery extends SQL
 	 * Restrict to the visibility/sharing statuses we want to show
 	 *
 	 * @param array Restrict to these statuses
+	 * @param string What blogs should be used to check the status permissions:
+	 *               - Empty string to use current blog setting
+	 *               - A list separated by ','
+	 *               - Value '*' to use all blogs
+	 *               - Value '-' to use only current blog without aggregated blog
 	 */
-	function where_visibility( $show_statuses )
+	function where_visibility( $show_statuses, $aggregate_coll_IDs = NULL )
 	{
 		$this->show_statuses = $show_statuses;
 
-		if( !isset( $this->blog ) )
+		if( ! isset( $this->blog ) )
 		{
 			debug_die( 'Status restriction requires to work with a specific blog first.' );
 		}
 
-		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog, 'blog_post!', true, $this->author ) );
+		if( empty( $aggregate_coll_IDs ) )
+		{ // Blog IDs are not defined, Use them depending on current blog setting
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
+		}
+
+		$blog_IDs = array();
+		if( empty( $aggregate_coll_IDs ) || $aggregate_coll_IDs == '-' )
+		{ // Get status restriction only for current blog
+			$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog, 'blog_post!', true, $this->author ) );
+			return; // Exit here, because we don't need to check the permissions for multiple blogs
+		}
+
+		// Check status permission for multiple blogs
+		if( $aggregate_coll_IDs == '*' )
+		{ // Get the status restrictions for all blogs
+			global $DB;
+			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
+		}
+		else
+		{ // Get the status restrictions for several blogs
+			$blog_IDs = explode( ',', $aggregate_coll_IDs );
+		}
+
+		$status_restrictions = array();
+		foreach( $blog_IDs as $blog_ID )
+		{ // Check status permission for each blog separately
+			$status_restrictions[] = 'cat_blog_ID='.$blog_ID.' AND '.statuses_where_clause( $show_statuses, $this->dbprefix, $blog_ID, 'blog_post!', true, $this->author );
+		}
+
+		$this->WHERE_and( '( '.implode( ' ) OR ( ', $status_restrictions ).' )' );
 	}
 
 

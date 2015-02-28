@@ -44,6 +44,7 @@ $params = array_merge( array(
 		'after_comment_form'   => '',
 		'form_comment_redirect_to' => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
 		'comment_image_size'   => 'fit-400x320',
+		'comment_attach_info'  => '<br />'.get_upload_restriction(),
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -311,7 +312,7 @@ function validateCommentForm(form)
 	}
 	if( $Item->can_attach() )
 	{	// Display attach file input field
-		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => '<br />'.get_upload_restriction(), 'name' => 'uploadfile[]', 'type' => 'file' ) );
+		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
 	}
 
 	$comment_options = array();

@@ -14,7 +14,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _comment.form.php 7645 2014-11-14 08:16:13Z yura $
+ * @version $Id: _comment.form.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -247,7 +247,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 </div>
 
-<div class="right_col col-md-3 form-inline">
+<div class="right_col col-md-3">
 
 <?php
 	if( $comment_Item->can_rate()

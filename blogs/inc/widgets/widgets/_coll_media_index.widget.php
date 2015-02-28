@@ -22,7 +22,7 @@
  * @author fplanque: Francois PLANQUE.
  * @author Yabba	- {@link http://www.astonishme.co.uk/}
  *
- * @version $Id: _coll_media_index.widget.php 8263 2015-02-15 04:27:31Z fplanque $
+ * @version $Id: _coll_media_index.widget.php 8321 2015-02-21 20:13:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -74,6 +74,16 @@ class coll_media_index_Widget extends ComponentWidget
 				'size' => 40,
 				'defaultvalue' => T_('Recent photos'),
 			),
+			'item_visibility' => array(
+				'label' => T_('Item visibility'),
+				'note' => T_('What item statuses should be included in the list?'),
+				'type' => 'radio',
+				'field_lines' => true,
+				'options' => array(
+						array( 'public', T_('show public images (cacheable)') ),
+						array( 'all', T_('show all images the current user is allowed to see (not cacheable)') ) ),
+				'defaultvalue' => 'all',
+			),
 			'item_type' => array(
 				'label' => T_('Item type'),
 				'note' => T_('What kind of items do you want to list?'),
@@ -92,7 +102,11 @@ class coll_media_index_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ) ),
+				'options' => array(
+						'grid' => T_('Grid'),
+						'list' => T_('List'),
+						'flow' => T_('Flowing Blocks')
+					),
 				'defaultvalue' => 'grid',
 			),
 			'disp_image_title' => array(
@@ -169,6 +183,22 @@ class coll_media_index_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		if( $this->disp_params['item_visibility'] == 'all' )
+		{ // Don't cache the widget when we display the images of posts with ALL statuses
+			$this->disp_params[ 'allow_blockcache' ] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -209,19 +239,27 @@ class coll_media_index_Widget extends ComponentWidget
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
 		$ItemQuery->where_chapter( $blog_ID );
-		$ItemQuery->where_visibility( NULL );
+		if( $this->disp_params['item_visibility'] == 'public' )
+		{ // Get images only of the public items
+			$ItemQuery->where_visibility( array( 'published' ) );
+		}
+		else
+		{ // Get image of all available posts for current user
+			$ItemQuery->where_visibility( NULL );
+		}
 		$ItemQuery->WHERE_and( '( file_type = "image" ) OR ( file_type IS NULL )' );
 		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
-		if( !empty( $this->disp_params[ 'item_type' ] ) )
+		$ItemQuery->WHERE_and( 'link_position != "albumart"' );
+		if( !empty( $this->disp_params['item_type'] ) )
 		{ // Get items only with specified type
-			$ItemQuery->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params[ 'item_type' ] ) );
+			$ItemQuery->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params['item_type'] ) );
 		}
 		$ItemQuery->GROUP_BY( 'link_ID' );
 
 		// fp> TODO: because no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
 		// asimo> This was updated and we get images and those files where we don't know the file type yet. Now we get 2 times more data than requested.
 		// Maybe it would be good to get only the requested amount of files, because after a very short period the file types will be set for all images.
-		$ItemQuery->LIMIT( intval( $this->disp_params[ 'limit' ] ) * 2 );
+		$ItemQuery->LIMIT( intval( $this->disp_params['limit'] ) * 2 );
 
 		$ItemQuery->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
@@ -232,9 +270,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$FileList->query( false, false, false, 'Media index widget' );
 
-		$layout = $this->disp_params[ 'thumb_layout' ];
+		$layout = $this->disp_params['thumb_layout'];
 
-		$nb_cols = $this->disp_params[ 'grid_nb_cols' ];
+		$nb_cols = $this->disp_params['grid_nb_cols'];
 		$count = 0;
 		$r = '';
 		/**
@@ -242,7 +280,7 @@ class coll_media_index_Widget extends ComponentWidget
 		 */
 		while( $File = & $FileList->get_next() )
 		{
-			if( $count >= $this->disp_params[ 'limit' ] )
+			if( $count >= $this->disp_params['limit'] )
 			{	// We have enough images already!
 				break;
 			}
@@ -255,16 +293,20 @@ class coll_media_index_Widget extends ComponentWidget
 			}
 
 			if( $layout == 'grid' )
-			{
+			{ // Grid layout
 				if( $count % $nb_cols == 0 )
 				{
-					$r .= $this->disp_params[ 'grid_colstart' ];
+					$r .= $this->disp_params['grid_colstart'];
 				}
-				$r .= $this->disp_params[ 'grid_cellstart' ];
+				$r .= $this->disp_params['grid_cellstart'];
+			}
+			elseif( $layout == 'flow' )
+			{ // Flow block layout
+				$r .= $this->disp_params['flow_block_start'];
 			}
 			else
-			{
-				$r .= $this->disp_params[ 'item_start' ];
+			{ // List layout
+				$r .= $this->disp_params['item_start'];
 			}
 
 			// 1/ Hack a dirty permalink( will redirect to canonical):
@@ -280,7 +322,7 @@ class coll_media_index_Widget extends ComponentWidget
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
 			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'], '', '', $ItemLight->title );
 			$r .= '</a>';
-			if( $this->disp_params[ 'disp_image_title' ] )
+			if( $this->disp_params['disp_image_title'] )
 			{ // Dislay title of image or item
 				$title = ( $File->get( 'title' ) ) ? $File->get( 'title' ) : $ItemLight->title;
 				if( ! empty( $title ) )
@@ -292,16 +334,20 @@ class coll_media_index_Widget extends ComponentWidget
 			++$count;
 
 			if( $layout == 'grid' )
-			{
-				$r .= $this->disp_params[ 'grid_cellend' ];
+			{ // Grid layout
+				$r .= $this->disp_params['grid_cellend'];
 				if( $count % $nb_cols == 0 )
 				{
-					$r .= $this->disp_params[ 'grid_colend' ];
+					$r .= $this->disp_params['grid_colend'];
 				}
 			}
+			elseif( $layout == 'flow' )
+			{ // Flow block layout
+				$r .= $this->disp_params['flow_block_end'];
+			}
 			else
-			{
-				$r .= $this->disp_params[ 'item_end' ];
+			{ // List layout
+				$r .= $this->disp_params['item_end'];
 			}
 		}
 
@@ -316,33 +362,41 @@ class coll_media_index_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 
 		if( $layout == 'grid' )
-		{
-			echo $this->disp_params[ 'grid_start' ];
+		{ // Grid layout
+			echo $this->disp_params['grid_start'];
+		}
+		elseif( $layout == 'flow' )
+		{ // Flow block layout
+			echo $this->disp_params['flow_start'];
 		}
 		else
-		{
-			echo $this->disp_params[ 'list_start' ];
+		{ // List layout
+			echo $this->disp_params['list_start'];
 		}
 
 		echo $r;
 
 		if( $layout == 'grid' )
-		{
+		{ // Grid layout
 			if( $count && ( $count % $nb_cols != 0 ) )
 			{
-				echo $this->disp_params[ 'grid_colend' ];
+				echo $this->disp_params['grid_colend'];
 			}
 
-			echo $this->disp_params[ 'grid_end' ];
+			echo $this->disp_params['grid_end'];
+		}
+		elseif( $layout == 'flow' )
+		{ // Flow block layout
+			echo $this->disp_params['flow_end'];
 		}
 		else
-		{
-			echo $this->disp_params[ 'list_end' ];
+		{ // List layout
+			echo $this->disp_params['list_end'];
 		}
 
 		echo $this->disp_params['block_body_end'];
 
-		echo $this->disp_params[ 'block_end' ];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}

@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8273 2015-02-16 16:19:27Z yura $
+	 * @version $Id: index.main.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,16 +52,23 @@ if( $is_pictured_page )
 { // Display a picture from skin setting as background image
 	global $media_path, $media_url;
 	$bg_image = $Skin->get_setting( 'front_bg_image' );
+	echo '<div id="bg_picture">';
 	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 	{ // If it exists in media folder
-		echo '<div id="bg_picture"><img src="'.$media_url.$bg_image.'" /></div>';
+		echo '<img src="'.$media_url.$bg_image.'" />';
 	}
+	echo '</div>';
 }
 ?>
 
 <div class="container body">
+
+<?php
+if( $disp != 'front' )
+{ // Don't display header on disp=front
+?>
 	<div class="row">
-		<div class="col-md-12<?php echo $disp == 'front' ? ' col-half-width' : ''; ?>">
+		<div class="col-md-12">
 
 <div class="PageTop">
 	<?php
@@ -69,7 +76,7 @@ if( $is_pictured_page )
 		// Display container and contents:
 		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '<div class="$wi_class$">',
+				'block_start'         => '<div class="widget $wi_class$">',
 				'block_end'           => '</div>',
 				'block_display_title' => false,
 				'list_start'          => '<ul>',
@@ -87,7 +94,7 @@ if( $is_pictured_page )
 		// Display container and contents:
 		skin_container( NT_('Header'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="$wi_class$">',
+				'block_start'       => '<div class="widget $wi_class$">',
 				'block_end'         => '</div>',
 				'block_title_start' => '<h1>',
 				'block_title_end'   => '</h1>',
@@ -98,18 +105,28 @@ if( $is_pictured_page )
 
 		</div>
 	</div>
-
+<?php
+}
+?>
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
-		<div class="col-md-12<?php echo $disp == 'front' ? ' col-half-width' : ''; ?>">
+		<div class="col-md-12<?php echo $disp == 'front' ? ' front_main_area' : ''; ?>">
 
 	<?php
+	if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo' ) ) )
+	{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 		messages( array(
 				'block_start' => '<div class="action_messages">',
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
+	}
+
+	if( $disp == 'front' )
+	{ // Start of wrapper for front page area, in order to have the $Messages outside this block
+		echo '<div class="front_main_content">';
+	}
 	?>
 
 	<?php
@@ -128,14 +145,17 @@ if( $is_pictured_page )
 	<?php
 		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
+				'title_before'      => '<h2>',
+				'title_after'       => '</h2>',
+				'title_none'        => '',
+				'glue'              => ' - ',
 				'title_single_disp' => true,
-				'format'      => 'htmlbody',
-				'login_text'  => '',
+				'format'            => 'htmlbody',
+				'register_text'     => '',
+				'login_text'        => '',
 				'lostpassword_text' => '',
+				'account_activation' => '',
+				'msgform_text'      => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
@@ -196,6 +216,14 @@ if( $is_pictured_page )
 					'comment_info_after'    => '</div></div>',
 					'preview_start'         => '<div class="panel panel-warning" id="comment_preview">',
 					'preview_end'           => '</div>',
+					'comment_attach_info'   => get_icon( 'help', 'imgtag', array(
+							'data-toggle'    => 'tooltip',
+							'data-placement' => 'bottom',
+							'data-html'      => 'true',
+							'title'          => htmlspecialchars( get_upload_restriction( array(
+									'block_after'     => '',
+									'block_separator' => '<br /><br />' ) ) )
+						) ),
 					// Comment form
 					'form_title_start'      => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' )
 					                           .' comment_form"><div class="panel-heading"><h3>',
@@ -229,6 +257,7 @@ if( $is_pictured_page )
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
+				'skin_form_params' => $Skin->get_template( 'Form' ),
 				'author_link_text' => 'preferredname',
 				'profile_tabs' => array(
 					'block_start'         => '<ul class="nav nav-tabs profile_tabs">',
@@ -247,22 +276,41 @@ if( $is_pictured_page )
 					'prev_text'             => '&lt;&lt;',
 					'next_text'             => '&gt;&gt;',
 				),
-				'form_title_login' => T_('Log in to your account'),
-				'form_class_login' => 'wrap-form-login',
-				'form_title_lostpass' => get_request_title(),
-				'form_class_lostpass' => 'wrap-form-lostpass',
-				'login_form_inskin' => false,
-				'login_page_before' => '<div class="$form_class$">',
-				'login_page_after'  => '</div>',
-				'login_form_before' => '<div class="panel panel-default">'
-																	.'<div class="panel-heading">'
-																		.'<h3 class="panel-title">$form_title$</h3>'
-																	.'</div>'
-																	.'<div class="panel-body">',
-				'login_form_after'  => '</div></div>',
-				'login_form_class'  => 'form-login',
+				// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
+				'skin_form_before'      => '<div class="panel panel-default skin-form">'
+																			.'<div class="panel-heading">'
+																				.'<h3 class="panel-title">$form_title$</h3>'
+																			.'</div>'
+																			.'<div class="panel-body">',
+				'skin_form_after'       => '</div></div>',
+				// Login
+				'display_form_messages' => true,
+				'form_title_login'      => T_('Log in to your account'),
+				'form_class_login'      => 'wrap-form-login',
+				'form_title_lostpass'   => get_request_title(),
+				'form_class_lostpass'   => 'wrap-form-lostpass',
+				'login_form_inskin'     => false,
+				'login_page_before'     => '<div class="$form_class$">',
+				'login_page_after'      => '</div>',
+				'login_form_class'      => 'form-login',
+				// Register
+				'register_page_before'      => '<div class="wrap-form-register">',
+				'register_page_after'       => '</div>',
+				'register_form_title'       => T_('Register'),
+				'register_form_class'       => 'form-register',
+				'register_links_attrs'      => '',
+				'register_use_placeholders' => true,
+				'register_field_width'      => 252,
+				'register_disabled_page_before' => '<div class="wrap-form-register register-disabled">',
+				'register_disabled_page_after'  => '</div>',
+				// Activate form
+				'activate_form_title'  => T_('Account activation'),
+				'activate_page_before' => '<div class="wrap-form-activation">',
+				'activate_page_after'  => '</div>',
+				// Profile
 				'profile_avatar_before' => '<div class="panel panel-default profile_avatar">',
-				'profile_avatar_after' => '</div>',
+				'profile_avatar_after'  => '</div>',
+				// Search
 				'search_input_before'  => '<div class="input-group">',
 				'search_input_after'   => '',
 				'search_submit_before' => '<span class="input-group-btn">',
@@ -283,10 +331,22 @@ if( $is_pictured_page )
 				'comment_info_after'    => '</div></div>',
 				'preview_start'         => '<div class="panel panel-warning" id="comment_preview">',
 				'preview_end'           => '</div>',
+				// Front page
+				'front_block_first_title_start' => '<h1>',
+				'front_block_first_title_end'   => '</h1>',
+				'front_block_title_start'       => '<h2>',
+				'front_block_title_end'         => '</h2>',
+				// Form "Sending a message"
+				'msgform_form_title' => T_('Sending a message'),
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
+
+		if( $disp == 'front' )
+		{ // End of wrapper for front page area, in order to have the $Messages outside this block
+			echo '</div>';// END OF <div class="front_main_content">
+		}
 	?>
 
 		</div>
@@ -330,12 +390,10 @@ if( $is_pictured_page )
 			// Display a link to help page:
 			$Blog->help_link( array(
 					'before' => ' ',
-					'after'  => ' &bull; ',
+					'after'  => ' ',
 					'text'   => T_('Help'),
 				) );
 		?>
-
-		<?php display_param_link( $skin_links ) ?> by <?php display_param_link( $francois_links ) ?>
 
 		<?php
 			// Display additional credits:
@@ -350,6 +408,18 @@ if( $is_pictured_page )
 				) );
 		?>
 	</p>
+
+	<?php
+		// Please help us promote b2evolution and leave this logo on your blog:
+		powered_by( array(
+				'block_start' => '<div class="powered_by">',
+				'block_end'   => '</div>',
+				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+				'img_width'   => 120,
+				'img_height'  => 32,
+			) );
+	?>
 			</div>
 		</div>
 	</div>

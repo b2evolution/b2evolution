@@ -31,7 +31,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @version $Id: _geoip.plugin.php 7317 2014-09-11 07:24:26Z yura $
+ * @version $Id: _geoip.plugin.php 8321 2015-02-21 20:13:57Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -122,7 +122,7 @@ class geoip_plugin extends Plugin
 
 		return array(
 			'datfile' => array(
-				'label' => T_('GeoIP.dat'),
+				'label' => 'GeoIP.dat',
 				'type' => 'info',
 				'note' => '',
 				'info' => $datfile_info,

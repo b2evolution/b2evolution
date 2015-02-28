@@ -29,7 +29,7 @@
  *
  * @package admin
  *
- * @version $Id: _email_settings.form.php 8188 2015-02-07 02:07:55Z fplanque $
+ * @version $Id: _email_settings.form.php 8281 2015-02-18 01:21:13Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -60,13 +60,13 @@ $Form->hidden( 'action', 'settings' );
 
 if( $Settings->get( 'smtp_enabled' ) )
 { // Only when SMTP gateway is enabled
-	$Form->begin_fieldset( T_( 'Email service preferences' ).get_manual_link( 'email-service-preferences' ) );
+	$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
 
 	$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
 				array( 'mail', T_('Regular PHP "mail" function'), ),
 				array( 'smtp', T_('SMTP gateway'), ),
-			), T_('Preferred email service'), true );
-	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the preferred email service is not available, the secondary option will be used.') );
+			), T_('Primary email service'), true );
+	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
 
 	$Form->end_fieldset();
 }

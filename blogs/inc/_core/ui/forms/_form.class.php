@@ -43,7 +43,7 @@
  * This will most probably cause problems, when nesting inputs. This should be refactored
  * to use a field_name-based member array. (blueyed)
  *
- * @version $Id: _form.class.php 7879 2014-12-23 12:08:16Z yura $
+ * @version $Id: _form.class.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -161,32 +161,76 @@ class Form extends Widget
 	 */
 	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
 	{
-		global $AdminUI, $pagenow, $Skin;
+		global $pagenow;
 
 		$this->form_name = $form_name;
 		$this->form_action = (is_null($form_action) ? $pagenow : $form_action );
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
 
-		if( is_object($AdminUI) )
+		// Get form template depending on current skin
+		$template = $this->get_template( $layout, true );
+
+		$this->saved_layouts = array( $layout );
+		$this->saved_templates = array( $template );
+		$this->switch_layout( NULL );	// "restore" saved layout.
+
+
+		// Add any GET params from $form_action as hidden inputs (GET forms only)
+		// Otherwise those params would be overwritten by the form submit and lost.
+		if( strpos( $this->form_action, '?' ) !== false && $this->form_method == 'get' )
 		{
-			if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
-			{ // Get default skin setting:
-				$template = $AdminUI->get_template( 'Form' );
-				$layout = $template['layout'];
+			$pos_args = strpos( $this->form_action, '?' );
+			$query_str = substr( $this->form_action, $pos_args + 1 );
+			// Split args by "&" (but leave "&amp;" alone).
+			$query_args = preg_split( '~&(?!amp;)~', $query_str, -1, PREG_SPLIT_NO_EMPTY );
+			foreach( $query_args as $query_arg )
+			{
+				list( $field_name, $field_value ) = explode( '=', $query_arg, 2 );
+				// Remember all pairs, and add them in end_form (so that used fieldnames can be skipped):
+				$this->possible_hiddens_from_action[] = array( $field_name, $field_value );
+			}
+			// Remove params.
+			$this->form_action = substr( $form_action, 0, $pos_args );
+		}
+	}
+
+
+	/**
+	 * Get template of the current skin
+	 *
+	 * @param string Layout name
+	 * @param boolean TRUE to use default template if the selected layout is not defined for current skin
+	 *                FALSE to return NULL
+	 * @return array|NULL Template params
+	 */
+	function get_template( & $layout, $use_default_template = false )
+	{
+		global $AdminUI, $Skin;
+
+		$template = NULL;
+
+		if( is_object( $AdminUI ) )
+		{
+			if( $layout == 'fieldset' || ( $use_default_template && ( empty( $layout ) || $layout == 'split' || $layout == 'none' ) ) )
+			{ // Get default skin setting
+				$template = $AdminUI->get_template( 'Form', 0, $use_default_template );
 			}
 			else
-			{
-				$template = $AdminUI->get_template( $layout.'_form' );
+			{ // Get special form skin
+				$template = $AdminUI->get_template( $layout.'_form', 0, $use_default_template );
+			}
+			if( is_array( $template ) && isset( $template['layout'] ) )
+			{ // Get layout name from template
 				$layout = $template['layout'];
 			}
 		}
 		else
-		{	// This happens for comment forms & login screen for example...
+		{ // This happens for comment forms & login screen for example...
 			$template_is_empty = true;
 			if( is_object( $Skin ) )
 			{ // Get skin setting:
-				if( empty( $layout ) || $layout == 'split' || $layout == 'none' || $layout == 'fieldset' )
+				if( $layout == 'fieldset' || ( $use_default_template && ( empty( $layout ) || $layout == 'split' || $layout == 'none' ) ) )
 				{ // Get default skin setting:
 					$template = $Skin->get_template( 'Form' );
 				}
@@ -201,75 +245,59 @@ class Form extends Widget
 				}
 			}
 
-			if( $template_is_empty )
+			if( $template_is_empty && $use_default_template )
 			{
 				$template = array(
-					'layout' => 'fieldset',
-					'formstart' => '<div>',// required before (no_)title_fmt for validation
-					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'layout'         => 'fieldset',
+					'formclass'      => '',
+					'formstart'      => '<div>',// required before (no_)title_fmt for validation
+					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end' => '</fieldset>'."\n",
-					'fieldstart' => '<fieldset$ID$>'."\n",
-					'labelclass' => '',
-					'labelstart' => '<div class="label">',
-					'labelend' => "</div>\n",
-					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
-					'inputstart' => '<div class="input">',
-					'infostart' => '<div class="info">',
-					'inputend' => "</div>\n",
-					'fieldend' => "</fieldset>\n\n",
-					'buttonsstart' => '<fieldset><div class="label"></div><div class="input">', // DIV.label for IE6
-					'buttonsend' => "</div></fieldset>\n\n",
-					'customstart' => '<div class="custom_content">',
-					'customend' => "</div>\n",
-					'note_format' => ' <span class="notes">%s</span>',
-					'formend' => '</div>',
+					'fieldset_end'   => '</fieldset>'."\n",
+					'fieldstart'     => '<fieldset$ID$>'."\n",
+					'labelclass'     => '',
+					'labelstart'     => '<div class="label">',
+					'labelend'       => "</div>\n",
+					'labelempty'     => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
+					'inputstart'     => '<div class="input">',
+					'inputend'       => "</div>\n",
+					'infostart'      => '<div class="info">',
+					'infoend'        => "</div>\n",
+					'fieldend'       => "</fieldset>\n\n",
+					'buttonsstart'   => '<fieldset><div class="label"></div><div class="input">', // DIV.label for IE6
+					'buttonsend'     => "</div></fieldset>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="notes">%s</span>',
+					'formend'        => '</div>',
 				);
 				$layout = 'fieldset';
 			}
 		}
 
-		$this->saved_layouts = array($layout);
-		$this->saved_templates = array($template);
-		$this->switch_layout( NULL );	// "restore" saved layout.
-
-
-		// Add any GET params from $form_action as hidden inputs (GET forms only)
-		// Otherwise those params would be overwritten by the form submit and lost.
-		if( strpos($this->form_action, '?') !== false && $this->form_method == 'get' )
-		{
-			$pos_args = strpos($this->form_action, '?');
-			$query_str = substr($this->form_action, $pos_args+1);
-			// Split args by "&" (but leave "&amp;" alone).
-			$query_args = preg_split('~&(?!amp;)~', $query_str, -1, PREG_SPLIT_NO_EMPTY);
-			foreach( $query_args as $query_arg )
-			{
-				list($field_name, $field_value) = explode('=', $query_arg, 2);
-				// Remember all pairs, and add them in end_form (so that used fieldnames can be skipped):
-				$this->possible_hiddens_from_action[] = array($field_name, $field_value);
-			}
-			// Remove params.
-			$this->form_action = substr($form_action, 0, $pos_args);
-		}
+		return $template;
 	}
 
 
 	/**
+	 * Switch to other layout
+	 *
 	 * @param string|NULL the form layout : 'fieldset', 'table' or ''; NULL to restore previsouly saved layout
 	 */
 	function switch_layout( $layout )
 	{
 		if( $layout == NULL )
 		{ // we want to restore previous layout:
-			if( count($this->saved_layouts) )
+			if( count( $this->saved_layouts ) )
 			{
-				$this->layout = array_shift($this->saved_layouts);
+				$this->layout = array_shift( $this->saved_layouts );
 				$template = $this->saved_templates[0];
-				if( !empty($template ) )
+				if( ! empty( $template ) )
 				{
 					$this->template       = $template;
+					$this->formclass      = isset( $template['formclass'] ) ? $template['formclass'] : '';
 					$this->formstart      = $template['formstart'];
 					$this->title_fmt      = $template['title_fmt'];
 					$this->no_title_fmt   = $template['no_title_fmt'];
@@ -281,8 +309,9 @@ class Form extends Widget
 					$this->labelend       = $template['labelend'];
 					$this->labelempty     = $template['labelempty'];
 					$this->inputstart     = $template['inputstart'];
-					$this->infostart      = $template['infostart'];
 					$this->inputend       = $template['inputend'];
+					$this->infostart      = $template['infostart'];
+					$this->infoend        = $template['infoend'];
 					$this->fieldend       = $template['fieldend'];
 					$this->buttonsstart   = $template['buttonsstart'];
 					$this->buttonsend     = $template['buttonsend'];
@@ -290,6 +319,51 @@ class Form extends Widget
 					$this->customend      = $template['customend'];
 					$this->note_format    = $template['note_format'];
 					$this->formend        = $template['formend'];
+					// Additional params depending on field type:
+					$template = array_merge( array(
+							// - checkbox
+							'fieldstart_checkbox'    => $this->fieldstart,
+							'fieldend_checkbox'      => $this->fieldend,
+							'inputclass_checkbox'    => 'checkbox',
+							'inputstart_checkbox'    => $this->inputstart,
+							'inputend_checkbox'      => $this->inputend,
+							'checkbox_newline_start' => '',
+							'checkbox_newline_end'   => "<br />\n",
+							'checkbox_basic_start'   => '<label>',
+							'checkbox_basic_end'     => '</label>',
+							// - radio
+							'fieldstart_radio'       => $this->fieldstart,
+							'fieldend_radio'         => $this->fieldend,
+							'inputclass_radio'       => 'radio',
+							'inputstart_radio'       => $this->inputstart,
+							'inputend_radio'         => $this->inputend,
+							'radio_label_format'     => '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>',
+							'radio_newline_start'    => "<div>\n",
+							'radio_newline_end'      => "</div>\n",
+							'radio_oneline_start'    => '',
+							'radio_oneline_end'      => '',
+						), $template );
+					// - checkbox
+					$this->fieldstart_checkbox    = $template['fieldstart_checkbox'];
+					$this->fieldend_checkbox      = $template['fieldend_checkbox'];
+					$this->inputclass_checkbox    = $template['inputclass_checkbox'];
+					$this->inputstart_checkbox    = $template['inputstart_checkbox'];
+					$this->inputend_checkbox      = $template['inputend_checkbox'];
+					$this->checkbox_newline_start = $template['checkbox_newline_start'];
+					$this->checkbox_newline_end   = $template['checkbox_newline_end'];
+					$this->checkbox_basic_start   = $template['checkbox_basic_start'];
+					$this->checkbox_basic_end     = $template['checkbox_basic_end'];
+					// - radio
+					$this->fieldstart_radio       = $template['fieldstart_radio'];
+					$this->fieldend_radio         = $template['fieldend_radio'];
+					$this->inputclass_radio       = $template['inputclass_radio'];
+					$this->inputstart_radio       = $template['inputstart_radio'];
+					$this->inputend_radio         = $template['inputend_radio'];
+					$this->radio_label_format     = $template['radio_label_format'];
+					$this->radio_newline_start    = $template['radio_newline_start'];
+					$this->radio_newline_end      = $template['radio_newline_end'];
+					$this->radio_oneline_start    = $template['radio_oneline_start'];
+					$this->radio_oneline_end      = $template['radio_oneline_end'];
 				}
 			}
 		}
@@ -298,148 +372,305 @@ class Form extends Widget
 			array_unshift( $this->saved_layouts, $this->layout );
 			$this->layout = $layout;
 
+			// Try to get template of current skin
+			$template = $this->get_template( $this->layout, false );
+
+			if( is_array( $template ) && ! empty( $template ) )
+			{ // Template is detected on current skin, Use it
+				foreach( $template as $t_param_name => $t_param_value )
+				{
+					$this->$t_param_name = $t_param_value;
+				}
+				// Exit here because layout is switched to template of current skin
+				return;
+			}
+
+			// Use default layout if it is not defined for current skin
 			switch( $this->layout )
 			{
 				case 'table':
-					$this->formstart = '<table cellspacing="0" class="fform">'."\n";
+					$this->formclass      = '';
+					$this->formstart      = '<table cellspacing="0" class="fform">'."\n";
 					// Note: no thead in here until you can safely add a tbody to the rest of the content...
-					$this->title_fmt = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
-															.'<span class="right_icons">$global_icons$</span>'
-															.'$title$</div></th></tr>'."\n";
-					$this->no_title_fmt = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
+					$this->title_fmt      = '<tr class="formtitle"><th colspan="2"><div class="results_title">'
+																	.'<span class="right_icons">$global_icons$</span>'
+																	.'$title$</div></th></tr>'."\n";
+					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = '<tr$ID$>'."\n";
-					$this->labelstart = '<td class="label">';
-					$this->labelend = "</td>\n";
-					$this->labelempty = '<td class="label">&nbsp;</td>'."\n";
-					$this->inputstart = '<td class="input">';
-					$this->infostart = '<td class="info">';
-					$this->inputend = "</td>\n";
-					$this->fieldend = "</tr>\n\n";
-					$this->buttonsstart = '<tr class="buttons"><td colspan="2">';
-					$this->buttonsend = "</td></tr>\n";
-					$this->customstart = '<tr><td colspan="2" class="custom_content">';
-					$this->customend = "</td></tr>\n";
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = "</table>\n";
+																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = '<tr$ID$>'."\n";
+					$this->labelstart     = '<td class="label">';
+					$this->labelend       = "</td>\n";
+					$this->labelempty     = '<td class="label">&nbsp;</td>'."\n";
+					$this->inputstart     = '<td class="input">';
+					$this->inputend       = "</td>\n";
+					$this->infostart      = '<td class="info">';
+					$this->infoend        = "</td>\n";
+					$this->fieldend       = "</tr>\n\n";
+					$this->buttonsstart   = '<tr class="buttons"><td colspan="2">';
+					$this->buttonsend     = "</td></tr>\n";
+					$this->customstart    = '<tr><td colspan="2" class="custom_content">';
+					$this->customend      = "</td></tr>\n";
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = "</table>\n";
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 					break;
 
 				case 'fieldset':
-					$this->formstart = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->formclass      = '';
+					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
+					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = '<fieldset$ID$>'."\n";
-					$this->labelstart = '<div class="label">';
-					$this->labelend = "</div>\n";
-					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart = '<div class="input">';
-					$this->infostart = '<div class="info">';
-					$this->inputend = "</div>\n";
-					$this->fieldend = "</fieldset>\n\n";
-					$this->buttonsstart = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend = "</div></fieldset>\n\n";
-					$this->customstart = '<div class="custom_content">';
-					$this->customend = "</div>\n";
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = '</div>';
+																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = '<fieldset$ID$>'."\n";
+					$this->labelstart     = '<div class="label">';
+					$this->labelend       = "</div>\n";
+					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
+					$this->inputstart     = '<div class="input">';
+					$this->infostart      = '<div class="info">';
+					$this->inputend       = "</div>\n";
+					$this->fieldend       = "</fieldset>\n\n";
+					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
+					$this->buttonsend     = "</div></fieldset>\n\n";
+					$this->customstart    = '<div class="custom_content">';
+					$this->customend      = "</div>\n";
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = '</div>';
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 					break;
 
 				case 'chicago':		// Temporary dirty hack
-					$this->formstart = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->formclass      = '';
+					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
+					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = '<fieldset$ID$>'."\n";
-					$this->labelstart = '<div class="label">';
-					$this->labelend = "</div>\n";
-					$this->labelempty = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart = '<div class="input">';
-					$this->infostart = '<div class="info">';
-					$this->inputend = "</div>\n";
-					$this->fieldend = "</fieldset>\n\n";
-					$this->buttonsstart = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend = "</div></fieldset>\n\n";
-					$this->customstart = '<div class="custom_content">';
-					$this->customend = "</div>\n";
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = '</div>';
+																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = '<fieldset$ID$>'."\n";
+					$this->labelstart     = '<div class="label">';
+					$this->labelend       = "</div>\n";
+					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
+					$this->inputstart     = '<div class="input">';
+					$this->inputend       = "</div>\n";
+					$this->infostart      = '<div class="info">';
+					$this->infoend        = "</div>\n";
+					$this->fieldend       = "</fieldset>\n\n";
+					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
+					$this->buttonsend     = "</div></fieldset>\n\n";
+					$this->customstart    = '<div class="custom_content">';
+					$this->customend      = "</div>\n";
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = '</div>';
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 					break;
 
 				case 'linespan':
-					$this->formstart = '';
-					$this->title_fmt = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
+					$this->formclass      = '';
+					$this->formstart      = '';
+					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
+					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = '<div class="tile"$ID$>';
-					$this->labelstart = '<strong>';
-					$this->labelend = "</strong>\n";
-					$this->labelempty = '';
-					$this->inputstart = '';
-					$this->infostart = '';
-					$this->inputend = "\n";
-					$this->fieldend = "</div>\n";
-					$this->buttonsstart = '';
-					$this->buttonsend = "\n";
-					$this->customstart = '';
-					$this->customend = "\n";
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = '';
+																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = '<div class="tile"$ID$>';
+					$this->labelstart     = '<strong>';
+					$this->labelend       = "</strong>\n";
+					$this->labelempty     = '';
+					$this->inputstart     = '';
+					$this->inputend       = "\n";
+					$this->infostart      = '';
+					$this->infoend        = "\n";
+					$this->fieldend       = "</div>\n";
+					$this->buttonsstart   = '';
+					$this->buttonsend     = "\n";
+					$this->customstart    = '';
+					$this->customend      = "\n";
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = '';
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 					break;
 
 				case 'blockspan':
-					$this->formstart = '';
-					$this->title_fmt = '$title$'."\n"; // TODO: icons
-					$this->no_title_fmt = '';          //           "
+					$this->formclass      = '';
+					$this->formstart      = '';
+					$this->title_fmt      = '$title$'."\n"; // TODO: icons
+					$this->no_title_fmt   = '';          //           "
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = '<span class="block"$ID$>';
-					$this->labelstart = '';
-					$this->labelend = "\n";
-					$this->labelempty = '';
-					$this->inputstart = '';
-					$this->infostart = '';
-					$this->inputend = "\n";
-					$this->fieldend = '</span>'.get_icon( 'pixel' )."\n";
-					$this->buttonsstart = '';
-					$this->buttonsend = "\n";
-					$this->customstart = '';
-					$this->customend = '';
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = '';
+																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = '<span class="block"$ID$>';
+					$this->labelstart     = '';
+					$this->labelend       = "\n";
+					$this->labelempty     = '';
+					$this->inputstart     = '';
+					$this->inputend       = "\n";
+					$this->infostart      = '';
+					$this->infoend        = "\n";
+					$this->fieldend       = '</span>'.get_icon( 'pixel' )."\n";
+					$this->buttonsstart   = '';
+					$this->buttonsend     = "\n";
+					$this->customstart    = '';
+					$this->customend      = '';
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = '';
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 					break;
 
 				default:
 					// "none" (no layout)
-					$this->formstart = '';
-					$this->title_fmt = '$title$'."\n"; // TODO: icons
-					$this->no_title_fmt = '';          //           "
+					$this->formclass      = '';
+					$this->formstart      = '';
+					$this->title_fmt      = '$title$'."\n"; // TODO: icons
+					$this->no_title_fmt   = '';          //           "
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end = '</fieldset>'."\n";
-					$this->fieldstart = ''; // fp> shall we still use $ID$ here ?
-					$this->labelstart = '';
-					$this->labelend = "\n";
-					$this->labelempty = '';
-					$this->inputstart = '';
-					$this->infostart = '';
-					$this->inputend = "\n";
-					$this->fieldend = "\n";
-					$this->buttonsstart = '';
-					$this->buttonsend = "\n";
-					$this->customstart = '';
-					$this->customend = "\n";
-					$this->note_format = ' <span class="notes">%s</span>';
-					$this->formend = '';
+																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
+					$this->fieldset_end   = '</fieldset>'."\n";
+					$this->fieldstart     = ''; // fp> shall we still use $ID$ here ?
+					$this->labelstart     = '';
+					$this->labelend       = "\n";
+					$this->labelempty     = '';
+					$this->inputstart     = '';
+					$this->inputend       = "\n";
+					$this->infostart      = '';
+					$this->infoend        = "\n";
+					$this->fieldend       = "\n";
+					$this->buttonsstart   = '';
+					$this->buttonsend     = "\n";
+					$this->customstart    = '';
+					$this->customend      = "\n";
+					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->formend        = '';
+					// Additional params depending on field type:
+					// - checkbox
+					$this->fieldstart_checkbox    = $this->fieldstart;
+					$this->fieldend_checkbox      = $this->fieldend;
+					$this->inputclass_checkbox    = 'checkbox';
+					$this->inputstart_checkbox    = $this->inputstart;
+					$this->inputend_checkbox      = $this->inputend;
+					$this->checkbox_newline_start = '';
+					$this->checkbox_newline_end   = "<br />\n";
+					$this->checkbox_basic_start   = '<label>';
+					$this->checkbox_basic_end     = '</label>';
+					// - radio
+					$this->fieldstart_radio       = $this->fieldstart;
+					$this->fieldend_radio         = $this->fieldend;
+					$this->inputclass_radio       = 'radio';
+					$this->inputstart_radio       = $this->inputstart;
+					$this->inputend_radio         = $this->inputend;
+					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
+					$this->radio_newline_start    = "<div>\n";
+					$this->radio_newline_end      = "</div>\n";
+					$this->radio_oneline_start    = '';
+					$this->radio_oneline_end      = '';
 			}
 
 		}
@@ -460,8 +691,9 @@ class Form extends Widget
 	 *    labelend
 	 *    labelempty
 	 *    inputstart
-	 *    infostart
 	 *    inputend
+	 *    infostart
+	 *    infoend
 	 *    fieldend
 	 *    buttonsstart
 	 *    buttonsend
@@ -491,9 +723,10 @@ class Form extends Widget
 	 * @param string The name of the field
 	 * @param string The field label
 	 * @param boolean Reset {@link $_common_params}? This should be used if you build a field by yourself.
+	 * @param string Field type
 	 * @return The generated HTML
 	 */
-	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false )
+	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false, $type = NULL )
 	{
 		if( $reset_common_params )
 		{
@@ -536,7 +769,14 @@ class Form extends Widget
 			$field_classes[] = 'field_required';
 		}
 
-		$r = $this->fieldstart;
+		if( isset( $this->{'fieldstart_'.$type} ) )
+		{ // Use special field start for element with type
+			$r = $this->{'fieldstart_'.$type};
+		}
+		else
+		{ // Use default field start
+			$r = $this->fieldstart;
+		}
 
 		if( count( $field_classes ) > 0 )
 		{
@@ -559,7 +799,14 @@ class Form extends Widget
 
 		$r .= $this->get_label();
 
-		$r .= $this->inputstart;
+		if( isset( $this->{'inputstart_'.$type} ) )
+		{ // Use special input start for element with type
+			$r .= $this->{'inputstart_'.$type};
+		}
+		else
+		{ // Use default input start
+			$r .= $this->inputstart;
+		}
 
 		return $r;
 	}
@@ -572,7 +819,7 @@ class Form extends Widget
 	 *
 	 * @return The generated HTML
 	 */
-	function end_field()
+	function end_field( $type )
 	{
 
 		$r = '';
@@ -587,7 +834,23 @@ class Form extends Widget
 			$r .= $this->_common_params['field_suffix'];
 		}
 
-		$r .= $this->inputend.$this->fieldend;
+		if( isset( $this->{'inputend_'.$type} ) )
+		{ // Use special input end for element with type
+			$r .= $this->{'inputend_'.$type};
+		}
+		else
+		{ // Use default input end
+			$r .= $this->inputend;
+		}
+
+		if( isset( $this->{'fieldend_'.$type} ) )
+		{ // Use special field end for element with type
+			$r .= $this->{'fieldend_'.$type};
+		}
+		else
+		{ // Use default field end
+			$r .= $this->fieldend;
+		}
 
 		return $r;
 	}
@@ -1422,7 +1685,7 @@ class Form extends Widget
 				'name'  => $field_name,
 				'label' => $field_label,
 				'type'  => 'checkbox',
-				'class' => 'checkbox',
+				'class' => $this->inputclass_checkbox, // 'checkbox'
 			), $field_params );
 
 		if( $field_checked )
@@ -1449,7 +1712,7 @@ class Form extends Widget
 				'name'  => $field_name,
 				'type'  => 'checkbox',
 				'value' => 1,
-				'class' => 'checkbox',
+				'class' => $this->inputclass_checkbox, // 'checkbox'
 			), $field_params );
 
 		if( $field_checked )
@@ -1457,10 +1720,10 @@ class Form extends Widget
 			$field_params['checked'] = 'checked';
 		}
 
-		echo '<label>';
-		echo $this->get_input_element($field_params);
+		echo $this->checkbox_basic_start;
+		echo $this->get_input_element( $field_params );
 		echo $field_label;
-		echo '</label>';
+		echo $this->checkbox_basic_end;
 	}
 
 
@@ -1552,7 +1815,7 @@ class Form extends Widget
 			$form_params['class'] = $form_class;
 		}
 		// Append bootstrap class
-		$form_params['class'] = empty( $form_params['class'] ) ? 'form-horizontal' : $form_params['class'].' form-horizontal';
+		$form_params['class'] = ( empty( $form_params['class'] ) ? '' : $form_params['class'].' ' ).$this->formclass;
 
 		if( ! isset($form_params['method']) )
 		{
@@ -1766,6 +2029,9 @@ class Form extends Widget
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
+			// Start of checkbox option for multi line format
+			$r .= $this->checkbox_newline_start;
+
 			$loop_field_name = $option[0];
 
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
@@ -1804,7 +2070,7 @@ class Form extends Widget
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
-			$r .= ' class="checkbox" />';
+			$r .= ' class="'.$this->inputclass_checkbox.'" />';
 
 			$r .= $after_field;
 
@@ -1814,11 +2080,13 @@ class Form extends Widget
 
 			$r .='</label>';
 
-			if( !empty($loop_field_note) )
+			if( ! empty( $loop_field_note ) )
 			{ // We want to display a note:
-				$r .= ' <span class="notes">'.$loop_field_note.'</span>';
+				$r .= sprintf( $this->note_format, $loop_field_note );
 			}
-			$r .= "<br />\n";
+
+			// End of checkbox option for multi line format
+			$r .= $this->checkbox_newline_end;
 		}
 
 		$r .= $field_params['input_suffix'];
@@ -2475,7 +2743,7 @@ class Form extends Widget
 			$r .= $this->_common_params['field_suffix'];
 		}
 
-		$r .= ( isset($this->infoend) ? $this->infoend : $this->inputend ).$this->fieldend;
+		$r .= $this->infoend.$this->fieldend;
 
 		return $this->display_or_return( $r );
 	}
@@ -2924,10 +3192,10 @@ class Form extends Widget
 				'note_format' => $this->note_format,
 			), $field_params );
 
-		if( isset($field_params['lines']) )
+		if( isset( $field_params['lines'] ) )
 		{
 			$field_lines = $field_params['lines'];
-			unset($field_params['lines']); // no HTML attribute
+			unset( $field_params['lines'] ); // no HTML attribute
 		}
 		else
 		{
@@ -2943,7 +3211,7 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 
-		$r = $this->begin_field();
+		$r = $this->begin_field( NULL, NULL, false, 'radio' );
 
 		/*
 		 * Build options list:
@@ -2954,15 +3222,22 @@ class Form extends Widget
 			// Merge defaults from $field_params:
 			$loop_radio = array_merge( $field_params, $loop_radio );
 
-			if( $field_lines ) $r .= "<div>\n";
+			if( $field_lines )
+			{ // Start of radio option for multi line format
+				$r .= $this->radio_newline_start;
+			}
+			else
+			{ // Start of radio option for single line format
+				$r .= $this->radio_oneline_start;
+			}
 
 			// Defaults:
-			if( ! isset($loop_radio['type']) )  $loop_radio['type'] = 'radio';
-			if( ! isset($loop_radio['class']) ) $loop_radio['class'] = 'radio';
-			if( ! isset($loop_radio['name']) )  $loop_radio['name'] = $field_name;
-			if( ! isset($loop_radio['id']) )
+			if( ! isset( $loop_radio['type'] ) )  $loop_radio['type'] = 'radio';
+			if( ! isset( $loop_radio['class'] ) ) $loop_radio['class'] = $this->inputclass_radio; // 'radio'
+			if( ! isset( $loop_radio['name'] ) )  $loop_radio['name'] = $field_name;
+			if( ! isset( $loop_radio['id'] ) )
 			{ // build unique id:
-				$loop_radio['id'] = $this->get_valid_id($field_params['name'].'_radio_'.(++$count_options));
+				$loop_radio['id'] = $this->get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
 			}
 
 			if( isset($loop_radio['checked']) )
@@ -2978,17 +3253,17 @@ class Form extends Widget
 			$label = $loop_radio['label'];
 			$note = isset($loop_radio['note']) ? $loop_radio['note'] : null;
 			$suffix = isset($loop_radio['suffix']) ? $loop_radio['suffix'] : '';
-			unset($loop_radio['label'], $loop_radio['note'], $loop_radio['suffix']);
+			unset( $loop_radio['label'], $loop_radio['note'], $loop_radio['suffix'] );
 
 			// the radio element:
 			$r .= $this->get_input_element( $loop_radio, false );
 
 			// the label:
-			$r .= '<label class="radiooption" for="'.$loop_radio['id'].'">'.$label.'</label>';
+			$r .= str_replace( array( '$radio_option_ID$', '$radio_option_label$' ), array( $loop_radio['id'], $label ), $this->radio_label_format );
 
-			if( ! empty($note) )
+			if( ! empty( $note ) )
 			{ // Add a note for the current radio option:
-				$r .= '<span class="notes">'.$note.'</span>';
+				$r .= sprintf( $this->note_format, $note );
 			}
 
 			// optional text for radio option (like additional fieldsets or input boxes)
@@ -2997,10 +3272,17 @@ class Form extends Widget
 			// Split radio options by whitespace:
 			$r .= "\n";
 
-			if( $field_lines ) $r .= "</div>\n";
+			if( $field_lines )
+			{ // End of radio option for multi line format
+				$r .= $this->radio_newline_end;
+			}
+			else
+			{ // End of radio option for single line format
+				$r .= $this->radio_oneline_end;
+			}
 		}
 
-		$r .= $this->end_field();
+		$r .= $this->end_field( 'radio' );
 
 		return $this->display_or_return( $r );
 	}
@@ -3164,12 +3446,13 @@ class Form extends Widget
 			}
 		}
 
-		$r = $this->begin_field();
+		$input_type = isset( $field_params['type'] ) ? $field_params['type'] : '';
+		$r = $this->begin_field( NULL, NULL, false, $input_type );
 		if( !$field_params['inline'] )
 		{ // Append input field
 			$r .= $element;
 		}
-		$r .= $this->end_field();
+		$r .= $this->end_field( $input_type );
 
 		if( $field_params['inline'] )
 		{ // Restore the changed form elements in mode 'inline'

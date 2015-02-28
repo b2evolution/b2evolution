@@ -9,12 +9,12 @@
  *
  * @package evoskins
  *
- * @version $Id: access_denied.main.php 8256 2015-02-13 06:50:39Z yura $
+ * @version $Id: access_denied.main.php 8293 2015-02-19 08:04:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Blog, $skin_links, $francois_links;
 
 require $ads_current_skin_path.'index.main.php';
 ?>

@@ -23,7 +23,7 @@
  *
  * @package evocore
  *
- * @version $Id: display.ctrl.php 7173 2014-07-22 08:09:05Z yura $
+ * @version $Id: display.ctrl.php 8316 2015-02-20 22:16:26Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -82,11 +82,11 @@ switch ( $action )
 			param_check_interval( 'allow_anonymous_user_level_min', 'allow_anonymous_user_level_max', T_('User group level must be a number.'), T_('The minimum user group level must be lower than (or equal to) the maximum.') );
 			if( ! param_has_error( 'allow_anonymous_user_level_min' ) && $allow_anonymous_user_level_min < 0 )
 			{ // Limit by min user group level
-				param_error( 'allow_anonymous_user_level_min', T_('Minimum user group level must be 0.') );
+				param_error( 'allow_anonymous_user_level_min', T_('Minimum user group level cannot be lower than 0.') );
 			}
 			if( ! param_has_error( 'allow_anonymous_user_level_max' ) && $allow_anonymous_user_level_max > 10 )
 			{ // Limit by max user group level
-				param_error( 'allow_anonymous_user_level_max', T_('Maximum user group level must be 10.') );
+				param_error( 'allow_anonymous_user_level_max', T_('Maximum user group level cannot be higher than 10.') );
 			}
 
 			$updated_settings[] = array( 'allow_anonymous_user_level_min', $allow_anonymous_user_level_min );

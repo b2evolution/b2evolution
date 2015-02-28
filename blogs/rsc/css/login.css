@@ -67,15 +67,6 @@ span.help-inline {
 	color: #999;
 	font-size: 84%;
 }
-div#ffield_m {
-	margin-bottom: 4px;
-}
-div#p-status {
-	margin-left: 5px;
-}
-#pass2_status .icon {
-	margin-top: -2px;
-}
 
 .form-horizontal .form-actions {
 	background: none;

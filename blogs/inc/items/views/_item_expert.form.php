@@ -11,7 +11,7 @@
  *
  * @package admin
  *
- * @version $Id: _item_expert.form.php 7999 2015-01-15 08:24:44Z yura $
+ * @version $Id: _item_expert.form.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -312,12 +312,6 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
- 	$Form->switch_layout( 'linespan' );
-	echo '<div id="itemform_urltitle" class="edit_fieldgroup">';
-
-	echo '</div>';
-	$Form->switch_layout( NULL );
-
 	$edited_Item_excerpt = $edited_Item->get('excerpt');
 	?>
 
@@ -363,7 +357,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col col-md-3 form-inline">
+<div class="right_col col-md-3">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
@@ -384,10 +378,8 @@ $Form->begin_form( '', '', $params );
 	$Form->switch_layout( 'linespan' );
 
 	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
-	echo "<br/>";
 
 	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
-	echo "<br/>";
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------

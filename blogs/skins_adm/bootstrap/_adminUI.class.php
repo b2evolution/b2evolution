@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _adminUI.class.php 7713 2014-12-01 06:35:17Z yura $
+ * @version $Id: _adminUI.class.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,8 +53,6 @@ class AdminUI extends AdminUI_general
 	{
 		global $Messages;
 		// This is included before controller specifc require_css() calls:
-		require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
-		require_css( 'basic.css', 'rsc_url' ); // Basic styles
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
 
 		require_js( '#jquery#', 'rsc_url' );
@@ -62,20 +60,24 @@ class AdminUI extends AdminUI_general
 
 		require_js( '#bootstrap#', 'rsc_url' );
 		require_css( '#bootstrap_css#', 'rsc_url' );
-		require_css( '#bootstrap_theme_css#', 'rsc_url' );
-		require_css( 'bootstrap/b2evo.css', 'rsc_url' );
-
+		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
+
+		// rsc/less/bootstrap-basic_styles.less
+		// rsc/less/bootstrap-basic.less
+		// rsc/less/bootstrap-evoskins.less
+		// rsc/build/bootstrap-backoffice-b2evo_base.bundle.css // CSS concatenation of the above
+		require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
 
 		require_css( 'skins_adm/bootstrap/rsc/css/style.css', true );
 
 		// Set bootstrap classes for messages
 		$Messages->set_params( array(
-				'class_success'  => 'alert alert-success fade in',
-				'class_warning'  => 'alert fade in',
-				'class_error'    => 'alert alert-danger fade in',
-				'class_note'     => 'alert alert-info fade in',
-				'before_message' => '<button class="close" data-dismiss="alert">&times;</button>',
+				'class_success'  => 'alert alert-dismissible alert-success fade in',
+				'class_warning'  => 'alert alert-dismissible alert-warning fade in',
+				'class_error'    => 'alert alert-dismissible alert-danger fade in',
+				'class_note'     => 'alert alert-dismissible alert-info fade in',
+				'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
 			) );
 
 		// Use glyph icons, @see get_icon()
@@ -182,9 +184,11 @@ class AdminUI extends AdminUI_general
 	 * Get a template by name and depth.
 	 *
 	 * @param string The template name ('main', 'sub').
+	 * @param integer Nesting level (start at 0)
+	 * @param boolean TRUE to die on unknown template name
 	 * @return array
 	 */
-	function get_template( $name, $depth = 0 )
+	function get_template( $name, $depth = 0, $die_on_unknown = false )
 	{
 		switch( $name )
 		{
@@ -245,7 +249,7 @@ class AdminUI extends AdminUI_general
 						'header_text_single' => '',
 					'header_end' => '',
 					'head_title' => '<div class="panel-heading fieldset_title">$title$<span class="pull-right">$global_icons$</span></div>'."\n",
-					'filters_start' => '<div class="filters panel-body form-inline">',
+					'filters_start' => '<div class="filters panel-body">',
 					'filters_end' => '</div>',
 					'messages_start' => '<div class="messages form-inline">',
 					'messages_end' => '</div>',
@@ -323,45 +327,157 @@ class AdminUI extends AdminUI_general
 				'sort_type' => 'basic'
 				);
 
+			case 'blockspan_form':
+				// Form settings for filter area:
+				return array(
+					'layout'         => 'blockspan',
+					'formclass'      => 'form-inline',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '$title$'."\n",
+					'no_title_fmt'   => '',
+					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+																.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+					'fieldset_end'   => '</fieldset>'."\n",
+					'fieldstart'     => '<div class="form-group form-group-sm" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => 'control-label',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '<label></label>',
+					'inputstart'     => '',
+					'inputend'       => "\n",
+					'infostart'      => '<p class="form-control-static">',
+					'infoend'        => "</p>\n",
+					'buttonsstart'   => '<div class="form-group form-group-sm">',
+					'buttonsend'     => "</div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
+					'fieldend_checkbox'      => "</div>\n\n",
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '',
+					'inputend_checkbox'      => "\n",
+					'checkbox_newline_start' => '',
+					'checkbox_newline_end'   => "\n",
+					// - radio
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '',
+					'radio_newline_end'      => "\n",
+					'radio_oneline_start'    => '',
+					'radio_oneline_end'      => "\n",
+				);
+
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
 				return array(
-					'layout' => 'fieldset',
-					'formstart' => '',
-					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
+					'layout'         => 'fieldset',
+					'formclass'      => 'form-horizontal',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
-					'fieldset_end' => '</div></div></fieldset></div>'."\n",
-					'fieldstart' => '<div class="form-group" $ID$>'."\n",
-					'labelclass' => 'control-label col-xs-2',
-					'labelstart' => '',
-					'labelend' => "\n",
-					'labelempty' => '<label class="control-label col-xs-2"></label>',
-					'inputstart' => '<div class="controls col-xs-10">',
-					'infostart' => '<div class="controls-info col-xs-10">',
-					'inputend' => "</div>\n",
-					'fieldend' => "</div>\n\n",
-					'buttonsstart' => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-xs-10">',
-					'buttonsend' => "</div></div>\n\n",
-					'customstart' => '<div class="custom_content">',
-					'customend' => "</div>\n",
-					'note_format' => ' <span class="help-inline">%s</span>',
-					'formend' => '',
+					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => 'control-label col-xs-2',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '<label class="control-label col-xs-2"></label>',
+					'inputstart'     => '<div class="controls col-xs-10">',
+					'inputend'       => "</div>\n",
+					'infostart'      => '<div class="controls col-xs-10"><p class="form-control-static">',
+					'infoend'        => "</p></div>\n",
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-xs-10">',
+					'buttonsend'     => "</div></div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
+					'inputend_checkbox'      => "</label></div></div>\n",
+					'checkbox_newline_start' => '<div class="checkbox">',
+					'checkbox_newline_end'   => "</div>\n",
+					// - radio
+					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
+					'fieldend_radio'         => "</div>\n\n",
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_end'      => "</label></div>\n",
+					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_end'      => "</label>\n",
+				);
+
+			case 'linespan_form':
+				// Linespan form:
+				return array(
+					'layout'         => 'linespan',
+					'formclass'      => 'form-horizontal',
+					'formstart'      => '',
+					'formend'        => '',
+					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+					'fieldend'       => "</div>\n\n",
+					'labelclass'     => '',
+					'labelstart'     => '',
+					'labelend'       => "\n",
+					'labelempty'     => '',
+					'inputstart'     => '<div class="controls">',
+					'inputend'       => "</div>\n",
+					'infostart'      => '<div class="controls"><p class="form-control-static">',
+					'infoend'        => "</p></div>\n",
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
+					'buttonsend'     => "</div></div>\n\n",
+					'customstart'    => '<div class="custom_content">',
+					'customend'      => "</div>\n",
+					'note_format'    => ' <span class="help-inline">%s</span>',
+					// Additional params depending on field type:
+					// - checkbox
+					'inputclass_checkbox'    => '',
+					'inputstart_checkbox'    => '<div class="controls"><div class="checkbox"><label>',
+					'inputend_checkbox'      => "</label></div></div>\n",
+					'checkbox_newline_start' => '<div class="checkbox">',
+					'checkbox_newline_end'   => "</div>\n",
+					'checkbox_basic_start'   => '<div class="checkbox"><label>',
+					'checkbox_basic_end'     => "</label></div>\n",
+					// - radio
+					'fieldstart_radio'       => '',
+					'fieldend_radio'         => '',
+					'inputstart_radio'       => '<div class="controls">',
+					'inputend_radio'         => "</div>\n",
+					'inputclass_radio'       => '',
+					'radio_label_format'     => '$radio_option_label$',
+					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_end'      => "</label></div>\n",
+					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_end'      => "</label>\n",
 				);
 
 			case 'block_item':
 			case 'dash_item':
 				return array(
 					'block_start' => '<div class="panel panel-default" id="styled_content_block"><div class="panel-heading"><h4><span style="float:right">$global_icons$</span>$title$</h4></div><div class="panel-body">',
-					'block_end' => '</div></div>',
+					'block_end'   => '</div></div>',
 				);
 
 			case 'side_item':
 				return array(
 					'block_start' => '<div class="panel panel-default"><div class="panel-heading"><h4><span style="float:right">$global_icons$</span>$title$</h4></div><div class="panel-body">',
-					'block_end' => '</div></div>',
+					'block_end'   => '</div></div>',
 				);
 
 			case 'user_navigation':
@@ -534,7 +650,7 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 
 			default:
 				// Delegate to parent class:
-				return parent::get_template( $name, $depth );
+				return parent::get_template( $name, $depth, $die_on_unknown );
 		}
 	}
 

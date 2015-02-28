@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _skin.class.php 7498 2014-10-23 07:38:52Z yura $
+ * @version $Id: _skin.class.php 8293 2015-02-19 08:04:06Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -210,7 +210,7 @@ class Skin extends DataObject
 		global $Timer, $Session;
 
 		$timer_name = 'skin_container('.$sco_name.')';
-		$Timer->start($timer_name);
+		$Timer->start( $timer_name );
 
 		$show_debug_containers = $Session->get( 'debug_containers_'.$Blog->ID ) == 1;
 
@@ -227,16 +227,33 @@ class Skin extends DataObject
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
 		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
-		if( !empty($Widget_array) )
+		if( ! empty( $Widget_array ) )
 		{
-			foreach( $Widget_array as $ComponentWidget )
-			{	// Let the Widget display itself (with contextual params):
+			foreach( $Widget_array as $w => $ComponentWidget )
+			{ // Let the Widget display itself (with contextual params):
+				if( $w == 0 )
+				{ // Use special params for first widget in the current container
+					$orig_params = $params;
+					if( isset( $params['block_first_title_start'] ) )
+					{
+						$params['block_title_start'] = $params['block_first_title_start'];
+					}
+					if( isset( $params['block_first_title_end'] ) )
+					{
+						$params['block_title_end'] = $params['block_first_title_end'];
+					}
+				}
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
-				$Timer->start($widget_timer_name);
+				$Timer->start( $widget_timer_name );
 				$ComponentWidget->display_with_cache( $params, array(
 						// 'sco_name' => $sco_name, // fp> not sure we need that for now
 					) );
-				$Timer->pause($widget_timer_name);
+				if( $w == 0 )
+				{ // Restore the params for next widgets after first
+					$params = $orig_params;
+					unset( $orig_params );
+				}
+				$Timer->pause( $widget_timer_name );
 			}
 		}
 
@@ -246,7 +263,7 @@ class Skin extends DataObject
 			echo '</div>';
 		}
 
-		$Timer->pause($timer_name);
+		$Timer->pause( $timer_name );
 	}
 
 

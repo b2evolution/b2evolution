@@ -167,6 +167,14 @@ fieldset#itemform_links {
 	height: 6px;
 	bottom: 0;
 }
+#attachmentframe_wrapper .ui-resizable-s:after {
+	content: "...";
+	font-size: 10px;
+	top: -6px;
+	position: relative;
+	text-align: center;
+	display: block;
+}
 #attachmentframe_wrapper > #attachmentframe_disabler {
 	position: absolute;
 	top: 0;
@@ -906,4 +914,8 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	width: 97%;
 	padding-left: 0;
 	padding-right: 0;
+}
+
+#itemform_extra > label {
+	display: block;
 }

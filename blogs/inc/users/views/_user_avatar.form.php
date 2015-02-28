@@ -253,8 +253,8 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 
 	if( $current_User->check_perm( 'files', 'view' ) )
 	{
-		$more_content .= '<div><a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">';
-		$more_content .= T_( 'Use the file manager to assign a new profile picture' ).'</a></div>';
+		$more_content .= '<a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">';
+		$more_content .= T_( 'Use the file manager to assign a new profile picture' ).'</a>';
 	}
 
 	if( ! empty( $more_content ) )

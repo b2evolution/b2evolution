@@ -13,7 +13,7 @@
  *
  * @package evoskins
  *
- * @version $Id: _edit.disp.php 7423 2014-10-14 07:52:43Z yura $
+ * @version $Id: _edit.disp.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -254,7 +254,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	if( $disp_edit_categories )
 	{	// Display categories
 		cat_select( $Form, true, false );
-		echo '<br />';
 	}
 
 	// ################### TEXT RENDERERS ###################

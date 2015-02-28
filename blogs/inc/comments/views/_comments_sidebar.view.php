@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id: _comments_sidebar.view.php 6134 2014-03-08 07:48:07Z manuel $
+ * @version $Id: _comments_sidebar.view.php 8339 2015-02-24 08:08:32Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -71,6 +71,7 @@ $Form->begin_form( '' );
 
 	$Form->hidden_ctrl();
 	$Form->hidden( 'tab3', $tab3 );
+	$Form->hidden( 'blog', $Blog->ID );
 	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
 
 	echo '<fieldset>';

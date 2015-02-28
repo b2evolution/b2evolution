@@ -32,7 +32,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _profile.disp.php 8141 2015-02-03 10:30:27Z yura $
+ * @version $Id: _profile.disp.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -47,8 +47,6 @@ if( ! is_logged_in() )
 	return;
 }
 
-$form_action = get_secure_htsrv_url().'profile_update.php';
-
 // set params
 if( !isset( $params ) )
 {
@@ -56,7 +54,8 @@ if( !isset( $params ) )
 }
 
 $params = array_merge( array(
-	'profile_tabs' => array(
+	'display_profile_tabs' => true,
+	'profile_tabs'         => array(
 			'block_start'         => '<div class="tabs">',
 			'item_start'          => '<div class="option">',
 			'item_end'            => '</div>',
@@ -64,8 +63,10 @@ $params = array_merge( array(
 			'item_selected_end'   => '</div>',
 			'block_end'           => '</div><div class="clear"></div>',
 		),
+	'form_action' => get_secure_htsrv_url().'profile_update.php',
 	), $params );
 
+$form_action = $params['form_action'];
 
 $user_profile_only = true;
 // check if there is unsaved User object stored in Session
@@ -83,31 +84,32 @@ else
 	}
 }
 
-// Display tabs
-echo $params['profile_tabs']['block_start'];
-$entries = get_user_sub_entries( false, NULL );
-foreach( $entries as $entry => $entry_data )
-{
-	if( $entry == $disp )
+if( $params['display_profile_tabs'] )
+{ // Display profile tabs
+	echo $params['profile_tabs']['block_start'];
+	$entries = get_user_sub_entries( false, NULL );
+	foreach( $entries as $entry => $entry_data )
 	{
-		echo $params['profile_tabs']['item_selected_start'];
+		if( $entry == $disp )
+		{
+			echo $params['profile_tabs']['item_selected_start'];
+		}
+		else
+		{
+			echo $params['profile_tabs']['item_start'];
+		}
+		echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
+		if( $entry == $disp )
+		{
+			echo $params['profile_tabs']['item_selected_end'];
+		}
+		else
+		{
+			echo $params['profile_tabs']['item_end'];
+		}
 	}
-	else
-	{
-		echo $params['profile_tabs']['item_start'];
-	}
-	echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
-	if( $entry == $disp )
-	{
-		echo $params['profile_tabs']['item_selected_end'];
-	}
-	else
-	{
-		echo $params['profile_tabs']['item_end'];
-	}
+	echo $params['profile_tabs']['block_end'];
 }
-echo $params['profile_tabs']['block_end'];
-
 // Display form
 switch( $disp )
 {
@@ -115,7 +117,6 @@ switch( $disp )
 		require $inc_path.'users/views/_user_identity.form.php';
 		if( $edited_User->has_avatar() )
 		{ // Load javascript function to open popup window with crop picture tool
-			load_funcs( '_core/_misc_js.funcs.php' );
 			echo_user_crop_avatar_window();
 		}
 		break;

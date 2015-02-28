@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage photoalbums
  *
- * @version $Id: index.main.php 8256 2015-02-13 06:50:39Z yura $
+ * @version $Id: index.main.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -53,7 +53,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		// Display container and contents:
 		skin_container( NT_('Page Top'), array(
 				// The following params will be used as defaults for widgets included in this container:
-				'block_start' => '<div class="$wi_class$">',
+				'block_start' => '<div class="widget $wi_class$">',
 				'block_end' => '</div>',
 				'block_display_title' => false,
 				'list_start' => '<ul>',

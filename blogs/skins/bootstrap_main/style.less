@@ -5,6 +5,9 @@
 div.sitewide_header {
 	margin-bottom: 0 !important;
 }
+div.widget_core_coll_tagline {
+	margin-bottom: 30px;
+}
 
 // Footer
 .footer {
@@ -22,26 +25,79 @@ body.pictured .footer {
 }
 
 // Body content
+html {
+	// TODO: this should NOT apply to all pages. It must apply to a certain class only!
+	height: 100%;
+}
 body {
 	-webkit-font-smoothing: subpixel-antialiased;
 }
-html, body, #skin_wrapper {
-	height: 100%;
-}
-#skin_wrapper {
-	display: table;
-	width: 100%;
-}
-.container.body {
-	height: 100%;
-	min-height: 100%;
-}
-div.col-half-width {
-	width: 500px;
+
+// SPECIAL FRONT PAGE:
+div.front_main_area {
+	width: 450px;
 	max-width: 100%;
+	padding: 0;
+	margin-top: 100px;
+	margin-bottom: 100px;
+	// border: 1px solid white;
+	.front_main_content {
+		border-radius: 6px;
+		padding: 5px 15px;
+	}
+
+	// Widgets need to be spaced
+	div.widget {
+		margin: 30px 0;
+	}
+
+	// Universal item list:
+	div.widget_core_coll_item_list {
+		// We want to display the first image cleanly before the title
+		// This may need further tweaking...
+		ul {
+			padding: 0;
+			margin-left: 0;
+		}
+		li {
+			clear: both;
+			list-style: none;
+			height: 80px;
+			margin: 5px 0;
+			padding: 0;
+		}
+		div.item_first_image {
+			float: left; 
+			margin-right: 6px;
+		}
+		div.item_title {
+			vertical-align: middle;
+			line-height: 80px;
+		}
+		img {
+			border-radius: 3px;
+		}
+	}
 }
-body.pictured .panel {
-	color: #333;
+
+body.pictured {
+	height: 100%;
+	#skin_wrapper {
+		display: table;
+		width: 100%;
+		height: 100%;
+	}
+	.container.body {
+		height: 100%;
+		min-height: 100%;
+	}
+	.panel {
+		color: #333;
+		a {
+			color: #333;
+			text-decoration: underline;
+		}
+	}
 }
 #bg_picture {
 	position: fixed;
@@ -52,7 +108,7 @@ body.pictured .panel {
 	width: 100%;
 	height: 100%;
 	background-size: cover;
-	background-position: center 0;
+	background-position: center center;
 	z-index: -999999;
 	img {
 		display: none;
@@ -68,8 +124,10 @@ body.pictured .panel {
 				display: block;
 			}
 		}
-		div.col-half-width {
+		div.front_main_area {
 			width: auto;
+			margin-top: 0;
+			margin-bottom: 0;
 		}
 	}
 }
@@ -116,12 +174,6 @@ body.pictured .panel {
 		display: block;
 		padding-top: 10px;
 	}
-}
-
-// Register form
-#register_form input.form_text_input {
-	border: 1px solid #CCC;
-	padding: 6px 12px;
 }
 
 // Register widget form
@@ -266,6 +318,8 @@ textarea.message_text {
 	.panel {
 		margin: 0;
 		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
 		.panel-body {
 			padding: 0;
 		}
@@ -274,7 +328,7 @@ textarea.message_text {
 form.bComment {
 	border: none;
 	padding: 0;
-	overflow: hidden;
+	overflow: visible;
 	.form-actions {
 		margin-bottom: 0;
 	}
@@ -286,6 +340,9 @@ form.bComment {
 	}
 	fieldset {
 		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
 	}
 }
 #comment_date_field {
@@ -350,19 +407,8 @@ div.bSideItem {
 	}
 }
 
-// Login form:
-.wrap-form-login, .wrap-form-lostpass {
-	width: 400px;
-	margin: 1.5em auto auto;
-	.panel {
-		margin: 5px 0;
-	}
-	.panel-body {
-		padding: 20px 30px 0;
-	}
-}
-.wrap-form-lostpass {
-	width: 480px;
+// Login/Register forms:
+.skin-form {
 	.panel-body {
 		.panel {
 			border: none;
@@ -374,11 +420,43 @@ div.bSideItem {
 	}
 	.fieldset {
 		margin: 0;
+		div.input {
+			margin: 0;
+		}
 	}
-	.control-buttons{
+	.control-buttons, div.input {
 		padding: 0;
 		width: 100%;
 		text-align: center;
+	}
+}
+.wrap-form-login, .wrap-form-lostpass, .wrap-form-register, .wrap-form-activation {
+	width: 400px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding: 20px 30px 0;
+	}
+}
+.wrap-form-lostpass {
+	width: 480px;
+}
+.wrap-form-activation {
+	width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.wrap-form-register {
+	width: 580px;
+	max-width: 100%;
+	.control-buttons{
+		text-align: left;
+	}
+	&.register-disabled {
+		width: 350px;
 	}
 }
 .form-login-links {
@@ -409,9 +487,10 @@ div.bSideItem {
 		background: none;
 		border: none;
 	}
-	.form-group {
-		margin-left: 0;
-		margin-right: 0;
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
 	}
 }
 .standard_login_link {
@@ -435,23 +514,4 @@ div.bSideItem {
 // Messages
 div.action_messages, div.log_container {
 	margin: 0;
-}
-
-// Media Index Plugin
-div.widget_core_coll_media_index {
-	ul {
-		margin: 0;
-		padding: 1px 0 50px;
-	}
-
-	li {
-		list-style: none;
-		display: inline-block;
-		margin: 2px;
-		padding: 0;
-	}
-
-	img {
-		border-radius: 3px;
-	}
 }

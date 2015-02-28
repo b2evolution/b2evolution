@@ -46,8 +46,10 @@ class html5_videojs_plugin extends Plugin
 	{
 		global $Blog;
 
-		require_css( 'http://vjs.zencdn.net/c/video-js.css', 'relative' );
-		require_js( 'http://vjs.zencdn.net/c/video.js', 'relative' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
+		require_css( '#videojs_css#', $relative_to );
+		require_js( '#videojs#', $relative_to );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting is ignored by some reason
@@ -89,7 +91,7 @@ class html5_videojs_plugin extends Plugin
 					'label' => T_('Skin'),
 					'type' => 'select',
 					'options' => $this->get_skins_list(),
-					'defaultvalue' => 'tubecss',
+					'defaultvalue' => 'vjs-default-skin',
 					),
 				'width' => array(
 					'label' => T_('Video width (px)'),
@@ -256,11 +258,11 @@ class html5_videojs_plugin extends Plugin
 		global $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
-		if( !empty( $skin ) && $skin != 'vjs-default-skin')
+		if( !empty( $skin ) && $skin != 'vjs-default-skin' )
 		{
 			$skins_path = dirname( $this->classfile_path ).'/skins';
 			if( file_exists( $skins_path.'/'.$skin.'/style.css' ) )
-			{	// Require css file only if it exists
+			{ // Require css file only if it exists
 				require_css( $this->get_plugin_url().'skins/'.$skin.'/style.css', 'relative' );
 			}
 		}

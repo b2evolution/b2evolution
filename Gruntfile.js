@@ -29,19 +29,50 @@ module.exports = function(grunt) {
 		// Configuration for the less->css compiling tasks:
 		less: {
 			development: {
+			// Note! The output css files are not compressed on this task
 				options: {
-					compress: true,
+					compress: false,
 					//yuicompress: true,
 					//optimization: 2
 				},
 				files: {
 					// target.css file: source.less file
 					'blogs/rsc/build/testless.css': 'blogs/rsc/less/test.less',
-					// Custom CSS for bootstrap
+					// Basic styles:
+					'blogs/rsc/css/basic_styles.css': 'blogs/rsc/less/basic_styles.less',
+					'blogs/rsc/css/basic.css':        'blogs/rsc/less/basic.less',
+					'blogs/rsc/css/blog_base.css':    'blogs/rsc/less/blog_base.less',
+					'blogs/rsc/css/item_base.css':    'blogs/rsc/less/item_base.less',
+					// Bootstrap frontoffice styles:
+					'blogs/rsc/build/bootstrap-b2evo_base.bundle.css': [
+							// Basic styles for all bootstrap skins
+							'blogs/rsc/less/bootstrap-basic_styles.less',
+							'blogs/rsc/less/bootstrap-basic.less',
+							'blogs/rsc/less/bootstrap-blog_base.less',
+							'blogs/rsc/less/bootstrap-item_base.less',
+							// Common styles for all bootstrap skins
+							'blogs/rsc/less/bootstrap-evoskins.less'
+						],
+					// Bootstrap backoffice styles:
+					'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
+							// Basic styles for all bootstrap skins
+							'blogs/rsc/less/bootstrap-basic_styles.less',
+							'blogs/rsc/less/bootstrap-basic.less',
+							// Common styles for all bootstrap skins
+							'blogs/rsc/less/bootstrap-evoskins.less'
+						],
+				}
+			},
+			compress: {
+			// This is a separate task special to compress the less files right here
+				options: {
+					compress: true,
+				},
+				files: {
+					// Bootstrap skins
 					'blogs/skins_adm/bootstrap/rsc/css/style.css': 'blogs/skins_adm/bootstrap/rsc/css/style.less',
-					'blogs/rsc/css/bootstrap/b2evo.css': 'blogs/rsc/css/bootstrap/b2evo.less',
-					'blogs/skins/bootstrap/style.css': 'blogs/skins/bootstrap/style.less',
-					'blogs/skins/bootstrap_main/style.css': 'blogs/skins/bootstrap_main/style.less',
+					'blogs/skins/bootstrap/style.css':             'blogs/skins/bootstrap/style.less',
+					'blogs/skins/bootstrap_main/style.css':        'blogs/skins/bootstrap_main/style.less',
 				}
 			}
 		},
@@ -109,6 +140,16 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: 'blogs/rsc/build/b2evo_base.bundle.css',
 				dest: 'blogs/rsc/build/b2evo_base.bmin.css',
+			},
+			bootstrap_b2evo_base: {
+				nonull: true, // Display missing files
+				src: 'blogs/rsc/build/bootstrap-b2evo_base.bundle.css',
+				dest: 'blogs/rsc/build/bootstrap-b2evo_base.bmin.css',
+			},
+			bootstrap_backoffice_b2evo_base: {
+				nonull: true, // Display missing files
+				src: 'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
+				dest: 'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
 			},
 			skin_evopress: {
 				src: 'blogs/skins/evopress/evopress.bundle.css',

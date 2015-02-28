@@ -30,7 +30,7 @@
  *
  * @package evocore
  *
- * @version $Id: _blog.class.php 8258 2015-02-13 08:16:04Z yura $
+ * @version $Id: _blog.class.php 8312 2015-02-20 12:56:08Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -2884,19 +2884,17 @@ class Blog extends DataObject
 			return NULL;
 		}
 
-		$r = url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID );
-
 		if( $with_redirect )
 		{
 			if( $owner_User->get_msgform_possibility() != 'login' )
 			{
-				$r .= '&amp;redirect_to='
+				$r = $this->get('msgformurl').'&amp;redirect_to='
 					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
 					.rawurlencode( regenerate_url('','','','&') );
 			}
 			else
-			{
-				$r .= '&amp;redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform&recipient_id='.$owner_User->ID, '&' ) );
+			{	// no email option - try to log in and send private message (only registered users can send PM)
+				$r = $this->get('msgformurl').'&amp;redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' ) );
 			}
 		}
 
@@ -3185,7 +3183,7 @@ class Blog extends DataObject
 			return true;
 		}
 
-		if( in_array( $disp, array( 'login', 'lostpassword', 'register' ) ) )
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform' ) ) )
 		{ // Don't restrict these pages
 			return true;
 		}

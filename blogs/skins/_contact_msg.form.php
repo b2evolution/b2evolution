@@ -16,7 +16,10 @@ global $dummy_fields;
 
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'   => array(),
+		'skin_form_before'   => '',
+		'skin_form_after'    => '',
+		'msgform_form_title' => '',
 	);
 
 if( isset( $params ) )
@@ -42,6 +45,8 @@ else
 	$email_author = $unsaved_message_params[ 'sender_name' ];
 	$email_author_address = $unsaved_message_params[ 'sender_address' ];
 }
+
+echo str_replace( '$form_title$', $params['msgform_form_title'], $params['skin_form_before'] ),
 
 $Form = new Form( $submit_url );
 
@@ -78,7 +83,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	?>
 		<div class="input">
 			<?php
-			$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit', 'value' => T_('Send message') ) );
+			$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit btn-primary btn-lg', 'value' => T_('Send message') ) );
 
 			$Plugins->trigger_event( 'DisplayMessageFormButton', array( 'Form' => & $Form,
 				'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
@@ -92,5 +97,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 
 <?php
 $Form->end_form();
+
+echo $params['skin_form_after'];
 
 ?>

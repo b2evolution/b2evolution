@@ -29,7 +29,7 @@
  * @author blueyed: Daniel HAHLER.
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _file.funcs.php 8182 2015-02-06 07:53:38Z yura $
+ * @version $Id: _file.funcs.php 8280 2015-02-17 12:07:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -693,9 +693,21 @@ function check_rename( & $newname, $is_dir, $dir_path, $allow_locked_filetypes )
 
 /**
  * Return a string with upload restrictions ( allowed extensions, max file size )
+ *
+ * @param array Params
  */
-function get_upload_restriction()
+function get_upload_restriction( $params = array() )
 {
+	$params = array_merge( array(
+			'block_before'       => '',
+			'block_after'        => '<br />',
+			'block_separator'    => '<br />',
+			'title_before'       => '<strong>',
+			'title_after'        => '</strong>: ',
+			'ext_separator'      => ', ',
+			'ext_last_separator' => ' &amp; ',
+		), $params );
+
 	global $DB, $Settings, $current_User;
 	$restrictNotes = array();
 
@@ -720,16 +732,16 @@ function get_upload_restriction()
 	// into array:
 	$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
 	// readable:
-	$allowed_extensions = implode_with_and($allowed_extensions);
+	$allowed_extensions = implode_with_and( $allowed_extensions, $params['ext_separator'], $params['ext_last_separator'] );
 
-	$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
+	$restrictNotes[] = $params['title_before'].T_('Allowed file extensions').$params['title_after'].$allowed_extensions;
 
 	if( $Settings->get( 'upload_maxkb' ) )
 	{ // We want to restrict on file size:
-		$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
+		$restrictNotes[] = $params['title_before'].T_('Maximum allowed file size').$params['title_after'].bytesreadable( $Settings->get( 'upload_maxkb' ) * 1024 );
 	}
 
-	return implode( '<br />', $restrictNotes ).'<br />';
+	return $params['block_before'].implode( $params['block_separator'], $restrictNotes ).$params['block_after'];
 }
 
 

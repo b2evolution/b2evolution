@@ -12,7 +12,7 @@
  *
  * @package evocore
  *
- * @version $Id: _link.funcs.php 8151 2015-02-03 15:15:48Z yura $
+ * @version $Id: _link.funcs.php 8302 2015-02-19 13:05:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -182,6 +182,10 @@ jQuery( document ).ready( function()
 		{ // Remove the temp div element
 			ui.element.find( '#attachmentframe_disabler' ).remove();
 		}
+	} );
+	jQuery( document ).on( 'click', '#attachmentframe_wrapper .ui-resizable-handle', function()
+	{ // Increase height on click
+		jQuery( '#attachmentframe_wrapper' ).css( 'height', jQuery( '#attachmentframe_wrapper' ).height() + 80 );
 	} );
 } );
 </script>

@@ -26,7 +26,7 @@
  *
  * @todo dh> Refactor to allow easier contributions!
  *
- * @version $Id: _adminUI_general.class.php 7964 2015-01-13 15:14:52Z yura $
+ * @version $Id: _adminUI_general.class.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -860,9 +860,10 @@ class AdminUI_general extends Menu
 	 *
 	 * @param string Name of the template ('main', 'sub')
 	 * @param integer Nesting level (start at 0)
+	 * @param boolean TRUE to die on unknown template name
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
-	function get_template( $name, $level = 0 )
+	function get_template( $name, $level = 0, $die_on_unknown = false )
 	{
 		switch( $name )
 		{
@@ -1223,7 +1224,14 @@ class AdminUI_general extends Menu
 				break;
 
 			default:
-				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) );
+				if( $die_on_unknown )
+				{ // Die because template name is unknown
+					debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export( $name, true ) );
+				}
+				else
+				{ // Return NULL, if we want to know when template is not defined by current skin
+					return NULL;
+				}
 		}
 	}
 

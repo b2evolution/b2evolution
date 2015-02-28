@@ -29,7 +29,7 @@
  *
  * @package htsrv
  *
- * @version $Id: login.php 8056 2015-01-23 10:30:37Z yura $
+ * @version $Id: login.php 8355 2015-02-27 10:18:59Z yura $
  */
 
 /**
@@ -39,7 +39,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
-param( 'action', 'string', 'req_login' );
+param_action( 'req_login' );
 param( 'mode', 'string', '' );
 param( 'inskin', 'boolean', false );
 if( $inskin )
@@ -276,8 +276,9 @@ switch( $action )
 			break;
 		}
 
-		// Link User to Session:
+		// Link User to Session and Log in:
 		$Session->set_user_ID( $forgetful_User->ID );
+		$current_User = & $forgetful_User;
 
 		// Add Message to change the password:
 		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
@@ -618,6 +619,10 @@ if( $inskin && use_in_skin_login() )
 				$redirect = url_add_param( $redirect, 'force_request=1', '&' );
 			}
 		}
+		elseif( $action == 'lostpassword' )
+		{ // redirect to inskin lost password page
+			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=lostpassword', '&' );
+		}
 		else
 		{ // redirect to inskin login page
 			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=login', '&' );
@@ -637,20 +642,26 @@ switch( $action )
 	case 'lostpassword':
 		// Lost password:
 		$page_title = T_('Lost your password?');
-		$page_icon = 'login';
-		$hidden_params = array( 'redirect_to' => url_rel_to_same_host($redirect_to, $secure_htsrv_url) );
+		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
 		$wrap_width = '480px';
+
 		// Include page header:
 		require $adminskins_path.'login/_html_header.inc.php';
-		// Display form:
-		display_lostpassword_form( $login, $hidden_params, array(
-				'form_before' => str_replace( '$title$', $page_title, $form_before ),
-				'form_after' => $form_after,
-				'form_class'    => 'form-login form-lostpass',
-				'form_template' => $login_form_params,
-				'inskin'        => false,
-				'inskin_urls'   => false,
-			) );
+
+		// Lost password form
+		$params = array(
+			'form_class_login'     => 'wrap-form-login',
+			'form_title_lostpass'  => $page_title,
+			'login_form_inskin'    => false,
+			'login_page_before'    => '<div class="wrap-form-lostpass">',
+			'login_page_after'     => '</div>',
+			'login_form_class'     => 'form-login form-lostpass',
+			'lostpass_form_params' => $login_form_params,
+			'lostpass_form_footer' => false,
+		);
+		require $skins_path.'_lostpassword.disp.php';
+
+		// Include page footer:
 		require $adminskins_path.'login/_html_footer.inc.php';
 		break;
 
@@ -662,7 +673,7 @@ switch( $action )
 
 	case 'changepwd':
 		// Display form to change password:
-		require $adminskins_path.'login/_password_form.main.php';
+		require $adminskins_path.'login/_reset_pwd_form.main.php';
 		break;
 
 	default:

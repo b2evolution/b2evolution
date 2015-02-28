@@ -7,7 +7,7 @@
  *
  * @package conf
  *
- * @version $Id: _advanced.php 8273 2015-02-16 16:19:27Z yura $
+ * @version $Id: _advanced.php 8285 2015-02-18 07:55:41Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -812,6 +812,15 @@ $sendmail_additional_params = '-r $return-address$';
 
 
 /**
+ * Use CDN urls of the array $library_cdn_urls below
+ * Set to FALSE in order to use the LOCAL urls of the array $library_local_urls
+ *
+ * @global boolean $use_cdns
+ */
+$use_cdns = true;
+
+
+/**
  * Which CDN do you want to use for loading common libraries?
  *
  * If you don't want to use a CDN and want to use the local version, comment out the line.
@@ -847,6 +856,8 @@ $library_cdn_urls = array(
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
+		//'#videojs#' => array( 'http://vjs.zencdn.net/c/video.js' ),
+		//'#videojs_css#' => array( 'http://vjs.zencdn.net/c/video-js.css' ),
 	);
 
 /**
@@ -884,6 +895,8 @@ $library_local_urls = array(
 		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
+		'#videojs#' => array( 'videojs/video.min.js', 'videojs/video.js' ),
+		'#videojs_css#' => array( 'videojs/video-js.min.css', 'videojs/video-js.css' ),
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 	);

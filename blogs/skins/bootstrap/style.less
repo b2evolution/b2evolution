@@ -42,12 +42,6 @@
 	}
 }
 
-// Register form
-#register_form input.form_text_input {
-	border: 1px solid #CCC;
-	padding: 6px 12px;
-}
-
 // Register widget form
 .widget_core_user_register {
 	#register_form {
@@ -190,6 +184,8 @@ textarea.message_text {
 	.panel {
 		margin: 0;
 		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
 		.panel-body {
 			padding: 0;
 		}
@@ -198,7 +194,7 @@ textarea.message_text {
 form.bComment {
 	border: none;
 	padding: 0;
-	overflow: hidden;
+	overflow: visible;
 	.form-actions {
 		margin-bottom: 0;
 	}
@@ -210,6 +206,9 @@ form.bComment {
 	}
 	fieldset {
 		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
 	}
 }
 #comment_date_field {
@@ -274,19 +273,8 @@ div.bSideItem {
 	}
 }
 
-// Login form:
-.wrap-form-login, .wrap-form-lostpass {
-	width: 400px;
-	margin: 1.5em auto auto;
-	.panel {
-		margin: 5px 0;
-	}
-	.panel-body {
-		padding: 20px 30px 0;
-	}
-}
-.wrap-form-lostpass {
-	width: 480px;
+// Login/Register forms:
+.skin-form {
 	.panel-body {
 		.panel {
 			border: none;
@@ -298,11 +286,43 @@ div.bSideItem {
 	}
 	.fieldset {
 		margin: 0;
+		div.input {
+			margin: 0;
+		}
 	}
-	.control-buttons{
+	.control-buttons, div.input {
 		padding: 0;
 		width: 100%;
 		text-align: center;
+	}
+}
+.wrap-form-login, .wrap-form-lostpass, .wrap-form-register, .wrap-form-activation {
+	width: 400px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding: 20px 30px 0;
+	}
+}
+.wrap-form-lostpass {
+	width: 480px;
+}
+.wrap-form-activation {
+	width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.wrap-form-register {
+	width: 580px;
+	max-width: 100%;
+	.control-buttons{
+		text-align: left;
+	}
+	&.register-disabled {
+		width: 350px;
 	}
 }
 .form-login-links {
@@ -333,9 +353,10 @@ div.bSideItem {
 		background: none;
 		border: none;
 	}
-	.form-group {
-		margin-left: 0;
-		margin-right: 0;
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
 	}
 }
 .standard_login_link {

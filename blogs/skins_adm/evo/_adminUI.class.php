@@ -22,7 +22,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER
  *
- * @version $Id: _adminUI.class.php 6134 2014-03-08 07:48:07Z manuel $
+ * @version $Id: _adminUI.class.php 8349 2015-02-26 10:28:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -157,9 +157,11 @@ class AdminUI extends AdminUI_general
 	 * Get a template by name and depth.
 	 *
 	 * @param string The template name ('main', 'sub').
+	 * @param integer Nesting level (start at 0)
+	 * @param boolean TRUE to die on unknown template name
 	 * @return array
 	 */
-	function get_template( $name, $depth = 0 )
+	function get_template( $name, $depth = 0, $die_on_unknown = false )
 	{
 		switch( $name )
 		{
@@ -194,7 +196,7 @@ class AdminUI extends AdminUI_general
 
 			default:
 				// Delegate to parent class:
-				return parent::get_template( $name, $depth );
+				return parent::get_template( $name, $depth, $die_on_unknown );
 		}
 	}
 

@@ -11,7 +11,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $Id: _register.disp.php 7771 2014-12-08 08:24:11Z yura $
+ * @version $Id: _register.disp.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -23,6 +23,26 @@ global $Blog, $rsc_path, $rsc_url, $dummy_fields;
 
 global $display_invitation;
 
+// Default params:
+$params = array_merge( array(
+		'skin_form_before'          => '',
+		'skin_form_after'           => '',
+		'register_page_before'      => '',
+		'register_page_after'       => '',
+		'register_form_title'       => '',
+		'register_form_class'       => 'bComment',
+		'register_links_attrs'      => ' style="margin: 1em 0 1ex"',
+		'register_use_placeholders' => false, // Set TRUE to use placeholders instead of notes for input fields
+		'register_field_width'      => 140,
+		'register_form_footer'      => true,
+		'register_form_params'      => NULL,
+		'register_disp_home_button' => false, // Display button to go home when registration is disabled
+		// If registration is disabled
+		'register_disabled_page_before' => '',
+		'register_disabled_page_after'  => '',
+		'register_disabled_form_title'  => T_('Registration Currently Disabled'),
+	), $params );
+
 if( is_logged_in() )
 { // if a user is already logged in don't allow to register
 	echo '<p>'.T_('You are already logged in').'</p>';
@@ -31,17 +51,30 @@ if( is_logged_in() )
 
 if( $display_invitation == 'deny' )
 { // Registration is disabled
-	echo '<p>'.T_('User registration is currently not allowed.').'</p>';
+	echo $params['register_disabled_page_before'];
+	echo str_replace( '$form_title$', $params['register_disabled_form_title'], $params['skin_form_before'] );
+
+	echo '<p class="error red">'.T_('User registration is currently not allowed.').'</p>';
+
+	if( $params['register_disp_home_button'] )
+	{
+		echo '<p class="center"><a href="'.$baseurl.'" class="btn btn-default">'.T_('Home').'</a></p>';
+	}
+
+	echo $params['skin_form_after'];
+	echo $params['register_disabled_page_after'];
 	return;
 }
 
-// Default params:
-$params = array_merge( array(
-		'register_page_before' => '',
-		'register_page_after'  => '',
-	), $params );
-
 echo $params['register_page_before'];
+
+if( $params['display_form_messages'] )
+{ // Display the form messages before form inside wrapper
+	messages( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+		) );
+}
 
 // Save trigger page
 $session_registration_trigger_url = $Session->get( 'registration_trigger_url' );
@@ -70,14 +103,21 @@ if( $register_user = $Session->get('core.register_user') )
 // set secure htsrv url with the same domain as the request has
 $secure_htsrv_url = get_secure_htsrv_url();
 
+echo str_replace( '$form_title$', $params['register_form_title'], $params['skin_form_before'] );
+
 $Form = new Form( $secure_htsrv_url.'register.php', 'register_form', 'post' );
+
+if( ! is_null( $params['register_form_params'] ) )
+{ // Use another template param from skin
+	$Form->switch_template_parts( $params['register_form_params'] );
+}
 
 $Form->add_crumb( 'regform' );
 $Form->hidden( 'inskin', true );
 $Form->hidden( 'blog', $Blog->ID );
 
 // disp register form
-$Form->begin_form( 'bComment' );
+$Form->begin_form( $params['register_form_class'] );
 
 $Plugins->trigger_event( 'DisplayRegisterFormBefore', array( 'Form' => & $Form, 'inskin' => true ) );
 
@@ -100,13 +140,51 @@ elseif( $display_invitation == 'info' )
 	$Form->hidden( 'invitation', get_param( 'invitation' ) );
 }
 
-$Form->text_input( $dummy_fields[ 'login' ], $login, 22, T_('Login'), T_('Choose an username.'), array( 'maxlength' => 20, 'class' => 'input_text', 'required' => true, 'input_suffix' => ' <span id="login_status"></span>', 'style' => 'width:138px' ) );
+// Login
+$Form->text_input( $dummy_fields['login'], $login, 22, T_('Login'), $params['register_use_placeholders'] ? '' : T_('Choose an username').'.',
+	array(
+			'placeholder'  => $params['register_use_placeholders'] ? T_('Choose an username') : '',
+			'maxlength'    => 20,
+			'class'        => 'input_text',
+			'required'     => true,
+			'input_suffix' => ' <span id="login_status"></span>',
+			'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
+		)
+	);
 
-$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'), array( 'note'=>T_('Choose a password.'), 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'style' => 'width:138px', 'autocomplete' => 'off' ) );
-$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '', array( 'note'=>T_('Please type your password again.').'<span id="pass2_status" class="red"></span>', 'maxlength' => 70, 'class' => 'input_text', 'required'=>true, 'style' => 'width:138px', 'autocomplete' => 'off' ) );
+// Passwords
+$Form->password_input( $dummy_fields[ 'pass1' ], '', 18, T_('Password'),
+	array(
+			'note'         => $params['register_use_placeholders'] ? '' : T_('Choose a password').'.',
+			'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a password') : '',
+			'maxlength'    => 70,
+			'class'        => 'input_text',
+			'required'     => true,
+			'style'        => 'width:'.$params['register_field_width'].'px',
+			'autocomplete' => 'off'
+		)
+	);
+$Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '',
+	array(
+			'note'         => ( $params['register_use_placeholders'] ? '' : T_('Please type your password again').'.' ).'<div id="pass2_status" class="red"></div>',
+			'placeholder'  => $params['register_use_placeholders'] ? T_('Please type your password again') : '',
+			'maxlength'    => 70,
+			'class'        => 'input_text',
+			'required'     => true,
+			'style'        => 'width:'.$params['register_field_width'].'px',
+			'autocomplete' => 'off'
+		)
+	);
 
-$Form->text_input( $dummy_fields[ 'email' ], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
-				array( 'maxlength'=>255, 'class'=>'input_text wide_input', 'required'=>true, 'style' => 'width:250px' ) );
+// Email
+$Form->text_input( $dummy_fields['email'], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
+	array(
+			'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+			'maxlength'   => 255,
+			'class'       => 'input_text wide_input',
+			'required'    => true,
+		)
+	);
 
 $registration_require_country = (bool)$Settings->get('registration_require_country');
 
@@ -138,27 +216,37 @@ if( $Settings->get( 'registration_ask_locale' ) )
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 }
 
-$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form, 'inskin' => true ) );
+// Plugin fields
+$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array(
+		'Form'             => & $Form,
+		'inskin'           => true,
+		'use_placeholders' => $params['register_use_placeholders']
+	) );
 
 // Submit button:
-$submit_button = array( array( 'name'=>'register', 'value'=>T_('Register my account now!'), 'class'=>'search btn-primary btn-lg' ) );
+$submit_button = array( array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg' ) );
 
-$Form->buttons_input($submit_button);
-
-echo '<div class="login_actions" style="margin: 1em 0 1ex">';
-echo '<strong><a href="'.get_login_url( $source, $redirect_to).'">&laquo; '.T_('Already have an account... ?').'</a></strong>';
-echo '</div>';
+$Form->buttons_input( $submit_button );
 
 $Form->end_form();
 
-echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+echo $params['skin_form_after'];
 
-echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+echo '<div class="form-login-links"'.$params['register_links_attrs'].'>';
+echo '<a href="'.get_login_url( $source, $redirect_to ).'">&laquo; '.T_('Already have an account... ?').'</a>';
+echo '</div>';
+
+if( $params['register_form_footer'] )
+{ // Display register form footer
+	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+
+	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+}
 
 echo $params['register_page_after'];
 
 // Display javascript password strength indicator bar
-display_password_indicator();
+display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
 
 // Display javascript login validator
 display_login_validator();
