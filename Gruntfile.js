@@ -37,29 +37,29 @@ module.exports = function(grunt) {
 				},
 				files: {
 					// target.css file: source.less file
-					'blogs/rsc/build/testless.css': 'blogs/rsc/less/test.less',
+					'rsc/build/testless.css': 'rsc/less/test.less',
 					// Basic styles:
-					'blogs/rsc/css/basic_styles.css': 'blogs/rsc/less/basic_styles.less',
-					'blogs/rsc/css/basic.css':        'blogs/rsc/less/basic.less',
-					'blogs/rsc/css/blog_base.css':    'blogs/rsc/less/blog_base.less',
-					'blogs/rsc/css/item_base.css':    'blogs/rsc/less/item_base.less',
+					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
+					'rsc/css/basic.css':        'rsc/less/basic.less',
+					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
+					'rsc/css/item_base.css':    'rsc/less/item_base.less',
 					// Bootstrap frontoffice styles:
-					'blogs/rsc/build/bootstrap-b2evo_base.bundle.css': [
+					'rsc/build/bootstrap-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
-							'blogs/rsc/less/bootstrap-basic_styles.less',
-							'blogs/rsc/less/bootstrap-basic.less',
-							'blogs/rsc/less/bootstrap-blog_base.less',
-							'blogs/rsc/less/bootstrap-item_base.less',
+							'rsc/less/bootstrap-basic_styles.less',
+							'rsc/less/bootstrap-basic.less',
+							'rsc/less/bootstrap-blog_base.less',
+							'rsc/less/bootstrap-item_base.less',
 							// Common styles for all bootstrap skins
-							'blogs/rsc/less/bootstrap-evoskins.less'
+							'rsc/less/bootstrap-evoskins.less'
 						],
 					// Bootstrap backoffice styles:
-					'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
+					'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
-							'blogs/rsc/less/bootstrap-basic_styles.less',
-							'blogs/rsc/less/bootstrap-basic.less',
+							'rsc/less/bootstrap-basic_styles.less',
+							'rsc/less/bootstrap-basic.less',
 							// Common styles for all bootstrap skins
-							'blogs/rsc/less/bootstrap-evoskins.less'
+							'rsc/less/bootstrap-evoskins.less'
 						],
 				}
 			},
@@ -70,9 +70,9 @@ module.exports = function(grunt) {
 				},
 				files: {
 					// Bootstrap skins
-					'blogs/skins_adm/bootstrap/rsc/css/style.css': 'blogs/skins_adm/bootstrap/rsc/css/style.less',
-					'blogs/skins/bootstrap/style.css':             'blogs/skins/bootstrap/style.less',
-					'blogs/skins/bootstrap_main/style.css':        'blogs/skins/bootstrap_main/style.less',
+					'skins_adm/bootstrap/rsc/css/style.css': 'skins_adm/bootstrap/rsc/css/style.less',
+					'skins/bootstrap/style.css':             'skins/bootstrap/style.less',
+					'skins/bootstrap_main/style.css':        'skins/bootstrap_main/style.less',
 				}
 			}
 		},
@@ -85,10 +85,10 @@ module.exports = function(grunt) {
 				},
 				files: {
 					// target.css file: source.scss file
-					//'blogs/rsc/build/testscss.css': 'blogs/rsc/scss/test.scss',
-					'blogs/skins/pureforums/pureforums_header.css': 'blogs/skins/pureforums/pureforums_header.scss',
-					'blogs/skins/pureforums/pureforums_main.css': 'blogs/skins/pureforums/pureforums_main.scss',
-					'blogs/skins/pureforums/pureforums_footer.css': 'blogs/skins/pureforums/pureforums_footer.scss',
+					//'rsc/build/testscss.css': 'rsc/scss/test.scss',
+					'skins/pureforums/pureforums_header.css': 'skins/pureforums/pureforums_header.scss',
+					'skins/pureforums/pureforums_main.css': 'skins/pureforums/pureforums_main.scss',
+					'skins/pureforums/pureforums_footer.css': 'skins/pureforums/pureforums_footer.scss',
 				}
 			}
 		},
@@ -107,26 +107,26 @@ module.exports = function(grunt) {
 					banner: '<%= concat.options.banner %>/* This includes: basic_styles.css, basic.css, blog_base.css, item_base.css */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/css/basic_styles.css', 'blogs/rsc/css/basic.css', 'blogs/rsc/css/blog_base.css', 'blogs/rsc/css/item_base.css'],
-				dest: 'blogs/rsc/build/b2evo_base.bundle.css',
+				src: ['rsc/css/basic_styles.css', 'rsc/css/basic.css', 'rsc/css/blog_base.css', 'rsc/css/item_base.css'],
+				dest: 'rsc/build/b2evo_base.bundle.css',
 			},
 			skin_evopress: {
 				nonull: true, // Display missing files
-				src: ['blogs/skins/evopress/style.css', 'blogs/skins/evopress/item.css'],
-				dest: 'blogs/skins/evopress/evopress.bundle.css',
+				src: ['skins/evopress/style.css', 'skins/evopress/item.css'],
+				dest: 'skins/evopress/evopress.bundle.css',
 			},
 			skin_pureforums: {
 				nonull: true, // Display missing files
-				src: ['blogs/skins/pureforums/pureforums_header.css', 'blogs/skins/pureforums/pureforums_main.css', 'blogs/skins/pureforums/pureforums_footer.css'],
-				dest: 'blogs/skins/pureforums/pureforums.bundle.css',
+				src: ['skins/pureforums/pureforums_header.css', 'skins/pureforums/pureforums_main.css', 'skins/pureforums/pureforums_footer.css'],
+				dest: 'skins/pureforums/pureforums.bundle.css',
 			},
 			/*
 			 * JS:
 			 */
 			// Login screen:
 			sha1_md5: {
-				src: ['blogs/rsc/js/src/sha1.js', 'blogs/rsc/js/src/md5.js'],
-				dest: 'blogs/rsc/js/build/sha1_md5.bundle.js',
+				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js'],
+				dest: 'rsc/js/build/sha1_md5.bundle.js',
 			},
 		},
 
@@ -138,26 +138,26 @@ module.exports = function(grunt) {
 			},
 			b2evo_base: {
 				nonull: true, // Display missing files
-				src: 'blogs/rsc/build/b2evo_base.bundle.css',
-				dest: 'blogs/rsc/build/b2evo_base.bmin.css',
+				src: 'rsc/build/b2evo_base.bundle.css',
+				dest: 'rsc/build/b2evo_base.bmin.css',
 			},
 			bootstrap_b2evo_base: {
 				nonull: true, // Display missing files
-				src: 'blogs/rsc/build/bootstrap-b2evo_base.bundle.css',
-				dest: 'blogs/rsc/build/bootstrap-b2evo_base.bmin.css',
+				src: 'rsc/build/bootstrap-b2evo_base.bundle.css',
+				dest: 'rsc/build/bootstrap-b2evo_base.bmin.css',
 			},
 			bootstrap_backoffice_b2evo_base: {
 				nonull: true, // Display missing files
-				src: 'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
-				dest: 'blogs/rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
+				src: 'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
+				dest: 'rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
 			},
 			skin_evopress: {
-				src: 'blogs/skins/evopress/evopress.bundle.css',
-				dest: 'blogs/skins/evopress/evopress.bmin.css',
+				src: 'skins/evopress/evopress.bundle.css',
+				dest: 'skins/evopress/evopress.bmin.css',
 			},
 			skin_pureforums: {
-				src: 'blogs/skins/pureforums/pureforums.bundle.css',
-				dest: 'blogs/skins/pureforums/pureforums.bmin.css',
+				src: 'skins/pureforums/pureforums.bundle.css',
+				dest: 'skins/pureforums/pureforums.bmin.css',
 			},
 		},
 
@@ -166,15 +166,15 @@ module.exports = function(grunt) {
 			// Login screen:
 			sha1_md5: { 
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/js/build/sha1_md5.bundle.js'],
-				dest: 'blogs/rsc/js/build/sha1_md5.bmin.js'
+				src: ['rsc/js/build/sha1_md5.bundle.js'],
+				dest: 'rsc/js/build/sha1_md5.bmin.js'
 			},
 			// Another Target:
 			/*  Early tests:
 			functionsjs: {
 				nonull: true, // Display missing files
-				src: 'blogs/rsc/js/functions.js',
-				dest: 'blogs/rsc/js/build/functions.min.js'
+				src: 'rsc/js/functions.js',
+				dest: 'rsc/js/build/functions.min.js'
 			},
 			ajaxcomjs: {
 				options: {
@@ -182,8 +182,8 @@ module.exports = function(grunt) {
 					banner: '<%= uglify.options.banner %>// This includes 2 files \n'
 				},
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/js/ajax.js', 'blogs/rsc/js/communication.js'],
-				dest: 'blogs/rsc/js/build/ajaxcom.min.js',
+				src: ['rsc/js/ajax.js', 'rsc/js/communication.js'],
+				dest: 'rsc/js/build/ajaxcom.min.js',
 			},
 			*/
 			// Colorbox + Voting + Touchswipe
@@ -192,8 +192,8 @@ module.exports = function(grunt) {
 					banner: '/* This includes 4 files: jquery.colorbox.js, voting.js, jquery.touchswipe.js, colorbox.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/js/colorbox/jquery.colorbox.js', 'blogs/rsc/js/voting.js', 'blogs/rsc/js/jquery/jquery.touchswipe.js', 'blogs/rsc/js/colorbox/colorbox.init.js'],
-				dest: 'blogs/rsc/js/build/colorbox.bmin.js'
+				src: ['rsc/js/colorbox/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/js/jquery/jquery.touchswipe.js', 'rsc/js/colorbox/colorbox.init.js'],
+				dest: 'rsc/js/build/colorbox.bmin.js'
 			},
 			// Bubbletip
 			bubbletip: {
@@ -203,8 +203,8 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
 				// if plugins.js is used only for editing we should probably move it to a textedit.bundle		
-				src: ['blogs/rsc/js/bubbletip.js', 'blogs/rsc/js/plugins.js', 'blogs/rsc/js/userfields.js', 'blogs/rsc/js/colorpicker.js'],
-				dest: 'blogs/rsc/js/build/bubbletip.bmin.js'
+				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
+				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
 			// Popover (Analog of bubbletip on bootstrap skins)
 			popover: {
@@ -212,8 +212,8 @@ module.exports = function(grunt) {
 					banner: '/* This includes 4 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/js/bootstrap/usernames.js', 'blogs/rsc/js/bootstrap/plugins.js', 'blogs/rsc/js/bootstrap/userfields.js', 'blogs/rsc/js/bootstrap/colorpicker.js'],
-				dest: 'blogs/rsc/js/build/popover.bmin.js'
+				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js'],
+				dest: 'rsc/js/build/popover.bmin.js'
 			},
 			// Textcomplete plugin to suggest user names in textareas with '@username'
 			textcomplete: {
@@ -221,8 +221,8 @@ module.exports = function(grunt) {
 					banner: '/* This includes 2 files: jquery.textcomplete.js, textcomplete.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['blogs/rsc/js/jquery/jquery.textcomplete.js', 'blogs/rsc/js/textcomplete.init.js'],
-				dest: 'blogs/rsc/js/build/textcomplete.bmin.js'
+				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
+				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
 		},
 
@@ -230,17 +230,17 @@ module.exports = function(grunt) {
 		watch: {
 			/* Early tests:
 			functionsjs: {
-				files: ['blogs/rsc/js/functions.js'],
+				files: ['rsc/js/functions.js'],
 				tasks: ['uglify:functionsjs'],
 			},
 			ajaxcomjs: {
-				files: ['blogs/rsc/js/ajax.js', 'blogs/rsc/js/communication.js'],
+				files: ['rsc/js/ajax.js', 'rsc/js/communication.js'],
 				tasks: ['uglify:ajaxcomjs'],
 			},
 			*/
 			less: {
 				// Which files to watch (all .less files recursively in the whole blogs directory)
-				files: ['blogs/**/*.less'],
+				files: ['**/*.less'],
 				tasks: ['less'],
 				options: {
 					nospawn: true,
@@ -248,7 +248,7 @@ module.exports = function(grunt) {
 			},
 			sass: {
 				// Which files to watch (all .scss files recursively in the scss directory)
-				files: ['blogs/**/*.scss'],
+				files: ['**/*.scss'],
 				tasks: ['sass'],
 				options: {
 					nospawn: true,
@@ -256,7 +256,7 @@ module.exports = function(grunt) {
 			},
 			concat_cssmin: {
 				// Which files to watch (all .css files recursively in the whole blogs directory)
-				files: ['blogs/**/*.css'],
+				files: ['**/*.css'],
 				tasks: ['concat','cssmin'],
 				options: {
 					nospawn: true,
