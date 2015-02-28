@@ -4,16 +4,13 @@ echo Generate file list.
 find ../blogs/ -name "*.php" -not -wholename "*/events/*" > files.txt
 
 echo Extract strings.
-xgettext -D ../blogs/ -f files.txt --package-version=6 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.net/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
+xgettext -D ../blogs/ -f files.txt --package-version=6 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
 
 echo Correct paths.
 sed -i .bak s#../blogs//#../../../#g messages.pot
 
 echo Copy to locales folder.
 cp messages.pot ../blogs/locales/
-
-echo Copy to Transifex.
-cp messages.pot transifex/
 
 #echo Correct Header.
 #sed -i .bak s/PACKAGE/b2evolution/ ../blogs/locales/messages.pot

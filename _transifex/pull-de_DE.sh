@@ -3,4 +3,4 @@ echo Getting updates from Transifex
 tx pull -l de_DE
 
 echo "Copy de_DE (transifex) to de_DE locale (b2evo)"
-cp translations/b2evolution.messages/de_DE.po ../../blogs/locales/de_DE/LC_MESSAGES/messages.po
+cp translations/b2evolution.messages/de_DE.po ../blogs/locales/de_DE/LC_MESSAGES/messages.po

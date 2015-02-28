@@ -32,6 +32,8 @@ if( empty($action) )
 	<body>
 		<h1>b2evolution simpletest framework</h1>
 
+		<p style="color:red">SECURITY WARNING: This folder is for developers only and should NOT be part of the distribution and should NOT be uploaded to production servers.</p>
+
 		<a href="index.php?action=all"><strong>All tests</strong></a>
 
 		<h2>evoCore tests</h2>
