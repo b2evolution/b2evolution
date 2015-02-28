@@ -2,9 +2,10 @@
 /**
  * This is the main dispatcher for the admin interface.
  *
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
- * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
- * OR YOUR HOSTING COMPANY.
+ * ---------------------------------------------------------------------------------------------------------------
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
+ * ---------------------------------------------------------------------------------------------------------------
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.

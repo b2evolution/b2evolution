@@ -135,23 +135,23 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 					if( count( $BlogCache->cache ) == 0 )
 					{	// There is no blog on this system!
-						echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any blog on this system yet.').'</strong></p>';
+						echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any content collection on this system yet.').'</strong></p>';
 
 						if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 						{ // Display this link only for users who can create blog
-							echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first blog' ).' &raquo;</a></p>';
+							echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first collection' ).' &raquo;</a></p>';
 						}
 					}
 					else
 					{
 						echo '<p><strong>'.T_('You have successfully installed b2evolution.').'</strong></p>';
 
-						echo '<p>'.T_('You haven\'t set a default blog yet. Thus, you see this default page.').'</p>';
+						echo '<p>'.T_('You haven\'t set a default collection yet. Thus, you see this default page.').'</p>';
 
 						if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 						{ // Display this link only for users who can create blog
 						?>
-						<p><a href="<?php echo $admin_url ?>?ctrl=gensettings"><?php echo T_( 'Set a default blog' ) ?> &raquo;</a></p>
+						<p><a href="<?php echo $admin_url ?>?ctrl=collections&amp;tab=site_settings"><?php echo T_( 'Set a default collection' ) ?> &raquo;</a></p>
 						<?php
 						}
 					}
@@ -170,7 +170,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<div class="block2">
 		<div class="block3">
 
-	<h2><?php echo T_('Blogs on this system') ?></h2>
+	<h2><?php echo T_('Collections on this system') ?></h2>
 
 	<ul>
 	<?php // --------------------------- BLOG LIST -----------------------------
@@ -193,40 +193,13 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<?php
 		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 		{ // Display this link only for users who can create blog
-			echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new blog' ).' &raquo;</a></p>';
+			echo '<p><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new collection' ).' &raquo;</a></p>';
 		}
 		?>
 		</div>
 		</div>
 		</div>
 
-		<div class="block1">
-		<div class="block2">
-		<div class="block3">
-
- 	<h2><?php echo T_('Bonus templates &amp; features') ?></h2>
-	<p class="note"><?php echo T_('These templates demonstrate more advanced uses of b2evolution. These do not make use of skins. The only way to change their look and feel is to edit their PHP template.') ?></p>
-	<ul>
-		<?php
-			$first_Blog = & $BlogCache->get_by_ID( 1, false );
-			if( !empty( $first_Blog ) )
-			{
-			?>
-				<li><strong><a href="a_noskin.php"><?php echo T_('Blog #1 called through a custom template (not a skin)') ?></a></strong> &nbsp; <span class="note">(a_noskin.php)</span></li>
-				<li><strong><a href="multiblogs.php"><?php echo T_('Multiple blogs displayed on the same page') ?></a></strong> &nbsp; <span class="note">(multiblogs.php)</span></li>
-				<li><strong><a href="sitemap_a.php"><?php echo T_('Blog #1 XML sitemap (called through a stub)') ?></a></strong> &nbsp; <span class="note">(sitemap_a.php)</span></li>
-				<li><strong><a href="sitemap_blogs.php"><?php echo T_('Blog #1 aggregated XML sitemap (called through a stub)') ?></a></strong> &nbsp; <span class="note">(sitemap_blogs.php)</span></li>
-			<?php
-			}
-		?>
-		<li><strong><a href="summary.php"><?php echo T_('Summary of latest posts in all blogs') ?></a></strong> &nbsp; <span class="note">(summary.php)</span></li>
-		<li><strong><a href="default.php"><?php echo T_('The page you\'re looking at') ?></a></strong> &nbsp; <span class="note">(default.php)</span></li>
-		<li><strong><a href="contact.php"><?php echo T_('A standalone admin-contact page for your site') ?></a></strong> &nbsp; <span class="note">(contact.php)</span></li>
-	</ul>
-
-	</div>
-	</div>
-	</div>
 	<?php
 	}
 ?>

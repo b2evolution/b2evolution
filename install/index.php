@@ -2,9 +2,10 @@
 /**
  * This is the main install menu
  *
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FIEL THROUGH A PHP WEB SERVER. 
- *
+ * ---------------------------------------------------------------------------------------------------------------
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
+ * ---------------------------------------------------------------------------------------------------------------
  * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}

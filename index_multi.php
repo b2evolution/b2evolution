@@ -22,7 +22,8 @@ require_once $inc_path.'_main.inc.php';
 
 if( !init_requested_blog() )
 { // No specific blog to be displayed:
-	echo 'No default blog is set.';
+	// we are going to display the default page:
+	require dirname(__FILE__).'/default.php';
 	exit();
 }
 

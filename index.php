@@ -2,9 +2,10 @@
 /**
  * This is the main public interface file.
  *
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
- * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
- * OR YOUR HOSTING COMPANY.
+ * ---------------------------------------------------------------------------------------------------------------
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
+ * ---------------------------------------------------------------------------------------------------------------
  *
  * This file is NOT mandatory. You can delete it if you want.
  * You can also replace the contents of this file with contents similar to the contents
@@ -34,7 +35,7 @@ if( ! isset($collections_Module) )
 	exit(0);
 }
 
-// initialize which blog should be displayed, and display default page if blog couldn't been initialized
+// initialize which blog should be displayed, and display default page if blog could not be initialized
 if( !init_requested_blog() )
 { // No specific blog to be displayed:
 	// we are going to display the default page:

@@ -625,17 +625,6 @@ else
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
-/*
- * Info pages
- */
-$block_item_Widget->title = T_('Info pages');
-$block_item_Widget->disp_template_replaced( 'block_start' );
-
-init_system_check( 'Default page:', '<a href="'.$baseurl.'default.php">'.$baseurl.'default.php</a>' );
-disp_system_check( 'note' );
-
-$block_item_Widget->disp_template_raw( 'block_end' );
-
 // TODO: dh> output_buffering (recommend off)
 // TODO: dh> session.auto_start (recommend off)
 // TODO: dh> How to change ini settings in .htaccess (for mod_php), link to manual
