@@ -3,11 +3,8 @@
  * This file implements the UI controller for managing posts.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
- *
- * {@internal Open Source relicensing agreement:
- * }}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo dh> AFAICS there are three params used for "item ID": "p", "post_ID"
  *       and "item_ID". This should get cleaned up.
@@ -20,11 +17,6 @@
  *     ... a lot of history lead to this :p
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: items.ctrl.php 7741 2014-12-03 12:13:50Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

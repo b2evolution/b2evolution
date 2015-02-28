@@ -2,11 +2,11 @@
 /**
  * This is the init file for the files module
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
- *
- * @version $Id: _files.init.php 7804 2014-12-11 15:11:50Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 

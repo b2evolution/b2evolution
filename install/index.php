@@ -2,13 +2,13 @@
 /**
  * This is the main install menu
  *
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT PHP IS NOT PROPERLY INSTALLED
- * ON YOUR WEB SERVER. IF YOU DON'T KNOW WHAT THIS MEANS, CONTACT YOUR SERVER ADMINISTRATOR
- * OR YOUR HOSTING COMPANY.
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FIEL THROUGH A PHP WEB SERVER. 
  *
+ * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
+ * 
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */

@@ -3,8 +3,6 @@
  * This file implements the recycled comments pruning Cron controller
  *
  * @author fplanque: Francois PLANQUE
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -4,14 +4,11 @@
  *
  * This file is not meant to be called directly.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author asimo: Evo Factory / Attila Simo
- *
- * @version $Id: _widget_login.form.php 7015 2014-06-30 07:46:54Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

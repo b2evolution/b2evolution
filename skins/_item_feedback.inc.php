@@ -13,8 +13,8 @@
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */

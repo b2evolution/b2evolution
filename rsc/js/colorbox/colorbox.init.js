@@ -1,11 +1,9 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * Used only to initialize colorbox for the links with attribute "rel" ^= "lightbox"
  * Don't load this file directly, It is appended to "/build/jquery.colorbox.b2evo.min.js" by Grunt, because we load colorbox plugin asynchronously.
- *
- * @version $Id: colorbox.init.js 7525 2014-10-27 10:39:46Z yura $
  */
 jQuery( document ).ready( function()
 {

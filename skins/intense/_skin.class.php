@@ -7,8 +7,6 @@
  *
  * @package skins
  * @subpackage intense
- *
- * @version $Id: _skin.class.php 8188 2015-02-07 02:07:55Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

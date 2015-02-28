@@ -9,8 +9,6 @@
  *
  * @package evoskins
  * @subpackage rdf
- *
- * @version $Id: comments.main.php 3156 2013-03-06 04:29:56Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

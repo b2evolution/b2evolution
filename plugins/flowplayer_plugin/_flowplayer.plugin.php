@@ -3,14 +3,14 @@
  * This file implements the Flow Player plugin for b2evolution
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
  *
  * @package plugins
- * @version $Id: _flowplayer.plugin.php 8110 2015-01-29 10:35:58Z yura $
+ * @version $Id: _flowplayer.plugin.php 8373 2015-02-28 21:44:37Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

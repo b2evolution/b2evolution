@@ -6,8 +6,6 @@
  *
  * @todo dh> Should this also handle feedback notifications (according to the "outbound_notifications_mode" setting)?
  * fp> No. The feedback notifications should have their own job.
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

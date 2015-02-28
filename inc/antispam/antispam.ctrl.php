@@ -3,36 +3,16 @@
  * This file implements the UI controller for the antispam management.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * Vegar BERG GULDAL grants Francois PLANQUE the right to license
- * Vegar BERG GULDAL's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * Halton STEWART grants Francois PLANQUE the right to license
- * Halton STEWART's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
- * @author fplanque: Francois PLANQUE.
- * @author vegarg: Vegar BERG GULDAL.
- * @author halton: Halton STEWART.
- *
  * @todo Allow applying / re-checking of the known data, not just after an update!
- *
- * @version $Id: antispam.ctrl.php 8184 2015-02-06 13:12:32Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

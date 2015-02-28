@@ -3,31 +3,13 @@
  * This file implements the system log list.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ *
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @copyright (c)2013 by Francois PLANQUE - {@link http://fplanque.com/}
  *
- * {@internal License choice
- * - If you have received this file as part of a package, please find the license.txt file in
- *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
- *   then you must choose one of the following licenses before using the file:
- *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
- *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
- * }}
- *
- * {@internal Open Source relicensing agreement:
- * The Evo Factory grants Francois PLANQUE the right to license
- * The Evo Factory's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois Planque.
- *
- * @version $Id: _syslog_list.view.php 8281 2015-02-18 01:21:13Z fplanque $
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );

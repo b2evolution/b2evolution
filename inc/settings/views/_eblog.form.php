@@ -3,13 +3,13 @@
  * This file implements the UI view for Post by Email settings.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
- *
- * @version $Id: _eblog.form.php 7997 2015-01-15 06:52:54Z manuel $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

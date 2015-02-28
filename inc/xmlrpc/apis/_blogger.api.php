@@ -3,16 +3,14 @@
  * XML-RPC : Blogger API
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @see http://b2evolution.net/man/blogger-api
  * @see http://www.blogger.com/developers/api/1_docs/
  * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/
  *
  * @package xmlsrv
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

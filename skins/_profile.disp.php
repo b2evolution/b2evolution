@@ -10,29 +10,13 @@
  *
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- *
- * PROGIDISTRI grants Francois PLANQUE the right to license
- * PROGIDISTRI's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: _profile.disp.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

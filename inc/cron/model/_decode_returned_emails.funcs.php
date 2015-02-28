@@ -3,16 +3,13 @@
  * This file implements the decode the returned emails support functions.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
- *
- * @version $Id: _decode_returned_emails.funcs.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -248,7 +245,7 @@ function dre_process_messages( & $mbox, $limit )
 		unlink( $tmpMIME );
 
 		if( empty($html_body) )
-		{	// Plain text message
+		{	// Plain-text message
 			dre_msg('Message type: TEXT');
 			dre_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
 

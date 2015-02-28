@@ -2,8 +2,8 @@
  * This file is DEPRECATED. It is left here only so that old plugins can load the functions they need for their toolbars
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: functions.js 7914 2014-12-29 11:37:38Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: functions.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 

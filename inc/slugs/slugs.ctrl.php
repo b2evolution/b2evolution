@@ -3,16 +3,13 @@
  * This file implements the slugs control.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author evfy-asimo: Attila Simo.
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

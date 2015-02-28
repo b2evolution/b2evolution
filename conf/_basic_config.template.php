@@ -81,6 +81,15 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 
 
 /**
+ * If you are a developer and you are making repeated installs of b2evolution, you might want to
+ * automatically set a very easy password for the admin.
+ *
+ * DO THIS ON DEVELOPMENT MACHINES ONLY! NEVER USE THIS SETTING ON A PRODUCTION SERVER!
+ */
+// $install_password = 'easy';
+
+
+/**
  * $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
  * It should be set to the URL where you can find the blog templates and/or the blog stub files,
  * that means index.php, blog1.php, blog2.php, etc. as well as admin.php.
@@ -106,7 +115,7 @@ if( isset($_SERVER['HTTP_HOST']) )
 */
 
 /**
- * This is used only to create the Admin account.
+ * This is used to create the Admin and the demo accounts at install time (not used after install).
  * @todo move to installer.
  */
 $admin_email = 'postmaster@localhost';

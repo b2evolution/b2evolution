@@ -3,20 +3,18 @@
  * This plugin replaces the textarea in the "Write" tab with {@link http://tinymce.moxiecode.com/ tinyMCE}.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ *
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @copyright 2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  * @copyright 2009 by Francois Planque - {@link http://fplanque.com/}.
- *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
  * @package plugins
  *
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois Planque
  * @author PhiBo: Philipp Seidel (since version 0.6)
- *
- * @version $Id: _tinymce.plugin.php 7914 2014-12-29 11:37:38Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

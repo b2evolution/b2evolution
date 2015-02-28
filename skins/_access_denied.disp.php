@@ -8,8 +8,6 @@
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- *
- * @version $Id: _access_denied.disp.php 8256 2015-02-13 06:50:39Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

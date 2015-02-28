@@ -2,7 +2,7 @@
 /*
  * mime_parser.php
  *
- * @(#) $Id$
+ * @(#) $Id: mime_parser.php 1180 2012-04-05 00:48:28Z sam2kb $
  *
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -31,7 +31,7 @@ define('MIME_ADDRESS_FIRST',            2);
 
 	<package>net.manuellemos.mimeparser</package>
 
-	<version>@(#) $Id$</version>
+	<version>@(#) $Id: mime_parser.php 1180 2012-04-05 00:48:28Z sam2kb $</version>
 	<copyright>Copyright © (C) Manuel Lemos 2006 - 2008</copyright>
 	<title>MIME parser</title>
 	<author>Manuel Lemos</author>

@@ -3,15 +3,13 @@
  * This file implements the UI view for the widgets installed on a blog.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
- *
- * @version $Id: _widget_list.view.php 7158 2014-07-21 10:07:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

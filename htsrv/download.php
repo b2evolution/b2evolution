@@ -2,15 +2,13 @@
 /**
  * This file is used to force download any file by link_ID.
  *
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: download.php 7261 2014-08-27 05:55:04Z yura $
  */
 
 /**

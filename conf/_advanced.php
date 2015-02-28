@@ -6,8 +6,6 @@
  * URL overrides.
  *
  * @package conf
- *
- * @version $Id: _advanced.php 8285 2015-02-18 07:55:41Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 

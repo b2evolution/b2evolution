@@ -3,19 +3,14 @@
  * This file implements the post browsing
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: _item_list_full.view.php 7512 2014-10-24 10:31:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -276,9 +271,9 @@ while( $Item = & $ItemList->get_item() )
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
-				// TRANS: Link to comments for current post
 				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
 				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' );
+				// TRANS: Link to comments for current post
 				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
 				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);

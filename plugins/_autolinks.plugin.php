@@ -3,8 +3,8 @@
  * This file implements the Automatic Links plugin for b2evolution
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -156,6 +156,7 @@ class autolinks_plugin extends Plugin
 				'autolink_username' => array(
 						'label' => T_( 'Autolink usernames' ),
 						'type' => 'checkbox',
+						// TRANS: the user can type in any username after "@" but it's typically only lowercase letters and no spaces.
 						'note' => $this->T_( '@username will link to the user profile page' ),
 						'defaultvalue' => $default_values['autolink_username'],
 					),

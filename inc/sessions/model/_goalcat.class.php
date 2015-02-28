@@ -3,14 +3,9 @@
  * This file implements the Goal Category class.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: _goalcat.class.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

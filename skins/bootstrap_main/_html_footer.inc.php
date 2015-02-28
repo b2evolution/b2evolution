@@ -10,8 +10,6 @@
  *
  * @package evoskins
  * @subpackage bootstrap_main
- *
- * @version $Id: _html_footer.inc.php 8232 2015-02-11 15:33:04Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

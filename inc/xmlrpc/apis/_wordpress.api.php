@@ -3,15 +3,15 @@
  * XML-RPC : Wordpress API
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author waltercruz
  *
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @package xmlsrv
- * @version $Id: _wordpress.api.php 7483 2014-10-21 11:55:47Z yura $
+ * @version $Id: _wordpress.api.php 8373 2015-02-28 21:44:37Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

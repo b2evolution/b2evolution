@@ -7,8 +7,8 @@
  * 	CloneOptions always Values 'a-1','a-2','b-3','c-2','c-4'
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: dynamic_select.js 9 2011-10-24 22:32:00Z fplanque $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: dynamic_select.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 /**

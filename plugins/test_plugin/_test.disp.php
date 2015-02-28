@@ -7,16 +7,14 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
- * @copyright (c)2009 by Yabba - {@link http://innervisiosn.org.uk/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009 by Yabba - {@link http://innervisiosn.org.uk/}.
  *
  * @package plugins
  *
  * @author Yabba
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>

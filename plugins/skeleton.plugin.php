@@ -11,9 +11,9 @@
  *
  * This file implements the Foo Plugin for {@link http://b2evolution.net/}.
  *
- * @copyright (c)2010 by Your NAME - {@link http://example.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ * @copyright (c)2010 by Your NAME - {@link http://example.com/}.
  *
  * @package plugins
  *

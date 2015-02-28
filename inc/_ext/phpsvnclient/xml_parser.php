@@ -3,7 +3,7 @@
 /*
  * xml_parser.php
  *
- * @(#) $Header$
+ * @(#) $Header: /home/mlemos/cvsroot/xmlparser/xml_parser.php,v 1.19 2006/11/22 01:25:05 mlemos Exp $
  *
  */
 

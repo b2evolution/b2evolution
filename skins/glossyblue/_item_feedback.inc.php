@@ -13,8 +13,8 @@
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage glossyblue
@@ -229,6 +229,8 @@ if( $Item->can_see_comments( true ) )
 					'comment_start'   => '<li id="comment-'.$Comment->ID.'" class="">',
 					'comment_end'     => $params['comment_end'],
 				) );
+			// Note: You can customize the default item comment by copying the generic
+			// /skins/_item_comment.inc.php file into the current skin folder.
 			// ---------------------- END OF COMMENT ---------------------
 
 			if( $Blog->get_setting( 'threaded_comments' ) )
@@ -276,6 +278,8 @@ else
 {
 	skin_include( '_item_comment_form.inc.php', $params );
 }
+// Note: You can customize the default item comment form by copying the generic
+// /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
 

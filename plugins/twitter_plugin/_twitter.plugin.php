@@ -7,10 +7,10 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
- * @copyright (c)2007 by Lee Turner - {@link http://leeturner.org/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2007 by Lee Turner - {@link http://leeturner.org/}.
  *
  * @package plugins
  *
@@ -18,8 +18,6 @@
  * @author fplanque: Francois PLANQUE.
  *
  * @todo dh> use OAuth instead of username/password: http://apiwiki.twitter.com/Authentication
- *
- * @version $Id: _twitter.plugin.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -1,26 +1,16 @@
 <?php
 /**
  * This file is part of b2evolution - {@link http://b2evolution.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- *
- * {@internal Open Source relicensing agreement:
- * The Evo Factory grants Francois PLANQUE the right to license
- * The Evo Factory's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @package collections
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-maxim: Evo Factory / Maxim.
- * @author fplanque: Francois Planque.
- *
- * @version $Id: _item_mass.form.php 6513 2014-04-18 06:18:18Z attila $
  */
 
 

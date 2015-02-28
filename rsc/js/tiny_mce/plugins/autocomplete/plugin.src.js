@@ -43,8 +43,6 @@
  * being maintained on GitHub where you can submit issues / feature requests. 
  *
  * Modified at 2014-02-06 to be compatible with TinyMCE 4 version
- *
- * @version $Id: plugin.src.js 7423 2014-10-14 07:52:43Z yura $
  */
 
 (function () {

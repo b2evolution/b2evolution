@@ -9,8 +9,6 @@
  *
  * @package evoskins
  * @subpackage nifty_corners
- *
- * @version $Id: index.main.php 8333 2015-02-24 00:40:28Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

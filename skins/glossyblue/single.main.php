@@ -10,8 +10,6 @@
  *
  * @package evoskins
  * @subpackage glossyblue
- *
- * @version $Id: single.main.php 7115 2014-07-14 14:08:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

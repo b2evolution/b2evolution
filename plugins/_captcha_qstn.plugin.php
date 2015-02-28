@@ -5,11 +5,11 @@
  * The core functionality was provided by Francois PLANQUE.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2012-2014 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ * @copyright (c)2012-2015 by Francois Planque - {@link http://fplanque.com/}.
  * {@internal
  * b2evolution is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
  * @package plugins
  *
  * @author fplanque: Francois PLANQUE
- *
- * @version $Id: _captcha_qstn.plugin.php 8347 2015-02-25 13:42:34Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

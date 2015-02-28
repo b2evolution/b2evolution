@@ -7,8 +7,6 @@
  *
  * @package skins
  * @subpackage pureforums
- *
- * @version $Id: _skin.class.php 8186 2015-02-06 22:24:19Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

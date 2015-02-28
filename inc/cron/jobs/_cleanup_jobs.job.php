@@ -3,8 +3,6 @@
  * This file implements the Clean up scheduled jobs older than x days
  *
  * @author fplanque: Francois PLANQUE
- *
- * @version $Id: _cleanup_jobs.job.php 7044 2014-07-02 08:55:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

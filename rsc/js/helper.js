@@ -1,9 +1,9 @@
 /**
  * This file implements the b2evoHelper object
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs {@link http://innervisions.org.uk/ }
- * @version $Id: helper.js 9 2011-10-24 22:32:00Z fplanque $
+ * @version $Id: helper.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 

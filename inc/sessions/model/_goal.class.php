@@ -3,14 +3,9 @@
  * This file implements the Goal class.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: _goal.class.php 7783 2014-12-09 07:16:04Z attila $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

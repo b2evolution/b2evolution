@@ -3,19 +3,14 @@
  * This file implements the comment list
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}.
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
- * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
- *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -56,7 +51,9 @@ while( $Comment = & $CommentList->get_next() )
 	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
 		continue;
 	}
+	//echo '<div id="comment_'.$Comment->ID.'">';
 	echo_comment( $Comment->ID, $redirect_to, $save_context );
+	//echo '</div>';
 } //end of the loop, don't delete
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )

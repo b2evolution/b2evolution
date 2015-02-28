@@ -5,8 +5,6 @@
  * Based on Piwik - Open source web analytics - {@link http://piwik.org/}
  * Latest version: http://dev.piwik.org/svn/trunk/core/DataFiles/SearchEngines.php
  *
- * @license http://www.gnu.org/licenses/gpl-3.0.html GPL v3 or later
- *
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 

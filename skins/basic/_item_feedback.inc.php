@@ -167,6 +167,8 @@ while( $Comment = & $CommentList->get_next() )
 			'comment_start'   => $params['comment_start'],
 			'comment_end'     => $params['comment_end'],
 		) );
+	// Note: You can customize the default item comment by copying the generic
+	// /skins/_item_comment.inc.php file into the current skin folder.
 	// ---------------------- END OF COMMENT ---------------------
 
 	if( $Blog->get_setting( 'threaded_comments' ) )
@@ -176,8 +178,9 @@ while( $Comment = & $CommentList->get_next() )
 }
 }
 
+// ------------------ COMMENT FORM INCLUDED HERE ------------------
 if( $disp_comment_form )
-{	// We want to display the comments form:
+{ // We want to display the comments form:
 	if( $Item->can_comment( '<p><em>', '</em></p>', '#', '#', '<h4>'.T_('Leave a comment').':</h4>' ) )
 	{ // User can leave a comment
 		if( $Blog->get_ajax_form_enabled() )
@@ -195,5 +198,8 @@ if( $disp_comment_form )
 			skin_include( '_item_comment_form.inc.php', $params );
 		}
 	}
+	// Note: You can customize the default item comment form by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
+// ---------------------- END OF COMMENT FORM ---------------------
 ?>

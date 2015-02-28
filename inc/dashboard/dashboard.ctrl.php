@@ -3,21 +3,15 @@
  * This file implements the UI controller for the dashboard.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2007 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * {@internal Open Source relicensing agreement:
- * }}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
  * @todo add 5 plugin hooks. Will be widgetized later (same as SkinTag became Widgets)
- *
- * @version $Id: dashboard.ctrl.php 7512 2014-10-24 10:31:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

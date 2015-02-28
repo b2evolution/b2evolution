@@ -3,8 +3,6 @@
  * This file implements the Page Cache pruning Cron controller (delete old files from the cache)
  *
  * @author asimo: Attila Simo
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -3,8 +3,6 @@
  * This file implements the comment notifications Cron controller
  *
  * @author efy-asimo: Attila Simo
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

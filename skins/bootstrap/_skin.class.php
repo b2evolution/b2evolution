@@ -7,8 +7,6 @@
  *
  * @package skins
  * @subpackage bootstrap
- *
- * @version $Id: _skin.class.php 8355 2015-02-27 10:18:59Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

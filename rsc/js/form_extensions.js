@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: form_extensions.js 6973 2014-06-24 19:14:31Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: form_extensions.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 

@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: bubbletip.js 6990 2014-06-26 05:10:57Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: bubbletip.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 jQuery( document ).ready(function()

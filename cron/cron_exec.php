@@ -5,8 +5,6 @@
  * Example to use CLI:
  * >c:\php4\php cron_exec.php
  * >c:\php4\php-cli cron_exec.php
- *
- * @version $Id: cron_exec.php 7381 2014-10-07 11:23:50Z yura $
  */
 
 

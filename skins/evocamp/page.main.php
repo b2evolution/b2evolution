@@ -10,8 +10,6 @@
  *
  * @package evoskins
  * @subpackage evocamp
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,7 +35,7 @@ skin_include( '_html_header.inc.php' );
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>
 
@@ -48,8 +46,8 @@ skin_include( '_body_header.inc.php' );
 	<?php
 	// ------------------------- SIDEBAR INCLUDED HERE --------------------------
 	skin_include( '_sidebar_left.inc.php' );
-	// Note: You can customize the default BODY footer by copying the
-	// _body_footer.inc.php file into the current skin folder.
+	// Note: You can customize the left sidebar by copying the
+	// _sidebar_left.inc.php file into the current skin folder.
 	// ----------------------------- END OF SIDEBAR -----------------------------
 	?>
 
@@ -95,10 +93,10 @@ skin_include( '_body_header.inc.php' );
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 				skin_include( '_item_content.inc.php', array(
-						'image_size'	=>	'fit-400x320',
+						'image_size' => 'fit-400x320',
 					) );
-				// Note: You can customize the default item feedback by copying the generic
-				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// Note: You can customize the default item content by copying the generic
+				// /skins/_item_content.inc.php file into the current skin folder.
 				// -------------------------- END OF POST CONTENT -------------------------
 			?>
 
@@ -132,8 +130,8 @@ skin_include( '_body_header.inc.php' );
 <?php
 // ------------------------- SIDEBAR INCLUDED HERE --------------------------
 skin_include( '_sidebar_right.inc.php' );
-// Note: You can customize the default BODY footer by copying the
-// _body_footer.inc.php file into the current skin folder.
+// Note: You can customize the right sidebar by copying the
+// _sidebar_right.inc.php file into the current skin folder.
 // ----------------------------- END OF SIDEBAR -----------------------------
 ?>
 

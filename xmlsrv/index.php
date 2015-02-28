@@ -6,10 +6,8 @@
  * We need this file here in order to use WordPress XML-RPC API since some native clients don't allow us to select xmlrpc.php location.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
- *
- * @version $Id$
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  */
 
 require dirname(__FILE__).'/xmlrpc.php';

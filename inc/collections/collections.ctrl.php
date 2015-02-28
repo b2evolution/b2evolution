@@ -3,35 +3,17 @@
  * This file implements the UI controller for blog params management, including permissions.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
- * {@internal License choice
- * - If you have received this file as part of a package, please find the license.txt file in
- *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
- *   then you must choose one of the following licenses before using the file:
- *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
- *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
- * }}
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
  *
  * @package admin
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- *
  * @todo (sessions) When creating a blog, provide "edit options" (3 tabs) instead of a single long "New" form (storing the new Blog object with the session data).
  * @todo Currently if you change the name of a blog it gets not reflected in the blog list buttons!
- *
- * @version $Id: collections.ctrl.php 7987 2015-01-14 18:44:48Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -82,8 +64,6 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 
-		// dh> TODO: "New %s" is probably too generic. What can %s become? (please comment it in "TRANS")
-		// Tblue> Look at get_collection_kinds(). I wrote a TRANS comment (30.01.09 22:03, HEAD).
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New %s'), get_collection_kinds($kind) ) ) );
 		break;
 

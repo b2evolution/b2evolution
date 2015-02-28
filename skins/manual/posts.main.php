@@ -13,8 +13,6 @@
  *
  * @package evoskins
  * @subpackage manual
- *
- * @version $Id: posts.main.php 7092 2014-07-09 05:49:26Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

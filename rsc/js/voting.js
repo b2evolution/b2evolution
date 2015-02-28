@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: voting.js 8013 2015-01-16 15:22:35Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: voting.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 /**

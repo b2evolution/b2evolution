@@ -10,8 +10,6 @@
  *
  * @package evoskins
  * @subpackage glossyblue
- *
- * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,8 +34,8 @@ skin_include( '_html_header.inc.php' );
 <?php
 // ------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
-// Note: You can customize the default BODY heder by copying the generic
-// /skins/_body_footer.inc.php file into the current skin folder.
+// Note: You can customize the default BODY header by copying the generic
+// /skins/_body_header.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>
 
@@ -117,8 +115,8 @@ echo '</div>'; // End of posts display
 <?php
 // ------------------------- SIDEBAR INCLUDED HERE --------------------------
 skin_include( '_sidebar.inc.php' );
-// Note: You can customize the default BODY footer by copying the
-// _body_footer.inc.php file into the current skin folder.
+// Note: You can customize the sidebar by copying the
+// _sidebar.inc.php file into the current skin folder.
 // ----------------------------- END OF SIDEBAR -----------------------------
 ?>
 

@@ -1,11 +1,9 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * Used only to initialize textcomplete jquery plugin for the textareas with class "autocomplete_usernames"
  * Don't load this file directly, It is appended to "/build/textcomplete.bmin.js" by Grunt.
- *
- * @version $Id: textcomplete.init.js 7423 2014-10-14 07:52:43Z yura $
  */
 jQuery( document ).ready( function()
 {

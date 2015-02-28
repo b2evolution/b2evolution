@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: results.js 5093 2013-10-30 10:57:42Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: results.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 jQuery( document ).ready(function()

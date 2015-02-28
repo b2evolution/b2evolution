@@ -3,18 +3,13 @@
  * This file implements the post by mail support functions.
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author Stephan Knauss
- * @author tblue246: Tilman Blumenbach
- * @author sam2kb: Alex
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
- *
- * @version $Id: _post_by_mail.funcs.php 6697 2014-05-15 10:51:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -267,7 +262,7 @@ function pbm_process_messages( & $mbox, $limit )
 		unlink( $tmpMIME );
 
 		if( empty($html_body) )
-		{	// Plain text message
+		{	// Plain-text message
 			pbm_msg('Message type: TEXT');
 			pbm_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
 

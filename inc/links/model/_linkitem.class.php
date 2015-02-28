@@ -3,16 +3,13 @@
  * This file implements the LinkItem class, which is a wrapper class for Item class to handle linked files.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author efy-asimo: Attila Simo.
- *
- * @version $Id: _linkitem.class.php 7752 2014-12-04 12:44:33Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -84,12 +81,12 @@ class LinkItem extends LinkOwner
 		}
 
 		return array_merge( array(
-				'teaser'     => T_( 'Teaser' ),
-				'teaserperm' => T_( 'Teaser-Permalink' ),
-				'teaserlink' => T_( 'Teaser-Ext Link' ),
-				'aftermore'  => T_( 'After "more"' ),
-				'inline'     => T_( 'Inline' ),
-				'fallback'   => T_( 'Fallback' ),
+				'teaser'     => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content */ T_( 'Teaser' ),
+				'teaserperm' => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink */ T_( 'Teaser-Permalink' ),
+				'teaserlink' => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to external link */ T_( 'Teaser-Ext Link' ),
+				'aftermore'  => /* TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator */ T_( 'After "more"' ),
+				'inline'     => /* TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text */ T_( 'Inline' ),
+				'fallback'   => /* TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file */ T_( 'Fallback' ),
 			), $additional_positions );
 	}
 

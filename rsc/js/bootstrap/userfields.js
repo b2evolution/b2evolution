@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- * @version $Id: userfields.js 7028 2014-07-01 06:28:00Z yura $
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ * @version $Id: userfields.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
 jQuery( document ).ready(function()

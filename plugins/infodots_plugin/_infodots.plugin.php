@@ -5,12 +5,10 @@
  * Info dots formatting, like [infodot:1234:40:60:20ex]text of the info dot additional info text including <a href="/">link text</a>[enddot]
  *
  * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2014 by Francois Planque - {@link http://fplanque.com/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
- *
- * @version $Id: _infodots.plugin.php 8172 2015-02-06 02:57:00Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -1,15 +1,15 @@
 <?php
 /**
  * This file is part of b2evolution - {@link http://b2evolution.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
+ * See also {@link https://github.com/b2evolution/b2evolution}.
  *
- * @copyright (c)2009-2014 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @package maintenance
- *
- * @version $Id: $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

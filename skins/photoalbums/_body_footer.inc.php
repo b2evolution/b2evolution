@@ -9,8 +9,6 @@
  *
  * @package evoskins
  * @subpackage photoalbums
- *
- * @version $Id: _body_footer.inc.php 8013 2015-01-16 15:22:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

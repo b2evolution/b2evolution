@@ -8,6 +8,8 @@
  * @version    1.3
  * @author     Hamid Sarfraz
  *
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
  * @copyright  2013 Hamid sarfraz
  * @license    http://pageconfig.com/post/license
  */
