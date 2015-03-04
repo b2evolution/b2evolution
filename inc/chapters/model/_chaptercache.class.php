@@ -38,6 +38,7 @@ class ChapterCache extends GenericCategoryCache
 	{
 		global $Settings;
 
+		// TODO: we want to  remove the followind (and implement chapter by chapter sorting somewhere else in the code)
 		if( $Settings->get('chapter_ordering') == 'manual' )
 		{	// Manual order
 			$select_temp_order = 'IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';

@@ -85,6 +85,7 @@ $date_default_timezone = '';
  * type, width, height, quality, percent of blur effect
  */
 $thumbnail_sizes = array(
+			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
 			'fit-720x500' => array( 'fit', 720, 500, 90 ),
 			'fit-640x480' => array( 'fit', 640, 480, 90 ),
 			'fit-520x390' => array( 'fit', 520, 390, 90 ),

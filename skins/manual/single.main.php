@@ -60,11 +60,6 @@ skin_include( '_left_navigation_bar.inc.php' );
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
-
-		if( !empty( $cat ) )
-		{	// Display breadcrumbs if some category is selected
-			$Skin->display_breadcrumbs( $cat );
-		}
 	?>
 
 	<?php

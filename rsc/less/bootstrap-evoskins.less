@@ -1,5 +1,10 @@
 	/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
 
+// Don't rewrite a font family of glyph icons
+.glyphicon {
+	font-family: 'Glyphicons Halflings' !important;
+}
+
 ul, ol {
 	margin: 0 0 10px 25px;
 	padding: 0;
@@ -104,6 +109,16 @@ ul, ol {
 		}
 		td.input div.tile label {
 			display: none;
+		}
+	}
+	// Select category table on edit post form
+	#itemform_categories {
+		.panel-body.extracats {
+			padding: 0;
+			table.table {
+				margin: 0;
+				border: none;
+			}
 		}
 	}
 	// Properties block on edit post form
@@ -404,7 +419,6 @@ legend.panel-heading {
 }
 div.comment_toolbars div.edit_toolbar,
 div.message_toolbars div.edit_toolbar {
-	width: 97%;
 	padding-left: 0;
 	padding-right: 0;
 }
@@ -464,4 +478,10 @@ a.evo_messages_link .badge {
 			margin: 0;
 		}
 	}
+}
+
+// Fix font-size for jumbotron blocks
+.jumbotron {
+	font-size: 21px;
+	font-weight: 200;
 }

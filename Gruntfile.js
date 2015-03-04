@@ -73,6 +73,7 @@ module.exports = function(grunt) {
 					'skins_adm/bootstrap/rsc/css/style.css': 'skins_adm/bootstrap/rsc/css/style.less',
 					'skins/bootstrap/style.css':             'skins/bootstrap/style.less',
 					'skins/bootstrap_main/style.css':        'skins/bootstrap_main/style.less',
+					'skins/bootstrap_manual/style.css':      'skins/bootstrap_manual/style.less',
 				}
 			}
 		},
@@ -226,6 +227,19 @@ module.exports = function(grunt) {
 			},
 		},
 
+		// Markdown to HTML
+		markdown: {
+			options: {
+				template: 'readme.template.html'
+			},
+			files: {
+				expand: true,
+				src: 'readme.md',
+				dest: '',
+				ext: '.html'
+			}
+		},
+
 		// Configuration for the watch tasks:
 		watch: {
 			/* Early tests:
@@ -262,7 +276,12 @@ module.exports = function(grunt) {
 					nospawn: true,
 				}
 			},
-		},
+			markdown: {
+				files: ['readme.md','readme.template.html'],
+				tasks: ['markdown']
+			}
+		}
+
 
 	});
 
@@ -273,6 +292,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
 	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify']);

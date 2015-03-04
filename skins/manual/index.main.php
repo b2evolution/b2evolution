@@ -56,9 +56,15 @@ skin_include( '_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 
-		if( !empty( $cat ) )
-		{	// Display breadcrumbs if some category is selected
-			$Skin->display_breadcrumbs( $cat );
+		if( ! empty( $cat ) )
+		{ // Display breadcrumbs if some category is selected
+			skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'breadcrumb_path',
+				// Optional display params
+				'block_start' => '<div class="breadcrumbs">',
+				'block_end'   => '</div>',
+			) );
 		}
 	?>
 

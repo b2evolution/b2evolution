@@ -265,6 +265,9 @@ function get_icon_info($name)
 			'legend' => T_('Expand'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 96, 0 ),
+			'glyph' => 'expand',
+			'toggle-glyph' => 'collapse-down',
+			'size-glyph' => array( 10 ),
 			'fa' => 'minus-square-o'
 		);
 		case 'collapse': return array(
@@ -272,6 +275,9 @@ function get_icon_info($name)
 			'legend' => T_('Collapse'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 112, 0 ),
+			'glyph' => 'collapse-down',
+			'toggle-glyph' => 'expand',
+			'size-glyph' => array( 10 ),
 			'fa' => 'plus-square-o'
 		);
 

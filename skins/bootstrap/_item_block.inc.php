@@ -21,7 +21,8 @@ $params = array_merge( array(
 		'feature_block'    => false,
 		'content_mode'     => 'auto',		// 'auto' will auto select depending on $disp-detail
 		'item_class'       => 'bPost',
-		'image_size'       => 'fit-400x320',
+		'image_class'      => 'img-responsive',
+		'image_size'       => 'fit-1280x720',
 		'author_link_text' => 'preferredname',
 	), $params );
 
@@ -36,8 +37,8 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		if( $disp != 'single' && $disp != 'page' )
 		{ // Don't display this on disp=single because there is already title header in h2
 			$Item->title( array(
-					'before'    => '<h3 class="bTitle linked">',
-					'after'     => '</h3>',
+					'before'    => '<h2 class="bTitle linked">',
+					'after'     => '</h2>',
 					'link_type' => 'permalink'
 				) );
 		}

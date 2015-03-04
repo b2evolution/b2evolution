@@ -1,11 +1,9 @@
 <?php
 /**
- * This is the template that displays the site map (the real one, not the XML thing) for a blog
+ * This is the template that displays the search form for a blog
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
- * To display the archive directory, you should call a stub AND pass the right parameters
- * For example: /blogs/index.php?disp=postidx
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -33,6 +31,12 @@ skin_widget( array(
 // ---------------------------------- END OF COMMON LINKS ---------------------------------
 
 // Display the search result
-search_result_block();
+search_result_block( array(
+		'use_editor'        => true,
+		'author_format'     => 'login',
+		'cell_author_start' => '<p class="small text-muted">',
+		'cell_author_end'   => '</p>',
+		'date_format'       => 'F jS, Y',
+	) );
 
 ?>

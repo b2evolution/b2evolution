@@ -496,7 +496,7 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'pureforums' );
 
 	// Note: Skin #6 will we used by Manual
-	skin_install( 'manual' );
+	skin_install( 'bootstrap_manual' );
 
 	skin_install( 'asevo' );
 	skin_install( 'custom' );
@@ -505,6 +505,8 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'forums' );
 	skin_install( 'glossyblue' );
 	skin_install( 'intense' );
+	skin_install( 'manual' );
+	skin_install( 'miami_blue' );
 	skin_install( 'natural_pink' );
 	skin_install( 'nifty_corners' );
 	skin_install( 'photoblog' );
@@ -622,7 +624,7 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'gmcode_plugin' );
 		install_plugin( 'wacko_plugin' );
 		install_plugin( 'wikilinks_plugin', $test_install_all_features );
-		install_plugin( 'wikitables_plugin', $test_install_all_features );
+		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );
 		install_plugin( 'widescroll_plugin' );

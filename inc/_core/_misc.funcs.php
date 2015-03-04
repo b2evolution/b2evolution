@@ -6655,11 +6655,14 @@ function button_class( $type = 'button', $jQuery_selector = false )
 /**
  * Get chapters by blog ID and parent ID
  *
+ * @todo Why is this not a method of $ChapterCache ?
+ *
  * @param integer Blog ID
  * @param integer Chapter parent ID
  */
 function get_chapters( $blog_ID, $parent_ID = 0 )
 {
+	// TODO: why do we need this in addition to $ChapterCache ?
 	global $blog_chapters_cache;
 
 	if( ! isset( $blog_chapters_cache ) )

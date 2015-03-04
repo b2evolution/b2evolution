@@ -1446,7 +1446,7 @@ function create_demo_contents()
 			T_('Manual Title'),
 			$blog_shortname,
 			$blog_stub,
-			T_('Tagline for Manual'),
+			T_('Tagline for this online manual'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			6, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
@@ -1509,15 +1509,17 @@ function create_demo_contents()
 
 	if( $install_collection_manual )
 	{ // Create categories for manual
-		$cat_manual_ann = cat_create( T_('Welcome'), 'NULL', $blog_manual_ID, T_('Welcome description'), false, 15 );
-		$cat_manual_news = cat_create( T_('News'), 'NULL', $blog_manual_ID, T_('News description'), false, 5 );
-		$cat_manual_bg = cat_create( T_('Background'), 'NULL', $blog_manual_ID, T_('Background description'), false, 35 );
-		$cat_manual_fun = cat_create( T_('Cat with intro post'), 'NULL', $blog_manual_ID, T_('Description of cat with intro post'), false, 25 );
-		$cat_manual_life = cat_create( T_('In real life'), $cat_manual_fun, $blog_manual_ID, NULL, false, 10 );
-		$cat_manual_web = cat_create( T_('On the web'), $cat_manual_fun, $blog_manual_ID, NULL, false, 5 );
-		$cat_manual_sports = cat_create( T_('Sports'), $cat_manual_life, $blog_manual_ID, NULL, false, 35 );
-		$cat_manual_movies = cat_create( T_('Movies'), $cat_manual_life, $blog_manual_ID, NULL, false, 25 );
-		$cat_manual_music = cat_create( T_('Music'), $cat_manual_life, $blog_manual_ID, NULL, false, 5 );
+		$cat_manual_intro = cat_create( T_('Introduction'), NULL, $blog_manual_ID, NULL, false, 10 );
+		$cat_manual_getstarted = cat_create( T_('Getting Started'), NULL, $blog_manual_ID, NULL, false, 20 );
+		$cat_manual_userguide = cat_create( T_('User Guide'), NULL, $blog_manual_ID, NULL, false, 30 );
+		$cat_manual_reference = cat_create( T_('Reference'), NULL, $blog_manual_ID, NULL, false, 40 );
+
+		$cat_manual_everyday = cat_create( T_('Collections'), $cat_manual_reference, $blog_manual_ID, NULL, false, 10 );
+		$cat_manual_advanced = cat_create( T_('Other'), $cat_manual_reference, $blog_manual_ID, NULL, false, 5 );
+		
+		$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 35 );
+		$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 25 );
+		$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 5 );
 	}
 
 	task_end();
@@ -2044,19 +2046,29 @@ The rain---not the reign---in Spain.');
 		// Insert a main intro:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("Manual main intro"), T_('This is the main introduction for the manual'), $now, $cat_manual_ann,
+		$edited_Item->insert( 1, T_("Welcome here!"), T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
+
+You may delete this post if you don\'t want such an introduction.
+
+Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/.'), $now, $cat_manual_intro,
 			array(), 'published', '#', '', '', 'open', array('default'), 1400 );
 
 		// Insert a cat intro:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("Cat intro post"), T_('This is an intro-cat post for the category with intro post'), $now, $cat_manual_fun,
+		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introcution for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
+			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
+
+		// Insert a cat intro:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introcution for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_everyday,
 			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
 
 		// Insert a PAGE:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("About Manual"), sprintf( $info_page, T_('Manual') ), $now, $cat_manual_ann,
+		$edited_Item->insert( 1, T_("About this manual"), sprintf( $info_page, T_('Manual') ), $now, $cat_manual_intro,
 			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
 
 		// Insert a post:
@@ -2064,7 +2076,7 @@ The rain---not the reign---in Spain.');
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('First Topic'), T_('<p>This is the first topic.</p>
 
-<p>It appears in a single category.</p>'), $now, $cat_manual_ann, array( $cat_manual_news, $cat_manual_movies ),
+<p>It appears in a single category.</p>'), $now, $cat_manual_intro, array( $cat_manual_userguide, $cat_manual_photos ),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
 
 		// Insert a post:
@@ -2072,7 +2084,7 @@ The rain---not the reign---in Spain.');
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Second topic'), T_('<p>This is the second topic.</p>
 
-<p>It appears in multiple categories.</p>'), $now, $cat_manual_news, array( $cat_manual_ann ),
+<p>It appears in multiple categories.</p>'), $now, $cat_manual_userguide, array( $cat_manual_intro ),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 3 );
 
 		// Insert a post:
@@ -2316,7 +2328,7 @@ Hello
 |-
 ! scope="row" colspan="2"| Total
 | $1.90
-|}', $now, $cat_manual_news, array( $cat_manual_ann ),
+|}', $now, $cat_manual_userguide, array( $cat_manual_intro ),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 3 );
 
 		// Insert a post:
@@ -2324,7 +2336,7 @@ Hello
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Image topic'), T_('<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
 
-<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_manual_bg, array( $cat_manual_sports ),
+<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_manual_getstarted, array( $cat_manual_blogs ),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 20 );
 		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -2349,7 +2361,7 @@ Hello
 
 '.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
-'.T_('<p>It is the last page.</p>'), $now, $cat_manual_fun, array(),
+'.T_('<p>It is the last page.</p>'), $now, $cat_manual_reference, array(),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 8 );
 
 		// Insert a post:
@@ -2359,7 +2371,7 @@ Hello
 
 [teaserbreak]
 
-<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_bg, array(),
+<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_getstarted, array(),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
 		$edited_Item->set_setting( 'hide_teaser', '1' );
 		$edited_Item->dbsave();
@@ -2371,7 +2383,7 @@ Hello
 
 [teaserbreak]
 
-<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_life, array(),
+<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_everyday, array(),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
 
 		// Insert a post:
@@ -2389,7 +2401,7 @@ Hello
 
 </ul>
 
-<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_ann, array( $cat_manual_life ),
+<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_intro, array( $cat_manual_everyday ),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
 		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -2400,7 +2412,7 @@ Hello
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Sports post'), T_('<p>This is the sports post.</p>
 
-<p>It appears in sports category.</p>'), $now, $cat_manual_sports, array(),
+<p>It appears in sports category.</p>'), $now, $cat_manual_blogs, array(),
 		'published', '#', '', '', 'open', array('default'), 1, NULL, 15 );
 
 		// Insert a post:
@@ -2408,13 +2420,13 @@ Hello
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Second sports post'), T_('<p>This is the second sports post.</p>
 
-<p>It appears in sports category.</p>'), $now, $cat_manual_sports, array(),
+<p>It appears in sports category.</p>'), $now, $cat_manual_blogs, array(),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
 
 		// Insert Markdown example post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_news );
+		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_userguide );
 	}
 
 	task_end();

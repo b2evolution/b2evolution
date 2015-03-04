@@ -1226,7 +1226,7 @@ function blogs_all_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'results_param_prefix' => 'blog_',
-			'results_title'        => T_('Collection list').get_manual_link('collection-list'),
+			'results_title'        => T_('List of Collections configured on this system').get_manual_link('site-collection-list'),
 			'results_no_text'      => T_('No blog has been created yet!'),
 			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
 		), $params );

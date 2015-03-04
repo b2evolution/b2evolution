@@ -72,6 +72,7 @@ class GenericCategoryCache extends GenericCache
 	{
 		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by, $allow_none_text, $allow_none_value, $select );
 
+		// This is the property by which we will filter out subsets, for exampel 'blog_ID' if we want to only load a specific collection:
 		$this->subset_property = $subset_property;
 	}
 
@@ -115,7 +116,7 @@ class GenericCategoryCache extends GenericCache
 	/**
 	 * Reveal children
 	 *
-	 * After this each Category will have an array pointing to its direct children
+	 * After executing this, each Chapter will have an array pointing to its direct children
 	 *
 	 * @param integer|NULL NULL for all subsets
 	 */
@@ -125,15 +126,14 @@ class GenericCategoryCache extends GenericCache
 		global $Timer;
 
 		if( $this->revealed_all_children )
-		{	// ALL Children have already been revealed: (can happen even if we require a subset *now*)
+		{	// All children have already been revealed: (can happen even if we require a subset *now*)
 			return;
-			/* RETURN */
 		}
 
 		if( empty($this->subset_property) )
-		{	// We are not handling subsets
+		{	// We are not handling a subset but everything instead:
 
-			echo 'Revealing all children -- this is not yet handling all edge cases that the subset version can handle';
+			echo 'DEBUG - PARTIAL IMPLEMENTATION - Revealing all children -- this is not yet handling all edge cases that the subset version can handle';
 
 			// Make sure everything has been loaded:
 			$this->load_all();
@@ -158,15 +158,15 @@ class GenericCategoryCache extends GenericCache
 			$this->revealed_all_children = true;
 		}
 		else
-		{	// We are handling subsets
+		{	// We are handling a subset (for example Chapers of a specific blog_ID only):
 
 			if( is_null( $subset_ID ) )
-			{	// No specific subset requested, we are going to reveal all subsets
+			{	// No specific subset requested, we are going to reveal all subsets in a row:
 
 				// Make sure everything has been loaded:
 				$this->load_all();
 
-				echo 'REVEALING ALL SUBSETS in a row. Is this needed?';
+				echo 'DEBUG - PARTIAL IMPLEMENTATION - REVEALING ALL SUBSETS in a row. Is this needed?';
 
 				foreach( $this->subset_cache as $subset_ID => $dummy )
 				{
@@ -176,11 +176,12 @@ class GenericCategoryCache extends GenericCache
 				$this->revealed_all_children = true;
 			}
 			else
-			{	// We're interested in a specific subset
+			{	// We're interested in a specific subset:
+				// *** THIS IS THE CASE USED IN B2EVOLUTION ***
+
 				if( !empty( $this->revealed_subsets[$subset_ID] ) )
 				{	// Children have already been revealed:
 					return;
-					/* RETURN */
 				}
 
 				$Timer->resume('reveal_children', false );
@@ -195,13 +196,13 @@ class GenericCategoryCache extends GenericCache
 				{	// There are loaded categories
 
 					// Now check that each category has a path to the root:
-					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin copy of the object :(((
+					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin COPY of the object :(((
 					{
 						$this->check_path_to_root( $subset_ID, $cat_ID );
 					}
 
-					// loop on all loaded categories to set their children list if it has some:
-					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin copy of the object :(((
+					// loop on all loaded categories to set their children list if they have some:
+					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin COPY of the object :(((
 					{
 						$GenericCategory = & $this->subset_cache[$subset_ID][$cat_ID];
 						// echo '<br>'.$cat_ID;
@@ -218,6 +219,18 @@ class GenericCategoryCache extends GenericCache
 							$this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}][] = & $GenericCategory; // $this->cache[$cat_ID];
 						}
 					}
+
+					// TODO: One option would be to pre-sort everything here...
+					// BUT it's probably better to sort at display time, only if we need to!
+					// 
+					// In case we wanted to presort here, we would od it approx like this:
+					// 1. Get sort order of requested collection (blog_ID) : either alphabetic or specifc order
+					// 2. Sort root categories against each other  --   sort( $this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}] )
+					// 3. Loop through all categories:
+					//   4. If this category has no children, continue to next cat
+					//   5. Get desired sort order for this categorie's children: either alphabetic or specific order or inherit from parent
+					//     6. If inhereited from parent, ask parent for sort order (which may trigger a recursion)
+					//   7. Sort children of this category against each other
 
 					$Timer->pause('reveal_children', false );
 
@@ -278,12 +291,14 @@ class GenericCategoryCache extends GenericCache
 	 * @param array categories list to display
 	 * @param integer depth of categories list
 	 * @param integer Max depth of categories list, 0/empty - is infinite
+	 * TODO: add a param to request sorting if we do want sorting (in some cases we don't need to sort, e-g: producing an XML sitemap)
+	 * The new param should probably be "$sorted = false" with possible other values being true or the sort order of the parent if we are in a recusion: 'alpha' or 'manual' (this will be used in case of inherit)
 	 *
 	 * @return string recursive list of all loaded categories
 	 */
 	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0, $max_level = 0 )
 	{
-		// Make sure children have been revealed for specific subset:
+		// Make sure children have been (loaded and) revealed for specific subset:
 		$this->reveal_children( $subset_ID );
 
 		if( is_null( $cat_array ) )
@@ -304,8 +319,18 @@ class GenericCategoryCache extends GenericCache
 
 		$r = '';
 
+		// TODO: if we want to display a $sorted list:
+		// 1. Check if this level of categories has been sorted before (don't do it twice)
+		// 2. Get sorting order for the current cat:
+		//    - If this is a root category, get if from the collection( blog_ID ): alphabetic or manual order
+		//    - If this is a child catgegory, get if from the category itself (new property): alphabetic or manual order or inherit from parent
+		//       - if inherited form parent, use the value received througg $order param
+		// 3. Sort level alphabetically or by order field
+
+		// Go through all categories at this level:
 		foreach( $cat_array as $cat )
 		{
+			// Display a category:
 			if( is_array( $callbacks['line'] ) )
 			{ // object callback:
 				$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $cat, $level ); // <li> Category  - or - <tr><td>Category</td></tr> ...
@@ -318,6 +343,7 @@ class GenericCategoryCache extends GenericCache
 			if( ! empty( $cat->children ) && ( empty( $max_level ) || $max_level > $level + 1 ) )
 			{ // Add children categories if they exist and no restriction by level depth:
 				$r .= $this->recurse( $callbacks, $subset_ID, $cat->children, $level + 1, $max_level );
+				// TODO: add false or sort order of parent to params above
 			}
 			elseif( is_array( $callbacks['no_children'] ) )
 			{ // object callback:
@@ -328,6 +354,7 @@ class GenericCategoryCache extends GenericCache
 				$r .= $callbacks['no_children']( $cat, $level ); // </li>
 			}
 		}
+
 
 		if( !empty( $cat->parent_ID ) && !empty( $callbacks['posts'] ) )
 		{	// Callback to display the posts under subchapters
@@ -341,8 +368,9 @@ class GenericCategoryCache extends GenericCache
 			}
 		}
 
+
 		if( ! empty( $r ) )
-		{
+		{ // We have something to display at this level, wrap in in before/after:
 			$r_before = '';
 			if( is_array( $callbacks['before_level'] ) )
 			{ // object callback:

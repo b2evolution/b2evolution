@@ -51,7 +51,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Site Settings').get_manual_link('site-settings') );
+$Form->begin_fieldset( T_('Global Site Settings').get_manual_link('site-settings') );
 
 	$Form->text_input( 'site_code', $Settings->get( 'site_code' ), 10, T_('Site code'), '$instance_name = '.$instance_name, array( 'maxlength' => 20 ) );
 	$Form->color_input( 'site_color', $Settings->get( 'site_color' ), T_('Site color'), T_('E-g: #ff0000 for red') );
@@ -78,7 +78,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Advanced Site Settings').get_manual_link('advanced-site-settings') );
+$Form->begin_fieldset( T_('Technical Site Settings').get_manual_link('technical-site-settings') );
 
 	$Form->duration_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), T_('Reload-page timeout'), 'minutes', 'seconds', array( 'minutes_step' => 1, 'required' => true ) );
 	// $Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,

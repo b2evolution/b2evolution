@@ -150,13 +150,18 @@ class coll_featured_intro_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		$params = array_merge( array(
+				'featured_intro_before' => '',
+				'featured_intro_after'  => '',
+			), $params );
+
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
 		if( $Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-			echo $this->disp_params['block_start'];
+			echo $this->disp_params['featured_intro_before'];
 			skin_include( $this->disp_params['skin_template'].'.inc.php', array(
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
@@ -168,8 +173,8 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
 				) );
-			echo $this->disp_params['block_end'];
-		// ----------------------------END ITEM BLOCK  ----------------------------
+			echo $this->disp_params['featured_intro_after'];
+			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
 	}

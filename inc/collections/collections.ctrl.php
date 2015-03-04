@@ -348,7 +348,7 @@ if( strpos( $action, 'new' ) === false && $action != 'create' )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->breadcrumbpath_add( T_('Site Settings'), '?ctrl=collections&amp;tab=site_settings' );
+			$AdminUI->breadcrumbpath_add( T_('Global Settings'), '?ctrl=collections&amp;tab=site_settings' );
 			init_colorpicker_js();
 			break;
 
@@ -356,7 +356,7 @@ if( strpos( $action, 'new' ) === false && $action != 'create' )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->breadcrumbpath_add( T_('Blog Settings'), '?ctrl=collections&amp;tab=blog_settings' );
+			$AdminUI->breadcrumbpath_add( T_('Common Collection Settings'), '?ctrl=collections&amp;tab=blog_settings' );
 			break;
 
 		case 'list':
@@ -366,7 +366,7 @@ if( strpos( $action, 'new' ) === false && $action != 'create' )
 					'action_url' => $ReqURI.'&order_action=update&order_data=',
 				) );
 
-			$AdminUI->breadcrumbpath_add( T_('Blogs'), '?ctrl=collections&amp;tab=list' );
+			$AdminUI->breadcrumbpath_add( T_('Collections'), '?ctrl=collections&amp;tab=list' );
 			break;
 	}
 }

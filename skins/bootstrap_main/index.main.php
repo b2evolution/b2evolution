@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8355 2015-02-27 10:18:59Z yura $
+	 * @version $Id: index.main.php 8403 2015-03-04 15:33:35Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -170,7 +170,6 @@ if( $disp != 'front' )
 				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
 				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
 				'item_class'   => 'featured_post',
-				'image_size'	 =>	'fit-400x320',
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
@@ -202,7 +201,6 @@ if( $disp != 'front' )
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'image_size'   => 'fit-400x320',
 					// Comment template
 					'comment_start'         => '<div class="panel panel-default">',
 					'comment_end'           => '</div>',

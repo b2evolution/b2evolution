@@ -232,7 +232,6 @@ div.edit_toolbar {
   border: 1px solid #becdd6;
   padding: 1px 2px;
   margin: 1px auto;
-  width: 98%;
 }
 div.edit_toolbar input {
   background: #fefefe url(../img/whitebar24.png) repeat-x center;
@@ -391,7 +390,7 @@ div.image_block {
   text-align: center;
 }
 div.image_block img {
-  margin: 1ex;
+  margin: 1ex 0;
 }
 .replied_comment div.image_block img {
   max-width: 100%;
@@ -1702,7 +1701,7 @@ form.inskin .edit_fieldgroup .label {
   display: none;
 }
 form.inskin .edit_area textarea {
-  width: 99%;
+  width: 100%;
 }
 table.catselect {
   border-spacing: 0;
@@ -2156,6 +2155,9 @@ span.NonExistentWikiWord {
 }
 
 /* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+.glyphicon {
+  font-family: 'Glyphicons Halflings' !important;
+}
 ul,
 ol {
   margin: 0 0 10px 25px;
@@ -2248,6 +2250,13 @@ ol {
 }
 .form-horizontal .compose_layout td.input div.tile label {
   display: none;
+}
+.form-horizontal #itemform_categories .panel-body.extracats {
+  padding: 0;
+}
+.form-horizontal #itemform_categories .panel-body.extracats table.table {
+  margin: 0;
+  border: none;
 }
 .form-horizontal #itemform_edit_timestamp > input[type=text] {
   display: inline-block;
@@ -2514,7 +2523,6 @@ legend.panel-heading {
 }
 div.comment_toolbars div.edit_toolbar,
 div.message_toolbars div.edit_toolbar {
-  width: 97%;
   padding-left: 0;
   padding-right: 0;
 }
@@ -2566,4 +2574,8 @@ a.evo_messages_link .badge {
 }
 .tt-dropdown-menu .tt-suggestion p {
   margin: 0;
+}
+.jumbotron {
+  font-size: 21px;
+  font-weight: 200;
 }

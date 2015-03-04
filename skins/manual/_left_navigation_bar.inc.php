@@ -19,23 +19,15 @@ global $Settings, $Session;
 <div id="sidebar" class="bSideBar">
 
 	<?php
-		// ------------------------- "Menu Top" CONTAINER EMBEDDED HERE --------------------------
+		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
 		// Note: this container is designed to be a single <ul> list
-		skin_container( NT_('Menu Top'), array(
+		skin_container( NT_('Sidebar'), array(
 				// The following params will be used as defaults for widgets included in this container:
 				'block_title_start'   => '',
 				'block_title_end'     => '',
-				'list_start'          => '',
-				'list_end'            => '',
-				'item_start'          => '',
-				'item_end'            => '',
 			) );
-		// ----------------------------- END OF "Menu Top" CONTAINER -----------------------------
-
-		// ------------------------- CATEGORIES -------------------------
-		$Skin->display_chapters();
-		// ------------------------- END OF CATEGORIES ------------------
+		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>
 
 	<?php

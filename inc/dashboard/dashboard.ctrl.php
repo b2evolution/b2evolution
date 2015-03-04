@@ -296,7 +296,7 @@ if( $blog )
 
 	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-6 col-xs-12">';
 
-	$side_item_Widget->title = T_('Manage your blog');
+	$side_item_Widget->title = T_('Manage this collection');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="dashboard_sidebar">';
@@ -320,7 +320,7 @@ if( $blog )
 			echo '<li><a href="'.$dispatcher.'?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
 		}
 
-		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this blog').'</a></li>';
+		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this collection').'</a></li>';
 	echo '</ul>';
 	echo '</div>';
 
@@ -330,7 +330,7 @@ if( $blog )
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
-		$side_item_Widget->title = T_('Customize your blog');
+		$side_item_Widget->title = T_('Customize this collection');
 		$side_item_Widget->disp_template_replaced( 'block_start' );
 
 		echo '<div class="dashboard_sidebar">';
@@ -367,7 +367,6 @@ else
 {	// We're on the GLOBAL tab...
 
 	$AdminUI->disp_payload_begin();
-	echo '<h2>'.T_('Select a blog').'</h2>';
 	// Display blog list VIEW:
 	$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 	$AdminUI->disp_payload_end();
@@ -435,7 +434,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		// Display a block with charts
 		$stat_item_Widget = new Widget( 'block_item' );
 
-		$stat_item_Widget->title = T_('Collection stats');
+		$stat_item_Widget->title = T_('Collection metrics');
 		$stat_item_Widget->disp_template_replaced( 'block_start' );
 
 		display_charts( $chart_data );
@@ -532,7 +531,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$stat_item_Widget = new Widget( 'block_item' );
 
-	$stat_item_Widget->title = T_('System stats');
+	$stat_item_Widget->title = T_('System metrics');
 	$stat_item_Widget->disp_template_replaced( 'block_start' );
 
 	display_charts( $chart_data );

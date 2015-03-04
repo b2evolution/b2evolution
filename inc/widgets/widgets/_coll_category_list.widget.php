@@ -255,7 +255,8 @@ class coll_category_list_Widget extends ComponentWidget
 				$tmp_disp .= $this->disp_params['item_end'];
 			}
 
-			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID, NULL, 0, $depth_level );
+			// Load current collection categories (if needed) and recurse through them:
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, /* subset ID */ $Blog->ID, NULL, 0, $depth_level );
 
 			if( ! empty($r) )
 			{
@@ -312,7 +313,8 @@ class coll_category_list_Widget extends ComponentWidget
 					echo $this->disp_params['coll_end'];
 				}
 
-				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID, NULL, 0, $depth_level );
+				// Load current collection categories (if needed) and recurse through them:
+				$r = $ChapterCache->recurse( $callbacks, /* subset ID */ $curr_blog_ID, NULL, 0, $depth_level );
 
 				if( ! empty($r) )
 				{

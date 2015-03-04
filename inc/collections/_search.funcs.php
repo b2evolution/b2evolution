@@ -223,6 +223,9 @@ function search_result_block( $params = array() )
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
+			'use_editor'            => false, // Use editor instead of author if it is allowed (only the posts have an editor)
+			'author_format'         => 'avatar_name', // @see User::get_identity_link() // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+			'date_format'           => locale_datefmt(),
 		), $params );
 
 	global $Blog, $Session, $search_result_loaded;
@@ -312,7 +315,6 @@ function search_result_block( $params = array() )
 
 	echo $params['block_start'];
 
-	$date_format = locale_datefmt();
 	for( $index = $from; $index < $to; $index++ )
 	{
 		$row = $search_result[ $index ];
@@ -320,47 +322,60 @@ function search_result_block( $params = array() )
 		{
 			case 'item':
 				$Item = $ItemCache->get_by_ID( $row['ID'] );
-				$creator_User = & $Item->get_creator_User();
 				$display_params = array(
-					'title' => $params['title_prefix_post'].$Item->get_title( array( 'link_type' => 'permalink' ) ),
+					'title'   => $params['title_prefix_post'].$Item->get_title( array( 'link_type' => 'permalink' ) ),
 					'excerpt' => $Item->get_excerpt2(),
-					'author' => $creator_User->get_identity_link(),
-					'creation_date' => mysql2date( $date_format, $Item->datecreated ),
-					'lastedit_date' => mysql2date( $date_format, $Item->datemodified ),
 				);
+				if( $params['use_editor'] )
+				{ // Get editor info to display
+					$lastedit_User = & $Item->get_lastedit_User();
+					if( empty( $lastedit_User ) )
+					{ // If editor is not defined yet then use author
+						$lastedit_User = & $Item->get_creator_User();
+					}
+					$display_params = array_merge( array(
+							'editor'        => $lastedit_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
+							'lastedit_date' => mysql2date( $params['date_format'], empty( $Item->datemodified ) ? $Item->datecreated : $Item->datemodified ),
+						), $display_params );
+				}
+				else
+				{ // Get author info to display
+					$creator_User = & $Item->get_creator_User();
+					$display_params = array_merge( array(
+							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
+							'creation_date' => mysql2date( $params['date_format'], $Item->datecreated ),
+							'lastedit_date' => mysql2date( $params['date_format'], $Item->datemodified ),
+						), $display_params );
+				}
 				break;
 
 			case 'comment':
 				$Comment = $CommentCache->get_by_ID( $row['ID'] );
 				$display_params = array(
-					'title' => $params['title_prefix_comment'].$Comment->get_permanent_link( '#item#' ),
+					'title'   => $params['title_prefix_comment'].$Comment->get_permanent_link( '#item#' ),
 					'excerpt' => excerpt( $Comment->content ),
-					'author' => $Comment->get_author( array(
-							'link_text'   => 'avatar',
+					'author'  => $Comment->get_author( array(
+							'link_text'   => $params['author_format'],
 							'thumb_size'  => 'crop-top-15x15',
 							'thumb_class' => 'avatar_before_login'
 						) ),
-					'creation_date' => mysql2date( $date_format, $Comment->date )
+					'creation_date' => mysql2date( $params['date_format'], $Comment->date )
 				);
 				break;
 
 			case 'category':
 				$Chapter = $ChapterCache->get_by_ID( $row['ID'] );
 				$display_params = array(
-					'title' => $params['title_prefix_category'].' <a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>',
+					'title'   => $params['title_prefix_category'].' <a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>',
 					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
-					'author' => '',
-					'creation_date' => '',
 				);
 				break;
 
 			case 'tag':
 				list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
 				$display_params = array(
-					'title' => $params['title_prefix_tag'].' <a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>',
+					'title'   => $params['title_prefix_tag'].' <a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>',
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
-					'author' => '',
-					'creation_date' => '',
 				);
 
 			default: // Other type of result is not implemented
@@ -481,16 +496,20 @@ function display_search_result( $params = array() )
 
 	// Content
 	echo $params['cell_content_start'];
-	echo !empty( $params['excerpt'] ) ? $params['excerpt'] : '&nbsp;';
+	echo ! empty( $params['excerpt'] ) ? $params['excerpt'] : '&nbsp;';
 	echo $params['cell_content_end'];
 
-	if( !empty( $params['author'] ) || $params['cell_author_empty'] !== false )
+	if( ! empty( $params['author'] ) || ! empty( $params['editor'] ) || $params['cell_author_empty'] !== false )
 	{ // Display author or empty string when no author
 		echo $params['cell_author_start'];
-		if( !empty( $params['author'] ) )
+		if( ! empty( $params['author'] ) )
 		{ // Display author if it is defined
 			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
 			printf( T_('Created by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
+		}
+		elseif( ! empty( $params['editor'] ) )
+		{ // Display editor if it is defined
+			echo T_('Last edit by ').$params['editor'].T_(' on ').$params['lastedit_date'];
 		}
 		else// $params['cell_author_empty'] !== false
 		{ // Display empty value if author is not defined

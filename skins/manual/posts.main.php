@@ -77,10 +77,14 @@ skin_include( '_left_navigation_bar.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 
-		if( !empty( $cat ) )
-		{	// Display breadcrumbs if some category is selected
-			$Skin->display_breadcrumbs( $cat );
-		}
+		// Display breadcrumbs if some category is selected
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'breadcrumb_path',
+				// Optional display params
+				'block_start' => '<div class="breadcrumbs">',
+				'block_end'   => '</div>',
+			) );
 	?>
 
 	<?php
@@ -221,7 +225,8 @@ skin_include( '_left_navigation_bar.inc.php' );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
-		$sub_chapters = $Skin->get_chapters( $cat );
+		// TODO: Use $ChapterCache in a way similar to _coll_category_list.widget.php
+		$sub_chapters = get_chapters( $Blog->ID, $cat );
 
 		if( $chapters_items_mode != 'order' && count( $sub_chapters ) > 0 )
 		{	// Display subchapters

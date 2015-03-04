@@ -97,7 +97,7 @@ $Form->begin_form( 'bComment' );
 	if( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) )
 	{ // Rating is editable
 		$edited_Comment->rating_input( array(
-				'before' => $Form->begin_field( 'comment_rating_field', T_('Rating') ),
+				'before' => $Form->begin_field( 'comment_rating_field', T_('Rating'), true ),
 				'after' => $Form->inputend.$Form->fieldend
 			) );
 	}

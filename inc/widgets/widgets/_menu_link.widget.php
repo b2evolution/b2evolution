@@ -17,7 +17,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 global $menu_link_widget_link_types;
 $menu_link_widget_link_types = array(
-		'home' => T_('Blog home'),
+		'home' => T_('Front Page'),
 		'recentposts' => T_('Recent posts'),
 		'search' => T_('Search page'),
 		'arcdir' => T_('Archive directory'),
@@ -499,7 +499,12 @@ class menu_link_Widget extends ComponentWidget
 			case 'home':
 			default:
 				$url = $current_Blog->get( 'url' );
-				$text = T_('Home');
+				$text = T_('Front Page');
+				global $is_front;
+				if( $disp == 'front' || ! empty( $is_front ) )
+				{ // Let's display the link as selected on front page
+					$link_class = $this->disp_params['link_selected_class'];
+				}
 		}
 
 		// Override default link text?

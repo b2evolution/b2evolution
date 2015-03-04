@@ -32,6 +32,13 @@ skin_include( '_html_header.inc.php' );
 // /skins/_html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HTML HEADER ---------------------------
 
+
+// ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
+// If site headers are enabled, they will be included here:
+siteskin_include( '_site_body_header.inc.php' );
+// ------------------------------- END OF SITE HEADER --------------------------------
+
+
 // -------------------------- BODY HEADER INCLUDED HERE --------------------------
 skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
@@ -71,14 +78,17 @@ skin_include( '_left_navigation_bar.inc.php' );
 	?>
 
 	<?php
-		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+		// --------------------------------- START OF CONTENT HIERARCHY --------------------------------
 		echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
-		$Skin->display_chapters( array(
-				'display_blog_title' => false,
-				'display_children'   => true,
-				'class_selected'     => ''
+		skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'content_hierarchy',
+				// Optional display params
+				'display_blog_title'   => false,
+				'open_children_levels' => 20,
+				'class_selected'       => ''
 			) );
-		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
+		// ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
 	?>
 </div>
 <?php
@@ -87,6 +97,13 @@ skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the generic
 // /skins/_body_footer.inc.php file into the current skin folder.
 // -------------------------------- END OF BODY FOOTER ---------------------------
+
+
+// ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
+// If site footers are enabled, they will be included here:
+siteskin_include( '_site_body_footer.inc.php' );
+// ------------------------------- END OF SITE FOOTER --------------------------------
+
 
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );

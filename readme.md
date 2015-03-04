@@ -1,6 +1,6 @@
 # b2evolution CCMS
 
-This is version 6.0.0-alpha (from the so-called "i7" branch).
+This is version **6.0.0-alpha** (from the so-called "i7" branch).
 
 ## A complete engine for your website !
 
@@ -16,7 +16,7 @@ Basically, all you need is a [standard web hosting plan](http://b2evolution.net/
 
 More specifically, your web server should support PHP 5.2+, MySQL 5+ & Apache 2+. [More info here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 
-## Download
+## Downloading
 
 ### With Bower
 
@@ -29,13 +29,13 @@ You can download releases either from GitHub or from b2evolution.net :
 - https://github.com/b2evolution/b2evolution/releases
 - http://b2evolution.net/downloads/
 
-## Installation: Amazing 3-minute install (wink ;)
+## Installation: Amazing 3-minute install ;)
 
-(If you're well trained, you can actually do it in less than 3 minutes...)
+Upload everything to your web server and call the installation script that you will find at `/install/index.php` on your website. Then you just need to enter your database connection details and the installer will take care of everything for you.
 
-Upload everything to your web server and call the installation script that you will find at `/install/index.php` on your website. Then you just need to enter your database connection details and the installer will take car eof everything for you.
+Now, you might ask for more details here... Totally legitimate! Please check out our [Getting Stated - Installation Guide](http://b2evolution.net/man/getting-started).
 
-Now, if you're reading this, you probably want a little or even luch more details. Please head over to our complete and illustrated [Getting Stated - Installation Guide](http://b2evolution.net/man/getting-started).
+Hint: It is possible to install b2evolution in less than 3 minutes. Probably not the first time though. (And the same is true for anyone else claiming a 5 minute install process.)
 
 ## Upgrading
 
@@ -45,11 +45,11 @@ b2evolution includes an automatic upgrade feature which you can use to automatic
 
 ### Manual upgrade
 
-You can download any newer version (including beta releases), overwrite the files of your current install (after backup) and then run the install script.
+You can download any newer version (including beta releases), overwrite the files of your current installation (after backup) and then run the install script.
 
 The installation script will detect that the b2evolution database is already installed (any version) and offer to upgrade it to the current version.
 
-More info: http://b2evolution.net/man/installation-upgrade/upgrading/
+There are [several other upgrade options](http://b2evolution.net/man/upgrading).
 
 ## GitHub
 

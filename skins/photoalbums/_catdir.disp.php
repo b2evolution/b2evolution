@@ -29,6 +29,7 @@ $params_no_content = array(
 	);
 
 // Get only root categories of this blog
+// TODO: Use $ChapterCache in a way similar to _coll_category_list.widget.php
 $chapters = get_chapters( $Blog->ID );
 
 // Boolean var to know when at least one post is displayed

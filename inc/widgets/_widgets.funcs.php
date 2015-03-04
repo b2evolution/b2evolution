@@ -173,48 +173,57 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Menu Top', 'coll_search_form', 'core', 1, $menu_top_params );
 
 	/* Sidebar */
-	if( $test_install_all_features )
-	{	// Add User login widget
-		add_basic_widget( $blog_id, 'Sidebar', 'user_login', 'core', 10 );
+	if( $kind == 'manual' )
+	{
+		$search_form_params = array( 'title' => T_('Search this manual:') );
+		add_basic_widget( $blog_id, 'Sidebar', 'coll_search_form', 'core', 10, $search_form_params );
+		add_basic_widget( $blog_id, 'Sidebar', 'content_hierarchy', 'core', 20 );
 	}
-	if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
-	{ // Don't install these Sidebar widgets for blog 'Forums'
-		add_basic_widget( $blog_id, 'Sidebar', 'coll_avatar', 'core', 20 );
-		if( $blog_id > $blog_a_ID )
-		{
-			add_basic_widget( $blog_id, 'Sidebar', 'evo_Calr', 'plugin', 30 );
+	else
+	{
+		if( $test_install_all_features )
+		{	// Add User login widget
+			add_basic_widget( $blog_id, 'Sidebar', 'user_login', 'core', 10 );
 		}
-		add_basic_widget( $blog_id, 'Sidebar', 'coll_longdesc', 'core', 40, array( 'title' => '$title$' ) );
-		add_basic_widget( $blog_id, 'Sidebar', 'coll_search_form', 'core', 50 );
-		add_basic_widget( $blog_id, 'Sidebar', 'coll_category_list', 'core', 60 );
+		if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
+		{ // Don't install these Sidebar widgets for blog 'Forums'
+			add_basic_widget( $blog_id, 'Sidebar', 'coll_avatar', 'core', 20 );
+			if( $blog_id > $blog_a_ID )
+			{
+				add_basic_widget( $blog_id, 'Sidebar', 'evo_Calr', 'plugin', 30 );
+			}
+			add_basic_widget( $blog_id, 'Sidebar', 'coll_longdesc', 'core', 40, array( 'title' => '$title$' ) );
+			add_basic_widget( $blog_id, 'Sidebar', 'coll_search_form', 'core', 50 );
+			add_basic_widget( $blog_id, 'Sidebar', 'coll_category_list', 'core', 60 );
 
-		if( $blog_id == $blog_home_ID )
-		{ // Advertisements, Install only for blog #1 home blog
-			add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 70, array(
-					'title' => 'Advertisement (Demo)',
-					'item_type' => 4000,
-					'blog_ID' => $blog_id,
-					'order_by' => 'RAND',
-					'limit' => 1,
-					'disp_title' => false,
-					'item_title_link_type' => 'linkto_url',
-					'attached_pics' => 'first',
-					'item_pic_link_type' => 'linkto_url',
-					'thumb_size' => 'fit-160x160',
-				) );
-		}
+			if( $blog_id == $blog_home_ID )
+			{ // Advertisements, Install only for blog #1 home blog
+				add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 70, array(
+						'title' => 'Advertisement (Demo)',
+						'item_type' => 4000,
+						'blog_ID' => $blog_id,
+						'order_by' => 'RAND',
+						'limit' => 1,
+						'disp_title' => false,
+						'item_title_link_type' => 'linkto_url',
+						'attached_pics' => 'first',
+						'item_pic_link_type' => 'linkto_url',
+						'thumb_size' => 'fit-160x160',
+					) );
+			}
 
-		if( $blog_id != $blog_b_ID )
-		{
-			add_basic_widget( $blog_id, 'Sidebar', 'coll_media_index', 'core', 80, 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+			if( $blog_id != $blog_b_ID )
+			{
+				add_basic_widget( $blog_id, 'Sidebar', 'coll_media_index', 'core', 80, 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+			}
+			if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
+			{
+				add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_home_ID, 'item_type' => '3000' ) );
+			}
 		}
-		if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
-		{
-			add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_home_ID, 'item_type' => '3000' ) );
-		}
+		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
+		add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );
 	}
-	add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
-	add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );
 
 	/* Sidebar 2 */
 	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );

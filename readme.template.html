@@ -1,0 +1,118 @@
+<!DOCTYPE  html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>b2evolution readme</title>
+		<!-- Bootstrap -->
+		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<style>
+			/* Space out content a bit */
+			body {
+			  padding-top: 20px;
+			  padding-bottom: 20px;
+			  font-size: 16px;
+			}
+
+			nav ul {
+				margin-top: 17px;
+			}
+
+			/* Everything but the jumbotron gets side spacing for mobile first views */
+			.header,
+			.footer {
+			  padding-right: 15px;
+			  padding-left: 15px;
+			}
+
+			/* Make the masthead heading the same height as the navigation */
+			.header h3 {
+			  padding-bottom: 19px;
+			  margin-top: 0;
+			  margin-bottom: 0;
+			  line-height: 40px;
+			}
+
+			/* Custom page footer */
+			.footer {
+				margin-top: 48px;
+			  padding-top: 19px;
+			  color: #777;
+			  border-top: 1px solid #e5e5e5;
+			}
+
+			/* Customize container */
+			@media (min-width: 768px) {
+			  .container {
+			    max-width: 730px;
+			  }
+			}
+
+  			h1, h2 {
+  				padding: 20px 0 8px;
+  				border-bottom: 1px solid #eee;
+  			}
+
+			.jumbotron {
+			  text-align: center;
+  				border-bottom: 1px solid #e5e5e5;
+  				margin-bottom: 42px;
+  			}
+  			.jumbotron h2 {
+  				padding-top: 0;
+  			}
+
+			/* Responsive: Portrait tablets and larger */
+			@media screen and (min-width: 768px) {
+			  /* Remove the padding we set earlier */
+			  .header,
+			  .footer {
+			    padding-right: 0;
+			    padding-left: 0;
+			  }
+			  /* Space out the masthead */
+			  .header {
+			    border-bottom: 1px solid #e5e5e5;
+			    margin-bottom: 30px;
+			  }
+			  .jumbotron .h1 {
+			  		font-size: 42px;
+			  }
+			}
+		</style>
+	</head>
+	<body>
+    <div class="container">
+      <div class="header">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" class="active"><a href="readme.html">Read me</a></li>
+            <li role="presentation"><a href="install/index.php">Installer</a></li>
+            <li role="presentation"><a href="index.php">Your site</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted"><a href="http://b2evolution.net/"><img src="rsc/img/b2evolution8.png" alt="b2evolution CCMS"></a></h3>
+      </div>
+
+      <div class="jumbotron">
+        <h2 class="h1">Welcome to b2evolution!</h2>
+        <p class="lead">If you're new to b2evolution, we recommend you follow our <a href="http://b2evolution.net/man/getting-started" class="text-nowrap">Getting Stated / Installation Guide</a>.</p>
+        <p class="lead">If you're about to upgrade make sure you know the different <a href="http://b2evolution.net/man/upgrading" class="text-nowrap">Upgrade Options</a>.</p>
+      </div>
+
+        <p class="text-muted">Tech-savvy users may find everything they need below...</p>
+
+<%=content%>
+
+      <footer class="footer">
+      	<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap">Project page on GitHub</a></p>
+        <p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
+        &bull; <a href="http://b2evolution.net/man/" class="text-nowrap">Online manual</a>
+        &bull; <a href="http://forums.b2evolution.net" class="text-nowrap">Get help from the community!</a>
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+	</body>
+</html>

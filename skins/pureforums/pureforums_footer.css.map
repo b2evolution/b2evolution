@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,OAAQ;EACP,UAAU,EAAE,KAAK;EACjB,KAAK,EAAE,OAAO;EACd,SAAS,EAAE,IAAI;EACf,WAAW,EAAE,IAAI;EACjB,WAAW,EAAE,kCAAkC",
+"sources": ["pureforums_footer.scss"],
+"names": [],
+"file": "pureforums_footer.css"
+}

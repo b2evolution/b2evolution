@@ -27,9 +27,19 @@ $params = array_merge( array(
 		'item_link_type'    => 'permalink',
 	), $params );
 
-if( ( $disp == 'single' ) && empty( $cat ) )
-{ // Display breadcrumb, but only if it was not displayed yet. When category is set then breadcrumbs is already displayed.
-	$Skin->display_breadcrumbs( $Item->main_cat_ID );
+if( $disp == 'single' )
+{ // Display the breadcrumb path
+	if( empty( $cat ) )
+	{ // Set a category as main of current Item
+		$cat = $Item->main_cat_ID;
+	}
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'breadcrumb_path',
+			// Optional display params
+			'block_start' => '<div class="breadcrumbs">',
+			'block_end'   => '</div>',
+		) );
 }
 ?>
 
@@ -84,32 +94,29 @@ if( ( $disp == 'single' ) && empty( $cat ) )
 		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
-	?>
 
-	<?php
-		// List all tags attached to this post:
-		$Item->tags( array(
-				'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
-				'after' =>          '</div>',
-				'separator' =>      ', ',
-			) );
+		if( ! $Item->is_intro() )
+		{ // Don't display this additional info for intro posts
 
-		echo '<p class="notes">';
-		$Item->author( array(
-				'before'    => T_('Created by '),
-				'after'     => ' &bull; ',
-				'link_text' => 'name',
-			) );
-		$Item->lastedit_user( array(
-				'before'    => T_('Last edit by '),
-				'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-				'link_text' => 'name',
-			) );
-		'</p>';
-		echo $Item->get_history_link( array(
-				'before'    => ' &bull; ',
-				'link_text' => T_('View history')
-			) );
+			// List all tags attached to this post:
+			$Item->tags( array(
+					'before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
+					'after'     => '</div>',
+					'separator' => ', ',
+				) );
+
+			echo '<p class="notes">';
+			$Item->lastedit_user( array(
+					'before'    => T_('Last edit by '),
+					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+					'link_text' => 'name',
+				) );
+			'</p>';
+			echo $Item->get_history_link( array(
+					'before'    => ' &bull; ',
+					'link_text' => T_('View history')
+				) );
+		}
 
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(

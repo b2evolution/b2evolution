@@ -134,12 +134,17 @@ skin_include( '_left_navigation_bar.inc.php' );
 
 			echo '<p>'.T_('or you can browse the table of contents below:').'</p>';
 
+			// --------------------------------- START OF CONTENT HIERARCHY --------------------------------
 			echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
-			$Skin->display_chapters( array(
-					'display_blog_title' => false,
-					'display_children'   => true,
-					'class_selected'     => ''
+			skin_widget( array(
+					// CODE for the widget:
+					'widget' => 'content_hierarchy',
+					// Optional display params
+					'display_blog_title'   => false,
+					'open_children_levels' => 20,
+					'class_selected'       => ''
 				) );
+			// ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
 
 			echo '</div>';
 		}

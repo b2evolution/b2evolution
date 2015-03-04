@@ -58,8 +58,16 @@ See manual for more.');
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_post_rendering' => 'opt-out' ) );
-		return parent::get_coll_setting_definitions( $default_params );
+		$default_params = array(
+				'default_post_rendering' => 'opt-in'
+			);
+
+		if( isset( $params['blog_type'] ) && $params['blog_type'] == 'manual' )
+		{ // Set the default settings depends on blog type
+			$default_params['default_post_rendering'] = 'opt-out';
+		}
+
+		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
 	}
 
 

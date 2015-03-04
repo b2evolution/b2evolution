@@ -697,14 +697,14 @@ class collections_Module extends Module
 			{
 				$AdminUI->add_menu_entries( 'blogs', array(
 						'site_settings' => array(
-									'text' => T_('Site Settings'),
+									'text' => T_('Global Site Settings'),
 									'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
 						),
 					) );
 			}
 			$AdminUI->add_menu_entries( 'blogs', array(
 					'list' => array(
-									'text' => T_('Blogs'),
+									'text' => T_('Site Collections'),
 									'href' => $admin_url.'?ctrl=collections&amp;tab=list',
 					),
 				) );
@@ -712,7 +712,7 @@ class collections_Module extends Module
 			{
 				$AdminUI->add_menu_entries( 'blogs', array(
 						'blog_settings' => array(
-							'text' => T_('Blog Settings'),
+							'text' => /* TRANS: settings common to all collections */ T_('Common Collection Settings'),
 							'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
 						),
 					) );
