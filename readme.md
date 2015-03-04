@@ -53,6 +53,6 @@ There are [several other upgrade options](http://b2evolution.net/man/upgrading).
 
 ## GitHub
 
-This version of b2evolution comes from the i7 branch on GitHub.
+This version of b2evolution comes from the "i7" (currently "master") branch on GitHub.
 
-All bug fixes and all new code are made available through GitHub before being packaged as releases. If you are interested in cutting-edge vesions, we recommend you [follow us on GitHub](https://github.com/b2evolution/b2evolution). 
+All bug fixes and all new code are made available through GitHub before being packaged as releases. If you are interested in cutting-edge versions, we recommend you [follow us on GitHub](https://github.com/b2evolution/b2evolution).
