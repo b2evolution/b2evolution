@@ -1,16 +1,19 @@
 echo Generate file list.
 # ending slash on purpose for sed to find and not confuse with /blogs/ in strings
 # exclude: events module and events skin
-find ../blogs/ -name "*.php" -not -wholename "*/events/*" > files.txt
+find .. -name "*.php" -not -wholename "*/_tests/*" > files.txt
 
 echo Extract strings.
-xgettext -D ../blogs/ -f files.txt --package-version=6 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
+xgettext -D . -f files.txt --package-version=6 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
 
-echo Correct paths.
-sed -i .bak s#../blogs//#../../../#g messages.pot
+#echo Correct paths.
+sed -i .bak "s#:\ \.\./#: ../../../#g" messages.pot
+
+#echo Correct Header.
+sed -i .bak s/CHARSET/UTF-8/ messages.pot
 
 echo Copy to locales folder.
-cp messages.pot ../blogs/locales/
+cp messages.pot ../locales/
 
 #echo Correct Header.
 #sed -i .bak s/PACKAGE/b2evolution/ ../blogs/locales/messages.pot
