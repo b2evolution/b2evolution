@@ -21,6 +21,12 @@ Modifications by yura:
 	    $x = $obj->method();
 	    ```
 	7. Split a list in two lists by paragraph after list element
+	8. Support additional params(id and class) for headers. Examples:
+	    - ###header {#header-id-value}                     => <h3 id="header-id-value">header</h3>
+	    - ##header {.header-class-value}                   => <h2 class="header-class-value">header</h2>
+	    - #header {.header-class-value#header-id-value}    => <h1 id="header-id-value" class="header-class-value">header</h1>
+	    - ####header {#header-id-value.header-class-value} => <h4 class="header-class-value" id="header-id-value">header</h4>
+	9. Don't apply <p> around list and already existing paragraph tags
 */
 
 class Parsedown
@@ -443,6 +449,10 @@ class Parsedown
 					{ // Don't apply <p> around item content separators
 						$markup .= $text."\n";
 					}
+					elseif( preg_match( '~^<(ul|ol|li|p)~i', $text ) || preg_match( '~</(ul|ol|li|p)>$~i', $text ) )
+					{ // Don't apply <p> around list and already existing paragraph tags
+						$markup .= $text;
+					}
 					elseif( $context === 'li' && $index === 0 )
 					{
 						$markup .= $text;
@@ -521,7 +531,41 @@ class Parsedown
 						}
 					}
 
-					$markup .= '<h'.$element['level'].'>'.$text.'</h'.$element['level'].'>'."\n";
+					// Parse the attributes
+					$attrs = array();
+					preg_match( '/([^\{]+)(\{([^\}]+)\})?/', $text, $header_matches );
+					if( isset( $header_matches[3] ) )
+					{ // Header has the additional attributes
+						$text = trim( $header_matches[1], ' #' );
+						if( preg_match_all( '/([#\.])([^#\.]+)/', $header_matches[3], $header_matches ) )
+						{
+							foreach( $header_matches[1] as $at_i => $attr_type )
+							{
+								if( $attr_type == '#' )
+								{ // id
+									$attrs['id'] = $header_matches[2][ $at_i ];
+								}
+								elseif( $attr_type == '.' )
+								{ // class
+									$attrs['class'] = $header_matches[2][ $at_i ];
+								}
+							}
+						}
+					}
+					else
+					{ // Header has no additional attibutes, Use text as value for id
+						$attrs['id'] = strtolower( preg_replace( '/\s+/i', '-', $text ) );
+					}
+
+					$header_attrs = '';
+					foreach( $attrs as $attr_key => $attr_value )
+					{
+						// clear the unallowed chars in attributes
+						$attr_value = preg_replace( '/[^a-z0-9\-_\s]/i', '', $attr_value );
+						$header_attrs .= ' '.$attr_key.'="'.trim( $attr_value ).'"';
+					}
+
+					$markup .= '<h'.$element['level'].$header_attrs.'>'.$text.'</h'.$element['level'].'>'."\n";
 
 					break;
 

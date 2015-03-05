@@ -263,17 +263,15 @@ form.bComment {
 	}
 }
 
-.bPost, .featurepost {
+.bPost, .featured_post {
 	margin-bottom: 2em;
 	.bTitle {
 		margin: 0;
 	}
-	.bSmallHead {
+	.small.text-muted {
 		margin: 4px 0 10px;
-		font-size: 84%;
-		color: #999;
 		a, a .glyphicon {
-			color: #999;
+			color: inherit;
 		}
 	}
 }
@@ -394,4 +392,19 @@ div.bSideItem {
 // Messages
 div.action_messages, div.log_container {
 	margin: 0;
+}
+
+// Positions on the action buttons near page titles
+.post_title {
+	display: table;
+	h2 {
+		display: table-cell;
+		margin: 0;
+		padding: 20px 0 10px;
+	}
+	.btn-group {
+		display: table-cell;
+		padding: 20px 0 10px 30px;
+		vertical-align: middle;
+	}
 }

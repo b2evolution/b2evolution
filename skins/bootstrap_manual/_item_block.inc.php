@@ -110,7 +110,7 @@ if( $disp == 'single' )
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 
-		if( ! $Item->is_intro() )
+		if( ! $Item->is_intro() && ! $Item->is_featured() )
 		{ // Don't display this additional info for intro posts
 
 			// List all tags attached to this post:

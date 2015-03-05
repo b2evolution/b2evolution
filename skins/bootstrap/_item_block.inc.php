@@ -36,15 +36,33 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 
 		if( $disp != 'single' && $disp != 'page' )
 		{ // Don't display this on disp=single because there is already title header in h2
+
+			$title_before = '<h2>';
+			$title_after = '</h2>';
+			if( $Item->is_intro() )
+			{ // Display a link to edit the post only for intro post, because for all other posts it is displayed below under title
+				$title_before = '<div class="post_title"><h2>';
+				$title_after = '</h2>'.$Item->get_edit_link( array(
+						'before' => '<div class="'.button_class( 'group' ).'">',
+						'after'  => '</div>',
+						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+						'class'  => button_class( 'text' ),
+					) ).'</div>';
+			}
+
 			$Item->title( array(
-					'before'    => '<h2 class="bTitle linked">',
-					'after'     => '</h2>',
+					'before'    => $title_before,
+					'after'     => $title_after,
 					'link_type' => 'permalink'
 				) );
 		}
 	?>
 
-	<div class="bSmallHead">
+	<?php
+	if( ! $Item->is_intro() )
+	{ // Don't display these data for intro posts
+	?>
+	<div class="small text-muted">
 	<?php
 		if( $Item->status != 'published' )
 		{
@@ -86,6 +104,9 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 		) );
 	?>
 	</div>
+	<?php
+	}
+	?>
 
 	<?php
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -98,13 +119,13 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 		// List all tags attached to this post:
 		$Item->tags( array(
-				'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
-				'after' =>          '</div>',
-				'separator' =>      ', ',
+				'before'    => '<div class="small">'.T_('Tags').': ',
+				'after'     => '</div>',
+				'separator' => ', ',
 			) );
 	?>
 
-	<div class="bSmallPrint">
+	<div class="small">
 		<?php
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
@@ -133,7 +154,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
-				'before_section_title' => '<h4>',
+				'before_section_title' => '<div class="clearfix"></div><h4>',
 				'after_section_title'  => '</h4>',
 				'author_link_text' => $params['author_link_text'],
 			), $params ) );
