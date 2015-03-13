@@ -118,6 +118,9 @@ if( $mode != 'upload' )
 
 	$Results->display();
 
+	// Print out JavaScript to change a link position
+	echo_link_position_js();
+
 	$Form->end_form( );
 }
 

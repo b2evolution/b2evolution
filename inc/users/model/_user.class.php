@@ -4317,7 +4317,7 @@ class User extends DataObject
 							$Blog = $BlogCache->get_by_ID( $blog, false );
 							$redirect_to = rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=userprefs' ) );
 						}
-						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to ).'"';
+						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to, '&amp;' ).'"';
 						$Messages->add( sprintf( T_('An email has been sent to your email address (%s). Please click on the link therein to activate your account. <a %s>More info &raquo;</a>' ), $this->dget('email'), $activate_info_link ), 'success' );
 					}
 					else
@@ -5356,7 +5356,7 @@ class User extends DataObject
 
 		if( $total_num_posts > 0 )
 		{ // Make a link to page with user's posts
-			$total_num_posts = '<a href="'.get_dispctrl_url( 'useritems&amp;user_ID='.$this->ID ).'"><b>'.$total_num_posts.'</b></a>';
+			$total_num_posts = '<a href="'.get_dispctrl_url( 'useritems', 'user_ID='.$this->ID ).'"><b>'.$total_num_posts.'</b></a>';
 		}
 		else
 		{
@@ -5395,7 +5395,7 @@ class User extends DataObject
 
 		if( $total_num_comments > 0 )
 		{ // Make a link to page with user's comments
-			$total_num_comments = '<a href="'.get_dispctrl_url( 'usercomments&amp;user_ID='.$this->ID ).'"><b>'.$total_num_comments.'</b></a>';
+			$total_num_comments = '<a href="'.get_dispctrl_url( 'usercomments', 'user_ID='.$this->ID ).'"><b>'.$total_num_comments.'</b></a>';
 		}
 		else
 		{

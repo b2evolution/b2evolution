@@ -8,7 +8,7 @@
  * 
  * @package admin
  * 
- * @version $Id: links.ctrl.php 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: links.ctrl.php 8437 2015-03-06 11:36:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -215,6 +215,9 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
+// require File Uploader js and css
+require_js( 'multiupload/fileuploader.js' );
+require_css( 'fileuploader.css' );
 
 $AdminUI->disp_html_head();
 $AdminUI->disp_body_top( false );
@@ -224,6 +227,9 @@ switch( $action )
 	case 'edit_links':
 		// Memorize 'action' for prev/next links
 		memorize_param( 'action', 'string', NULL );
+
+		// Used to get FileRoot ID of the current Blog
+		load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
 		// View attachments
 		$AdminUI->disp_view( 'links/views/_link_list.view.php' );

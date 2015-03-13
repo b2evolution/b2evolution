@@ -29,26 +29,6 @@ global $Debuglog;
 
 ?>
 <script type="text/javascript">
-	// Script to update the Blog URL preview:
-	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->gen_baseurl() ); ?>';
-
-	function update_urlpreview( baseurl )
-	{
-		if( typeof baseurl == 'string' )
-		{
-			blog_baseurl = baseurl;
-		}
-
-		if( document.getElementById( 'urlpreview' ).hasChildNodes() )
-		{
-			document.getElementById( 'urlpreview' ).firstChild.data = blog_baseurl;
-		}
-		else
-		{
-			document.getElementById( 'urlpreview' ).appendChild( document.createTextNode( blog_baseurl ) );
-		}
-	}
-
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -95,16 +75,16 @@ else
 	$blog_siteurl_absolute = 'http://';
 }
 
-$Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog_url_settings') );
+$Form->begin_fieldset( T_('Collection base URL').' ['.T_('Admin').']'.get_manual_link('blog_url_settings') );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
 
-		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Blog URL name'), T_('Used to uniquely identify this blog. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
+		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Collection URL name'), T_('Used to uniquely identify this collection. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
 
 		if( $default_blog_ID = $Settings->get('default_blog_ID') )
 		{
-			$Debuglog->add('Default blog is set to: '.$default_blog_ID);
+			$Debuglog->add('Default collection is set to: '.$default_blog_ID);
 			$BlogCache = & get_BlogCache();
 			if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
 			{ // Default blog exists
@@ -138,36 +118,49 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 			 * people have a hard time finding the settings. I personally couldn't care
 			 * less that there are 2 ways to do the same thing.
 			 */
-			array( 'default', T_('Default blog in index.php'),
-											$baseurl.'index.php ('.( !isset($defblog)
-												?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
+			array( 'baseurl', T_('Default collection on baseurl'),
+											$baseurl.' ('.( !isset($defblog)
+												?	/* TRANS: NO current default blog */ T_('No default collection is currently set')
 												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
 											')',
 										'',
-										'onclick="update_urlpreview( \''.$baseurl.'index.php\' );"'
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php\' );"'
+			),
+			array( 'default', T_('Default collection in index.php'),
+											$baseurl.'index.php ('.( !isset($defblog)
+												?	/* TRANS: NO current default blog */ T_('No default collection is currently set')
+												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
+											')',
+										'',
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php\' );"'
 			),
 			array( 'index.php', T_('Explicit param on index.php'),
 										$baseurl.'index.php?blog='.$edited_Blog->ID,
 										'',
-										'onclick="update_urlpreview( \''.$baseurl.'index.php?blog='.$edited_Blog->ID.'\' )"',
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php?blog='.$edited_Blog->ID.'\' )"',
+			),
+			array( 'extrabase', T_('Extra path on baseurl'),
+										$baseurl.'<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/ ('.T_('Requires mod_rewrite').')',
+										'',
+										'onclick="update_urlpreview( \''.$baseurl.'\', document.getElementById( \'blog_urlname\' ).value+\'/\' )"'
 			),
 			array( 'extrapath', T_('Extra path on index.php'),
-										$baseurl.'index.php/'.$edited_Blog->get( 'urlname' ),
+										$baseurl.'index.php/<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/',
 										'',
-										'onclick="update_urlpreview( \''.$baseurl.'index.php/\'+document.getElementById( \'blog_urlname\' ).value )"'
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php/\'+document.getElementById( \'blog_urlname\' ).value+\'/\' )"'
 			),
 			array( 'relative', T_('Relative to baseurl').':',
 										'',
 										'<span class="nobr"><code>'.$baseurl.'</code>'
 										.'<input type="text" id="blog_siteurl_relative" class="form_text_input form-control" name="blog_siteurl_relative" size="35" maxlength="120" value="'
 										.format_to_output( $blog_siteurl_relative, 'formvalue' )
-										.'" onkeyup="update_urlpreview( \''.$baseurl.'\'+this.value );"
-										onfocus="document.getElementsByName(\'blog_access_type\')[3].checked=true;
-										update_urlpreview( \''.$baseurl.'\'+this.value );" /></span>'.$siteurl_relative_warning,
+										.'" onkeyup="update_urlpreview( \''.$baseurl.'\', this.value );"
+										onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
+										update_urlpreview( \''.$baseurl.'\', this.value );" /></span>'.$siteurl_relative_warning,
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 			),
 			array( 'subdom', T_('Subdomain of basedomain'),
-										preg_replace( '#(https?://)#i', '$1'.$edited_Blog->urlname.'.', $baseurl ),
+										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
 										'',
 										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
 			),
@@ -176,11 +169,53 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 										'<input type="text" id="blog_siteurl_absolute" class="form_text_input form-control" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
 											.format_to_output( $blog_siteurl_absolute, 'formvalue' )
 											.'" onkeyup="update_urlpreview( this.value );"
-											onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
+											onfocus="document.getElementsByName(\'blog_access_type\')[7].checked=true;
 											update_urlpreview( this.value );" />'.$siteurl_absolute_warning,
 										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
 			),
-		), T_('Blog base URL'), true );
+		), T_('Collection base URL'), true );
+
+?>
+<script type="text/javascript">
+// Script to update the Blog URL preview:
+function update_urlpreview( baseurl, url_path )
+{
+	if( typeof( url_path ) != 'string' )
+	{
+		url_path = '';
+	}
+	if( ! baseurl.match( /\/[^\/]+\.[^\/]+$/ ) )
+	{
+		baseurl = baseurl.replace( /\/$/, '' ) + '/';
+	}
+	jQuery( '#urlpreview' ).html( baseurl + url_path );
+
+	baseurl = baseurl.replace( /^(.+\/)([^\/]+\.[^\/]+)?$/, '$1' );
+	jQuery( '#rsc_assets_url_type_relative' ).html( baseurl + 'rsc/' );
+	jQuery( '#media_assets_url_type_relative' ).html( baseurl + 'media/' );
+	jQuery( '#skins_assets_url_type_relative' ).html( baseurl + 'skins/' );
+}
+
+// Update blog url name in several places on the page
+jQuery( '#blog_urlname' ).bind( 'keyup blur', function()
+{
+	jQuery( '.blog_url_text' ).html( jQuery( this ).val() );
+	var blog_access_type_obj = jQuery( 'input[name=blog_access_type]:checked' );
+	if( blog_access_type_obj.length > 0 &&
+	    ( blog_access_type_obj.val() == 'extrabase' || blog_access_type_obj.val() == 'extrapath' || blog_access_type_obj.val() == 'subdom' ) )
+	{
+		blog_access_type_obj.click();
+	}
+} );
+
+// Select 'absolute' option when cursor is focused on input element
+jQuery( '[id$=_assets_absolute_url]' ).focus( function()
+{
+	var radio_field_name = jQuery( this ).attr( 'id' ).replace( '_absolute_url', '_url_type' );
+	jQuery( '[name=' + radio_field_name + ']' ).attr( 'checked', 'checked' );
+} );
+</script>
+<?php
 
 	}
 

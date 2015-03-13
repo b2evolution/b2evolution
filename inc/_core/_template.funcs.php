@@ -112,7 +112,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 * @var Hit
 	 */
 	global $Hit;
-	global $baseurl, $Blog, $htsrv_url_sensitive;
+	global $baseurl, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
@@ -138,47 +138,60 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		}
 		elseif( $redirect_to[0] == '/' )
 		{ // relative URL, prepend current host:
-			global $ReqHost;
 			$redirect_to = $ReqHost.$redirect_to;
 		}
 	}
 	// <fp
 
-	if( $redirect_to[0] == '/' )
+	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
+
+	$external_redirect = true; // Start with worst case, then whitelist:
+
+	if( $redirect_to[0] == '/' || $redirect_to[0] == '?' )
+	{  // We stay on the same domain or same page:
+		$external_redirect = false;
+	}
+	elseif( strpos($redirect_to, $dispatcher ) === 0 )
+	{	// $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
+		$external_redirect = false;
+	}
+	elseif( strpos($redirect_to, $baseurl) === 0 )
 	{
-		// TODO: until all calls to header_redirect are cleaned up:
-		global $ReqHost;
-		$redirect_to = $ReqHost.$redirect_to;
-		// debug_die( '$redirect_to must be an absolute URL' );
+	 	$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
+	 	$external_redirect = false;
+	}
+	elseif( strpos($redirect_to, $htsrv_url_sensitive) === 0 )
+	{
+	 	$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+	 	$external_redirect = false;
+	}
+	elseif( !empty($Blog) && strpos($redirect_to, $Blog->gen_baseurl()) === 0 )
+	{
+	 	$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
+	 	$external_redirect = false;
 	}
 
-	if( strpos($redirect_to, $htsrv_url_sensitive) === 0 /* we're going somewhere on $htsrv_url_sensitive */
-	 || strpos($redirect_to, $baseurl) === 0   /* we're going somewhere on $baseurl */ )
-	{
-		// Remove login and pwd parameters from URL, so that they do not trigger the login screen again:
-		// Also remove "action" get param to avoid unwanted actions
-		// blueyed> Removed the removing of "action" here, as it is used to trigger certain views. Instead, "confirm(ed)?" gets removed now
-		// fp> which views please (important to list in order to remove asap)
-		// dh> sorry, don't remember
-		// TODO: fp> action should actually not be used to trigger views. This should be changed at some point.
+
+	// Remove login and pwd parameters from URL, so that they do not trigger the login screen again (and also as global security measure):
+	$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
+
+	if( $external_redirect == false )
+	{	// blueyed> Removed "confirm(ed)?" so it doesn't do the same thing twice
 		// TODO: fp> confirm should be normalized to confirmed
-		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
+		$redirect_to = preg_replace( '~(?<=\?|&) (confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
-	if( ( $allow_redirects_to_different_domain != 'always' ) // Always allow redirects to different domains is not set
-	 && ( ! ( ( $allow_redirects_to_different_domain == 'only_redirected_posts' ) && $redirected_post ) ) ) // This is not a 'redirected' post display request
+
+	// Check if we're trying to redirect to an external URL:
+	if( $external_redirect // Attempting external redirect
+		&& ( $allow_redirects_to_different_domain != 'always' ) // Always allow redirects to different domains is not set
+		&& ( ! ( ( $allow_redirects_to_different_domain == 'only_redirected_posts' ) && $redirected_post ) ) ) // This is not a 'redirected' post display request
 	{ // Force header redirects into the same domain. Do not allow external URLs.
-		$redirect_url_parts = parse_url( $redirect_to );
-		$host = empty( $redirect_url_parts['host'] ) ? null : $redirect_url_parts['host'];
-		$baseurl_parts = parse_url( $baseurl );
-		$base_host = empty( $baseurl_parts['host'] ) ? null : $baseurl_parts['host'];
-		if( ( $host != null ) && ( $host !== $base_host ) && ( substr( $host, - ( strlen( $base_host ) + 1 ) ) != '.'.$base_host ) )
-		{ // The main domain of the redirect_to url and the base url doesn't match
-			$Messages->add( 'Tried to redirect to an external url!', 'error' );
-			syslog_insert( 'Tried to redirect to an external url: '.$redirect_to, 'error', NULL );
-			$redirect_to = $baseurl;
-		}
+		$Messages->add( T_('A redirection to an external URL was blocked for security reasons.'), 'error' );
+		syslog_insert( 'A redirection to an external URL '.$redirect_to.' was blocked for security reasons.', 'error', NULL );
+		$redirect_to = $baseurl;
 	}
+
 
 	if( is_integer($status) )
 	{
@@ -2273,21 +2286,10 @@ function display_login_form( $params )
 					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	if( $inskin || $params[ 'inskin_urls' ] )
-	{
-		$lost_password_url = regenerate_url( 'disp', 'disp=lostpassword' );
-	}
-	else
-	{
-		$lost_password_url = $secure_htsrv_url.'login.php?action=lostpassword&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $secure_htsrv_url) );
-	}
+	$lost_password_url = get_lostpassword_url( $redirect_to );
 	if( ! empty( $login ) )
 	{
-		$lost_password_url .= '&amp;'.$dummy_fields[ 'login' ].'='.rawurlencode($login);
-	}
-	if( ! empty( $redirect_to ) )
-	{
-		$lost_password_url .= '&amp;redirect_to='.rawurlencode( $redirect_to );
+		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
 	}
 	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
 
@@ -2520,19 +2522,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'btn-primary btn-lg' )) );
 
-	if( $params['inskin'] || $params['inskin_urls'] )
-	{
-		$login_url = regenerate_url( 'disp', 'disp=login' );
-	}
-	else
-	{
-		$login_url = $secure_htsrv_url.'login.php';
-	}
-	if( ! empty( $redirect_to ) )
-	{
-		$login_url = url_add_param( $login_url, 'redirect_to='.rawurlencode( $redirect_to ) );
-	}
-	$login_link = '<a href="'.$login_url.'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
+	$login_link = '<a href="'.get_login_url( get_param( 'source' ), $redirect_to ).'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
 
 	if( $params['inskin'] )
 	{

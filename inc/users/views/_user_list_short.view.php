@@ -110,7 +110,7 @@ $UserList->query();
 
 
 $filter_presets = array();
-$filter_presets['all'] = array( T_('All users'), get_dispctrl_url( 'users&amp;filter=new' ) );
+$filter_presets['all'] = array( T_('All users'), get_dispctrl_url( 'users', 'filter=new' ) );
 if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
 { // Allow to filter by members when Blog has an access only for members
 	$filter_presets['members'] = array( T_('Members'), get_dispctrl_url( 'users', 'membersonly=1&amp;filter=new' ) );
@@ -125,7 +125,7 @@ if( is_admin_page() )
 
 if( $UserList->is_filtered() )
 {	// Display link to reset filters only if some filter is applied
-	$filter_presets['reset'] = array( T_('Reset Filters'), get_dispctrl_url( 'users&amp;filter=reset' ), 'class="floatright"' );
+	$filter_presets['reset'] = array( T_('Reset Filters'), get_dispctrl_url( 'users', 'filter=reset' ), 'class="floatright"' );
 }
 
 $UserList->filter_area = array(

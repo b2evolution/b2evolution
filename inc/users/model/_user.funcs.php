@@ -188,7 +188,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 {
 	global $secure_htsrv_url;
 
-	if( !empty( $redirect_to ) )
+	if( ! empty( $redirect_to ) )
 	{
 		$redirect = $redirect_to;
 	}
@@ -198,7 +198,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
-	{ // use in-skin login
+	{ // Use in-skin login form of the current blog or of the special blog for login/register actions
 		if( empty( $blog_ID ) )
 		{ // Use current blog if it is not defined
 			global $blog;
@@ -208,41 +208,78 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( ! empty( $redirect ) )
 		{
-			$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $Blog->get( 'loginurl' ) ) );
+			$redirect = url_rel_to_same_host( $redirect, $Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 		}
-		$url = url_add_param( $Blog->get( 'loginurl' ), $redirect, '&' );
+		$url = $Blog->get( 'loginurl', array( 'glue' => '&' ) );
 	}
 	else
-	{ // Normal login
+	{ // Use normal/standard login form (without blog skin)
 		if( ! empty( $redirect ) )
 		{
-			$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $secure_htsrv_url ) );
+			$redirect = url_rel_to_same_host( $redirect, $secure_htsrv_url );
 		}
-		$url = $secure_htsrv_url.'login.php'.$redirect;
+		$url = $secure_htsrv_url.'login.php';
 	}
 
-	return url_add_param( $url, 'source='.rawurlencode($source), '&' );
+	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect ).'&source='.rawurlencode( $source ), '&' );
+}
+
+
+/**
+ * Get url to show user a form to restore a lost passowrd
+ *
+ * @param string URL to redirect
+ * @param string delimiter to use for more url params
+ * @return string URL
+ */
+function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
+{
+	global $Blog, $secure_htsrv_url;
+
+	if( empty( $redirect_to ) )
+	{ // Redirect back to current URL
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+	}
+
+	if( use_in_skin_login() )
+	{ // Use in-skin lostpassword form of the current blog or of the special blog for login/register actions
+		$lostpassword_url = $Blog->get( 'lostpasswordurl', array( 'glue' => $glue ) );
+	}
+	else
+	{ // Use normal/standard lostpassword form (without blog skin)
+		$lostpassword_url = $secure_htsrv_url.'login.php?action=lostpassword';
+	}
+
+	return url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
 }
 
 
 /**
  * Get url to show user activate info screen
+ *
+ * @param string URL to redirect
+ * @param string delimiter to use for more url params
+ * @return string URL
  */
-function get_activate_info_url( $redirect_to = NULL )
+function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 {
 	global $Blog, $secure_htsrv_url;
 
 	if( empty( $redirect_to ) )
-	{ // redirect back to current URL
-		$redirect_to = rawurlencode( url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url ) );
+	{ // Redirect back to current URL
+		$redirect_to = rawurlencode( url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url ) );
 	}
 
 	if( use_in_skin_login() )
-	{ // use in-skin login is set, use in-skin activate info page
-		return url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo&redirect_to='.$redirect_to, '&' );
+	{ // Use in-skin activate info page of the current blog or of the special blog for login/register actions
+		$activateinfo_url = $Blog->get( 'activateinfourl', array( 'glue' => $glue ) );
+	}
+	else
+	{ // Use normal/standard lostpassword form (without blog skin)
+		$activateinfo_url = $secure_htsrv_url.'login.php?action=req_validatemail';
 	}
 
-	return $secure_htsrv_url.'login.php?action=req_validatemail&redirect_to='.$redirect_to;
+	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
 }
 
 
@@ -363,19 +400,24 @@ function use_in_skin_login()
 	global $Blog, $blog;
 
 	if( is_admin_page() )
-	{
+	{ // Back-office page
 		return false;
 	}
 
-	if( !isset( $blog ) )
-	{
+	if( ! isset( $blog ) )
+	{ // No current blog selected
 		return false;
+	}
+
+	if( get_setting_Blog( 'login_blog_ID' ) )
+	{ // If special blog is defined for all login actions
+		return true;
 	}
 
 	$BlogCache = & get_BlogCache();
 	$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( empty( $Blog ) )
-	{
+	{ // No current blog found in DB
 		return false;
 	}
 
@@ -522,7 +564,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 	}
 
 	if( use_in_skin_login() )
-	{
+	{ // Use in-skin register form of the current blog or of the special blog for login/register actions
 		if( empty( $blog_ID ) )
 		{ // Use current blog if it is not defined
 			global $blog;
@@ -532,22 +574,22 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
 
-		$register_url = url_add_param( $Blog->get( 'url' ), 'disp=register', $glue );
+		$register_url = $Blog->get( 'registerurl', array( 'glue' => $glue ) );
 	}
 	else
-	{
+	{ // Use normal/standard register form (without blog skin)
 		$register_url = $secure_htsrv_url.'register.php';
 	}
 
-	// Source=
+	// Source
 	$source = param( 'source', 'string', '' );
-	if( empty($source) )
+	if( empty( $source ) )
 	{
 		$source = $default_source_string;
 	}
-	if( ! empty($source) )
+	if( ! empty( $source ) )
 	{
-		$register_url = url_add_param( $register_url, 'source='.rawurlencode($source), $glue );
+		$register_url = url_add_param( $register_url, 'source='.rawurlencode( $source ), $glue );
 	}
 
 	if( ! isset( $redirect_to ) )
@@ -3851,9 +3893,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	}
 	else
 	{ // Url to activate email address
-		$url_change_email = ! $is_admin_page && $Blog->get_setting( 'in_skin_login' ) ?
-			url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo' ) :
-			get_secure_htsrv_url().'login.php?action=req_validatemail';
+		$url_change_email = get_activate_info_url( NULL, '&amp;' );
 	}
 
 	// Url to change status

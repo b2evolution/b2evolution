@@ -284,13 +284,17 @@ switch( $action )
 		// Enable site skins
 		$Settings->set( 'site_skins_enabled', param( 'site_skins_enabled', 'integer', 0 ) );
 
+		// Default blog
+		$Settings->set( 'default_blog_ID', param( 'default_blog_ID', 'integer', 0 ) );
+
 		// Blog for info pages
 		$Settings->set( 'info_blog_ID', param( 'info_blog_ID', 'integer', 0 ) );
 
-		if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
-		{
-			$Settings->set( 'default_blog_ID', $default_blog_ID );
-		}
+		// Blog for login|registration
+		$Settings->set( 'login_blog_ID', param( 'login_blog_ID', 'integer', 0 ) );
+
+		// Blog for messaging
+		$Settings->set( 'msg_blog_ID', param( 'msg_blog_ID', 'integer', 0 ) );
 
 		// Reload page timeout
 		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
@@ -422,6 +426,26 @@ switch( $action )
 
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
+
+		// Check if the deleting blog is used as default blog and Display a warning
+		if( $default_Blog = & get_setting_Blog( 'default_blog_ID' ) && $default_Blog->ID == $edited_Blog->ID )
+		{ // Default blog
+			$Messages->add( T_('WARNING: You are about to delete the default collection.'), 'warning' );
+		}
+		if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) && $info_Blog->ID == $edited_Blog->ID  )
+		{ // Info blog
+			$Messages->add( T_('WARNING: You are about to delete the collection used for info pages.'), 'warning' );
+		}
+		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $login_Blog->ID == $edited_Blog->ID  )
+		{ // Login blog
+			$Messages->add( T_('WARNING: You are about to delete the collection used for login/registration pages.'), 'warning' );
+		}
+		if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $msg_Blog->ID == $edited_Blog->ID  )
+		{ // Messaging blog
+			$Messages->add( T_('WARNING: You are about to delete the collection used for messaging pages.'), 'warning' );
+		}
+		$Messages->display();
+
 		// Not confirmed
 		if( $current_User->check_perm( 'files', 'view', false ) )
 		{ // User has permission to view files in this blog's fileroot, diplay link
@@ -430,7 +454,7 @@ switch( $action )
 		}
 		else
 		{ // User has no permission to view files in this blog's fielroot
-			$delete_warning = T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s <a %s>fileroot</a> !');
+			$delete_warning = T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s fileroot !');
 		}
 		?>
 		<div class="panelinfo">

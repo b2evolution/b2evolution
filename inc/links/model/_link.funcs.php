@@ -78,13 +78,12 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	if( $creating )
 	{	// Creating new Item
-		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
+		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Link existing files').'</a>';
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
-		$Form->hidden( 'is_attachments', 'false' );
 
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
-		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
+		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
 		echo '</td></tr></table>';
 
 		$Form->end_fieldset();
@@ -106,12 +105,11 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{	// Check that we have permission to edit owner:
 		$fieldset_title .= ' - '
-			.action_icon( T_('Add/Link files'), 'folder',
+			.action_icon( T_('Link existing files'), 'folder',
 				$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID(),
-				T_('Add/Link files'), 3, 4,
+				T_('Link existing files'), 3, 4,
 				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' )
-			)
-			.' <span class="note">(popup)</span>';
+			);
 	}
 
 	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold ) );
@@ -161,12 +159,15 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 
 jQuery( document ).ready( function()
 {
-	jQuery( '#attachmentframe' ).load( function()
-	{ // Expand the frame height if it is more than wrapper height (but max height is 320px)
-		if( this.contentWindow.document.body.offsetHeight > jQuery( '#attachmentframe_wrapper' ).height() )
-		{
-			jQuery( '#attachmentframe_wrapper' ).css( 'height', this.contentWindow.document.body.offsetHeight < 320 ? this.contentWindow.document.body.offsetHeight : 320 );
+	jQuery( '#attachmentframe' ).bind( 'load', function()
+	{
+		var body_height = jQuery( '#attachmentframe' ).contents().find( 'body' ).height();
+		if( body_height > jQuery( '#attachmentframe_wrapper' ).height() )
+		{ // Expand the frame height if it is more than wrapper height (but max height is 320px)
+			jQuery( '#attachmentframe_wrapper' ).css( 'height', body_height < 320 ? body_height : 320 );
 		}
+		// Set max-height on each iframe reload in order to avoid a space after upload button
+		jQuery( '#attachmentframe_wrapper' ).css( 'max-height', body_height );
 	} );
 	jQuery( '#attachmentframe_wrapper' ).resizable(
 	{ // Make the frame wrapper resizable
@@ -179,6 +180,10 @@ jQuery( document ).ready( function()
 		stop: function( e, ui )
 		{ // Remove the temp div element
 			ui.element.find( '#attachmentframe_disabler' ).remove();
+		},
+		resize: function( e, ui )
+		{ // Limit max height
+			jQuery( '#attachmentframe_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachmentframe' ).contents().find( 'body' ).height() );
 		}
 	} );
 	jQuery( document ).on( 'click', '#attachmentframe_wrapper .ui-resizable-handle', function()
@@ -258,45 +263,39 @@ function display_attachments( & $LinkOwner, $params = array() )
  *               'first'  - Current row is first in whole list
  *               'last'   - Current row is last in whole list
  *               'middle' - Current row is not first and not last
+ * @param string Link type
  * @return string
  */
-function link_actions( $link_ID, $row_idx_type = '' )
+function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 {
 	/**
 	 * @var File
 	 */
 	global $current_File;
 	global $LinkOwner, $current_User;
-	global $iframe_name, $admin_url;
+	global $iframe_name, $admin_url, $blog;
 
 	$r = '';
+
+	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
 
 	// Change order.
 	if( $LinkOwner->check_perm( 'edit' ) )
 	{ // Check that we have permission to edit LinkOwner object:
-		if( $row_idx_type != 'first' && $row_idx_type != 'single' )
-		{ // Allow to move up all rows except of first
-			$r .= action_icon( T_('Move upwards'), 'move_up',
-				regenerate_url( 'ctrl,link_object_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up&amp;'.url_crumb('link') ) );
-		}
-		else
-		{
-			$r .= get_icon( 'nomove' ).' ';
-		}
 
-		if( $row_idx_type != 'last' && $row_idx_type != 'single' )
-		{ // Allow to move down all rows except of last
-			$r .= action_icon( T_('Move down'), 'move_down',
-				regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down&amp;'.url_crumb('link') ) );
-		}
-		else
-		{
-			$r .= get_icon( 'nomove' ).' ';
-		}
+		// Allow to move up all rows except of first, This action icon is hidden by CSS for first row
+		$r .= action_icon( T_('Move upwards'), 'move_up',
+						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+						array( 'class' => 'action_icon_link_move_up' ) );
+
+		// Allow to move down all rows except of last, This action icon is hidden by CSS for last row
+		$r .= ' '.action_icon( T_('Move down'), 'move_down',
+						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+						array( 'class' => 'action_icon_link_move_down' ) );
 	}
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
-	{
+	{ // Locate file
 		$title = $current_File->is_dir() ? T_('Locate this directory!') : T_('Locate this file!');
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
 		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
@@ -310,12 +309,12 @@ function link_actions( $link_ID, $row_idx_type = '' )
 	if( $LinkOwner->check_perm( 'edit' ) )
 	{ // Check that we have permission to edit LinkOwner object:
 		$r .= action_icon( T_('Delete this link!'), 'unlink',
-		                  regenerate_url( 'ctrl,p,itm_ID,action', 'ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ), NULL, NULL, NULL,
-		                  array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
 	}
 
-	if( $current_File )
-	{	// Display icon to insert image into post inline
+	if( $link_type == 'item' && $current_File )
+	{ // Display icon to insert image into post inline
 		$type = $current_File->is_image() ? 'image' : 'file';
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => T_('Insert image into the post'),
@@ -344,9 +343,7 @@ function display_link_position( & $row )
 	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
 	$r = '<form action="" method="post">
 		<select id="'.$id.'" name="link_position">'
-		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>'
-		.'<script type="text/javascript">jQuery("#'.$id.'").change( { url: "'.$htsrv_url.'", crumb: "'.get_crumb( 'link' ).'" }, function( event ) {
-			evo_display_position_onchange( this, event.data.url, event.data.crumb ) } );</script>';
+		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>';
 
 	$r .= '<noscript>';
 	// Add hidden fields for non-JS
@@ -362,7 +359,27 @@ function display_link_position( & $row )
 	$r .= '</noscript>';
 	$r .= '</form>';
 
-	return $r;
+	return str_replace( array( "\r", "\n" ), '', $r );
+}
+
+
+/**
+ * Print out JavaScript to change a link position
+ */
+function echo_link_position_js()
+{
+	global $htsrv_url;
+?>
+<script type="text/javascript">
+jQuery( document ).on( 'change', 'select[id^=display_position_]', {
+		url:   '<?php echo $htsrv_url; ?>',
+		crumb: '<?php echo get_crumb( 'link' ); ?>'
+}, function( event )
+{
+	evo_display_position_onchange( this, event.data.url, event.data.crumb );
+} );
+</script>
+<?php
 }
 
 

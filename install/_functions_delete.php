@@ -37,4 +37,43 @@ function db_delete()
 	}
 }
 
+
+/**
+ * Uninstall b2evolution: Delete DB & Cache files
+ */
+function uninstall_b2evolution()
+{
+	global $DB;
+
+	/* REMOVE PAGE CACHE */
+	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+
+	// Remove general page cache
+	$PageCache = new PageCache( NULL );
+	$PageCache->cache_delete();
+
+	// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
+	if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
+	{ // Get all blogs
+		$blogs_SQL = new SQL();
+		$blogs_SQL->SELECT( 'blog_ID' );
+		$blogs_SQL->FROM( 'T_blogs' );
+		$blogs = $DB->get_col( $blogs_SQL->get() );
+
+		$BlogCache = & get_BlogCache( 'blog_ID' );
+		foreach( $blogs as $blog_ID )
+		{
+			$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+			// Remove page cache of current blog
+			$PageCache = new PageCache( $Blog );
+			$PageCache->cache_delete();
+		}
+	}
+
+	/* REMOVE DATABASE */
+	db_delete();
+
+	echo '<p>'.T_('Reset done!').'</p>';
+}
 ?>

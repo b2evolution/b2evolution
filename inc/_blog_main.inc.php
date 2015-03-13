@@ -543,7 +543,7 @@ elseif( $disp == '-' )
 		{	// We are not on the canocial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, true );
+				header_redirect( $canonical_url, empty( $debug_containers ) ? true : 303 );
 			}
 			else
 			{	// Use link rel="canoncial":

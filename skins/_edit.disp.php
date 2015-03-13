@@ -78,14 +78,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		{	// Edit post
 			$Form->hidden( 'post_ID', $edited_Item->ID );
 		}
-
-		// Here we add js code for attaching file popup window: (Yury)
-		if( !empty( $edited_Item->ID ) && ( $Session->get('create_edit_attachment') === true ) )
-		{	// item also created => we have $edited_Item->ID for popup window:
-			echo_attaching_files_button_js( $iframe_name );
-			// clear session variable:
-			$Session->delete('create_edit_attachment');
-		}
 	}
 	$Form->hidden( 'redirect_to', $redirect_to );
 

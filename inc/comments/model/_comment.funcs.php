@@ -571,7 +571,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	elseif( $current_User->check_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
-		$activateinfo_link = '<a href="'.get_activate_info_url( $item_url ).'">'.T_( 'More info &raquo;' ).'</a>';
+		$activateinfo_link = '<a href="'.get_activate_info_url( $item_url, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>';
 	}
 	// else -> user is logged in and account was activated
 

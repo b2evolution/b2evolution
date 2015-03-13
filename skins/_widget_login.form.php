@@ -50,9 +50,8 @@ $submit_button = array(
 $Form->begin_fieldset( '', array( 'class' => 'fieldset field_login_btn' ) );
 $Form->button_input( $submit_button );
 if( $Widget && $Widget->get_param('password_link_show') )
-{	// Display a link to recovery password
-	$lost_password_url = url_add_param( ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() ), 'disp=lostpassword' );
-	echo '<a href="'.$lost_password_url.'">'.$Widget->get_param('password_link').'</a>';
+{ // Display a link to recovery password
+	echo '<a href="'.get_lostpassword_url().'">'.$Widget->get_param('password_link').'</a>';
 }
 $Form->end_fieldset();
 

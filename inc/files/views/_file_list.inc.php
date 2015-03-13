@@ -228,15 +228,16 @@ $Form->begin_form();
 		if( ! $fm_flatmode ||
 		    ( $selected_Filelist->get_rds_list_path() === false && dirname( $lFile->get_rdfs_rel_path() ) == '.' ) ||
 		    ( $selected_Filelist->get_rds_list_path() == dirname( $lFile->get_rdfs_rel_path() ).'/' ) )
-		{ // Use attribute "rel" only for current folder and not for subfolders
+		{ // Use a hidden field only for current folder and not for subfolders
 		  // It is used to detect a duplicate file on quick upload
-			$td_filename_rel_attr = ' rel="'.$lFile->get_name().'"';
+			$filename_hidden_field = '<input type="hidden" value="'.$lFile->get_root_and_rel_path().'" />';
 		}
 		else
-		{ // Don't set attribute "rel" for this file because it is from another folder
-			$td_filename_rel_attr = '';
+		{ // Don't use the hidden field for this file because it is from another folder
+			$filename_hidden_field = '';
 		}
-		echo '<td class="fm_filename"'.$td_filename_rel_attr.'>';
+		echo '<td class="fm_filename">'
+			.$filename_hidden_field;
 
 			/*************  Invalid filename warning:  *************/
 
@@ -463,7 +464,7 @@ $Form->begin_form();
 	{ // Filelist errors or "directory is empty"
 		?>
 
-		<tr>
+		<tr class="noresults">
 			<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
 			<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 				<?php

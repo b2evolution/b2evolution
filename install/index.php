@@ -612,6 +612,15 @@ switch( $action )
 				/>
 				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?></label></p>
 			<p class="install_options">
+				<?php
+				if( $test_install_all_features && $allow_evodb_reset )
+				{ // Option to quick delete before new installation
+				?>
+				<span>
+					<input type="checkbox" name="delete_contents" id="delete_contents" value="1" checked="checked" />
+					<label for="delete_contents"><?php echo T_('Delete pre-existing b2evolution tables &amp; cache files.')?></label>
+				</span>
+				<?php } ?>
 				<span>
 					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
 					<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
@@ -783,7 +792,15 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$test_install_all_features = param( 'install_all_features', 'boolean', false );
+		$config_test_install_all_features = $test_install_all_features;
+		if( $test_install_all_features )
+		{ // Allow to use $test_install_all_features from request only when it is enabled in config
+			$test_install_all_features = param( 'install_all_features', 'boolean', false );
+		}
+		else
+		{
+			$test_install_all_features = false;
+		}
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
 		$expected_connection_charset = DB::php_to_mysql_charmap($evo_charset);
@@ -793,6 +810,22 @@ switch( $action )
 				$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
 			// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
 			break;
+		}
+
+		if( $config_test_install_all_features && $allow_evodb_reset )
+		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
+			$delete_contents = param( 'delete_contents', 'integer', 0 );
+
+			if( $delete_contents )
+			{ // A quick deletion is requested before new installation
+				require_once( dirname(__FILE__). '/_functions_delete.php' );
+
+				echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+				evo_flush();
+
+				// Uninstall b2evolution: Delete DB & Cache files
+				uninstall_b2evolution();
+			}
 		}
 
 		if( $old_db_version = get_db_version() )
@@ -956,36 +989,9 @@ switch( $action )
 				$DB->show_errors = $DB->halt_on_error = true;
 		*/
 
-		/* REMOVE PAGE CACHE */
-		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-
-		// Remove general page cache
-		$PageCache = new PageCache( NULL );
-		$PageCache->cache_delete();
-
-		// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
-		if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
-		{ // Get all blogs
-			$blogs_SQL = new SQL();
-			$blogs_SQL->SELECT( 'blog_ID' );
-			$blogs_SQL->FROM( 'T_blogs' );
-			$blogs = $DB->get_col( $blogs_SQL->get() );
-
-			$BlogCache = & get_BlogCache( 'blog_ID' );
-			foreach( $blogs as $blog_ID )
-			{
-				$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-				// Remove page cache of current blog
-				$PageCache = new PageCache( $Blog );
-				$PageCache->cache_delete();
-			}
-		}
-
-		/* REMOVE DATABASE */
-		db_delete();
+		// Uninstall b2evolution: Delete DB & Cache files
+		uninstall_b2evolution();
 		?>
-		<p><?php echo T_('Reset done!')?></p>
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;

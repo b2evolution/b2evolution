@@ -132,7 +132,7 @@ class GeneralSettings extends AbstractSettings
 		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
 		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
-		'upload_maxkb' => '10000',					// 10 MB
+		'upload_maxkb' => '32000',					// 32 MB
 		'evocache_foldername' => '.evocache',
 		'blogs_order_by' => 'order',				// blogs order in backoffice menu and other places
 		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
@@ -332,10 +332,12 @@ C message size exceeds',
 		{ // Database is not up to date:
 			if( $DB->last_error )
 			{
+				$error_title = 'The database is not installed yet!';
 				$error_message = '<p>MySQL error:</p>'.$DB->last_error;
 			}
 			else
 			{
+				$error_title = 'Database schema is not up to date!';
 				$error_message = '<p>Database schema is not up to date!</p>'
 					.'<p>You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
 					.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.</p>';

@@ -398,7 +398,6 @@ function create_default_settings( $override = array() )
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
 		'newusers_grp_ID' => $Group_Users->ID,
-		'default_blog_ID' => 1,
 		'evocache_foldername' => '_evocache',
 	);
 	if( $test_install_all_features )
@@ -611,7 +610,7 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin' );
+		install_plugin( 'watermark_plugin', $test_install_all_features );
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
@@ -623,7 +622,7 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'code_highlight_plugin', $test_install_all_features );
 		install_plugin( 'gmcode_plugin' );
 		install_plugin( 'wacko_plugin' );
-		install_plugin( 'wikilinks_plugin', $test_install_all_features );
+		install_plugin( 'wikilinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );

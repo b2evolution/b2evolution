@@ -129,7 +129,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	$login_note = '';
 	if( $is_logged_in && ( $User->ID == $current_User->ID ) && ( $User->check_status( 'can_be_validated' ) ) )
 	{ // Remind the current user that he has not activated his account yet:
-		$login_note = '<span style="color:red; font-weight:bold">[<a style="color:red" href="'.get_activate_info_url().'">'.T_('Not activated').'</a>]</span>';
+		$login_note = '<span style="color:red; font-weight:bold">[<a style="color:red" href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_('Not activated').'</a>]</span>';
 	}
 
 	$ProfileForm->info( T_('Login'), $User->get_colored_login(), $login_note );
@@ -229,16 +229,16 @@ $ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 		$is_contact = check_contact( $User->ID );
 		if( $is_contact )
 		{ // displayed user is on current User contact list
-			$contacts[] = action_icon( T_('On my contacts list'), 'allowback', url_add_param( $Blog->gen_blogurl(), 'disp=contacts' ), T_('On my contacts list'), 3, 4, array(), array( 'style' => 'margin: 0 2px' ) );
+			$contacts[] = action_icon( T_('On my contacts list'), 'allowback', $Blog->get( 'contactsurl' ), T_('On my contacts list'), 3, 4, array(), array( 'style' => 'margin: 0 2px' ) );
 			$contacts_groups = get_contacts_groups_list( $User->ID );
 		}
 		elseif( $is_contact !== NULL )
 		{ // displayed user is on current User contact list but it's blocked by current User
-			$contacts[] = get_icon( 'file_not_allowed', 'imgtag', array( 'style' => 'margin-left: 4px' ) ).T_('You have blocked this user').' - <a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=contacts&amp;action=unblock&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ).'">'.T_('Unblock').'</a>';
+			$contacts[] = get_icon( 'file_not_allowed', 'imgtag', array( 'style' => 'margin-left: 4px' ) ).T_('You have blocked this user').' - <a href="'.url_add_param( $Blog->get( 'contactsurl' ), 'action=unblock&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ).'">'.T_('Unblock').'</a>';
 		}
 		elseif( $current_User->check_status( 'can_edit_contacts' ) )
 		{ // user is not in current User contact list, so allow "Add to my contacts" action, but only if current User is activated
-			$contacts[] = action_icon( T_('Add to my contacts'), 'add', url_add_param( $Blog->gen_blogurl(), 'disp=contacts&amp;action=add_user&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ), T_('Add to my contacts'), 3, 4, array(), array( 'style' => 'margin: 0 2px 0 0' ) );
+			$contacts[] = action_icon( T_('Add to my contacts'), 'add', url_add_param( $Blog->get( 'contactsurl' ), 'action=add_user&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ), T_('Add to my contacts'), 3, 4, array(), array( 'style' => 'margin: 0 2px 0 0' ) );
 		}
 	}
 
@@ -288,7 +288,7 @@ $ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 			'Form'       => $ProfileForm,
 			'user_ID'    => $User->ID,
 			'crumb_name' => 'messaging_contacts',
-			'cancel_url' => url_add_param( $Blog->get('url'), 'disp=contacts&amp;user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ),
+			'cancel_url' => url_add_param( $Blog->get( 'contactsurl' ), 'user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ),
 		) );
 
 $ProfileForm->end_fieldset();

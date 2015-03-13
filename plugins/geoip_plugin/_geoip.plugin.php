@@ -622,7 +622,7 @@ jQuery( document ).ready( function()
 				}
 
 				// Success message
-				$this->print_tool_log( '<br />'.sprintf( T_('GeoIP.dat file was downloaded successfully, you can go to <a %s>here</a> to enabled the plugin.'), 'href="'.$admin_url.'?ctrl=plugins"' ) );
+				$this->print_tool_log( '<br />'.sprintf( T_('GeoIP.dat file was downloaded successfully, you can go to <a %s>here</a> to enable the plugin.'), 'href="'.$admin_url.'?ctrl=plugins"' ) );
 				break;
 
 			default:

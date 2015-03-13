@@ -877,7 +877,7 @@ class _core_Module extends Module
 	}
 
 	/**
-	 * Build teh evobar menu
+	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
 	{
@@ -913,7 +913,7 @@ class _core_Module extends Module
 						'title' => T_('See the home page'),
 					),
 				'write' => array(
-						'text' => T_('Write'),
+						'text' => T_('New post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 					),
@@ -977,7 +977,7 @@ class _core_Module extends Module
 					if( !$perm_admin_normal )
 					{
 						$entries[ 'write' ] = array(
-							'text' => T_('Write'),
+							'text' => T_('New post'),
 						);
 					}
 					$entries['write']['href'] = $write_item_url;

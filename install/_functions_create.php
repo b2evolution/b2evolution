@@ -1065,7 +1065,7 @@ function create_blog(
 	$kind = 'std', // standard blog; notorious variations: "photo", "group", "forum"
 	$allow_rating_items = '',
 	$use_inskin_login = 0,
-	$blog_access_type = 'relative',
+	$blog_access_type = 'relative', // Deprecated param for this func, because it is defined in $Blog->dbinsert()
 	$allow_html = true,
 	$in_bloglist = 'public',
 	$owner_user_ID = 1 )
@@ -1101,11 +1101,6 @@ function create_blog(
 
 	$Blog->dbinsert();
 
-	$Blog->set( 'access_type', $blog_access_type );
-	if( $blog_access_type == 'relative' )
-	{
-		$Blog->set( 'siteurl', 'blog'.$Blog->ID.'.php' );
-	}
 	if( $test_install_all_features )
 	{
 		$allow_rating_items = 'any';
@@ -1480,9 +1475,9 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_home )
-	{ // Create categories for linkblog
-		$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_home_ID );
-		$cat_linkblog_contrib = cat_create( T_('Contributors'), 'NULL', $blog_home_ID );
+	{ // Create categories for home blog
+		$cat_home_b2evo = cat_create( 'b2evolution', 'NULL', $blog_home_ID );
+		$cat_home_contrib = cat_create( T_('Contributors'), 'NULL', $blog_home_ID );
 	}
 
 	if( $install_collection_photos )
@@ -1525,41 +1520,6 @@ function create_demo_contents()
 	task_end();
 
 
-	task_begin( 'Creating sample posts... ' );
-
-	// Define here all categories which should have the advertisement banners
-	$adv_cats = array();
-	if( $install_collection_home )
-	{
-		$adv_cats['linkblog'] = $cat_linkblog_b2evo; // b2evolution
-	}
-	foreach( $adv_cats as $adv_cat_ID )
-	{ // Insert three ADVERTISEMENTS for each blog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $adv_cat_ID,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
-		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-pros.png' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		$edit_File->link_to_Object( $LinkOwner );
-
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $adv_cat_ID,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
-		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-better.png' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		$edit_File->link_to_Object( $LinkOwner );
-
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $adv_cat_ID,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
-		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-other.png' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		$edit_File->link_to_Object( $LinkOwner );
-	}
-
 	$info_page = T_('<p>This blog is powered by b2evolution.</p>
 
 <p>You are currently looking at an info page about %s.</p>
@@ -1568,8 +1528,100 @@ function create_demo_contents()
 
 <p>If needed, an evoskin can format info pages differently from regular posts.</p>');
 
+
+	if( $install_collection_home )
+	{ // ---------------- Insert the POSTS for Home blog ---------------- //
+		task_begin( 'Creating sample posts for Collection Home... ' );
+
+		// Insert three ADVERTISEMENTS for home blog:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $cat_home_b2evo,
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-pros.png' );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File->link_to_Object( $LinkOwner );
+
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $cat_home_b2evo,
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-better.png' );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File->link_to_Object( $LinkOwner );
+
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $cat_home_b2evo,
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-other.png' );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File->link_to_Object( $LinkOwner );
+
+		// Insert a post into info blog:
+		// walter : a weird line of code to create a post in the home a minute after the others.
+		// It will show a bug on home agregation by category
+		$timestamp++;
+		$now = date('Y-m-d H:i:s',$timestamp + 59);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_home_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array(), 3000 );
+
+		// Insert a post into home:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Francois', '', $now, $cat_home_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array(), 3000 );
+
+		// Insert a post into home:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Blog news', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array(), 3000 );
+
+		// Insert a post into home:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array(), 3000 );
+
+		// Insert a post into home:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Manual', '', $now, $cat_home_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array(), 3000 );
+
+		// Insert a post into home:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, 'Support', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array(), 3000 );
+
+		// Insert a PAGE:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_("About this site"), T_("<p>This blog platform is powered by b2evolution.</p>
+
+<p>You are currently looking at an info page about this site.</p>
+
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
+
+<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
+			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File->link_to_Object( $LinkOwner );
+
+		// Insert a post:
+		$now = date( 'Y-m-d H:i:s', $timestamp++ ); // A year ago
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_('Homepage post'), T_('<p>This is the Home page of this site.</p>
+
+<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Home". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
+
+<p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 1400 );
+
+		task_end();
+	}
+
 	if( $install_collection_bloga )
 	{ // ---------------- Insert the POSTS for Blog A ---------------- //
+		task_begin( 'Creating sample posts for Collection Blog A... ' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
@@ -1672,10 +1724,13 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
+
+		task_end();
 	}
 
 	if( $install_collection_blogb )
 	{ // ---------------- Insert the POSTS for Blog B ---------------- //
+		task_begin( 'Creating sample posts for Collection Blog B... ' );
 
 		// Insert sidebar links into Blog B
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1787,72 +1842,13 @@ function create_demo_contents()
 		$edited_Item->set( 'featured', 1 );
 		$edited_Item->dbsave();
 		// $edited_Item->insert_update_tags( 'update' );
-	}
 
-	if( $install_collection_home )
-	{ // ---------------- Insert the POSTS for Info blog ---------------- //
-
-		// Insert a post into info blog:
-		// walter : a weird line of code to create a post in the linkblog a minute after the others.
-		// It will show a bug on linkblog agregation by category
-		$timestamp++;
-		$now = date('Y-m-d H:i:s',$timestamp + 59);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Evo Factory', '', $now, $cat_linkblog_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array(), 3000 );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array(), 3000 );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array(), 3000 );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array(), 3000 );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array(), 3000 );
-
-		// Insert a post into linkblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array(), 3000 );
-
-		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("About this site"), T_("<p>This blog platform is powered by b2evolution.</p>
-
-<p>You are currently looking at an info page about this site.</p>
-
-<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
-
-<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_linkblog_b2evo,
-			array( $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		$edit_File->link_to_Object( $LinkOwner );
-
-		// Insert a post:
-		$now = date( 'Y-m-d H:i:s', $timestamp++ ); // A year ago
-		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('Homepage post'), T_('<p>This is the Homepage of this site.</p>
-
-<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Home". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
-
-<p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
-			$now, $cat_linkblog_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 1400 );
+		task_end();
 	}
 
 	if( $install_collection_photos )
 	{ // ---------------- Insert the POSTS for Photos blog ---------------- //
+		task_begin( 'Creating sample posts for Collection Photos... ' );
 
 		// Insert a post into photoblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -1938,10 +1934,13 @@ Shopping list:
 * pears
 
 The rain---not the reign---in Spain.');
+
+		task_end();
 	}
 
 	if( $install_collection_forums )
 	{ // ---------------- Insert the POSTS for Forums blog ---------------- //
+		task_begin( 'Creating sample posts for Collection Forums... ' );
 
 		// Insert a PAGE:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2038,10 +2037,13 @@ The rain---not the reign---in Spain.');
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_forums_news );
+
+		task_end();
 	}
 
 	if( $install_collection_manual )
 	{ // ---------------- Insert the POSTS for Manual blog ---------------- //
+		task_begin( 'Creating sample posts for Collection Manual... ' );
 
 		// Insert a main intro:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2056,13 +2058,13 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 		// Insert a cat intro:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introcution for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
+		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
 			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
 
 		// Insert a cat intro:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introcution for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_everyday,
+		$edited_Item->insert( 1, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_everyday,
 			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
 
 		// Insert a PAGE:
@@ -2427,9 +2429,9 @@ Hello
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_userguide );
-	}
 
-	task_end();
+		task_end();
+	}
 
 
 

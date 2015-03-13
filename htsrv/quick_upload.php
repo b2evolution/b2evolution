@@ -35,7 +35,7 @@ class qqUploadedFileXhr
 		if( is_string( $temp ) )
 		{ // Error on create a temp file
 			return array(
-					'text'   => '<span class="result_error"> '.$temp.'</span>',
+					'text'   => $temp,
 					'status' => 'error',
 				);
 		}
@@ -76,7 +76,7 @@ class qqUploadedFileXhr
 		if( is_string( $temp ) )
 		{ // Error on create a temp file
 			return array(
-					'text'   => '<span class="result_error"> '.$temp.'</span>',
+					'text'   => $temp,
 					'status' => 'error',
 				);
 		}
@@ -97,7 +97,7 @@ class qqUploadedFileXhr
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
 				return array(
-						'text'   => '<span class="result_error"> '.T_( 'The server (PHP script) has not enough available memory to receive this large file!' ).'</span>',
+						'text'   => T_( 'The server (PHP script) has not enough available memory to receive this large file!' ),
 						'status' => 'error',
 					);
 			}
@@ -225,9 +225,16 @@ global $current_User;
 
 param( 'upload', 'boolean', true );
 param( 'root_and_path', 'string', true );
+param( 'blog', 'integer' );
+param( 'link_owner', 'string' );
+// Use the glyph or font-awesome icons if requested by skin
+param( 'b2evo_icons_type', 'string', '' );
 
 // Check that this action request is not a CSRF hacked request:
-$Session->assert_received_crumb( 'file' );
+if( ! $Session->assert_received_crumb( 'file', false ) )
+{ // Send a clear error message
+	die( T_('Incorrect crumb received. Did you wait too long before uploading?') );
+}
 
 $upload_path = false;
 if( strpos( $root_and_path, '::' ) )
@@ -241,7 +248,7 @@ if( strpos( $root_and_path, '::' ) )
 
 if( $upload_path === false )
 {
-	$message['text'] = '#'.$root_and_path.'#<span class="result_error"> Bad request. Unknown upload location!</span>'; // NO TRANS!!
+	$message['text'] = '#'.$root_and_path.'# Bad request. Unknown upload location!'; // NO TRANS!!
 	$message['status'] = 'error';
 	out_echo( $message, $specialchars );
 	exit();
@@ -249,14 +256,14 @@ if( $upload_path === false )
 
 if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 {
-	$message['text'] = '<span class="result_error"> '.T_( 'You don\'t have permission to upload on this file root.' ).'</span>';
+	$message['text'] = T_( 'You don\'t have permission to upload on this file root.' );
 	$message['status'] = 'error';
 	out_echo( $message, $specialchars );
 	exit();
 }
 
 if( $upload )
-{	// Create the object and assign property
+{ // Create the object and assign property
 
 	if( isset( $_GET['qqfile'] ) )
 	{
@@ -273,10 +280,7 @@ if( $upload )
 
 	if( $Settings->get( 'upload_maxkb' ) && ( $file->getSize() > $Settings->get( 'upload_maxkb' ) * 1024 ) )
 	{
-		$message['text'] = '<span class="result_error"> '.
-		// fp>vitaliy : call function to make human readable sized in kB MB etc.
-		sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), bytesreadable( $file->getSize() ), bytesreadable( $Settings->get( 'upload_maxkb' ) * 1024 ) )
-		. '</span>';
+		$message['text'] = sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), bytesreadable( $file->getSize() ), bytesreadable( $Settings->get( 'upload_maxkb' ) * 1024 ) );
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
 		exit();
@@ -287,7 +291,7 @@ if( $upload )
 	// validate file name
 	if( $error_filename = process_filename( $newName ) )
 	{ // Not a file name or not an allowed extension
-		$message['text'] = '<span class="result_error"> '.$error_filename.'</span>';
+		$message['text'] = $error_filename;
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
 		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
@@ -299,7 +303,7 @@ if( $upload )
 
 	if( empty( $fm_FileRoot ) )
 	{ // Stop when this object is NULL, it can happens when media path has no rights to write
-		$message['text'] = '<span class="result_error"> '.sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' ).'</span>';
+		$message['text'] = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
 		exit;
@@ -316,7 +320,13 @@ if( $upload )
 		out_echo( $message, $specialchars );
 		exit();
 	}
-	elseif( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
+
+	if( ! file_exists( $newFile->get_dir() ) )
+	{ // Create a folder for new uploaded file if it doesn't exist yet
+		mkdir_r( $newFile->get_dir() );
+	}
+
+	if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
 	{
 		// Change to default chmod settings
 		$newFile->chmod( NULL );
@@ -330,8 +340,43 @@ if( $upload )
 		// Prepare the uploaded file to the final format ( E.g. Resize and Rotate images )
 		prepare_uploaded_files( array( $newFile ) );
 
+		if( ! empty( $link_owner ) )
+		{ // Try to link the uploaded file to the object Item/Comment
+			list( $link_owner_type, $link_owner_ID ) = explode( '_', $link_owner, 2 );
+			$link_owner_ID = intval( $link_owner_ID );
+			if( $link_owner_ID > 0 )
+			{
+				switch( $link_owner_type )
+				{
+					case 'item':
+						// Get LinkOwner object of the Item
+						$ItemCache = & get_ItemCache();
+						if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
+						{
+							$LinkOwner = new LinkItem( $linked_Item );
+						}
+						break;
+
+					case 'comment':
+						// Get LinkOwner object of the Comment
+						$CommentCache = & get_CommentCache();
+						if( $linked_Comment = & $CommentCache->get_by_ID( $link_owner_ID, false, false ) )
+						{
+							$LinkOwner = new LinkComment( $linked_Comment );
+						}
+						break;
+				}
+			}
+
+			if( isset( $LinkOwner ) )
+			{ // Link the uploaded file to the object only if it is found in DB
+				$new_link_ID = $newFile->link_to_Object( $LinkOwner );
+				$current_File = $newFile;
+			}
+		}
+
 		$message = '';
-		if( ! empty($oldFile_thumb) )
+		if( ! empty( $oldFile_thumb ) )
 		{
 			$image_info = getimagesize( $newFile->get_full_path() );
 			if( $image_info )
@@ -342,7 +387,7 @@ if( $upload )
 			{
 				$newFile_thumb = $newFile->get_size_formatted();
 			}
-			$message = '<br />';
+			$message .= '<br />';
 			$message .= sprintf( T_('%s was renamed to %s. Would you like to replace %s with the new version instead?'),
 								'&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
 			$message .= '<div class="invalid" title="'.T_('File name changed.').'">';
@@ -361,43 +406,60 @@ if( $upload )
 			$warning .= $Messages->display( NULL, NULL, false );
 		}
 
-		if( !empty( $message ) )
-		{
-			$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />' .
-			'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
+		if( ! empty( $message ) )
+		{ // There is an error message on uploading
+			$FileCache = & get_FileCache();
+			$old_File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash( $path ).$oldName, true );
+
+			$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />'.
+				'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
+
 			$message = array(
 					'text'    => $message,
-					'warning' => $warning,
 					'status'  => 'rename',
 					'file'    => $newFile->get_preview_thumb( 'fulltype' ),
 					'oldname' => $oldName,
-					'newname' => $newName,
-					'path'    => rawurlencode( $newFile->get_rdfp_rel_path() ),
+					'oldpath' => $old_File->get_root_and_rel_path(),
 				);
-			out_echo( $message, $specialchars );
-			exit();
 		}
 		else
-		{
+		{ // Success uploading
 			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
-			$message['warning'] = $warning;
 			$message['status'] = 'success';
-			$message['newname'] = $newName;
-			$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
-			out_echo( $message, $specialchars );
-			exit();
 		}
 
+		$message['newname'] = $newName;
+		$message['newpath'] = $newFile->get_root_and_rel_path();
+		$message['warning'] = $warning;
+		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
+
+		if( ! empty( $new_link_ID ) )
+		{ // Send also the link data if it was created
+			$message['link_ID'] = $new_link_ID;
+			$message['link_url'] = $newFile->get_view_link();
+			$message['link_actions'] = link_actions( $new_link_ID, 'last', $link_owner_type );
+			$LinkCache = & get_LinkCache();
+			$new_Link = & $LinkCache->get_by_ID( $new_link_ID );
+			$mask_row = (object) array(
+					'link_ID'       => $new_link_ID,
+					'file_ID'       => $newFile->ID,
+					'link_position' => $new_Link->get( 'position' ),
+				);
+			$message['link_position'] = display_link_position( $mask_row );
+		}
+
+		out_echo( $message, $specialchars );
+		exit();
 	}
 
-	$message['text'] = '<span class="result_error"> '.T_( 'The file could not be saved!' ).'</span>';
+	$message['text'] = T_( 'The file could not be saved!' );
 	$message['status'] = 'error';
 	out_echo( $message, $specialchars );
 	exit();
 
 }
 
-$message['text'] =  '<span class="error">Invalid upload param</span>';
+$message['text'] =  'Invalid upload param';
 $message['status'] = 'error';
 out_echo( $message, $specialchars );
 exit();

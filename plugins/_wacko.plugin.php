@@ -91,11 +91,11 @@ class wacko_plugin extends Plugin
 		return array_merge( parent::get_coll_setting_definitions( $default_params ),
 			array(
 				'min_h_level' => array(
-						'label' => T_( 'Minimum Heading Level' ),
+						'label' => T_( 'Top Heading Level' ),
 						'type' => 'integer',
 						'size' => 1,
 						'maxlength' => 1,
-						'note' => T_( 'This plugin will adjust headings so they can never be lower than the level you want: 2 for &lt;H2&gt;, 3 for &lt;H3&gt;, etc.' ),
+						'note' => T_( 'This plugin will adjust headings so they always start at the level you want: 2 for &lt;H2&gt;, 3 for &lt;H3&gt;, etc.' ),
 						'defaultvalue' => 2,
 						'valid_range' => array(
 							'min' => 2, // from <h2>

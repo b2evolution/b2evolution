@@ -453,9 +453,9 @@ class captcha_qstn_plugin extends Plugin
 
 		$Form->info( $this->T_('Captcha question'), $question->cptq_question );
 		$Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
-				10, $this->T_('Captcha answer'), ( $params['use_placeholders'] ? '' : $this->T_('Please answer on question above').'.' ),
+				10, $this->T_('Captcha answer'), ( $params['use_placeholders'] ? '' : $this->T_('Please answer the question above').'.' ),
 				array(
-						'placeholder' => $params['use_placeholders'] ? T_('Please answer on question above') : '',
+						'placeholder' => $params['use_placeholders'] ? T_('Please answer the question above') : '',
 					)
 			);
 

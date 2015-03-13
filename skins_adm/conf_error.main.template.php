@@ -68,12 +68,7 @@ else
 // Get a markdown content to replace the mask variables
 ob_start();
 ?>
-<p>This is $app_name$ version $app_version$.</p>
-<p>You cannot use the application before you finish configuration and installation.</p>
-<p>$error_message$</p>
-<p>Please use the installer to finish your configuration/installation now.</p>
-<p>On most installations, the installer should be <a href="install/index.php">here</a> (but I can&#39;t be sure since I have no config info available! :P)</p>
-
+<%=content%>
 <?php
 $markdown_content = ob_get_clean();
 

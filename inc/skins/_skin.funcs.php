@@ -502,6 +502,11 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'msgform':
+			if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
+			{ // Redirect to special blog for messaging actions if it is defined in general settings
+				header_redirect( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ) );
+			}
+
 			init_ajax_forms( 'blog' ); // auto requires jQuery
 
 			$seo_page_type = 'Contact form';
@@ -514,6 +519,11 @@ var downloadInterval = setInterval( function()
 		case 'messages':
 		case 'contacts':
 		case 'threads':
+			if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
+			{ // Redirect to special blog for messaging actions if it is defined in general settings
+				header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
+			}
+
 			init_results_js( 'blog' ); // Add functions to work with Results tables
 			// just in case some robot would be logged in:
 			$seo_page_type = 'Messaging module';
@@ -525,6 +535,11 @@ var downloadInterval = setInterval( function()
 
 		case 'login':
 			global $Plugins, $transmit_hashed_password;
+
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			{ // Redirect to special blog for login/register actions if it is defined in general settings
+				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
+			}
 
 			$seo_page_type = 'Login form';
 			$robots_index = false;
@@ -543,6 +558,12 @@ var downloadInterval = setInterval( function()
 				$Messages->add( T_( 'You are already logged in.' ), 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
+
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			{ // Redirect to special blog for login/register actions if it is defined in general settings
+				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
+			}
+
 			$seo_page_type = 'Register form';
 			$robots_index = false;
 
@@ -557,8 +578,21 @@ var downloadInterval = setInterval( function()
 				$Messages->add( T_( 'You are already logged in.' ), 'note' );
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
+
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			{ // Redirect to special blog for login/register actions if it is defined in general settings
+				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
+			}
+
 			$seo_page_type = 'Lost password form';
 			$robots_index = false;
+			break;
+
+		case 'activateinfo':
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			{ // Redirect to special blog for login/register actions if it is defined in general settings
+				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
+			}
 			break;
 
 		case 'profile':

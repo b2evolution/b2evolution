@@ -1,6 +1,6 @@
 # b2evolution CCMS
 
-This is version **6.0.0-alpha** (from the so-called "i7" branch).
+This is version **6.0.1-alpha** (from the so-called "i7" branch).
 
 ## A complete engine for your website !
 
@@ -12,9 +12,9 @@ More info: http://b2evolution.net
 
 ## Requirements
 
-Basically, all you need is a [standard web hosting plan](http://b2evolution.net/web-hosting/top-quality-best-webhosting.php).
+Basically, all you need is a standard [web hosting plan](http://b2evolution.net/web-hosting/top-quality-best-webhosting.php).
 
-More specifically, your web server should support PHP 5.2+, MySQL 5+ & Apache 2+. [More info here](http://b2evolution.net/man/installation-upgrade/system_requirements).
+More specifically, your web server should support PHP 5.2+, MySQL 5+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 
 ## Downloading
 

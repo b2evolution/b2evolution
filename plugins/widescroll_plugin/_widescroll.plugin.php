@@ -32,7 +32,7 @@ class widescroll_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Wide scroll');
-		$this->long_desc = T_('This plugin allows to horizontally scroll through blocs of wide content.');
+		$this->long_desc = T_('This plugin allows to horizontally scroll through blocks of wide content.');
 	}
 
 

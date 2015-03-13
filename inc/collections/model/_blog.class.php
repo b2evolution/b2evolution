@@ -818,7 +818,10 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
+				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				{ // Update this only when no blog is defined for login/registration
+					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
+				}
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 			}
 
@@ -852,7 +855,7 @@ class Blog extends DataObject
 
 			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
 			{	// check urlname
-				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
+				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
 				{
 					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $blog_urlname ) )
 					{
@@ -866,7 +869,7 @@ class Blog extends DataObject
 															AND blog_ID <> '.$this->ID
 														) )
 					{ // urlname is already in use
-						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another blog. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
+						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another collection. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
 						$blog_urlname = NULL;
 					}
 
@@ -894,7 +897,7 @@ class Blog extends DataObject
 					else
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
 						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
-						$Messages->add( T_('Blog Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
+						$Messages->add( T_('Collection Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
 							.' '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
 				}
@@ -933,7 +936,7 @@ class Blog extends DataObject
 				// fp> TODO: better interface
 				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
 				{
-					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate blog ID list!') );
+					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate collection ID list!') );
 				}
 				$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 			}
@@ -1190,13 +1193,21 @@ class Blog extends DataObject
 
 		switch( $this->access_type )
 		{
+			case 'baseurl':
 			case 'default':
 				// Access through index.php: match absolute URL or call default blog
 				if( ( $Settings->get('default_blog_ID') == $this->ID )
 					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
-					return $baseurl.$this->siteurl.'index.php';
+					if( $this->access_type == 'default' )
+					{
+						return $baseurl.$this->siteurl.'index.php';
+					}
+					else
+					{
+						return $baseurl.$this->siteurl;
+					}
 				}
 				// ... otherwise, we add the blog ID:
 
@@ -1204,8 +1215,12 @@ class Blog extends DataObject
 				// Access through index.php + blog qualifier
 				return $baseurl.$this->siteurl.'index.php?blog='.$this->ID;
 
+			case 'extrabase':
+				// We want to use extra path on base url, use the blog urlname:
+				return $baseurl.$this->siteurl.$this->urlname.'/';
+
 			case 'extrapath':
-				// We want to use extra path info, use the blog urlname:
+				// We want to use extra path on index.php, use the blog urlname:
 				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
@@ -1233,12 +1248,19 @@ class Blog extends DataObject
 
 		switch( $this->access_type )
 		{
+			case 'baseurl':
+				return $baseurl.$this->siteurl;
+
 			case 'default':
 			case 'index.php':
 				return $baseurl.$this->siteurl.'index.php/';
 
+			case 'extrabase':
+				// We want to use extra path on base url, use the blog urlname:
+				return $baseurl.$this->siteurl.$this->urlname.'/';
+
 			case 'extrapath':
-				// We want to use extra path info, use the blog urlname:
+				// We want to use extra path on index.php, use the blog urlname:
 				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
@@ -1877,11 +1899,16 @@ class Blog extends DataObject
 	 * Get a param.
 	 *
 	 * @param string Parameter name
+	 * @param array Additional params
 	 * @return false|string The value as string or false in case of error (e.g. media dir is disabled).
 	 */
-	function get( $parname )
+	function get( $parname, $params = array() )
 	{
 		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+
+		$params = array_merge( array(
+				'glue' => '&amp;',
+			), $params );
 
 		switch( $parname )
 		{
@@ -1940,13 +1967,28 @@ class Blog extends DataObject
 				break;
 
 			case 'loginurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=login' );
+			case 'registerurl':
+			case 'lostpasswordurl':
+			case 'activateinfourl':
+				$url_disp = str_replace( 'url', '', $parname );
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				{ // Use special blog for login/register actions if it is defined in general settings
+					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+				}
+				else
+				{ // Use login/register urls of this blog
+					return url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+				}
 
 			case 'subsurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=subs#subs' );
 
 			case 'threadsurl':
 				$disp_param = 'threads';
+				break;
+
+			case 'messagesurl':
+				$disp_param = 'messages';
 				break;
 
 			case 'contactsurl':
@@ -2038,15 +2080,24 @@ class Blog extends DataObject
 				return parent::get( $parname );
 		}
 
-		if( !empty( $disp_param ) )
+		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
-			if( $this->get_setting( 'front_disp' ) == $disp_param )
+			$this_Blog = & $this;
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform' ) ) )
+			{ // Check if we can use this blog for messaging actions or we should use spec blog
+				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
+				{ // Use special blog for messaging actions if it is defined in general settings
+					$this_Blog = & $msg_Blog;
+				}
+			}
+
+			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
 			{ // Get home page of this blog because front page displays current disp
-				return $this->gen_blogurl( 'default' );
+				return $this_Blog->gen_blogurl( 'default' );
 			}
 			else
 			{ // Add disp param to blog's url when current disp is not a front page
-				return url_add_param( $this->gen_blogurl(), 'disp='.$disp_param );
+				return url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
 		}
 	}
@@ -2223,12 +2274,12 @@ class Blog extends DataObject
 	}
 
 
- 	/**
+	/**
 	 * Insert into the DB
 	 */
 	function dbinsert()
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $Settings;
 
 		$DB->begin();
 
@@ -2241,8 +2292,29 @@ class Blog extends DataObject
 			$this->set( 'order', $max_order + 1 );
 		}
 
+		$set_default_blog_ID = isset( $Settings );
+		if( get_setting_Blog( 'default_blog_ID' ) )
+		{ // Don't set a default blog if it is already defined and the blog exists in DB
+			$set_default_blog_ID = false;
+		}
+
+		if( $set_default_blog_ID )
+		{ // No default blog yet, Use for first base url as "Default collection on baseurl"
+			$this->set( 'access_type', 'baseurl' );
+		}
+		else
+		{ // For all other blogs use "Extra path on index.php"
+			$this->set( 'access_type', 'extrapath' );
+		}
+
 		if( parent::dbinsert() )
 		{
+			if( $set_default_blog_ID )
+			{ // Use this blog as default because it is probably first created
+				$Settings->set( 'default_blog_ID', $this->ID );
+				$Settings->dbupdate();
+			}
+
 			if( isset( $this->CollectionSettings ) )
 			{
 				// So far all settings have been saved to collection #0 !
@@ -2424,7 +2496,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete( $echo = false )
 	{
-		global $DB, $Messages, $Plugins;
+		global $DB, $Messages, $Plugins, $Settings;
 
 		// Try to obtain some serious time to do some serious processing (5 minutes)
 		set_max_execution_time(300);
@@ -2565,6 +2637,27 @@ class Blog extends DataObject
 		$this->ID = $old_ID;
 		$Plugins->trigger_event( 'AfterCollectionDelete', $params = array( 'Blog' => & $this ) );
 		$this->ID = 0;
+
+		if( isset( $Settings ) )
+		{ // Reset settings related to the deleted blog
+			if( $Settings->get( 'default_blog_ID' ) == $old_ID )
+			{ // Reset default blog ID
+				$Settings->set( 'default_blog_ID', 0 );
+			}
+			if( $Settings->get( 'info_blog_ID' ) == $old_ID )
+			{ // Reset info blog ID
+				$Settings->set( 'info_blog_ID', 0 );
+			}
+			if( $Settings->get( 'login_blog_ID' ) == $old_ID )
+			{ // Reset login blog ID
+				$Settings->set( 'login_blog_ID', 0 );
+			}
+			if( $Settings->get( 'msg_blog_ID' ) == $old_ID )
+			{ // Reset messaging blog ID
+				$Settings->set( 'msg_blog_ID', 0 );
+			}
+			$Settings->dbupdate();
+		}
 
 		if( $echo ) echo '<br />Done.</p>';
 	}

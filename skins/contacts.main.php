@@ -106,7 +106,7 @@ switch( $action )
 			{	// User has been removed from the group
 				if( $view == 'contacts' )
 				{	// Redirect to the contacts list
-					header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=contacts', '&' ) );
+					header_redirect( $Blog->get( 'contactsurl', array( 'glue' => '&' ) ) );
 				}
 				else
 				{	// Redirect to the user profile page
@@ -126,7 +126,7 @@ switch( $action )
 		if( $result = create_contacts_group_users( $group, $users ) )
 		{	// Users have been added to the group
 			$Messages->add( sprintf( T_('%d contacts have been added to the &laquo;%s&raquo; group.'), $result['count_users'], $result['group_name'] ), 'success' );
-			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=contacts', '&' );
+			$redirect_to = $Blog->get( 'contactsurl', array( 'glue' => '&' ) );
 
 			$item_ID = param( 'item_ID', 'integer', 0 );
 			if( $item_ID > 0 )
@@ -147,7 +147,7 @@ switch( $action )
 		{
 			$item_ID = param( 'item_ID', 'integer', 0 );
 
-			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=contacts&g='.$group_ID, '&' );
+			$redirect_to = url_add_param( $Blog->get( 'contactsurl', array( 'glue' => '&' ) ), 'g='.$group_ID, '&' );
 			if( $item_ID > 0 )
 			{
 				$redirect_to = url_add_param( $redirect_to, 'item_ID='.$item_ID, '&' );
@@ -168,7 +168,7 @@ switch( $action )
 		{
 			$item_ID = param( 'item_ID', 'integer', 0 );
 
-			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=contacts', '&' );
+			$redirect_to = $Blog->get( 'contactsurl', array( 'glue' => '&' ) );
 			if( $item_ID > 0 )
 			{
 				$redirect_to = url_add_param( $redirect_to, 'item_ID='.$item_ID, '&' );

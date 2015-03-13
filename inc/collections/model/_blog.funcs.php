@@ -477,48 +477,63 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
  *
  * @return boolean true if $blog was initialized successful, false otherwise
  */
-function init_requested_blog()
+function init_requested_blog( $use_blog_param_first = true )
 {
-	global $blog, $ReqHost, $ReqPath;
+	global $blog, $ReqHost, $ReqPath, $baseurl;
 	global $Settings;
 	global $Debuglog;
 
 	if( !empty( $blog ) )
-	{ // blog was already initialized
+	{ // $blog was already initialized (maybe through a stub file)
 		return true;
 	}
 
-	// Check if a specific blog has been requested in the URL:
-	$blog = param( 'blog', 'integer', '', true );
+	// If we want to give priority to ?blog=123..
+	if( $use_blog_param_first == true )
+	{	// Check if a specific blog has been requested in the URL:
+		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );			
+		$blog = param( 'blog', 'integer', '', true );
 
-	if( !empty($blog) )
-	{ // a specific blog has been requested in the URL
-		return true;
-	}
-
-	// No blog requested by URL param, let's try to match something in the URL
-	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
-	$BlogCache = & get_BlogCache();
-	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHost.$ReqPath, $matches ) )
-	{ // We have an URL blog name:
-		$Debuglog->add( 'Found a potential URL blog name: '.$matches[2], 'detectblog' );
-		if( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) )
-		{ // We found a matching blog:
-			$blog = $Blog->ID;
+		if( !empty($blog) )
+		{ // a specific blog has been requested in the URL:
 			return true;
 		}
 	}
 
-	// No blog identified by URL name, let's try to match the absolute URL
+	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
+
+	// No blog requested by URL param, let's try to match something in the URL:
+	$BlogCache = & get_BlogCache();
+	if( preg_match( '#^'.preg_quote($baseurl).'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+	{ // We have an URL blog name:
+		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
+		if( strpos( $matches[2], '.' ) !== false )
+		{	// There is an extension (like .php) in the collection name, ignore...
+			$Debuglog->add( 'Ignoring because it contains a dot.', 'detectblog' );
+		}
+		elseif( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) ) /* SQL request '=' */
+		{ // We found a matching blog:
+			$blog = $Blog->ID;
+			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
+			return true;
+		}
+		else
+		{
+			$Debuglog->add( 'No match.', 'detectblog' );			
+		}
+	}
+
+	// No blog identified by URL name, let's try to match the absolute URL: (remove optional index.php)
 	if( preg_match( '#^(.+?)index.php#', $ReqHost.$ReqPath, $matches ) )
-	{ // Remove what's not part of the absolute URL
+	{ // Remove what's not part of the absolute URL:
 		$ReqAbsUrl = $matches[1];
 	}
 	else
-	{
+	{	// Match on the whole URL (we'll try to find the base URL at the beginning)
 		$ReqAbsUrl = $ReqHost.$ReqPath;
 	}
 	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
+	// SQL request 'LIKE':
 	if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
 	{ // We found a matching blog:
 		$blog = $Blog->ID;
@@ -526,7 +541,19 @@ function init_requested_blog()
 		return true;
 	}
 
-	// Still no blog requested, use default
+	// If we did NOT give priority to ?blog=123, check for param now:
+	if( $use_blog_param_first == false )
+	{	// Check if a specific blog has been requested in the URL:
+		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );			
+		$blog = param( 'blog', 'integer', '', true );
+
+		if( !empty($blog) )
+		{ // a specific blog has been requested in the URL:
+			return true;
+		}
+	}
+
+	// Still no blog requested, use default:
 	$blog = $Settings->get( 'default_blog_ID' );
 	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )
@@ -535,6 +562,7 @@ function init_requested_blog()
 		return true;
 	}
 
+	// No collection has been selected (we'll probably display the default.php page):
 	$blog = NULL;
 	return false;
 }
@@ -668,14 +696,7 @@ function check_allow_disp( $disp )
 	}
 
 	// User is allowed to see the requested view, but show an account activation error message
-	if( $Blog->get_setting( 'in_skin_login' ) )
-	{
-		$activateinfo_link = 'href="'.url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo' ).'"';
-	}
-	else
-	{
-		$activateinfo_link = 'href="'.$secure_htsrv_url.'login.php?action=req_validatemail'.'"';
-	}
+	$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
 	$Messages->add( sprintf( T_( 'IMPORTANT: your account is not active yet! Activate your account now by clicking on the activation link in the email we sent you. <a %s>More info &raquo;</a>' ), $activateinfo_link ) );
 }
 
@@ -1119,6 +1140,36 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
 	}
 
 	return $result;
+}
+
+
+/**
+ * Get Blog object from general setting
+ *
+ * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'
+ * @param boolean true if function $BlogCache->get_by_ID() should die on error
+ * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
+ * @return object|NULL|false
+ */
+function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_empty = false )
+{
+	global $Settings;
+
+	$setting_Blog = false;
+
+	if( ! isset( $Settings ) )
+	{
+		return $setting_Blog;
+	}
+
+	$blog_ID = intval( $Settings->get( $setting_name ) );
+	if( $blog_ID > 0 )
+	{ // Check if blog really exists in DB
+		$BlogCache = & get_BlogCache();
+		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	return $setting_Blog;
 }
 
 

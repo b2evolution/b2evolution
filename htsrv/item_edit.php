@@ -214,12 +214,6 @@ switch( $action )
 			$edited_Item->dbinsert();
 		}
 
-		param( 'is_attachments', 'string' );
-		if( !empty( $is_attachments ) && $is_attachments === 'true' )
-		{ // Set session variable to dynamically create js popup:
-			$Session->set('create_edit_attachment', true);
-		}
-
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
 		if( !empty( $trackback_url ) )

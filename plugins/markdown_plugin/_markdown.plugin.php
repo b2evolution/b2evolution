@@ -86,11 +86,11 @@ class markdown_plugin extends Plugin
 						'defaultvalue' => 0,
 					),
 				'min_h_level' => array(
-						'label' => T_( 'Minimum Heading Level' ),
+						'label' => T_( 'Top Heading Level' ),
 						'type' => 'integer',
 						'size' => 1,
 						'maxlength' => 1,
-						'note' => T_( 'This plugin will adjust headings so they can never be lower than the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.' ),
+						'note' => T_( 'This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.' ),
 						'defaultvalue' => 1,
 						'valid_range' => array(
 							'min' => 1, // from <h1>

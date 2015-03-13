@@ -44,8 +44,8 @@ if( isset($collections_Module) )
 
 	$BlogCache = & get_BlogCache();
 
-		$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
-				'note' => T_('This blog will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+		$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default collection to display'), array(
+				'note' => T_('This collection will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>',
 				'allow_none' => true,
 				'class' => '',
 				'loop_object_method' => 'get_maxlen_name',

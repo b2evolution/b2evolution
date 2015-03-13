@@ -141,7 +141,7 @@ switch( $action )
 			{ // Don't allow the duplicate emails
 				$Messages->add( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
 					'href="'.$Blog->get( 'loginurl' ).'"',
-					'href="'.url_add_param( $Blog->gen_blogurl(), 'disp=lostpassword' ).'"' ), 'warning' );
+					'href="'.$Blog->get( 'lostpasswordurl' ).'"' ), 'warning' );
 				break;
 			}
 
@@ -393,14 +393,7 @@ switch( $action )
 			$inskin_blog = $inskin ? $blog : NULL;
 			if( $new_User->send_validate_email( $redirect_to, $inskin_blog ) )
 			{
-				if( $inskin && !empty( $Blog ) )
-				{
-					$activateinfo_link = 'href="'.url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo' ).'"';
-				}
-				else
-				{
-					$activateinfo_link = 'href="'.$secure_htsrv_url.'login.php?action=req_validatemail'.'"';
-				}
+				$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
 				$Messages->add( sprintf( T_('An email has been sent to your email address. Please click on the link therein to activate your account. <a %s>More info &raquo;</a>'), $activateinfo_link ), 'success' );
 			}
 			elseif( $demo_mode )

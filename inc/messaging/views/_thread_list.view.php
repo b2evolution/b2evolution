@@ -88,18 +88,9 @@ threads_results( $Results, array_merge( array(
 	), $display_params ) );
 
 if( ! $perm_abuse_management )
-{	// Show link to create a new conversation
-	if( is_admin_page() )
-	{
-		$newmsg_url = regenerate_url( 'action', 'action=new' );
-	}
-	else
-	{
-		$newmsg_url = regenerate_url( 'disp', 'disp=threads&action=new' );
-	}
-
+{ // Show link to create a new conversation
 	$Results->global_icon( T_('See My Contacts'), '', get_dispctrl_url( 'contacts' ), T_('See My Contacts').' ', 3, 4 );
-	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', $newmsg_url, T_('Compose new').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', get_dispctrl_url( 'threads', 'action=new' ), T_('Compose new').' &raquo;', 3, 4 );
 }
 
 $Results->display( $display_params );

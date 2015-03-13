@@ -2531,15 +2531,24 @@ class File extends DataObject
 			}
 		}
 
-		$DB->begin();
+		$DB->begin( 'SERIALIZABLE' );
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );
 
-		$DB->commit();
-
 		// Let's make the link!
-		return $LinkOwner->add_link( $this->ID, $position, $order );
+		$link_ID = $LinkOwner->add_link( $this->ID, $position, $order );
+
+		if( $link_ID )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $link_ID;
 	}
 
 

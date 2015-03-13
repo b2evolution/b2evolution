@@ -1094,9 +1094,9 @@ class AdminUI_general extends Menu
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n",
-					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
-								                .'</table>'."\n\n",
+					'no_results_start' => '<table class="grouped" cellspacing="0"><tbody>'."\n\n",
+					'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+								                .'</tbody></table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);

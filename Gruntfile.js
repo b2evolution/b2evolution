@@ -74,6 +74,8 @@ module.exports = function(grunt) {
 					'skins/bootstrap/style.css':             'skins/bootstrap/style.less',
 					'skins/bootstrap_main/style.css':        'skins/bootstrap_main/style.less',
 					'skins/bootstrap_manual/style.css':      'skins/bootstrap_manual/style.less',
+					// Helper pages
+					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
 				}
 			}
 		},
@@ -133,7 +135,7 @@ module.exports = function(grunt) {
 
 		// CSS minification:
 		cssmin: {
-			options: { 
+			options: {
 				// The following will appear on top of the created files:
 				banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
@@ -165,7 +167,7 @@ module.exports = function(grunt) {
 		// Configuration for the uglify minifying tasks:
 		uglify: {
 			// Login screen:
-			sha1_md5: { 
+			sha1_md5: {
 				nonull: true, // Display missing files
 				src: ['rsc/js/build/sha1_md5.bundle.js'],
 				dest: 'rsc/js/build/sha1_md5.bmin.js'
@@ -229,14 +231,27 @@ module.exports = function(grunt) {
 
 		// Markdown to HTML
 		markdown: {
-			options: {
-				template: 'readme.template.html'
+			readme: {
+				options: {
+					template: 'readme.template.html'
+				},
+				files: [{
+					expand: true,
+					src: 'readme.md',
+					dest: '',
+					ext: '.html'
+				}]
 			},
-			files: {
-				expand: true,
-				src: 'readme.md',
-				dest: '',
-				ext: '.html'
+			conf_error: {
+				options: {
+					template: 'skins_adm/conf_error.main.template.php',
+				},
+				files: [{
+					expand: true,
+					src: 'skins_adm/conf_error.main.md',
+					dest: '',
+					ext: '.main.php'
+				}]
 			}
 		},
 
@@ -277,7 +292,7 @@ module.exports = function(grunt) {
 				}
 			},
 			markdown: {
-				files: ['readme.md','readme.template.html'],
+				files: ['readme.md','readme.template.html','skins_adm/conf_error.main.md','skins_adm/conf_error.main.template.php'],
 				tasks: ['markdown']
 			}
 		}
@@ -295,6 +310,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify']);
+	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify','markdown']);
 
 };

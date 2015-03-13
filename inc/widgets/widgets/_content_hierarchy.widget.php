@@ -57,7 +57,7 @@ class content_hierarchy_Widget extends ComponentWidget
 					'type' => 'integer',
 					'defaultvalue' => '0',
 					'valid_pattern' => array( 'pattern'=>'~^(1?\d|20)$~i',
-																		'error'=>T_('The open children levels must be from 0 to 20.') ),
+						'error'=>T_('We can display from 0 to 20 children levels.') ),
 				),
 				'blog_ID' => array(
 					'label' => T_( 'Collection' ),

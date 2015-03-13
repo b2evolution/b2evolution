@@ -1,4 +1,4 @@
-/*! b2evolution v6.0.0 */
+/*! b2evolution v6.0.1 */
 /* ------------------------- sha1.js ------------------------- */
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined

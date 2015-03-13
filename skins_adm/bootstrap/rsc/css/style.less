@@ -375,12 +375,15 @@ div.skinshot {
 #itemform_goals td {
 	padding-bottom: 2px;
 }
+
+// Attachments / links
 #attachmentframe_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
 	overflow: hidden;
 	padding-bottom: 6px;
+	box-sizing: content-box;
  .ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
@@ -402,6 +405,12 @@ div.skinshot {
 		height: 100%;
 	}
 }
+#filelist_tbody {
+	tr:first-child .action_icon_link_move_up,
+	tr:last-child .action_icon_link_move_down {
+		visibility: hidden;
+	}
+}
 
 // File browser table
 table.filelist {
@@ -412,6 +421,7 @@ table.filelist {
 		input[type="checkbox"] {
 			margin: 0;
 			float: none;
+			position: relative;
 		}
 	}
 	th.firstcol {
@@ -444,6 +454,9 @@ table.filelist {
 			display: inline-block;
 		}
 	}
+}
+td.fm_filename .result_error {
+	border: none;
 }
 .toolbaritem {
 	input, select {
@@ -500,6 +513,10 @@ ul#uploadfileinputs {
 		border-bottom: 1px solid #DDD;
 		padding: 10px 0;
 	}
+}
+div#fileuploader_form {
+	padding: 5px;
+	height: 65px;
 }
 
 h2.user_title {

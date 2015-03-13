@@ -1180,7 +1180,7 @@ function get_contacts_groups_list( $user_ID, $params = array() )
 
 	if( !empty( $Blog ) )
 	{	// Set url to contacts list
-		$contacts_url = url_add_param( $Blog->gen_blogurl(), 'disp=contacts' );
+		$contacts_url = $Blog->get( 'contactsurl' );
 	}
 
 	$groups_1st = array();

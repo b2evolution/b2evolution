@@ -276,11 +276,11 @@ class wikilinks_plugin extends Plugin
 			foreach( $wikiwords as $WikiWord => $wiki_word )
 			{
 				// Parse wiki word to find additional param for atrr "id"
-				$attrs = '';
+				$url_params = '';
 				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
 				if( isset( $WikiWord_match[3] ) )
 				{ // wiki word has attr "id"
-					$attrs .= ' id="'.$WikiWord_match[3].'"';
+					$url_params .= '#'.$WikiWord_match[3];
 				}
 
 				// Fix for regexp
@@ -335,34 +335,34 @@ class wikilinks_plugin extends Plugin
 				}
 
 				if( !empty( $permalink ) )
-				{	// Chapter or Item are found
+				{ // Chapter or Item are found
 					// [[WikiWord text]]
-					$replace_links[] = '<a href="'.$permalink.'"'.$attrs.'>$1</a>';
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
 
 					// ((WikiWord text))
-					$replace_links[] = '<a href="'.$permalink.'"'.$attrs.'>$1</a>';
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
 
 					// [[Wikiword]]
-					$replace_links[] = '<a href="'.$permalink.'"'.$attrs.'>'.$existing_link_text.'</a>';
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$existing_link_text.'</a>';
 
 					// ((Wikiword))
-					$replace_links[] = '<a href="'.$permalink.'"'.$attrs.'>'.$link_text.'</a>';
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$link_text.'</a>';
 				}
 				else
-				{	// Chapter and Item are not found
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create..."'.$attrs.'>?</a>') : '';
+				{ // Chapter and Item are not found
+					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 					// [[WikiWord text]]
-					$replace_links[] = '<span class="NonExistentWikiWord"'.$attrs.'>$1'.$create_link.'</span>';
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
 
 					// ((WikiWord text))
-					$replace_links[] = '<span class="NonExistentWikiWord"'.$attrs.'>$1'.$create_link.'</span>';
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
 
 					// [[Wikiword]]
-					$replace_links[] = '<span class="NonExistentWikiWord"'.$attrs.'>'.$link_text.$create_link.'</span>';
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
 
 					// ((Wikiword))
-					$replace_links[] = '<span class="NonExistentWikiWord"'.$attrs.'>'.$link_text.$create_link.'</span>';
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
 				}
 			}
 		}

@@ -20,9 +20,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $Plugins;
+global $Plugins, $Settings;
 
-global $basepath, $rsc_url, $dispatcher;
+global $basepath, $rsc_url, $dispatcher, $admin_url;
 
 $Form = new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -114,7 +114,14 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('In-skin Actions').' ['.T_('Admin').']'.get_manual_link('in_skin_action_settings') );
-		$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
+		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+		{ // The login blog is defined in general settings
+			$Form->info( T_( 'In-skin login' ), sprintf( T_('All login/registration functions are delegated to the collection: %s'), '<a href="'.$admin_url.'?ctrl=collections&tab=site_settings">'.$login_Blog->get( 'shortname' ).'</a>' ) );
+		}
+		else
+		{ // Allow to select in-skin login for this blog
+			$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
+		}
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
 	$Form->end_fieldset();
 

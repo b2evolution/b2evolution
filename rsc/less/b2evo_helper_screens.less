@@ -1,0 +1,74 @@
+/* This file is used to b2evolution help pages */
+
+// Space out content a bit
+body {
+	padding-top: 20px;
+	padding-bottom: 20px;
+	font-size: 16px;
+}
+
+nav ul {
+	margin-top: 17px;
+}
+
+// Everything but the jumbotron gets side spacing for mobile first views
+.header,
+.footer {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+// Make the masthead heading the same height as the navigation
+.header h3 {
+	padding-bottom: 19px;
+	margin-top: 0;
+	margin-bottom: 0;
+	line-height: 40px;
+}
+
+// Custom page footer
+.footer {
+	margin-top: 48px;
+	padding-top: 19px;
+	color: #777;
+	border-top: 1px solid #e5e5e5;
+}
+
+// Customize container
+@media (min-width: 768px) {
+	.container {
+		max-width: 730px;
+	}
+}
+
+	h1, h2 {
+		padding: 20px 0 8px;
+		border-bottom: 1px solid #eee;
+	}
+
+.jumbotron {
+	text-align: center;
+	border-bottom: 1px solid #e5e5e5;
+	margin-bottom: 42px;
+	h2 {
+		padding-top: 0;
+	}
+	.h1 {
+		font-size: 35px;
+	}
+}
+
+// Responsive: Portrait tablets and larger
+@media screen and (min-width: 768px) {
+	// Remove the padding we set earlier
+	.header,
+	.footer {
+		padding-right: 0;
+		padding-left: 0;
+	}
+	// Space out the masthead
+	.header {
+		border-bottom: 1px solid #e5e5e5;
+		margin-bottom: 30px;
+	}
+}

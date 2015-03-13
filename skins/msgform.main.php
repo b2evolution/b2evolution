@@ -67,6 +67,10 @@ if( $recipient_User )
 		param( 'action', 'string', 'req_login' );
 		// override redirect to param
 		param( 'redirect_to', 'url', regenerate_url(), true, true );
+		if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
+		{ // Redirect to special blog for messaging actions if it is defined in general settings
+			header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
+		}
 		$Messages->add( T_( 'You must log in before you can contact this user' ) );
 	}
 	elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )
@@ -75,7 +79,7 @@ if( $recipient_User )
 		{ // recipient User accepts email allow to send email
 			$allow_msgform = 'email';
 			$msg_type = 'email';
-			$activateinfo_link = 'href="'.get_activate_info_url().'"';
+			$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
 			$Messages->add( sprintf( T_( 'You must activate your account before you can send a private message to %s. However you can send them an email if you\'d like. <a %s>More info &raquo;</a>' ), $recipient_User->get( 'login' ), $activateinfo_link ), 'warning' );
 		}
 		else

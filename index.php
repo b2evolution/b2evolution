@@ -7,9 +7,8 @@
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
  *
- * This file is NOT mandatory. You can delete it if you want.
- * You can also replace the contents of this file with contents similar to the contents
- * of a_stub.php, a_noskin.php, multiblogs.php, etc.
+ * This file is NOT mandatory. You may replace it with one or several stub files.
+ * More info: {@link http://b2evolution.net/man/stub-file}
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -36,7 +35,7 @@ if( ! isset($collections_Module) )
 }
 
 // initialize which blog should be displayed, and display default page if blog could not be initialized
-if( !init_requested_blog() )
+if( !init_requested_blog( false ) )
 { // No specific blog to be displayed:
 	// we are going to display the default page:
 	require dirname(__FILE__).'/default.php';
@@ -50,6 +49,7 @@ if( !init_requested_blog() )
 
 # This setting retricts posts to those published, thus hiding drafts.
 # You should not have to change this.
+# TODO: Check if we still need this and if it's even working (it's probably overidden anyways)
 $show_statuses = array();
 
 # Additionnaly, you can set other values (see URL params in the manual)...

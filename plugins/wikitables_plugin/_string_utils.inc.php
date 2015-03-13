@@ -241,8 +241,8 @@ class StringUtils {
 	}
 
 	/**
-	 * Escape a string to make it suitable for inclusion in a preg_replace()
-	 * replacement parameter.
+	 * Escape a string to make it suitable for inclusion in a preg_replace() replacement parameter.
+	 * Not to be confused with PHP's preg_quote()
 	 *
 	 * @param $string String
 	 * @return String

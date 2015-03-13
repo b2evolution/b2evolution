@@ -1748,41 +1748,6 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	) );
 }
 
-/**
- * Output JavaScript code to dynamically show popup files attachment window
- *
- * This is a part of the process that makes it smoother to "Save & start attaching files".
- */
-function echo_attaching_files_button_js( & $iframe_name )
-{
-	global $edited_Item;
-	$iframe_name = 'attach_'.generate_random_key( 16 );
-	?>
-	<script type="text/javascript">
-		jQuery( document ).ready( function() {
-			link_attachment_window( '<?php echo $iframe_name; ?>', 'item', '<?php echo $edited_Item->ID; ?>' );
-		} );
-	</script>
-	<?php
-}
-
-/**
- * Output JavaScript code to set hidden field is_attachments
- * which indicates that we must show attachments files popup window
- *
- * This is a part of the process that makes it smoother to "Save & start attaching files".
- */
-function echo_set_is_attachments()
-{
-	?>
-	<script type="text/javascript">
-		jQuery( '#itemform_createlinks td input' ).click( function()
-		{
-			jQuery( 'input[name=is_attachments]' ).attr("value", "true");
-		} );
-	</script>
-	<?php
-}
 
 /**
  * Output JavaScript code for "Add/Link files" link
@@ -1793,11 +1758,10 @@ function echo_link_files_js()
 {
 	?>
 	<script type="text/javascript">
-			jQuery( '#title_file_add' ).click( function()
-			{
-				jQuery( 'input[name=is_attachments]' ).attr("value", "true");
-				jQuery( '#itemform_createlinks input[name="actionArray[create_edit]"]' ).click();
-			} );
+		jQuery( '#title_file_add' ).click( function()
+		{
+			jQuery( '#itemform_createlinks input[name="actionArray[create_edit]"]' ).click();
+		} );
 	</script>
 	<?php
 }

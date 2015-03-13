@@ -602,11 +602,11 @@ if( $inskin && use_in_skin_login() )
 		}
 		elseif( $action == 'lostpassword' )
 		{ // redirect to inskin lost password page
-			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=lostpassword', '&' );
+			$redirect = $Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) );
 		}
 		else
 		{ // redirect to inskin login page
-			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=login', '&' );
+			$redirect = $Blog->get( 'loginurl', array( 'glue' => '&' ) );
 		}
 		$redirect = url_add_param( $redirect, 'redirect_to='.$redirect_to, '&' );
 		header_redirect( $redirect );

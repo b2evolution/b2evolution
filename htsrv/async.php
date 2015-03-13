@@ -712,6 +712,7 @@ switch( $action )
 		param( 'path', 'string' );
 		param( 'oldfile', 'string' );
 		param( 'newfile', 'string' );
+		param( 'format', 'string' );
 
 		$fileroot = explode( '_', $fileroot_ID );
 		$fileroot_type = $fileroot[0];
@@ -720,8 +721,19 @@ switch( $action )
 		$result = replace_old_file_with_new( $fileroot_type, $fileroot_type_ID, $path, $newfile, $oldfile, false );
 
 		$data = array();
-		$data['old'] = $oldfile;
-		$data['new'] = $newfile;
+		if( $format == 'full_path_link' )
+		{ // User link with full path to file
+			$FileCache = & get_FileCache();
+			$new_File = & $FileCache->get_by_root_and_path( $fileroot_type, $fileroot_type_ID, trailing_slash( $path ).$newfile, true );
+			$old_File = & $FileCache->get_by_root_and_path( $fileroot_type, $fileroot_type_ID, trailing_slash( $path ).$oldfile, true );
+			$data['new'] = $new_File->get_view_link();
+			$data['old'] = $old_File->get_view_link();
+		}
+		else
+		{ // Simple text format
+			$data['new'] = $newfile;
+			$data['old'] = $oldfile;
+		}
 		if( $result !== true )
 		{ // Send an error if it was created during the replacing
 			$data['error'] = $result;

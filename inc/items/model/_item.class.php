@@ -974,7 +974,7 @@ class Item extends ItemLight
 		}
 		elseif( $user_can_be_validated )
 		{ // user is logged in but not activated
-			$activateinfo_link = '<a href="'.get_activate_info_url( $this->get_permanent_url().'#comments' ).'">'.T_( 'More info &raquo;' ).'</a>';
+			$activateinfo_link = '<a href="'.get_activate_info_url( $this->get_permanent_url().'#comments', '&amp;'  ).'">'.T_( 'More info &raquo;' ).'</a>';
 			echo '<p>'.$display_text.' '.$activateinfo_link.'</p>';
 		}
 		else

@@ -891,7 +891,14 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 		}
 	}
 
-	return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params );
+	if( in_array( $dispctrl, array( 'threads', 'messages', 'contacts', 'msgform' ) ) )
+	{ // Get this url through Blog function, because it can be linked to other blog
+		return $Blog->get( $dispctrl.'url' ).$params;
+	}
+	else
+	{ // Use current blog url
+		return url_add_param( $Blog->gen_blogurl(), 'disp='.$dispctrl.$params );
+	}
 }
 
 

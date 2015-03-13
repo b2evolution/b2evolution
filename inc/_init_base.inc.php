@@ -75,10 +75,12 @@ $request_transaction_name = '';
 
 if( !$config_is_done )
 { // base config is not done!
+	$error_title = 'Base configuration is not done!';
 	$error_message = 'Base configuration is not done! (see /conf/_basic_config.php)';
 }
 elseif( !isset( $locales[$default_locale] ) )
 {
+	$error_title = 'The default locale does not exist!';
 	$error_message = 'The default locale '.var_export( $default_locale, true ).' does not exist! (see /conf/_locales.php)';
 }
 if( isset( $error_message ) )

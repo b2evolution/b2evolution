@@ -2170,13 +2170,13 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url;
+	global $htsrv_url, $blog;
 
 	$params = array_merge( array(
-			'fileroot_ID' => 0, // Root type and ID, e.g. collection_1
-			'path'        => '', // Subpath for the file/folder
-			'list_style'  => 'list',  // 'list' or 'table'
-			'template_button' => '<div class="qq-uploader">'
+			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
+			'path'             => '', // Subpath for the file/folder
+			'list_style'       => 'list',  // 'list' or 'table'
+			'template_button'  => '<div class="qq-uploader">'
 					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
 					.'<div class="qq-upload-button">#button_text#</div>'
 					.'<ul class="qq-upload-list"></ul>'
@@ -2188,14 +2188,22 @@ function display_dragdrop_upload_button( $params = array() )
 					.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 					.'<span class="qq-upload-failed-text">'.TS_('Failed').'</span>'
 				.'</li>',
-			'display_support_msg' => true, // Display info under button about that current supports drag&drop
-			'additional_dropzone' => '', // jQuery selector of additional drop zone
-			'filename_before'     => '', // Append this text before file name on success uploading of new file,
+			'display_support_msg'    => true, // Display info under button about that current supports drag&drop
+			'additional_dropzone'    => '', // jQuery selector of additional drop zone
+			'filename_before'        => '', // Append this text before file name on success uploading of new file,
 			                             // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
+			'LinkOwner'              => NULL, // Use it if you want to link a file to Item/Comment right after uploading
+			'display_status_success' => true, // Display status text about successful uploading
+			'status_conflict_place'  => 'default', // Where we should write a message about conflict:
+																						 //    'default' - in the element ".qq-upload-status"
+																						 //    'before_button' - before button to solve a conflict
+			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
+			'resize_frame'           => false, // Resize frame on upload new image
+			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 		), $params );
 
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true';
+	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2226,6 +2234,16 @@ function display_dragdrop_upload_button( $params = array() )
 			uploader.setParams({root_and_path: root_and_path});
 		} );
 
+		<?php
+		if( $params['LinkOwner'] !== NULL )
+		{ // Add params to link a file right after uploading
+			global $b2evo_icons_type;
+			$link_owner_type = $params['LinkOwner']->type;
+			$link_owner_ID = ( $link_owner_type == 'item' ? $params['LinkOwner']->Item->ID : $params['LinkOwner']->Comment->ID );
+			echo 'url += "&link_owner='.$link_owner_type.'_'.$link_owner_ID.'&b2evo_icons_type='.$b2evo_icons_type.'"';
+		}
+		?>
+
 		jQuery( document ).ready( function()
 		{
 			uploader = new qq.FileUploader(
@@ -2235,6 +2253,20 @@ function display_dragdrop_upload_button( $params = array() )
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				debug: true,
+				onSubmit: function( id, fileName )
+				{
+					var noresults_row = jQuery( 'tr.noresults' );
+					if( noresults_row.length )
+					{ // Add table headers and remove "No results" row
+						<?php
+						if( $params['table_headers'] != '' )
+						{ // Append table headers if they are defined
+						?>
+						noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+						<?php } ?>
+						noresults_row.remove();
+					}
+				},
 				onComplete: function( id, fileName, responseJSON )
 				{
 					if( responseJSON.success != undefined )
@@ -2268,18 +2300,21 @@ function display_dragdrop_upload_button( $params = array() )
 					{ // Table view
 					?>
 					var this_row = jQuery( 'tr[rel=file_upload_' + id + ']' );
+
 					if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
 					{ // Failed
-						this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' )
-						this_row.find( '.qq-upload-file' ).append( text );
-						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
-						if( responseJSON != '' )
-						{ // Disppay the fatal errors
-							this_row.find( '.qq-upload-file' ).append( responseJSON );
+						this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
+						if( typeof( text ) == 'undefined' || text == '' )
+						{ // Message for unknown error
+							text = '<?php echo TS_('Server dropped the connection.'); ?>';
 						}
+						this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
+						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
 					}
 					else
-					{ // Success
+					{ // Success/Conflict
+						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
+
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
 						if( filename_before != '' )
 						{
@@ -2292,31 +2327,60 @@ function display_dragdrop_upload_button( $params = array() )
 							warning = '<div class="orange">' + responseJSON.success.warning + '</div>';
 						}
 
+						// File name or url to view file
+						var file_name = ( typeof( responseJSON.success.link_url ) != 'undefined' ) ? responseJSON.success.link_url : responseJSON.success.newname;
+
 						if( responseJSON.success.status == 'success' )
-						{
+						{ // Success upload
+							<?php
+							if( $params['display_status_success'] )
+							{ // Display this message only if it is enabled
+							?>
 							this_row.find( '.qq-upload-status' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
+							<?php } else { ?>
+							this_row.find( '.qq-upload-status' ).html( '' );
+							<?php } ?>
 							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before + '<span class="fname">' + responseJSON.success.newname + '</span>' + warning );
+							this_row.find( '.qq-upload-file' ).html( filename_before
+								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
+								+ '<span class="fname">' + file_name + '</span>' + warning );
 						}
 						else if( responseJSON.success.status == 'rename' )
-						{
-							this_row.find( '.qq-upload-status' ).html( '<span class="orange"><?php echo TS_('Upload Conflict'); ?></span>' )
+						{ // Conflict on upload
+							<?php
+							$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
+							if( $params['status_conflict_place'] == 'default' )
+							{ // Default place for a conflict message
+							?>
+							this_row.find( '.qq-upload-status' ).html( '<?php echo $status_conflict_message; ?>' );
+							<?php } else { ?>
+							this_row.find( '.qq-upload-status' ).html( '' );
+							<?php } ?>
 							this_row.find( '.qq-upload-image' ).append( htmlspecialchars_decode( responseJSON.success.file ) );
-							this_row.find( '.qq-upload-file' ).html( filename_before + '<span class="fname">' + responseJSON.success.newname + '</span> - '
-								+ '<a href="#" '
-								+ 'class="roundbutton_text roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldname + '" '
-								+ 'new="' + responseJSON.success.newname + '">'
+							this_row.find( '.qq-upload-file' ).html( filename_before
+								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
+								+ '<span class="fname">' + file_name + '</span>'
+								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
+								+ ' - <a href="#" '
+								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
+								+ 'old="' + responseJSON.success.oldpath + '" '
+								+ 'new="' + responseJSON.success.newpath + '">'
 								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 								+ '</a>'
 								+ warning );
-							this_row.find( '.qq-upload-file' ).removeAttr( 'rel' );
-							var old_file_obj = jQuery( 'td.fm_filename[rel="' + responseJSON.success.oldname + '"]' );
+							var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
 							if( old_file_obj.length > 0 )
 							{
-								old_file_obj.append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
+								old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
 							}
+						}
+
+						if( table_view == 'link' )
+						{ // Update the cells for link view, because these data exist in response
+							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
+							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
+							this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
 						}
 					}
 					<?php
@@ -2331,13 +2395,30 @@ function display_dragdrop_upload_button( $params = array() )
 						}
 					<?php
 					}
+
+					if( $params['resize_frame'] )
+					{ // Resize frame after upload new image
 					?>
+					update_iframe_height();
+					jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+					<?php } ?>
 				},
 				template: '<?php echo str_replace( '#button_text#', "' + button_text + '", $params['template_button'] ); ?>',
 				fileTemplate: '<?php echo $params['template_filerow']; ?>',
 				params: { root_and_path: root_and_path }
 			} );
 		} );
+
+		<?php
+		if( $params['resize_frame'] )
+		{ // Resize frame after upload new image
+		?>
+		function update_iframe_height()
+		{
+			var wrapper_height = jQuery( 'body' ).height();
+			jQuery( 'div#attachmentframe_wrapper', window.parent.document ).css( { 'height': wrapper_height, 'max-height': wrapper_height } );
+		}
+		<?php } ?>
 
 		<?php
 		if( $params['list_style'] == 'table' )
@@ -2351,17 +2432,17 @@ function display_dragdrop_upload_button( $params = array() )
 			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
 
 			var old_file_name = this_obj.attr( 'old' );
-			var old_file_obj = jQuery( 'td.fm_filename[rel="' + old_file_name + '"]' );
-			if( old_file_obj.length == 0 )
-			{ // No element found with old file name
-				alert( '<?php echo TS_('The old file is not found on the page!') ?>' );
-				return false;
-			}
+			var old_file_obj = jQuery( 'input[type=hidden][value="' + old_file_name + '"]' );
+			// Element found with old file name on the page
+			var old_file_exists = ( old_file_obj.length > 0 );
 			this_obj.hide();
 
 			// Highlight the rows with new and old files
-			var tr_rows = old_file_obj.parent().children( 'td' );
-			tr_rows = tr_rows.add( this_obj.parent().parent().children( 'td' ) );
+			var tr_rows = this_obj.parent().parent().children( 'td' );
+			if( old_file_exists )
+			{
+				tr_rows = tr_rows.add( old_file_obj.parent().parent().children( 'td' ) );
+			}
 			tr_rows.css( 'background', '#FFFF00' );
 			// Remove previous errors
 			tr_rows.find( 'span.error' ).remove();
@@ -2375,8 +2456,9 @@ function display_dragdrop_upload_button( $params = array() )
 					action: 'conflict_files',
 					fileroot_ID: '<?php echo $params['fileroot_ID']; ?>',
 					path: '<?php echo $params['path']; ?>',
-					oldfile: old_file_name,
-					newfile: this_obj.attr( 'new' ),
+					oldfile: old_file_name.replace( /^(.+\/)?([^\/]+)$/, '$2' ),
+					newfile: this_obj.attr( 'new' ).replace( /^(.+\/)?([^\/]+)$/, '$2' ),
+					format: '<?php echo $params['conflict_file_format']; ?>',
 					crumb_conflictfiles: '<?php echo get_crumb( 'conflictfiles' ); ?>'
 				},
 				success: function( result )
@@ -2385,32 +2467,40 @@ function display_dragdrop_upload_button( $params = array() )
 					if( typeof data.error == 'undefined' )
 					{ // Success
 						this_obj.show();
-						var old_filename_obj = old_file_obj.find( 'span.fname' );
 						var new_filename_obj = this_obj.parent().find( 'span.fname' );
 						if( is_replace )
 						{ // The replacing was executed, Change data of html elements
 							this_obj.children( 'div:first' ).hide();
 							this_obj.children( 'div:last' ).show();
-							old_filename_obj.html( data.new );
-							new_filename_obj.html( data.old );
 						}
 						else
 						{ // The replacing was reverting, Put back the data of html elements
 							this_obj.children( 'div:first' ).show();
 							this_obj.children( 'div:last' ).hide();
-							old_filename_obj.html( data.old );
-							new_filename_obj.html( data.new );
 						}
-						var old_icon_link = old_filename_obj.prev();
-						if( old_icon_link.length == 0 || old_icon_link.get(0).tagName != 'A' )
-						{
-							old_icon_link = old_filename_obj.parent().prev();
+						if( old_file_exists )
+						{ // If old file element exists on the page, we can:
+							// Swap old and new names
+							var old_filename_obj = old_file_obj.parent().find( 'span.fname' );
+							var old_filename_obj_html = old_filename_obj.html();
+							old_filename_obj.html( new_filename_obj.html() );
+							new_filename_obj.html( old_filename_obj_html );
+
+							var old_icon_link = old_filename_obj.prev();
+							if( old_icon_link.length == 0 || old_icon_link.get(0).tagName != 'A' )
+							{
+								old_icon_link = old_filename_obj.parent().prev();
+							}
+							if( old_icon_link.length > 0 && old_icon_link.get(0).tagName == 'A' )
+							{ // The icons exist to link files, We should swap them
+								var old_href = old_icon_link.attr( 'href' );
+								old_icon_link.attr( 'href', new_filename_obj.prev().attr( 'href' ) );
+								new_filename_obj.prev().attr( 'href', old_href );
+							}
 						}
-						if( old_icon_link.length > 0 && old_icon_link.get(0).tagName == 'A' )
-						{ // The icons exist to link files, We should swap them
-							var old_href = old_icon_link.attr( 'href' );
-							old_icon_link.attr( 'href', new_filename_obj.prev().attr( 'href' ) );
-							new_filename_obj.prev().attr( 'href', old_href );
+						else
+						{ // No old file element, Get data from request
+							new_filename_obj.html( is_replace ? data.old : data.new );
 						}
 					}
 					else
