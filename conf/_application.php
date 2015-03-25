@@ -21,7 +21,7 @@ $app_version = '6.0.1-alpha';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2015-03-13';
+$app_date = '2015-03-23';
 
 /**
  * Long version string for checking differences
@@ -55,9 +55,9 @@ $required_mysql_version = array( 'application' => '5.0.3' );
  */
 $app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
 		&ndash;
-		<a href="http://b2evolution.net/about/license.html" class="nobr">GPL License</a>';
+		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2015 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/dev/authors.html">others</a>.</span>';
+$copyright_text = '<span class="nobr">&copy;2003-2015 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
  * Modules to load

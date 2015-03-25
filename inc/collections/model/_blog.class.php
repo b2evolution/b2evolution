@@ -359,6 +359,12 @@ class Blog extends DataObject
 			}
 			$this->set( 'advanced_perms', $new_advanced_perms );
 			$this->set_setting( 'allow_access', $new_allow_access );
+			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
+			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
+				$this->set_setting( 'enable_sitemaps', 0 );
+				$this->set_setting( 'feed_content', 'none' );
+				$this->set_setting( 'ping_plugins', '' );
+			}
 
 			// Lists of collections:
 			$this->set( 'order', param( 'blog_order', 'integer' ) );
@@ -3292,7 +3298,7 @@ class Blog extends DataObject
 		{ // Current user has no access to current page
 			$Messages->add( T_( $error_message ), 'error' );
 
-			if( $this->get_setting( 'in_skin_login' ) )
+			if( $this->get_setting( 'in_skin_login' ) && ! get_setting_Blog( 'login_blog_ID' ) )
 			{ // If blog has in-skin login form we should not display it
 			  // Use 'access_requires_login.main.php' or 'access_denied.main.php' instead
 				$blog_skin_ID = $this->get_skin_ID();
@@ -3321,9 +3327,11 @@ class Blog extends DataObject
 				}
 			}
 
-			// Redirect to standard login form
-			header_redirect( get_login_url( 'no access to blog', NULL, true ), 302 );
-			// will have exited
+			if( ! is_logged_in() )
+			{ // Redirect to login form
+				header_redirect( get_login_url( 'no access to blog' ), 302 );
+				// will have exited
+			}
 		}
 
 		return true;

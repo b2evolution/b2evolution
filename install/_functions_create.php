@@ -25,6 +25,9 @@ function create_tables()
 	// Load DB schema from modules
 	load_db_schema();
 
+	// Update the progress bar status
+	update_install_progress_bar();
+
 	load_funcs('_core/model/db/_upgrade.funcs.php');
 
 	// Alter DB to match DB schema:
@@ -294,6 +297,9 @@ function create_default_data()
 	$DB->query( 'INSERT INTO T_track__goalcat ( gcat_name, gcat_color )
 		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
 	task_end();
+
+	// Update the progress bar status
+	update_install_progress_bar();
 
 	install_basic_skins();
 
@@ -1448,6 +1454,14 @@ function create_demo_contents()
 			$ablogger_ID );
 	}
 
+	$BlogCache = & get_BlogCache();
+	if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
+	{ // Set first blog as default login and default messaging collection
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+			VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
+						 ( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
+	}
+
 	task_end();
 
 	global $query, $timestamp;
@@ -1528,6 +1542,9 @@ function create_demo_contents()
 
 <p>If needed, an evoskin can format info pages differently from regular posts.</p>');
 
+
+	// Update the progress bar status
+	update_install_progress_bar();
 
 	if( $install_collection_home )
 	{ // ---------------- Insert the POSTS for Home blog ---------------- //
@@ -1615,6 +1632,9 @@ function create_demo_contents()
 
 <p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
 			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 1400 );
+
+		// Update the progress bar status
+		update_install_progress_bar();
 
 		task_end();
 	}
@@ -1724,6 +1744,9 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
+
+		// Update the progress bar status
+		update_install_progress_bar();
 
 		task_end();
 	}
@@ -1843,6 +1866,9 @@ function create_demo_contents()
 		$edited_Item->dbsave();
 		// $edited_Item->insert_update_tags( 'update' );
 
+		// Update the progress bar status
+		update_install_progress_bar();
+
 		task_end();
 	}
 
@@ -1894,6 +1920,11 @@ a school bus stop where you wouldn\'t really expect it!
 [infodot:%s:207:28:15em]Red planet[enddot]', $photo_link_1_ID, $photo_link_2_ID, $photo_link_4_ID ) );
 			$edited_Item->dbupdate();
 		}
+
+		// Update the progress bar status
+		update_install_progress_bar();
+
+		task_end();
 	}
 
 	if( $install_collection_forums || $install_collection_manual )
@@ -1934,8 +1965,6 @@ Shopping list:
 * pears
 
 The rain---not the reign---in Spain.');
-
-		task_end();
 	}
 
 	if( $install_collection_forums )
@@ -2037,6 +2066,9 @@ The rain---not the reign---in Spain.');
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_forums_news );
+
+		// Update the progress bar status
+		update_install_progress_bar();
 
 		task_end();
 	}
@@ -2429,6 +2461,9 @@ Hello
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_userguide );
+
+		// Update the progress bar status
+		update_install_progress_bar();
 
 		task_end();
 	}

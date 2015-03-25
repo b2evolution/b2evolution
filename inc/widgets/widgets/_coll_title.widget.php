@@ -35,6 +35,27 @@ class coll_title_Widget extends ComponentWidget
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'add_tagline' => array(
+					'label' => T_('Add tagline'),
+					'note' => T_('check to add the collection tagline after the title.'),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+				),
+			), parent::get_param_definitions( $params ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
@@ -82,6 +103,10 @@ class coll_title_Widget extends ComponentWidget
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
 							.$Blog->dget( 'name', 'htmlbody' )
 							.'</a>';
+		if( $this->disp_params['add_tagline'] )
+		{ // Add a tagline after blog title
+			$title .= ' <small>'.$Blog->dget( 'tagline', 'htmlbody' ).'</small>';
+		}
 		$this->disp_title( $title );
 
 		echo $this->disp_params['block_end'];

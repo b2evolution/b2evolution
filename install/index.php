@@ -30,6 +30,11 @@ define( 'EVO_MAIN_INIT', true );
  */
 define( 'EVO_IS_INSTALLING', true );
 
+/**
+ * @global boolean Is this an install page? Use {@link is_install_page()} to query it, because it may change.
+ */
+$is_install_page = true;
+
 // Force to display errors during install/upgrade, even when not in debug mode
 $display_errors_on_production = true;
 
@@ -183,7 +188,7 @@ if( $config_is_done || $try_db_connect )
 				{
 					$error_message = sprintf( T_('The minimum requirement for %s module is %s version %s but you are trying to use version %s!'), $key, 'MySQL', $value, $mysql_version );
 				}
-				die( '<h1>Insufficient Requirements</h1><div class="error"><p class="error"><strong>'.$error_message.'</strong></p></div>');
+				die( '<h1>'.T_('Insufficient Requirements').'</h1><p><strong>'.$error_message.'</strong></p>' );
 			}
 		}
 	}
@@ -234,7 +239,7 @@ switch( $action )
 		break;
 
 	case 'utf8upgrade':
-		$title = T_('Upgrade your DB to UTF-8');
+		$title = T_('Convert your DB to UTF-8');
 		break;
 
 	case 'start':
@@ -250,70 +255,68 @@ switch( $action )
 		break;
 }
 
-// Add CSS:
-require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
-require_css( 'basic.css', 'rsc_url' ); // Basic styles
-require_css( 'evo_distrib_2.css', 'rsc_url' );
-add_css_headline( '
-.install_options {
-	margin-left: 2em;
-}
-.install_options > span {
-	display: block;
-	margin: 6px 0;
-}' );
+// Form params
+$booststrap_install_form_params = array(
+		'formstart'      => '',
+		'formend'        => '',
+		'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+		'fieldend'       => "</div>\n\n",
+		'labelclass'     => 'control-label col-sm-4',
+		'labelstart'     => '',
+		'labelend'       => "\n",
+		'labelempty'     => '<label class="control-label col-sm-4"></label>',
+		'inputstart'     => '<div class="col-sm-8">',
+		'inputend'       => "</div>\n",
+		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
+		'buttonsend'     => "</div></div>\n\n",
+		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+	);
 
-header('Content-Type: text/html; charset='.$io_charset);
+header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
-<head>
-	<!-- InstanceBeginEditable name="doctitle" -->
-	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
-	<!-- InstanceEndEditable -->
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset; ?>" />
-	<meta name="viewport" content="width = 750" />
-	<meta name="robots" content="noindex, follow" />
-	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
-	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
-</head>
-
-<body>
-	<!-- InstanceBeginEditable name="BodyHead" --><!-- InstanceEndEditable -->
-
-	<div class="wrapper1">
-	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>
-
-		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-
-		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
-			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
-			<a href="../<?php echo $dispatcher ?>"><?php echo T_('Admin') ?></a>
-			</span>
-		<?php echo T_('Current installation') ?>:
-		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
-		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a>
-		<!-- InstanceEndEditable --></div>
+<!DOCTYPE html>
+<html lang="<?php locale_lang() ?>">
+	<head>
+		<base href="<?php echo get_script_baseurl(); ?>">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="noindex, follow" />
+		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
+		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<!-- Bootstrap -->
+		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<nav>
+					<ul class="nav nav-pills pull-right">
+						<li role="presentation"><a href="../readme.html"><?php echo T_('Read me'); ?></a></li>
+						<li role="presentation" class="active"><a href="index.php"><?php echo T_('Installer'); ?></a></li>
+						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
+					</ul>
+				</nav>
+				<h3 class="text-muted"><a href="http://b2evolution.net/"><img src="../rsc/img/b2evolution8.png" alt="b2evolution CCMS"></a></h3>
+			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->
 
 <?php
 
-block_open();
-
 // echo $action;
 $date_timezone = ini_get( "date.timezone" );
 if( empty( $date_timezone ) && empty( $date_default_timezone ) )
 { // The default timezone is not set, display a warning
-	echo '<div class="error"><p class="error">'.sprintf( T_("No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of %s (Example: %s)"), '$date_default_timezone', '$date_default_timezone = \'Europe/Paris\';' ).'</p></div>';
+	display_install_messages( sprintf( T_("No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of %s (Example: %s)"), '$date_default_timezone', '$date_default_timezone = \'Europe/Paris\';' ) );
 }
 
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 { // DB connect was unsuccessful, restart conf
-	echo '<div class="error"><p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p></div>';
+	display_install_messages( T_('Check your database config settings below and update them if necessary...') );
 	display_base_config_recap();
 	$action = 'start';
 }
@@ -322,10 +325,8 @@ if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 // TODO: Non-install/upgrade-actions should be allowed (e.g. "deletedb")
 if( $req_errors = install_validate_requirements() )
 {
-	echo '<div class="error">';
-	echo '<p class="error"><strong>'.T_('b2evolution cannot be installed, because of the following errors:').'</strong></p>';
-	echo '<ul class="error"><li>'.implode( '</li><li>', $req_errors ).'</li></ul>';
-	echo '</div>';
+	echo '<p class="text-danger"><strong>'.T_('b2evolution cannot be installed, because of the following errors:').'</strong></p>';
+	display_install_messages( $req_errors );
 	die;
 }
 
@@ -338,8 +339,6 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		display_locale_selector();
-
-		block_open();
 
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'raw', true );
@@ -363,7 +362,7 @@ switch( $action )
 			'halt_on_error' => false ) );
 		if( $DB->error )
 		{ // restart conf
-			echo '<p class="error">'.T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...').'</p>';
+			display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
 			$action = 'start';
 		}
 		else
@@ -376,7 +375,7 @@ switch( $action )
 
 			if( empty( $file_loaded ) )
 			{ // This should actually never happen, just in case...
-				echo '<div class="error"><p class="error">'.sprintf( T_('Could not load original conf file [%s]. Is it missing?'), $conf_filepath ).'</p></div>';
+				display_install_messages( sprintf( T_('Could not load original conf file [%s]. Is it missing?'), $conf_filepath ) );
 				break;
 			}
 
@@ -411,7 +410,7 @@ switch( $action )
 			// Write new contents:
 			if( save_to_file( $conf, $conf_filepath, 'w' ) )
 			{
-				printf( '<p>'.T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath );
+				display_install_messages( sprintf( T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath ), 'success' );
 
 				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
@@ -470,8 +469,6 @@ switch( $action )
 
 			display_locale_selector();
 
-			block_open();
-
 			echo '<h1>'.T_('Base configuration').'</h1>';
 
 			if( $config_is_done && $allow_evodb_reset != 1 )
@@ -513,43 +510,36 @@ switch( $action )
 
 			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
-			<form class="fform" name="form" action="index.php" method="post">
-				<input type="hidden" name="action" value="conf" />
-				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
-
-				<fieldset>
-					<legend><?php echo T_('Database you want to install into') ?></legend>
-					<p class="note"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
-					<?php
-						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-						form_text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
-						// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
-					?>
-				</fieldset>
-
-				<fieldset>
-					<legend><?php echo T_('Additional settings') ?></legend>
-					<?php
-						form_text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
-
-						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
-					?>
-				</fieldset>
-
-				<fieldset>
-					<fieldset>
-						<div class="input">
-							<input type="submit" name="submit" value="<?php echo T_('Update config file') ?>" class="search" />
-							<input type="reset" value="<?php echo T_('Reset') ?>" class="search" />
-						</div>
-					</fieldset>
-				</fieldset>
-
-			</form>
-
 			<?php
+			$Form = new Form( 'index.php' );
+
+			$Form->switch_template_parts( $booststrap_install_form_params );
+
+			$Form->begin_form( 'form-horizontal' );
+
+			$Form->hidden( 'action', 'conf' );
+			$Form->hidden( 'locale', $default_locale );
+
+			block_open( T_('Database you want to install into') );
+			?>
+				<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
+				<?php
+				$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
+				$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
+				$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
+				$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+				// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+			block_close();
+
+			block_open( T_('Additional settings') );
+				$Form->text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
+				$Form->text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
+			block_close();
+
+			$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Update config file'), 'class' => 'btn-primary btn-lg' ),
+					array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'btn-default btn-lg' )
+				) );
+
 			break;
 			}
 		}
@@ -565,7 +555,6 @@ switch( $action )
 
 		display_locale_selector();
 
-		block_open();
 		?>
 		<h1><?php echo T_('How would you like your b2evolution installed?') ?></h1>
 
@@ -578,8 +567,8 @@ switch( $action )
 				$expected_connection_charset = $DB->php_to_mysql_charmap( $evo_charset );
 				if( $DB->connection_charset != $expected_connection_charset )
 				{
-					echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
-						$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
+					display_install_messages( sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
+						$current_locale, $evo_charset, $expected_connection_charset ) );
 					// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
 					break;
 				}
@@ -588,7 +577,7 @@ switch( $action )
 					load_funcs( 'tools/model/_system.funcs.php' );
 					if( system_check_charset_update() )
 					{
-						echo '<div class="error"><p class="error">'.sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the preselected task below:"), utf8_strtoupper( $evo_charset ) ).'</p></div>';
+						display_install_messages( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the preselected task below:"), utf8_strtoupper( $evo_charset ) ) );
 					}
 				}
 			}
@@ -601,29 +590,37 @@ switch( $action )
 
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
-			<p><input type="radio" name="action" id="newdb" value="newdb"
-				<?php
-					// fp> change the above to 'newdbsettings' for an additional settings screen.
-					if( is_null($old_db_version) )
-					{
-						echo 'checked="checked"';
-					}
-				?>
-				/>
-				<label for="newdb"><?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?></label></p>
-			<p class="install_options">
+			<div class="radio">
+				<label>
+					<input type="radio" name="action" id="newdb" value="newdb"
+					<?php
+						// fp> change the above to 'newdbsettings' for an additional settings screen.
+						if( is_null($old_db_version) )
+						{
+							echo 'checked="checked"';
+						}
+					?>/>
+					<?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?>
+				</label>
+			</div>
+			
+			<div style="margin-left:2em">
 				<?php
 				if( $test_install_all_features && $allow_evodb_reset )
 				{ // Option to quick delete before new installation
 				?>
-				<span>
-					<input type="checkbox" name="delete_contents" id="delete_contents" value="1" checked="checked" />
-					<label for="delete_contents"><?php echo T_('Delete pre-existing b2evolution tables &amp; cache files.')?></label>
-				</span>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" name="delete_contents" id="delete_contents" value="1" checked="checked" />
+						<?php echo T_('Delete pre-existing b2evolution tables &amp; cache files.')?>
+					</label>
+				</div>
 				<?php } ?>
-				<span>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-					<label for="create_sample_contents"><?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?></label>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
+						<?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?>
+					</label>
 					<br />
 					<?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?>
 					<?php
@@ -653,11 +650,15 @@ switch( $action )
 						foreach( $collections as $coll_index => $coll_title )
 						{ // Display the checkboxes to select what demo collection to install
 					?>
-					<br /> &nbsp; &nbsp; <input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-					<label for="collection_<?php echo $coll_index; ?>"><?php echo $coll_title; ?></label>
+					<div class="checkbox" style="margin-left:2em">
+						<label>
+							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
+							<?php echo $coll_title; ?>
+						</label>
+					</div>
 					<?php } ?>
-				</span>
-				<span>
+				</div>
+				<div class="checkbox">
 					<?php
 						// Pre-check if current installation is local
 						$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
@@ -680,56 +681,69 @@ switch( $action )
 								)
 							);
 					?>
-					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
-					<label for="local_installation"><?php echo T_('This is a local / test / intranet installation.')?></label>
-				</span>
+					<label>
+						<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
+						<?php echo T_('This is a local / test / intranet installation.')?>
+					</label>
+				</div>
 				<?php
 					if( $test_install_all_features )
 					{ // Checkbox to install all features
 				?>
-				<span>
-					<input type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-					<label for="install_all_features"><?php echo T_('Also install all test features.')?></label>
-				</span>
+				<div class="checkbox">
+					<label>
+						<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+						<?php echo T_('Also install all test features.')?>
+					</label>
+				</div>
 				<?php } ?>
-			</p>
+			</div>
 
-			<p><input type="radio" name="action" id="evoupgrade" value="evoupgrade"
-				<?php if( !is_null($old_db_version) && ! $require_charset_update && $old_db_version < $new_db_version )
-					{
-						echo 'checked="checked"';
-					}
-				?>
-				/>
-				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?></label></p>
+			<div class="radio">
+				<label>
+					<input type="radio" name="action" id="evoupgrade" value="evoupgrade"
+					<?php if( !is_null($old_db_version) && ! $require_charset_update && $old_db_version < $new_db_version )
+						{
+							echo 'checked="checked"';
+						}
+					?>/>
+					<?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?>
+				</label>
+			</div>
 
 			<?php
-				if( $allow_evodb_reset == 1 )
-				{
-					?>
-					<p><input type="radio" name="action" id="deletedb" value="deletedb" />
-					<label for="deletedb"><strong><?php echo T_('Delete b2evolution tables &amp; cache files')?></strong>:
-					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.')?></label></p>
-
-					<p><input type="radio" name="action" id="start" value="start" />
-					<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
-					<?php
-				}
+			if( $allow_evodb_reset == 1 )
+			{
 			?>
-					<p><input type="radio" name="action" id="utf8upgrade" value="utf8upgrade"
-					<?php if( $require_charset_update )
-					{
-						echo 'checked="checked"';
-					}
-					?>
-					/>
-					<label for="utf8upgrade"><?php echo T_('<strong>Upgrade your DB to UTF-8</strong>: all the b2evolution tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset.')?></label></p>
+			<div class="radio">
+				<label>
+					<input type="radio" name="action" id="deletedb" value="deletedb" />
+					<strong><?php echo T_('Delete b2evolution tables &amp; cache files')?></strong>:
+					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.')?>
+				</label>
+			</div>
+
+			<div class="radio">
+				<label>
+					<input type="radio" name="action" id="start" value="start" />
+					<?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?>
+				</label>
+			</div>
+			<?php
+			}
+			?>
+			<div class="radio">
+				<label>
+					<input type="radio" name="action" id="utf8upgrade" value="utf8upgrade"<?php echo ( $require_charset_update ) ? ' checked="checked"' : '' ?>/>
+					<?php echo T_('<strong>Convert your DB to UTF-8</strong>: all the b2evolution tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset.')?>
+				</label>
+			</div>
 			<?php
 
 
 			if( $allow_evodb_reset != 1 )
 			{
-				echo '<div class="floatright"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').' &raquo;</a></div>';
+				echo '<div class="pull-right"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').' &raquo;</a></div>';
 			}
 			?>
 
@@ -737,12 +751,10 @@ switch( $action )
 			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
 				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { if ( confirm( '<?php
 					printf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
-					?>' ) ) { this.form.confirmed.value = 1; return true; } else return false; }" />
+					?>' ) ) { this.form.confirmed.value = 1; return true; } else return false; }" class="btn btn-primary btn-lg" />
 			</p>
 			</form>
 		<?php
-
-		block_close();
 
 		display_base_config_recap();
 		break;
@@ -750,8 +762,6 @@ switch( $action )
 	case 'localeinfo':
 		// Info about getting additional locales.
 		display_locale_selector();
-
-		block_open();
 
 		// Note: Do NOT make these strings translatable. We are not in the desired language anyways!
 		?>
@@ -769,8 +779,9 @@ switch( $action )
 		<p>Nobody has contributed a language pack in your language yet. You could help by providing a translation for your language.</p>
 		<p>For now, you will have to install b2evolution with a supported language.</p>
 		<p>Once you get familiar with b2evolution you will be able to <a href="<?php echo get_manual_url( 'localization' ); ?>" target="_blank">create your own language pack</a> fairly easily.</p>
-		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
+		// A link to back to install menu
+		display_install_back_link();
 		break;
 
 	case 'newdbsettings':
@@ -806,11 +817,14 @@ switch( $action )
 		$expected_connection_charset = DB::php_to_mysql_charmap($evo_charset);
 		if( $DB->connection_charset != $expected_connection_charset )
 		{
-			echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
-				$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
+			display_install_messages( sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
+				$current_locale, $evo_charset, $expected_connection_charset ) );
 			// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
 			break;
 		}
+
+		// Progress bar
+		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
 		if( $config_test_install_all_features && $allow_evodb_reset )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
@@ -825,6 +839,9 @@ switch( $action )
 
 				// Uninstall b2evolution: Delete DB & Cache files
 				uninstall_b2evolution();
+
+				// Update the progress bar status
+				update_install_progress_bar();
 			}
 		}
 
@@ -837,6 +854,9 @@ switch( $action )
 				echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
 			}
 
+			// Stop the animation of the progress bar
+			stop_install_progress_bar();
+
 			break;
 		}
 
@@ -845,13 +865,19 @@ switch( $action )
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		evo_flush();
 		// Check for .htaccess:
-		if( !install_htaccess( false ) )
-		{	// Exit installation here because the .htaccess file has the some errors
+		if( ! install_htaccess( false ) )
+		{ // Exit installation here because the .htaccess file has the some errors
 			break;
 		}
 
+		// Update the progress bar status
+		update_install_progress_bar();
+
 		// Here's the meat!
 		install_newdb();
+
+		// Stop the animation of the progress bar
+		stop_install_progress_bar();
 		break;
 
 
@@ -867,22 +893,28 @@ switch( $action )
 
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
+		// Progress bar
+		start_install_progress_bar( T_('Uprade in progress'), get_upgrade_steps_count() );
+
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		evo_flush();
 		// Check for .htaccess:
-		if( !install_htaccess( true ) )
-		{	// Exit installation here because the .htaccess file has the some errors
+		if( ! install_htaccess( true ) )
+		{ // Exit installation here because the .htaccess file has the some errors
 			break;
 		}
+
+		// Update the progress bar status
+		update_install_progress_bar();
 
 		// Try to obtain some serious time to do some serious processing (5 minutes)
 		// NOte: this must NOT be in upgrade_b2evo_tables(), otherwise it will mess with the longer setting used by the auto upgrade feature.
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="orange">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</div>';
+			echo '<div class="text-warning">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</div>';
 		}
 
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
@@ -897,9 +929,13 @@ switch( $action )
 				// disable maintenance mode at the end of the upgrade script
 				switch_maintenance_mode( false, 'upgrade' );
 			}
+
+			// Update the progress bar status
+			update_install_progress_bar();
+
 			?>
-			<p><?php echo T_('Upgrade completed successfully!')?></p>
-			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
+			<p class="text-success"><?php echo T_('Upgrade completed successfully!')?></p>
+			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' )?></p>
 			<?php
 		}
 		else
@@ -909,9 +945,14 @@ switch( $action )
 				switch_maintenance_mode( false, 'upgrade' );
 			}
 			?>
-			<p class="red"><?php echo T_('Upgrade failed!')?></p>
+			<p class="text-danger"><?php echo T_('Upgrade failed!')?></p>
 			<?php
+			// A link to back to install menu
+			display_install_back_link();
 		}
+
+		// Stop the animation of the progress bar
+		stop_install_progress_bar();
 
 		break;
 
@@ -924,6 +965,9 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_delete.php' );
 
+		// Progress bar
+		start_install_progress_bar( T_('Deletion in progress') );
+
 		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
 		evo_flush();
 
@@ -932,7 +976,8 @@ switch( $action )
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
 			echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
-			echo '<p><a href="index.php?locale='.$default_locale.'">&laquo; '.T_('Back to install menu').'</a></p>';
+			// A link to back to install menu
+			display_install_back_link();
 
 			break;
 		}
@@ -991,9 +1036,12 @@ switch( $action )
 
 		// Uninstall b2evolution: Delete DB & Cache files
 		uninstall_b2evolution();
-		?>
-		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
-		<?php
+
+		// Stop the animation of the progress bar
+		stop_install_progress_bar();
+
+		// A link to back to install menu
+		display_install_back_link();
 		break;
 
 
@@ -1006,10 +1054,16 @@ switch( $action )
 
 		load_funcs('_core/model/db/_upgrade.funcs.php');
 
+		// Progress bar
+		start_install_progress_bar( T_('Conversion in progress') );
+
 		db_upgrade_to_utf8( true );
-		?>
-		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
-		<?php
+
+		// Stop the animation of the progress bar
+		stop_install_progress_bar();
+
+		// A link to back to install menu
+		display_install_back_link();
 		break;
 }
 
@@ -1017,21 +1071,18 @@ block_close();
 ?>
 
 <!-- InstanceEndEditable -->
-	</div>
 
-	<div class="body_fade_out">
+			<footer class="footer">
+				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
+				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
+				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
+				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
+				</p>
+			</footer>
 
-	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
-			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="<?php echo get_manual_url( NULL ); ?>" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
-		<!-- InstanceEndEditable --></div>
+		</div><!-- /container -->
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2015 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
-		<!-- InstanceEndEditable --></div>
-
-	</div>
-	</div>
-
-	<!-- InstanceBeginEditable name="BodyFoot" -->
 	<?php
 		// We need to manually call debug_info since there is no shutdown function registered during the install process.
 		// debug_info( true ); // force output of debug info
@@ -1040,6 +1091,5 @@ block_close();
 ?>
 <!-- b2evo-install-action:<?php echo $action ?> -->
 <!-- b2evo-install-end -->
-	<!-- InstanceEndEditable -->
-</body>
-<!-- InstanceEnd --></html>
+	</body>
+</html>

@@ -58,6 +58,8 @@ $params = array_merge( array(
 		'login_form_sessID'        => '',
 		'transmit_hashed_password' => $transmit_hashed_password,
 		'display_abort_link'       => true,
+		'abort_link_position'      => 'above_form',
+		'display_reg_link'         => false,
 		'display_form_messages'    => false,
 		'login_form_footer'        => true,
 	), $params );
@@ -82,6 +84,8 @@ $login_form_params = array(
 	'sessID'                   => $params['login_form_sessID'],
 	'transmit_hashed_password' => $params['transmit_hashed_password'],
 	'display_abort_link'       => $params['display_abort_link'],
+	'abort_link_position'      => $params['abort_link_position'],
+	'display_reg_link'         => $params['display_reg_link'],
 );
 
 echo str_replace( '$form_class$', $params['form_class_login'], $params['login_page_before'] );

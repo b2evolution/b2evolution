@@ -65,10 +65,12 @@ function display_container( $container, $legend_suffix = '' )
 				'td_class' => 'shrinkwrap' ),
 		);
 	//enable fadeouts here
-	$Table->display_init( NULL, array('fadeouts' => true) );
-	// add ID for jQuery
-	// TODO: fp> Awfully dirty. This should be handled by the Table object
-	$Table->params['list_start'] = str_replace( '<table', '<table id="'.$table_id.'"', $Table->params['list_start'] );
+	$Table->display_init( array(
+				'list_attrib' => 'id="'.$table_id.'"',
+				'list_class'  => 'widget_container_list'
+			),
+			array( 'fadeouts' => true )
+		);
 
 	/*
 	if( $legend_suffix )

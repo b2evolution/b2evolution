@@ -3,6 +3,7 @@
  * This is the site header include template.
  *
  * If enabled, this will be included at the top of all skins to provide a common identity and site wide navigation.
+ * NOTE: each skin is responsible for calling siteskin_include( '_site_body_header.inc.php' );
  *
  * @package site_skins
  */

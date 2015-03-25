@@ -12,16 +12,25 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Open a block
+ *
+ * @param string Block title
  */
-function block_open()
+function block_open( $title = '' )
 {
 	global $block_status;
-	if( isset($block_status) && $block_status == 'open' )
+	if( isset( $block_status ) && $block_status == 'open' )
 	{
 		return;
 	}
+
 	$block_status = 'open';
-	echo '<div class="block1"><div class="block2"><div class="block3">';
+
+	echo "\n".'<div class="panel panel-default">'."\n";
+	if( $title != '' )
+	{ // Display a title
+		echo '<div class="panel-heading">'.$title.'</div>'."\n";
+	}
+	echo '<div class="panel-body">'."\n";
 }
 
 /**
@@ -30,12 +39,12 @@ function block_open()
 function block_close()
 {
 	global $block_status;
-	if( !isset($block_status) || $block_status == 'closed' )
+	if( ! isset( $block_status ) || $block_status == 'closed' )
 	{
 		return;
 	}
 	$block_status = 'closed';
-	echo '</div></div></div>';
+	echo '</div></div>'."\n\n";
 }
 
 /**
@@ -52,29 +61,50 @@ function display_locale_selector()
 		return;
 	}
 	$selector_already_displayed = true;
-	block_open();
-	?>
-	<h2><?php echo T_('Language / Locale')?></h2>
-	<form action="index.php" method="get">
-	<?php
-	echo '<div class="floatright"><a href="index.php?action=localeinfo&amp;locale='.$default_locale.'">'.T_('More languages').' &raquo;</a></div>';
 
-	locale_flag( $default_locale, 'w16px', 'flag', '', true, /* Do not rely on $baseurl/$rsc_url here: */ '../rsc/flags' );
-	echo '<select name="locale" onchange="this.form.submit()">';
+	block_open( T_('Language / Locale') );
+	?>
+	<ul class="pager pull-right" style="margin:0">
+		<li class="next"><a href="index.php?action=localeinfo&amp;locale=<?php echo $default_locale; ?>">More languages <span aria-hidden="true">&rarr;</span></a></li>
+	</ul>
+
+	<?php
+	if( isset( $locales[ $default_locale ] ) )
+	{
+		$default_locale_option_title = locale_flag( $default_locale, 'w16px', 'flag', '', false ).' '.$locales[ $default_locale ]['name'];
+	}
+	$locale_options = '';
 	foreach( $locales as $lkey => $lvalue )
 	{
-		echo '<option';
-		if( $default_locale == $lkey ) echo ' selected="selected"';
-		echo ' value="'.$lkey.'">';
-		echo T_( $lvalue['name'] );
-		echo '</option>';
+		$locale_options .= '<li><a href="index.php?locale='.$lkey.'">'.locale_flag( $lkey, 'w16px', 'flag', '', false ).' '.T_( $lvalue['name'] ).'</a></li>'."\n";
 	}
 	?>
-	</select>
+	<div class="btn-group install-language">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+			<?php echo $default_locale_option_title; ?>
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+		<?php echo $locale_options; ?>
+		</ul>
+	</div>
+
 	<noscript>
-		<input type="submit" value="<?php echo T_('Select as default language/locale'); ?>" />
+		<style type="text/css">.install-language{display:none;}</style>
+		<form action="index.php" method="get" class="form-inline">
+		<select name="locale" class="form-control">
+		<?php
+		foreach( $locales as $lkey => $lvalue )
+		{
+			echo '<option'.( $default_locale == $lkey ? ' selected="selected"' : '' ).' value="'.$lkey.'">';
+			echo T_( $lvalue['name'] );
+			echo '</option>';
+		}
+		?>
+		</select>
+		<input type="submit" value="<?php echo T_('Select as default language/locale'); ?>" class="btn btn-primary" />
+		</form>
 	</noscript>
-	</form>
 	<?php
 	block_close();
 }
@@ -94,10 +124,9 @@ function display_base_config_recap()
 	}
 	$base_config_recap_already_displayed = true;
 
-	block_open();
+	echo '<br />';
+	block_open( T_('Base config recap...') );
 	?>
-	<h2><?php echo T_('Base config recap...')?></h2>
-
 	<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
 
 	<?php
@@ -106,15 +135,16 @@ function display_base_config_recap()
 	if( !isset($conf_db_name) ) $conf_db_name = $db_config['name'];
 	if( !isset($conf_db_host) ) $conf_db_host = isset($db_config['host']) ? $db_config['host'] : 'localhost';
 
-	echo '<pre>',
-	T_('MySQL Username').': '.$conf_db_user."\n".
-	T_('MySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
-	T_('MySQL Database name').': '.$conf_db_name."\n".
-	T_('MySQL Host/Server').': '.$conf_db_host."\n".
-	T_('MySQL tables prefix').': '.$tableprefix."\n\n".
-	T_('Base URL').': '.$baseurl."\n\n".
+	echo '<samp>'.
+	T_('MySQL Username').': '.$conf_db_user.'<br />'.
+	T_('MySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') ).'<br />'.
+	T_('MySQL Database name').': '.$conf_db_name.'<br />'.
+	T_('MySQL Host/Server').': '.$conf_db_host.'<br />'.
+	T_('MySQL tables prefix').': '.$tableprefix.'<br /><br />'.
+	T_('Base URL').': '.$baseurl.'<br /><br />'.
 	T_('Admin email').': '.$admin_email.
-	'</pre>';
+	'</samp>';
+
 	block_close();
 }
 
@@ -168,6 +198,9 @@ function install_newdb()
 	evo_flush();
 	create_tables();
 
+	// Update the progress bar status
+	update_install_progress_bar();
+
 	echo '<h2>'.T_('Creating minimum default data...').'</h2>';
 	evo_flush();
 	create_default_data();
@@ -204,6 +237,9 @@ function install_newdb()
 		create_demo_contents();
 	}
 
+	// Update the progress bar status
+	update_install_progress_bar();
+
 	track_step( 'install-success' );
 	echo '<h2>'.T_('Installation successful!').'</h2>';
 
@@ -216,7 +252,7 @@ function install_newdb()
 	printf( '<tr><td>%s: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', T_( 'Password' ), $random_password );
 	echo '</table>';
 
-	echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
+	echo '<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 }
 
 
@@ -498,25 +534,16 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'bootstrap_manual' );
 
 	skin_install( 'asevo' );
-	skin_install( 'custom' );
 	skin_install( 'dating_mood' );
 	skin_install( 'evopress' );
 	skin_install( 'forums' );
-	skin_install( 'glossyblue' );
-	skin_install( 'intense' );
 	skin_install( 'manual' );
-	skin_install( 'miami_blue' );
-	skin_install( 'natural_pink' );
-	skin_install( 'nifty_corners' );
 	skin_install( 'photoblog' );
 	skin_install( 'pixelgreen' );
-	skin_install( 'pluralism' );
-	skin_install( 'terrafirma' );
 	if( $install_mobile_skins )
 	{
 		skin_install( 'touch' );
 	}
-	skin_install( 'vastitude' );
 	skin_install( '_atom' );
 	skin_install( '_rss2' );
 
@@ -659,8 +686,8 @@ function install_plugin( $plugin, $activate = true )
 	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! is_a( $edit_Plugin, 'Plugin' ) )
-	{
-		echo $edit_Plugin."<br />\n";
+	{ // Broken plugin
+		echo '<span class="text-danger">'.$edit_Plugin.'</span><br />'."\n";
 		return false;
 	}
 
@@ -668,19 +695,19 @@ function install_plugin( $plugin, $activate = true )
 	install_plugin_db_schema_action( $edit_Plugin, true );
 
 	if( $activate )
-	{	// Try to enable plugin:
+	{ // Try to enable plugin:
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return !== true )
-		{
+		{ // Warning on enable a plugin
 			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
-			echo $enable_return."<br />\n";
+			echo '<span class="text-warning">'.$enable_return.'</span><br />'."\n";
 			return false;
 		}
 
 		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'enabled' );
 	}
 	else
-	{	// Set plugin status as disable
+	{ // Set plugin status as disable
 		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' );
 	}
 
@@ -948,12 +975,12 @@ function load_db_schema()
  */
 function install_htaccess( $upgrade = false )
 {
-	echo '<p>Preparing to install .htaccess ... ';
+	echo '<p>'.T_('Preparing to install .htaccess ...').' ';
 
-	$server = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
-	if( !empty($server) && preg_match('~(Nginx|Lighttpd|Microsoft-IIS)~i', $server) )
-	{	// Skip installation if this is not an Apache server
-		echo '<br /><b>.htaccess is not needed (not an Apache server)</b></p>';
+	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
+	{ // Skip installation if this is not an Apache server
+		echo '<br /><b class="text-warning">'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</b></p>';
 		return true;
 	}
 
@@ -963,15 +990,15 @@ function install_htaccess( $upgrade = false )
 	{
 		$htignore = param( 'htignore', 'integer', 0 );
 
-		echo 'ERROR!<br/><b>'.$error_message.'</b>';
+		echo '<span class="text-danger">'.T_('ERROR!').'<br/><b>'.$error_message.'</b></span>';
 
 		if( $htignore )
-		{	// Ignore errors with .htaccess file
+		{ // Ignore errors with .htaccess file
 			return true;
 		}
 		else
-		{	// Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
-			echo '<p style="text-align:center;font-size:150%;font-weight:bold;margin-top:10px"><a href="'.$_SERVER['REQUEST_URI'].'&htignore=1">'.T_('Continue installation &raquo;').'</a></p>';
+		{ // Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
+			echo '<ul class="pager"><li><a href="'.$_SERVER['REQUEST_URI'].'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			return false;
 		}
 	}
@@ -992,11 +1019,11 @@ function do_install_htaccess( $upgrade = false )
 	global $baseurl;
 	global $basepath;
 
-	if( @file_exists($basepath.'.htaccess') )
+	if( @file_exists( $basepath.'.htaccess' ) )
 	{
 		if( $upgrade )
 		{
-			echo T_('Already installed.');
+			echo '<span class="text-warning">'.T_('Already installed.').'</span>';
 			return ''; // all is well :)
 		}
 
@@ -1006,8 +1033,8 @@ function do_install_htaccess( $upgrade = false )
 			$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
 
 			if( $content_htaccess != $content_sample_htaccess )
-			{	// The .htaccess file has content that different from a sample file
-				$error_message = '<p class="red">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
+			{ // The .htaccess file has content that different from a sample file
+				$error_message = '<p class="text-danger">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
 				$error_message .= T_('Here are the contents of the current .htaccess file:');
 				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
 				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
@@ -1015,7 +1042,7 @@ function do_install_htaccess( $upgrade = false )
 			}
 			else
 			{
-				echo T_('Already installed.');
+				echo '<span class="text-warning">'.T_('Already installed.').'</span>';
 				return '';
 			}
 		}
@@ -1024,13 +1051,13 @@ function do_install_htaccess( $upgrade = false )
 	// Make sure we have a sample file to start with:
 	if( ! @file_exists( $basepath.'sample.htaccess' ) )
 	{
-		return 'Cannot find file [ sample.htaccess ] in your base url folder.';
+		return T_('Cannot find file [ sample.htaccess ] in your base url folder.');
 	}
 
 	// Try to copy that file to the test folder:
 	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
 	{
-		return 'Failed to copy files!';
+		return T_('Failed to copy files!');
 	}
 
 	// Make sure .htaccess does not crash in the test folder:
@@ -1042,16 +1069,16 @@ function do_install_htaccess( $upgrade = false )
 	}
 	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
 	{
-		return 'install/test/index.html was not found as expected.';
+		return sprintf( T_('%s was not found as expected.'), 'install/test/index.html' );
 	}
 
 	// Now we consider it's safe, copy .htaccess to its real location:
 	if( ! @copy( $basepath.'sample.htaccess', $basepath.'.htaccess' ) )
 	{
-		return 'Test was successful, but failed to copy .htaccess into baseurl directory!';
+		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo 'Install successful.';
+	echo '<span class="text-success">'.T_('Installation successful!').'</span>';
 	return '';
 }
 
@@ -1077,9 +1104,267 @@ function get_antispam_query()
 function track_step( $current_step )
 {
 	// echo 'Tracking '.$current_step;
-	echo '<img src="http://b2evolution.net/htsrv/track.php?key='.$current_step.'" alt="" />';
+	echo '<div style="display:none">'
+			.'<img src="http://b2evolution.net/htsrv/track.php?key='.$current_step.'" alt="" />'
+		.'</div>';
 }
 
 
+/**
+ * Display a link to back to install menu
+ */
+function display_install_back_link()
+{
+	global $default_locale;
 
+	echo '<ul class="pager">'
+			.'<li class="previous"><a href="index.php?locale='.$default_locale.'"><span aria-hidden="true">&larr;</span> '.T_('Back to install menu').'</a></li>'
+		.'</ul>';
+}
+
+
+/**
+ * Display a progress bar to start an animation of a process
+ *
+ * @param string Title (Not visible on screen, it is used ONLY for screen readers)
+ * @param integer|NULL A number of the steps
+ */
+function start_install_progress_bar( $title, $steps = NULL )
+{
+	global $install_progress_bar_counter, $install_progress_bar_total;
+
+	if( $steps !== NULL )
+	{ // Progress bar with steps
+		$install_progress_bar_total = $steps;
+		$install_progress_bar_counter = 0;
+		$bar_width = '0%';
+	}
+	else
+	{ // Progress bar has no steps for update
+		$bar_width = '100%';
+	}
+
+	echo '<div class="progress">'
+			.'<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$bar_width.'">'
+				.'<span class="sr-only">'.$title.'</span>'
+			.'</div>'
+		.'</div>';
+	if( $steps !== NULL )
+	{ // Use this fix to keep the progress animated forever when JavaScript is disabled
+		echo '<noscript>'
+				.'<style type="text/css">.progress-bar{width:100% !important}</style>'
+			.'</noscript>';
+		// Don't use the striped animation when we have a real progress indication
+		echo '<script type="text/javascript">'
+			.'jQuery( ".progress-bar.active.progress-bar-striped" ).removeClass( "active progress-bar-striped" );'
+		.'</script>';
+	}
+}
+
+
+/**
+ * Print JavaScript to stop the animation of the progress bar
+ */
+function stop_install_progress_bar()
+{
+	echo '<script type="text/javascript">'
+		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
+	.'</script>';
+}
+
+
+/**
+ * Print JavaScript to update the progress bar status
+ */
+function update_install_progress_bar()
+{
+	global $install_progress_bar_counter, $install_progress_bar_total;
+
+	if( empty( $install_progress_bar_total ) )
+	{ // No a number of the steps, Exit here
+		return;
+	}
+
+	// This is next step
+	$install_progress_bar_counter++;
+
+	$bar_width = ceil( $install_progress_bar_counter / $install_progress_bar_total * 100 );
+	if( $bar_width > 100 )
+	{ // Limit by 100%
+		$bar_width = 100;
+	}
+
+	echo '<script type="text/javascript">'
+		.'jQuery( ".progress-bar" ).css( "width", "'.$bar_width.'%" );'
+	.'</script>';
+}
+
+
+/**
+ * Calculate a number of the steps for current installation
+ *
+ * @return integer
+ */
+function get_install_steps_count()
+{
+	global $config_test_install_all_features, $allow_evodb_reset;
+
+	$steps = 0;
+
+	// After Deleting b2evolution tables:
+	if( $config_test_install_all_features && $allow_evodb_reset )
+	{ // Allow to quick delete before new installation only when these two settings are enabled in config files
+		$delete_contents = param( 'delete_contents', 'integer', 0 );
+
+		if( $delete_contents )
+		{ // A quick deletion is requested before new installation
+			$steps++;
+		}
+	}
+
+	// After Checking files:
+	$steps++;
+
+	// After Loading all modules:
+	$steps++;
+
+	// After Creating all DB tables:
+	$steps++;
+
+	// Before install default skins:
+	$steps++;
+
+	// Installing sample contents:
+	$installer_version = param( 'installer_version', 'integer', 0 );
+	if( $installer_version >= 10 )
+	{
+		$create_sample_contents = param( 'create_sample_contents', 'integer', 0 );
+	}
+	else
+	{ // OLD INSTALLER call. Probably an automated script calling.
+		// Let's force the sample contents since they haven't been explicitly disabled
+		$create_sample_contents = 1;
+	}
+	if( $create_sample_contents )
+	{
+		// After Creating default sample contents(users, and probably blogs and categories):
+		$steps++;
+
+		// Array contains which collections should be installed
+		$collections = param( 'collections', 'array:string', array() );
+		$install_collection_home = in_array( 'home', $collections );
+		$install_collection_bloga = in_array( 'a', $collections );
+		$install_collection_blogb = in_array( 'b', $collections );
+		$install_collection_photos = in_array( 'photos', $collections );
+		$install_collection_forums = in_array( 'forums', $collections );
+		$install_collection_manual = in_array( 'manual', $collections );
+
+		if( $install_collection_home )
+		{ // After installing of the blog "Home"
+			$steps++;
+		}
+		if( $install_collection_bloga )
+		{ // After installing of the blog "Blog A"
+			$steps++;
+		}
+		if( $install_collection_blogb )
+		{ // After installing of the blog "Blog B"
+			$steps++;
+		}
+		if( $install_collection_photos )
+		{ // After installing of the blog "Photos"
+			$steps++;
+		}
+		if( $install_collection_forums )
+		{ // After installing of the blog "Forums"
+			$steps++;
+		}
+		if( $install_collection_manual )
+		{ // After installing of the blog "Manual"
+			$steps++;
+		}
+	}
+
+	// Last step before successful message:
+	$steps++;
+
+	return $steps;
+}
+
+
+/**
+ * Calculate a number of the steps for current upgrading
+ *
+ * @return integer
+ */
+function get_upgrade_steps_count()
+{
+	global $new_db_version;
+
+	$steps = 0;
+
+	// After Checking files:
+	$steps++;
+
+	// After Loading all modules:
+	$steps++;
+
+	// Calculate the upgrade blocks:
+	$old_db_version = get_db_version();
+	if( $new_db_version > $old_db_version )
+	{ // Only when DB must be updated
+		$upgrade_file_name = dirname( __FILE__ ).'/_functions_evoupgrade.php';
+		if( @file_exists( $upgrade_file_name ) )
+		{ // If file exists we can parse to know how much the upgrade blocks will be executed
+			$upgrade_file_content = file_get_contents( $upgrade_file_name );
+			if( preg_match_all( '#if\(\s*\$old_db_version\s*<\s*(\d+)\s*\)#i', $upgrade_file_content, $version_matches ) )
+			{
+				foreach( $version_matches[1] as $version )
+				{
+					if( $old_db_version < $version && $new_db_version != $old_db_version )
+					{ // Only these blocks will be executed
+						$steps++;
+					}
+				}
+			}
+		}
+	}
+
+	// Before Starting to check DB:
+	$steps++;
+
+	// Last step before successful message:
+	$steps++;
+
+	return $steps;
+}
+
+
+/**
+ * Display the messages on install pages
+ *
+ * @param string|array Messages
+ */
+function display_install_messages( $messages, $type = 'error' )
+{
+	if( empty( $messages ) )
+	{ // No messages
+		return;
+	}
+
+	if( is_string( $messages ) )
+	{
+		$messages = array( $messages );
+	}
+
+	$type = ( $type == 'error' )? 'danger' : $type;
+
+	$r = '';
+	foreach( $messages as $message )
+	{
+		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$message.'</div>'."\n";
+	}
+
+	echo $r;
+}
 ?>

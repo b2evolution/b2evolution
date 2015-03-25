@@ -794,7 +794,7 @@ class Form extends Widget
 	 *
 	 * @return The generated HTML
 	 */
-	function end_field( $type )
+	function end_field( $type = '' )
 	{
 
 		$r = '';

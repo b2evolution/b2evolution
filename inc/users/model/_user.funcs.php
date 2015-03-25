@@ -228,7 +228,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 /**
  * Get url to show user a form to restore a lost passowrd
  *
- * @param string URL to redirect
+ * @param string URL to redirect, FALSE - don't use a redirect
  * @param string delimiter to use for more url params
  * @return string URL
  */
@@ -236,7 +236,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
 {
 	global $Blog, $secure_htsrv_url;
 
-	if( empty( $redirect_to ) )
+	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
 		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
 	}
@@ -250,7 +250,12 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
 		$lostpassword_url = $secure_htsrv_url.'login.php?action=lostpassword';
 	}
 
-	return url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
+	if( $redirect_to !== false )
+	{ // Append redirect URL only when it is not restricted
+		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
+	}
+
+	return $lostpassword_url;
 }
 
 
@@ -280,6 +285,68 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
+}
+
+
+/**
+ * Get url to show user a form of notification settings
+ *
+ * @param string delimiter to use for more url params
+ * @param integer|NULL User ID, NULL - use current user
+ * @return string URL
+ */
+function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
+{
+	global $blog, $Blog, $admin_url;
+
+	if( ! empty( $blog ) && empty( $Blog ) )
+	{ // Try to initialize global $Blog object
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	}
+
+	$use_admin_page_url = false;
+	if( is_admin_page() || empty( $Blog ) )
+	{ // Check if the user has an access to backoffice
+		if( is_null( $user_ID ) )
+		{ // Use current user
+			global $current_User;
+			$User = & $current_User;
+		}
+		else
+		{ // Get user by ID
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $user_ID, false, false );
+		}
+		if( ! empty( $User ) && $User->check_perm( 'admin', 'restricted' ) )
+		{ // The user has an access to backoffice
+			$use_admin_page_url = true;
+		}
+	}
+
+	if( $use_admin_page_url )
+	{ // Use backoffice form of notifications form
+		$notifications_url = $admin_url.'?ctrl=user'.$glue.'user_tab=subs#subs';
+	}
+	else
+	{ // Use in-skin form of notifications form
+		if( empty( $Blog ) )
+		{ // If no current blog, try to use a default blog
+			$url_Blog = & get_setting_Blog( 'default_blog_ID' );
+			if( empty( $url_Blog ) )
+			{ // No default blog, Use base url
+				global $baseurl;
+				$notifications_url = url_add_param( $baseurl, 'disp=subs#subs' );
+			}
+		}
+		else
+		{ // Use current blog
+			$url_Blog = & $Blog;
+		}
+		$notifications_url = $url_Blog->get( 'subsurl', array( 'glue' => $glue ) );
+	}
+
+	return $notifications_url;
 }
 
 
@@ -404,9 +471,15 @@ function use_in_skin_login()
 		return false;
 	}
 
-	if( ! isset( $blog ) )
+	if( empty( $blog ) )
 	{ // No current blog selected
 		return false;
+	}
+
+	if( empty( $Blog ) )
+	{ // Try to initialize global $Blog object
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
 	if( get_setting_Blog( 'login_blog_ID' ) )
@@ -414,8 +487,6 @@ function use_in_skin_login()
 		return true;
 	}
 
-	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( empty( $Blog ) )
 	{ // No current blog found in DB
 		return false;
@@ -443,34 +514,25 @@ function show_toolbar()
  */
 function check_setting( $setting_name )
 {
-	global $Settings, $Blog, $SkinCache;
+	global $Settings, $Blog;
 
-	if( ! isset( $Blog ) && ! is_admin_page() )
-	{	// If we use some page without blog data
-		return false;
-	}
-
-	if( is_admin_page() )
-	{	// Check setting in the Back office
+	if( is_admin_page() || ! isset( $Blog ) )
+	{ // Check setting in the Back office or when Blog is not defined
 		if( $Settings->get( $setting_name ) )
-		{	// Set TRUE if the setting is ON
+		{ // Set TRUE if the setting is ON
 			return true;
 		}
 	}
 	else
-	{	// Check setting in the Front office for current blog & skin
-		global $Blog, $SkinCache;
-		if( ! isset( $SkinCache ) )
-		{	// Init $SkinCache if it doesn't still exist
-			$SkinCache = & get_SkinCache();
-		}
+	{ // Check setting in the Front office for current blog & skin
+		$SkinCache = & get_SkinCache();
 		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
 		if( $skin->get_setting( $setting_name ) )
 		{ // If setting is ON for current Blog & Skin
 			if( $setting_name == 'bubbletip' )
-			{	// Check separate case for setting 'bubbletip'
+			{ // Check separate case for setting 'bubbletip'
 				if( is_logged_in() || $Settings->get( $setting_name.'_anonymous' ) )
-				{	// If user is logged in OR Anonymous user can see bubbletips
+				{ // If user is logged in OR Anonymous user can see bubbletips
 					return true;
 				}
 			}
@@ -492,11 +554,14 @@ function check_setting( $setting_name )
  * @param string Link text, "Register" by default
  * @param string Link title, "Register for a new account..." by default
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
+ * @param string Where to redirect
+ * @param string Used for source tracking
+ * @param string Link class
  * @param string Used for source tracking if $source is not already set
  */
-function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $default_source_string = '' )
+function user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#', $disp_when_logged_in = false, $redirect = null, $default_source_string = '', $link_class = '' )
 {
-	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in, NULL, $default_source_string );
+	echo get_user_register_link( $before, $after, $link_text, $link_title, $disp_when_logged_in, $redirect, $default_source_string, $link_class );
 }
 
 
@@ -510,10 +575,11 @@ function user_register_link( $before = '', $after = '', $link_text = '', $link_t
  * @param boolean Display the link, if the user is already logged in? (this is used by the login form)
  * @param string Where to redirect
  * @param string Used for source tracking
+ * @param string Link class
  * @return string The link to new user registration on success, empty string otherwise
  */
 function get_user_register_link( $before = '', $after = '', $link_text = '', $link_title = '#',
-		$disp_when_logged_in = false, $redirect = null, $default_source_string = '' )
+		$disp_when_logged_in = false, $redirect = null, $default_source_string = '', $link_class = '' )
 {
 	$register_url = get_user_register_url( $redirect, $default_source_string, $disp_when_logged_in );
 
@@ -525,8 +591,13 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 	if( $link_text == '' ) $link_text = T_('Register').' &raquo;';
 	if( $link_title == '#' ) $link_title = T_('Register for a new account...');
 
+	if( $link_class != '' )
+	{ // Use a link class if it is defined
+		$link_class = ' class="'.$link_class.'"';
+	}
+
 	$r = $before;
-	$r .= '<a href="'.$register_url.'" title="'.$link_title.'">';
+	$r .= '<a href="'.$register_url.'" title="'.$link_title.'"'.$link_class.'>';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -1653,7 +1724,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 
 		if( empty( $img_url ) )
 		{
-			$img_url = 'http://www.gravatar.com/avatar/'.md5( $params['email'] );
+			$img_url = '//www.gravatar.com/avatar/'.md5( $params['email'] );
 			$gravatar_width = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][1] : '15';
 			$gravatar_height = $gravatar_width;
 

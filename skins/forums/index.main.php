@@ -22,6 +22,8 @@ if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
 }
 
 
+global $Settings;
+
 /**
  * @var string Name of cookie for skin width
  */
@@ -115,11 +117,21 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 </div>
 
+<?php
+global $hide_widget_container_menu;
+if( empty( $hide_widget_container_menu ) )
+{ // Display this widget container only when it is not disabled
+?>
 <div class="top_menu_bg"></div>
+<?php } ?>
 
 <div id="layout">
 	<div id="wrapper"<?php echo ( !empty( $cookie_skin_width_value ) ) ? ' style="width:'.$cookie_skin_width_value.'"' : ''; ?>>
 
+<?php
+if( empty( $hide_widget_container_menu ) )
+{ // Display this widget container only when it is not disabled
+?>
 <div class="top_menu">
 	<ul>
 	<?php
@@ -143,6 +155,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	</ul>
 	&nbsp;
 </div>
+<?php } ?>
 
 
 <?php

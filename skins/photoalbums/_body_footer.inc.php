@@ -62,19 +62,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				) );
 		?>
 
-		Powered by <a href="http://b2evolution.net/" title="Content &amp; Community Management System" target="_blank">b2evolution CCMS</a>
-
 		<?php
 			// Display additional credits:
 			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			credits( array(
-					'list_start'  => ' | ',
+			if( ! credits( array(
+					'list_start'  => '',
 					'list_end'    => '',
 					'separator'   => ' | ',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
-				) );
+				) ) )
+			{	// We're not dipslaying credits, display "Powered by"
+				?>
+		Powered by <a href="http://b2evolution.net/" title="Content &amp; Community Management System" target="_blank">b2evolution CMS</a>
+				<?php
+			}
 		?>
 	</p>
 

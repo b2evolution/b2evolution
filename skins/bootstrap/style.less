@@ -1,3 +1,11 @@
+// Header
+.pageHeader {
+	margin-bottom: 20px;
+}
+.nav.nav-tabs {
+	margin-top: 0;
+}
+
 // Login widget form
 .widget_core_user_login {
 	#login_form {
@@ -263,7 +271,7 @@ form.bComment {
 	}
 }
 
-.bPost, .featured_post {
+.bPost {
 	margin-bottom: 2em;
 	.bTitle {
 		margin: 0;
@@ -314,7 +322,7 @@ div.bSideItem {
 	}
 }
 .wrap-form-login, .wrap-form-lostpass, .wrap-form-register, .wrap-form-activation {
-	width: 400px;
+	min-width: 290px;
 	margin: 1.5em auto auto;
 	.panel {
 		margin: 5px 0;
@@ -323,23 +331,33 @@ div.bSideItem {
 		padding: 20px 30px 0;
 	}
 }
+.wrap-form-login {
+	max-width: 400px;
+}
 .wrap-form-lostpass {
-	width: 480px;
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
 }
 .wrap-form-activation {
-	width: 530px;
+	max-width: 530px;
 	#activateinfo_form .control-buttons{
 		text-align: left;
 	}
 }
 .wrap-form-register {
-	width: 580px;
-	max-width: 100%;
+	max-width: 580px;
 	.control-buttons{
 		text-align: left;
 	}
 	&.register-disabled {
 		width: 350px;
+	}
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
 	}
 }
 .form-login-links {

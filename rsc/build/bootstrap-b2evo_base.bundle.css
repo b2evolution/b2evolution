@@ -1309,14 +1309,6 @@ ul.jslog_error {
  *
  * Override this with style.css in your skin folder.
  */
-div.featured_post {
-  border: 1px solid #ccc;
-  padding: 14px;
-  margin: 1ex 0;
-}
-div.featured_post h2 {
-  margin-top: 6px;
-}
 a.permalink_right {
   float: right;
   margin: 0 0 0 1em;

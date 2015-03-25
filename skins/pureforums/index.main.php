@@ -21,7 +21,7 @@ if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
+global $Skin, $Settings;
 
 if( $Skin->get_setting( 'width_switcher' ) )
 {
@@ -129,6 +129,12 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
+
+		<?php
+		global $hide_widget_container_menu;
+		if( empty( $hide_widget_container_menu ) )
+		{ // Display this widget container only when it is not disabled
+		?>
 			<div class="header_right">
 				<ul class="top_menu">
 		<?php
@@ -166,6 +172,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 				</ul>
 			</div>
+		<?php } ?>
 			<div class="clear"></div>
 		</div>
 	</div>

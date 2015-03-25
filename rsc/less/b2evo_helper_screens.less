@@ -53,7 +53,7 @@ nav ul {
 	h2 {
 		padding-top: 0;
 	}
-	.h1 {
+	.h1_small {
 		font-size: 35px;
 	}
 }
@@ -71,4 +71,38 @@ nav ul {
 		border-bottom: 1px solid #e5e5e5;
 		margin-bottom: 30px;
 	}
+	.jumbotron .h1 {
+			font-size: 42px;
+	}
+}
+
+/* Sprite style for the all flags */
+/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
+ * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
+ * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
+ * **** Also don't forget to save the "flags.PSD"
+ *
+ * NEW ADDED FLAGS:
+ *   aq - Antarctica
+ *   ax - Aland Islands
+ *   bl - Saint Barthelemy
+ *   cc - Cocos Islands
+ *   cx - Christmas Island
+ *   sj - Svalbard And Jan Mayen
+ *
+ * CHANGED FLAGS TO 16px WIDTH:
+ *   np - Nepal
+ *   ch - Switzerland
+ */
+span.flag {
+	border: 1px solid #000000;
+	background: url(../icons/flags_sprite.png) no-repeat;
+	width: 16px;
+	height: 11px;
+	line-height: 11px;
+	padding: 0 !important;
+	font-size: 6px;
+	display: inline-block !important;
+	margin-bottom: -2px;
+	box-sizing: content-box;
 }

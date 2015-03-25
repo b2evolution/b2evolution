@@ -60,7 +60,7 @@ $params = array_merge( array(
 		$Item->issue_time( array(
 				'before'    => ', ',
 				'after'     => '',
-				'date_format' => 'l j F Y à H:i',
+				'date_format' => 'l j F Y',
 			) );
 		$Item->categories( array(
 				'before'          => ', '.T_('Categories').': ',

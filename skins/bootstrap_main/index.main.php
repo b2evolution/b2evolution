@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main/default page template for the "custom" skin.
+ * This is the main/default page template for the "bootstrap_main" skin.
  *
  * This skin only uses one single template which includes most of its features.
  * It will also rely on default includes for specific dispays (like the comment form).
@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8403 2015-03-04 15:33:35Z yura $
+	 * @version $Id: index.main.php 8577 2015-03-25 16:18:45Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -165,12 +165,14 @@ if( $disp != 'front' )
 	if( $Item = & get_featured_Item() )
 	{ // We have a featured/intro post to display:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		echo '<div class="panel panel-default"><div class="panel-body">';
 		skin_include( '_item_block.inc.php', array(
 				'feature_block' => true,
 				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
 				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'   => 'featured_post',
+				'item_class'   => '',
 			) );
+		echo '</div></div>';
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 	?>
@@ -283,7 +285,7 @@ if( $disp != 'front' )
 				'skin_form_after'       => '</div></div>',
 				// Login
 				'display_form_messages' => true,
-				'form_title_login'      => T_('Log in to your account'),
+				'form_title_login'      => T_('Log in to your account').'$form_links$',
 				'form_class_login'      => 'wrap-form-login',
 				'form_title_lostpass'   => get_request_title(),
 				'form_class_lostpass'   => 'wrap-form-lostpass',
@@ -291,6 +293,8 @@ if( $disp != 'front' )
 				'login_page_before'     => '<div class="$form_class$">',
 				'login_page_after'      => '</div>',
 				'login_form_class'      => 'form-login',
+				'display_reg_link'      => true,
+				'abort_link_position'   => 'form_title',
 				// Register
 				'register_page_before'      => '<div class="wrap-form-register">',
 				'register_page_after'       => '</div>',

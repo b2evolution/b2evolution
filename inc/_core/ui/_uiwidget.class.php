@@ -528,12 +528,14 @@ class Table extends Widget
 	function display_list_start()
 	{
 		if( $this->total_pages == 0 )
-		{	// There are no results! Nothing to display!
+		{ // There are no results! Nothing to display!
 			echo $this->replace_vars( $this->params['no_results_start'] );
 		}
 		else
-		{	// We have rows to display:
-			echo $this->params['list_start'];
+		{ // We have rows to display:
+			$list_class = empty( $this->params['list_class'] ) ? '' : ' '.$this->params['list_class'];
+			$list_attrs = empty( $this->params['list_attrib'] ) ? '' : ' '.$this->params['list_attrib'];
+			echo str_replace( array( ' $list_class$', ' $list_attrib$' ), array( $list_class, $list_attrs ), $this->params['list_start'] );
 		}
 	}
 

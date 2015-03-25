@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: blog_widgets.js 8557 2015-03-23 15:34:17Z yura $
  */
 
 
@@ -105,7 +105,7 @@ jQuery(document).ready( function()
 
 	// Convert the tables:
 	var the_widgets = new Array();
-	jQuery( ".grouped" ).each( function()
+	jQuery( ".widget_container_list" ).each( function()
 	{ // grab each container
 		var container = jQuery( this ).attr( "id" );
 		the_widgets[ container ] = new Array();

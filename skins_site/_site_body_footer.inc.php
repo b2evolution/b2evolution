@@ -2,7 +2,8 @@
 /**
  * This is the site header include template.
  *
- * If enabled, thiw will be included at the bottom of all skins to provide site wide copyright info for example.
+ * If enabled, this will be included at the bottom of all skins to provide site wide copyright info for example.
+ * NOTE: each skin is ressponsible for calling siteskin_include( '_site_body_footer.inc.php' );
  *
  * @package site_skins
  */

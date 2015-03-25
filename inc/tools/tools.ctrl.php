@@ -22,7 +22,7 @@ load_class( 'items/model/_item.class.php', 'Item' );
 
 if( $current_User->check_perm( 'options', 'edit' ) && $action != 'utf8upgrade' && system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the tool <a %s>Upgrade your DB to UTF-8</a>."), utf8_strtoupper( $evo_charset ), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8upgrade&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the tool <a %s>Convert your DB to UTF-8</a>."), utf8_strtoupper( $evo_charset ), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8upgrade&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 param( 'tab', 'string', '', true );
@@ -78,17 +78,17 @@ if( empty($tab) )
 	switch( $action )
 	{
 		case 'del_itemprecache':
-			// Clear pre-renderered item cache (DB)
+			// Clear pre-rendered item cache (DB)
 			dbm_delete_itemprecache();
 			break;
 
 		case 'del_commentprecache':
-			// Clear pre-renderered comment cache (DB)
+			// Clear pre-rendered comment cache (DB)
 			dbm_delete_commentprecache();
 			break;
 
 		case 'del_messageprecache':
-			// Clear pre-renderered message cache (DB)
+			// Clear pre-rendered message cache (DB)
 			dbm_delete_messageprecache();
 			break;
 

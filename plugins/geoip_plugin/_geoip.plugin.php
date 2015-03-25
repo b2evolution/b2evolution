@@ -140,12 +140,20 @@ class geoip_plugin extends Plugin
 		{ // GeoIP DB doesn't exist in the right folder
 			global $admin_url;
 
-			return sprintf( T_('GeoIP Country database not found. Download the <b>GeoLite Country DB in binary format</b> from here: <a %s>%s</a> and then upload the %s file to the folder: %s. Click <a href="%s">here</a> for automatic download.'),
-					'href="'.$this->geoip_manual_download_url.'" target="_blank"',
-					$this->geoip_manual_download_url,
-					$this->geoip_file_name,
-					dirname( __FILE__ ),
-					$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip' );
+
+			if( is_install_page() )
+			{ // Display simple warning on install pages
+				return T_('WARNING: this plugin can only work once you download the GeoLite Country DB database. Go to the plugin settings to download it.');
+			}
+			else
+			{ // Display full detailed warning on backoffice pages
+				return sprintf( T_('GeoIP Country database not found. Download the <b>GeoLite Country DB in binary format</b> from here: <a %s>%s</a> and then upload the %s file to the folder: %s. Click <a href="%s">here</a> for automatic download.'),
+						'href="'.$this->geoip_manual_download_url.'" target="_blank"',
+						$this->geoip_manual_download_url,
+						$this->geoip_file_name,
+						dirname( __FILE__ ),
+						$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip' );
+			}
 		}
 
 		return true;

@@ -36,6 +36,11 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 
+<?php
+global $hide_widget_container_menu;
+if( empty( $hide_widget_container_menu ) )
+{ // Display this widget container only when it is not disabled
+?>
 <div class="nav_zone">
 <div class="inner_wrapper">
 <div class="top_menu">
@@ -63,6 +68,7 @@ siteskin_include( '_site_body_header.inc.php' );
 </div>
 </div>
 </div>
+<?php } ?>
 
 
 <div class="main_zone">

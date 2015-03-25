@@ -3574,6 +3574,11 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				break;
 		}
 
+		if( ! isset( $template_params['recipient_User'] ) )
+		{ // Set recipient User, it should be defined for each template because of email footer
+			$template_params['recipient_User'] = $User;
+		}
+
 		// Get a message text from template file
 		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
 
@@ -3630,16 +3635,12 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset, $is_admin_page;
+	global $current_charset;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
 		locale_temp_switch( $params['locale'] );
 	}
-
-	$value_is_admin_page = $is_admin_page;
-	// Set TRUE to use gender settings from back office
-	$is_admin_page = true;
 
 	// Set extension of template
 	$template_exts = array();
@@ -3720,9 +3721,6 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		$template_message .= "\n".'--'.$boundary.'--'."\n";
 	}
 
-	// Return back the value
-	$is_admin_page = $value_is_admin_page;
-
 	if( !empty( $params['locale'] ) )
 	{ // Restore previous locale
 		locale_restore_previous();
@@ -3748,7 +3746,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
  */
 function emailskin_include( $template_name, $params = array() )
 {
-	global $emailskins_path, $is_admin_page, $rsc_url;
+	global $emailskins_path, $rsc_url;
 
 	/**
 	* @var Log
@@ -4820,6 +4818,19 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 
 /**
+ * Is the current page an install page?
+ *
+ * @return boolean
+ */
+function is_install_page()
+{
+	global $is_install_page;
+
+	return isset( $is_install_page ) && $is_install_page === true; // check for type also, because of register_globals!
+}
+
+
+/**
  * Is the current page an admin/backoffice page?
  *
  * @return boolean
@@ -4828,7 +4839,7 @@ function is_admin_page()
 {
 	global $is_admin_page;
 
-	return isset($is_admin_page) && $is_admin_page === true; // check for type also, because of register_globals!
+	return isset( $is_admin_page ) && $is_admin_page === true; // check for type also, because of register_globals!
 }
 
 
@@ -4841,7 +4852,7 @@ function is_front_page()
 {
 	global $is_front;
 
-	return isset($is_front) && $is_front === true;
+	return isset( $is_front ) && $is_front === true;
 }
 
 
@@ -7033,5 +7044,34 @@ function save_fieldset_folding_values()
 
 	// Update the folding setting for current user
 	$UserSettings->dbupdate();
+}
+
+
+/**
+ * Get base url depending on current called script
+ *
+ * @return string URL
+ */
+function get_script_baseurl()
+{
+	if( isset( $_SERVER['SERVER_NAME'] ) )
+	{ // Set baseurl from current server name
+		$temp_baseurl = 'http://'.$_SERVER['SERVER_NAME'];
+		if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
+		{ // Get also a port number
+			$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
+		}
+		if( isset( $_SERVER['SCRIPT_NAME'] ) )
+		{ // Get also the subfolders, when script is called e.g. from http://localhost/blogs/b2evolution/
+			$temp_baseurl .= preg_replace( '~(.*/)[^/]*$~', '$1', $_SERVER['SCRIPT_NAME'] );
+		}
+	}
+	else
+	{ // Use baseurl from config
+		global $baseurl;
+		$temp_baseurl = $baseurl;
+	}
+
+	return $temp_baseurl;
 }
 ?>

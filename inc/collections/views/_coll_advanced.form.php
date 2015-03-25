@@ -41,6 +41,14 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
+	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+	}
+	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+	}
 	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
 
 	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');

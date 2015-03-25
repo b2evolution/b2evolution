@@ -413,22 +413,15 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 	{
 		$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
 
-		if( ! empty($login_action) )
+		if( ! empty( $login_action ) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
-			if( $login_action == 'redirect_to_backoffice' )
-			{ // user pressed the "Log into backoffice!" button
-				$redirect_to = $admin_url;
-			}
-			else
-			{
-				$redirect_to = param( 'redirect_to', 'url', $baseurl );
-				if( empty( $redirect_to ) ||
-					preg_match( '#/login.php([&?].*)?$#', $redirect_to ) ||
-					preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
-					preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
-				{ // avoid redirect back to login/register screen. This shouldn't occur.
-					$redirect_to = $baseurl;
-				}
+			$redirect_to = param( 'redirect_to', 'url', $baseurl );
+			if( empty( $redirect_to ) ||
+				preg_match( '#/login.php([&?].*)?$#', $redirect_to ) ||
+				preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
+				preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
+			{ // avoid redirect back to login/register screen. This shouldn't occur.
+				$redirect_to = $baseurl;
 			}
 
 			if( $email_login )

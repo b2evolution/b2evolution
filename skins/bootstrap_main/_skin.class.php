@@ -257,7 +257,7 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_text_color' ) )
 			{ // Custom text color:
-				$custom_css .= 'body.pictured { color: '.$color." }\n";
+				$custom_css .= 'body.pictured, body.pictured h1 small { color: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'front_link_color' ) )

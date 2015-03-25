@@ -45,6 +45,10 @@ function set_upgrade_checkpoint( $version )
 	$elapsed_time = time() - $script_start_time;
 
 	echo "OK. (Elapsed upgrade time: $elapsed_time seconds)<br />\n";
+
+	// Update the progress bar status
+	update_install_progress_bar();
+
 	evo_flush();
 
 	$max_exe_time = ini_get( 'max_execution_time' );
@@ -308,6 +312,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	// Load DB schema from modules
 	load_db_schema();
+
+	// Update the progress bar status
+	update_install_progress_bar();
 
 	load_funcs('_core/model/db/_upgrade.funcs.php');
 
@@ -5447,8 +5454,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part 18.b trunk aka 4th part of "i7"
 
 		task_begin( 'Upgrade table blogs... ' );
+		$DB->query( 'UPDATE T_blogs
+			  SET blog_in_bloglist = "1"
+			WHERE blog_in_bloglist > 0' );
 		$DB->query( 'ALTER TABLE T_blogs
-			MODIFY blog_in_bloglist ENUM( "public", "logged", "member", "never" ) NOT NULL DEFAULT "public"' );
+			CHANGE blog_in_bloglist blog_in_bloglist ENUM( "public", "logged", "member", "never" ) COLLATE ascii_general_ci DEFAULT "public" NOT NULL' );
 		$DB->query( 'UPDATE T_blogs
 			  SET blog_in_bloglist = "never"
 			WHERE blog_in_bloglist = ""' );
@@ -5612,6 +5622,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 
+	// Update the progress bar status
+	update_install_progress_bar();
+
 	/*
 	 * -----------------------------------------------
 	 * Check to make sure the DB schema is up to date:
@@ -5672,7 +5685,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{ // received confirmation from form
 				if( $upgrade_db_deltas_confirm_md5 != md5( implode('', $upgrade_db_deltas) ) )
 				{ // unlikely to happen
-					echo '<p class="error">'
+					echo '<p class="text-danger">'
 						.T_('The DB schema has been changed since confirmation.')
 						.'</p>';
 				}

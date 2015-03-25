@@ -124,3 +124,44 @@ span.help-inline {
 .footer a:hover {
 	color: #005580;
 }
+
+@media only screen and (max-width: 414px) {
+	.container {
+		padding: 0;
+	}
+	.control-buttons {
+		width: 100%;
+		padding-right: 0;
+		text-align: center;
+	}
+	#password_form .control-label,
+	#password_form .controls {
+		width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#password_form .input_text,
+	#password_form .form-control {
+		width: 100% !important;
+	}
+	div#p-status {
+		position: initial;
+		margin: 0;
+		float: left;
+	}
+}
+@media only screen and (max-width: 320px) {
+	.btn {
+		white-space: normal;
+	}
+	#register_form .control-label,
+	#register_form .controls {
+		width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#register_form .input_text,
+	#register_form .form-control {
+		width: 100% !important;
+	}
+}

@@ -621,3 +621,32 @@ div.fieldset_wrapper.folded .panel-body {
 		margin-right: 0;
 	}
 }
+
+// Widgets table
+.widget_row.odd {
+	background: #FFF;
+}
+ul.widget_container {
+	border: none;
+	li {
+		padding: 0;
+		&.odd {
+			background: #f9f9f9;
+		}
+		&:hover {
+			background: #f5f5f5;
+		}
+		> span, > a {
+			display: inline-block;
+			padding: 3px 10px;
+			margin: 0;
+			border-color: #ddd;
+		}
+		.widget_state {
+			height: 26px;
+		}
+	}
+}
+div#widget_settings.widget_settings_active {
+	background: #FFF;
+}

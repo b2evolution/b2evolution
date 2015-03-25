@@ -237,65 +237,69 @@ switch( $action )
 		break;
 }
 
-// Add CSS:
-require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
-require_css( 'basic.css', 'rsc_url' ); // Basic styles
-require_css( 'evo_distrib_2.css', 'rsc_url' );
+// Form params
+$booststrap_install_form_params = array(
+		'formstart'      => '',
+		'formend'        => '',
+		'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+		'fieldend'       => "</div>\n\n",
+		'labelclass'     => 'control-label col-sm-4',
+		'labelstart'     => '',
+		'labelend'       => "\n",
+		'labelempty'     => '<label class="control-label col-sm-4"></label>',
+		'inputstart'     => '<div class="col-sm-8">',
+		'inputend'       => "</div>\n",
+		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
+		'buttonsend'     => "</div></div>\n\n",
+		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+	);
 
-header('Content-Type: text/html; charset='.$io_charset);
+header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
-<head>
-	<!-- InstanceBeginEditable name="doctitle" -->
-	<title><?php echo T_('b2evo debug tool').( $title ? ': '.$title : '' ) ?></title>
-	<!-- InstanceEndEditable -->
-	<meta name="viewport" content="width = 750" />
-	<meta name="robots" content="noindex, follow" />
-	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
-	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
-</head>
-
-<body>
-	<!-- InstanceBeginEditable name="BodyHead" --><!-- InstanceEndEditable -->
-
-	<div class="wrapper1">
-	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Debug tool') ?><!-- InstanceEndEditable --></span>
-
-		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-
-		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
-			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
-			<a href="../<?php echo $dispatcher ?>"><?php echo T_('Admin') ?></a>
-			</span>
-		<?php echo T_('Current installation') ?>:
-		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
-		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a>
-		<!-- InstanceEndEditable --></div>
+<!DOCTYPE  html>
+<html lang="en">
+	<head>
+		<base href="<?php echo get_script_baseurl(); ?>">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="noindex, follow" />
+		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
+		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<!-- Bootstrap -->
+		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<nav>
+					<ul class="nav nav-pills pull-right">
+						<li role="presentation"><a href="../readme.html"><?php echo T_('Read me'); ?></a></li>
+						<li role="presentation" class="active"><a href="index.php"><?php echo T_('Installer'); ?></a></li>
+						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
+					</ul>
+				</nav>
+				<h3 class="text-muted"><a href="http://b2evolution.net/"><img src="../rsc/img/b2evolution8.png" alt="b2evolution CCMS"></a></h3>
+			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->
 <?php
 
-if( count( $errors ) > 0 )
-{	// Display errors
-	echo '<div class="error">';
-	echo '<ul class="error"><li>'.implode( '</li><li>', $errors ).'</li></ul>';
-	echo '</div>';
+if( count( $errors ) )
+{ // Display errors
+	display_install_messages( $errors );
 }
 
-if( !empty( $message ) )
-{	// Display errors
-	echo '<div class="success">';
-	echo '<ul class="success"><li>'.$message.'</li></ul>';
-	echo '</div>';
+if( ! empty( $message ) )
+{ // Display a message
+	display_install_messages( $message, 'success' );
 }
 
-block_open();
 echo '<h1>'.T_('Debug tool').'</h1>';
-echo '<p>'.sprintf( T_('This tool allows you to configure some debug variables in the file %s'), $file_overrides_name ).'</p>';
+display_install_messages( sprintf( T_('This tool allows you to configure some debug variables in the file %s'), $file_overrides_name ), 'info' );
 
 switch( $action )
 {
@@ -305,22 +309,19 @@ switch( $action )
 		 * Form to log in
 		 * -----------------------------------------------------------------------------------
 		 */
-		?>
-		<form class="fform" name="form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-			<input type="hidden" name="action" value="login" />
+		block_open( T_('Log in to edit the config of debug') );
+		$Form = new Form( $_SERVER['PHP_SELF'] );
 
-			<fieldset>
-				<legend><?php echo T_('Log in to edit the config of debug') ?></legend>
-				<?php
-					form_text( 'password', '', 16, T_('Password'), T_('Debug password'), 120, '', 'password' );
-				?>
-					<div class="input">
-						<input type="submit" name="submit" value="<?php echo T_('Log in') ?>" class="search" />
-					</div>
-			</fieldset>
+		$Form->switch_template_parts( $booststrap_install_form_params );
 
-		</form>
-		<?php
+		$Form->begin_form( 'form-horizontal' );
+
+		$Form->hidden( 'action', 'login' );
+
+		$Form->text( 'password', '', 16, T_('Password'), T_('Debug password'), 120, '', 'password' );
+
+		$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Log in'), 'class' => 'btn-primary btn-lg' ) ) );
+		block_close();
 		break;
 
 	case 'config_form':
@@ -329,19 +330,20 @@ switch( $action )
 		 * Form to change the debug config
 		 * -----------------------------------------------------------------------------------
 		 */
-		?>
-		<form class="fform" name="form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-			<input type="hidden" name="action" value="update_config" />
-			<input type="hidden" name="password" value="<?php echo $password; ?>" />
+		
+		block_open( T_('Debug config') );
+		$Form = new Form( $_SERVER['PHP_SELF'] );
 
-			<fieldset>
-				<legend><?php echo T_('Debug config') ?></legend>
-				<?php
+		$Form->switch_template_parts( $booststrap_install_form_params );
 
-					form_textarea( 'content', $file_overrides_content, 20, T_('Config'), array(
+		$Form->begin_form( 'form-horizontal' );
+
+		$Form->hidden( 'action', 'update_config' );
+		$Form->hidden( 'password', $password );
+
+		$Form->textarea_input( 'content', $file_overrides_content, 20, T_('Config'), array(
 						'cols' => 50,
-						'note' => '<br />
-A few possible settings:<br /><br />
+						'note' => 'A few possible settings:<br /><br />
 $minimum_comment_interval = 1;<br />
 $debug = 1;<br />
 $debug_jslog = 1;<br />
@@ -351,14 +353,9 @@ $db_config[\'debug_dump_rows\'] = 20;<br />
 $db_config[\'debug_explain_joins\'] = false;<br />
 $display_errors_on_production = false;'
 						) );
-				?>
-					<div class="input">
-						<input type="submit" name="submit" value="<?php echo T_('Update') ?>" class="search" />
-					</div>
-			</fieldset>
 
-		</form>
-		<?php
+		$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Save Changes!'), 'class' => 'btn-primary btn-lg' ) ) );
+		block_close();
 		break;
 
 	default:
@@ -369,34 +366,29 @@ $display_errors_on_production = false;'
 		 */
 
 		echo T_( 'To enable this tool, create a file called /conf/_overrides_TEST.php with the following contents:' );
-		echo '<p>&lt;?php<br />
-$debug_pwd = \'set a password here\';<br />
-// @@BEGIN debug.php section<br />
-// @@END debug.php section<br />
-?&gt;</p>';
+		echo '<pre>&lt;?php
+$debug_pwd = \'set a password here\';
+// @@BEGIN debug.php section
+// @@END debug.php section
+?&gt;</pre>';
 
 		break;
 }
-
-block_close();
 ?>
 
+
 <!-- InstanceEndEditable -->
-	</div>
 
-	<div class="body_fade_out">
+			<footer class="footer">
+				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('Project page on GitHub'); ?></a></p>
+				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
+				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
+				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Get help from the community!'); ?></a>
+				</p>
+			</footer>
 
-	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
-			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="<?php echo get_manual_url( NULL ); ?>" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
-		<!-- InstanceEndEditable --></div>
+		</div><!-- /container -->
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2015 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
-		<!-- InstanceEndEditable --></div>
-
-	</div>
-	</div>
-
-	<!-- InstanceBeginEditable name="BodyFoot" -->
 	<?php
 		// We need to manually call debug_info since there is no shutdown function registered during the install process.
 		// debug_info( true ); // force output of debug info
@@ -405,6 +397,5 @@ block_close();
 ?>
 <!-- b2evo-install-action:<?php echo $action ?> -->
 <!-- b2evo-install-end -->
-	<!-- InstanceEndEditable -->
-</body>
-<!-- InstanceEnd --></html>
+	</body>
+</html>

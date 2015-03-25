@@ -2,9 +2,6 @@
 .pageHeader {
 	margin-bottom: 30px;
 }
-div.sitewide_header {
-	margin-bottom: 0 !important;
-}
 div.widget_core_coll_tagline {
 	margin-bottom: 30px;
 }
@@ -38,7 +35,7 @@ div.front_main_area {
 	width: 450px;
 	max-width: 100%;
 	padding: 0;
-	margin-top: 100px;
+	margin-top: 85px;
 	margin-bottom: 100px;
 	// border: 1px solid white;
 	.front_main_content {
@@ -93,9 +90,12 @@ body.pictured {
 	}
 	.panel {
 		color: #333;
-		a {
+		a:not([class]) {
 			color: #333;
 			text-decoration: underline;
+		}
+		input {
+			-webkit-font-smoothing: subpixel-antialiased;
 		}
 	}
 }
@@ -117,6 +117,9 @@ body.pictured {
 }
 @media only screen and (max-width: 640px) {
 	body.disp_front {
+		.sitewide_header {
+			margin-bottom: 0;
+		}
 		#bg_picture {
 			position: relative;
 			height: auto;
@@ -397,7 +400,7 @@ form.bComment {
 	}
 }
 
-.bPost, .featured_post {
+.bPost {
 	margin-bottom: 2em;
 	.bTitle {
 		margin: 0;
@@ -448,7 +451,7 @@ div.bSideItem {
 	}
 }
 .wrap-form-login, .wrap-form-lostpass, .wrap-form-register, .wrap-form-activation {
-	width: 400px;
+	min-width: 290px;
 	margin: 1.5em auto auto;
 	.panel {
 		margin: 5px 0;
@@ -457,23 +460,33 @@ div.bSideItem {
 		padding: 20px 30px 0;
 	}
 }
+.wrap-form-login {
+	max-width: 400px;
+}
 .wrap-form-lostpass {
-	width: 480px;
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
 }
 .wrap-form-activation {
-	width: 530px;
+	max-width: 530px;
 	#activateinfo_form .control-buttons{
 		text-align: left;
 	}
 }
 .wrap-form-register {
-	width: 580px;
-	max-width: 100%;
+	max-width: 580px;
 	.control-buttons{
 		text-align: left;
 	}
 	&.register-disabled {
 		width: 350px;
+	}
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
 	}
 }
 .form-login-links {

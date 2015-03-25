@@ -33,6 +33,14 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 
 $Form->begin_fieldset( T_('Sitemaps').get_manual_link( 'sitemaps-other' ) );
+	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
+	}
+	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
+	}
 	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
 						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
 $Form->end_fieldset();

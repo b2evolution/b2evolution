@@ -1872,12 +1872,14 @@ function credits( $params = array() )
 	$cred_links = $global_Cache->get( 'creds' );
 	if( empty( $cred_links ) )
 	{	// Use basic default:
-		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
+		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:3:"CMS";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
 	}
 
 	$max_credits = (empty($Blog) ? NULL : $Blog->get_setting( 'max_footer_credits' ));
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
+
+	return $max_credits;	
 }
 
 
@@ -1941,7 +1943,7 @@ function powered_by( $params = array() )
 	$evo_links = $global_Cache->get( 'evo_links' );
 	if( empty( $evo_links ) )
 	{	// Use basic default:
-		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:36:"powered by b2evolution blog software";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by free blog software";}}}}}');
+		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:26:"powered by b2evolution CMS";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by an open-source CMS";}}}}}');
 	}
 
 	echo resolve_link_params( $evo_links, NULL, array(
@@ -1949,7 +1951,7 @@ function powered_by( $params = array() )
 			'img_url'     => $img_url,
 			'img_width'   => $params['img_width'],
 			'img_height'  => $params['img_height'],
-			'title'       => 'b2evolution: next generation blog software',
+			'title'       => 'b2evolution CMS',
 		) );
 
 	echo $params['block_end'];
@@ -2168,13 +2170,16 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
-			'display_abort_link' => true,
+			'display_abort_link'  => true,
+			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
+			'display_reg_link'    => false, // Display registration link after login button
 		), $params );
 
 	$inskin = $params[ 'inskin' ];
 	$login = $params[ 'login' ];
 	$redirect_to = $params[ 'redirect_to' ];
 	$links = array();
+	$form_links = array();
 
 	if( $params['display_abort_link']
 		&& empty( $params[ 'login_required' ] )
@@ -2205,16 +2210,23 @@ function display_login_form( $params )
 		{ // logged in user isn't required for redirect_to url, set abort url to redirect_to
 			$abort_url = $redirect_to;
 		}
-		$links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
-		./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
+		if( $params['abort_link_position'] == 'above_form' )
+		{ // Display an abort link under login form
+			$links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
+			./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
+		}
+		elseif( $params['abort_link_position'] == 'form_title' )
+		{ // Display an abort link in form title block
+			$form_links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'.get_icon( 'close' ).'</a>';
+		}
 	}
 
-	if( ( !$inskin ) && is_logged_in() )
+	if( ! $inskin && is_logged_in() )
 	{ // if we arrive here, but are logged in, provide an option to logout (e.g. during the email validation procedure)
 		$links[] = get_user_logout_link();
 	}
 
-	if( count($links) )
+	if( count( $links ) )
 	{
 		echo '<div class="form-login-links">'
 				.'<div class="floatright">'.implode( $links, ' &middot; ' ).'</div>'
@@ -2222,14 +2234,15 @@ function display_login_form( $params )
 			.'</div>';
 	}
 
-	echo $params['form_before'];
+	$form_links = count( $form_links ) ? '<span class="pull-right">'.implode( ' ', $form_links ).'</span>' : '';
+	echo str_replace( '$form_links$', $form_links, $params['form_before'] );
 
-	$Form = new Form( $params[ 'form_action' ] , $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
+	$Form = new Form( $params['form_action'] , $params['form_name'], 'post', $params['form_layout'] );
 
-	$Form->begin_form( $params[ 'form_class' ] );
+	$Form->begin_form( $params['form_class'] );
 
 	$Form->add_crumb( 'loginform' );
-	$source = param( 'source', 'string', $params[ 'source' ].' login form' );
+	$source = param( 'source', 'string', $params['source'].' login form' );
 	$Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
 	if( $inskin || $params['inskin_urls'] )
@@ -2291,7 +2304,7 @@ function display_login_form( $params )
 	{
 		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
 	}
-	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
+	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Forgot your password?').'</a>';
 
 	if( $inskin )
 	{
@@ -2301,20 +2314,17 @@ function display_login_form( $params )
 	}
 	else
 	{
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
 	}
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
+	// Display registration link after login button
+	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', T_('Register').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source, 'btn btn-primary btn-lg pull-right' ) : '';
+
 	// Submit button(s):
-	$submit_buttons = array( array( 'name'=>'login_action[login]', 'value'=>T_('Log in!'), 'class'=>'btn-primary btn-lg' ) );
-	if( ( !$inskin && !$params['inskin_urls'] ) && ( strpos( $redirect_to, $admin_url ) !== 0 )
-		&& ( strpos( $ReqHost.$redirect_to, $admin_url ) !== 0 )// if $redirect_to is relative
-		&& ( ! is_admin_page() ) )
-	{ // provide button to log straight into backoffice, if we would not go there anyway
-		$submit_buttons[] = array( 'name'=>'login_action[redirect_to_backoffice]', 'value'=>T_('Log into backoffice!'), 'class'=>'btn-lg' );
-	}
+	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => T_('Log in!'), 'class' => 'btn-success btn-lg', 'input_suffix' => $register_link ) );
 
 	$Form->buttons_input( $submit_buttons );
 
@@ -2335,15 +2345,6 @@ function display_login_form( $params )
 	$Form->end_form();
 
 	echo $params['form_after'];
-
-	if( ! $inskin )
-	{
-		echo '<div class="form-login-links">';
-		echo '<a href="'.$lost_password_url.'" class="floatleft">'.T_('Forgot your password?').'</a>';
-		user_register_link( '<div class="floatright">', '</div>', T_('Create an account').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source );
-		echo '<div class="clear"></div>';
-		echo '</div>';
-	}
 
 	display_login_js_handler( $params );
 }
@@ -2372,11 +2373,6 @@ function display_login_js_handler( $params )
 	{ // Focus on the login field:
 		login.focus();
 	}
-
-	var login_action = 'login_action[login]';
-	jQuery( "input[name='login_action[redirect_to_backoffice]']" ).click( function() {
-		login_action = 'login_action[redirect_to_backoffice]';
-	});
 
 	function processSubmit(e) {
 		if (e.preventDefault) e.preventDefault();
@@ -2435,7 +2431,7 @@ function display_login_js_handler( $params )
 				// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
 
 				// Append the correct login action as hidden input field
-				pwd_container.append( '<input type="hidden" value="1" name="' + login_action + '">' );
+				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
 				form.submit();
 			}
 		});
@@ -2503,14 +2499,6 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	$Form->begin_fieldset();
 
-	echo '<ol>';
-	echo '<li>'.T_('Please enter your login (or email address) below.').'</li>';
-	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
-	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
-	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
-	echo '</ol>';
-	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
-
 	if( $params['inskin'] )
 	{
 		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
@@ -2520,7 +2508,16 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 		$Form->text_input( $dummy_fields[ 'login' ], $login, 30, '', '', array( 'maxlength' => 255, 'placeholder' => T_('Username (or email address)'), 'input_required' => 'required' ) );
 	}
 
-	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'btn-primary btn-lg' )) );
+	$Form->buttons_input( array( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me a recovery email!'), 'class' => 'btn-primary btn-lg' ) ) );
+
+	echo '<b>'.T_('How to recover your password:').'</b>';
+	echo '<ol>';
+	echo '<li>'.T_('Please enter you login (or email address) above.').'</li>';
+	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
+	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
+	echo '</ol>';
+	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
 	$login_link = '<a href="'.get_login_url( get_param( 'source' ), $redirect_to ).'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
 

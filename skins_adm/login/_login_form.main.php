@@ -60,6 +60,9 @@ if( $transmit_hashed_password )
 	require_js( 'build/sha1_md5.bmin.js' );
 }
 
+// Use the links in the form title
+$use_form_links = true;
+
 // Header
 require dirname(__FILE__).'/_html_header.inc.php';
 
@@ -88,6 +91,8 @@ $params = array(
 	'login_form_sessID'        => isset( $sessID ) ? $sessID : NULL,
 	'transmit_hashed_password' => $transmit_hashed_password,
 	'display_abort_link'       => true,
+	'abort_link_position'      => 'form_title',
+	'display_reg_link'         => true,
 	'login_form_footer'        => false,
 );
 require $skins_path.'_login.disp.php';

@@ -54,6 +54,11 @@ global $Settings, $disp, $cat;
 		</div>
 	</div>
 
+	<?php
+	global $hide_widget_container_menu;
+	if( empty( $hide_widget_container_menu ) )
+	{ // Display this widget container only when it is not disabled
+	?>
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs">
@@ -80,6 +85,7 @@ global $Settings, $disp, $cat;
 			</ul>
 		</div>
 	</div>
+	<?php } ?>
 
 	<div class="row">
 		<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-md-9 pull-right' : 'col-md-12' ?>">

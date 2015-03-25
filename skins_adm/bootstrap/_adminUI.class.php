@@ -244,7 +244,7 @@ class AdminUI extends AdminUI_general
 					'messages_end' => '</div>',
 					'messages_separator' => '<br />',
 					'list_start' => '<div class="table_scroll">'."\n"
-					               .'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0">'."\n",
+					               .'<table class="table table-striped table-bordered table-hover table-condensed $list_class$" cellspacing="0" $list_attrib$>'."\n",
 						'head_start' => "<thead>\n",
 							'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
 							'colhead_start' => '<th $class_attrib$>',

@@ -487,7 +487,7 @@ class bootstrap_manual_Skin extends Skin
 					'skin_form_after'       => '</div></div>',
 					// Login
 					'display_form_messages' => true,
-					'form_title_login'      => T_('Log in to your account'),
+					'form_title_login'      => T_('Log in to your account').'$form_links$',
 					'form_class_login'      => 'wrap-form-login',
 					'form_title_lostpass'   => get_request_title(),
 					'form_class_lostpass'   => 'wrap-form-lostpass',
@@ -495,6 +495,8 @@ class bootstrap_manual_Skin extends Skin
 					'login_page_before'     => '<div class="$form_class$">',
 					'login_page_after'      => '</div>',
 					'login_form_class'      => 'form-login',
+					'display_reg_link'      => true,
+					'abort_link_position'   => 'form_title',
 					// Register
 					'register_page_before'      => '<div class="wrap-form-register">',
 					'register_page_after'       => '</div>',

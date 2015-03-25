@@ -144,6 +144,14 @@ $Form->end_fieldset();
 modules_call_method( 'display_collection_features', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features') );
+	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep feeds disabled.').'</p>';
+	}
+	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
+	{
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep feeds disabled.').'</p>';
+	}
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),

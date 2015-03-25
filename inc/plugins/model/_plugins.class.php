@@ -502,7 +502,7 @@ class Plugins
 							$Plugins_admin->index_ID_rows[$Plugin->ID]['plug_version'] = $Plugin->version;
 						}
 
-						// Remove any prerenderered content for the Plugins renderer code:
+						// Remove any prerendered content for the Plugins renderer code:
 						if( ! empty($Plugin->code) )
 						{
 							$DB->query( '

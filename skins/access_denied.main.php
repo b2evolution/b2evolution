@@ -12,7 +12,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $skin_links, $francois_links;
+global $app_version, $disp, $Blog, $skin_links, $francois_links, $hide_widget_container_menu;
+
+// Hide the widget container "Menu" on each skin
+$hide_widget_container_menu = true;
 
 require $ads_current_skin_path.'index.main.php';
 ?>

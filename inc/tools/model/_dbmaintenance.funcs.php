@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Clear pre-renderered item cache (DB)
+ * Clear pre-rendered item cache (DB)
  */
 function dbm_delete_itemprecache()
 {
@@ -28,7 +28,7 @@ function dbm_delete_itemprecache()
 
 
 /**
- * Clear pre-renderered comment cache (DB)
+ * Clear pre-rendered comment cache (DB)
  */
 function dbm_delete_commentprecache()
 {
@@ -41,7 +41,7 @@ function dbm_delete_commentprecache()
 
 
 /**
- * Clear pre-renderered message cache (DB)
+ * Clear pre-rendered message cache (DB)
  */
 function dbm_delete_messageprecache()
 {
@@ -864,8 +864,8 @@ function dbm_convert_item_content_separators()
 	{ // Some separators were updated
 		echo ' '.sprintf( T_('%d items have been updated.'), $item_updated_count );
 
-		// To see the changes we should update the pre-renderered item contents
-		echo '<br />'.T_( 'Clear pre-renderered item cache (DB)' ).'...';
+		// To see the changes we should update the pre-rendered item contents
+		echo '<br />'.T_( 'Clear pre-rendered item cache (DB)' ).'...';
 		dbm_delete_itemprecache();
 		echo ' OK.';
 	}

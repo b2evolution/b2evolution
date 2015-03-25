@@ -76,6 +76,11 @@ siteskin_include( '_site_body_header.inc.php' );
 		) );
 	?>
 
+	<?php
+	global $hide_widget_container_menu;
+	if( empty( $hide_widget_container_menu ) )
+	{ // Display this widget container only when it is not disabled
+	?>
 	<div class="top_menu floatright">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
@@ -97,6 +102,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
 	</div>
+	<?php } ?>
 
 	<div class="clear"></div>
 </div>

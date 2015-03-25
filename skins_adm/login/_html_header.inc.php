@@ -13,6 +13,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// Use glyph icons, @see get_icon()
+global $b2evo_icons_type;
+$b2evo_icons_type = 'glyphicons';
+
 require_js( '#jquery#', 'rsc_url' );
 
 // Bootstrap
@@ -43,7 +48,7 @@ $login_form_params = array(
 	'formclass'     => 'form-horizontal',
 	'formstart'      => '<div class="panel panel-default">'
 												.'<div class="panel-heading">'
-													.'<h3 class="panel-title">$form_title$</h3>'
+													.'<h3 class="panel-title">$form_title$$form_links$</h3>'
 												.'</div>'
 												.'<div class="panel-body">',
 	'formend'        => '</div></div>',
@@ -85,6 +90,10 @@ $login_form_params = array(
 	'radio_oneline_end'      => "</label>\n",
 );
 $login_form_params['formstart'] = str_replace( '$form_title$', $page_title, $login_form_params['formstart'] );
+if( empty( $use_form_links ) )
+{ // Remove the mask for form links because it is not used by current template
+	$login_form_params['formstart'] = str_replace( '$form_links$', '', $login_form_params['formstart'] );
+}
 
 headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 

@@ -63,7 +63,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
-			blog_in_bloglist     ENUM( 'public', 'logged', 'member', 'never' ) NOT NULL DEFAULT 'public',
+			blog_in_bloglist     ENUM( 'public', 'logged', 'member', 'never' ) COLLATE ascii_general_ci DEFAULT 'public' NOT NULL,
 			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
 			blog_media_location  ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_general_ci DEFAULT 'default' NOT NULL,
 			blog_media_subdir    VARCHAR( 255 ) NULL,

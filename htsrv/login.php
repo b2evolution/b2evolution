@@ -98,6 +98,13 @@ switch( $action )
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 
+		if( empty( $login ) )
+		{ // Don't allow empty request
+			$Messages->add( T_('You must enter your username or your email address so we know where to send the password recovery email.') );
+			$action = 'lostpassword';
+			break;
+		}
+
 		$request_ts_login = $Session->get( 'core.changepwd.request_ts_login' );
 		if( $request_ts_login != NULL )
 		{
