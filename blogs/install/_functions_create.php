@@ -37,7 +37,7 @@
  * @author edgester: Jason EDGECOMBE.
  * @author mfollett: Matt Follett.
  *
- * @version $Id: _functions_create.php 8219 2015-02-10 21:25:08Z fplanque $
+ * @version $Id: _functions_create.php 8523 2015-03-17 11:46:01Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -1358,6 +1358,7 @@ function create_demo_contents()
 		1,
 		$blog_a_access_type,
 		true,
+		1,
 		$ablogger_ID );
 	$BlogCache = & get_BlogCache();
 	if( $Blog_a = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
@@ -1381,6 +1382,7 @@ function create_demo_contents()
 		0,
 		$blog_b_access_type,
 		true,
+		1,
 		$bblogger_ID );
 
 	$blog_shortname = 'Info';
@@ -1416,7 +1418,7 @@ function create_demo_contents()
 		T_('This blog shows photos...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 		4, // Skin ID
-		'photo', '', 0, 'relative', true,
+		'photo', '', 0, 'relative', true, 1,
 		$ablogger_ID );
 
 	$blog_shortname = 'Forums';
@@ -1428,7 +1430,7 @@ function create_demo_contents()
 		T_('Tagline for Forums'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		5, // Skin ID
-		'forum', 'any', 1, 'relative', false,
+		'forum', 'any', 1, 'relative', false, 1,
 		$ablogger_ID );
 
 	$blog_shortname = 'Manual';
@@ -1440,7 +1442,7 @@ function create_demo_contents()
 		T_('Tagline for Manual'),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 		6, // Skin ID
-		'manual', 'any', 1, $default_blog_access_type, false,
+		'manual', 'any', 1, $default_blog_access_type, false, 1,
 		$ablogger_ID );
 
 	task_end();

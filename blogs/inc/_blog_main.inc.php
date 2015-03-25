@@ -22,7 +22,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
  *
- * @version $Id: _blog_main.inc.php 7431 2014-10-15 04:23:46Z yura $
+ * @version $Id: _blog_main.inc.php 8459 2015-03-10 10:58:46Z yura $
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -553,7 +553,7 @@ elseif( $disp == '-' )
 		{	// We are not on the canocial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, true );
+				header_redirect( $canonical_url, empty( $debug_containers ) ? true : 303 );
 			}
 			else
 			{	// Use link rel="canoncial":

@@ -85,7 +85,7 @@ class LinkItem extends LinkOwner
 
 		return array_merge( array(
 				'teaser'    => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content */ T_( 'Teaser' ),
-				'aftermore' => /* TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator */ T_( 'After "more"' ), T_( 'After "more"' ),
+				'aftermore' => /* TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator */ T_( 'After "more"' ),
 				'inline'    => /* TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text */ T_( 'Inline' ),
 			), $additional_positions );
 	}
