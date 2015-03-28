@@ -965,4 +965,24 @@ function url_part( $url, $part )
 
 	return '';
 }
+
+
+/**
+ * Check if the check_url has the same domains as the main_url
+ * Note: check_url may also be a subdomain of the main_url
+ *
+ * @param string main url to compare domain with
+ * @param string the url which needs to be checked
+ * @return boolean true in case of the same main domain, false otherwise
+ */
+function url_check_same_domain( $main_url, $check_url )
+{
+	$main_url_host = url_part( $main_url, 'host' );
+	$check_url_host = url_part( $check_url, 'host' );
+
+	// Check same domain
+	$same_domain = ( ( $check_url_host == null ) || ( $check_url_host == $main_url_host ) );
+	// Check subdomain
+	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
+}
 ?>

@@ -147,7 +147,7 @@ if( $permission_to_edit )
 
 echo '</tr>';
 
-echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
+echo $GenericCategoryCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
 
 echo '</table>';
 

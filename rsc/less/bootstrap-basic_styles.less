@@ -252,6 +252,28 @@ button.action_icon {
 }
 // ---------------- //
 
+// Additional styles for FontAwesome icons:
+span.fa {
+	line-height: inherit;
+	font-size: 14px;
+	.btn & {
+		line-height: 14px;
+	}
+	a.action_icon & {
+		margin-right: 2px;
+	}
+}
+a.roundbutton .fa, a.roundbutton:hover .fa,
+a.roundbutton_text .fa, a.roundbutton_text:hover .fa {
+	color: #000;
+}
+a:hover .fa-x-rollover-green {color: #0C0 !important;}
+a:hover .fa-x-rollover-red {color: #C00 !important;}
+a:hover .fa-x-rollover-red-light {color: #F00 !important;}
+a:hover .fa-x-rollover-orange {color: #F90 !important;}
+a:hover .fa-x-rollover-black {color: #000 !important;}
+// ---------------- //
+
 // Toolbars with buttons before the edit post/comment forms:
 div.edit_toolbars {
 	margin-top: 1ex;
@@ -314,31 +336,27 @@ span.loader_img.loader_user_deldata {
 	vertical-align: middle;
 	margin: 1px;
 	text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000;
-}
-.filter_item a.user {
-	text-shadow: 1px 1px 0 #FFF;
-}
-.filter_item div {
-	margin: 0;
-	padding: 3px 5px;
-	color: #FFF;
-	float: left;
-	height: 16px;
-	line-height: 16px;
-}
-.filter_item div:first-child {
-	border-radius: 5px 0 0 5px;
-}
-.filter_item div.icon {
-	border-radius: 0 5px 5px 0;
-	float: right;
-	padding: 0;
-	height: 22px;
-}
-.filter_item div.icon a {
-	display: block;
-	padding: 4px 5px 5px;
-	margin: 0;
+	div {
+		margin: 0;
+		padding: 3px 5px;
+		color: #FFF;
+		float: left;
+		height: 24px !important;
+		line-height: 18px !important;
+		&:first-child {
+			border-radius: 5px 0 0 5px;
+		}
+		&.icon {
+			border-radius: 0 5px 5px 0;
+			float: right;
+			padding: 0;
+			a {
+				display: block;
+				padding: 4px 5px 5px;
+				margin: 0;
+			}
+		}
+	}
 }
 // green
 .filter_item .name { background: #3d8f3d; }

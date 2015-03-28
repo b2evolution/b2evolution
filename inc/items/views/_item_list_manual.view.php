@@ -20,10 +20,32 @@ items_manual_results_block();
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings, $dispatcher, $ReqURI, $blog;
+global $Settings, $dispatcher, $ReqURI, $Blog, $blog;
 
-echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sblogs settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#categories">', '</a>' ).'</p> ';
+if( empty( $Blog ) )
+{ // Set Blog
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog );
+}
+
+// Use a wrapper div to have margin around the form
+echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
+
+$Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->add_crumb( 'collection' );
+$Form->hidden( 'ctrl', 'coll_settings' );
+$Form->hidden( 'action', 'update' );
+$Form->hidden( 'blog', $Blog->ID );
+$Form->hidden( 'tab', 'chapters' );
+$Form->hidden( 'redirect_to', regenerate_url( '', '', '', '&' ) );
+$Form->radio_input( 'category_ordering', $Blog->get_setting('category_ordering'), array(
+					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
+					array( 'value'=>'manual', 'label'=>T_('Manually') ),
+			 ), T_('Sort categories'), array( 'note'=>'('.T_('Note: can be overridden for sub-categories').')' ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) )  );
+
+echo '</div>'; // form wrapper end
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm

@@ -49,7 +49,7 @@ else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
 	// redirect to blog list:
-	header_redirect( '?ctrl=collections' );
+	header_redirect( $admin_url.'?ctrl=dashboard' );
 	// EXITED:
 	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 	$action = 'nil';
@@ -467,10 +467,9 @@ if( $display_mode == 'normal' )
 	/**
 	 * Display page header, menus & messages:
 	 */
-	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
-				T_('Site'), '?ctrl=collections&amp;blog=0' );
+	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ) );
 
-	$AdminUI->set_path( 'blogs', 'widgets' );
+	$AdminUI->set_path( 'collections', 'widgets' );
 
 	// load the js and css required to make the magic work
 	add_js_headline( '
@@ -501,9 +500,8 @@ if( $display_mode == 'normal' )
 	require_css( 'blog_widgets.css' );
 
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Structure'), 'url' => '?ctrl=coll_settings' ) );
-	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
-	$AdminUI->breadcrumbpath_add( T_('Widgets'), '?ctrl=widgets&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();

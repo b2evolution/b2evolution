@@ -1095,6 +1095,10 @@ class User extends DataObject
 				{ // update 'notify_comment_moderation' only if user is comment moderator/editor at least in one blog
 					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
+				if( $this->check_perm( 'admin', 'restricted', false ) )
+				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
+					$UserSettings->set( 'notify_meta_comments', param( 'edited_user_notify_meta_comments', 'integer', 0 ), $this->ID );
+				}
 				if( $is_comment_moderator )
 				{ // update 'send_cmt_moderation_reminder' only if user is comment moderator at least in one blog
 					$UserSettings->set( 'send_cmt_moderation_reminder', param( 'edited_user_send_cmt_moderation_reminder', 'integer', 0 ), $this->ID );
@@ -1721,6 +1725,7 @@ class User extends DataObject
 			$SQL->SELECT( 'comment_status, COUNT(*)' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
+			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
 			$SQL->GROUP_BY( 'comment_status' );
 			$this->_num_comments = $DB->get_assoc( $SQL->get() );
 
@@ -2445,6 +2450,12 @@ class User extends DataObject
 				$blog_ID = $Item->get_blog_ID();
 				$check_status = substr( $permname, 8 );
 
+				if( $Comment->is_meta() && in_array( $permlevel, array( 'edit', 'moderate', 'delete' ) ) )
+				{ // Check the permissions for meta comment with special function
+					$perm = $this->check_perm( 'meta_comment', $permlevel, false, $Comment );
+					break;
+				}
+
 				if( ( $permlevel != 'view' ) &&  $Item->is_locked() && !$this->check_perm( 'blog_cats', 'edit', false, $blog_ID ) )
 				{ // Comment item is locked and current user is not allowed to edit/moderate locked items comment
 					break;
@@ -2484,6 +2495,77 @@ class User extends DataObject
 						$perm = $this->Group->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
 					}
 				}
+				break;
+
+			case 'meta_comment':
+				// Check permission for meta comment:
+
+				if( $permlevel == 'view' || $permlevel == 'add' )
+				{ // Set Item from target object
+					$Item = & $perm_target;
+				}
+				elseif( $permlevel == 'edit' || $permlevel == 'moderate' || $permlevel == 'delete' )
+				{ // Set Comment from target object
+					$Comment = & $perm_target;
+					if( empty( $Comment ) || ! $Comment->is_meta() )
+					{ // Comment must be defined and meta to check these permissions
+						$perm = false;
+						break;
+					}
+					$Item = & $Comment->get_Item();
+				}
+				else
+				{ // Invalid permission level
+					$perm = false;
+					break;
+				}
+
+				if( empty( $Item ) )
+				{ // Item must be defined to check these permissions
+					$perm = false;
+					break;
+				}
+
+				switch( $permlevel )
+				{
+					case 'view':
+					case 'add':
+						// Check perms to View/Add meta comments:
+						$perm = // If User can edit or delete this Item
+								$this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
+								// OR If User can delete any Item of the Blog
+								|| $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() );
+						break;
+
+					case 'edit':
+						// Check perms to Edit meta comment
+						$perm = // User can edit only own meta comment
+								$Comment->author_user_ID == $this->ID
+								// AND User must has a permission to view meta comments
+								&& $this->check_perm( 'meta_comment', 'view', false, $Item );
+						break;
+
+					case 'moderate':
+						// Moderation is not available for meta comment
+						$perm = false;
+						break;
+
+					case 'delete':
+						// Check perms to Delete meta comment:
+						if( $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() ) )
+						{ // If User can delete this Item
+							$perm = true;
+							break;
+						}
+						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
+						    $Comment->author_user_ID == $this->ID )
+						{ // If it is own meta comment of the User
+							$perm = true;
+							break;
+						}
+						break;
+				}
+
 				break;
 
 			case 'item_post!CURSTATUS':

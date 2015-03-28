@@ -763,7 +763,7 @@ class ItemListLight extends DataObjectList2
 
 		// QUERY:
 		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
-									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ptyp_ID '
+									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -863,17 +863,49 @@ class ItemListLight extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
-		global $month;
+		global $month, $disp_detail;
 
 		$params = array_merge( array(
-				'category_text' => T_('Category').': ',
-				'categories_text' => T_('Categories').': ',
-				// 'tag_text' => T_('Tag').': ',
-				'tags_text' => T_('Tags').': ',
+				'category_text'       => T_('Category').': ',
+				'categories_text'     => T_('Categories').': ',
+				'categories_nor_text' => T_('All but '),
+				'tag_text'            => T_('Tag').': ',
+				'tags_text'           => T_('Tags').': ',
+				'author_text'         => T_('Author').': ',
+				'authors_text'        => T_('Authors').': ',
+				'authors_nor_text'    => T_('All authors except').': ',
+				'visibility_text'     => T_('Visibility').': ',
+				'keyword_text'        => T_('Keyword').': ',
+				'keywords_text'       => T_('Keywords').': ',
+				'keywords_exact_text' => T_('Exact match').' ',
+				'status_text'         => T_('Status').': ',
+				'statuses_text'       => T_('Statuses').': ',
+				'archives_text'       => T_('Archives for').': ',
+				'assignes_text'       => T_('Assigned to').': ',
+				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
+				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
+				'filter_mask_nogroup' => '"$filter_name$"', // $filter_name$, $clear_icon$
+				'before_items'        => '',
+				'after_items'         => '',
+				'separator_and'       => ' '.T_('and').' ',
+				'separator_or'        => ' '.T_('or').' ',
+				'separator_nor'       => ' '.T_('or').' ',
+				'separator_comma'     => ', ',
+				'display_category'    => true,
+				'display_archive'     => true,
+				'display_keyword'     => true,
+				'display_tag'         => true,
+				'display_author'      => true,
+				'display_assignee'    => true,
+				'display_locale'      => true,
+				'display_status'      => true,
+				'display_visibility'  => true,
+				'display_time'        => true,
+				'display_limit'       => true,
 			), $params );
 
 		if( empty( $this->filters ) )
-		{	// Filters have no been set before, we'll use the default filterset:
+		{ // Filters have no been set before, we'll use the default filterset:
 			// echo ' setting default filterset ';
 			$this->set_filters( $this->default_filters );
 		}
@@ -881,11 +913,11 @@ class ItemListLight extends DataObjectList2
 		$title_array = array();
 
 		if( $this->single_post )
-		{	// We have requested a specific post:
+		{ // We have requested a specific post:
 			// Should be in first position
 			$Item = & $this->get_by_idx( 0 );
 
-			if( is_null($Item) )
+			if( is_null( $Item ) )
 			{
 				$title_array[] = T_('Invalid request');
 			}
@@ -896,294 +928,478 @@ class ItemListLight extends DataObjectList2
 			return $title_array;
 		}
 
+		// Check if the filter mask has an icon to clear the filter item
+		$clear_icon = ( strpos( $params['filter_mask'], '$clear_icon$' ) !== false );
+
+		$filter_classes = array( 'green' );
+		$filter_class_i = 0;
+		if( strpos( $params['filter_mask'], '$filter_class$' ) !== false )
+		{ // Initialize array with available classes for filter items
+			$filter_classes = array( 'green', 'yellow', 'orange', 'red', 'magenta', 'blue' );
+		}
+
 
 		// CATEGORIES:
-		if( !empty($this->filters['cat_array']) )
-		{ // We have requested specific categories...
-			$cat_names = array();
-			$ChapterCache = & get_ChapterCache();
-			foreach( $this->filters['cat_array'] as $cat_ID )
-			{
-				if( ($my_Chapter = & $ChapterCache->get_by_ID($cat_ID, false) ) !== false )
-				{ // It is almost never meaningful to die over an invalid cat when generating title
-					$cat_names[] = $my_Chapter->name;
-				}
-			}
-			if( $this->filters['cat_modifier'] == '*' )
-			{
-				$cat_names_string = '"'.implode( '" '.T_('and').' "', $cat_names ).'"';
-			}
-			else
-			{
-				$cat_names_string = '"'.implode( '" '.T_('or').' "', $cat_names ).'"';
-			}
-			if( !empty( $cat_names_string ) )
-			{
-				if( $this->filters['cat_modifier'] == '-' )
+		if( $params['display_category'] )
+		{
+			if( ! empty( $this->filters['cat_array'] ) )
+			{ // We have requested specific categories...
+				$cat_names = array();
+				$ChapterCache = & get_ChapterCache();
+				$catsel_param = get_param( 'catsel' );
+				foreach( $this->filters['cat_array'] as $cat_ID )
 				{
-					$cat_names_string = T_('All but ').' '.$cat_names_string;
-					$title_array['cats'] = $params['categories_text'].$cat_names_string;
+					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
+					{ // It is almost never meaningful to die over an invalid cat when generating title
+						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
+						if( $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
+						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
+							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
+						}
+						$cat_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', $cat_clear_url ) : '';
+						$cat_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['category_text'], $tmp_Chapter->name, $cat_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+				}
+				$filter_class_i++;
+				if( $this->filters['cat_modifier'] == '*' )
+				{ // Categories with "AND" condition
+					$cat_names_string = implode( $params['separator_and'], $cat_names );
+				}
+				elseif( $this->filters['cat_modifier'] == '-' )
+				{ // Categories with "NOR" condition
+					$cat_names_string = implode( $params['separator_nor'], $cat_names );
 				}
 				else
+				{ // Categories with "OR" condition
+					$cat_names_string = implode( $params['separator_or'], $cat_names );
+				}
+				if( ! empty( $cat_names_string ) )
 				{
-					if( count($this->filters['cat_array']) > 1 )
-						$title_array['cats'] = $params['categories_text'].$cat_names_string;
-					else
-						$title_array['cats'] = $params['category_text'].$cat_names_string;
+					if( $this->filters['cat_modifier'] == '-' )
+					{ // Categories with "NOR" condition
+						$cat_names_string = $params['categories_nor_text'].$cat_names_string;
+						$params['category_text'] = $params['categories_text'];
+					}
+					$title_array['cats'] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $this->filters['cat_array'] ) > 1 ?
+							array( $params['categories_text'], $params['before_items'].$cat_names_string.$params['after_items'] ) :
+							array( $params['category_text'], $cat_names_string ) ),
+						$params['group_mask'] );
 				}
 			}
 		}
 
 
 		// ARCHIVE TIMESLOT:
-		if( !empty($this->filters['ymdhms']) )
-		{	// We have asked for a specific timeframe:
+		if( $params['display_archive'] )
+		{
+			if( ! empty( $this->filters['ymdhms'] ) )
+			{ // We have asked for a specific timeframe:
 
-			$my_year = substr($this->filters['ymdhms'],0,4);
+				$my_year = substr( $this->filters['ymdhms'], 0, 4 );
 
-			if( strlen($this->filters['ymdhms']) > 4 )
-			{ // We have requested a month too:
-				$my_month = T_($month[substr($this->filters['ymdhms'],4,2)]);
+				if( strlen( $this->filters['ymdhms'] ) > 4 )
+				{ // We have requested a month too:
+					$my_month = T_( $month[ substr( $this->filters['ymdhms'], 4, 2 ) ] );
+				}
+				else
+				{
+					$my_month = '';
+				}
+
+				// Requested a day?
+				$my_day = substr( $this->filters['ymdhms'], 6, 2 );
+
+				$arch = $my_month.' '.$my_year;
+
+				if( ! empty( $my_day ) )
+				{ // We also want to display a day
+					$arch .= ', '.$my_day;
+				}
+
+				if( ! empty( $this->filters['week'] ) || ( $this->filters['week'] === 0 ) ) // Note: week # can be 0
+				{ // We also want to display a week number
+					$arch .= ', '.T_('week').' '.$this->filters['week'];
+				}
+
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$arch_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'m' ) ) : '';
+				$arch = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( $params['archives_text'], $arch, $arch_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask'] );
+				$title_array['ymdhms'] = str_replace( array( '$group_title$', '$filter_items$' ),
+					array( $params['archives_text'], $arch ),
+					$params['group_mask'] );
+				$filter_class_i++;
 			}
-			else
-			{
-				$my_month = '';
-			}
-
-			// Requested a day?
-			$my_day = substr($this->filters['ymdhms'],6,2);
-
-			$arch = T_('Archives for').': '.$my_month.' '.$my_year;
-
-			if( !empty( $my_day ) )
-			{	// We also want to display a day
-				$arch .= ', '.$my_day;
-			}
-
-			if( !empty($this->filters['week']) || ($this->filters['week'] === 0) ) // Note: week # can be 0
-			{	// We also want to display a week number
-				$arch .= ', '.T_('week').' '.$this->filters['week'];
-			}
-
-			$title_array['ymdhms'] = $arch;
 		}
 
 
 		// KEYWORDS:
-		if( ! empty( $this->filters['keywords'] ) )
+		if( $params['display_keyword'] )
 		{
-			if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
+			if( ! empty( $this->filters['keywords'] ) )
 			{
-				$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
-				$keywords = explode( ' ', $keywords );
-				$keywords_count = count( $keywords );
-				$keywords = '"'.implode( '" '.( $this->filters['phrase'] == 'OR' ? T_('or') : T_('and') ).' "', $keywords ).'"';
+				if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
+				{ // Search by each keyword
+					$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
+					$keywords = explode( ' ', $keywords );
+				}
+				else
+				{ // Exact match (Single keyword)
+					$keywords = array( $this->filters['keywords'] );
+				}
+
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$keyword_names = array();
+				foreach( $keywords as $keyword )
+				{
+					$word_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'s='.$keyword ) ) : '';
+					$keyword_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['keyword_text'], $keyword, $word_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				$filter_class_i++;
+				$keywords = ( $this->filters['exact'] ? $params['keywords_exact_text'] : '' )
+					.implode( ( $this->filters['phrase'] == 'OR' ? $params['separator_or'] : $params['separator_and'] ), $keyword_names );
+
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $keyword_names ) > 1 ?
+						array( $params['keywords_text'], $params['before_items'].$keywords.$params['after_items'] ) :
+						array( $params['keyword_text'], $keywords ) ),
+					$params['group_mask'] );
 			}
-			else
-			{
-				$keywords = '"'.$this->filters['keywords'].'"';
-				$keywords_count = 1;
-			}
-			$title_array['keywords'] = ( $keywords_count == 1 ? T_('Keyword') : T_('Keywords') ).': '
-				.( $this->filters['exact'] ? T_('Exact match').' ' : '' )
-				.$keywords;
 		}
 
 
 		// TAGS:
-		if( !empty($this->filters['tags']) )
+		if( $params['display_tag'] )
 		{
-			$title_array[] = $params['tags_text'].$this->filters['tags'];
+			if( !empty($this->filters['tags']) )
+			{
+				$tags = explode( ',', $this->filters['tags'] );
+				$tag_names = array();
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				foreach( $tags as $tag )
+				{
+					$tag_clear_url = regenerate_url( $this->param_prefix.'tag='.$tag );
+					if( $disp_detail == 'posts-tag' )
+					{ // Remove tag url from $ReqPath when we use tag url instead of tag ID
+						$tag_clear_url = str_replace( '/'.$tag.':', '', $tag_clear_url );
+					}
+					$tag_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', $tag_clear_url ) : '';
+					$tag_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['tag_text'], $tag, $tag_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				$filter_class_i++;
+				$tags = implode( $params['separator_comma'], $tag_names );
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $tag_names ) > 1 ? 
+						array( $params['tags_text'], $params['before_items'].$tags.$params['after_items'] ) :
+						array( $params['tag_text'], $tags ) ),
+					$params['group_mask'] );
+			}
 		}
 
 
 		// AUTHORS:
-		if( ! empty( $this->filters['authors'] ) || ! empty( $this->filters['authors_login'] ) )
+		if( $params['display_author'] )
 		{
-			$authors = trim( $this->filters['authors'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
-			$exclude_authors = false;
-			if( substr( $authors, 0, 1 ) == '-' )
-			{ // Authors are excluded
-				$authors = substr( $authors, 1 );
-				$exclude_authors = true;
-			}
-			$authors = preg_split( '~\s*,\s*~', $authors, -1, PREG_SPLIT_NO_EMPTY );
-			$author_names = array();
-			if( $authors )
+			if( ! empty( $this->filters['authors'] ) || ! empty( $this->filters['authors_login'] ) )
 			{
-				$UserCache = & get_UserCache();
-				foreach( $authors as $author_ID )
+				$authors = trim( $this->filters['authors'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
+				$exclude_authors = false;
+				if( substr( $authors, 0, 1 ) == '-' )
+				{ // Authors are excluded
+					$authors = substr( $authors, 1 );
+					$exclude_authors = true;
+				}
+				$authors = preg_split( '~\s*,\s*~', $authors, -1, PREG_SPLIT_NO_EMPTY );
+				$author_names = array();
+				if( $authors )
 				{
-					if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
+					$UserCache = & get_UserCache();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $authors as $author_ID )
 					{
-						$author_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'name' ) );
+						if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
+						{
+							$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'author='.$author_ID ) ) : '';
+							$author_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['author_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
 					}
+					$filter_class_i++;
 				}
-			}
-			if( count( $author_names ) > 0 )
-			{ // Display info of filter by authors
-				if( $exclude_authors )
-				{ //
-					$title_array[] = sprintf( T_('All authors except: %s'), implode( ' '.T_('and').' ', $author_names ) );
-				}
-				else
-				{ //
-					$title_array[] = ( count( $author_names ) == 1 ? T_('Author') : T_('Authors') )
-						.': '.implode( ', ', $author_names );
+				if( count( $author_names ) > 0 )
+				{ // Display info of filter by authors
+					if( $exclude_authors )
+					{ // Exclude authors
+						$author_names_string = $params['authors_nor_text'].implode( $params['separator_nor'], $author_names );
+					}
+					else
+					{ // Filter by authors
+						$author_names_string = implode( $params['separator_comma'], $author_names );
+					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $author_names ) > 1 ?
+							array( $params['authors_text'], $params['before_items'].$author_names_string.$params['after_items'] ) :
+							array( $params['author_text'], $author_names_string ) ),
+						$params['group_mask'] );
 				}
 			}
 		}
 
 
 		// ASSIGNEES:
-		if( ! empty( $this->filters['assignees'] ) || ! empty( $this->filters['assignees_login'] ) )
+		if( $params['display_assignee'] )
 		{
-			if( $this->filters['assignees'] == '-' )
+			if( ! empty( $this->filters['assignees'] ) || ! empty( $this->filters['assignees_login'] ) )
 			{
-				$title_array[] = T_('Not assigned');
-			}
-			else
-			{
-				$assignees = trim( $this->filters['assignees'].','.get_users_IDs_by_logins( $this->filters['assignees_login'] ), ',' );
-				$assignees = preg_split( '~\s*,\s*~', $assignees, -1, PREG_SPLIT_NO_EMPTY );
-				$assignees_names = array();
-				if( $assignees )
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( $this->filters['assignees'] == '-' )
 				{
-					$UserCache = & get_UserCache();
-					foreach( $assignees as $user_ID )
+					$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'assgn' ) ) : '';
+					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Not assigned'), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask_nogroup'] );
+				}
+				else
+				{
+					$assignees = trim( $this->filters['assignees'].','.get_users_IDs_by_logins( $this->filters['assignees_login'] ), ',' );
+					$assignees = preg_split( '~\s*,\s*~', $assignees, -1, PREG_SPLIT_NO_EMPTY );
+					$assignees_names = array();
+					if( $assignees )
 					{
-						if( $tmp_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+						$UserCache = & get_UserCache();
+						foreach( $assignees as $user_ID )
 						{
-							$assignees_names[] = $tmp_User->get_identity_link( array( 'link_text' => 'name' ) );
+							if( $tmp_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+							{
+								$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'assgn='.$user_ID ) ) : '';
+								$assignees_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+									array( $params['assignes_text'], $tmp_User->get_identity_link( array( 'link_text' => 'name' ) ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+									$params['filter_mask'] );
+							}
 						}
 					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $assignees_names ) > 1 ?
+							array( $params['assignes_text'], $params['before_items'].implode( $params['separator_comma'], $assignees_names ).$params['after_items'] ) :
+							array( $params['assignes_text'], implode( $params['separator_comma'], $assignees_names ) ) ),
+						$params['group_mask'] );
 				}
-				$title_array[] = T_('Assigned to').': '.implode( ', ', $assignees_names );
+				$filter_class_i++;
 			}
 		}
 
 
 		// LOCALE:
-		if( $this->filters['lc'] != 'all' )
+		if( $params['display_locale'] )
 		{
-			$title_array[] = T_('Locale').': '.$this->filters['lc'];
+			if( $this->filters['lc'] != 'all' )
+			{
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'lc' ) ) : '';
+				$loc = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( T_('Locale').': ', $this->filters['lc'], $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask'] );
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					array( T_('Locale').': ', $loc ),
+					$params['group_mask'] );
+				$filter_class_i++;
+			}
 		}
 
 
 		// EXTRA STATUSES:
-		if( !empty($this->filters['statuses']) )
+		if( $params['display_status'] )
 		{
-			if( $this->filters['statuses'] == '-' )
+			if( !empty($this->filters['statuses']) )
 			{
-				$title_array[] = T_('Without status');
-			}
-			else
-			{
-				$status_IDs = explode( ',', $this->filters['statuses'] );
-				$ItemStatusCache = & get_ItemStatusCache();
-				$statuses = array();
-				foreach( $status_IDs as $status_ID )
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( $this->filters['statuses'] == '-' )
 				{
-					if( $ItemStatus = & $ItemStatusCache->get_by_ID( $status_ID ) )
-					{
-						$statuses[] = $ItemStatus->get_name();
-					}
-				}
-				$title_array[] = ( count( $statuses ) > 1 ? T_('Statuses') : T_('Status') )
-					.': '.implode( ', ', $statuses );
-			}
-		}
-
-
-		// SHOW STATUSES
-		if( !in_array( 'visibility', $ignore ) )
-		{
-			$post_statuses = get_visibility_statuses();
-			if( count( $this->filters['visibility_array'] ) != count( $post_statuses ) )
-			{ // Display it only when visibility filter is changed
-				$status_titles = array();
-				foreach( $this->filters['visibility_array'] as $status )
-				{
-					$status_titles[] = $post_statuses[$status];
-				}
-				$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
-			}
-		}
-
-
-		// START AT
-		if( !empty($this->filters['ymdhms_min'] ) )
-		{
-			$title_array['ymdhms_min'] = T_('Start at').': '.$this->filters['ymdhms_min'] ;
-		}
-		if( !empty($this->filters['ts_min'] ) )
-		{
-			if( $this->filters['ts_min'] == 'now' )
-			{
-				$title_array['ts_min'] = T_('Hide past');
-			}
-			else
-			{
-				$title_array['ts_min'] = T_('Start at').': '.$this->filters['ts_min'];
-			}
-		}
-
-
-		// STOP AT
-		if( !empty($this->filters['ymdhms_max'] ) )
-		{
-			$title_array['ymdhms_max'] = T_('Stop at').': '.$this->filters['ymdhms_max'];
-		}
-		if( !empty($this->filters['ts_max'] ) )
-		{
-			if( $this->filters['ts_max'] == 'now' )
-			{
-				if( !in_array( 'hide_future', $ignore ) )
-				{
-					$title_array['ts_max'] = T_('Hide future');
-				}
-			}
-			else
-			{
-				$title_array['ts_max'] = T_('Stop at').': '.$this->filters['ts_max'];
-			}
-		}
-
-
-		// LIMIT TO
-		if( $this->single_post )   // p or title
-		{ // Single post: no paging required!
-		}
-		elseif( !empty($this->filters['ymdhms']) )
-		{ // no restriction if we request a month... some permalinks may point to the archive!
-		}
-		elseif( $this->filters['unit'] == 'posts' || $this->filters['unit'] == 'all' )
-		{ // We're going to page, so there's no real limit here...
-		}
-		elseif( $this->filters['unit'] == 'days' )
-		{ // We are going to limit to x days:
-			// echo 'LIMIT DAYS ';
-			if( empty( $this->filters['ymdhms_min'] ) )
-			{ // We have no start date, we'll display the last x days:
-				if( !empty($this->filters['keywords'])
-					|| !empty($this->filters['cat_array'])
-					|| !empty($this->filters['authors']) )
-				{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+					$status_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'status=-' ) ) : '';
+					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask_nogroup'] );
 				}
 				else
-				{ // We are going to limit to LAST x days:
-					// TODO: rename 'posts' to 'limit'
-					$title_array['posts'] = sprintf( T_('Limited to %d last days'), $this->limit );
+				{
+					$status_IDs = explode( ',', $this->filters['statuses'] );
+					$ItemStatusCache = & get_ItemStatusCache();
+					$statuses = array();
+					foreach( $status_IDs as $status_ID )
+					{
+						if( $ItemStatus = & $ItemStatusCache->get_by_ID( $status_ID ) )
+						{
+							$status_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'status='.$status_ID ) ) : '';
+							$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['status_text'], $ItemStatus->get_name(), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
+					}
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( ( count( $statuses ) > 1 ) ?
+							array( $params['statuses_text'], $params['before_items'].implode( $params['separator_comma'], $statuses ).$params['after_items'] ):
+							array( $params['status_text'], implode( $params['separator_comma'], $statuses ) ) ),
+						$params['group_mask'] );
 				}
-			}
-			else
-			{ // We have a start date, we'll display x days starting from that point:
-				$title_array['posts'] = sprintf( T_('Limited to %d days'), $this->limit );
+				$filter_class_i++;
 			}
 		}
-		else
+
+
+		// VISIBILITY (SHOW STATUSES):
+		if( $params['display_visibility'] )
 		{
-			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
+			if( !in_array( 'visibility', $ignore ) )
+			{
+				$post_statuses = get_visibility_statuses();
+				if( count( $this->filters['visibility_array'] ) != count( $post_statuses ) )
+				{ // Display it only when visibility filter is changed
+					$status_titles = array();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $this->filters['visibility_array'] as $status )
+					{
+						$vis_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_statuses='.$status ) ) : '';
+						$status_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['visibility_text'], $post_statuses[ $status ], $vis_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+					$filter_class_i++;
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $status_titles ) > 1 ? 
+							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $status_titles ).$params['after_items'] ) :
+							array( $params['visibility_text'], implode( $params['separator_comma'], $status_titles ) ) ),
+						$params['group_mask'] );
+				}
+			}
+		}
+
+
+		if( $params['display_time'] )
+		{
+			// START AT:
+			if( ! empty( $this->filters['ymdhms_min'] ) || ! empty( $this->filters['ts_min'] ) )
+			{
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( ! empty( $this->filters['ymdhms_min'] ) )
+				{
+					$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'dstart' ) ) : '';
+					$title_array['ts_min'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Start at').': ', date2mysql( $this->filters['ymdhms_min'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				else
+				{
+					if( $this->filters['ts_min'] == 'now' )
+					{
+						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
+						$title_array['ts_min'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( T_('Hide past'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask_nogroup'] );
+					}
+					else
+					{
+						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
+						$title_array['ts_min'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( T_('Start at').': ', date2mysql( $this->filters['ts_min'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+				}
+				$filter_class_i++;
+			}
+
+
+			// STOP AT:
+			if( ! empty( $this->filters['ymdhms_max'] ) || ! empty( $this->filters['ts_max'] ) )
+			{
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( ! empty( $this->filters['ymdhms_max'] ) )
+				{
+					$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'dstop' ) ) : '';
+					$title_array['ts_max'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Stop at').': ', date2mysql( $this->filters['ymdhms_max'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				else
+				{
+					if( $this->filters['ts_max'] == 'now' )
+					{
+						if( ! in_array( 'hide_future', $ignore ) )
+						{
+							$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
+							$title_array['ts_max'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( T_('Hide future'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask_nogroup'] );
+						}
+					}
+					else
+					{
+						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
+						$title_array['ts_max'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( T_('Stop at').': ', date2mysql( $this->filters['ts_max'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+				}
+				$filter_class_i++;
+			}
+		}
+
+
+		// LIMIT TO:
+		if( $params['display_limit'] )
+		{
+			if( $this->single_post )   // p or title
+			{ // Single post: no paging required!
+			}
+			elseif( !empty($this->filters['ymdhms']) )
+			{ // no restriction if we request a month... some permalinks may point to the archive!
+			}
+			elseif( $this->filters['unit'] == 'posts' || $this->filters['unit'] == 'all' )
+			{ // We're going to page, so there's no real limit here...
+			}
+			elseif( $this->filters['unit'] == 'days' )
+			{ // We are going to limit to x days:
+				// echo 'LIMIT DAYS ';
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( empty( $this->filters['ymdhms_min'] ) )
+				{ // We have no start date, we'll display the last x days:
+					if( !empty($this->filters['keywords'])
+						|| !empty($this->filters['cat_array'])
+						|| !empty($this->filters['authors']) )
+					{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+					}
+					else
+					{ // We are going to limit to LAST x days:
+						// TODO: rename 'posts' to 'limit'
+						$unit_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'unit' ) ) : '';
+						$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( sprintf( T_('Limited to %d last days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask_nogroup'] );
+					}
+				}
+				else
+				{ // We have a start date, we'll display x days starting from that point:
+					$unit_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'unit' ) ) : '';
+					$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( sprintf( T_('Limited to %d days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask_nogroup'] );
+				}
+				$filter_class_i++;
+			}
+			else
+			{
+				debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
+			}
 		}
 
 		return $title_array;
@@ -1454,7 +1670,7 @@ class ItemListLight extends DataObjectList2
 	 */
 	function date_if_changed( $params = array() )
 	{
-		if( $this->current_Obj->ptyp_ID == 1000 )
+		if( $this->current_Obj->ityp_ID == 1000 )
 		{	// This is not applicable to pages
 			return;
 		}

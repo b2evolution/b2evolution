@@ -186,19 +186,19 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Remote publishing'), '?ctrl=remotepublish' );
+$AdminUI->breadcrumbpath_add( T_('Remote publishing'), $admin_url.'?ctrl=remotepublish' );
 
 switch( $tab )
 {
 	case 'eblog':
-		$AdminUI->breadcrumbpath_add( T_('Post by Email'), '?ctrl=remotepublish&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Post by Email'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
 		$AdminUI->set_page_manual_link( 'post-by-email' );
 		break;
 
 	case 'xmlrpc':
-		$AdminUI->breadcrumbpath_add( T_('XML-RPC'), '?ctrl=remotepublish&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('XML-RPC'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
 		break;
 }
 

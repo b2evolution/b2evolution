@@ -44,7 +44,7 @@ global $dispatcher;
 
 $action = param_action( 'list' );
 
-$AdminUI->set_path( 'items' );	// Sublevel may be attached below
+$AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 
 
 /*
@@ -74,10 +74,19 @@ switch( $action )
 	case 'history_details':
 	case 'history_compare':
 	case 'history_restore':
-		// Load post to edit:
 		param( 'p', 'integer', true, true );
-		$ItemCache = & get_ItemCache();
-		$edited_Item = & $ItemCache->get_by_ID( $p );
+		param( 'restore', 'integer', 0 );
+
+		if( $restore )
+		{ // Restore a post from Session
+			$edited_Item = get_session_Item( $p );
+		}
+
+		if( empty( $edited_Item ) )
+		{ // Load post to edit from DB:
+			$ItemCache = & get_ItemCache();
+			$edited_Item = & $ItemCache->get_by_ID( $p );
+		}
 
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
@@ -87,28 +96,40 @@ switch( $action )
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 		break;
 
-	case 'mass_edit' :
+	case 'mass_edit':
 		break;
 
-	case 'update_edit' :
-	case 'update' :
-	case 'update_publish' :
-	case 'publish' :
-	case 'publish_now' :
-	case 'restrict' :
-	case 'deprecate' :
-	case 'delete' :
+	case 'update_edit':
+	case 'update':
+	case 'update_publish':
+	case 'publish':
+	case 'publish_now':
+	case 'restrict':
+	case 'deprecate':
+	case 'delete':
 	// Note: we need to *not* use $p in the cases above or it will conflict with the list display
-	case 'edit_switchtab' : // this gets set as action by JS, when we switch tabs
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'edit_type': // this gets set as action by JS, when we switch tabs
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
 		}
 
-		// Load post to edit:
-		param ( 'post_ID', 'integer', true, true );
-		$ItemCache = & get_ItemCache ();
-		$edited_Item = & $ItemCache->get_by_ID ( $post_ID );
+		param( 'post_ID', 'integer', true, true );
+
+		if( $action == 'edit_type' )
+		{ // Load post from Session
+			$edited_Item = get_session_Item( $post_ID );
+
+			// Memorize action for list of item types
+			memorize_param( 'action', 'string', '', $action );
+		}
+
+		if( empty( $edited_Item ) )
+		{ // Load post to edit from DB:
+			$ItemCache = & get_ItemCache();
+			$edited_Item = & $ItemCache->get_by_ID( $post_ID );
+		}
 
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
@@ -122,18 +143,22 @@ switch( $action )
 		$exit_after_save = ( $action != 'update_edit' );
 		break;
 
+	case 'update_type':
+		break;
+
 	case 'mass_save' :
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog=' . $Blog->ID, '&' ) );
 		break;
 
-	case 'new' :
-	case 'new_switchtab' : // this gets set as action by JS, when we switch tabs
-	case 'new_mass' :
-	case 'copy' :
-	case 'create_edit' :
-	case 'create' :
-	case 'create_publish' :
-	case 'list' :
+	case 'new':
+	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'new_mass':
+	case 'new_type':
+	case 'copy':
+	case 'create_edit':
+	case 'create':
+	case 'create_publish':
+	case 'list':
 		if( in_array( $action, array( 'create_edit', 'create', 'create_publish' ) ) )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -344,7 +369,8 @@ switch( $action )
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_add( T_('Posts'), $admin_url.'?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 
 /**
  * Perform action:
@@ -362,6 +388,7 @@ switch( $action )
 		$item_issue_time = date( 'H:i:s', $localtimenow );
 		// pre_dump( $item_issue_date, $item_issue_time );
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'new_type': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
@@ -370,8 +397,23 @@ switch( $action )
 			break;
 		}
 
+		if( in_array( $action, array( 'new', 'new_type' ) ) )
+		{
+			param( 'restore', 'integer', 0 );
+			if( $restore || $action == 'new_type' )
+			{ // Load post from Session
+				$edited_Item = get_session_Item( 0 );
+
+				// Memorize action for list of item types
+				memorize_param( 'action', 'string', '', $action );
+			}
+		}
+
 		load_class( 'items/model/_item.class.php', 'Item' );
-		$edited_Item = new Item();
+		if( empty( $edited_Item ) )
+		{ // Create new Item object
+			$edited_Item = new Item();
+		}
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
@@ -440,6 +482,11 @@ switch( $action )
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'blog='.$blog;
+
+		if( $action == 'new_type' )
+		{ // Save the changes of Item to Session
+			set_session_Item( $edited_Item );
+		}
 		break;
 
 
@@ -466,7 +513,7 @@ switch( $action )
 		check_categories_nosave ( $post_category, $post_extracats );
 
 		// Page title:
-		switch( $edited_Item->ptyp_ID )
+		switch( $edited_Item->ityp_ID )
 		{
 			case 1000:
 				$title = T_('Duplicate page');
@@ -503,6 +550,7 @@ switch( $action )
 
 
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'edit_type': // this gets set as action by JS, when we switch tabs
 		// This is somewhat in between new and edit...
 
 		// Check permission based on DB status:
@@ -515,12 +563,12 @@ switch( $action )
 
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
-		$edited_Item->load_from_Request ( true ); // needs Blog set
+		$edited_Item->load_from_Request( true ); // needs Blog set
 
 		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats );
 
-		$edited_Item->set ( 'main_cat_ID', $post_category );
+		$edited_Item->set( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -540,6 +588,11 @@ switch( $action )
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'p='.$edited_Item->ID;
+
+		if( $action == 'edit_type' )
+		{ // Save the changes of Item to Session
+			set_session_Item( $edited_Item );
+		}
 		break;
 
 	case 'history':
@@ -732,6 +785,9 @@ switch( $action )
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
+		// Delete Item from Session
+		delete_session_Item( 0 );
+
 		if( ! $exit_after_save )
 		{	// We want to continue editing...
 			$tab_switch_params = 'p='.$edited_Item->ID;
@@ -762,8 +818,19 @@ switch( $action )
 			}
 			else// 'no'
 			{	// redirect to posts list:
-				header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+				$redirect_to = NULL;
+				// header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 			}
+		}
+
+		if( ( $redirect_to === NULL ) ||
+			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
+		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
+			if( $redirect_to !== NULL )
+			{ // Add messages which explain the different target of the redirect
+				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
+			}
+			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 		}
 
 		// REDIRECT / EXIT
@@ -855,6 +922,9 @@ switch( $action )
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
+		// Delete Item from Session
+		delete_session_Item( $edited_Item->ID );
+
 		if( ! $exit_after_save )
 		{ // We want to continue editing...
 			break;
@@ -891,16 +961,58 @@ switch( $action )
 		{ // redirect to post page:
 			$redirect_to = $edited_Item->get_permanent_url();
 		}
-		else// $blog_redirect_setting == 'no'
-		{ // redirect to posts list
+		else
+		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list
+			$redirect_to = NULL;
+		}
+
+		if( ( $redirect_to === NULL ) ||
+			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
+		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
+			if( $redirect_to !== NULL )
+			{ // Add messages which explain the different target of the redirect
+				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
+			}
 			// Set highlight
 			$Session->set( 'highlight_id', $edited_Item->ID );
 			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 		}
 
-
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to, 303 );
+		/* EXITED */
+		break;
+
+	case 'update_type':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		param( 'post_ID', 'integer', true, true );
+		param( 'ityp_ID', 'integer', true );
+
+		// Load post from Session
+		$edited_Item = get_session_Item( $post_ID );
+
+		// Set new item type
+		$edited_Item->set( 'ityp_ID', $ityp_ID );
+
+		// Unset old object of Item Type to reload it on next page
+		unset( $edited_Item->ItemType );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		set_session_Item( $edited_Item );
+
+		// REDIRECT / EXIT
+		if( $post_ID > 0 )
+		{ // Edit item form
+			header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID );
+		}
+		else
+		{ // New item form
+			header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1' );
+		}
 		/* EXITED */
 		break;
 
@@ -1007,6 +1119,9 @@ switch( $action )
 				break;
 		}
 		$Messages->add( $success_message, 'success' );
+
+		// Delete Item from Session
+		delete_session_Item( $edited_Item->ID );
 
 		// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
 		// If anyone doesn't want that, we can make this optional...
@@ -1136,7 +1251,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $Blog, $UserSettings, $ItemList, $AdminUI, $posttypes_perms;
+	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $posttypes_perms;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -1152,6 +1267,7 @@ function init_list_mode()
 	else
 	{	// Store/retrieve preferred tab from UserSettings:
 		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */, true /* force */ );
+		$UserSettings->param_Request( 'tab_type', 'pref_browse_tab_type', 'string', NULL, true /* memorize */, true /* force */ );
 	}
 
 	if( $tab == 'tracker' && ! $Blog->get_setting( 'use_workflow' ) )
@@ -1168,10 +1284,14 @@ function init_list_mode()
 
 	if( !empty( $tab ) && !empty( $items_list_param_prefix ) )
 	{	// Use different param prefix for each tab
-		$items_list_param_prefix .= substr( $tab, 0, 7 ).'_';
+		$items_list_param_prefix .= substr( $tab, 0, 7 ).'_';//.utf8_strtolower( $tab_type ).'_';
 	}
+
+	// Set different filterset name for each different tab and tab_type
+	$filterset_name = ( $tab == 'type' ) ? $tab.'_'.utf8_strtolower( $tab_type ) : $tab;
+
 	// Create empty List:
-	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', $items_list_param_prefix, $tab /* filterset name */ ); // COPY (func)
+	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', $items_list_param_prefix, $filterset_name /* filterset name */ ); // COPY (func)
 
 	$ItemList->set_default_filters( array(
 			'visibility_array' => get_visibility_statuses('keys'),
@@ -1194,13 +1314,15 @@ function init_list_mode()
 
 			// require colorbox js
 			require_js_helper( 'colorbox' );
+
+			$AdminUI->breadcrumbpath_add( T_('All'), $admin_url.'?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
 
 		case 'manual':
 			if( $Blog->get( 'type' ) != 'manual' )
 			{	// Display this tab only for manual blogs
 				global $admin_url;
-				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=list&filter=restore' );
+				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type=posts&filter=restore' );
 			}
 
 			global $ReqURI, $blog;
@@ -1212,44 +1334,12 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_('Manual view'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
-		case 'list':
-			// Nothing special
-			$AdminUI->breadcrumbpath_add( T_('Regular posts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
-			break;
-
-		case 'pages':
+		case 'type':
+			// Filter a posts list by type
 			$ItemList->set_default_filters( array(
-					'types' => implode(',',$posttypes_perms['page']), // Pages
+					'types' => get_item_types_by_tab( $tab_type ),
 				) );
-			$AdminUI->breadcrumbpath_add( T_('Pages'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
-			break;
-
-		case 'intros':
-			$ItemList->set_default_filters( array(
-					'types' => implode(',',$posttypes_perms['intro']), // Intros
-				) );
-			$AdminUI->breadcrumbpath_add( T_('Intro posts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
-			break;
-
-		case 'podcasts':
-			$ItemList->set_default_filters( array(
-					'types' => implode(',',$posttypes_perms['podcast']), // Podcasts
-				) );
-			$AdminUI->breadcrumbpath_add( T_('Podcasts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
-			break;
-
-		case 'links':
-			$ItemList->set_default_filters( array(
-					'types' => '3000', // Links
-				) );
-			$AdminUI->breadcrumbpath_add( T_('Links'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
-			break;
-
-		case 'ads':
-			$ItemList->set_default_filters( array(
-					'types' => '4000', // Advertisements
-				) );
-			$AdminUI->breadcrumbpath_add( T_('Advertisements'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
+			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
 			break;
 
 		case 'tracker':
@@ -1289,14 +1379,13 @@ switch( $action )
 {
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
 	case 'create_edit':
 	case 'create':
 	case 'create_publish':
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
-						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
-						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'\', %s )' );
+		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit', array( 'ctrl' => 'items', 'action' => 'new' ) );
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
@@ -1316,6 +1405,7 @@ switch( $action )
 
 	case 'edit':
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'edit_type': // this gets set as action by JS, when we switch tabs
 	case 'update_edit':
 	case 'update': // on error
 	case 'update_publish': // on error
@@ -1332,50 +1422,57 @@ switch( $action )
 			case 'update_publish': // on error
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
-					$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
-						 ' '.T_('Delete'), 4, 3, array(
-						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
-						 		'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
-						 ) );
+					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
+						' '.T_('Delete'), 4, 3, array(
+								'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
+								'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
+						) );
 				}
 
 				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
 						' '.T_('Permalink'), 4, 3, array(
-						 		'style' => 'margin-right: 3ex',
-						 ) );
-
-				if( $edited_Item->ID > 0 )
-				{ // Display a link to history if Item exists in DB
-					$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
-						$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
-								'style' => 'margin-right: 3ex'
+								'style' => 'margin-right: 3ex',
 						) );
-				}
 				break;
 		}
 
-		if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
-		{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
-			$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
-			$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
-			$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
-					' '.T_('In skin editing'), 4, 3, array(
-					'style' => 'margin-right: 3ex',
-					'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
-			) );
+		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
+		{
+			$AdminUI->global_icon( T_('Change type'), 'edit', $edited_Item->get_type_edit_link( 'url' ),
+				' '.T_('Change type'), 4, 3, array(
+						'style' => 'margin-right: 3ex',
+						'onclick' => $edited_Item->get_type_edit_link( 'onclick' )
+				) );
+
+			if( $edited_Item->ID > 0 )
+			{ // Display a link to history if Item exists in DB
+				$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
+					$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
+							'style' => 'margin-right: 3ex'
+					) );
+			}
+
+			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
+				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
+				$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
+						' '.T_('In skin editing'), 4, 3, array(
+						'style' => 'margin-right: 3ex',
+						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
+				) );
+			}
+
+			$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
+
+			init_tokeninput_js();
 		}
-
-		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
-
-		init_tokeninput_js();
 
 		break;
 
 	case 'new_mass':
 
-		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
-						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
-						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'\', %s )' );
+		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit', array( 'ctrl' => 'items', 'action' => 'new' ) );
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
@@ -1414,21 +1511,32 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
-		/*
-		 * Add sub menu entries:
-		 * We do this here instead of _header because we need to include all filter params into regenerate_url()
-		 */
-		attach_browse_tabs();
-
 		break;
 }
 
-if( !empty($tab) )
-{
-	$AdminUI->append_path_level( $tab );
+/*
+ * Add sub menu entries:
+ * We do this here instead of _header because we need to include all filter params into regenerate_url()
+ */
+attach_browse_tabs();
+
+
+if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ))
+{ // Set a tab type for edited item
+	$tab = 'type';
+	$tab_type = $ItemType->backoffice_tab;
+}
+//pre_dump( 1,1,1,1, )
+if( ! empty( $tab ) && $tab == 'type' )
+{ // Set a path from dynamic tabs
+	$AdminUI->append_path_level( 'type_'.str_replace( ' ', '_', utf8_strtolower( $tab_type ) ) );
+}
+else
+{ // Set a path to selected tab
+	$AdminUI->append_path_level( empty( $tab ) ? 'full' : $tab );
 }
 
-if( ( isset( $tab ) && in_array( $tab, array( 'full', 'list', 'pages', 'intros', 'podcasts', 'links', 'ads', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
 { // Init JS to autcomplete the user logins
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Initialize date picker for _item_expert.form.php
@@ -1484,6 +1592,8 @@ switch( $action )
 
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'new_type': // this gets set as action by JS, when we switch tabs
+	case 'edit_type': // this gets set as action by JS, when we switch tabs
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
 	case 'copy':
@@ -1502,7 +1612,7 @@ switch( $action )
 
 		$item_content = prepare_item_content( $edited_Item->content );
 
-		if( ! $Blog->get_setting( 'allow_html_post' ) )
+		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
 			$item_content = htmlspecialchars_decode( $item_content );
 		}
@@ -1514,8 +1624,14 @@ switch( $action )
 		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated(), $params );
 
 		// Display VIEW:
-		// Form to edit item
-		$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
+		if( in_array( $action, array( 'new_type', 'edit_type' ) ) )
+		{ // Form to change item type
+			$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
+		}
+		else
+		{ // Form to edit item
+			$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
+		}
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
@@ -1531,7 +1647,7 @@ switch( $action )
 
 		$item_content = prepare_item_content( $edited_Item->content );
 
-		if( ! $Blog->get_setting( 'allow_html_post' ) )
+		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
 			$item_content = htmlspecialchars_decode( $item_content );
 		}
@@ -1557,7 +1673,10 @@ switch( $action )
 		// Memorize 'p' in case we reload while changing some display settings
 		memorize_param( 'p', 'integer', NULL );
 
- 		// Begin payload block:
+		// What comments view, 'feedback' - all user comments, 'meta' - meta comments of the admins
+		param( 'comment_type', 'string', 'feedback', true );
+
+		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
 		// We use the "full" view for displaying single posts:
@@ -1668,10 +1787,7 @@ switch( $action )
 					$AdminUI->disp_view( 'items/views/_item_list_manual.view.php' );
 					break;
 
-				case 'list':
-				case 'pages':
-				case 'intros':
-				case 'podcasts':
+				case 'type':
 				default:
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_table.view.php' );

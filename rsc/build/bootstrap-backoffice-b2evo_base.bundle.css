@@ -221,6 +221,37 @@ button.action_icon {
   padding: 0;
   cursor: pointer;
 }
+span.fa {
+  line-height: inherit;
+  font-size: 14px;
+}
+.btn span.fa {
+  line-height: 14px;
+}
+a.action_icon span.fa {
+  margin-right: 2px;
+}
+a.roundbutton .fa,
+a.roundbutton:hover .fa,
+a.roundbutton_text .fa,
+a.roundbutton_text:hover .fa {
+  color: #000;
+}
+a:hover .fa-x-rollover-green {
+  color: #0C0 !important;
+}
+a:hover .fa-x-rollover-red {
+  color: #C00 !important;
+}
+a:hover .fa-x-rollover-red-light {
+  color: #F00 !important;
+}
+a:hover .fa-x-rollover-orange {
+  color: #F90 !important;
+}
+a:hover .fa-x-rollover-black {
+  color: #000 !important;
+}
 div.edit_toolbars {
   margin-top: 1ex;
   width: 100%;
@@ -276,16 +307,13 @@ span.loader_img.loader_user_deldata {
   margin: 1px;
   text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000000;
 }
-.filter_item a.user {
-  text-shadow: 1px 1px 0 #FFF;
-}
 .filter_item div {
   margin: 0;
   padding: 3px 5px;
   color: #FFF;
   float: left;
-  height: 16px;
-  line-height: 16px;
+  height: 24px !important;
+  line-height: 18px !important;
 }
 .filter_item div:first-child {
   border-radius: 5px 0 0 5px;
@@ -294,7 +322,6 @@ span.loader_img.loader_user_deldata {
   border-radius: 0 5px 5px 0;
   float: right;
   padding: 0;
-  height: 22px;
 }
 .filter_item div.icon a {
   display: block;
@@ -1311,6 +1338,13 @@ ol {
   margin: 0 0 10px 25px;
   padding: 0;
 }
+a.btn.action_icon {
+  font-weight: normal;
+  text-decoration: none;
+}
+a.btn.action_icon.hoverlink {
+  text-decoration: none;
+}
 .form-horizontal .control-label {
   padding-left: 0;
 }
@@ -1535,6 +1569,9 @@ div.filters .block {
   display: inline-block;
   margin: 2px;
 }
+div.filters.panel-body {
+  padding: 15px;
+}
 .table_scroll .table {
   margin-bottom: 0;
 }
@@ -1726,4 +1763,82 @@ a.evo_messages_link .badge {
 .jumbotron {
   font-size: 21px;
   font-weight: 200;
+}
+.btn-status-draft {
+  color: #000;
+  background-color: #ff9;
+  border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+  color: #000;
+  background-color: #f3f392;
+}
+.btn-status-review {
+  color: #fff;
+  background-color: #CC0099;
+}
+.btn-status-review:hover {
+  color: #fff;
+  background-color: #c20092;
+}
+.btn-status-community {
+  color: #fff;
+  background-color: #2E8BB9;
+}
+.btn-status-community:hover {
+  color: #fff;
+  background-color: #2c84b0;
+}
+.btn-status-protected {
+  color: #fff;
+  background-color: #FF9C2A;
+}
+.btn-status-protected:hover {
+  color: #fff;
+  background-color: #f39528;
+}
+.btn-status-private {
+  color: #fff;
+  background-color: #DC143C;
+}
+.btn-status-private:hover {
+  color: #fff;
+  background-color: #d21339;
+}
+.btn-status-published {
+  color: #000;
+  background-color: #99EE44;
+}
+.btn-status-published .glyphicon {
+  color: inherit !important;
+}
+.btn-status-published:hover {
+  color: #000;
+  background-color: #92e341;
+}
+.btn-status-deprecated {
+  color: #fff;
+  background-color: #000;
+}
+.btn-status-deprecated:hover {
+  color: #fff;
+  background-color: #333;
+}
+.btn-status-redirected {
+  color: #fff;
+  background-color: #663399;
+}
+.btn-status-redirected:hover {
+  color: #fff;
+  background-color: #613192;
+}
+div.controls ul.token-input-list-facebook {
+  padding: 6px 12px;
+}
+div.controls ul.token-input-list-facebook li input {
+  padding: 2px 0 1px 0;
+}
+div.controls ul.token-input-list-facebook .token-input-token-facebook {
+  margin-bottom: 0;
+  border-radius: 4px;
 }

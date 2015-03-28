@@ -214,14 +214,14 @@ class coll_media_index_Widget extends ComponentWidget
 		//          overriding ItemListLigth::query() for starters ;)
 
 		// Init caches
-		$ItemCache = & get_ItemCache();
 		$FileCache = & get_FileCache();
+		$ItemCache = & get_ItemCache();
 
-		// Query list of files:
+		// Query list of files and posts fields:
 		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
 		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
-									post_tiny_slug_ID, post_ptyp_ID, post_title, post_excerpt, post_url, file_ID, file_type,
+									post_tiny_slug_ID, post_ityp_ID, post_title, post_excerpt, post_url, file_ID, file_type,
 									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
@@ -239,7 +239,7 @@ class coll_media_index_Widget extends ComponentWidget
 		$ItemQuery->WHERE_and( 'link_position != "albumart"' );
 		if( !empty( $this->disp_params['item_type'] ) )
 		{ // Get items only with specified type
-			$ItemQuery->WHERE_and( 'post_ptyp_ID = '.intval( $this->disp_params['item_type'] ) );
+			$ItemQuery->WHERE_and( 'post_ityp_ID = '.intval( $this->disp_params['item_type'] ) );
 		}
 		$ItemQuery->GROUP_BY( 'link_ID' );
 

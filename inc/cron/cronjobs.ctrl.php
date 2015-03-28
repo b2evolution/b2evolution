@@ -212,8 +212,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Scheduler'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Scheduler'), $admin_url.'?ctrl=crontab' );
 
 if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy', 'list' ) ) )
 { // Initialize date picker for cronjob.form.php

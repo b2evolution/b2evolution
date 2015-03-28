@@ -35,30 +35,31 @@ $required_mysql_version[ 'collections' ] = '5.0.3';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
-		'T_blogs'                  => $tableprefix.'blogs',
-		'T_categories'             => $tableprefix.'categories',
-		'T_coll_group_perms'       => $tableprefix.'bloggroups',
-		'T_coll_user_perms'        => $tableprefix.'blogusers',
-		'T_coll_settings'          => $tableprefix.'coll_settings',
-		'T_comments'               => $tableprefix.'comments',
-		'T_comments__votes'        => $tableprefix.'comments__votes',
-		'T_comments__prerendering' => $tableprefix.'comments__prerendering',
-		'T_items__item'            => $tableprefix.'items__item',
-		'T_items__item_settings'   => $tableprefix.'items__item_settings',
-		'T_items__itemtag'         => $tableprefix.'items__itemtag',
-		'T_items__prerendering'    => $tableprefix.'items__prerendering',
-		'T_items__status'          => $tableprefix.'items__status',
-		'T_items__tag'             => $tableprefix.'items__tag',
-		'T_items__type'            => $tableprefix.'items__type',
-		'T_items__subscriptions'   => $tableprefix.'items__subscriptions',
-		'T_items__version'         => $tableprefix.'items__version',
-		'T_links'                  => $tableprefix.'links',
-		'T_links__vote'            => $tableprefix.'links__vote',
-		'T_postcats'               => $tableprefix.'postcats',
-		'T_skins__container'       => $tableprefix.'skins__container',
-		'T_skins__skin'            => $tableprefix.'skins__skin',
-		'T_subscriptions'          => $tableprefix.'subscriptions',
-		'T_widget'                 => $tableprefix.'widget',
+		'T_blogs'                    => $tableprefix.'blogs',
+		'T_categories'               => $tableprefix.'categories',
+		'T_coll_group_perms'         => $tableprefix.'bloggroups',
+		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_settings'            => $tableprefix.'coll_settings',
+		'T_comments'                 => $tableprefix.'comments',
+		'T_comments__votes'          => $tableprefix.'comments__votes',
+		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
+		'T_items__item'              => $tableprefix.'items__item',
+		'T_items__item_settings'     => $tableprefix.'items__item_settings',
+		'T_items__itemtag'           => $tableprefix.'items__itemtag',
+		'T_items__prerendering'      => $tableprefix.'items__prerendering',
+		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__tag'               => $tableprefix.'items__tag',
+		'T_items__type'              => $tableprefix.'items__type',
+		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__version'           => $tableprefix.'items__version',
+		'T_links'                    => $tableprefix.'links',
+		'T_links__vote'              => $tableprefix.'links__vote',
+		'T_postcats'                 => $tableprefix.'postcats',
+		'T_skins__container'         => $tableprefix.'skins__container',
+		'T_skins__skin'              => $tableprefix.'skins__skin',
+		'T_subscriptions'            => $tableprefix.'subscriptions',
+		'T_widget'                   => $tableprefix.'widget',
 	) );
 
 /**
@@ -233,7 +234,7 @@ function & get_ItemTypeCache()
 	if( ! isset( $ItemTypeCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
-		$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ityp_\', \'ityp_ID\' )' );
 	}
 
 	return $ItemTypeCache;
@@ -548,35 +549,7 @@ class collections_Module extends Module
 
 		global $Settings;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			return;
-		}
-
-		$entries = array();
-
-		// Separator
-		$entries['newblog_sep'] = array(
-				'separator' => true,
-			);
-
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{ // Menu to edit site settings
-			$entries['structure'] = array(
-					'text' => T_('Site structure').'&hellip;',
-					'href' => $admin_url.'?ctrl=collections',
-				);
-		}
-
-		// Menu to view blogs list
-		$entries['blogs'] = array(
-				'text' => T_('Blogs').'&hellip;',
-				'href' => $admin_url.'?ctrl=collections&amp;tab=list',
-			);
-
-		$topleft_Menu->add_menu_entries( 'blog', $entries );
-
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! $current_User->check_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
@@ -596,9 +569,6 @@ class collections_Module extends Module
 								'text' => T_('Open Online manual'),
 								'href' => get_manual_url( NULL ),
 								'target' => '_blank',
-							);
-		$entries['info_sep'] = array(
-								'separator' => true,
 							);
 		$entries['twitter'] = array(
 								'text' => T_('b2evolution on twitter'),
@@ -632,41 +602,72 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
 		{ // don't show these menu entries if user hasn't at least admin restricted permission
 			return;
 		}
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) && !$current_User->check_role( 'member' ) )
-		{ // don't show these menu entries if user has only admin restricted permission, and he is not member of any blog
-			return;
+		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+
+		$site_menu = array(
+			'text' => T_('Site'),
+			'href' => $admin_url.'?ctrl=dashboard',
+			'entries' => array(
+				'dashboard' => array(
+					'text' => T_('Site Dashboard'),
+					'href' => $admin_url.'?ctrl=dashboard' ),
+				)
+		);
+		if( $perm_admin_normal )
+		{ // User has an access to backoffice
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{ // User has an access to view settings
+				$site_menu['entries']['settings'] = array(
+					'text' => T_('Site Settings'),
+					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
+				);
+			}
+			if( $current_User->check_perm( 'slugs', 'view' ) )
+			{ // User has an access to view slugs
+				$site_menu['entries']['slugs'] = array(
+					'text' => T_('Slugs'),
+					'href' => $admin_url.'?ctrl=slugs'
+				);
+			}
 		}
 
-		$AdminUI->add_menu_entries(
+		$working_blog = get_working_blog();
+		if( $working_blog )
+		{ // User is member of some blog or has at least view perms, so Dashboard and Collections menus should be visible
+			$AdminUI->add_menu_entries(
 				NULL, // root
 				array(
-					'dashboard' => array(
-						'text' => T_('Dashboard'),
-						'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
-						'style' => 'font-weight: bold;'
-						),
-
-					'items' => array(
-						'text' => T_('Contents'),
-						'href' => $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
-						// Controller may add subtabs
-						),
-					) );
+					'site' => $site_menu,
+					'collections' => array(
+						'text' => T_('Collections'),
+						'href' => $admin_url.'?ctrl=dashboard&blog='.$working_blog
+					)
+				)
+			);
+		}
+		elseif( $perm_admin_normal )
+		{ // User is not member of any blogs, but has admin normal permission. Only the dashboard menu ( no Collections ) should be visible.
+			$AdminUI->add_menu_entries(
+				NULL, // root
+				array( 'site' => $site_menu )
+			);
+		}
 	}
 
-  /**
+
+	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
 	 */
 	function build_menu_2()
 	{
-		global $blog, $loc_transinfo, $ctrl, $admin_url;
+		global $loc_transinfo, $ctrl, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -677,141 +678,166 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
-		{
+		$blog = get_working_blog();
+		if( ! $blog )
+		{ // No available blogs for current user
 			return;
 		}
 
-		// BLOG SETTINGS:
-		if( $ctrl == 'collections' )
-		{ // We are viewing the blog list, nothing fancy involved:
-			$AdminUI->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Structure'),
-							'href' => $admin_url.'?ctrl=collections',
-						),
-					), 'dashboard' );
-			if( $current_User->check_perm( 'options', 'view' ) )
-			{
-				$AdminUI->add_menu_entries( 'blogs', array(
-						'site_settings' => array(
-									'text' => T_('Global Site Settings'),
-									'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
-						),
-					) );
-			}
-			$AdminUI->add_menu_entries( 'blogs', array(
-					'list' => array(
-									'text' => T_('Site Collections'),
-									'href' => $admin_url.'?ctrl=collections&amp;tab=list',
-					),
-				) );
-			if( $current_User->check_perm( 'options', 'view' ) )
-			{
-				$AdminUI->add_menu_entries( 'blogs', array(
-						'blog_settings' => array(
-							'text' => /* TRANS: settings common to all collections */ T_('Common Collection Settings'),
-							'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
-						),
-					) );
-			}
+		// Collection Dashboard
+		$collection_menu_entries = array(
+				'dashboard' => array(
+					'text' => T_('Collection Dashboard'),
+					'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
+					'order' => 'group_last' ),
+			);
+
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
+
+		// Posts
+		$collection_menu_entries['posts'] = array(
+				'text' => T_('Posts'),
+				'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$blog,
+			);
+		$last_group_menu_entry = 'posts';
+
+		if( $perm_comments )
+		{ // User has permission to edit published, draft or deprecated comments (at least one kind)
+			$collection_menu_entries['comments'] = array(
+					'text' => T_('Comments'),
+					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore',
+				);
+			$last_group_menu_entry = 'comments';
 		}
-		else
-		{	// We're on any other page, we may have a direct destination
-		  // + we have subtabs (fp > maybe the subtabs should go into the controller as for _items ?)
+		if( $perm_cats )
+		{ // Categories
+			$collection_menu_entries['categories'] = array(
+				'text' => T_('Categories'),
+				'href' => $admin_url.'?ctrl=chapters&amp;blog='.$blog
+			);
+			$last_group_menu_entry = 'categories';
+		}
 
-			// What perms do we have?
-			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
+		// Mark last menu entry in group
+		$collection_menu_entries[ $last_group_menu_entry ]['order'] = 'group_last';
 
-			// Determine default page based on permissions:
-			if( $coll_settings_perm && ! empty( $blog ) )
-			{	// Default: show General Blog Settings
-				$default_page = $admin_url.'?ctrl=coll_settings&amp;blog='.$blog;
-			}
-			else
-			{	// Default: Show site settings
-				$default_page = $admin_url.'?ctrl=collections';
-			}
+		$AdminUI->add_menu_entries( 'collections', $collection_menu_entries );
 
-			$AdminUI->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Structure'),
-							'href' => $default_page,
-							),
-						), 'dashboard' );
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		{ // Display these menus only when some blog is selected and current user has an access to edit the blog properties
 
-			if( $coll_settings_perm )
-			{
-				$skin_entries['current_skin'] = array(
-							'text' => T_('Skins for this blog'),
-							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog );
+			// BLOG SETTINGS:
 
-				if( $current_User->check_perm( 'options', 'view' ) )
-				{
-					$skin_entries['manage_skins'] = array(
-							'text' => T_('Manage skins'),
-							'href' => $admin_url.'?ctrl=skins&amp;blog='.$blog );
-				}
+			// We're on any other page, we may have a direct destination
+			// + we have subtabs (fp > maybe the subtabs should go into the controller as for _items ?)
 
-				$AdminUI->add_menu_entries( 'blogs',	array(
+			$AdminUI->add_menu_entries( 'collections', array(
+					'features' => array(
+						'text' => T_('Features'),
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog,
+						'entries' => array(
+							'home' => array(
+								'text' => T_('Front page'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog ),
+							'features' => array(
+								'text' => T_('Posts'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
+							'comments' => array(
+								'text' => T_('Comments'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'other' => array(
+								'text' => T_('Other'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+						),
+					),
+					'skin' => array(
+						'text' => T_('Skins'),
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
+						'entries' => array(
+							'current_skin' => array(
+								'text' => T_('Skins for this blog'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
+							)
+						),
+					),
+					'plugin_settings' => array(
+						'text' => T_('Plugins'),
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
+					'widgets' => array(
+						'text' => T_('Widgets'),
+						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
+						'order' => 'group_last', ),
+					'settings' => array(
+						'text' => T_('Settings'),
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog,
+						'entries' => array(
 							'general' => array(
 								'text' => T_('General'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
-							'features' => array(
-								'text' => T_('Features'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog,
-								'entries' => array(
-									'home' => array(
-										'text' => T_('Front page'),
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog ),
-									'features' => array(
-										'text' => T_('Posts'),
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog ),
-									'comments' => array(
-										'text' => T_('Comments'),
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
-									'other' => array(
-										'text' => T_('Other'),
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
-								),
-							),
-							'skin' => array(
-								'text' => T_('Skin'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
-								'entries' => $skin_entries,
-							),
-							'plugin_settings' => array(
-								'text' => T_('Plugins'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
-							'widgets' => array(
-								'text' => T_('Widgets'),
-								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog, ),
 							'urls' => array(
 								'text' => T_('URLs'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'advanced' => array(
-								'text' => T_('Advanced'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
-						) );
+						),
+					),
+				) );
 
-				if( $Blog && $Blog->advanced_perms )
-				{
-					$AdminUI->add_menu_entries( 'blogs', array(
-								'perm' => array(
-									'text' => T_('User perms'), // keep label short
-									'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
-								'permgroup' => array(
-									'text' => T_('Group perms'), // keep label short
-									'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
-							) );
-				}
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{ // Manage skins
+				$AdminUI->add_menu_entries( array( 'collections', 'skin' ), array(
+					'manage_skins' => array(
+						'text' => T_('Manage skins'),
+						'href' => $admin_url.'?ctrl=skins&amp;blog='.$blog )
+				) );
+			}
+
+			if( $current_User->check_perm( 'options', 'view', false, $blog ) )
+			{ // Item Types & Statuses
+				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
+					'types' => array(
+						'text' => T_('Item Types'),
+						'title' => T_('Item Types Management'),
+						'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$blog
+						),
+					'statuses' => array(
+						'text' => T_('Item Statuses'),
+						'title' => T_('Item Statuses Management'),
+						'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses&amp;blog='.$blog
+						),
+					)
+				);
+			}
+
+			$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
+					'advanced' => array(
+						'text' => T_('Advanced'),
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
+				) );
+
+			if( $Blog && $Blog->advanced_perms )
+			{ // Permissions
+				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
+						'perm' => array(
+							'text' => T_('User perms'), // keep label short
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
+						'permgroup' => array(
+							'text' => T_('Group perms'), // keep label short
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
+					) );
+			}
+
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{ // Check if current user has a permission to view the common settings of the blogs
+				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
+					'blog_settings' => array(
+						'text' => T_('Common Settings'),
+						'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
+						)
+					)
+				);
 			}
 		}
 	}

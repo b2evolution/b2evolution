@@ -58,7 +58,10 @@ class LinkComment extends LinkOwner
 		global $current_User;
 
 		$this->load_Blog();
-		return $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
+		$comment_Item = $this->Comment->get_Item();
+
+		return ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
+			|| $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
 	}
 
 	/**

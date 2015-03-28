@@ -23,7 +23,7 @@ global $current_User;
 // Check minimum permission:
 $current_User->check_perm( 'slugs', 'view', true );
 
-$AdminUI->set_path( 'options', 'slugs' );
+$AdminUI->set_path( 'site', 'slugs' );
 
 param_action( 'list' );
 
@@ -143,8 +143,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Slugs'), '?ctrl=slugs' );
+$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( T_('Slugs'), $admin_url.'?ctrl=slugs' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

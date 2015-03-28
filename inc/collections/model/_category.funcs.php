@@ -32,7 +32,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param integer Category order
  * @param boolean Is meta category?
  */
-function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $meta = false )
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $subcat_ordering = NULL, $meta = false )
 {
 	global $DB;
 
@@ -63,6 +63,7 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
 		$new_Chapter->set( 'description', $cat_description );
 	}
 	$new_Chapter->set( 'order', $cat_order );
+	$new_Chapter->set( 'subcat_ordering', $subcat_ordering );
 	if( $meta )
 	{ // Set this category as meta
 		$new_Chapter->set( 'meta', 1 );
@@ -242,7 +243,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON postcat_post_ID = post_id' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( 'post_ptyp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
+		$SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
@@ -277,6 +278,7 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_id' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
+		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
@@ -540,6 +542,20 @@ function get_allow_cross_posting()
  */
 function cat_req_dummy()
 {
+}
+
+
+/**
+ * In-skin display of a Chapter.
+ * It is a wrapper around the skin '_cat_list.inc.php' file.
+ *
+ * @param Object Chapter
+ */
+function cat_inskin_display( $Chapter )
+{
+	skin_include( '_cat_list.inc.php', array(
+					'Chapter' => $Chapter,
+				) );
 }
 
 ?>

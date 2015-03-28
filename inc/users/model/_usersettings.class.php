@@ -95,7 +95,9 @@ class UserSettings extends AbstractSettings
 
 		'email_format' => 'auto', // Email format: auto | html | text
 
-		'admin_skin' => 'chicago',  // User default admin skin
+		'admin_skin' => 'bootstrap',  // User default admin skin
+
+		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
 	);
 
 	/**
@@ -114,6 +116,7 @@ class UserSettings extends AbstractSettings
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
 		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation and the user has right to moderate that comment
 		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
+		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,
 		'enable_email' => 1,

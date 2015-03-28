@@ -163,7 +163,7 @@ function init_inskin_editing()
 
 	$item_content = prepare_item_content( $edited_Item->content );
 
-	if( ! $Blog->get_setting( 'allow_html_post' ) )
+	if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
 		$item_content = htmlspecialchars_decode( $item_content );
 	}
@@ -1384,61 +1384,48 @@ function cat_select_new()
  */
 function attach_browse_tabs( $display_tabs3 = true )
 {
-	global $AdminUI, $Blog, $current_User, $dispatcher, $ItemTypeCache;
+	global $AdminUI, $Blog, $current_User, $admin_url, $ItemTypeCache;
+
+	if( empty( $Blog ) )
+	{ // No blog
+		return;
+	}
 
 	$menu_entries = array(
-			'full' => array(
-				'text' => T_('All'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-		);
+		'full' => array(
+			'text' => T_('All'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+		)
+	);
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{ // We want to use workflow properties for this blog:
-		$menu_entries[ 'tracker' ] = array(
-				'text' => T_('Workflow view'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=tracker&amp;filter=restore&amp;blog='.$Blog->ID,
-			);
+		$menu_entries['tracker'] = array(
+			'text' => T_('Workflow view'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=tracker&amp;filter=restore&amp;blog='.$Blog->ID,
+		);
 	}
 
 	if( $Blog->get( 'type' ) == 'manual' )
 	{ // Display this tab only for manual blogs
-		$menu_entries = array_merge( $menu_entries, array(
-				'manual' => array(
-					'text' => T_('Manual view'),
-					'href' => $dispatcher.'?ctrl=items&amp;tab=manual&amp;filter=restore&amp;blog='.$Blog->ID,
-					),
-			) );
+		$menu_entries['manual'] = array(
+			'text' => T_('Manual view'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=manual&amp;filter=restore&amp;blog='.$Blog->ID,
+		);
 	}
 
-	$menu_entries = array_merge( $menu_entries, array(
-			'list' => array(
-				'text' => T_('Posts'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-			'pages' => array(
-				'text' => T_('Pages'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-			'intros' => array(
-				'text' => T_('Intros'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-			'podcasts' => array(
-				'text' => T_('Podcasts'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-			'links' => array(
-				'text' => T_('Sidebar links'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-			'ads' => array(
-				'text' => T_('Advertisements'),
-				'href' => $dispatcher.'?ctrl=items&amp;tab=ads&amp;filter=restore&amp;blog='.$Blog->ID,
-				),
-		) );
+	$type_tabs = get_item_type_tabs();
+	foreach( $type_tabs as $type_tab )
+	{
+		$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
+		$menu_entries[ $type_tab_key ] = array(
+			'text' => T_( $type_tab ),
+			'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
+		);
+	}
 
-	$AdminUI->add_menu_entries( 'items', $menu_entries );
+	//$AdminUI->clear_menu_entries( 'collections' );
+	$AdminUI->add_menu_entries( array( 'collections', 'posts' ), $menu_entries );
 
 	/* fp> Custom types should be variations of normal posts by default
 	  I am ok with giving extra tabs to SOME of them but then the
@@ -1465,85 +1452,60 @@ function attach_browse_tabs( $display_tabs3 = true )
 		}
 	*/
 
-	if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+	if( $display_tabs3 && $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
 	{ // User has permission to edit published, draft or deprecated comments (at least one kind)
-		$AdminUI->add_menu_entries(
-				'items',
-				array(
-						'comments' => array(
-							'text' => T_('Comments'),
-							'href' => $dispatcher.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
-							),
-					)
-			);
-
-		if( $display_tabs3 )
-		{
-			$AdminUI->add_menu_entries( array('items','comments'), array(
-					'fullview' => array(
-						'text' => T_('Full text view'),
-						'href' => $dispatcher.'?ctrl=comments&amp;tab3=fullview&amp;filter=restore&amp;blog='.$Blog->ID
-						),
-					'listview' => array(
-						'text' => T_('List view'),
-						'href' => $dispatcher.'?ctrl=comments&amp;tab3=listview&amp;filter=restore&amp;blog='.$Blog->ID
-						),
-					)
-				);
-		}
-	}
-
-
-	// What perms do we have?
-	$coll_settings_perm = $current_User->check_perm( 'options', 'view', false, $Blog->ID );
-	$settings_url = '?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$Blog->ID;
-	if( $coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
-	{
-		$settings_url = '?ctrl=chapters&amp;blog='.$Blog->ID;
-	}
-
-	if( $coll_settings_perm || $coll_chapters_perm )
-	{
-		$AdminUI->add_menu_entries(
-			'items',
-			array(
-				'settings' => array(
-					'text' => T_('Content settings'),
-					'href' => $settings_url,
-					)
-				)
-			);
-
-		if( $coll_chapters_perm )
-		{
-			$AdminUI->add_menu_entries( array('items','settings'), array(
-				'chapters' => array(
-					'text' => T_('Categories'),
-					'href' => '?ctrl=chapters&amp;blog='.$Blog->ID
-					),
-				)
-			);
-		}
-
-		if( $coll_settings_perm )
-		{
-			$AdminUI->add_menu_entries( array('items','settings'), array(
-				'types' => array(
-					'text' => T_('Post types'),
-					'title' => T_('Post types management'),
-					'href' => '?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$Blog->ID
-					),
-				'statuses' => array(
-					'text' => T_('Post statuses'),
-					'title' => T_('Post statuses management'),
-					'href' => '?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses&amp;blog='.$Blog->ID
-					),
-				)
-			);
-		}
+		$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
+			'fullview' => array(
+				'text' => T_('Full text view'),
+				'href' => $admin_url.'?ctrl=comments&amp;tab3=fullview&amp;filter=restore&amp;blog='.$Blog->ID ),
+			'listview' => array(
+				'text' => T_('List view'),
+				'href' => $admin_url.'?ctrl=comments&amp;tab3=listview&amp;filter=restore&amp;blog='.$Blog->ID ),
+			) );
 	}
 }
 
+
+/**
+ * Get back-office tabs from item types
+ *
+ * @return array Tabs
+ */
+function get_item_type_tabs()
+{
+	global $DB;
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'DISTINCT( ityp_backoffice_tab )' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->WHERE( 'ityp_backoffice_tab IS NOT NULL' );
+	$SQL->ORDER_BY( 'ityp_ID' );
+
+	return $DB->get_col( $SQL->get() );
+}
+
+
+/**
+ * Get item type IDs by tab name
+ *
+ * @return string Item IDs separated by comma
+ */
+function get_item_types_by_tab( $tab_name )
+{
+	global $DB;
+
+	if( empty( $tab_name ) )
+	{
+		return '';
+	}
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'ityp_ID' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_name ) );
+
+	return implode( ',', $DB->get_col( $SQL->get() ) );
+}
 
 
 /**
@@ -1716,7 +1678,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$next_action = ($creating ? 'create' : 'update');
 	if( !$inskin )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-default' ) );
 	}
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
@@ -1728,7 +1690,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	// Display a save button with title depending on post status
 	$button_titles = get_visibility_statuses( 'button-titles' );
 	$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton' ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
 
 	if( $edited_Item->status != $highest_publish_status )
 	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
@@ -1742,7 +1704,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$Form->submit( array(
 		'actionArray['.$next_action.'_publish]',
 		/* TRANS: This is the value of an input submit button */ $publish_text,
-		'SaveButton',
+		'SaveButton btn-status-published',
 		'',
 		$publish_style
 	) );
@@ -1807,6 +1769,7 @@ function echo_publishnowbutton_js()
 			var status = jQuery( this ).val();
 			var save_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>]"]' );
 			save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
+			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-[^\s]+/, 'btn-status-' + this.value ) );
 		} );
 	</script>
 	<?php
@@ -1817,51 +1780,65 @@ function echo_publishnowbutton_js()
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
- *
- * @param array Tags
  */
-function echo_autocomplete_tags( $tags = array() )
+function echo_autocomplete_tags()
 {
-	global $htsrv_url;
-
-	// Initialize an array to pre-fill the tags input
-	$prefilled_tags = array();
-	if( !empty( $tags ) )
-	{
-		foreach( $tags as $tag_name )
-		{
-			$prefilled_tags[] = array( 'id' => $tag_name, 'title' => $tag_name );
-		}
-	}
-
-	//echo <<<EOD
 ?>
 	<script type="text/javascript">
-	(function($){
-		jQuery(function() {
-			jQuery( '#item_tags' ).tokenInput(
-				'<?php echo $htsrv_url.'anon_async.php?action=get_tags' ?>',
-				{
-					theme: 'facebook',
-					queryParam: 'term',
-					propertyToSearch: 'title',
-					tokenValue: 'title',
-					preventDuplicates: true,
-					prePopulate: <?php echo evo_json_encode( $prefilled_tags ) ?>,
-					hintText: '<?php echo TS_('Type in a tag') ?>',
-					noResultsText: '<?php echo TS_('No results') ?>',
-					searchingText: '<?php echo TS_('Searching...') ?>'
-				}
-			);
-			<?php
-				// Don't submit a form by Enter when user is editing the tags
-				echo get_prevent_key_enter_js( '#token-input-item_tags' );
-			?>
-		});
-	})(jQuery);
+	function init_autocomplete_tags( selector )
+	{
+		var tags = jQuery( selector ).val();
+		var tags_json = new Array();
+		if( tags.length > 0 )
+		{ // Get tags from <input>
+			tags = tags.split( ',' );
+			for( var t in tags )
+			{
+				tags_json.push( { id: tags[t], title: tags[t] } );
+			}
+		}
+
+		jQuery( selector ).tokenInput( '<?php echo get_samedomain_htsrv_url().'anon_async.php?action=get_tags' ?>',
+		{
+			theme: 'facebook',
+			queryParam: 'term',
+			propertyToSearch: 'title',
+			tokenValue: 'title',
+			preventDuplicates: true,
+			prePopulate: tags_json,
+			hintText: '<?php echo TS_('Type in a tag') ?>',
+			noResultsText: '<?php echo TS_('No results') ?>',
+			searchingText: '<?php echo TS_('Searching...') ?>'
+		} );
+	}
+
+	jQuery( document ).ready( function()
+	{
+		if( jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+		{
+			init_autocomplete_tags( '#item_tags' );
+		}
+
+		jQuery( '#suggest_item_tags' ).click( function()
+		{
+			if( jQuery( this ).is( ':checked' ) )
+			{ // Use plugin to suggest tags
+				jQuery( '#item_tags' ).hide();
+				init_autocomplete_tags( '#item_tags' );
+			}
+			else
+			{ // Remove autocomplete tags plugin
+				jQuery( '#item_tags' ).show();
+				jQuery( '#item_tags' ).parent().find( 'ul.token-input-list-facebook' ).remove();
+			}
+		} );
+		<?php
+			// Don't submit a form by Enter when user is editing the tags
+			echo get_prevent_key_enter_js( '#token-input-item_tags' );
+		?>
+	} );
 	</script>
 <?php
-//EOD;
 }
 
 
@@ -2250,8 +2227,10 @@ function echo_set_slug_changed()
 
 /**
  * Handle show_comments radioboxes on item list full view
+ *
+ * @param string Comment type: 'feedback' | 'meta'
  */
-function echo_show_comments_changed()
+function echo_show_comments_changed( $comment_type )
 {
 ?>
 	<script type="text/javascript">
@@ -2262,7 +2241,7 @@ function echo_show_comments_changed()
 			{ // if item_id is not defined, we have to show all comments from current blog
 				item_id = -1;
 			}
-			refresh_item_comments( item_id, 1 );
+			refresh_item_comments( item_id, 1, '<?php echo $comment_type; ?>' );
 		} );
 	</script>
 <?php
@@ -2306,13 +2285,20 @@ function echo_onchange_item_type_js()
  * @param array Comments IDs string to exclude from the list
  * @param string Filterset name
  * @param string Expiry status: 'all', 'active', 'expired'
+ * @param string Type of the comments: 'feedback' or 'meta'
  */
-function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = 20, $comment_IDs = array(), $filterset_name = '', $expiry_status = 'active' )
+function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
 {
 	global $inc_path, $status_list, $Blog, $admin_url;
 
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+
+	if( empty( $limit ) )
+	{ // Get default limit from curent user's setting
+		global $UserSettings;
+		$limit = $UserSettings->get( 'results_per_page' );
+	}
 
 	global $CommentList;
 	$CommentList = new CommentList2( $Blog, $limit, 'CommentCache', '', $filterset_name );
@@ -2343,8 +2329,20 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		$item_ID = NULL;
 	}
 	// set redirect_to
-	if( $item_ID != null )
-	{ // redirect to the items full view
+	if( ! is_null( $item_ID ) )
+	{
+		if( $comment_type == 'meta' )
+		{ // Check if current user can sees meta comments of this item
+			global $current_User;
+			$ItemCache = & get_ItemCache();
+			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			{ // Current user has no permissions to view meta comments
+				$comment_type = 'feedback';
+			}
+		}
+
+		// redirect to the items full view
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog_ID.'&p='.$item_ID, '&' ) );
 		param( 'item_id', 'integer', $item_ID );
 		param( 'currentpage', 'integer', $currentpage );
@@ -2356,10 +2354,11 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		{
 			$show_comments = 'all';
 		}
-		param( 'comments_number', 'integer', generic_ctp_number( $item_ID, 'comments', $show_comments ) );
+		$comments_number_mode = ( $comment_type == 'meta' ? 'metas' : 'comments' );
+		param( 'comments_number', 'integer', generic_ctp_number( $item_ID, $comments_number_mode, $show_comments ) );
 		// Filter list:
 		$CommentList->set_filters( array(
-			'types' => array( 'comment', 'trackback', 'pingback' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
 			'statuses' => $statuses,
 			'expiry_statuses' => $expiry_statuses,
 			'comment_ID_list' => $exlude_ID_list,
@@ -2416,27 +2415,33 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
+	echo '<a name="c'.$comment_ID.'"></a>';
 	echo '<div id="comment_'.$comment_ID.'" class="bComment bComment';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
 		echo 'expired';
 	}
+	elseif( $Comment->is_meta() )
+	{ // meta comment
+		echo 'meta';
+	}
 	else
-	{ // comment is not expired
+	{ // comment is not expired and not meta
 		$Comment->status('raw');
 	}
 	echo '">';
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
-	{	// User can moderate this comment
+	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
+	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) )
+	{ // User can moderate this comment OR Comment is meta and current user can view it
 		echo '<div class="bSmallHead">';
 		echo '<div>';
 
 		echo '<div class="bSmallHeadRight">';
 		$Comment->permanent_link( array(
 				'before' => '',
-				'text'   => '#text#'
+				'text'   => $Comment->is_meta() ? T_('Meta link') : '#text#'
 			) );
 		echo '</div>';
 
@@ -2446,38 +2451,56 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		$Comment->time( '#short_time' );
 		echo '</span>';
 
-		$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
-		echo ' &middot; <span class="bKarma">';
-		$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
-		echo '</span>';
-
-		echo '</div>';
-		echo '<div style="padding-top:3px">';
-		if( $is_expired )
-		{
-			echo '<div class="bSmallHeadRight">';
-			echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
-			echo '</div>';
+		if( $Comment->is_meta() )
+		{ // Display only author for meta comment
+			$Comment->author( '', '', ' &middot; '.T_('Author').': ', '' );
 		}
-		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ', true );
-		$Comment->ip_country( '', ' &middot; ' );
-		$Comment->author_url_with_actions( /*$redirect_to*/'', true, true );
+		else
+		{ // Display the detailed info for standard comment
+			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
+			echo ' &middot; <span class="bKarma">';
+			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
+			echo '</span>';
+
+			echo '</div>';
+			echo '<div style="padding-top:3px">';
+			if( $is_expired )
+			{
+				echo '<div class="bSmallHeadRight">';
+				echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
+				echo '</div>';
+			}
+			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ', true );
+			$Comment->ip_country( '', ' &middot; ' );
+			$Comment->author_url_with_actions( /*$redirect_to*/'', true, true );
+		}
 		echo '</div>';
 		echo '</div>';
 
 		echo '<div class="bCommentContent">';
 		$Comment->status( 'styled' );
-		echo '<div class="bTitle">';
-		echo T_('In response to:')
-				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
-		echo '</div>';
-		echo '<div class="bCommentTitle">';
-		echo $Comment->get_title();
-		echo '</div>';
+		if( ! $Comment->is_meta() )
+		{
+			echo '<div class="bTitle">';
+			echo T_('In response to:')
+					.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
+			echo '</div>';
+			echo '<div class="bCommentTitle">';
+			echo $Comment->get_title();
+			echo '</div>';
+		}
 		echo '<div class="bCommentText">';
 		$Comment->rating();
 		$Comment->avatar();
+		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		{ // Put the comment content into this container to edit by ajax
+			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
+		}
 		$Comment->content( 'htmlbody', 'true' );
+		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		{ // End of the container that is used to edit meta comment by ajax
+			echo '</div>';
+		}
 		echo '</div>';
 		echo '</div>';
 
@@ -2486,7 +2509,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="floatleft">';
 
 		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', button_class(), '&amp;', $save_context, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ), '#', button_class(), '&amp;', $save_context, $redirect_to );
 
 		echo '<span class="'.button_class( 'group' ).'">';
 		// Display publish NOW button if current user has the rights:
@@ -2513,8 +2536,10 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 		echo '</div>';
 
-		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', $save_context, true );
+		if( ! $Comment->is_meta() )
+		{ // Display Spam Voting system
+			$Comment->vote_spam( '', '', '&amp;', $save_context, true );
+		}
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -2562,33 +2587,37 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 
 /**
- * Display a page link on item full view
+ * Display a page link of the comments on item full view
  *
  * @param integer the item id
  * @param string link text
  * @param integer the page number
  */
-function echo_pagenumber( $item_ID, $text, $page )
+function echo_comment_pagenumber( $item_ID, $text, $page )
 {
 	global $blog, $admin_url;
 	$page_param = $page > 1 ? '&amp;currentpage='.$page : '';
-	echo ' <a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$item_ID.$page_param.'#comments' ).'" onclick="startRefreshComments( \''.request_from().'\', '.$item_ID.', '.$page.' ); return false;">'.$text.'</a>';
+	$comment_type = get_param( 'comment_type' );
+	$page_param .= $comment_type == 'meta' ? '&amp;comment_type=meta' : '';
+	echo ' <a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$item_ID.$page_param.'#comments' ).'" onclick="startRefreshComments( \''.request_from().'\', '.$item_ID.', '.$page.', \''.$comment_type.'\' ); return false;">'.$text.'</a>';
 }
 
 
 /**
- * Display page links on item full view
+ * Display page links of the comments on item full view
  *
  * @param integer the item id
  * @param integer current page number
  * @param integer all comments number in the list
  * @param array Params
  */
-function echo_pages( $item_ID, $currentpage, $comments_number, $params = array() )
+function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params = array() )
 {
+	global $UserSettings;
+
 	$params = array_merge( array(
 			'list_span'  => 11, // The number of pages to display for one time
-			'page_size'  => 20, // The number of comments on one page
+			'page_size'  => $UserSettings->get( 'results_per_page' ), // The number of comments on one page
 			'list_start' => '<div class="results_nav" id="paging">',
 			'list_end'   => '</div>',
 			'prev_text'  => T_('Previous'),
@@ -2639,16 +2668,16 @@ function echo_pages( $item_ID, $currentpage, $comments_number, $params = array()
 		echo $params['pages_text'];
 		if( $currentpage > 1 )
 		{ // link to previous page
-			echo_pagenumber( $item_ID, $params['prev_text'], $currentpage - 1 );
+			echo_comment_pagenumber( $item_ID, $params['prev_text'], $currentpage - 1 );
 		}
 		if( $first_page > 1 )
 		{ // link to first page
-			echo_pagenumber( $item_ID, '1', '1' );
+			echo_comment_pagenumber( $item_ID, '1', '1' );
 		}
 		if( $first_page > 2 )
 		{ // link to previous pages
 			$page_i = ceil( $first_page / 2 );
-			echo_pagenumber( $item_ID, '...', $page_i );
+			echo_comment_pagenumber( $item_ID, '...', $page_i );
 		}
 		for( $i = $first_page; $i <= $last_page; $i++ )
 		{ // Display list with pages
@@ -2658,21 +2687,21 @@ function echo_pages( $item_ID, $currentpage, $comments_number, $params = array()
 			}
 			else
 			{
-				echo_pagenumber( $item_ID, $i, $i );
+				echo_comment_pagenumber( $item_ID, $i, $i );
 			}
 		}
 		if( $last_page < $total_pages - 1 )
 		{ // link to next pages
 			$page_i = $last_page + floor( ( $total_pages - $last_page ) / 2 );
-			echo_pagenumber( $item_ID, '...', $page_i );
+			echo_comment_pagenumber( $item_ID, '...', $page_i );
 		}
 		if( $last_page < $total_pages )
 		{ // link to last page
-			echo_pagenumber( $item_ID, $total_pages, $total_pages );
+			echo_comment_pagenumber( $item_ID, $total_pages, $total_pages );
 		}
 		if( $currentpage < $total_pages )
 		{ // link to next page
-			echo_pagenumber( $item_ID, $params['next_text'], $currentpage + 1 );
+			echo_comment_pagenumber( $item_ID, $params['next_text'], $currentpage + 1 );
 		}
 	}
 	echo $params['list_end'];
@@ -2814,8 +2843,7 @@ function echo_item_location_form( & $Form, & $edited_Item, $params = array() )
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	load_funcs( 'regional/model/_regional.funcs.php' );
 
-	$edited_Item_Blog = $edited_Item->get_Blog();
-	if( !$edited_Item_Blog->country_visible() )
+	if( ! $edited_Item->country_visible() )
 	{	// If country is NOT visible it means all other location fields also are not visible, so exit here
 		return;
 	}
@@ -2847,24 +2875,24 @@ function echo_item_location_form( & $Form, & $edited_Item, $params = array() )
 
 	// Country
 	$CountryCache = & get_CountryCache();
-	$country_is_required = ( $edited_Item->Blog->get_setting( 'location_country' ) == 'required' );
+	$country_is_required = ( $edited_Item->get_type_setting( 'use_country' ) == 'required' );
 	$Form->select_country( 'item_ctry_ID', $edited_Item->ctry_ID, $CountryCache, T_('Country'), array( 'required' => $country_is_required, 'allow_none' => true ) );
 
-	if( $edited_Item->Blog->region_visible() )
+	if( $edited_Item->region_visible() )
 	{ // Region
-		$region_is_required = ( $edited_Item->Blog->get_setting( 'location_region' ) == 'required' );
+		$region_is_required = ( $edited_Item->get_type_setting( 'use_region' ) == 'required' );
 		$Form->select_input_options( 'item_rgn_ID', get_regions_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Region' ), sprintf( $button_refresh_regional, 'button_refresh_region' ), array( 'required' => $region_is_required ) );
 	}
 
-	if( $edited_Item->Blog->subregion_visible() )
+	if( $edited_Item->subregion_visible() )
 	{ // Subregion
-		$subregion_is_required = ( $edited_Item->Blog->get_setting( 'location_subregion' ) == 'required' );
+		$subregion_is_required = ( $edited_Item->get_type_setting( 'use_sub_region' ) == 'required' );
 		$Form->select_input_options( 'item_subrg_ID', get_subregions_option_list( $edited_Item->rgn_ID, $edited_Item->subrg_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'Sub-region' ), sprintf( $button_refresh_regional, 'button_refresh_subregion' ), array( 'required' => $subregion_is_required ) );
 	}
 
-	if( $edited_Item->Blog->city_visible() )
+	if( $edited_Item->city_visible() )
 	{ // City
-		$city_is_required = ( $edited_Item->Blog->get_setting( 'location_city' ) == 'required' );
+		$city_is_required = ( $edited_Item->get_type_setting( 'use_city' ) == 'required' );
 		$Form->select_input_options( 'item_city_ID', get_cities_option_list( $edited_Item->ctry_ID, $edited_Item->rgn_ID, $edited_Item->subrg_ID, $edited_Item->city_ID, array( 'none_option_text' => T_( 'Unknown' ) ) ), T_( 'City' ), sprintf( $button_refresh_regional, 'button_refresh_city' ), array( 'required' => $city_is_required ) );
 	}
 
@@ -2877,47 +2905,6 @@ function echo_item_location_form( & $Form, & $edited_Item, $params = array() )
 
 
 /**
- * Get custom fields for item of current Blog
- *
- * @return array Custom fields = array( 'name', 'type', 'title' )
- */
-function get_item_custom_fields()
-{
-	global $Blog;
-
-	$custom_fields = array();
-
-	if( empty( $Blog ) )
-	{	// No Blog
-		return $custom_fields;
-	}
-
-	foreach( array( 'double', 'varchar' ) as $type )
-	{ // get all types of custom fields
-		$count_custom_field = $Blog->get_setting( 'count_custom_'.$type );
-		for( $i = 1; $i <= $count_custom_field; $i++ )
-		{ // Add each custom field with type $type to the custom_fields array
-			$field_guid = $Blog->get_setting( 'custom_'.$type.$i );
-			$field_type_guid = $type.'_'.$field_guid;
-			$field_title = $Blog->get_setting( 'custom_'.$field_type_guid );
-			$field_fname = $Blog->get_setting( 'custom_fname_'.$field_guid );
-			if( $field_title && $field_fname )
-			{
-				$field_index = preg_replace( '/\s+/', '_', strtolower( trim( $field_fname ) ) );
-				$custom_fields[$field_index] = array(
-						'name' => $field_type_guid,
-						'type' => $type,
-						'title' => $field_title
-					);
-			}
-		}
-	}
-
-	return $custom_fields;
-}
-
-
-/**
  * Display custom field settings as hidden input values
  *
  * @param object Form
@@ -2925,17 +2912,93 @@ function get_item_custom_fields()
  */
 function display_hidden_custom_fields( & $Form, & $edited_Item )
 {
-	$edited_Item->load_Blog();
-
-	foreach( array( 'double', 'varchar' ) as $type )
-	{ // get all types of custom fields
-		$count_custom_field = $edited_Item->Blog->get_setting( 'count_custom_'.$type );
-		for( $i = 1; $i <= $count_custom_field; $i++ )
-		{ // For each custom field with type $type:
-			$field_guid = $edited_Item->Blog->get_setting( 'custom_'.$type.$i );
-			$Form->hidden( 'item_'.$type.'_'.$field_guid, $edited_Item->get_setting( 'custom_'.$type.'_'.$field_guid ) );
-		}
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	foreach( $custom_fields as $custom_field )
+	{ // For each custom field with type $type:
+		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] ) );
 	}
+}
+
+
+/**
+ * Save object Item into Session
+ *
+ * @param object Item
+ */
+function set_session_Item( $Item )
+{
+	global $Session;
+
+	if( ! is_object( $Item ) )
+	{
+		return;
+	}
+
+	$edited_items = $Session->get( 'edited_items' );
+
+	if( ! is_array( $edited_items ) )
+	{ // Initialize an array for Item objects
+		$edited_items = array();
+	}
+
+	$edited_items[ intval( $Item->ID ) ] = $Item;
+
+	$Session->delete( 'edited_items' );
+	$Session->set( 'edited_items', $edited_items );
+}
+
+
+/**
+ * Get object Item from Session
+ *
+ * @param integer Item ID
+ * @return object Item
+ */
+function get_session_Item( $item_ID = 0 )
+{
+	global $Session;
+
+	$edited_items = $Session->get( 'edited_items' );
+
+	if( isset( $edited_items[ $item_ID ] ) && is_object( $edited_items[ $item_ID ] ) )
+	{
+		$edited_Item = $edited_items[ $item_ID ];
+
+		// Reload main Chapter
+		$edited_Item->main_Chapter = NULL;
+		$edited_Item->get_main_Chapter();
+
+		// Reload Item Type
+		$edited_Item->ItemType = NULL;
+		$edited_Item->get_ItemType();
+
+		return $edited_Item;
+	}
+
+	return NULL;
+}
+
+
+/**
+ * Delete object Item from Session
+ *
+ * @param integer Item ID
+ */
+function delete_session_Item( $item_ID )
+{
+	global $Session;
+
+	$edited_items = $Session->get( 'edited_items' );
+
+	if( ! isset( $edited_items[ $item_ID ] ) )
+	{ // Item doesn't exist in Session
+		return;
+	}
+
+	unset( $edited_items[ $item_ID ] );
+
+	$Session->delete( 'edited_items' );
+	$Session->set( 'edited_items', $edited_items );
 }
 
 
@@ -3463,6 +3526,31 @@ function items_list_block_by_page( $params = array() )
 
 
 /**
+ * In-skin display of an Item.
+ * It is a wrapper around the skin '_item_list.inc.php' file.
+ *
+ * @param object Item
+ */
+function item_inskin_display( $Item )
+{
+	global $cat;
+	$params = array( 'Item' => $Item );
+
+	if( isset( $cat ) && ( $cat != $Item->main_cat_ID ) )
+	{
+		$params = array_merge( array(
+				'before_title'   => '<h3>',
+				'after_title'    => '</h3>',
+				'before_content' => '<div class="excerpt">',
+				'after_content'  => '</div>'
+			), $params );
+	}
+
+	skin_include( '_item_list.inc.php', $params );
+}
+
+
+/**
  * Initialize Results object for items list
  *
  * @param object Results
@@ -3526,7 +3614,7 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Type'),
 				'th_class' => 'nowrap',
 				'td_class' => 'nowrap',
-				'order' => $params['field_prefix'].'ptyp_ID',
+				'order' => $params['field_prefix'].'ityp_ID',
 				'td' => '@type()@',
 			);
 	}
@@ -3720,20 +3808,9 @@ function item_edit_actions( $Item )
  *
  * @param array Params
  */
-function manual_display_chapters( $params = array(), $level = 0 )
+function manual_display_chapters( $params = array() )
 {
-	$params = array_merge( array(
-			'parent_cat_ID'      => 0,
-		), $params );
-
 	global $Blog, $blog, $cat_ID;
-
-	$chapters = manual_get_chapters( (int)$params['parent_cat_ID'] );
-
-	if( empty( $chapters ) )
-	{ // No categories, Exit here
-		return;
-	}
 
 	if( empty( $Blog ) && !empty( $blog ) )
 	{ // Set Blog if it still doesn't exist
@@ -3746,321 +3823,26 @@ function manual_display_chapters( $params = array(), $level = 0 )
 		return;
 	}
 
+	$ChapterCache = & get_ChapterCache();
+
 	$chapter_path = array();
 	if( !empty( $cat_ID ) )
 	{ // A category is opened
-		$chapter_path = manual_get_chapter_path( $cat_ID );
+		$chapter_path = $ChapterCache->get_chapter_path( $Blog->ID, $cat_ID );
 	}
-	//pre_dump($chapter_path);
 
-	foreach( $chapters as $Chapter )
-	{ // Display all given chapters
-		manual_display_chapter( array_merge( $params, array(
-				'Chapter'      => $Chapter,
-				'chapter_path' => $chapter_path,
-			) ), $level );
-	}
-}
+	$callbacks = array(
+		'line'   => 'manual_display_chapter_row',
+		'posts'  => 'manual_display_post_row',
+	);
 
-
-/**
- * Display chapter and children
- *
- * @param array Params
- * @param integer Level of the category in the recursive tree
- */
-function manual_display_chapter( $params = array(), $level = 0 )
-{
 	$params = array_merge( array(
-			'Chapter'      => NULL,
-			'chapter_path' => array(),
+			'sorted'       => true,
+			'expand_all'   => false,
+			'chapter_path' => $chapter_path,
 		), $params );
 
-	global $Blog;
-
-	if( empty( $params['Chapter'] ) )
-	{ // No Chapter, Exit here
-		return;
-	}
-
-	$Chapter = & $params['Chapter'];
-
-	$is_selected = false;
-	$is_opened = false;
-
-	$classes = array();
-	if( !empty( $params['chapter_path'] ) && in_array( $Chapter->ID, $params['chapter_path'] ) )
-	{ // A category is selected
-		$is_selected = true;
-	}
-	if( !empty( $Chapter->children ) && $is_selected )
-	{ // A category is opened
-		$is_opened = true;
-	}
-	else if( $Chapter->has_posts() && $is_selected )
-	{ // A category is selected and it has the posts
-		$is_opened = true;
-	}
-
-	manual_display_chapter_row( $Chapter, $level, $is_opened );
-
-	if( $is_selected )
-	{
-		global $Settings;
-
-		if( $Settings->get( 'chapter_ordering' ) == 'manual' &&
-				$Blog->get_setting( 'orderby' ) == 'order' &&
-				$Blog->get_setting( 'orderdir' ) == 'ASC' )
-		{ // Items & categories are ordered by manual field 'order'
-			// In this mode we should show them in one merged list ordered by field 'order'
-			$chapters_items_mode = 'order';
-		}
-		else
-		{ // Standard mode for all other cases
-			$chapters_items_mode = 'std';
-		}
-
-		if( $chapters_items_mode != 'order' )
-		{ // Display all subchapters
-			manual_display_chapters( array_merge( $params, array(
-					'parent_cat_ID'      => $Chapter->ID,
-				) ), $level + 1 );
-		}
-
-		if( $Chapter->has_posts() || $is_opened )
-		{ // Display the posts/subcategories of this chapter
-			manual_display_posts( array_merge( $params, array(
-				'chapter_ID'          => $Chapter->ID,
-				'chapters_items_mode' => $chapters_items_mode,
-			) ), $level + 1 );
-		}
-	}
-}
-
-
-/**
- * Display a list of the posts for current chapter
- *
- * @param array params
- * @return string List with posts
- */
-function manual_display_posts( $params = array(), $level = 0 )
-{
-	$params = array_merge( array(
-			'chapter_ID'          => 0,
-			'chapters_items_mode' => 'std',
-		), $params );
-
-	global $DB, $Blog, $blog;
-
-	if( empty( $Blog ) && !empty( $blog ) )
-	{ // Set Blog if it still doesn't exist
-		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog, false );
-	}
-
-	if( empty( $params['chapter_ID'] ) || empty( $Blog ) )
-	{ // No chapter ID, Exit here
-		return;
-	}
-
-	if( $params['chapters_items_mode'] == 'order' )
-	{ // Get all subchapters in this mode to following insertion into posts list below
-		$sub_chapters = manual_get_chapters( $params['chapter_ID'] );
-	}
-
-	// Get the posts of current category
-	$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
-	$ItemList->load_from_Request();
-	$ItemList->set_filters( array(
-			'cat_array'    => array( $params['chapter_ID'] ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_modifier' => NULL,
-			'unit'         => 'all', // Display all items of this category, Don't limit by page
-		) );
-	$ItemList->query();
-
-	// Split items in two arrays to know what items are from main category and what items are from extra category
-	$items_main = array();
-	$items_extra = array();
-	while( $cur_Item = $ItemList->get_item() )
-	{
-		if( $cur_Item->main_cat_ID == $params['chapter_ID'] )
-		{ // Item is from main category
-			$items_main[] = $cur_Item;
-		}
-		else
-		{ // Item is from extra catogry
-			$items_extra[] = $cur_Item;
-		}
-	}
-
-
-	// ---- Display Items from MAIN category ---- //
-	$prev_item_order = 0;
-	foreach( $items_main as $cur_Item )
-	{
-		if( $params['chapters_items_mode'] == 'order' )
-		{ // In this mode we display the chapters inside a posts list
-			foreach( $sub_chapters as $s => $sub_Chapter )
-			{ // Loop through categories to find for current order
-				if( ( $sub_Chapter->get( 'order' ) <= $cur_Item->get( 'order' ) && $sub_Chapter->get( 'order' ) > $prev_item_order ) ||
-							/* This condition is needed for NULL order: */
-							( $cur_Item->get( 'order' ) == 0 && $sub_Chapter->get( 'order' ) >= $cur_Item->get( 'order' ) ) )
-				{ // Display chapter
-					manual_display_chapter( array_merge( $params, array(
-							'Chapter'      => $sub_Chapter,
-						) ), $level );
-					// Remove this chapter from array to avoid the duplicates
-					unset( $sub_chapters[ $s ] );
-				}
-			}
-
-			// Save current post order for next iteration
-			$prev_item_order = $cur_Item->get( 'order' );
-		}
-
-		manual_display_post_row( $cur_Item, $level, array(
-				'post_navigation' => 'same_category', // we are always navigating through category in this skin
-				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
-				'link_type'       => 'permalink',
-				'title_field'     => 'urltitle',
-			) );
-	}
-
-	if( $params['chapters_items_mode'] == 'order' )
-	{
-		foreach( $sub_chapters as $s => $sub_Chapter )
-		{ // Loop through rest categories that have order more than last item
-			manual_display_chapter( array_merge( $params, array(
-					'Chapter' => $sub_Chapter,
-				) ), $level );
-			// Remove this chapter from array to avoid the duplicates
-			unset( $sub_chapters[ $s ] );
-		}
-	}
-
-
-	// ---- Display Items from EXTRA category ---- //
-	foreach( $items_extra as $cur_Item )
-	{
-		manual_display_post_row( $cur_Item, $level, array(
-			'post_navigation' => 'same_category', // we are always navigating through category in this skin
-			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
-			'link_type'       => 'permalink',
-			'title_field'     => 'urltitle',
-			'title_before'    => '<i>',
-			'title_after'     => '</i>',
-		) );
-	}
-}
-
-/**
- * Get chapters
- *
- * @param integer Chapter parent ID
- */
-function manual_get_chapters( $parent_ID = 0 )
-{
-	global $Blog, $skin_chapters_cache;
-
-	if( !isset( $skin_chapters_cache ) )
-	{ // Get the all chapters for current blog
-		$ChapterCache = & get_ChapterCache();
-		$ChapterCache->load_subset( $Blog->ID );
-
-		if( isset( $ChapterCache->subset_cache[ $Blog->ID ] ) )
-		{
-			$chapters = $ChapterCache->subset_cache[ $Blog->ID ];
-
-			$skin_chapters_cache = array();
-			foreach( $chapters as $chapter_ID => $Chapter )
-			{ // Init children
-				//pre_dump( $Chapter->ID.' - '.$Chapter->get_name().' : '.$Chapter->get( 'parent_ID' ) );
-				if( $Chapter->get( 'parent_ID' ) == 0 )
-				{
-					$Chapter->children = manual_get_chapter_children( $Chapter->ID );
-					$skin_chapters_cache[ $Chapter->ID ] = $Chapter;
-				}
-			}
-		}
-	}
-
-	if( $parent_ID > 0 )
-	{ // Get the chapters by parent
-		$ChapterCache = & get_ChapterCache();
-		if( $Chapter = & $ChapterCache->get_by_ID( $parent_ID, false ) )
-		{
-			return $Chapter->children;
-		}
-		else
-		{ // Invalid ID of parent category
-			return array();
-		}
-	}
-
-	return $skin_chapters_cache;
-}
-
-
-/**
- * Get the children of current chapter recursively
- *
- * @param integer Parent ID
- * @return array Chapter children
- */
-function manual_get_chapter_children( $parent_ID = 0 )
-{
-	global $blog;
-
-	$ChapterCache = & get_ChapterCache();
-
-	$chapter_children = array();
-	if( isset( $ChapterCache->subset_cache[ $blog ] ) )
-	{
-		$chapters = $ChapterCache->subset_cache[ $blog ];
-		foreach( $chapters as $Chapter )
-		{
-			if( $parent_ID == $Chapter->get( 'parent_ID' ) )
-			{
-				$Chapter->children = manual_get_chapter_children( $Chapter->ID );
-				$chapter_children[ $Chapter->ID ] = $Chapter;
-			}
-		}
-	}
-
-	return $chapter_children;
-}
-
-
-/**
- * Get an array with chapters ID that located in current path
- *
- * @param integer Chapter ID
- * @return array Chapters ID
- */
-function manual_get_chapter_path( $chapter_ID )
-{
-	global $blog;
-	$ChapterCache = & get_ChapterCache();
-	$ChapterCache->load_subset( $blog );
-
-	$chapter_path = array( $chapter_ID );
-	if( isset( $ChapterCache->subset_cache[ $blog ] ) )
-	{
-		$chapters = $ChapterCache->subset_cache[ $blog ];
-		if( isset( $chapters[ $chapter_ID ] ) )
-		{
-			$Chapter = $chapters[ $chapter_ID ];
-			while( $Chapter->get( 'parent_ID' ) > 0 )
-			{
-				$chapter_path[] = $Chapter->get( 'parent_ID' );
-				// Select a parent chapter
-				$Chapter = $chapters[ $Chapter->get( 'parent_ID' ) ];
-			}
-		}
-	}
-
-	return $chapter_path;
+	$ChapterCache->recurse( $callbacks, $Blog->ID, NULL, 0, 0, $params );
 }
 
 
@@ -4071,11 +3853,15 @@ function manual_get_chapter_path( $chapter_ID )
  * @param integer Level of the category in the recursive tree
  * @param boolean TRUE - if category is opened
  */
-function manual_display_chapter_row( $Chapter, $level, $is_opened = false )
+function manual_display_chapter_row( $Chapter, $level, $params = array() )
 {
 	global $line_class, $current_User, $Settings;
 	global $admin_url;
 	global $Session;
+
+	$params = array_merge( array(
+			'is_opened' => false
+		), $params );
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -4091,7 +3877,7 @@ function manual_display_chapter_row( $Chapter, $level, $is_opened = false )
 
 	$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;blog='.$Chapter->blog_ID;
 	// Name
-	if( $is_opened )
+	if( $params['is_opened'] )
 	{ // Chapter is expanded
 		$cat_icon = get_icon( 'filters_hide' );
 		if( $parent_Chapter = & $Chapter->get_parent_Chapter() )
@@ -4106,7 +3892,7 @@ function manual_display_chapter_row( $Chapter, $level, $is_opened = false )
 	}
 	$r .= '<td class="firstcol">'
 					.'<strong style="padding-left: '.($level).'em;">'
-						.'<a href="'.$open_url.'">'.$cat_icon.'</a>';
+						.'<a href="'.$open_url.'">'.$cat_icon.'</a> ';
 	if( $perm_edit )
 	{ // Current user can edit the chapters of the blog
 		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
@@ -4123,11 +3909,16 @@ function manual_display_chapter_row( $Chapter, $level, $is_opened = false )
 
 	// Order
 	$order_attrs = '';
-	if( $perm_edit )
-	{ // Add availability to edit an order if current user can edit chapters
-		$order_attrs = ' id="order-chapter-'.$Chapter->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+	$order_value = T_('Alphabetic');
+	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
+	{ // Parent chapter ordering is set to manual and not alphabetic
+		if( $perm_edit )
+		{ // Add availability to edit an order if current user can edit chapters
+			$order_attrs = ' id="order-chapter-'.$Chapter->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+		}
+		$order_value = $Chapter->dget('order');
 	}
-	$r .= '<td class="center"'.$order_attrs.'>'.$Chapter->dget('order').'</td>';
+	$r .= '<td class="center"'.$order_attrs.'>'.$order_value.'</td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">';
@@ -4202,7 +3993,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 		$r .= '';
 	}
 	$r .= $params['title_before']
-			.$item_icon
+			.$item_icon.' '
 			.$Item->dget('title')
 			.$params['title_after'];
 	$r .= !empty( $item_edit_url ) ? '</a>' : '';
@@ -4219,11 +4010,16 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Order
 	$order_attrs = '';
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-	{ // Add availability to edit an order if current user can edit this item
-		$order_attrs = ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+	$order_value = T_('Alphabetic');
+	if( isset( $params['cat_order'] ) && $params['cat_order'] == 'manual' )
+	{
+		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		{ // Add availability to edit an order if current user can edit this item
+			$order_attrs = ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+		}
+		$order_value = $Item->dget('order');
 	}
-	$r .= '<td class="center"'.$order_attrs.'>'.$Item->dget('order').'</td>';
+	$r .= '<td class="center"'.$order_attrs.'>'.$order_value.'</td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';

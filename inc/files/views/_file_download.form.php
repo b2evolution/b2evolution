@@ -41,6 +41,6 @@ $Form->begin_form( 'fform', T_('Download files in archive') );
 	$Form->end_fieldset();
 
 $Form->end_form( array(
-		array( 'submit', 'submit', T_('Download'), 'DeleteButton' ) ) );
+		array( 'submit', 'submit', T_('Download'), 'btn-primary' ) ) );
 
 ?>

@@ -30,7 +30,7 @@ global $Item;
 
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
-global $comment_allowed_tags;
+global $comment_allowed_tags, $comment_type;
 
 $highlight = param( 'highlight', 'integer', NULL );
 
@@ -44,37 +44,16 @@ global $postIDarray;
 $postIDarray = $ItemList->get_page_ID_array();
 
 
-
 $block_item_Widget = new Widget( 'block_item' );
 
 if( $action == 'view' )
-{	// We are displaying a single post:
+{ // We are displaying a single post:
 	$block_item_Widget->title = $ItemList->get_filter_title( '', '', ' - ', NULL, 'htmlbody' );
 	$block_item_Widget->global_icon( T_('Close post'), 'close',
 				regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ), T_('close'), 4, 1 );
-}
-else
-{	// We are displaying multiple posts
-	$block_item_Widget->title = T_('Full posts');
-	if( $ItemList->is_filtered() )
-	{	// List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
-	}
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-	{
-		$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
-		$block_item_Widget->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
-		$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
-	}
-}
+	$block_item_Widget->disp_template_replaced( 'block_start' );
 
-$block_item_Widget->disp_template_replaced( 'block_start' );
-
-
-
-if( $action == 'view' )
-{
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
 					'header_start' => '',
@@ -87,9 +66,42 @@ if( $action == 'view' )
 				);
 }
 else
-{ // Not a single post!
-	// Display title depending on selection params:
-	echo $ItemList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+{ // We are displaying multiple posts ( Not a single post! )
+	$block_item_Widget->title = T_('Posts Browser');
+	if( $ItemList->is_filtered() )
+	{ // List is filtered, offer option to reset filters:
+		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	}
+
+	if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	{
+		$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
+		$block_item_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
+		$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
+	}
+
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+
+	// --------------------------------- START OF CURRENT FILTERS --------------------------------
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'coll_current_filters',
+			// Optional display params
+			'ItemList'             => $ItemList,
+			'block_start'          => '',
+			'block_end'            => '',
+			'block_title_start'    => '<b>',
+			'block_title_end'      => ':</b> ',
+			'show_filters'         => array( 'time' => 1 ),
+			'display_button_reset' => false,
+			'display_empty_filter' => true,
+		) );
+	// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
+
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+
+	// This block is used to keep correct css style for the post status banners
+	echo '<div id="styled_content_block">';
 
 	global $AdminUI;
 	$admin_template = $AdminUI->get_template( 'Results' );
@@ -259,20 +271,20 @@ while( $Item = & $ItemList->get_item() )
 			echo '<span class="'.button_class( 'group' ).'">';
 			if( $action != 'view' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).T_('View').'</a>';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('View').'</a>';
 			}
 
 			if( isset($GLOBALS['files_Module']) && $current_User->check_perm( 'files', 'view' ) )
 			{
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).T_('Files').'</a>';
+							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Files').'</a>';
 			}
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
 				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
-				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' );
+				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
 				// TRANS: Link to comments for current post
 				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
 				load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
@@ -281,25 +293,25 @@ while( $Item = & $ItemList->get_item() )
 			}
 			echo '</span>';
 
-			echo '<span class="'.button_class( 'group' ).'">';
+			echo '<span class="'.button_class( 'group' ).'"> ';
 			// Display edit button if current user has the rights:
 			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => ' ',
+					'before' => '',
 					'after'  => '',
-					'class'  => button_class( 'text' ),
+					'class'  => button_class( 'text_primary' ),
 					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 
 			// Display copy button if current user has the rights:
 			$Item->copy_link( array( // Link to backoffice for coping
 					'before' => '',
-					'after'  => ' ',
+					'after'  => '',
 					'text'   => '#icon#',
 					'class'  => button_class()
 				) );
 			echo '</span>';
 
-			echo '<span class="'.button_class( 'group' ).'">';
+			echo '<span class="'.button_class( 'group' ).'"> ';
 			// Display the moderate buttons if current user has the rights:
 			$status_link_params = array(
 					'class'       => button_class( 'text' ),
@@ -330,9 +342,14 @@ while( $Item = & $ItemList->get_item() )
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
+			if( $comment_type == 'meta' && ! $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			{ // Current user cannot views meta comments
+				$comment_type = 'feedback';
+			}
+
 			if( isset($GLOBALS['files_Module']) )
-			{	// Files:
-				echo '<div class="bFeedback">';	// TODO
+			{ // Files:
+				echo '<div class="bPostAttachments">';	// TODO
 	
 				/**
 				 * Needed by file display funcs
@@ -347,11 +364,37 @@ while( $Item = & $ItemList->get_item() )
 
 			// ---------- comments ----------
 
+			if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
+				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
+				$switch_comment_type_tabs = array(
+						'feedback' => array(
+							'url'   => $switch_comment_type_url.'&amp;comment_type=feedback#comments',
+							'title' => T_('User comments') ),
+						'meta' => array(
+							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
+							'title' => T_('Meta discussion') )
+					);
+				?>
+				<ul class="feedback-tabs nav nav-pills">
+				<?php
+					foreach( $switch_comment_type_tabs as $comment_tab_type => $comment_tab )
+					{
+						echo '<li'.( $comment_type == $comment_tab_type ? ' class="active"' : '' ).'>';
+						echo '<a href="'.$comment_tab['url'].'">'.$comment_tab['title'].'</a>';
+						echo '</li>';
+					}
+				?>
+				</ul>
+				<?php
+			}
+
 			$currentpage = param( 'currentpage', 'integer', 1 );
-			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
-			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
+			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
+			$draft_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'draft' );
 			// decide to show all comments, or only drafts
-			if( $total_comments_number > 5 && $draft_comments_number > 0 )
+			if( ( $comment_type != 'meta' ) && // Display all comments in meta mode by default
+			    ( $total_comments_number > 5 && $draft_comments_number > 0 ) )
 			{ // show only drafts
 				$statuses = array( 'draft' );
 				$show_comments = 'draft';
@@ -376,7 +419,7 @@ while( $Item = & $ItemList->get_item() )
 
 			// Filter list:
 			$CommentList->set_filters( array(
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment','trackback','pingback' ),
 				'statuses' => $statuses,
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
@@ -392,58 +435,73 @@ while( $Item = & $ItemList->get_item() )
 			param( 'item_id', 'integer', $Item->ID );
 			param( 'show_comments', 'string', $show_comments, false, true );
 
-			// display status filter
+			// Display status filter
+			// Get "Refresh" link
+			$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID.'#comments' ), NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\', '.$Item->ID.', 1, \''.$comment_type.'\' ); return false;' ) ).'</span> ';
 			?>
 			<div class="bFeedback">
 			<a id="comments"></a>
+			<?php
+			if( $comment_type == 'meta' )
+			{ // Display only "Refresh" link for meta comments
+				echo $refresh_link;
+			}
+			else
+			{ // Feedbacks
+			?>
 			<h4>
-			<?php 
+			<?php
 				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).')';
-				$opentrash_link = get_opentrash_link();
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID.'#comments' ), NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\', '.$Item->ID.' ); return false;' ) ).'</span> ';
-				echo $refresh_link.$opentrash_link;
+				// Display "Recycle bin" and "Refresh" links
+				echo $refresh_link.get_opentrash_link();
 			?>:</h4>
 			<?php
+			}
+			echo '<div class="clear"></div>';
 
 			if( $display_params['disp_rating_summary'] )
-			{	// Display a ratings summary
-				echo '<h3>'.$Item->get_feedback_title( 'comments', '#', '#', '#', 'total' ).'</h3>';
+			{ // Display a ratings summary
+				if( $comment_type != 'meta' )
+				{
+					echo '<h3>'.$Item->get_feedback_title( ( $comment_type == 'meta' ? 'metas' : 'comments' ), '#', '#', '#', 'total' ).'</h3>';
+				}
 				echo $Item->get_rating_summary();
 				echo '<br />';
 			}
 
-			?>
-			<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
-			<div class="tile">
-				<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
-				<label for="only_draft"><?php echo T_('Drafts') ?></label>
-			</div>
-			<div class="tile">
-				<input type="radio" name="show_comments" value="published" id="only_published" class="radio" <?php if( $show_comments == 'published' ) echo 'checked="checked" '?> />
-				<label for="only_published"><?php echo T_('Published') ?></label>
-			</div>
-			<div class="tile">
-				<input type="radio" name="show_comments" value="all" id="show_all" class="radio" <?php if( $show_comments == 'all' ) echo 'checked="checked" '?> />
-				<label for="show_all"><?php echo T_('All comments') ?></label>
-			</div>
-			<?php
-			$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
-			if( ! empty( $expiry_delay ) )
-			{ // A filter to display even the expired comments
-			?>
-			<div class="tile">
-				&nbsp; | &nbsp;
-				<input type="radio" name="show_comments_expiry" value="expiry" id="show_expiry_delay" class="radio" <?php if( $show_comments_expiry == 'active' ) echo 'checked="checked" '?> />
-				<label for="show_expiry_delay"><?php echo get_duration_title( $expiry_delay ); ?></label>
-			</div>
-			<div class="tile">
-				<input type="radio" name="show_comments_expiry" value="all" id="show_expiry_all" class="radio" <?php if( $show_comments_expiry == 'all' ) echo 'checked="checked" '?> />
-				<label for="show_expiry_all"><?php echo T_('All comments') ?></label>
-			</div>
-			<?php
+			if( $comment_type != 'meta' )
+			{ // Display this filter only for not meta comments
+				?>
+				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
+				<div class="tile">
+					<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
+					<label for="only_draft"><?php echo T_('Drafts') ?></label>
+				</div>
+				<div class="tile">
+					<input type="radio" name="show_comments" value="published" id="only_published" class="radio" <?php if( $show_comments == 'published' ) echo 'checked="checked" '?> />
+					<label for="only_published"><?php echo T_('Published') ?></label>
+				</div>
+				<div class="tile">
+					<input type="radio" name="show_comments" value="all" id="show_all" class="radio" <?php if( $show_comments == 'all' ) echo 'checked="checked" '?> />
+					<label for="show_all"><?php echo T_('All comments') ?></label>
+				</div>
+				<?php
+				$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
+				if( ! empty( $expiry_delay ) )
+				{ // A filter to display even the expired comments
+				?>
+				<div class="tile">
+					&nbsp; | &nbsp;
+					<input type="radio" name="show_comments_expiry" value="expiry" id="show_expiry_delay" class="radio" <?php if( $show_comments_expiry == 'active' ) echo 'checked="checked" '?> />
+					<label for="show_expiry_delay"><?php echo get_duration_title( $expiry_delay ); ?></label>
+				</div>
+				<div class="tile">
+					<input type="radio" name="show_comments_expiry" value="all" id="show_expiry_all" class="radio" <?php if( $show_comments_expiry == 'all' ) echo 'checked="checked" '?> />
+					<label for="show_expiry_all"><?php echo T_('All comments') ?></label>
+				</div>
+				<?php
+				}
 			}
-
-			load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 			// comments_container value shows, current Item ID
 			echo '<div id="comments_container" value="'.$Item->ID.'">';
@@ -457,20 +515,27 @@ while( $Item = & $ItemList->get_item() )
 			require $inc_path.'comments/views/_comment_list.inc.php';
 			echo '</div>'; // comments_container div
 
-			if( $Item->can_comment() )
-			{ // User can leave a comment
+			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Item ) ) // User can add meta comment on the Item
+			    || $Item->can_comment() ) // User can add standard comment
+			{
 			?>
 			<!-- ========== FORM to add a comment ========== -->
-			<h4><?php echo T_('Leave a comment') ?>:</h4>
+			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 
 			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
 
-			$Form->begin_form( 'bComment' );
+			$Form->begin_form( 'bComment'.( $comment_type == 'meta' ? ' meta_comment_form' : '' ) );
+
+			if( $comment_type == 'meta' )
+			{
+				echo '<b class="form_info">'.T_('Please remember: this comment will be included in a private discussion view and <u>only will be visible to other admins</u>').'</b>';
+			}
 
 			$Form->add_crumb( 'comment' );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
+			$Form->hidden( 'comment_type', $comment_type );
 			$Form->hidden( 'redirect_to', $ReqURI );
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
@@ -498,12 +563,24 @@ while( $Item = & $ItemList->get_item() )
 <?php
 }
 
-echo_show_comments_changed();
+if( $action == 'view' )
+{ // Load JS functions to work with comments
+	load_funcs( 'comments/model/_comment_js.funcs.php' );
+
+	// Handle show_comments radioboxes
+	echo_show_comments_changed( $comment_type );
+}
 
 // Display navigation:
 $ItemList->display_nav( 'footer' );
 
-
-$block_item_Widget->disp_template_replaced( 'block_end' );
+if( $action == 'view' )
+{ // End block of a single post
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+}
+else
+{ // End block of the multiple posts
+	echo '</div>';// END OF <div id="styled_content_block">
+}
 
 ?>

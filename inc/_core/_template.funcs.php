@@ -2304,7 +2304,7 @@ function display_login_form( $params )
 	{
 		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
 	}
-	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Forgot your password?').'</a>';
+	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
 
 	if( $inskin )
 	{
@@ -3054,6 +3054,25 @@ function get_prevent_key_enter_js( $jquery_selection )
 	}
 
 	return 'jQuery( "'.$jquery_selection.'" ).keypress( function( e ) { if( e.keyCode == 13 ) return false; } );';
+}
+
+
+/**
+ * Initialize CSS and JS to use font-awesome icons
+ *
+ * @param string Icons type:
+ *               - 'fontawesome' - Use only font-awesome icons
+ *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
+ */
+function init_fontawesome_icons( $icons_type = 'fontawesome' )
+{
+	global $b2evo_icons_type;
+
+	// Use font-awesome icons, @see get_icon()
+	$b2evo_icons_type = $icons_type;
+
+	// Load main CSS file of font-awesome icons
+	require_css( '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' );
 }
 
 ?>

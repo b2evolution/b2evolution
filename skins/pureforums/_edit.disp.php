@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Session, $inc_path;
+global $Blog, $Session, $inc_path, $cat;
 global $action, $form_action;
 
 /**
@@ -31,6 +31,10 @@ global $Plugins;
  * @var GeneralSettings
  */
 global $Settings;
+/**
+ * @var UserSettings
+ */
+global $UserSettings;
 
 global $pagenow;
 
@@ -82,7 +86,15 @@ elseif( param( 'cat', 'integer', 0 ) > 0 )
 {	// Get chapter ID from request when we create a new topic
 	$chapter_ID = get_param( 'cat' );
 }
-$Skin->display_breadcrumbs( $chapter_ID );
+$cat = $chapter_ID;
+skin_widget( array(
+		// CODE for the widget:
+		'widget' => 'breadcrumb_path',
+		// Optional display params
+		'block_start' => '<div class="breadcrumbs">',
+		'block_end'   => '</div>',
+		'separator'   => ''
+	) );
 echo '</div><div class="clear"></div>';
 
 $Form = new Form( $form_action, 'item_checkchanges', 'post' );
@@ -114,7 +126,7 @@ $Form->begin_form( 'inskin', '', $params );
 	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Add hidden required fields or fields that were set in the init_inskin_editing() function
-	$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
+	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 
 	// These fields are required on preview mode
 	$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
@@ -151,7 +163,7 @@ $Form->begin_form( 'inskin', '', $params );
 		$Form->hidden( 'item_owner_login', $creator_User->login );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
 
-		if( $Blog->get_setting( 'show_location_coordinates' ) )
+		if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 		{
 			$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
 			$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
@@ -198,45 +210,56 @@ $Form->begin_form( 'inskin', '', $params );
 	<?php
 	// ############################ POST CONTENTS #############################
 	// Title input:
-	$require_title = $Blog->get_setting('require_title');
-	if( $require_title != 'none' )
+	$use_title = $edited_Item->get_setting( 'use_title' );
+	if( $use_title != 'none' )
 	{
-		$Form->text_input( 'post_title', $item_title, 20, T_('Subject'), '', array('maxlength'=>255, 'style'=>'width: 98%;', 'required'=>($require_title=='required')) );
+		$Form->text_input( 'post_title', $item_title, 20, T_('Subject'), '', array( 'maxlength' => 255, 'style' => 'width:98%;', 'required' => ( $use_title == 'required' ) ) );
 	}
 
-	// --------------------------- TOOLBARS ------------------------------------
-	ob_start();
-	echo '<div class="edit_toolbars">';
-	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-			'target_type' => 'Item',
-			'edit_layout' => 'expert',
-			'Item' => $edited_Item,
-		) );
-	echo '</div>';
-	$plugins_toolbar = ob_get_clean();
-	
-	// CALL PLUGINS NOW:
-	ob_start();
-	$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
-	$plugins_editor_button = ob_get_clean();
+	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{ // Display text
+		// --------------------------- TOOLBARS ------------------------------------
+		ob_start();
+		echo '<div class="edit_toolbars">';
+		// CALL PLUGINS NOW:
+		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+				'target_type' => 'Item',
+				'edit_layout' => 'expert',
+				'Item' => $edited_Item,
+			) );
+		echo '</div>';
+		$plugins_toolbar = ob_get_clean();
+		
+		// CALL PLUGINS NOW:
+		ob_start();
+		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		$plugins_editor_button = ob_get_clean();
 
-	$Form->switch_template_parts( array(
-			'inputstart' => '<td class="form_input">'.$plugins_toolbar,
-			'inputend' => $plugins_editor_button.'</td>',
-		) );
-	// ---------------------------- TEXTAREA -------------------------------------
-	$Form->textarea_input( 'content', $item_content, 16, T_('Message body'), array( 'cols' => 60 , 'id' => 'itemform_post_content', 'style' => 'width:100%' ) );
-	?>
-	<script type="text/javascript" language="JavaScript">
-		<!--
-		// This is for toolbar plugins
-		var b2evoCanvas = document.getElementById('itemform_post_content');
-		//-->
-	</script>
+		$Form->switch_template_parts( array(
+				'inputstart' => '<td class="form_input">'.$plugins_toolbar,
+				'inputend' => $plugins_editor_button.'</td>',
+			) );
+		// ---------------------------- TEXTAREA -------------------------------------
+		$Form->textarea_input( 'content', $item_content, 16, T_('Message body'), array( 'cols' => 60 ,
+				'id'       => 'itemform_post_content',
+				'style'    => 'width:100%',
+				'class'    => 'autocomplete_usernames',
+				'required' => $edited_Item->get_type_setting( 'use_text' ) == 'required' ) );
+		?>
+		<script type="text/javascript" language="JavaScript">
+			<!--
+			// This is for toolbar plugins
+			var b2evoCanvas = document.getElementById('itemform_post_content');
+			//-->
+		</script>
 
-	<?php
-	$Form->switch_template_parts( $disp_params['edit_form_params'] );
+		<?php
+		$Form->switch_template_parts( $disp_params['edit_form_params'] );
+	}
+	else
+	{ // Hide text
+		$Form->hidden( 'content', $item_content );
+	}
 
 $Form->end_fieldset();
 
@@ -292,16 +315,29 @@ $Form->end_fieldset();
 	}
 
 	if( $edited_Item->ID > 0 )
-	{	// If item is editing
-		$Form->checkbox_input( 'item_featured', $edited_Item->featured, T_('Sticky'), array( 'note' => T_('Make this topic sticky (featured at the top of the list)') ) );
+	{ // If item is editing
+		if( $edited_Item->get_type_setting( 'allow_featured' ) )
+		{ // Display featured
+			$Form->checkbox_input( 'item_featured', $edited_Item->featured, T_('Sticky'), array( 'note' => T_('Make this topic sticky (featured at the top of the list)') ) );
+		}
+		else
+		{ // Hide featured
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+		}
 
-		if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
-		{	// Display radio inputs to change the comments status
-			$Form->radio_input( 'post_comment_status', $edited_Item->get( 'comment_status' ), array(
-					array( 'value' => 'open', 'label' => T_('Open'), 'note' => T_('Visitors can leave comments on this post.') ),
-					array( 'value' => 'closed', 'label' => T_('Closed'), 'note' => T_('Visitors can NOT leave comments on this post.') ),
-					array( 'value' => 'disabled', 'label' => T_('Disabled'), 'note' => T_('Visitors cannot see nor leave comments on this post.') ),
-				), T_('Allow replies'), array( 'lines' => true ) );
+		if( $edited_Item->allow_comment_statuses() )
+		{ // Display radio inputs to change the comments status
+			$comment_status_options = array( array( 'value' => 'open', 'label' => T_('Open'), 'note' => T_('Visitors can leave comments on this post.') ) );
+			if( $edited_Item->get_type_setting( 'allow_closing_comments' ) )
+			{ // Allow closing comments
+				$comment_status_options[] = array( 'value' => 'closed', 'label' => T_('Closed'), 'note' => T_('Visitors can NOT leave comments on this post.') );
+			}
+			if( $edited_Item->get_type_setting( 'allow_disabling_comments' ) )
+			{ // Allow disabling comments
+				$comment_status_options[] = array( 'value' => 'disabled', 'label' => T_('Disabled'), 'note' => T_('Visitors cannot see nor leave comments on this post.') );
+			}
+			$Form->radio_input( 'post_comment_status', $edited_Item->get( 'comment_status' ), $comment_status_options,
+				T_('Allow replies'), array( 'lines' => true ) );
 		}
 		else
 		{
@@ -330,26 +366,40 @@ $Form->end_fieldset();
 	}
 
 	// ################### TAGS ###################
-	$Form->text_input( 'item_tags', $item_tags, 40, T_('Tags'), '', array('maxlength'=>255, 'style'=>'width:100%;') );
-
-// ####################### ATTACHMENTS FIELDSETS #########################
-$LinkOwner = new LinkItem( $edited_Item );
-if( $LinkOwner->count_links() )
-{
-	$Form->switch_template_parts( array(
-			'fieldset_begin' => '<tr><td class="form_label" valign="top"><strong>$fieldset_title$:</strong></td><td class="form_input">',
-		) );
-	$Form->begin_fieldset( T_('Attachments') );
-	if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-	{
-		display_attachments( $LinkOwner );
+	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
+	{ // Display tags
+		// Checkbox to suggest tags
+		$suggest_checkbox = ' <span title="'.format_to_output( T_('Check this to let b2evolution auto-suggest tags as you type, based on the tags existing on other posts.'), 'htmlattr' ).'">'
+				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
+				.'<label for="suggest_item_tags">'.T_('suggest').'</label>'
+			.'</span>';
+		$Form->text_input( 'item_tags', $item_tags, 40, '<span class="nowrap">'.T_('Tags').$suggest_checkbox.'</span>', '', array( 'maxlength' => 255, 'style' => 'width:100%;', 'required' => ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ) );
 	}
 	else
-	{
-		echo T_('You do not have permission to edit file attachments for this post');
+	{ // Hide tags
+		$Form->hidden( 'item_tags', $item_tags );
 	}
-	$Form->end_fieldset();
-	$Form->switch_template_parts( $disp_params['edit_form_params'] );
+
+if( $edited_Item->get_type_setting( 'allow_attachments' ) )
+{ // ####################### ATTACHMENTS FIELDSETS #########################
+	$LinkOwner = new LinkItem( $edited_Item );
+	if( $LinkOwner->count_links() )
+	{
+		$Form->switch_template_parts( array(
+				'fieldset_begin' => '<tr><td class="form_label" valign="top"><strong>$fieldset_title$:</strong></td><td class="form_input">',
+			) );
+		$Form->begin_fieldset( T_('Attachments') );
+		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			display_attachments( $LinkOwner );
+		}
+		else
+		{
+			echo T_('You do not have permission to edit file attachments for this post');
+		}
+		$Form->end_fieldset();
+		$Form->switch_template_parts( $disp_params['edit_form_params'] );
+	}
 }
 
 // ####################### PLUGIN FIELDSETS #########################
@@ -373,5 +423,5 @@ $Form->end_form();
 echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
-echo_autocomplete_tags( $edited_Item->get_tags() );
+echo_autocomplete_tags();
 ?>

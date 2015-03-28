@@ -182,7 +182,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	else
 	{
 		if( $test_install_all_features )
-		{	// Add User login widget
+		{
+			if( $kind != 'forum' && $kind != 'manual' )
+			{ // Current filters widget
+				add_basic_widget( $blog_id, 'Sidebar', 'coll_current_filters', 'core', 5 );
+			}
+			// User login widget
 			add_basic_widget( $blog_id, 'Sidebar', 'user_login', 'core', 10 );
 		}
 		if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )

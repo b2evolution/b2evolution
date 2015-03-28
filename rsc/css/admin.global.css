@@ -116,7 +116,8 @@ div.dashboard_rating {
  * Compose screen:
  */
 table.compose_layout {
-	width: 100%;
+	width: 99%;
+	padding: 0 1px;
 }
 table.compose_layout td {
 	white-space: nowrap;
@@ -127,12 +128,15 @@ table.compose_layout td.label {
 	width: 1%;
 }
 table.compose_layout td.input {
-	padding: 1px 5px;
+	padding: 1px 2px 1px 5px;
 	width: 97%;
 }
 table.compose_layout td.select {
 	padding: 1px 0 1px 5px;
 	width: 97%;
+}
+table.compose_layout td.select select {
+	margin: 0;
 }
 
 
@@ -918,6 +922,83 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	width: 97%;
 	padding-left: 0;
 	padding-right: 0;
+}
+
+.bContent,
+.bCommentContent,
+.bFeedback,
+.bPostAttachments {
+	margin: 1ex;
+}
+
+.bFeedback {
+	border: 1px solid #BECDD6;
+	padding: 1ex;
+	margin-top: 0;
+}
+.feedback-tabs {
+	list-style: none;
+	margin: 1ex 1ex 0 1ex;
+	padding: 0;
+	text-align: center;
+}
+.feedback-tabs li {
+	display: inline-block;
+	position: relative;
+	margin: 0 1px;
+}
+.feedback-tabs li a {
+	display: block;
+	padding: 1ex;
+	background-color: #F1F6F8;
+	text-decoration: none;
+	border: 1px solid #BECDD6;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-khtml-border-radius: 4px;
+	border-radius: 4px 4px 0 0;
+}
+.feedback-tabs li.active a {
+	border-bottom-color: #FFF;
+}
+.feedback-tabs li a:hover,
+.feedback-tabs li.active a {
+	background-color: #FFF;
+}
+
+div.block_item form.bComment.meta_comment_form {
+	background-color: #f7f4ff;
+	border: 2px solid #5133ab;
+}
+.meta_comment_form .form_info {
+	display: block;
+	text-align: center;
+	padding: 10px;
+	color: #5133ab;
+}
+div.block_item div.bComment.bCommentmeta {
+	border: 2px solid #5133ab;
+}
+div.block_item div.bComment.bCommentmeta .bSmallHead {
+	background-color: #f7f4ff;
+	border-bottom: 1px solid #5133ab;
+}
+div.block_item div.bComment.bCommentmeta .CommentActionsArea {
+	background-color: #f7f4ff;
+	border-top: 1px solid #5133ab;
+}
+div.block_item div.bComment.bCommentmeta p, div.block_item div.bComment.bCommentmeta img.bCommentAvatar {
+	margin-top: 0;
+}
+
+.editable_comment_content textarea.form_textarea_input {
+	width: 90%;
+	margin-bottom: 10px;
+}
+
+.form_send_contacts span.fa,
+.form_add_contacts span.fa {
+	top: 0 !important;
 }
 
 #itemform_extra > label {

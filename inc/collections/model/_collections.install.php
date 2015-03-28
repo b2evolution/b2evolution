@@ -110,6 +110,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
+			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
 			cat_meta            tinyint(1) NOT NULL DEFAULT 0,
 			cat_lock            tinyint(1) NOT NULL DEFAULT 0,
 			cat_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
@@ -136,7 +137,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_last_touched_ts        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_status                 enum('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL default 'published',
 			post_pst_ID                 int(11) unsigned NULL,
-			post_ptyp_ID                int(10) unsigned NOT NULL DEFAULT 1,
+			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 			post_content                MEDIUMTEXT NULL,
 			post_excerpt                text NULL,
@@ -168,7 +169,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			INDEX post_status( post_status ),
 			INDEX post_parent_ID( post_parent_ID ),
 			INDEX post_assigned_user_ID( post_assigned_user_ID ),
-			INDEX post_ptyp_ID( post_ptyp_ID ),
+			INDEX post_ityp_ID( post_ityp_ID ),
 			INDEX post_pst_ID( post_pst_ID ),
 			INDEX post_order( post_order )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -187,7 +188,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_comments (
 			comment_ID                 int(11) unsigned NOT NULL auto_increment,
 			comment_item_ID            int(11) unsigned NOT NULL default 0,
-			comment_type               enum('comment','linkback','trackback','pingback') COLLATE ascii_general_ci NOT NULL default 'comment',
+			comment_type               enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
 			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'published' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_user_ID     int unsigned NULL default NULL,
@@ -278,9 +279,46 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__type' => array(
 		'Creating table for Post Types',
 		"CREATE TABLE T_items__type (
-			ptyp_ID   int(11) unsigned not null auto_increment,
-			ptyp_name varchar(30)      not null,
-			primary key (ptyp_ID)
+			ityp_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			ityp_name              VARCHAR(30) NOT NULL,
+			ityp_description       TEXT NULL DEFAULT NULL,
+			ityp_backoffice_tab    VARCHAR(30) NULL DEFAULT NULL,
+			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
+			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
+			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_text          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_allow_html        TINYINT DEFAULT 1,
+			ityp_allow_attachments TINYINT DEFAULT 1,
+			ityp_use_excerpt       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_title_tag     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_meta_desc     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_meta_keywds   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_tags          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_allow_featured    TINYINT DEFAULT 1,
+			ityp_use_country       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ityp_use_region        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ityp_use_sub_region    ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ityp_use_city          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ityp_use_coordinates   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ityp_use_custom_fields TINYINT DEFAULT 1,
+			ityp_use_comments      TINYINT DEFAULT 1,
+			ityp_allow_closing_comments   TINYINT DEFAULT 1,
+			ityp_allow_disabling_comments TINYINT DEFAULT 0,
+			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			PRIMARY KEY ( ityp_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__type_custom_field' => array(
+		'Creating table for custom fields of Post Types',
+		"CREATE TABLE T_items__type_custom_field (
+			itcf_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
+			itcf_label   VARCHAR(255) NOT NULL,
+			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( 'double', 'varchar' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_order   INT NULL,
+			PRIMARY KEY ( itcf_ID ),
+			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__tag' => array(
@@ -424,79 +462,4 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 ) );
 
-/*
- * _collections.install.php,v
- * Revision 1.46  2011/10/23 09:19:42  efy-yurybakh
- * Implement new permission for comment editing
- *
- * Revision 1.45  2011/09/27 13:30:14  efy-yurybakh
- * spam vote checkbox
- *
- * Revision 1.44  2011/09/25 07:06:21  efy-yurybakh
- * Implement new permission for spam voting
- *
- * Revision 1.43  2011/09/23 14:01:58  fplanque
- * Quick/temporary fixes so we can work in the meantime
- *
- * Revision 1.42  2011/09/22 05:03:11  efy-yurybakh
- * 4 new fileds in the table T_comments
- *
- * Revision 1.41  2011/09/22 03:20:54  fplanque
- * minor
- *
- * Revision 1.40  2011/09/21 13:01:09  efy-yurybakh
- * feature "Was this comment helpful?"
- *
- * Revision 1.39  2011/09/19 23:23:43  fplanque
- * Db fixes
- *
- * Revision 1.38  2011/09/17 22:16:05  fplanque
- * cleanup
- *
- * Revision 1.37  2011/09/10 00:57:23  fplanque
- * doc
- *
- * Revision 1.36  2011/09/08 17:58:08  lxndral
- * Comments task fix (table sql fix)
- *
- * Revision 1.35  2011/09/08 05:22:40  efy-asimo
- * Remove item attending and add item settings
- *
- * Revision 1.34  2011/09/04 22:13:14  fplanque
- * copyright 2011
- *
- * Revision 1.33  2011/09/04 21:32:16  fplanque
- * minor MFB 4-1
- *
- * Revision 1.32  2011/08/25 07:31:14  efy-asimo
- * DB documentation
- *
- * Revision 1.31  2011/08/25 02:54:12  efy-james
- * Add checkbox for no teaser
- *
- * Revision 1.30  2011/08/25 01:02:10  fplanque
- * doc/minor
- *
- * Revision 1.24  2011/03/03 12:47:29  efy-asimo
- * comments attachments
- *
- * Revision 1.23  2011/03/02 09:45:59  efy-asimo
- * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
- *
- * Revision 1.22  2011/02/14 14:13:24  efy-asimo
- * Comments trash status
- *
- * Revision 1.21  2011/02/10 23:07:21  fplanque
- * minor/doc
- *
- * Revision 1.17.2.6  2010/10/19 01:04:48  fplanque
- * doc
- *
- * Revision 1.3  2009/08/30 12:31:44  tblue246
- * Fixed CVS keywords
- *
- * Revision 1.1  2009/08/30 00:34:15  fplanque
- * increased modularity
- *
- */
 ?>

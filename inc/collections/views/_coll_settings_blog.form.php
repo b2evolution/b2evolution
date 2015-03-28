@@ -90,10 +90,6 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_settings'), array( 'id'=>'categories') );
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
-	$Form->radio_input( 'chapter_ordering', $Settings->get('chapter_ordering'), array(
-					array( 'value'=>'alpha', 'label'=>T_('Alphabetical') ),
-					array( 'value'=>'manual', 'label'=>T_('Manual ') ),
-			 ), T_('Ordering of categories') );
 $Form->end_fieldset();
 
 // --------------------------------------------

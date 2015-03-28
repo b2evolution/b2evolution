@@ -26,10 +26,11 @@ $current_User->check_perm( 'options', 'view', true );
 
 
 param( 'action', 'string', 'list' );
+param( 'tab', 'string', 'manage', true );
 
-param( 'redirect_to', 'url', '?ctrl=skins' );
+param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
 
-if( param( 'skin_ID', 'integer', '', true) )
+if( param( 'skin_ID', 'integer', '', true ) )
 {// Load file type:
 	$SkinCache = & get_SkinCache();
 	if( ($edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false )) === false )
@@ -123,7 +124,7 @@ switch( $action )
 		$edited_Skin->db_save_containers();
 
 		// We want to highlight the edited object on next list display:
- 		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
+		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $redirect_to, 303 ); // Will EXIT
@@ -172,7 +173,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'skin' );
 
- 		// Check permission:
+		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// Make sure we got skin and blog IDs:
@@ -193,21 +194,28 @@ switch( $action )
 }
 
 
-$AdminUI->set_path( 'blogs', 'skin', 'manage_skins' );
+if( $tab == 'system' )
+{ // From System tab
+	$AdminUI->set_path( 'options', 'skins' );
 
+	$AdminUI->breadcrumbpath_init( false );
+	$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
+		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+	$AdminUI->breadcrumbpath_add( T_('Skins'), $admin_url.'?ctrl=skins' );
+}
+else
+{ // From Blog settings
+	$AdminUI->set_path( 'collections', 'skin', 'manage_skins' );
 
-/**
- * Display page header, menus & messages:
- */
-$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
-											array( 'ctrl' => 'skins' ),
-											T_('Site'), '?ctrl=collections&amp;blog=0' );
+	/**
+	 * Display page header, menus & messages:
+	 */
+	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'skins' ) );
 
-
-$AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Skin configuration'), '?ctrl=skins' );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_add( T_('Skin'), $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_add( T_('Manage skins'), $admin_url.'?ctrl=skins' );
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

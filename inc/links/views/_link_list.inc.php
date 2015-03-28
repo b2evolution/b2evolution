@@ -159,7 +159,7 @@ if( $current_User->check_perm( 'files', 'view', false, $blog )
 	&& $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit LinkOwner object:
 	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),
-														'fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID() ), T_('Link files'), 3, 4 );
+														'fm_mode=link_object&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID() ), T_('Attach files'), 3, 4 );
 }
 
 $Results->display();

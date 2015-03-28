@@ -21,16 +21,22 @@ $params = array_merge( array(
 		'after_title'     => '</h3>',
 		'before_content'  => '<div class="excerpt">',
 		'after_content'   => '</div>',
+		'Item'            => NULL
 	), $params );
 
-global $Item;
+$curr_Item = $params['Item'];
+if( empty( $curr_Item ) )
+{
+	global $Item;
+	$curr_Item = $Item;
+}
 
 ?>
 <li><?php
-		$item_edit_link = $Item->get_edit_link( array(
+		$item_edit_link = $curr_Item->get_edit_link( array(
 				'class' => button_class( 'text' ),
 			) );
-		$Item->title( array(
+		$curr_Item->title( array(
 				'before'          => $params['before_title'],
 				'after'           => $params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'before_title'    => get_icon( 'permalink' ),
@@ -38,7 +44,7 @@ global $Item;
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',
 			) );
-		$Item->excerpt( array(
+		$curr_Item->excerpt( array(
 				'before' => $params['before_content'],
 				'after'  => $params['after_content'],
 			) );

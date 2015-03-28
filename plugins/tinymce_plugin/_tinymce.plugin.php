@@ -264,12 +264,9 @@ class tinymce_plugin extends Plugin
 			return;
 		}
 
-		if( !empty( $Blog ) )
-		{
-			if( !$Blog->get_setting( 'allow_html_post' ) )
-			{	// Only when HTML is allowed in post
-				return false;
-			}
+		if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
+		{ // Only when HTML is allowed in post
+			return false;
 		}
 
 		// Get init params, depending on edit mode: simple|expert

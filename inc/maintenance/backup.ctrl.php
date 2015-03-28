@@ -45,9 +45,9 @@ if( $action == 'backup' && !$current_Backup->load_from_Request() )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Backup'), '?ctrl=backup' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('Backup'), $admin_url.'?ctrl=backup' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

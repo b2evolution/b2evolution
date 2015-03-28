@@ -17,14 +17,16 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$AdminUI->set_path( 'blogs' );
 
-$default_tab = $current_User->check_perm( 'options', 'view' ) ? 'site_settings' : 'list';
-param( 'tab', 'string', $default_tab, true );
+param( 'tab', 'string', 'site_settings', true );
 
 param_action( 'list' );
 
-if( !in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'list', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( strpos( $action, 'new' ) !== false )
+{ // Simulate tab to value 'new' for actions to create new blog
+	$tab = 'new';
+}
+if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -37,11 +39,6 @@ if( !in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-nam
 		$action = 'list';
 	}
 }
-else
-{	// We are not working on a specific blog (yet) -- prevent highlighting one in the list
-	set_working_blog( 0 );
-}
-
 
 /**
  * Perform action:
@@ -117,7 +114,7 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $dispatcher.'?ctrl=coll_settings&tab=features&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $admin_url.'?ctrl=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -150,7 +147,7 @@ switch( $action )
 
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = param( 'redirect_to', 'url', '?ctrl=collections' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url.'?ctrl=dashboard' );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -160,6 +157,8 @@ switch( $action )
 			{ // There are restrictions:
 				$action = 'view';
 			}
+			// Force this virtual tab to select a correct path on delete action
+			$tab = 'delete';
 		}
 		break;
 
@@ -200,7 +199,6 @@ switch( $action )
 
 		// Categories:
 		$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
-		$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
 
 		// Cross posting:
 		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
@@ -322,63 +320,59 @@ switch( $action )
 			$Settings->dbupdate();
 			$Messages->add( T_('Site settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=collections&tab=site_settings', 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=collections&tab=site_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 
 		break;
 }
 
-$AdminUI->set_path( 'blogs', $tab );
+switch( $tab )
+{
+	case 'site_settings':
+		// Check minimum permission:
+		$current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Structure'), '?ctrl=collections' );
+		$AdminUI->set_path( 'site', 'settings' );
 
-/**
- * Display page header, menus & messages:
- */
-if( strpos( $action, 'new' ) === false && $action != 'create' )
-{ // Not creating a new blog:
-	// fp> TODO: fall back to ctrl=chapters when no perm for blog_properties
-	$AdminUI->set_coll_list_params( 'blog_properties', 'edit',
-												array( 'ctrl' => 'coll_settings', 'tab' => 'general' ),
-												T_('Site'), '?ctrl=collections&amp;blog=0' );
+		$AdminUI->breadcrumbpath_init( false );
+		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+		$AdminUI->breadcrumbpath_add( T_('Site Settings'), $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+		init_colorpicker_js();
+		break;
 
-	$AdminUI->breadcrumbpath_add( T_('Site'), '?ctrl=collections' );
+	case 'blog_settings':
+		// Check minimum permission:
+		$current_User->check_perm( 'options', 'view', true );
 
-	switch( $tab )
-	{
-		case 'site_settings':
-			// Check minimum permission:
-			$current_User->check_perm( 'options', 'view', true );
+		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
-			$AdminUI->breadcrumbpath_add( T_('Global Settings'), '?ctrl=collections&amp;tab=site_settings' );
-			init_colorpicker_js();
-			break;
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&tab=general&blog='.$blog );
+		$AdminUI->breadcrumbpath_add( T_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings' );
 
-		case 'blog_settings':
-			// Check minimum permission:
-			$current_User->check_perm( 'options', 'view', true );
+		// Init params to display a panel with blog selectors
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'collections', 'tab' => 'blog_settings' ) );
+		break;
 
-			$AdminUI->breadcrumbpath_add( T_('Common Collection Settings'), '?ctrl=collections&amp;tab=blog_settings' );
-			break;
+	case 'new':
+		// Init JS to autcomplete the user logins
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 
-		case 'list':
-		default:
-			init_field_editor_js( array(
-					'field_prefix' => 'order-blog-',
-					'action_url' => $ReqURI.'&order_action=update&order_data=',
-				) );
+		$AdminUI->set_path( 'collections' );
+		$AdminUI->clear_menu_entries( 'collections' );
 
-			$AdminUI->breadcrumbpath_add( T_('Collections'), '?ctrl=collections&amp;tab=list' );
-			break;
-	}
-}
-else
-{	// Creating a new blog
-	$AdminUI->breadcrumbpath_add( T_('New blog'), '?ctrl=collections&amp;action=new' );
-	// Init JS to autcomplete the user logins
-	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_add( T_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
+		break;
+
+	case 'delete':
+		// Page to confirm a blog deletion
+		$AdminUI->set_path( 'collections' );
+		$AdminUI->clear_menu_entries( 'collections' );
+
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		break;
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -391,7 +385,7 @@ $AdminUI->disp_body_top();
 switch( $action )
 {
 	case 'new':
-		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		//$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 
 		$AdminUI->disp_view( 'collections/views/_coll_sel_type.view.php' );
@@ -402,7 +396,7 @@ switch( $action )
 
 	case 'new-selskin':
 	case 'new-installskin':
-		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		//	$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 
 		$AdminUI->disp_view( 'skins/views/_coll_sel_skin.view.php' );
@@ -413,7 +407,7 @@ switch( $action )
 
 	case 'new-name':
 	case 'create': // in case of validation error
-		$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
+		//$AdminUI->displayed_sub_begin = 1;	// DIRTY HACK :/ replacing an even worse hack...
 		$AdminUI->disp_payload_begin();
 
 		$next_action = 'create';
@@ -457,8 +451,11 @@ switch( $action )
 			$delete_warning = T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s fileroot !');
 		}
 		?>
-		<div class="panelinfo">
-			<h3><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
+		<div class="panelinfo panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
+			</div>
+			<div class="panel-body">
 
 			<p class="warning"><?php echo $delete_warning; ?></p>
 
@@ -481,7 +478,7 @@ switch( $action )
 					$Form->hidden( 'blog', $edited_Blog->ID );
 					$Form->hidden( 'confirm', 1 );
 					$Form->hidden( 'redirect_to', $redirect_to );
-					$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+					$Form->submit( array( '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
 				$Form->end_form();
 
 				$Form = new Form( !empty( $redirect_to ) ? $redirect_to: NULL, '', 'get', 'none' );
@@ -500,6 +497,7 @@ switch( $action )
 			</p>
 
 			</div>
+		</div>
 		<?php
 		break;
 
@@ -516,11 +514,6 @@ switch( $action )
 
 			case 'blog_settings':
 				$AdminUI->disp_view( 'collections/views/_coll_settings_blog.form.php' );
-				break;
-
-			case 'list':
-			default:
-				$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 				break;
 		}
 		$AdminUI->disp_payload_end();

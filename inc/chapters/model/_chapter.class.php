@@ -55,6 +55,18 @@ class Chapter extends GenericCategory
 	var $last_touched_ts;
 
 	/**
+	 * The sub categories sort order.
+	 *
+	 * Possible values:
+	 *   'parent' - same as in case of parent,
+	 *   'alpha' - sort alphabetically,
+	 *   'manual' - sort manually
+	 *
+	 * @var string
+	 */
+	var $subcat_ordering;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -75,6 +87,7 @@ class Chapter extends GenericCategory
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
+			$this->subcat_ordering = $db_row->cat_subcat_ordering;
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
 			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
@@ -98,6 +111,79 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Compare two Chapters based on the parent/blog sort category setting
+	 *
+	 * @param Chapter A
+	 * @param Chapter B
+	 * @return number -1 if A < B, 1 if A > B, 0 if A == B
+	 */
+	static function compare_chapters( $a_Chapter, $b_Chapter )
+	{
+		if( $a_Chapter == NULL || $b_Chapter == NULL ) {
+			debug_die('Invalid category objects received to compare.');
+		}
+
+		if( $a_Chapter->parent_ID != $b_Chapter->parent_ID )
+		{
+			debug_die('Category objects with different parents received to compare.');
+		}
+
+		if( empty( $a_Chapter->parent_ID ) )
+		{
+			$a_Chapter->load_Blog();
+			$cat_order = $a_Chapter->Blog->get_setting('category_ordering');
+		}
+		else
+		{
+			$ChapterCache= & get_ChapterCache();
+			$parent_Chapter = $ChapterCache->get_by_ID( $a_Chapter->parent_ID );
+			$cat_order = $parent_Chapter->get_subcat_ordering();
+		}
+
+		switch( $cat_order )
+		{
+			case 'alpha':
+				return strcmp( $a_Chapter->name, $b_Chapter->name );
+
+			case 'manual':
+				if( $a_Chapter->order === NULL )
+				{
+					if( $b_Chapter->order !== NULL )
+					{ // a is NULL b is a number, NULL values are greater than any number
+						return 1;
+					}
+					return 0;
+				}
+
+				if( $b_Chapter->order === NULL )
+				{ // NULL values are greater than any number, so a is lower than b
+					return -1;
+				}
+
+				return ( $a_Chapter->order > $b_Chapter->order ) ? 1 : ( ( $a_Chapter->order < $b_Chapter->order ) ? -1 : 0 );
+
+			default:
+				debug_die("Invalid category ordering value!");
+		}
+	}
+
+
+	/**
+	 * Sort chapter childer
+	 */
+	function sort_children()
+	{
+		if( $this->children_sorted )
+		{ // Category children list is already sorted
+			return;
+		}
+
+		// Sort children list
+		usort( $this->children, array( 'Chapter','compare_chapters' ) );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -116,11 +202,15 @@ class Chapter extends GenericCategory
 		param( 'cat_description', 'string' );
 		$this->set_from_Request( 'description' );
 
-		if( $Settings->get('chapter_ordering') == 'manual' )
-		{	// Manual ordering
-			param( 'cat_order', 'integer' );
+		// Manual ordering
+		if( param( 'cat_order', 'integer', NULL ) )
+		{
 			$this->set_from_Request( 'order' );
 		}
+
+		// Sort sub-categories
+		param( 'cat_subcat_ordering', 'string' );
+		$this->set_from_Request( 'subcat_ordering' );
 
 		// Meta category
 		$cat_meta = param( 'cat_meta', 'integer', 0 );
@@ -287,6 +377,54 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Get sub-category ordering
+	 *
+	 * @param boolean actual ordering - set to false to get raw setting value with default fallback to 'parent'
+	 * @return string
+	 *   - the setting value if actual_ordering param is false
+	 *   - the actual ordering value computed recursively from parents/blog if the actual_ordering param is true
+	 */
+	function get_subcat_ordering( $actual_ordering = true )
+	{
+		$setting_value = empty( $this->subcat_ordering ) ? 'parent' : $this->subcat_ordering;
+		if( ! $actual_ordering )
+		{
+			return $setting_value;
+		}
+
+		switch( $setting_value ) {
+			case 'alpha':
+			case 'manual':
+				return $this->subcat_ordering;
+
+			case 'parent':
+				return $this->get_parent_subcat_ordering();
+
+			default:
+				debug_die('Unhandled sub-category ordering value was detected');
+		}
+	}
+
+
+	/**
+	 * Get blog's category ordering value in case of root categories, parent Chapter subcat ordering otherwise
+	 *
+	 * @return string parent subcat ordering
+	 */
+	function get_parent_subcat_ordering()
+	{
+		if( empty( $this->parent_ID ) )
+		{ // Return the default blog setting
+			$this->load_Blog();
+			return $this->Blog->get_setting( 'category_ordering' );
+		}
+
+		$this->get_parent_Chapter();
+		return $this->parent_Chapter->get_subcat_ordering();
+	}
+
+
+	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
 	 * @return boolean true on success
@@ -351,6 +489,24 @@ class Chapter extends GenericCategory
 		// The chapter was updated successful
 		$DB->commit();
 		return true;
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'subcat_ordering':
+				return $this->get_subcat_ordering( false );
+		}
+
+		return parent::get( $parname );
 	}
 
 

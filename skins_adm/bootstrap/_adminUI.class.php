@@ -62,6 +62,7 @@ class AdminUI extends AdminUI_general
 
 		// Set bootstrap classes for messages
 		$Messages->set_params( array(
+				'class_outerdiv' => 'action_messages container-fluid',
 				'class_success'  => 'alert alert-dismissible alert-success fade in',
 				'class_warning'  => 'alert alert-dismissible alert-warning fade in',
 				'class_error'    => 'alert alert-dismissible alert-danger fade in',
@@ -69,9 +70,8 @@ class AdminUI extends AdminUI_general
 				'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
 			) );
 
-		// Use glyph icons, @see get_icon()
-		global $b2evo_icons_type;
-		$b2evo_icons_type = 'glyphicons';
+		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+		init_fontawesome_icons( 'fontawesome-glyphicons' );
 	}
 
 
@@ -83,52 +83,10 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_body_top()
 	{
-		global $Messages, $app_shortname, $app_version;
+		$r = $this->get_page_head();
 
-		$r = '';
-
-		$r .= $this->get_page_head();
-
-		$r .= '<div id="wrapper"><div class="row">'."\n".
-			'<div class="col-md-2">'."\n";
-
-		// Display MAIN menu:
-		$r .= '<div class="well" style="padding:0">'."\n".
-				$this->get_html_menu()."\n".
-				'</div><p class="center">'.$app_shortname.' v <strong>'.$app_version.'</strong></p>'."\n";
-
-		$r .= '</div>'."\n".
-			'<div class="col-md-10">'."\n";
-
-		$r .= '<div id="panelbody" class="panelbody">'."\n".
-				'<div id="payload">'."\n";
-
+		// Blog selector
 		$r .= $this->get_bloglist_buttons();
-
-		// Display info & error messages
-		$r .= $Messages->display( NULL, NULL, false, 'action_messages' );
-
-		return $r;
-	}
-
-
-	/**
-	 * Close open div(s).
-	 *
-	 * @return string
-	 */
-	function get_body_bottom()
-	{
-		$r = '';
-
-		$r .= "\n\t\t\t\t</div>";
-		$r .= "\n\t\t\t</div>";
-		$r .= "\n\t\t</div>";
-		$r .= "\n\t</div>";
-
-		$r .= "\n</div>\n";	// Close right col.
-
-		$r .= get_icon( 'pixel' );
 
 		return $r;
 	}
@@ -141,33 +99,129 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $UserSettings, $current_User;
+		global $admin_url, $Settings;
 
-		$r = '
-		<div id="header">';
-		if( $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) )
-		{
-			$r .= $this->breadcrumbpath_get_html( array(
-					'before'     => '<div class="breadcrumbpath floatleft"><ul class="breadcrumb">',
-					'after'      => '</ul></div><div class="breadcrumbpath floatright">'.$this->page_manual_link.'</div><div class="clear"></div>'."\n",
-					'beforeText' => '',
-					'beforeEach' => '<li>',
-					'afterEach'  => '</li>',
-					'beforeSel'  => '<li class="active">',
-					'afterSel'   => '</li>',
-					'separator'  => '',
-				) );
-		}
-		else
-		{
-			$r .= $this->get_title_for_titlearea();
-		}
-		$r .= '
-		</div>
-		';
+		$r = '<nav class="navbar level1 navbar-inverse navbar-static-top">
+			<div class="container-fluid">
+				 <!-- Brand and toggle get grouped for better mobile display -->
+				 <div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#b2evo-top-navbar">
+							 <span class="sr-only">Toggle navigation</span>
+							 <span class="icon-bar"></span>
+							 <span class="icon-bar"></span>
+							 <span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
+								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+							.$Settings->get( 'site_code' )
+						.'</a>
+				 </div>
+
+				 <!-- Collect the nav links, forms, and other content for toggling -->
+				 <div class="collapse navbar-collapse" id="b2evo-top-navbar">
+						'.$this->get_html_menu().'
+						<ul class="nav navbar-nav navbar-right">
+							 <li>'.$this->page_manual_link.'</li>
+						</ul>
+				 </div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav>';
 
 		return $r;
 	}
+
+
+	/**
+	 * Dsiplay the top of the HTML <body>...
+	 *
+	 * Typically includes title, menu, messages, etc.
+	 *
+	 * @param boolean Whether or not to display messages.
+	 */
+	function disp_body_top( $display_messages = true )
+	{
+		global $Messages;
+
+		parent::disp_body_top( $display_messages );
+
+		parent::disp_payload_begin();
+
+		// Display info & error messages
+		$Messages->display();
+
+		echo '<div class="container-fluid page-content">'."\n\t"
+				.'<div class="row">'."\n\t\t"
+			.'<div class="col-md-12">'."\n";
+	}
+
+
+	/**
+	 * Display body bottom, debug info and close </html>
+	 */
+	function disp_global_footer()
+	{
+		echo "\n\t\t</div>"
+				."\n\t</div>"
+			."\n</div>";
+
+		parent::disp_payload_end();
+
+		parent::disp_global_footer();
+	}
+
+
+	/**
+	 * Display the start of a payload block
+	 *
+	 * Note: it is possible to display several payload blocks on a single page.
+	 *       The first block uses the "sub" template, the others "block".
+	 *
+	 * @see disp_payload_end()
+	 */
+	function disp_payload_begin( $params = array() )
+	{
+		// Nothing display here, because all already is printed in $this->disp_body_top()
+	}
+
+
+	/**
+	 * Display the end of a payload block
+	 *
+	 * Note: it is possible to display several payload blocks on a single page.
+	 *       The first block uses the "sub" template, the others "block".
+	 * @see disp_payload_begin()
+	 */
+	function disp_payload_end()
+	{
+		// Nothing display here, because all already is printed in $this->disp_global_footer()
+	}
+
+
+	/**
+	 * Get the footer text
+	 *
+	 * @return string
+	 */
+	function get_footer_contents()
+	{
+		global $app_footer_text, $copyright_text;
+
+		global $Hit;
+
+		$r = '';
+
+		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
+		{ // Warning for IE 9 and less
+			$r .= '<div class="container-fluid"><div class="alert alert-danger" role="alert">'
+				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
+				.'</div></div>';
+		}
+
+		$r .= '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
+
+		return $r;
+	}
+
 
 	/**
 	 * Get a template by name and depth.
@@ -184,38 +238,60 @@ class AdminUI extends AdminUI_general
 			case 'main':
 				// main level
 				return array(
-					'before' => '<ul class="nav nav-list">',
+					'before' => '<ul class="nav navbar-nav">',
 					'after' => '</ul>',
 					'beforeEach' => '<li>',
 					'afterEach' => '</li>',
 					'beforeEachSel' => '<li class="active">',
-					'afterEachSel' => '</li>',
+					'afterEachSel' => ' <span class="sr-only">(current)</span></li>',
 					'beforeEachSelWithSub' => '<li class="active">',
 					'afterEachSelWithSub' => '</li>',
-					'_props' => array(
-						'recurse'       => 'yes', // To display the submenus recursively
-						'recurse_level' => 2,     // Limit recursion
-					),
 				);
+
+			case 'sub':
+				// a payload block with embedded submenu
+				return array(
+						'before' => '<div class="container-fluid level2">'."\n"
+									.'<nav class="subnav level2">'."\n"
+								.'<ul class="nav nav-tabs">'."\n",
+						'after' => '</ul>'."\n"
+										.'</nav>'."\n"
+									.'</div>'."\n"
+									.'<div class="container-fluid pull-right">$global_icons$</div>',
+						'empty' => '<div class="container-fluid pull-right">$global_icons$</div>',
+						'beforeEach'    => '<li role="presentation">',
+						'afterEach'     => '</li>',
+						'beforeEachSel' => '<li role="presentation" class="active">',
+						'afterEachSel'  => '</li>',
+						'beforeEachGrpLast'    => '<li role="presentation" class="grplast">',
+						'afterEachGrpLast'     => '</li>',
+						'beforeEachSelGrpLast' => '<li role="presentation" class="grplast active">',
+						'afterEachSelGrpLast'  => '</li>',
+						'end' => '', // used to end payload block that opened submenu
+					);
 
 			case 'menu3':
 				// level 3 submenu:
 				return array(
-							'before' => '<ul class="nav nav-tabs" style="margin:10px 0 20px">',
-							'after' => '</ul>',
-							'empty' => '',
-							'beforeEach' => '<li>',
-							'afterEach'  => '</li>',
-							'beforeEachSel' => '<li class="active">',
-							'afterEachSel' => '</li>',
-						);
+						'before' => '<div class="container-fluid">'."\n"
+										.'<nav class="subnav level3">'."\n"
+									.'<ul class="nav nav-pills">'."\n",
+						'after' => '</ul>'."\n"
+									.'</nav>'."\n"
+								.'</div>'."\n",
+						'empty' => '',
+						'beforeEach' => '<li role="presentation">',
+						'afterEach'  => '</li>',
+						'beforeEachSel' => '<li role="presentation" class="active">',
+						'afterEachSel' => '</li>',
+					);
 
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div class="btn-group blogs-menu">',
-						'after' => '</div>',
-						'select_start' => '<div class="collection_select">',
+						'before' => '<div class="container-fluid coll-selector"><nav class="subnav"><div class="btn-group">',
+						'after' => '</div></nav></div>',
+						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
 						'buttons_end' => '',
@@ -237,9 +313,13 @@ class AdminUI extends AdminUI_general
 							.'</ul></div>',
 						'header_text_single' => '',
 					'header_end' => '',
-					'head_title' => '<div class="panel-heading fieldset_title">$title$<span class="pull-right">$global_icons$</span></div>'."\n",
-					'filters_start' => '<div class="filters panel-body">',
-					'filters_end' => '</div>',
+					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+					'global_icons_class' => 'btn btn-default btn-sm',
+					'filters_start'        => '<div class="filters panel-body">',
+					'filters_end'          => '</div>',
+					'filter_button_class'  => 'btn-sm btn-info',
+					'filter_button_before' => '<div class="form-group pull-right">',
+					'filter_button_after'  => '</div>',
 					'messages_start' => '<div class="messages form-inline">',
 					'messages_end' => '</div>',
 					'messages_separator' => '<br />',
@@ -288,7 +368,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '',
+					'footer_start' => '<div class="panel-footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -297,9 +377,11 @@ class AdminUI extends AdminUI_general
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => '<div class="center page_size_selector">$page_size$</div>',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before' => '<li>',
 						'page_item_after' => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after' => '</li>',
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
@@ -308,7 +390,7 @@ class AdminUI extends AdminUI_general
 						'list_next_text' => T_('...'),
 						'list_span' => 11,
 						'scroll_list_range' => 5,
-					'footer_end' => "\n\n",
+					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<div class="panel-footer">'."\n",
 					'no_results_end'   => '$no_results$</div>'."\n\n",
 				'content_end' => '</div>',
@@ -336,8 +418,8 @@ class AdminUI extends AdminUI_general
 					'labelempty'     => '<label></label>',
 					'inputstart'     => '',
 					'inputend'       => "\n",
-					'infostart'      => '<p class="form-control-static">',
-					'infoend'        => "</p>\n",
+					'infostart'      => '<div class="form-control-static">',
+					'infoend'        => "</div>\n",
 					'buttonsstart'   => '<div class="form-group form-group-sm">',
 					'buttonsend'     => "</div>\n\n",
 					'customstart'    => '<div class="custom_content">',
@@ -352,6 +434,8 @@ class AdminUI extends AdminUI_general
 					'inputend_checkbox'      => "\n",
 					'checkbox_newline_start' => '',
 					'checkbox_newline_end'   => "\n",
+					'checkbox_basic_start'   => '<div class="checkbox"><label>',
+					'checkbox_basic_end'     => "</label></div>\n",
 					// - radio
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
@@ -369,10 +453,10 @@ class AdminUI extends AdminUI_general
 					'formclass'      => 'form-horizontal',
 					'formstart'      => '',
 					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+					'title_fmt'      => '<span class="pull-right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span class="pull-right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
@@ -382,8 +466,8 @@ class AdminUI extends AdminUI_general
 					'labelempty'     => '<label class="control-label col-xs-2"></label>',
 					'inputstart'     => '<div class="controls col-xs-10">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-xs-10"><p class="form-control-static">',
-					'infoend'        => "</p></div>\n",
+					'infostart'      => '<div class="controls col-xs-10"><div class="form-control-static">',
+					'infoend'        => "</div></div>\n",
 					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-xs-10">',
 					'buttonsend'     => "</div></div>\n\n",
 					'customstart'    => '<div class="custom_content">',
@@ -396,6 +480,8 @@ class AdminUI extends AdminUI_general
 					'inputend_checkbox'      => "</label></div></div>\n",
 					'checkbox_newline_start' => '<div class="checkbox">',
 					'checkbox_newline_end'   => "</div>\n",
+					'checkbox_basic_start'   => '<div class="checkbox"><label>',
+					'checkbox_basic_end'     => "</label></div>\n",
 					// - radio
 					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
 					'fieldend_radio'         => "</div>\n\n",
@@ -414,10 +500,10 @@ class AdminUI extends AdminUI_general
 					'formclass'      => 'form-horizontal',
 					'formstart'      => '',
 					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+					'title_fmt'      => '<span class="pull-right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'   => '<span class="pull-right">$global_icons$</span>'."\n",
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
@@ -427,8 +513,8 @@ class AdminUI extends AdminUI_general
 					'labelempty'     => '',
 					'inputstart'     => '<div class="controls">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls"><p class="form-control-static">',
-					'infoend'        => "</p></div>\n",
+					'infostart'      => '<div class="controls"><div class="form-control-static">',
+					'infoend'        => "</div></div>\n",
 					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
 					'buttonsend'     => "</div></div>\n\n",
 					'customstart'    => '<div class="custom_content">',
@@ -459,13 +545,14 @@ class AdminUI extends AdminUI_general
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="panel panel-default" id="styled_content_block"><div class="panel-heading"><h4><span style="float:right">$global_icons$</span>$title$</h4></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default" id="styled_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
+					'global_icons_class' => 'btn btn-default btn-sm',
 				);
 
 			case 'side_item':
 				return array(
-					'block_start' => '<div class="panel panel-default"><div class="panel-heading"><h4><span style="float:right">$global_icons$</span>$title$</h4></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 				);
 
@@ -487,10 +574,11 @@ class AdminUI extends AdminUI_general
 			case 'button_classes':
 				// Button classes
 				return array(
-					'button'       => 'btn btn-default btn-xs',
+					'button'       => 'btn btn-default',
 					'button_red'   => 'btn-danger',
 					'button_green' => 'btn-success',
-					'text'         => 'btn btn-default btn-xs',
+					'text'         => 'btn btn-default',
+					'text_primary' => 'btn btn-primary',
 					'group'        => 'btn-group',
 				);
 
@@ -659,22 +747,6 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 
 
 	/**
-	 * Display the start of a payload block
-	 *
-	 * Note: it is possible to display several payload blocks on a single page.
-	 *       The first block uses the "sub" template, the others "block".
-	 *
-	 * @see disp_payload_end()
-	 */
-	function disp_payload_begin( $params = array() )
-	{
-		parent::disp_payload_begin( array(
-				'display_menu2' => false,
-			) );
-	}
-
-
-	/**
 	 * Returns list of buttons for available Collections (aka Blogs) to work on.
 	 *
 	 * @param string Title
@@ -768,18 +840,16 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 		$r .= $template['buttons_end'];
 
 
-		//$r .= $template['select_start'];
 		if( $not_favorite_blogs )
 		{ // Display select list with not favorite blogs
-			$r .= $template['after'].$template['before']
-				.'<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.T_('More')
+			$r .= $template['select_start']
+				.'<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.T_('Other')
 				.'<span class="caret"></span></a>'
 				.'<ul class="dropdown-menu">'
 				.$select_options
-				.'</ul>';
+				.'</ul>'
+				.$template['select_end'];
 		}
-		//$r .= $template['select_end'];
-
 
 		$r .= $template['after'];
 

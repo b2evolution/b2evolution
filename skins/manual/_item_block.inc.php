@@ -51,13 +51,15 @@ if( $disp == 'single' )
 
 	<?php
 		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-		item_prevnext_links( array(
+		// Comment out prev/next links display until it is not correctly implemented to get cats and items
+		// in the same order as they are in the sidebar
+		/*item_prevnext_links( array(
 				'block_start' => '<div class="posts_navigation">',
 				'separator'   => ' :: ',
 				'block_end'   => '</div>',
 				'target_blog' => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
 				'post_navigation' => 'same_category', // force to stay in the same category in this skin
-			) );
+			) );*/
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 
 	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
@@ -66,7 +68,7 @@ if( $disp == 'single' )
 			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 			'class'  => 'roundbutton roundbutton_text',
 		) );
-	if( $Item->is_intro() && $Item->ptyp_ID > 1500 )
+	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )

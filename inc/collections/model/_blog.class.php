@@ -269,7 +269,6 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_comments', 'registered' );
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
-				$this->set_setting( 'allow_html_post', 0 );
 				$this->set_setting( 'allow_html_comment', 0 );
 				$this->set_setting( 'orderby', 'last_touched_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
@@ -277,6 +276,17 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
+
+				// Try to find item type "Forum Topic" in DB
+				global $DB;
+				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_ID = 200
+					  AND ityp_name = "Forum Topic"' );
+				if( $forum_topic_type_ID )
+				{ // Set default item type as "Forum Topic"
+					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
 				break;
 
 			case 'manual':
@@ -288,6 +298,18 @@ class Blog extends DataObject
 				$this->set_setting( 'single_links', 'chapters' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'category_ordering', 'manual' );
+
+				// Try to find item type "Manual Page" in DB
+				global $DB;
+				$manual_page_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_ID = 100
+					  AND ityp_name = "Manual Page"' );
+				if( $manual_page_type_ID )
+				{ // Set default item type as "Manual Page"
+					$this->set_setting( 'default_post_type', $manual_page_type_ID );
+				}
 				break;
 
 			case 'std':
@@ -329,7 +351,6 @@ class Blog extends DataObject
 
 		// Load collection settings and clear update cascade array
 		$this->load_CollectionSettings();
-		$this->CollectionSettings->clear_update_cascade();
 
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
@@ -372,14 +393,13 @@ class Blog extends DataObject
 			$this->set( 'favorite',  param( 'favorite', 'integer', 0 ) );
 		}
 
-
-		if( param( 'archive_links',   'string', NULL ) !== NULL )
+		if( param( 'archive_links', 'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
 			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
 		}
 
-		if( param( 'chapter_links',   'string', NULL ) !== NULL )
+		if( param( 'chapter_links', 'string', NULL ) !== NULL )
 		{ // Chapter link type:
 			$this->set_setting( 'chapter_links', get_param( 'chapter_links' ) );
 		}
@@ -410,7 +430,7 @@ class Blog extends DataObject
 			$this->set_setting( 'image_size', get_param( 'image_size' ));
 		}
 
-		if( param( 'tag_links',   'string', NULL ) !== NULL )
+		if( param( 'tag_links', 'string', NULL ) !== NULL )
 		{ // Tag page link type:
 			$this->set_setting( 'tag_links', get_param( 'tag_links' ) );
 		}
@@ -527,11 +547,6 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_per_feed', get_param( 'comments_per_feed' ) );
 		}
 
-		if( param( 'require_title', 'string', NULL ) !== NULL )
-		{ // Title for items required?
-			$this->set_setting( 'require_title', get_param( 'require_title' ) );
-		}
-
 		if( param( 'blog_shortdesc', 'string', NULL ) !== NULL )
 		{	// Description:
 			$this->set_from_Request( 'shortdesc' );
@@ -605,12 +620,11 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'allow_html_post', param( 'allow_html_post', 'integer', 0 ) );
-
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
 
+			$this->set_setting( 'default_post_type', param( 'default_post_type', 'integer', 0 ) );
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
@@ -634,42 +648,6 @@ class Blog extends DataObject
 			$this->set_setting( 'timestamp_min_duration', param_duration( 'timestamp_min_duration' ) );
 			$this->set_setting( 'timestamp_max', param( 'timestamp_max', 'string', '' ) );
 			$this->set_setting( 'timestamp_max_duration', param_duration( 'timestamp_max_duration' ) );
-
-			// Location
-			$location_country = param( 'location_country', 'string', 'hidden' );
-			$location_region = param( 'location_region', 'string', 'hidden' );
-			$location_subregion = param( 'location_subregion', 'string', 'hidden' );
-			$location_city = param( 'location_city', 'string', 'hidden' );
-
-			if( $location_city == 'required' )
-			{	// If city is required - all location fields also are required
-				$location_country = $location_region = $location_subregion = 'required';
-			}
-			else if( $location_subregion == 'required' )
-			{	// If subregion is required - country & region fields also are required
-				$location_country = $location_region = 'required';
-			}
-			else if( $location_region == 'required' )
-			{	// If region is required - country field also is required
-				$location_country = 'required';
-			}
-
-			$this->set_setting( 'location_country', $location_country );
-			$this->set_setting( 'location_region', $location_region );
-			$this->set_setting( 'location_subregion', $location_subregion );
-			$this->set_setting( 'location_city', $location_city );
-
-			// Set to show Latitude & Longitude params for this blog items
-			$this->set_setting( 'show_location_coordinates', param( 'show_location_coordinates', 'integer', 0 ) );
-
-			// Load custom double & varchar fields
-			$custom_field_names = array();
-			$this->load_custom_fields( 'double', $update_cascade_query, $custom_field_names );
-			$this->load_custom_fields( 'varchar', $update_cascade_query, $custom_field_names );
-			if( !empty( $update_cascade_query ) )
-			{ // Some custom fields were deleted and these fields must be deleted from the item settings table also. Add required query.
-				$this->CollectionSettings->add_update_cascade( $update_cascade_query );
-			}
 
 			// call modules update_collection_features on this blog
 			modules_call_method( 'update_collection_features', array( 'edited_Blog' => & $this ) );
@@ -732,7 +710,6 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
-			$this->set_setting( 'disable_comments_bypost', param( 'disable_comments_bypost', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
@@ -904,7 +881,7 @@ class Blog extends DataObject
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
 						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
 						$Messages->add( T_('Collection Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
-							.' '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
+							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
 				}
 				elseif( $access_type == 'relative' )
@@ -1018,89 +995,6 @@ class Blog extends DataObject
 		}
 
 		return ! param_errors_detected();
-	}
-
-
-	/**
-	 * Load blog custom fields setting
-	 *
-	 * @param string custom field types
-	 * @param string query to remove deleted custom field settings from items
-	 * @param array Field names array is used to check the diplicates
-	 */
-	function load_custom_fields( $type, & $update_cascade_query, & $field_names )
-	{
-		global $DB, $Messages;
-
-		$empty_title_error = false; // use this to display empty title fields error message only ones
-		$real_custom_field_count = 0; // custom fields count after update
-		$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
-		$delted_field_guids = param( 'deleted_custom_'.$type, 'string', '' );
-		if( ( $custom_field_count == 0 ) && empty( $delted_field_guids ) )
-		{ // There were no custom field add, update or delete request so no need for further checks
-			return;
-		}
-		$deleted_custom_fields = explode( ',', $delted_field_guids );
-
-		// Update custom fields
-		for( $i = 1 ; $i <= $custom_field_count; $i++ )
-		{
-			$custom_field_guid = param( 'custom_'.$type.'_guid'.$i, '/^[a-z0-9\-_]+$/', NULL );
-			if( in_array( $custom_field_guid, $deleted_custom_fields ) )
-			{ // This field was deleted, don't neeed to update
-				continue;
-			}
-
-			$real_custom_field_count++;
-			$custom_field_value = param( 'custom_'.$type.'_'.$i, 'string', NULL );
-			$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
-			if( empty( $custom_field_value ) )
-			{ // Field title can't be emtpy
-				if( !$empty_title_error )
-				{ // This message was not displayed yet
-					$Messages->add( T_('Custom field titles can\'t be empty!') );
-					$empty_title_error = true;
-				}
-			}
-			elseif( empty( $custom_field_name ) )
-			{ // Field identical name can't be emtpy
-				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_value ) );
-			}
-			elseif( in_array( $custom_field_name, $field_names ) )
-			{ // Field name must be identical
-				$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_value ) );
-			}
-			else
-			{ // Add new identical field name
-				$field_names[] = $custom_field_name;
-			}
-			// Update field settings
-			$this->set_setting( 'custom_'.$type.$real_custom_field_count, $custom_field_guid );
-			$this->set_setting( 'custom_'.$type.'_'.$custom_field_guid, $custom_field_value );
-			$this->set_setting( 'custom_fname_'.$custom_field_guid, $custom_field_name );
-		}
-
-		// get custom field count from db
-		$db_custom_field_count = $this->get_setting( 'count_custom_'.$type );
-		for( $i = $real_custom_field_count + 1 ; $i <= $db_custom_field_count; $i++ )
-		{ // delete not wanted settings by index
-			$this->delete_setting( 'custom_'.$type.$i );
-		}
-		foreach( $deleted_custom_fields as $delted_field_guid )
-		{ // delete not wanted settings by guid
-			if( empty( $update_cascade_query ) )
-			{
-				$update_cascade_query = 'DELETE FROM T_items__item_settings WHERE iset_name = "custom_'.$type.'_'.$delted_field_guid.'"';
-			}
-			else
-			{
-				$update_cascade_query .= ' OR iset_name = "custom_'.$type.'_'.$delted_field_guid.'"';
-			}
-			$this->delete_setting( 'custom_fname_'.$delted_field_guid );
-			$this->delete_setting( 'custom_'.$type.'_'.$delted_field_guid );
-		}
-		// update number of custom fields
-		$this->set_setting( 'count_custom_'.$type, $real_custom_field_count );
 	}
 
 
@@ -1670,7 +1564,7 @@ class Blog extends DataObject
 
 		if( empty( $this->default_cat_ID ) )
 		{	// If the previous query has returned NULL
-			if( $Settings->get('chapter_ordering') == 'manual' )
+			if( $this->get_setting('category_ordering') == 'manual' )
 			{	// Manual order
 				$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
 				$sql_order = ' ORDER BY temp_order';
@@ -1682,7 +1576,7 @@ class Blog extends DataObject
 			}
 			$sql = 'SELECT cat_ID'.$select_temp_order.'
 			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID
+			         WHERE cat_blog_ID = '.$this->ID.' AND cat_parent_ID IS NULL'
 			         .$sql_order
 			         .' LIMIT 1';
 
@@ -3200,50 +3094,6 @@ class Blog extends DataObject
 		}
 
 		return $url;
-	}
-
-
-	/**
-	 * Country is visible for defining
-	 *
-	 * @return boolean TRUE if users can define a country for posts of current blog
-	 */
-	function country_visible()
-	{
-		return $this->get_setting( 'location_country' ) != 'hidden' || $this->region_visible();
-	}
-
-
-	/**
-	 * Region is visible for defining
-	 *
-	 * @return boolean TRUE if users can define a region for posts of current blog
-	 */
-	function region_visible()
-	{
-		return $this->get_setting( 'location_region' ) != 'hidden' || $this->subregion_visible();
-	}
-
-
-	/**
-	 * Subregion is visible for defining
-	 *
-	 * @return boolean TRUE if users can define a subregion for posts of current blog
-	 */
-	function subregion_visible()
-	{
-		return $this->get_setting( 'location_subregion' ) != 'hidden' || $this->city_visible();
-	}
-
-
-	/**
-	 * City is visible for defining
-	 *
-	 * @return boolean TRUE if users can define a city for posts of current blog
-	 */
-	function city_visible()
-	{
-		return $this->get_setting( 'location_city' ) != 'hidden';
 	}
 
 

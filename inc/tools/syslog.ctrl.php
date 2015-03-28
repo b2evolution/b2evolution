@@ -27,9 +27,9 @@ $current_User->check_perm( 'options', 'edit', true );
 $AdminUI->set_path( 'options', 'syslog' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('System log'), '?ctrl=syslog' );
+$AdminUI->breadcrumbpath_add( T_('System log'), $admin_url.'?ctrl=syslog' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

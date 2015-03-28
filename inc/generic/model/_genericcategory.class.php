@@ -39,6 +39,8 @@ class GenericCategory extends GenericElement
 	 */
 	var $children = array();
 
+	var $children_sorted = false;
+
 	/**
 	 * Constructor
 	 *

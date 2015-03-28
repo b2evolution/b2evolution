@@ -467,8 +467,8 @@ if( $display_mode != 'js' )
 	else
 	{
 		$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-		$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-		$AdminUI->breadcrumbpath_add( T_('Antispam'), '?ctrl=antispam' );
+		$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+		$AdminUI->breadcrumbpath_add( T_('Antispam'), $admin_url.'?ctrl=antispam' );
 	}
 
 	if( empty( $tab3 ) )

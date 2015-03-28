@@ -60,7 +60,7 @@ class ItemLight extends DataObject
 	 */
 	var $url;
 
- 	var $ptyp_ID;
+	var $ityp_ID;
 
 	/**
 	 * ID of the main category.
@@ -152,7 +152,7 @@ class ItemLight extends DataObject
 			$this->tiny_slug_ID = $db_row->post_tiny_slug_ID;
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
-			$this->ptyp_ID = $db_row->post_ptyp_ID;
+			$this->ityp_ID = $db_row->post_ityp_ID;
 			$this->url = $db_row->post_url;
 		}
 	}
@@ -224,7 +224,7 @@ class ItemLight extends DataObject
 		global $posttypes_specialtypes;
 
 		// Check if this post type is between the special post types
-		return in_array( $this->ptyp_ID, $posttypes_specialtypes );
+		return in_array( $this->ityp_ID, $posttypes_specialtypes );
 	}
 
 
@@ -235,7 +235,7 @@ class ItemLight extends DataObject
 	 */
 	function is_intro()
 	{
-		return ($this->ptyp_ID >= 1400 && $this->ptyp_ID <= 1600);
+		return ($this->ityp_ID >= 1400 && $this->ityp_ID <= 1600);
 	}
 
 
@@ -395,13 +395,13 @@ class ItemLight extends DataObject
 		{ // This item is used as front specific page on the blog's home
 			$permalink_type = 'none';
 		}
-		elseif( in_array( $this->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
+		elseif( in_array( $this->ityp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
 		{	// This is not an "in stream" post:
-			if( in_array( $this->ptyp_ID, $posttypes_nopermanentURL ) )
+			if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			elseif( in_array( $this->ptyp_ID, $posttypes_catpermanentURL ) )
+			elseif( in_array( $this->ityp_ID, $posttypes_catpermanentURL ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
 			}
@@ -641,7 +641,7 @@ class ItemLight extends DataObject
 			}
 			else
 			{	// Load cats for items list
-				if( ! isset($cache_postcats[$this->ID]) )
+				if( ! isset($cache_postcats[$this->ID]) && ! empty( $postIDlist ) )
 				{	// Add to cache
 					$sql = "SELECT postcat_post_ID, postcat_cat_ID
 							FROM T_postcats
@@ -1220,7 +1220,7 @@ class ItemLight extends DataObject
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
-			else if( $this->ptyp_ID == 3000 )
+			else if( $this->ityp_ID == 3000 )
 			{	// tblue> This is a sidebar link, link to its "link to" URL by default:
 				$params['link_type'] = 'linkto_url';
 			}
@@ -1289,7 +1289,7 @@ class ItemLight extends DataObject
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
 		$ItemTypeCache = & get_ItemTypeCache();
-		$Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID, true, false );
+		$Element = & $ItemTypeCache->get_by_ID( $this->ityp_ID, true, false );
 		if( !$Element )
 		{ // No status:
 			return;
@@ -1380,7 +1380,7 @@ class ItemLight extends DataObject
 				$this->issue_date = $parvalue_empty_seconds;
 				return $this->set_param( 'datestart', 'date', $parvalue_empty_seconds, false );
 
-			case 'ptyp_ID':
+			case 'ityp_ID':
 			case 'canonical_slug_ID':
 			case 'tiny_slug_ID':
 			case 'dateset':

@@ -10,7 +10,7 @@
  *
  * @package evocore
  *
- * @version  $Id: _userfields.view.php 8373 2015-02-28 21:44:37Z fplanque $
+ * @version  $Id: _userfields.view.php 8608 2015-03-27 23:47:19Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -137,7 +137,7 @@ else
 }
 $Results->grp_cols[] = array(
 						'td_colspan' => $group_td_colspan,
-						'td' => $td_group_name,
+						'td' => '<b>'.$td_group_name.'</b>',
 					);
 if( $current_User->check_perm( 'users', 'edit', false ) )
 {	// We have permission to modify:
@@ -187,7 +187,7 @@ else
 }
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => $td_field_name,
+		'td' => '&nbsp; &nbsp; '.$td_field_name,
 	);
 
 $Results->cols[] = array(

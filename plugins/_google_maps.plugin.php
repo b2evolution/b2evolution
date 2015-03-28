@@ -173,18 +173,19 @@ class google_maps_plugin extends Plugin
 		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
 		$params['Form']->begin_fieldset( $plugin_title, array( 'id' => 'itemform_plugin_googlemap', 'fold' => ( $params['edit_layout'] == 'expert' ) ) );
 
-		if( !$Blog->get_setting( 'show_location_coordinates' ) )
-		{
-			$url = $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'#ffield_show_location_coordinates';
+		$Item = $params['Item'];
 
-			echo sprintf( T_('You must turn on the <b>"Show location coordinates"</b> setting in Blog settings <a %s>Post Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
+		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
+		{
+			$url = $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;blog='.$Blog->ID.'&amp;ityp_ID='.$Item->get_ItemType()->ID.'#itemtype_features';
+
+			echo sprintf( T_('You must turn on the <b>"Use coordinates"</b> setting in Item Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
 			$params['Form']->end_fieldset();
 			return;
 		}
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		$Item = $params['Item'];
 		require_js( '#jqueryUI#' );
 
 		$lat = $Item->get_setting('latitude');
@@ -835,7 +836,7 @@ function locate()
 
 		$this->number_of_widgets += 1;
 
-		if( !$Blog->get_setting( 'show_location_coordinates' ) )
+		if( ! empty( $Item ) && $Item->get_type_setting( 'use_coordinates' ) == 'never' )
 		{
 			return;
 		}

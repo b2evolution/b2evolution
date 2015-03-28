@@ -163,104 +163,107 @@ $Table->filter_area = array(
 	);
 
 
-echo '<div class="results">';;
+global $AdminUI;
+$results_template= $AdminUI->get_template( 'Results' );
+
+echo $results_template['before'];
 
 $Table->display_init();
 
 // TITLE / COLUMN HEADERS:
 $Table->display_head();
 
-// START OF LIST/TABLE:
-$Table->display_list_start();
-
 if( empty( $hitgroup_array ) )
 { // No records
 	$Table->total_pages = 0;
 }
-else
+
+// START OF LIST/TABLE:
+$Table->display_list_start();
+
+if( $Table->total_pages > 0 )
 { // Display table
 
-// DISPLAY COLUMN HEADERS:
-$Table->display_col_headers();
+	// DISPLAY COLUMN HEADERS:
+	$Table->display_col_headers();
 
-// BODY START:
-$Table->display_body_start();
+	// BODY START:
+	$Table->display_body_start();
 
-$goal_total = array();
-foreach( $hitgroup_array as $day => $hitday_array )
-{
-	$Table->display_line_start();
+	$goal_total = array();
+	foreach( $hitgroup_array as $day => $hitday_array )
+	{
+		$Table->display_line_start();
 
-	$Table->display_col_start();
-	echo $day;
-	$Table->display_col_end();
-
-	$date_param = rawurlencode( date( locale_datefmt(), strtotime( $day ) ) );
-
-	$line_total = 0;
-	foreach( $goal_rows as $goal_row )
-	{ // For each named goal, display count:
-		if( ! isset( $goal_total[ $goal_row->goal_ID ] ) )
-		{
-			$goal_total[ $goal_row->goal_ID ] = 0;
-		}
 		$Table->display_col_start();
-		if( isset( $hitday_array[ $goal_row->goal_ID ] ) )
+		echo $day;
+		$Table->display_col_end();
+
+		$date_param = rawurlencode( date( locale_datefmt(), strtotime( $day ) ) );
+
+		$line_total = 0;
+		foreach( $goal_rows as $goal_row )
+		{ // For each named goal, display count:
+			if( ! isset( $goal_total[ $goal_row->goal_ID ] ) )
+			{
+				$goal_total[ $goal_row->goal_ID ] = 0;
+			}
+			$Table->display_col_start();
+			if( isset( $hitday_array[ $goal_row->goal_ID ] ) )
+			{
+				echo '<a href="'.$admin_url.'?blog='.$blog.'&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
+				$line_total += $hitday_array[ $goal_row->goal_ID ];
+				$goal_total[ $goal_row->goal_ID ] += $hitday_array[ $goal_row->goal_ID ];
+			}
+			else
+			{
+				echo '&nbsp;';
+			}
+			$Table->display_col_end();
+		}
+
+		$Table->display_col_start();
+		echo $line_total;
+		$Table->display_col_end();
+
+		$Table->display_line_end();
+	}
+
+	// Totals row:
+	echo $Table->params['total_line_start'];
+
+	echo str_replace( '$class$', '', $Table->params['total_col_start_first'] );
+	echo T_('Total');
+	echo $Table->params['total_col_end'];
+
+	$all_total = 0;
+	foreach( $goal_rows as $goal_row )
+	{ // For each named goal, display total of count:
+		echo str_replace( '$class_attrib$', 'class="right"', $Table->params['total_col_start'] );
+		if( ! empty( $goal_total[ $goal_row->goal_ID ] ) )
 		{
-			echo '<a href="'.$admin_url.'?blog='.$blog.'&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
-			$line_total += $hitday_array[ $goal_row->goal_ID ];
-			$goal_total[ $goal_row->goal_ID ] += $hitday_array[ $goal_row->goal_ID ];
+			echo '<a href="?blog=0&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$goal_total[ $goal_row->goal_ID ].'</a>';
+			$all_total += $goal_total[ $goal_row->goal_ID ];
 		}
 		else
 		{
 			echo '&nbsp;';
 		}
-		$Table->display_col_end();
+		echo $Table->params['total_col_end'];
 	}
 
-	$Table->display_col_start();
-	echo $line_total;
-	$Table->display_col_end();
-
-	$Table->display_line_end();
-}
-
-// Totals row:
-echo $Table->params['total_line_start'];
-
-echo str_replace( '$class$', '', $Table->params['total_col_start_first'] );
-echo T_('Total');
-echo $Table->params['total_col_end'];
-
-$all_total = 0;
-foreach( $goal_rows as $goal_row )
-{ // For each named goal, display total of count:
-	echo str_replace( '$class_attrib$', 'class="right"', $Table->params['total_col_start'] );
-	if( ! empty( $goal_total[ $goal_row->goal_ID ] ) )
-	{
-		echo '<a href="?blog=0&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$goal_total[ $goal_row->goal_ID ].'</a>';
-		$all_total += $goal_total[ $goal_row->goal_ID ];
-	}
-	else
-	{
-		echo '&nbsp;';
-	}
+	echo str_replace( '$class$', 'right', $Table->params['total_col_start_last'] );
+	echo $all_total;
 	echo $Table->params['total_col_end'];
-}
 
-echo str_replace( '$class$', 'right', $Table->params['total_col_start_last'] );
-echo $all_total;
-echo $Table->params['total_col_end'];
+	echo $this->params['total_line_end'];
 
-echo $this->params['total_line_end'];
-
-// BODY END:
-$Table->display_body_end();
-
+	// BODY END:
+	$Table->display_body_end();
 }
 
 $Table->display_list_end();
 
-echo '</div>';
+echo $results_template['after'];
 
 ?>

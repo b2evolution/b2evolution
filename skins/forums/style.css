@@ -871,12 +871,7 @@ td.comment_content textarea {
 }
 
 /* Statuses of posts & comments display */
-#styled_content_block .status_draft,
-#styled_content_block .status_review,
-#styled_content_block .status_community,
-#styled_content_block .status_protected,
-#styled_content_block .status_private,
-#styled_content_block .status_published {
+#styled_content_block span[class*=status_] {
 	top: -3px;
 	left: 3px;
 }

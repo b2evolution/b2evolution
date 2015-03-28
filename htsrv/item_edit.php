@@ -321,7 +321,7 @@ switch( $action )
 		}
 		else
 		{ // User can see this post in the Front-office
-			if( $edited_Item->ptyp_ID == 1520 )
+			if( $edited_Item->ityp_ID == 1520 )
 			{ // If post is category intro we should redirect to page of that category
 				$main_Chapter = & $edited_Item->get_main_Chapter();
 				$redirect_to = $main_Chapter->get_permanent_url();

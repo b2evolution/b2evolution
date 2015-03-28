@@ -12,7 +12,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-echo '<h2>'.T_('What kind of collection would you like to create?').get_manual_link('collection-type').'</h2>';
+
+echo '<div class="panel panel-default">';
+
+echo '<div class="panel-heading">'
+			.'<h2 class="panel-title">'.T_('What kind of collection would you like to create?').get_manual_link('collection-type').'</h2>'
+		.'</div>';
+
+echo '<div class="panel-body">';
 
 echo '<table class="coll_kind">';
 
@@ -22,7 +29,7 @@ if( $blog_kinds = get_collection_kinds() )
 	{
 		echo '<tr>';
 			echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'">'.$info['name'].' &raquo;</a></h3></td>';
-			echo '<td>'.$info['desc'].'<td>';
+			echo '<td>'.$info['desc'].'</td>';
 		echo '</tr>';
 	}
 }
@@ -30,12 +37,16 @@ else
 {
 	echo '<tr>';
 		echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind=std">'.T_('Standard').' &raquo;</a></h3></td>';
-		echo '<td>'.T_('A standard blog with the most common features.').'<td>';
+		echo '<td>'.T_('A standard blog with the most common features.').'</td>';
 	echo '</tr>';
 }
 
 echo '</table>';
 
 echo '<p>'.T_('Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time.').'</p>';
+
+echo '</div>';
+
+echo '</div>';
 
 ?>

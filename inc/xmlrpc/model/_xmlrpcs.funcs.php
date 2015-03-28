@@ -398,7 +398,7 @@ function _wp_mw_get_item_struct( & $Item )
 			'wp_page_order'				=> new xmlrpcval( $Item->order ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
 			'wp_author_id'				=> new xmlrpcval( $Item->creator_user_ID, 'string' ),
 			'wp_author_display_name'	=> new xmlrpcval( $Item->get('t_author') ),
-			'wp_post_format'			=> new xmlrpcval( $Item->ptyp_ID ),
+			'wp_post_format'			=> new xmlrpcval( $Item->ityp_ID ),
 			'date_created_gmt'			=> new xmlrpcval( datetime_to_iso8601($Item->issue_date, true), 'dateTime.iso8601' ),
 			'dateCreated'				=> new xmlrpcval( datetime_to_iso8601($Item->issue_date),'dateTime.iso8601' ),
 			'custom_fields'				=> new xmlrpcval( $item_settings, 'array' ),
@@ -1449,7 +1449,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 	$edited_Item->set( 'main_cat_ID', $params['main_cat_ID'] );
 	$edited_Item->set( 'extra_cat_IDs', $params['extra_cat_IDs'] );
 	$edited_Item->set( 'status', $params['status'] );
-	$edited_Item->set( 'ptyp_ID', $params['item_typ_ID'] );
+	$edited_Item->set( 'ityp_ID', $params['item_typ_ID'] );
 	$edited_Item->set( 'featured', $params['featured'] );
 	$edited_Item->set_tags_from_string( $params['tags'] );
 	$edited_Item->set( 'locale', $current_User->locale );
@@ -1460,8 +1460,8 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 	if( $params['parent_ID'] != '' ) $edited_Item->set( 'parent_ID', $params['parent_ID'] );
 	if( !empty($params['order']) ) $edited_Item->set( 'order', $params['order'] ); // Do not set if order is 0
 
-	if( ($Blog->get_setting('allow_comments') != 'never') && ($Blog->get_setting('disable_comments_bypost')) )
-	{	// Comment status
+	if( $edited_Item->allow_comment_statuses() )
+	{ // Comment status
 		$edited_Item->set( 'comment_status', $params['comment_status'] );
 	}
 
@@ -1612,7 +1612,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	}
 	if( !is_null($params['item_typ_ID']) )
 	{
-		$edited_Item->set('ptyp_ID', $params['item_typ_ID']);
+		$edited_Item->set('ityp_ID', $params['item_typ_ID']);
 	}
 	if( !is_null($params['featured']) )
 	{
@@ -1641,7 +1641,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	{
 		$edited_Item->set( 'excerpt', $params['excerpt'] );
 	}
-	if( !empty($params['comment_status']) && ($Blog->get_setting('allow_comments') != 'never') && ($Blog->get_setting('disable_comments_bypost')) )
+	if( !empty($params['comment_status']) && $edited_Item->allow_comment_statuses() )
 	{	// Comment status
 		$edited_Item->set( 'comment_status', $params['comment_status'] );
 	}

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 8557 2015-03-23 15:34:17Z yura $
+ * @version $Id: blog_widgets.js 8591 2015-03-26 15:47:08Z yura $
  */
 
 
@@ -437,7 +437,7 @@ function T_( native_string )
 function convertAvailableList()
 {
 	// Open list on click, not on hover!
-	jQuery( ".fieldset_title_bg > span > a" ).attr( 'href', '#' ).bind( 'click', function(e)
+	jQuery( ".fieldset_title > span > a[id^='add_new']" ).attr( 'href', '#' ).bind( 'click', function(e)
 	{
 		// add placeholder for widgets settings form:
 		jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeAvailableWidgets()"></div>' );

@@ -63,10 +63,17 @@ $Form->begin_fieldset( T_('Properties') );
 
 	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag and/or meta description.'), array( 'maxlength' => 255 ) );
 
-	if( $Settings->get('chapter_ordering') == 'manual' )
+	$parent_cat_order = $edited_Chapter->get_parent_subcat_ordering();
+	if( $parent_cat_order == 'manual' )
 	{
 		$Form->text_input( 'cat_order', $edited_Chapter->order, 5, T_('Order'), T_('For manual ordering of the categories.'), array( 'maxlength' => 11 ) );
 	}
+
+	$Form->radio_input( 'cat_subcat_ordering', $edited_Chapter->get( 'subcat_ordering' ), array(
+					array( 'value'=>'parent', 'label'=>T_('Same as parent') ),
+					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
+					array( 'value'=>'manual', 'label'=>T_('Manually') ),
+			 ), T_('Sort sub-categories') );
 
 	$Form->checkbox_input( 'cat_meta', $edited_Chapter->meta, T_('Meta category'), array( 'note' => T_('If you check this box you will not be able to put any posts into this category.') ) );
 

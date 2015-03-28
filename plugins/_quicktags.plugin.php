@@ -47,14 +47,11 @@ class quicktags_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit, $Blog;
+		global $Hit, $edited_Item;
 
-		if( !empty( $Blog ) )
-		{
-			if( !$Blog->get_setting( 'allow_html_post' ) )
-			{	// Only when HTML is allowed in post
-				return false;
-			}
+		if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
+		{ // Only when HTML is allowed in post
+			return false;
 		}
 
 		$simple = ( $params['edit_layout'] == 'inskin' );

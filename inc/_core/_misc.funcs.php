@@ -4178,7 +4178,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 			if( isset( $b2evo_icons_type ) )
 			{ // Specific icons type is defined
-				switch( $b2evo_icons_type )
+				$current_icons_type = $b2evo_icons_type;
+				if( $current_icons_type == 'fontawesome-glyphicons' )
+				{ // Use fontawesome icons as a priority over the glyphicons
+					$current_icons_type = isset( $icon['fa'] ) ? 'fontawesome' : 'glyphicons';
+				}
+				switch( $current_icons_type )
 				{
 					case 'glyphicons':
 						// Use glyph icons of bootstrap
@@ -4197,7 +4202,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			}
 
 			if( isset( $icon_class_prefix ) && ! empty( $icon[ $icon_param_name ] ) )
-			{ // Use glyph icon if it is defined in icons config
+			{ // Use glyph or fa icon if it is defined in icons config
 				if( isset( $params['class'] ) )
 				{ // Get class from params
 					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ].' '.$params['class'];
@@ -4207,9 +4212,28 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					$params['class'] = $icon_class_prefix.$icon[ $icon_param_name ];
 				}
 
-				if( isset( $icon['color'] ) )
-				{ // Set a color for icon
-					$params['style'] = 'color:'.$icon['color'];
+				$styles = array();
+				if( isset( $icon['color-'.$icon_param_name] ) )
+				{ // Set a color for icon only for current type
+					if( $icon['color-'.$icon_param_name] != 'default' )
+					{
+						$styles[] = 'color:'.$icon['color-'.$icon_param_name];
+					}
+				}
+				elseif( isset( $icon['color'] ) )
+				{ // Set a color for icon for all types
+					if( $icon['color'] != 'default' )
+					{
+						$styles[] = 'color:'.$icon['color'];
+					}
+				}
+				if( isset( $icon['color-over'] ) )
+				{ // Set a color for mouse over event
+					$params['data-color'] = $icon['color-over'];
+				}
+				if( isset( $icon['toggle-'.$icon_param_name] ) )
+				{ // Set a color for mouse over event
+					$params['data-toggle'] = $icon['toggle-'.$icon_param_name];
 				}
 
 				if( ! isset( $params['title'] ) )
@@ -4223,6 +4247,27 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{
 						$params['title'] = $icon['alt'];
 					}
+				}
+
+				if( isset( $icon['size-'.$icon_param_name] ) )
+				{ // Set a size for icon only for current type
+					if( isset( $icon['size-'.$icon_param_name][0] ) )
+					{ // Width
+						$styles['width'] = 'width:'.$icon['size-'.$icon_param_name][0].'px';
+					}
+					if( isset( $icon['size-'.$icon_param_name][1] ) )
+					{ // Height
+						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+					}
+				}
+
+				if( isset( $params['style'] ) )
+				{ // Keep styles from params
+					$styles[] = $params['style'];
+				}
+				if( ! empty( $styles ) )
+				{ // Init attribute 'style'
+					$params['style'] = implode( ';', $styles );
 				}
 
 				// Add all the attributes:
@@ -4354,12 +4399,59 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			/* BREAK */
 
 		case 'noimg':
+			global $b2evo_icons_type;
+
+			if( isset( $b2evo_icons_type ) )
+			{ // Specific icons type is defined
+				switch( $b2evo_icons_type )
+				{
+					case 'glyphicons':
+						// Use glyph icons of bootstrap
+						$icon_param_name = 'glyph';
+						break;
+
+					case 'fontawesome':
+						// Use the icons from http://fortawesome.github.io/Font-Awesome/icons/
+						$icon_param_name = 'fa';
+						break;
+				}
+			}
+
+			$styles = array();
+			if( isset( $icon_param_name ) && ! empty( $icon[ $icon_param_name ] ) )
+			{ // Use glyph or fa icon if it is defined in icons config
+				if( isset( $icon['size-'.$icon_param_name] ) )
+				{ // Set a size for icon only for current type
+					if( isset( $icon['size-'.$icon_param_name][0] ) )
+					{ // Width
+						$styles['width'] = 'width:'.$icon['size-'.$icon_param_name][0].'px';
+					}
+					if( isset( $icon['size-'.$icon_param_name][1] ) )
+					{ // Height
+						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+					}
+					if( isset( $icon['size'] ) )
+					{ // Unset size for sprite icon
+						unset( $icon['size'] );
+					}
+				}
+			}
+
 			// Include size (optional):
 			if( isset( $icon['size'] ) )
 			{
 				$params['size'] = $icon['size'];
 			}
-			$params['style'] = 'margin: 0 2px';
+			$styles[] = 'margin:0 2px';
+
+			if( isset( $params['style'] ) )
+			{ // Keep styles from params
+				$styles[] = $params['style'];
+			}
+			if( ! empty( $styles ) )
+			{ // Init attribute 'style'
+				$params['style'] = implode( ';', $styles );
+			}
 
 			return get_icon( 'pixel', 'imgtag', $params );
 			/* BREAK */
@@ -4757,7 +4849,7 @@ function get_manual_link( $topic, $link_text = NULL, $action_word = NULL, $word_
 {
 	global $Settings, $current_locale, $app_shortname, $app_version;
 
-	if( $Settings->get('webhelp_enabled') )
+	if( isset( $Settings ) &&  $Settings->get('webhelp_enabled') )
 	{
 		$manual_url = get_manual_url( $topic );
 
@@ -6628,6 +6720,7 @@ function button_class( $type = 'button', $jQuery_selector = false )
 			'button_red'   => 'roundbutton_red', // Button with red background
 			'button_green' => 'roundbutton_green', // Button with green background
 			'text'         => 'roundbutton_text', // Button with text
+			'text_primary' => 'roundbutton_text', // Button with text with special style color
 			'group'        => 'roundbutton_group', // Group of the buttons
 		);
 

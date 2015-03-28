@@ -516,7 +516,7 @@ jQuery( 'input[name=<?php echo $prefix; ?>city][value=required]' ).click( functi
 {	// when city is required make subregion is required
 	set_subregion_required();
 } );
-jQuery( 'input[name=<?php echo $prefix; ?>subregion][value=required]' ).click( function ()
+jQuery( 'input[name=<?php echo $prefix; ?>subregion][value=required], input[name=<?php echo $prefix; ?>sub_region][value=required]' ).click( function ()
 {	// when subregion is required make region is required
 	set_region_required();
 } );
@@ -527,7 +527,7 @@ jQuery( 'input[name=<?php echo $prefix; ?>region][value=required]' ).click( func
 
 function set_subregion_required()
 {
-	jQuery( 'input[name=<?php echo $prefix; ?>subregion][value=required]' ).attr( 'checked', 'checked' );
+	jQuery( 'input[name=<?php echo $prefix; ?>subregion][value=required], input[name=<?php echo $prefix; ?>sub_region][value=required]' ).attr( 'checked', 'checked' );
 	set_region_required();
 }
 function set_region_required()

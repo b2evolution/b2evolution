@@ -28,8 +28,12 @@ check_post_max_size_exceeded();
 
 // Getting GET or POST parameters:
 param( 'comment_item_ID', 'integer', true ); // required
+param( 'comment_type', 'string', 'feedback' );
 param( 'redirect_to', 'url', '' );
 param( 'reply_ID', 'integer', 0 );
+
+// Only logged in users can post the meta comments
+$comment_type = is_logged_in() ? $comment_type : 'feedback';
 
 $action = param_arrayindex( 'submit_comment_post_'.$comment_item_ID, 'save' );
 
@@ -56,11 +60,22 @@ if( $Settings->get('system_lock') )
 	header_redirect(); // Will save $Messages into Session
 }
 
-if( ! $commented_Item->can_comment( NULL ) )
-{
-	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
-
-	header_redirect(); // Will save $Messages into Session
+// Check user permissions to post this comment:
+if( $comment_type == 'meta' )
+{ // Meta comment
+	if( ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
+	{ // Current user has no permission to post a meta comment
+		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
+		header_redirect(); // Will save $Messages into Session
+	}
+}
+else // 'feedback'
+{ // Normal/Standard comment
+	if( ! $commented_Item->can_comment( NULL ) )
+	{ // Current user has no permission to post a normal comment
+		$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
+		header_redirect(); // Will save $Messages into Session
+	}
 }
 
 if( $commented_Item->Blog->get_setting( 'allow_html_comment' ) )
@@ -226,7 +241,7 @@ if( $reply_ID > 0 )
 {	// Set parent ID if this comment is reply to other comment
 	$Comment->set( 'in_reply_to_cmt_ID', $reply_ID );
 }
-$Comment->set( 'type', 'comment' );
+$Comment->set( 'type',( $comment_type == 'meta' ? 'meta' : 'comment' ) );
 $Comment->set_Item( $commented_Item );
 if( $User )
 { // User is logged in, we'll use his ID
@@ -257,7 +272,7 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 }
 
 // Def status will be the highest publish status what the current User ( or anonymous user if there is no current user ) can post
-$def_status = get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
+$def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
 
 if( $action != 'preview' )

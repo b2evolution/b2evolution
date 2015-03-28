@@ -1305,7 +1305,7 @@ class Comment extends DataObject
 		}
 		else
 		{
-			echo '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action=edit'.$glue.'comment_ID='.$this->ID;
+			echo '<a href="'.$admin_url.'?ctrl=comments'.$glue.'blog='.$item_Blog->ID.$glue.'action=edit'.$glue.'comment_ID='.$this->ID;
 		}
 		if( $save_context )
 		{
@@ -1319,7 +1319,11 @@ class Comment extends DataObject
 			}
 		}
 		echo '" title="'.$title.'"';
-		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		echo empty( $class ) ? '' : ' class="'.$class.'"';
+		if( $this->is_meta() )
+		{ // Edit meta comment by ajax
+			echo ' onclick="return edit_comment( \'form\', '.$this->ID.' )"';
+		}
 		echo '>'.$text.'</a>';
 		echo $after;
 
@@ -1454,17 +1458,20 @@ class Comment extends DataObject
 
 		if( $text == '#' )
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
-			$text = ( $this->status == 'trash' ) ? T_('Delete!') : T_('Recycle!');
+			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
 			if( ! $button )
 			{
-				$text = get_icon( 'delete' ).' '.$text;
+				$text = get_icon( 'recycle' ).' '.$text;
 			}
 			else
 			{
 				$text = $text;
 			}
 		}
-		if( $title == '#' ) $title = ( $this->status == 'trash' ) ? T_('Delete this comment') : T_('Recycle this comment');
+		if( $title == '#' )
+		{ // Set default title
+			$title = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete this comment') : T_('Recycle this comment');
+		}
 
 		$url = $admin_url.'?ctrl=comments'.$glue.'action=delete'.$glue.'comment_ID='.$this->ID.$glue.url_crumb('comment');
 		if( $save_context )
@@ -1482,7 +1489,8 @@ class Comment extends DataObject
 		echo $before;
 		if( $ajax_button && ( $this->status != 'trash' ) )
 		{
-			echo '<a href="'.$url.'" onclick="deleteComment('.$this->ID.', \''.request_from().'\'); return false;" title="'.$title.'"';
+			$comment_type = $this->is_meta() ? 'meta' : 'feedback';
+			echo '<a href="'.$url.'" onclick="deleteComment('.$this->ID.', \''.request_from().'\', \''.$comment_type.'\'); return false;" title="'.$title.'"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
 		}
@@ -2023,7 +2031,8 @@ class Comment extends DataObject
 			{
 				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
+			$comment_type = $this->is_meta() ? 'meta' : 'feedback';
+			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\' ); return false;"';
 		}
 
 		$status_title = get_visibility_statuses( 'moderation-titles' );
@@ -2351,7 +2360,15 @@ class Comment extends DataObject
 	{
 		$this->get_Item();
 
-		$post_permalink = $this->Item->get_single_url( 'auto', '', $glue );
+		if( $this->is_meta() )
+		{ // Meta comment is not published on front-office, Get url to back-office
+			global $admin_url;
+			$post_permalink = $admin_url.'?ctrl=items&amp;blog='.$this->Item->get_blog_ID().'&amp;p='.$this->Item->ID.'&amp;comment_type=meta';
+		}
+		else
+		{ // Normal comment
+			$post_permalink = $this->Item->get_single_url( 'auto', '', $glue );
+		}
 
 		return $post_permalink.'#'.$this->get_anchor();
 	}
@@ -2834,6 +2851,10 @@ class Comment extends DataObject
 			case 'pingback': // Display a pingback:
 				$s = T_('Pingback from %s');
 				break;
+
+			case 'meta': // Display a meta comment:
+				$s = T_('Meta comment from %s');
+				break;
 		}
 		return sprintf($s, $author);
 	}
@@ -3075,7 +3096,14 @@ class Comment extends DataObject
 				break;
 
 			case 'styled':
-				$r .= get_styled_status( $this->status, $this->get( 't_status' ) );
+				if( $this->is_meta() )
+				{
+					$r .= get_styled_status( 'meta', T_('Meta') );
+				}
+				else
+				{
+					$r .= get_styled_status( $this->status, $this->get( 't_status' ) );
+				}
 				break;
 
 			default:
@@ -3149,8 +3177,18 @@ class Comment extends DataObject
 		global $Settings;
 
 		if( $just_posted )
-		{ // send email notification to moderators
+		{ // send email notification to moderators or to users with "meta comments" notification
 			$this->send_email_notifications( true, false, $executed_by_userid );
+			if( $this->is_meta() )
+			{ // Record that processing has been done in case of this meta comment
+				$this->set( 'notif_status', 'finished' );
+				$this->dbupdate();
+			}
+		}
+
+		if( $this->is_meta() )
+		{ // Meta comments were already notified when they were posted.
+			return;
 		}
 
 		if( $this->status != 'published' )
@@ -3214,7 +3252,7 @@ class Comment extends DataObject
 	 * efy-asimo> moderatation and subscription notifications have been separated
 	 *
 	 * @param boolean true if send only moderation email, false otherwise
-	 * @param boolean true if send for everyone else but not for moterators, because a moderation email was sent for them
+	 * @param boolean true if send for everyone else but not for moderators, because a moderation email was sent for them
 	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
 	function send_email_notifications( $only_moderators = false, $except_moderators = false, $executed_by_userid = NULL )
@@ -3233,7 +3271,7 @@ class Comment extends DataObject
 		$notify_users = array();
 		$moderators = array();
 
-		if( $only_moderators || $except_moderators )
+		if( ! $this->is_meta() && ( $only_moderators || $except_moderators ) )
 		{ // we need the list of moderators:
 			$sql = 'SELECT DISTINCT user_email, user_ID, uset_value as notify_moderation
 						FROM T_users
@@ -3277,7 +3315,7 @@ class Comment extends DataObject
 			}
 		}
 
-		if( ! $only_moderators )
+		if( ! $this->is_meta() && ! $only_moderators )
 		{ // Not only moderators needs to be notified:
 			$except_condition = '';
 
@@ -3307,7 +3345,10 @@ class Comment extends DataObject
 				// Preprocess list:
 				foreach( $notify_list as $notification )
 				{
-					$notify_users[$notification->user_ID] = 'item_subscription';
+					if( ! isset( $notify_users[ $notification->user_ID ] ) )
+					{ // Don't rewrite a notify type if user already is notified by other type before
+						$notify_users[ $notification->user_ID ] = 'item_subscription';
+					}
 				}
 			}
 
@@ -3324,9 +3365,57 @@ class Comment extends DataObject
 				// Preprocess list:
 				foreach( $notify_list as $notification )
 				{
-					$notify_users[$notification->user_ID] = 'blog_subscription';
+					if( ! isset( $notify_users[ $notification->user_ID ] ) )
+					{ // Don't rewrite a notify type if user already is notified by other type before
+						$notify_users[ $notification->user_ID ] = 'blog_subscription';
+					}
 				}
 			}
+		}
+
+		if( $this->is_meta() )
+		{ // Meta comments have a special notification
+			$UserCache = & get_UserCache();
+
+			$meta_SQL = new SQL();
+			$meta_SQL->SELECT( 'user_ID, "meta_comment"' );
+			$meta_SQL->FROM( 'T_users' );
+			$meta_SQL->FROM_add( 'INNER JOIN evo_groups ON user_grp_ID = grp_ID' );
+			$meta_SQL->FROM_add( 'LEFT JOIN evo_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
+			$meta_SQL->FROM_add( 'LEFT JOIN evo_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
+			$meta_SQL->FROM_add( 'LEFT JOIN evo_blogusers ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$edited_Blog->ID );
+			$meta_SQL->FROM_add( 'LEFT JOIN evo_bloggroups ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$edited_Blog->ID );
+			// Check if users have access to the back-office
+			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
+			// Check if the users would like to receive notifications about new meta comments
+			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
+			// Check if the users have permission to edit this Item
+			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $edited_Blog->owner_user_ID ).' )';
+			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
+			if( $edited_Blog->get( 'advanced_perms' ) )
+			{
+				$creator_User = & $edited_Item->get_creator_User();
+				$creator_User->get_Group();
+				$post_creator_user_level = $creator_User->get( 'level' );
+
+				$users_with_item_edit_perms .= ' OR ( bloguser_perm_delpost = 1 ) OR ( bloggroup_perm_delpost = 1 ) OR (
+					( ( bloguser_perm_poststatuses LIKE '.$DB->quote( '%'.$edited_Item->get( 'status' ).'%' ).' )
+					OR ( bloggroup_perm_poststatuses LIKE '.$DB->quote( '%'.$edited_Item->get( 'status' ).'%' ).' ) )';
+				$users_with_item_edit_perms .= ' AND (
+						( bloguser_perm_edit = "all"
+						OR ( bloguser_perm_edit = "le" AND '.$DB->quote( $post_creator_user_level ).' <= user_level )
+						OR ( bloguser_perm_edit = "lt" AND '.$DB->quote( $post_creator_user_level ).' < user_level )
+						OR ( bloguser_perm_edit = "own" AND '.$DB->quote( $creator_User->ID ).' = user_ID ) )';
+				$users_with_item_edit_perms .= ' OR ( bloggroup_perm_edit = "all"
+						OR ( bloggroup_perm_edit = "le" AND '.$DB->quote( $post_creator_user_level ).' <= user_level )
+						OR ( bloggroup_perm_edit = "lt" AND '.$DB->quote( $post_creator_user_level ).' < user_level )
+						OR ( bloggroup_perm_edit = "own" AND '.$DB->quote( $creator_User->ID ).' = user_ID ) ) )';
+				$users_with_item_edit_perms .= ' )';
+			}
+			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
+
+			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications
+			$notify_users = $DB->get_assoc( $meta_SQL->get() );
 		}
 
 		if( ( $executed_by_userid != NULL ) && isset( $notify_users[$executed_by_userid] ) )
@@ -3391,7 +3480,12 @@ class Comment extends DataObject
 			{
 				case 'trackback':
 					/* TRANS: Subject of the mail to send on new trackbacks. First %s is the blog's shortname, the second %s is the item's title. */
-					$subject = T_('[%s] New trackback on "%s"');
+					$subject = sprintf( T_('[%s] New trackback on "%s"'), $edited_Blog->get('shortname'), $edited_Item->get('title') );
+					break;
+
+				case 'meta':
+					/* TRANS: Subject of the mail to send on new meta comments. First %s is author login, the second %s is the item's title. */
+					$subject = sprintf( T_( '%s posted a new meta comment on "%s"' ), $author_name, $edited_Item->get('title') );
 					break;
 
 				default:
@@ -3410,30 +3504,25 @@ class Comment extends DataObject
 							$subject = $notify_full ? T_('[%s] New comment may need moderation on "%s"') : T_('New comment may need moderation: ').$subject;
 						}
 					}
+					$subject = sprintf( $subject, $notify_full ? $edited_Blog->get('shortname') : $author_name, $edited_Item->get('title') );
 			}
 
-			if( $notify_type == 'moderator' )
-			{ // moderation email
-				$user_reply_to = $reply_to;
-			}
-			else if( $notify_type == 'blog_subscription' )
-			{ // blog subscription
-				$user_reply_to = NULL;
-			}
-			else if( $notify_type == 'item_subscription' )
-			{ // item subscription
-				$user_reply_to = NULL;
-			}
-			else if( $notify_type == 'creator' )
-			{ // user is the creator of the post
-				$user_reply_to = $reply_to;
-			}
-			else
+			switch( $notify_type )
 			{
-				debug_die( 'Unknown user subscription type' );
-			}
+				case 'moderator': // moderation email
+				case 'creator': // user is the creator of the post
+					$user_reply_to = $reply_to;
+					break;
 
-			$subject = sprintf( $subject, $notify_full ? $edited_Blog->get('shortname') : $author_name, $edited_Item->get('title') );
+				case 'blog_subscription': // blog subscription
+				case 'item_subscription': // item subscription
+				case 'meta_comment': // meta comment notification
+					$user_reply_to = NULL;
+					break;
+
+				default: // Invalid notify type
+					debug_die( 'Unknown user subscription type' );
+			}
 
 			$email_template_params = array(
 					'notify_full'    => $notify_full,
@@ -3675,7 +3764,7 @@ class Comment extends DataObject
 			}
 		}
 
-		if( $force_permanent_delete || ( $this->status == 'trash' ) )
+		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
 		{
 			// remember ID, because parent method resets it to 0
 			$old_ID = $this->ID;
@@ -3830,6 +3919,11 @@ class Comment extends DataObject
 	{
 		global $localtimenow, $current_User;
 
+		if( $this->is_meta() )
+		{ // Don't touch Item when this Comment is meta
+			return;
+		}
+
 		$comment_Item = & $this->get_Item();
 
 		if( empty( $comment_Item ) )
@@ -3879,6 +3973,17 @@ class Comment extends DataObject
 			), $params );
 
 		return $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['nofollow'], $params['restrict_status'] );
+	}
+
+
+	/**
+	 * Check if this comment is meta
+	 *
+	 * @return boolean TRUE if this comment is meta
+	 */
+	function is_meta()
+	{
+		return $this->type == 'meta';
 	}
 }
 

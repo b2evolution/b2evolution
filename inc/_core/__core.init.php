@@ -886,7 +886,7 @@ class _core_Module extends Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $home_url, $admin_url, $dispatcher, $debug, $seo_page_type, $robots_index;
+		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;
@@ -895,8 +895,13 @@ class _core_Module extends Module
 		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
 		$entries = NULL;
 
+		$working_blog = get_working_blog();
+		if( $working_blog )
+		{ // Set collection url only when current user has an access to the working blog
+			$collection_url = $admin_url.'?ctrl=dashboard&amp;blog='.$working_blog;
+		}
 		if( $perm_admin_normal )
-		{	// Normal Access to Admin:
+		{ // Normal Access to Admin:
 			$entries = array(
 				'b2evo' => array(
 						'text' => '<strong>b2evolution</strong>',
@@ -916,21 +921,24 @@ class _core_Module extends Module
 						'text' => T_('New post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
-					),
-				'blog' => array(
-						'text' => T_('Blog'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-					),
-				'tools' => array(
-						'text' => T_('More'),
-						'href' => $admin_url.'#',
-						'disabled' => true,
-					),
+					)
 			);
+			if( $working_blog )
+			{
+				$entries['blog'] = array(
+					'text' => T_('Collection'),
+					'title' => T_('No blog is currently selected'),
+					'href' => $collection_url,
+				);
+			}
+			$entries['tools'] = array(
+					'text' => T_('More'),
+					'href' => $admin_url.'#',
+					'disabled' => true,
+				);
 		}
 		elseif( $perm_admin_restricted )
-		{	// restricted Access to Admin:
+		{ // restricted Access to Admin:
 			$entries = array(
 				'see' => array(
 						'text' => T_('Structure'),
@@ -938,17 +946,15 @@ class _core_Module extends Module
 						'title' => T_('See the home page'),
 					),
 			);
-			if( $current_User->check_perm( 'blogs', 'view' ) ||
-			    $current_User->check_role( 'member' ) ||
-			    $current_User->check_perm( 'blogs', 'create' ) )
+			if( $working_blog )
 			{
-				$entries[ 'blog' ] = array(
-					'text' => T_('Blog'),
+				$entries['blog'] = array(
+					'text' => T_('Collection'),
 					'title' => T_('No blog is currently selected'),
-					'disabled' => true,
+					'href' => $collection_url,
 				);
 			}
-			$entries[ 'tools' ] = array(
+			$entries['tools'] = array(
 				'text' => T_('More'),
 				'href' => $admin_url.'#',
 				'disabled' => true,
@@ -956,13 +962,8 @@ class _core_Module extends Module
 		}
 
 
-		if( !empty($Blog) )
-		{	// A blog is currently selected:
-			if( $perm_admin_normal )
-			{
-				$entries['dashboard']['href'] = $admin_url.'?blog='.$Blog->ID;
-			}
-
+		if( ! empty( $Blog ) )
+		{ // A blog is currently selected:
 			if( $perm_admin_restricted )
 			{
 				$entries['see']['href'] = $Blog->get( 'url' );
@@ -986,43 +987,49 @@ class _core_Module extends Module
 				}
 			}
 
-			if( $perm_admin_normal )
+			if( $perm_admin_normal && $working_blog )
 			{
-				if( empty( $write_item_url) )
+				if( empty( $write_item_url ) )
 				{ // Display restricted message on this blog
 					$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
 				}
 
 				// BLOG MENU:
-				$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
-				$entries['blog']['href'] = $items_url;
-				$entries['blog']['disabled'] = false;
-				$entries['blog']['title'] = T_('Manage this blog');
+				$entries['blog'] = array(
+					'text' => T_('Collection'),
+					'title' => T_('Manage this blog'),
+					'href' => $collection_url,
+				);
 
-				if( $Blog->get_setting( 'use_workflow' ) )
-				{ // Workflow view
-					$entries['blog']['entries']['workflow'] = array(
-									'text' => T_('Workflow view').'&hellip;',
-									'href' => $items_url.'&amp;tab=tracker',
-								);
-				}
+				if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+				{ // Check if current user has an access to post lists
+					$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
 
-				if( $Blog->get( 'type' ) == 'manual' )
-				{ // Manual view
-					$entries['blog']['entries']['manual'] = array(
-									'text' => T_('Manual view').'&hellip;',
-									'href' => $items_url.'&amp;tab=manual',
-								);
-				}
-
-				$entries['blog']['entries']['posts'] = array(
-								'text' => T_('Posts').'&hellip;',
-								'href' => $items_url,
+					if( $Blog->get_setting( 'use_workflow' ) )
+					{ // Workflow view
+						$entries['blog']['entries']['workflow'] = array(
+								'text' => T_('Workflow view').'&hellip;',
+								'href' => $items_url.'&amp;tab=tracker',
 							);
+					}
+
+					if( $Blog->get( 'type' ) == 'manual' )
+					{ // Manual view
+						$entries['blog']['entries']['manual'] = array(
+								'text' => T_('Manual view').'&hellip;',
+								'href' => $items_url.'&amp;tab=manual',
+							);
+					}
+
+					$entries['blog']['entries']['posts'] = array(
+							'text' => T_('Posts').'&hellip;',
+							'href' => $items_url,
+						);
+				}
 
 				// Check if user has permission for published, draft or depreceted comments (any of these)
 				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-				{	// Comments:
+				{ // Comments:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
@@ -1031,7 +1038,7 @@ class _core_Module extends Module
 
 				// Chapters / Categories:
 				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
-				{	// Either permission for a specific blog or the global permission:
+				{ // Either permission for a specific blog or the global permission:
 					$entries['blog']['entries']['chapters'] = array(
 							'text' => T_('Categories').'&hellip;',
 							'href' => $admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID,
@@ -1043,7 +1050,7 @@ class _core_Module extends Module
 
 				// BLOG SETTINGS:
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
-				{	// We have permission to edit blog properties:
+				{ // We have permission to edit blog properties:
 					$blog_param = '&amp;blog='.$Blog->ID;
 
 					if( ! empty($entries['blog']['entries']) )
@@ -1053,7 +1060,7 @@ class _core_Module extends Module
 						);
 					}
 					$entries['blog']['entries']['general'] = array(
-								'text' => T_('Blog settings'),
+								'text' => T_('Collection settings'),
 								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
 								'entries' => array(
 									'general' => array(
@@ -1203,21 +1210,23 @@ class _core_Module extends Module
 				}
 
 				$entries['tools']['disabled'] = false;
-				$entries['tools']['entries']['tools_sep'] = array(
-						'separator' => true,
+
+				$entries['tools']['entries']['system'] = array(
+						'text' => T_('System'),
+						'href' => $admin_url.'?ctrl=system',
 					);
 
 				if( $perm_options )
 				{
-					$entries['tools']['entries']['status'] = array(
-							'text' => T_('System status').'&hellip;',
+					$entries['tools']['entries']['system']['entries']['status'] = array(
+							'text' => T_('Status').'&hellip;',
 							'href' => $admin_url.'?ctrl=system',
 						);
 				}
 
 				if( $perm_options )
 				{
-						$entries['tools']['entries']['crontab'] = array(
+						$entries['tools']['entries']['system']['entries']['crontab'] = array(
 									'text' => T_('Scheduler').'&hellip;',
 									'href' => $admin_url.'?ctrl=crontab',
 								);
@@ -1225,7 +1234,7 @@ class _core_Module extends Module
 
 				if( $perm_spam )
 				{
-					$entries['tools']['entries']['antispam'] = array(
+					$entries['tools']['entries']['system']['entries']['antispam'] = array(
 							'text' => T_('Antispam'),
 							'href' => $admin_url.'?ctrl=antispam',
 							'entries' => array(
@@ -1237,28 +1246,28 @@ class _core_Module extends Module
 
 					if( $perm_options )
 					{	// If we have access to options, then we add a submenu:
-						$entries['tools']['entries']['antispam']['entries']['ipranges'] = array(
+						$entries['tools']['entries']['system']['entries']['antispam']['entries']['ipranges'] = array(
 								'text' => T_('IP Ranges').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
 
-						$entries['tools']['entries']['antispam']['entries']['countries'] = array(
+						$entries['tools']['entries']['system']['entries']['antispam']['entries']['countries'] = array(
 								'text' => T_('Countries').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=countries' );
 
 						if( $current_User->check_perm( 'stats', 'list' ) )
 						{
-							$entries['tools']['entries']['antispam']['entries']['domains'] = array(
+							$entries['tools']['entries']['system']['entries']['antispam']['entries']['domains'] = array(
 									'text' => T_('Referring domains').'&hellip;',
 									'href' => $admin_url.'?ctrl=antispam&amp;tab3=domains' );
 						}
 
-						$entries['tools']['entries']['antispam']['entries']['settings'] = array(
+						$entries['tools']['entries']['system']['entries']['antispam']['entries']['settings'] = array(
 								'text' => T_('Settings').'&hellip;',
 								'href' => $admin_url.'?ctrl=antispam&amp;tab3=settings' );
 
 						if( $current_User->check_perm( 'options', 'edit' ) )
 						{
-							$entries['tools']['entries']['antispam']['entries']['tools'] = array(
+							$entries['tools']['entries']['system']['entries']['antispam']['entries']['tools'] = array(
 									'text' => T_('Tools').'&hellip;',
 									'href' => $admin_url.'?ctrl=antispam&amp;tab3=tools' );
 						}
@@ -1267,7 +1276,7 @@ class _core_Module extends Module
 
 				if( $perm_slugs )
 				{
-					$entries['tools']['entries']['slugs'] = array(
+					$entries['tools']['entries']['system']['entries']['slugs'] = array(
 							'text' => T_('Slugs').'&hellip;',
 							'href' => $admin_url.'?ctrl=slugs'
 						);
@@ -1277,11 +1286,11 @@ class _core_Module extends Module
 
 			if( $perm_options )
 			{	// Global settings:
-				$entries['tools']['entries']['general'] = array(
+				$entries['tools']['entries']['system']['entries']['general'] = array(
 						'text' => T_('General').'&hellip;',
 						'href' => $admin_url.'?ctrl=gensettings',
 					);
-				$entries['tools']['entries']['regional'] = array(
+				$entries['tools']['entries']['system']['entries']['regional'] = array(
 						'text' => T_('Regional'),
 						'href' => $admin_url.'?ctrl=regional',
 						'entries' => array(
@@ -1308,15 +1317,15 @@ class _core_Module extends Module
 								'href' => $admin_url.'?ctrl=currencies' ),
 						)
 					);
-				$entries['tools']['entries']['plugins'] = array(
+				$entries['tools']['entries']['system']['entries']['plugins'] = array(
 						'text' => T_('Plugins').'&hellip;',
 						'href' => $admin_url.'?ctrl=plugins',
 					);
-				$entries['tools']['entries']['remote'] = array(
+				$entries['tools']['entries']['system']['entries']['remote'] = array(
 						'text' => T_('Remote publishing').'&hellip;',
 						'href' => $admin_url.'?ctrl=remotepublish',
 					);
-				$entries['tools']['entries']['maintenance'] = array(
+				$entries['tools']['entries']['system']['entries']['maintenance'] = array(
 						'text' => T_('Maintenance'),
 						'href' => $admin_url.'?ctrl=tools',
 						'entries' => array(
@@ -1438,7 +1447,7 @@ class _core_Module extends Module
 				{
 					$entries['userprefs']['entries']['admskins']['entries'][$admin_skin] = array(
 							'text' => $admin_skin,
-							'href' => $dispatcher.'?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin)
+							'href' => $admin_url.'?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin)
 								.'&amp;redirect_to='.$redirect_to
 						);
 				}
@@ -1503,7 +1512,7 @@ class _core_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $blog, $loc_transinfo, $ctrl, $dispatcher, $Settings;
+		global $blog, $loc_transinfo, $ctrl, $admin_url, $Settings;
 		/**
 		 * @var User
 		 */
@@ -1621,20 +1630,19 @@ class _core_Module extends Module
 
 		/**** System ****/
 		if( $perm_admin_normal && $perm_options )
-		{	// Permission to view settings:
+		{ // Permission to view settings:
 			$AdminUI->add_menu_entries( NULL, array(
 						'options' => array(
 							'text' => T_('System'),
-							'href' => $dispatcher.'?ctrl=system'
+							'href' => $admin_url.'?ctrl=system'
 				) ) );
 
 			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
-			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
 
-			if( $perm_admin_normal && ( $perm_options || $perm_spam || $perm_slugs ) )
-			{	// Permission to view tools, antispam or slugs.
+			if( $perm_admin_normal && ( $perm_options || $perm_spam ) )
+			{ // Permission to view tools or antispam.
 				if( $perm_options )
-				{	// Permission to view settings:
+				{ // Permission to view settings:
 					// FP> This assumes that we don't let regular users access the tools, including plugin tools.
 					$AdminUI->add_menu_entries( 'options', array(
 						'system' => array(
@@ -1645,7 +1653,7 @@ class _core_Module extends Module
 							'href' => '?ctrl=crontab' ) ) );
 				}
 				if( $perm_spam )
-				{	// Permission to view antispam:
+				{ // Permission to view antispam:
 					$AdminUI->add_menu_entries( 'options', array(
 						'antispam' => array(
 							'text' => T_('Antispam'),
@@ -1656,7 +1664,7 @@ class _core_Module extends Module
 									'href' => '?ctrl=antispam' ) ) ) ) );
 
 					if( $perm_options )
-					{	// If we have access to options, then we add a submenu:
+					{ // If we have access to options, then we add a submenu:
 						$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 							'ipranges' => array(
 								'text' => T_('IP Ranges'),
@@ -1688,18 +1696,6 @@ class _core_Module extends Module
 									'href' => '?ctrl=antispam&amp;tab3=tools' ) ) );
 						}
 					}
-				}
-
-				if( $perm_slugs )
-				{	// Permission to view slugs:
-					/*if( !$perm_options && !$perm_spam )
-					{
-						$tools_entries['tools']['href'] = '?ctrl=slugs';
-					}*/
-					$AdminUI->add_menu_entries( 'options', array(
-						'slugs' => array(
-							'text' => T_('Slugs'),
-							'href' => '?ctrl=slugs' ) ) );
 				}
 			}
 
@@ -1734,6 +1730,9 @@ class _core_Module extends Module
 							'text' => T_('Currencies'),
 							'href' => '?ctrl=currencies' ),
 						) ),
+				'skins' => array(
+					'text' => T_('Skins'),
+					'href' => '?ctrl=skins&amp;tab=system' ),
 				'plugins' => array(
 					'text' => T_('Plugins'),
 					'href' => '?ctrl=plugins'),

@@ -59,7 +59,7 @@ function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 	$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
 	$SQL->WHERE_and( 'post_status = '.$DB->quote( 'published' ) );
 	// Set condition to not create sample comments for special posts
-	$SQL->WHERE_and( 'post_ptyp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
+	$SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
 	$SQL->ORDER_BY( $curr_orderby.' '.$curr_orderdir.', post_ID '.$curr_orderdir );
 	$SQL->LIMIT( $num_posts );
 	$items_result = $DB->get_results( $SQL->get(), ARRAY_A, 'Find the x latest posts in blog' );

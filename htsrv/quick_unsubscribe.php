@@ -154,6 +154,12 @@ switch( $type )
 		$UserSettings->set( 'notify_cronjob_error', '0', $edited_User->ID );
 		$UserSettings->dbupdate();
 		break;
+
+	case 'meta_comment':
+		// unsubscribe from meta comment notifications
+		$UserSettings->set( 'notify_meta_comments', '0', $edited_User->ID );
+		$UserSettings->dbupdate();
+		break;
 }
 
 echo( T_( 'You have successfully unsubscribed.' ) );

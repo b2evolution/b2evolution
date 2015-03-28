@@ -28,8 +28,8 @@ $AdminUI->set_path( 'options', 'system' );
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Status'), '?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Status'), $admin_url.'?ctrl=system' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

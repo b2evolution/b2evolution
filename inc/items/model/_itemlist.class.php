@@ -86,12 +86,17 @@ class ItemList2 extends ItemListLight
 		global $DB, $localtimenow, $Messages, $BlogCache;
 		global $Plugins;
 
-		if( $this->Blog->get_setting( 'allow_html_post' ) )
-		{	// HTML is allowed for this post
+		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID, false, false );
+
+		if( $ItemType && $ItemType->get( 'allow_html' ) )
+		{ // HTML is allowed for this post
 			$text_format = 'html';
 		}
 		else
-		{	// HTML is disallowed for this post
+		{ // HTML is disallowed for this post
 			$text_format = 'htmlspecialchars';
 		}
 
@@ -114,7 +119,10 @@ class ItemList2 extends ItemListLight
 			$post_category = $this->Blog->get_default_cat_ID();
 		}
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
-		if( ( $comment_Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $comment_Blog->get_setting( 'disable_comments_bypost' ) ) )
+		if( ( $comment_Blog->get_setting( 'allow_comments' ) != 'never' ) &&
+		    ( $ItemType && $ItemType->get( 'use_comments' ) &&
+		      ( $ItemType->get( 'allow_disabling_comments' ) || $ItemType->get( 'allow_closing_comments' ) )
+		  ) )
 		{ // param is required
 			$post_comment_status = param( 'post_comment_status', 'string', true );
 		}
@@ -140,7 +148,6 @@ class ItemList2 extends ItemListLight
 		}
 		locale_restore_previous();
 
-		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
 		$item_st_ID = param( 'item_st_ID', 'integer', NULL );
 		$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
 		$item_deadline = param( 'item_deadline', 'string', NULL );
@@ -187,7 +194,7 @@ class ItemList2 extends ItemListLight
 			".$DB->quote($post_comment_status)." AS post_comment_status,
 			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,
 			".$DB->quote($item_assigned_user_ID)." AS post_assigned_user_ID,
-			".$DB->quote($item_typ_ID)." AS post_ptyp_ID,
+			".$DB->quote($item_typ_ID)." AS post_ityp_ID,
 			".$DB->quote($item_st_ID)." AS post_pst_ID,
 			".$DB->quote($item_deadline)." AS post_datedeadline,
 			".$DB->quote($item_priority)." AS post_priority,";
@@ -209,15 +216,11 @@ class ItemList2 extends ItemListLight
 		$Item->set_setting( 'metakeywords', param( 'metakeywords', 'string', true ) );
 
 		// set custom Item settings
-		foreach( array( 'double', 'varchar' ) as $type )
-		{
-			$count_custom_field = $comment_Blog->get_setting( 'count_custom_'.$type );
-			$param_type = ( $type == 'varchar' ) ? 'string' : $type;
-			for( $i = 1; $i <= $count_custom_field; $i++ )
-			{ // For each custom double field:
-				$field_guid = $comment_Blog->get_setting( 'custom_'.$type.$i );
-				$Item->set_setting( 'custom_'.$type.'_'.$field_guid, param( 'item_'.$type.'_'.$field_guid, $param_type, NULL ) );
-			}
+		$custom_fields = $Item->get_type_custom_fields();
+		foreach( $custom_fields as $custom_field )
+		{ // For each custom double field:
+			$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
+			$Item->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], param( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $param_type, NULL ) );
 		}
 
 		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed
@@ -658,7 +661,7 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		if( in_array( $current_Item->ptyp_ID, $posttypes_specialtypes ) ) // page, intros, ads
+		if( in_array( $current_Item->ityp_ID, $posttypes_specialtypes ) ) // page, intros, ads
 		{	// We are not on a REGULAR post -- we cannot navigate:
 			$r = NULL;
 			return $r;
@@ -760,7 +763,7 @@ class ItemList2 extends ItemListLight
 				break;
 
 			case 'title':
-			case 'ptyp_ID':
+			case 'ityp_ID':
 			case 'datecreated':
 			case 'datemodified':
 			case 'last_touched_ts':

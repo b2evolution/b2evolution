@@ -31,7 +31,7 @@ if( $edited_Blog->ID == 0 )
 	$kind_title = get_collection_kinds( $kind );
 	$form_title = sprintf( T_('New %s'), $kind_title ).':';
 
-	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections&amp;tab=list', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
+	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
 }
 
 $Form->begin_form( 'fform', $form_title );

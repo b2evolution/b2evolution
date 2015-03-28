@@ -57,8 +57,10 @@ if( $disp == 'single' )
 	?>
 
 	<?php
+		// Comment out prev/next links display until it is not correctly implemented to get cats and items
+		// in the same order as they are in the sidebar
 		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-		item_prevnext_links( array(
+		/*item_prevnext_links( array(
 				'block_start' => '<ul class="pager">',
 				'block_end'   => '</ul>',
 				'template' => '$prev$$next$',
@@ -70,7 +72,7 @@ if( $disp == 'single' )
 				'next_end' => '</li>',
 				'target_blog' => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
 				'post_navigation' => 'same_category', // force to stay in the same category in this skin
-			) );
+			) );*/
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 
 	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing

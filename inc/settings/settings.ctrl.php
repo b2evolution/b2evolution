@@ -86,9 +86,9 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=gensettings' );
+$AdminUI->breadcrumbpath_add( T_('General'), $admin_url.'?ctrl=gensettings' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

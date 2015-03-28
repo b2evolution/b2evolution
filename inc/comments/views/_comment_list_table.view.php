@@ -39,7 +39,7 @@ $CommentList->title = T_('Comment List');
 
 if( check_comment_mass_delete( $CommentList ) )
 {	// A form for mass deleting is availabl, Display link
-	$CommentList->global_icon( T_('Delete all comments!'), 'delete', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
+	$CommentList->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
 if( $CommentList->is_filtered() )

@@ -358,10 +358,10 @@ if( $tab_from == 'antispam' )
 	$AdminUI->breadcrumbpath = array();
 	$AdminUI->breadcrumb_titles = array();
 	$AdminUI->breadcrumbpath_init( false );
-	$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-	$AdminUI->breadcrumbpath_add( T_('Antispam'), '?ctrl=antispam' );
-	$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=antispam&amp;tab3=domains' );
-	$AdminUI->breadcrumbpath_add( T_('Add domain'), '?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;tab_from='.$tab_from );
+	$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+	$AdminUI->breadcrumbpath_add( T_('Antispam'), $admin_url.'?ctrl=antispam' );
+	$AdminUI->breadcrumbpath_add( T_('Referring domains'), $admin_url.'?ctrl=antispam&amp;tab3=domains' );
+	$AdminUI->breadcrumbpath_add( T_('Add domain'), $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;tab_from='.$tab_from );
 }
 else
 {

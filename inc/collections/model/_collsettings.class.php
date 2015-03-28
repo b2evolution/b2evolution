@@ -53,9 +53,6 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
-			'count_custom_double' => 0,
-			'count_custom_varchar' => 0,
-			'show_location_coordinates' => 0,
 			'slug_limit' => 5,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
@@ -68,7 +65,6 @@ class CollectionSettings extends AbstractSettings
 			// 'post_inskin_statuses' => NULL,          // Same as in case of comments
 			'allow_comments' => 'any',
 			'allow_view_comments' => 'any',				// 'any', 'registered', 'member', 'moderator'
-			'disable_comments_bypost' => '1',
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
@@ -108,6 +104,7 @@ class CollectionSettings extends AbstractSettings
 			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
+			'category_ordering' => 'alpha',             // Ordering of categories
 
 		// Tag page settings:
 			'tag_links'  => 'colon',					// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
@@ -153,7 +150,6 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
-			'require_title' => 'required',				// Is a title for items required ("required", "optional", "none")
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 0,					// Don't allow email subscriptions by default
 			'allow_item_subscriptions' => 0,			// Don't allow email subscriptions for a specific post by default
@@ -163,12 +159,12 @@ class CollectionSettings extends AbstractSettings
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
+			'default_post_type' => '1', // Default type for new posts, value is ID of item type from table T_items__type
 			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
 			'blog_footer_includes' => '',
-			'allow_html_post' => 1, // Allow HTML in posts
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
@@ -186,12 +182,6 @@ class CollectionSettings extends AbstractSettings
 		// Back-end settings, these can't be modified by the users, it will be modified from code:
 			'last_invalidation_timestamp' => 0,
 
-		// Location
-			'location_country'   => 'hidden', // Editing mode of country for item:   "optional" | "required" | "hidden"
-			'location_region'    => 'hidden', // Editing mode of region for item:    "optional" | "required" | "hidden"
-			'location_subregion' => 'hidden', // Editing mode of subregion for item: "optional" | "required" | "hidden"
-			'location_city'      => 'hidden', // Editing mode of city for item:      "optional" | "required" | "hidden"
-
 		// Download settings:
 			'download_delay' => 5,
 			'download_noindex' => 1,
@@ -208,17 +198,6 @@ class CollectionSettings extends AbstractSettings
 	 *  'mobile_skin_ID' => NULL,
 	 *  'tablet_skin_ID' => NULL,
 	 */
-
-
-	/**
-	 * When custom fields are changed it may require other updates on different tables.
-	 * These changes must be processed only if the collection settings were also saved.
-	 *
-	 * @access private
-	 *
-	 * @var array which contains update/delete queries
-	 */
-	var $update_cascade = array();
 
 
 	/**
@@ -246,60 +225,6 @@ class CollectionSettings extends AbstractSettings
 		}
 
 		return parent::_load( $coll_ID, $arg );
-	}
-
-
-	/**
-	 * Commit changed settings to DB.
-	 *
-	 * @return boolean true, if settings have been updated; false otherwise
-	 */
-	function dbupdate()
-	{
-		global $DB;
-
-		if( !parent::dbupdate() )
-		{ // Collection settings couldn't been updated successful
-			return false;
-		}
-
-		if( !empty( $this->update_cascade ) )
-		{ // process update cascade commands
-			foreach( $this->update_cascade as $query )
-			{
-				if( $DB->query( $query ) === false )
-				{ // error occured
-					return false;
-				}
-			}
-			$this->update_cascade = array();
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Add an update/delete query which must be processed if collection settings will be updated
-	 *
-	 * @param string query
-	 */
-	function add_update_cascade( $query )
-	{
-		if( empty( $query ) )
-		{
-			return;
-		}
-		$this->update_cascade[] = $query;
-	}
-
-
-	/**
-	 * Remove all registered update query
-	 */
-	function clear_update_cascade()
-	{
-		$this->update_cascade = array();
 	}
 }
 

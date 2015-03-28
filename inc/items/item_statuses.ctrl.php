@@ -31,26 +31,18 @@ $current_User->check_perm( 'options', 'view', true );
 
 $tab = param( 'tab', 'string', 'settings', true );
 
-/**
- * We need make this call to build menu for all modules
- */
-$AdminUI->set_path( 'items' );
+$AdminUI->set_path( 'collections', 'settings', 'statuses' );
 
-/*
- * Add sub menu entries:
- * We do this here instead of _header because we need to include all filter params into regenerate_url()
- */
-attach_browse_tabs();
+// Generate available blogs list:
+$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'itemstatuses', 'tab' => $tab, 'tab3' => 'statuses' ) );
 
-$AdminUI->set_path( 'items', 'settings', 'statuses' );
-
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
-$AdminUI->breadcrumbpath_add( T_('Content settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
-$AdminUI->breadcrumbpath_add( T_('Post statuses'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
+$AdminUI->breadcrumbpath_add( T_('Item Statuses'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
 $AdminUI->set_page_manual_link( 'managing-item-statuses' );
 
-$list_title = T_('Post statuses');
+$list_title = T_('Item Statuses');
 $default_col_order = 'A';
 $edited_name_maxlen = 30;
 $perm_name = 'options';

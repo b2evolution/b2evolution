@@ -1751,6 +1751,10 @@ function get_memorized( $ignore = '' )
  * But it is also useful when generating static pages: you cannot rely on $_REQUEST[]
  *
  * @param mixed|string (delimited by commas) or array of params to ignore (can be regexps in /.../)
+ *                     Use format 'var_name=var_value' to ignore only one value from param,
+ *                       e.g. 'catsel=3' will ignores cat with ID=3 from 'catsel[]'
+ *                            'keyword=see' will ignores word "see" from 'keyword=you see post'
+ *                            'authors=5' will ignores from "5" from 'authors=1,3,5,8'
  * @param array|string Param(s) to set
  * @param mixed|string Alternative URL we want to point to if not the current URL (may be absolute if BASE tag gets used)
  * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
@@ -1778,6 +1782,8 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		$type = $thisparam['type'];
 		$defval = $thisparam['default'];
 
+		$value = $GLOBALS[$var];
+
 		// Check if the param should to be ignored:
 		$skip = false;
 		foreach( $ignore as $ignore_pattern )
@@ -1792,10 +1798,52 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 			}
 			else
 			{
+				$ignore_value = NULL;
+				if( strpos( $ignore_pattern, '=' ) !== false )
+				{ // Ignore only one value from array param
+					$ignore_pattern = explode( '=', $ignore_pattern );
+					$ignore_value = $ignore_pattern[1];
+					$ignore_pattern = $ignore_pattern[0];
+				}
 				if( $var == $ignore_pattern )
-				{	// Skip this param!
-					$skip = true;
-					break;
+				{ // Skip this param!
+					if( $ignore_value === NULL )
+					{ // Skip var only by param name
+						$skip = true;
+						break;
+					}
+					elseif( ! empty( $value ) )
+					{ // Exclude only the selected values of the var
+						$value_is_string = ! is_array( $value );
+						$value_is_negative = false;
+						if( $value_is_string )
+						{ // Convert string param to array to remove one value
+							$string_separator = ( strpos( $value, ',' ) !== false ) ? ',' : ' ';
+							if( substr( $value, 0, 1 ) == '-' && substr( $ignore_value, 0, 1 ) != '-' )
+							{ // If value is negative
+								$value = substr( $value, 1 );
+								$value_is_negative = true;
+							}
+							$value = explode( ' ', str_replace( ',', ' ', $value ) );
+						}
+						foreach( $value as $v => $global_var_value )
+						{
+							if( $global_var_value == $ignore_value || ( $value_is_negative && $global_var_value == '-'.$ignore_value ) )
+							{ // Unset the ignored value from array
+								unset( $value[ $v ] );
+								break;
+							}
+						}
+						if( $value_is_string && ! empty( $value ) )
+						{ // Revert back value to string format
+							$value = ( $value_is_negative ? '-' : '' ).implode( $string_separator, $value );
+						}
+						if( empty( $value ) || $value == $ignore_value )
+						{ // Skin var if it is empty OR it is string var and equals the ignored value
+							$skip = true;
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -1806,7 +1854,6 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 			continue;
 		}
 
-		$value = $GLOBALS[$var];
 		if( $value != $defval )
 		{ // Value is not set to default value:
 			// Note: sometimes we will want to include an empty value, especially blog=0 ! In that case we set the default for blog to -1.
@@ -1814,7 +1861,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 			// $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 			// echo "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]";
 
-			$params[] = get_param_urlencoded($var, $value, $glue);
+			$params[] = get_param_urlencoded( $var, $value, $glue );
 		}
 		else // if( $var == 's' )
 		{

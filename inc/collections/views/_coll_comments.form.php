@@ -104,8 +104,6 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	echo '<div class="feedback_details_container">';
 
-	$Form->checkbox( 'disable_comments_bypost', $edited_Blog->get_setting( 'disable_comments_bypost' ), '', T_('Comments can be disabled on each post separately') );
-
 	$Form->checkbox( 'allow_anon_url', $edited_Blog->get_setting( 'allow_anon_url' ), T_('Anonymous URLs'), T_('Allow anonymous commenters to submit an URL') );
 
 	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),

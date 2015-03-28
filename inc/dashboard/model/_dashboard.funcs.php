@@ -313,9 +313,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		echo '<div class="small">';
 		$Comment->content( 'htmlbody', true );
-		echo '</div>';
 
 		echo '<div class="dashboard_action_area">';
 		// Display edit button if current user has the rights:
@@ -457,10 +455,10 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => ' ',
-				'class'     => 'ActionButton btn btn-default',
+				'class'     => 'ActionButton btn btn-primary',
 				'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 			) );
-		$Item->publish_link( '', '', '#', '#', 'PublishButton' );
+		$Item->publish_link( '', '', '#', '#', 'PublishButton btn btn-status-published' );
 		echo get_icon( 'pixel' );
 		echo '</div>';
 

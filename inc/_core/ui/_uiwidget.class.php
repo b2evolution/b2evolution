@@ -77,8 +77,12 @@ class Widget
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array( 'class'=>'action_icon' ) )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array() )
 	{
+		$link_attribs = array_merge( array(
+				'class' => 'action_icon'
+			), $link_attribs );
+
 		$this->global_icons[] = array(
 			'title' => $title,
 			'icon'  => $icon,
@@ -216,6 +220,18 @@ class Widget
 
 		foreach( $this->global_icons as $icon_params )
 		{
+			if( isset( $this->params, $this->params['global_icons_class'] ) )
+			{ // Append a link class from global params
+				if( strpos( $icon_params['link_attribs']['class'], 'btn-' ) !== false )
+				{
+					$global_icons_class = str_replace( 'btn-default', '', $this->params['global_icons_class'] );
+				}
+				else
+				{
+					$global_icons_class = $this->params['global_icons_class'];
+				}
+				$icon_params['link_attribs']['class'] = ( empty( $icon_params['link_attribs']['class'] ) ? '' : $icon_params['link_attribs']['class'].' ' ).$global_icons_class;
+			}
 			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
 						$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] );
 		}
@@ -327,6 +343,14 @@ class Table extends Widget
 			}
 		}
 
+		if( ! empty( $this->params ) )
+		{ // Initialize default params
+			$this->params = array_merge( array(
+					'filter_button_class'  => 'filter',
+					'filter_button_before' => '',
+					'filter_button_after'  => '',
+				), $this->params );
+		}
 
 		if( $fadeout == 'session' )
 		{	// Get fadeout_array from session:
@@ -457,8 +481,10 @@ class Table extends Widget
 				$this->Form->begin_form( '' );
 			}
 
+			echo $this->params['filter_button_before'];
 			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
-			$this->Form->submit( array( $submit_name, $submit_title, 'filter' ) );
+			$this->Form->submit( array( $submit_name, $submit_title, $this->params['filter_button_class'] ) );
+			echo $this->params['filter_button_after'];
 
 			if( ! empty( $this->force_checkboxes_to_inline ) )
 			{ // Set this to TRUE in order to display all checkboxes before labels

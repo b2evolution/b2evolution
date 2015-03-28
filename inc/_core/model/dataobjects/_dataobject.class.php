@@ -778,7 +778,7 @@ class DataObject
 			$Form->hidden( 'confirm', 1 );
 			$Form->hidden( 'redirect_to', $redirect_to );
 			echo $params['before_submit_button'];
-			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
+			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
 		$Form->end_form();
 
 		$Form = new Form( $redirect_to, 'form_cancel', 'get', '' );

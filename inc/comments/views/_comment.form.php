@@ -49,7 +49,7 @@ else
 	$delete_title = T_('Recycle this comment');
 	$delete_text = T_('recycle');
 }
-$Form->global_icon( $delete_title, 'delete', $delete_url, $delete_text, 4, 3, $link_attribs );
+$Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1 );
 
@@ -71,7 +71,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<?php
 	$Form->begin_fieldset( T_('Comment contents') );
 
-	echo '<table cellspacing="0" class="compose_layout">';
+	echo '<table cellspacing="0" class="compose_layout" align="center">';
 
 	echo '<tr><td width="1%"><strong>'.T_('In response to').':</strong></td>';
 	echo '<td>';
@@ -100,7 +100,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	if( $Blog->get_setting( 'threaded_comments' ) )
 	{ // Display a reply comment ID only when this feature is enabled in blog settings
-		echo '<table cellspacing="0" class="compose_layout">';
+		echo '<table cellspacing="0" class="compose_layout" align="center">';
 		echo '<tr><td width="1%"><strong>'.T_('In reply to comment ID').':</strong></td>';
 		echo '<td class="input">';
 		$Form->switch_layout( 'none' );
@@ -111,7 +111,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		echo '</tr></table>';
 	}
 
-	echo '<table cellspacing="0" class="compose_layout">';
+	echo '<table cellspacing="0" class="compose_layout" align="center">';
 
 	if( ! $edited_Comment->get_author_User() )
 	{ // This is not a member comment
@@ -178,7 +178,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	if( $action == 'editcomment' )
 	{	// Editing comment
 		// Display delete button if user has permission to:
-		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', true );
+		$edited_Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton btn-danger', true );
 	}
 
 	// CALL PLUGINS NOW:
@@ -274,7 +274,15 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->switch_layout( 'linespan' );
 
 		// Get those statuses which are not allowed for the current User to create comments in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
+		if( $edited_Comment->is_meta() )
+		{ // Don't restrict statuses for meta comments
+			$restricted_statuses = array();
+		}
+		else
+		{ // Restrict statuses for normal comments
+			$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' );
+		}
+		$exclude_statuses = array_merge( $restricted_statuses, array( 'redirected', 'trash' ) );
 		// Get allowed visibility statuses
 		$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 		$Form->radio( 'comment_status', $edited_Comment->status, $sharing_options, '', true );

@@ -185,6 +185,10 @@ $Form->begin_fieldset( T_('Notifications') );
 	{ // edited user has permission to edit other than his own comments at least in one status in one blog
 		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
 	}
+	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
+	{ // edited user has a permission to back-office
+		$notify_options[] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
+	}
 	if( $is_comment_moderator )
 	{ // edited user is comment moderator at least in one blog
 		$notify_options[] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );

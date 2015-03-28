@@ -275,7 +275,17 @@ function valid_blog_requested()
 {
 	global $Blog, $Messages;
 	if( empty( $Blog ) )
-	{	// The requested blog does not exist
+	{ // The requested blog does not exist, Try to get other available blog for the current User
+		$blog_ID = get_working_blog();
+		if( $blog_ID )
+		{
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+	}
+
+	if( empty( $Blog ) )
+	{ // The requested blog does not exist
 		$Messages->add( T_('The requested blog does not exist (any more?)'), 'error' );
 		return false;
 	}
@@ -284,9 +294,54 @@ function valid_blog_requested()
 
 
 /**
+ * Get working blog
+ *
+ * For use in backoffice
+ *
+ * @return integer|FALSE Blog ID or FALSE when no available blog to view by current User
+ */
+function get_working_blog()
+{
+	global $blog, $current_User, $UserSettings;
+	
+	if( ! is_logged_in() )
+	{ // User must be logged in to view the blogs
+		return false;
+	}
+
+	if( ! empty( $blog ) )
+	{ // Use a blog from GET request
+		$blog_ID = intval( $blog );
+		if( $blog_ID > 0 && $current_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
+		{ // Allow to use this blog only when current user has an access to view it
+			return $blog_ID;
+		}
+	}
+
+	$blog_ID = intval( $UserSettings->get( 'selected_blog' ) );
+	if( $blog_ID > 0 && $current_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
+	{ // Use the blog which is selected by current user last time
+		return $blog_ID;
+	}
+
+	// Use first blog from DB which current user can views
+	$BlogCache = & get_BlogCache();
+	if( $blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', NULL, '', '', 1 ) )
+	{
+		foreach( $blog_array as $blog_ID )
+		{
+			return $blog_ID;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Set working blog to a new value and memorize it in user settings if needed.
  *
- * For use in admin
+ * For use in backoffice
  *
  * @return boolean $blog changed?
  */
@@ -295,7 +350,7 @@ function set_working_blog( $new_blog_ID )
 	global $blog, $UserSettings;
 
 	if( $new_blog_ID != (int)$UserSettings->get('selected_blog') )
-	{	// Save the new default blog.
+	{ // Save the new default blog.
 		// fp> Test case 1: dashboard without a blog param should go to last selected blog
 		// fp> Test case 2: uploading to the default blog may actually upload into another root (sev)
 		$UserSettings->set( 'selected_blog', $blog );
@@ -827,7 +882,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 
 	if( $skip_intro_posts )
 	{ // Skip "Intro" posts
-		$tags_SQL->WHERE_and( 'post_ptyp_ID NOT IN ( '.implode( ', ', $posttypes_specialtypes ).' )' );
+		$tags_SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.implode( ', ', $posttypes_specialtypes ).' )' );
 	}
 
 	if( ! empty( $filter_list ) )
@@ -1346,8 +1401,8 @@ function blogs_all_results_block( $params = array() )
 
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
-		global $dispatcher;
-		$blogs_Results->global_icon( T_('New collection...'), 'new', url_add_param( $dispatcher, 'ctrl=collections&amp;action=new' ), T_('New collection...'), 3, 4 );
+		global $admin_url;
+		$blogs_Results->global_icon( T_('New blog...'), 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 );
 	}
 
 	// Initialize Results object
@@ -1651,17 +1706,12 @@ function blog_row_actions( $curr_blog_ID )
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
-		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;blog='.$curr_blog_ID );
-	}
-
-	if( $current_User->check_perm( 'blog_cats', '', false, $curr_blog_ID ) )
-	{
-		$r .= action_icon( T_('Edit categories...'), 'edit', $admin_url.'?ctrl=chapters&amp;blog='.$curr_blog_ID );
+		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$curr_blog_ID );
 	}
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;tab=list&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )

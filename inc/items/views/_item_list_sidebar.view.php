@@ -72,8 +72,8 @@ echo $template['block_end'];
 $Widget = new Widget();
 $Widget->title = T_('Filters');
 if( $ItemList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 4, 4 );
+{ // List is filtered, offer option to reset filters:
+	$Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 4, 4, array( 'class' => 'action_icon btn btn-warning btn-sm' ) );
 }
 echo $Widget->replace_vars( $template['block_start'] );
 
@@ -82,7 +82,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 	$Form->begin_form( '' );
 
 		$Form->hidden_ctrl();
-		$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
+		$Form->submit( array( 'submit', T_('Filter'), 'search btn-info', '', 'float:right' ) );
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
@@ -308,13 +308,13 @@ echo $Widget->replace_vars( $template['block_start'] );
 				'itemlist_prefix' => $pp,       // Prefix of the ItemList object
 			) );
 
-
-		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
+		echo '<br />';
+		$Form->submit( array( 'submit', T_('Filter'), 'search btn-info' ) );
 
 		if( $ItemList->is_filtered() )
 		{
 			// TODO: style this better:
-			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a>';
+			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning">'.T_('Reset all filters!').'</a>';
 		}
 
 	$Form->end_form();

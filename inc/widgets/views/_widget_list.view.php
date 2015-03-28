@@ -22,7 +22,7 @@ global $container_list;
 if(	$current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="floatright small">'.action_icon( TS_('Reload containers!'), 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers!') ).'</div>';
+	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4 ).'</div>';
 }
 
 // Load widgets for current collection:

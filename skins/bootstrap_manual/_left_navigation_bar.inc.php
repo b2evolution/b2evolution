@@ -47,6 +47,8 @@ global $Settings, $Session;
 				'item_before_opened'   => get_icon( 'collapse' ),
 				'item_before_closed'   => get_icon( 'expand' ),
 				'item_before_post'     => get_icon( 'permalink' ),
+				'expand_all'           => false,
+				'sorted'               => true
 			) );
 		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>

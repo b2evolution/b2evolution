@@ -78,7 +78,7 @@ $Form->begin_form( '', '', $params );
 
 	// Fields used in "advanced" form, but not here:
 	$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
-	$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
+	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 	$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 	$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
@@ -174,20 +174,29 @@ $Form->begin_form( '', '', $params );
 
 	// ################### COMMENT STATUS ###################
 
-	if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
+	if( $edited_Item->allow_comment_statuses() )
 	{
 		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Open') ?></label><br />
-
+		<?php
+		if( $edited_Item->get_type_setting( 'allow_closing_comments' ) )
+		{ // Allow closing comments
+		?>
 			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="closed" class="checkbox" <?php if( $post_comment_status == 'closed' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Closed') ?></label><br />
+		<?php
+		}
 
+		if( $edited_Item->get_type_setting( 'allow_disabling_comments' ) )
+		{ // Allow disabling comments
+		?>
 			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
+		}
 
 		$Form->end_fieldset();
 	}

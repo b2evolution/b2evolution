@@ -249,6 +249,90 @@ switch( $action )
 		$add_response_end_comment = false;
 		break;
 
+	case 'edit_comment':
+		// Used to edit a comment from back-office (Note: Only for meta comments now!)
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		$comment_ID = param( 'commentid', 'integer' );
+
+		// Get Comment by ID
+		$CommentCache = & get_CommentCache();
+		$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
+		// Load Item
+		$edited_Comment_Item = & $edited_Comment->get_Item();
+
+		// Check user permission to edit this meta comment
+		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
+
+		// Load Blog of the Item
+		$Blog = & $edited_Comment_Item->get_Blog();
+
+		$comment_action = param( 'comment_action', 'string' );
+
+		switch( $comment_action )
+		{
+			case 'form':
+				// Display a form to change a content of the Comment
+				$comment_title = '';
+				$comment_content = htmlspecialchars_decode( $edited_Comment->content );
+
+				// Format content for editing, if we were not already in editing...
+				$Plugins_admin = & get_Plugins_admin();
+				$params = array( 'object_type' => 'Comment', 'object_Blog' => & $Blog );
+				$Plugins_admin->unfilter_contents( $comment_title /* by ref */, $comment_content /* by ref */, $edited_Comment_Item->get_renderers_validated(), $params );
+
+				// Display <textarea> to change a content
+				$rows_approx = round( strlen( $comment_content ) / 200 );
+				$rows_number = substr_count( $comment_content, "\n" );
+				$rows_number = ( ( $rows_number > 3 && $rows_number > $rows_approx ) ? $rows_number : $rows_approx ) + 2;
+				echo '<textarea class="form_textarea_input form-control" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
+				// Display a button to Save the changes
+				echo '<input type="button" value="'.T_('Save Changes!').'" class="SaveButton btn btn-primary" onclick="edit_comment( \'update\', '.$edited_Comment->ID.' )" /> ';
+				// Display a button to Cancel the changes
+				echo '<input type="button" value="'.T_('Cancel').'" class="ResetButton btn btn-danger" onclick="edit_comment( \'cancel\', '.$edited_Comment->ID.' )" />';
+				break;
+
+			case 'update':
+				// Save the changed content
+				if( $Blog->get_setting( 'allow_html_comment' ) )
+				{ // HTML is allowed for this comment
+					$text_format = 'html';
+				}
+				else
+				{ // HTML is disallowed for this comment
+					$text_format = 'htmlspecialchars';
+				}
+
+				$comment_content = param( 'comment_content', $text_format );
+
+				// Trigger event: a Plugin could add a $category="error" message here..
+				// This must get triggered before any internal validation and must pass all relevant params.
+				// The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
+				$Plugins->trigger_event( 'CommentFormSent', array(
+						'dont_remove_pre' => true,
+						'comment_item_ID' => $edited_Comment_Item->ID,
+						'comment' => & $comment_content,
+						'renderers' => $edited_Comment->get_renderers_validated(),
+					) );
+
+				// Update the content
+				$edited_Comment->set( 'content', $comment_content );
+				$edited_Comment->dbupdate();
+
+				// Display new content
+				$edited_Comment->content( 'htmlbody', 'true' );
+				break;
+
+			case 'cancel':
+				// The changes were canceled, Display old content
+				$edited_Comment->content( 'htmlbody', 'true' );
+				break;
+		}
+
+		break;
+
 	case 'get_opentrash_link':
 		// Used to get a link 'Open recycle bin' in order to show it in the header of comments list
 
@@ -279,6 +363,7 @@ switch( $action )
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$limit = param( 'limit', 'integer', 0 );
 		$request_from = param( 'request_from', 'string', NULL );
+		$comment_type = param( 'comment_type', 'string', 'feedback' );
 
 		$edited_Comment = & Comment_get_by_ID( $comment_ID, false );
 		if( $edited_Comment !== false )
@@ -311,11 +396,8 @@ switch( $action )
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
-			if( $limit == 0 )
-			{
-				$limit = $UserSettings->get( 'results_per_page' ); 
-			}
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
+
+			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
 		break;
 
@@ -355,9 +437,15 @@ switch( $action )
 		$expiry_status = param( 'expiry_status', 'string', 'active' );
 		$currentpage = param( 'currentpage', 'string', 1 );
 		$request_from = param( 'request_from', 'string', 'items' );
+		$comment_type = param( 'comment_type', 'string', 'feedback' );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
 		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
+
+		// Set admin skin, used for buttons, @see button_class()
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
 		{ // AJAX request goes from backoffice and ctrl = items or comments
@@ -371,7 +459,7 @@ switch( $action )
 				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 			}
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, 20, array(), '', $expiry_status );
+			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
 		elseif( $request_from == 'dashboard' )
 		{ // AJAX request goes from backoffice dashboard

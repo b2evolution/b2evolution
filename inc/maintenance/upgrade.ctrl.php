@@ -44,15 +44,15 @@ param_action();
 check_upgrade_config( true );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 if( $tab == 'svn' )
 {
-	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), '?ctrl=upgrade&amp;tab='.$tab );
+	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
 }
 else
 {
-	$AdminUI->breadcrumbpath_add( T_('Auto Upgrade'), '?ctrl=upgrade' );
+	$AdminUI->breadcrumbpath_add( T_('Auto Upgrade'), $admin_url.'?ctrl=upgrade' );
 }
 
 

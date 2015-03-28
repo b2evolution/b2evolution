@@ -2849,26 +2849,29 @@ class Form extends Widget
 
 		// Use bootstrap classes for buttons
 		$field_params['class'] .= ' btn';
-		if( strpos( $field_params['class'], 'SaveButton' ) !== false ||
-		    strpos( $field_params['class'], 'SaveEditButton' ) !== false )
-		{ // Submit button
-			$field_params['class'] .= ' btn-primary';
-		}
-		elseif( strpos( $field_params['class'], 'ResetButton' ) !== false )
-		{ // Reset button
-			$field_params['class'] .= ' btn-danger';
-		}
-		elseif( strpos( $field_params['class'], 'PreviewButton' ) !== false )
-		{ // Preview button
-			$field_params['class'] .= ' btn-info';
-		}
-		elseif( strpos( $field_params['class'], 'SmallButton' ) !== false )
-		{ // Small button
-			$field_params['class'] .= ' btn-xs';
-		}
-		if( ! preg_match( '/btn\-(primary|success|info|warning|danger)/', $field_params['class'] ) )
-		{ // This button is default
-			$field_params['class'] .= ' btn-default';
+		if( strpos( $field_params['class'], 'btn-' ) === false )
+		{ // Only when it is not defined from skin
+			if( strpos( $field_params['class'], 'SaveButton' ) !== false ||
+					strpos( $field_params['class'], 'SaveEditButton' ) !== false )
+			{ // Submit button
+				$field_params['class'] .= ' btn-primary';
+			}
+			elseif( strpos( $field_params['class'], 'ResetButton' ) !== false )
+			{ // Reset button
+				$field_params['class'] .= ' btn-danger';
+			}
+			elseif( strpos( $field_params['class'], 'PreviewButton' ) !== false )
+			{ // Preview button
+				$field_params['class'] .= ' btn-info';
+			}
+			elseif( strpos( $field_params['class'], 'SmallButton' ) !== false )
+			{ // Small button
+				$field_params['class'] .= ' btn-xs';
+			}
+			if( ! preg_match( '/btn\-(primary|success|info|warning|danger)/', $field_params['class'] ) )
+			{ // This button is default
+				$field_params['class'] .= ' btn-default';
+			}
 		}
 
 		return $this->display_or_return( $this->get_input_element( $field_params ) );

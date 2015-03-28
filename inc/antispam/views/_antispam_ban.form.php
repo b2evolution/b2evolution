@@ -242,7 +242,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 
 	$Form->buttons( array(
-		array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton' ),
+		array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton btn-danger' ),
 	) );
 
 $Form->end_form();

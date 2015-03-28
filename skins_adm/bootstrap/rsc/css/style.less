@@ -8,7 +8,7 @@
  * @package admin
  */
 
-.border-radius (@radius: 5px) {
+.border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
 	-ms-border-radius: @radius;
@@ -16,22 +16,15 @@
 	border-radius: @radius;
 }
 
-// Header div contains the breadcrumbs navigation
-#header {
-	padding: 10px;
+// Add space above page content when no navigation level2 and level3 before this
+.page-content {
+	margin-top: 16px;
 }
-#wrapper {
-	padding: 0 10px;
-}
-ul.nav ul.nav {
-	background: #FFF;
-	.border-radius(4px);
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.3) inset;
-	margin: 5px 0;
-	overflow: hidden;
-}
-ul.breadcrumb {
-	margin: 0;
+#iframe_wrapper {
+	.container-fluid.page-content {
+		padding: 0;
+		margin: 0;
+	}
 }
 
 table.browse {
@@ -63,7 +56,6 @@ div.status_icon {
 	font-weight: bold;
 	margin: 0 2px;
 }
-
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
 	margin: 0;
@@ -120,6 +112,13 @@ div.avatartag {
 	legend &, h2 & {
 		line-height: 20px;
 	}
+	.btn &, .btn:hover &,
+	.btn-warning &, .btn-warning:hover & {
+		color: #FFF;
+	}
+	.btn-default &, .btn-default:hover & {
+		color: #333;
+	}
 }
 .btn-group + .btn-group {
 	margin-left: 5px;
@@ -162,8 +161,18 @@ div.avatartag {
 	}
 }
 
-div.log_container, div.action_messages {
+div.log_container {
 	margin: 0;
+}
+div.action_messages {
+	margin: 16px 0;
+	ul li:last-child div.alert {
+		margin-bottom: 0;
+	}
+}
+.container-fluid .action_messages.container-fluid {
+	padding: 0; // Remove double padding, for example on delete collection action
+	margin-top: 0;
 }
 
 /*
@@ -174,9 +183,8 @@ div.bPost {
 	margin: 0 0 1ex;
 	padding: 0;
 	border: 1px solid #CCC;
-}
-#comments_container div.bComment {
-	padding: 0;
+	.border-radius;
+	overflow: hidden; /* to normal view of border-radius */
 }
 .bSmallHead {
 	background-color: #F5F5F5;
@@ -197,8 +205,110 @@ div.bPost {
 	padding: 1ex;
 	color: #929292;
 }
-.bContent, .bCommentContent, .bFeedback {
+.bContent {
+	padding: 1ex;
+}
+.bCommentContent, .bFeedback {
 	margin: 1ex;
+}
+#comments_container.full_comment_list {
+	border: none;
+	.bComment {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+.bFeedback {
+	.tile {
+		display: inline-block;
+		padding-right: 10px;
+		input, label {
+			display: inline-block;
+		}
+	}
+	.results_nav {
+		background: #F5F5F5;
+		border: none;
+	}
+	form.bComment {
+		margin: 0;
+		padding: 1ex;
+		border: 1px solid #ddd;
+		.border-radius;
+		&.meta_comment_form {
+			border: 2px solid #5133ab;
+			background-color: #f7f4ff;
+		}
+		.form_info {
+			display: block;
+			text-align: center;
+			padding: 10px;
+			color: #5133ab;
+		}
+	}
+}
+
+// Sidebar form filter
+#comment_filter_form {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls.col-xs-10 {
+		width: 100%;
+		input[type=text] {
+			width: 100%;
+		}
+	}
+	.rating input[name=cmnt_fullview_rating_limit] {
+		margin-right: 10px;
+		&:first-child {
+			margin-left: 10px;
+		}
+	}
+}
+
+#comments_container {
+	div.bComment {
+		padding: 0;
+		margin: 1ex;
+		border: 1px solid #ddd;
+		.border-radius;
+		> p {
+			margin: 0;
+		}
+		&.bCommentdraft {
+			border: 1px solid #fc3;
+			background-color: #ffb;
+		}
+		&.bCommentdeprecated {
+			border: 1px solid #000;
+			background-color: #eee;
+			color: #888;
+		}
+		&.bCommentmeta {
+			border: 2px solid #5133ab;
+			.bSmallHead, .CommentActionsArea {
+				background-color: #f7f4ff;
+				border-bottom: 1px solid #5133ab;
+			}
+			.CommentActionsArea {
+				border-top: 1px solid #5133ab;
+				border-bottom: none;
+			}
+		}
+		&.bCommenttrash {
+			border: 1px solid #f66;
+			background-color: #fcc;
+			.bSmallHead {
+				border-bottom: 1px solid #f66;
+				background-color: #faa;
+			}
+			.CommentActionsArea {
+				border-top: 1px solid #f66;
+				background-color: #faa;
+			}
+		}
+	}
 }
 div.PostActionsArea, div.CommentActionsArea {
 	background-color: #F5F5F5;
@@ -207,10 +317,113 @@ div.PostActionsArea, div.CommentActionsArea {
 	margin: 0;
 	padding: 1ex;
 }
+.bPostAttachments {
+	margin: 1ex;
+}
+.feedback-tabs.nav {
+	margin: 0 1ex;
+}
+.vote_spam {
+	float: left;
+	padding-left: 10px;
+	line-height: 33px;
+	a.action_icon {
+		font-size: inherit;
+		.icon {
+			margin-bottom: 2px;
+		}
+	}
+}
 // Status banner
 #styled_content_block span[class*="status_"] {
 	left: 8px;
 	top: -8px;
+}
+// The colored blocks for special post statuses
+div.bPostcommunity {
+	border: 1px solid #2E8BB9;
+	> div.bSmallHead {
+		border-bottom: inherit;
+	}
+	> .PostActionsArea {
+		border-top: inherit;
+	}
+}
+div.bPostprotected {
+	border: 1px solid #fc9;
+	> div.bSmallHead {
+		border-bottom: inherit;
+	}
+	> .PostActionsArea {
+		border-top: inherit;
+	}
+}
+div.bPostreview {
+	border: 1px solid #CC0099;
+	> div.bSmallHead {
+		border-bottom: inherit;
+	}
+	> .PostActionsArea {
+		border-top: inherit;
+	}
+}
+div.bPostprivate {
+	border: 1px solid #f99;
+	> div.bSmallHead {
+		border-bottom: inherit;
+	}
+	> .PostActionsArea {
+		border-top: inherit;
+	}
+}
+div.bPostdraft, div.bCommentdraft {
+	border: 1px solid #fc3;
+	> .bContent {
+		background-color: #ffb;
+	}
+	.bSmallHead {
+		border-bottom: 1px solid #fc3;
+		background-color: #ff9;
+	}
+	.CommentActionsArea, .PostActionsArea {
+		background-color: #ff9;
+	}
+	span.bStatus {
+		color: #f96;
+		background-color: #ff9;
+	}
+	span.note.status_draft span {
+		color: #fff;
+		background-color: #FFCC33;
+	}
+}
+div.bPostdeprecated, div.bCommentdeprecated {
+	border: 1px solid #000;
+	> .bContent {
+		background-color: #eee;
+	}
+	> div.bSmallHead {
+		border-bottom: inherit;
+		background-color: #ccc;
+	}
+	> .PostActionsArea, .CommentActionsArea {
+		border-top: inherit;
+		background-color: #ccc;
+	}
+}
+div.bPostredirected {
+	border: 1px solid #639;
+	> .bContent {
+		background-color: #dcf;
+	}
+	> div.bSmallHead {
+		border-bottom: inherit;
+		background-color: #c0b0e0;
+	}
+	> .PostActionsArea {
+		border-top: inherit;
+		background-color: #c0b0e0;
+	}
 }
 
 /*
@@ -286,22 +499,16 @@ fieldset ul {
 div.skinshot {
 	background-color: #F5F5F5;
 	border: 1px solid #E3E3E3;
-	.border-radius(4px);
+	.border-radius;
 	padding: 5px;
 	float: left;
 	margin: 1ex;
 }
 
 // Dashboard
-#styled_content_block {
-	margin-right: 20px;
-	#styled_content_block {
-		margin-right: 0;
-	}
-}
 #comments_container, .items_container {
 	border: 1px solid #DDD;
-	.border-radius(3px);
+	.border-radius;
 	margin-bottom: 20px;
 	.dashboard_post {
 		border-top: 1px solid #DDD;
@@ -323,6 +530,11 @@ div.skinshot {
 	span[class*=status_] {
 		line-height: 20px;
 	}
+}
+// Charts on dashboard
+.chart .label {
+	color: #000;
+	font-weight: normal;
 }
 
 // Form elements on item edit page
@@ -467,7 +679,7 @@ td.fm_filename .result_error {
 div.fileman_toolbars_bottom .toolbaritem {
 	border: 2px dashed #fff;
 	background: #b5cee0;
-	.border-radius(3px);
+	.border-radius;
 	margin: 3px 0 0 10px;
 	padding: 2px 10px;
 	float: right;
@@ -554,10 +766,7 @@ h2.user_title {
 			padding: 5px;
 			text-align: center;
 			width: 33px;
-			-moz-border-radius: 100%;
-			-webkit-border-radius: 100%;
-			-khtml-border-radius: 100%;
-			border-radius: 100%;
+			.border-radius(100%);
 		}
 	}
 	.step.current {
@@ -605,11 +814,20 @@ span.loader_img.loader_user_deldata {
 	background-image: url("../../../../rsc/img/ajax-loader/fff.gif");
 }
 
+.editable_comment_content textarea.form_textarea_input {
+	width: 90%;
+	margin-bottom: 10px;
+}
+
 div#upload_wrapper, div#import_wrapper {
 	border: none;
 	background: none;
 }
 
+// Remove spacing between form and global menu
+div.fieldset_wrapper {
+	margin-top: 0;
+}
 // Fieldset folding
 div.fieldset_wrapper.folded .panel-body {
 	display: none;
@@ -619,6 +837,32 @@ div.fieldset_wrapper.folded .panel-body {
 .browse {
 	#styled_content_block {
 		margin-right: 0;
+	}
+}
+
+// Results table
+div.results {
+	margin-top: 0;
+}
+table.table {
+	thead	tr th {
+		background: #e8e8e8;
+		color: darken( #848484, 5%);
+		text-align: center;
+		a {
+			color: darken( #848484, 5%); 
+		}
+		a.basic_current,
+		a:hover {
+			color: #337ab7;
+		}
+	}
+	tbody tr.group td {
+		background: lighten( #e8e8e8, 3%);
+		color: #848484;
+		a {
+			color: #337ab7;
+		}
 	}
 }
 
@@ -649,4 +893,138 @@ ul.widget_container {
 }
 div#widget_settings.widget_settings_active {
 	background: #FFF;
+}
+// A list to add new widget
+div.available_widgets {
+	background: #FFF;
+	border-color: #ddd;
+	.border-radius;
+	.available_widgets_toolbar {
+		border-bottom: 1px solid #ddd;
+		background: #F5F5F5;
+		padding: 10px 15px;
+	}
+	.widget_list {
+		list-style: none;
+		margin: 0;
+	}
+	#available_widgets_inner {
+		top: 82px;
+	}
+}
+
+// Table to select a collection type
+.coll_kind {
+	h3 {
+		margin: 0 10px 0 0;
+		font-size: 20px;
+	}
+	td {
+		padding-bottom: 10px;
+	}
+}
+
+// Support for buttons in panel headings
+.btn-right{
+	float: right;
+}
+.panel-heading .btn {
+	margin: -6px 0 0 6px;
+}
+
+// Support for multiline inline forms
+.filters .form-inline {
+	 margin: 0 -10px -5px;
+	.form-group {
+		margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
+}
+
+// Navigations
+.navbar {
+	margin-bottom: 0;
+}
+div.coll-selector {
+	padding-top: 18px;
+	background-color: #ddd;
+	margin-bottom: -3px; // in this case we don't want level 2 to have it's 18 px top padding
+}
+div.level2 {
+	padding-top: 17px; // 18 px top padding (including pos relative in next style) if there is no coll-selector
+	background-color: #ddd;
+	margin-bottom: 16px;
+	border-bottom: 1px solid #ccc;
+}
+.nav-tabs {
+	position: relative;
+	top: 1px;
+	border-bottom: 1px solid #ccc;
+	>li {
+		&.grplast {
+			margin-right: 6px;
+		}
+		>a {
+			background-color: #eee;
+			padding: 7px 12px;
+			margin-bottom: 1px;
+			border-color: #ddd;
+			border-bottom: none;
+		}
+		>a:hover,
+		&.active>a:hover {
+			background-color: #fff;
+			border-color: #ccc #ccc transparent;
+		}
+		&.active>a {
+			margin-bottom: 0;
+			border-color: #ccc #ccc transparent;
+		}
+	}
+}
+.nav {
+	margin: 0;
+	a.action_icon {
+		font-size: inherit;
+		font-weight: normal;
+		.glyphicon {
+			font-size: inherit;
+			color: inherit;
+			margin-right: 4px;
+		}
+	}
+}
+.navbar-right {
+	margin-right: -15px;
+}
+nav {
+	&.level1 {
+		z-index: 1;
+	}
+	&.level3 .nav>li>a {
+		padding: 4px 10px;
+		font-size: 92%;
+	}
+}
+
+// Footer
+.footer {
+	background-color: #f5f5f5;
+	padding: 15px 15px 5px;
+	p {
+		margin-bottom: 10px;
+	}
+}
+
+// Skin info
+.skin_settings {
+	div.controls.col-xs-10 {
+		width: auto;
+	}
+	ul {
+		list-style: disc;
+		margin-left: 20px;
+	}
 }

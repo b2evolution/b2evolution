@@ -71,6 +71,11 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	global $admin_url, $dispatcher;
 	global $current_User;
 
+	if( $LinkOwner->type == 'item' && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
+	{ // Attachments are not allowed for current post type
+		return;
+	}
+
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 		return;
 

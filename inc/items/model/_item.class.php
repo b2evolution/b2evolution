@@ -244,6 +244,13 @@ class Item extends ItemLight
 	var $content_read_status = NULL;
 
 	/**
+	 * The Type of the Item (lazy filled, use {@link get_ItemType()} to access it.
+	 * @access protected
+	 * @var object ItemType
+	 */
+	var $ItemType;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -269,6 +276,8 @@ class Item extends ItemLight
 
 		if( is_null($db_row) )
 		{ // New item:
+			global $Blog;
+
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
 				$this->creator_user_login = $current_User->login;
@@ -281,7 +290,11 @@ class Item extends ItemLight
 			// we prolluy don't need this: $this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
 			$this->set( 'priority', 3 );
-			$this->set( 'ptyp_ID', 1 /* Post */ );
+			if( ! empty( $Blog ) )
+			{ // Get default post type from blog setting
+				$default_post_type = $Blog->get_setting('default_post_type');
+			}
+			$this->set( 'ityp_ID', ( empty( $default_post_type ) ? 1 /* Post */ : $default_post_type ) );
 		}
 		else
 		{
@@ -336,6 +349,51 @@ class Item extends ItemLight
 		}
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $this ) );
+	}
+
+
+	/**
+	 * Compare two Items based on the title
+	 *
+	 * @param Item A
+	 * @param Item B
+	 * @return number -1 if A->title < B->title, 1 if A->title > B->title, 0 if A->title == B->title
+	 */
+	static function compare_items_by_title( $a_Item, $b_Item )
+	{
+		if( $a_Item == NULL || $b_Item == NULL )
+		{
+			debug_die('Invalid item objects received to compare.');
+		}
+
+		return strcmp( $a_Item->title, $b_Item->title );
+	}
+
+
+	/**
+	 * Compare two Items based on the order field
+	 *
+	 * @param Item A
+	 * @param Item B
+	 * @return number -1 if A->order < B->order, 1 if A->order > B->order, 0 if A->order == B->order
+	 */
+	static function compare_items_by_order( $a_Item, $b_Item )
+	{
+		if( $a_Item == NULL || $b_Item == NULL )
+		{
+			debug_die('Invalid item objects received to compare.');
+		}
+
+		if( $a_Item->order == NULL )
+		{
+			return $b_Item->order == NULL ? 0 : 1;
+		}
+		elseif( $b_Item->order == NULL )
+		{
+			return -1;
+		}
+
+		return ( $a_Item->order < $b_Item->order ) ? -1 : ( ( $a_Item->order > $b_Item->order ) ? 1 : 0 );
 	}
 
 
@@ -518,12 +576,12 @@ class Item extends ItemLight
 		// TYPE:
 		if( param( 'post_type', 'string', NULL ) !== NULL )
 		{ // Set type ID from request type code, happens when e.g. we add an intro from manual skin by url: /blog6.php?disp=edit&cat=25&post_type=intro-cat
-			$this->set( 'ptyp_ID', get_item_type_ID( get_param( 'post_type' ) ) );
+			$this->set( 'ityp_ID', get_item_type_ID( get_param( 'post_type' ) ) );
 		}
 		elseif( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
 		{ // fp> when does this happen?
 			// yura>fp: this happens on submit expert form
-			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
+			$this->set_from_Request( 'ityp_ID', 'item_typ_ID' );
 
 			if( in_array( $item_typ_ID, $posttypes_reserved_IDs ) )
 			{
@@ -532,10 +590,15 @@ class Item extends ItemLight
 		}
 
 		// URL associated with Item:
-		if( param( 'post_url', 'string', NULL ) !== NULL )
+		$post_url = param( 'post_url', 'string', NULL );
+		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
 			$this->set_from_Request( 'url' );
+		}
+		if( empty( $post_url ) && $this->get_type_setting( 'use_url' ) == 'required' )
+		{ // URL must be entered
+			param_check_not_empty( 'post_url', T_('Please provide a link to url.'), '' );
 		}
 
 		if( $this->status == 'redirected' && empty($this->url) )
@@ -548,19 +611,23 @@ class Item extends ItemLight
 		$this->load_Blog();
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{
-			$this->set( 'dateset', param( 'item_dateset', 'integer', 0 ) );
+			$item_dateset = param( 'item_dateset', 'integer', NULL );
+			if( $item_dateset !== NULL )
+			{
+				$this->set( 'dateset', $item_dateset );
 
-			if( $editing || $this->dateset == 1 )
-			{ // We can use user date:
-				if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
-					&& param_time( 'item_issue_time' ) )
-				{ // only set it, if a (valid) date and time was given:
-					$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
+				if( $editing || $this->dateset == 1 )
+				{ // We can use user date:
+					if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
+						&& param_time( 'item_issue_time' ) )
+					{ // only set it, if a (valid) date and time was given:
+						$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
+					}
 				}
-			}
-			elseif( $this->dateset == 0 )
-			{	// Set date to NOW:
-				$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
+				elseif( $this->dateset == 0 )
+				{	// Set date to NOW:
+					$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
+				}
 			}
 		}
 
@@ -575,24 +642,48 @@ class Item extends ItemLight
 		}
 
 		// <title> TAG:
-		if( param( 'titletag', 'string', NULL ) !== NULL ) {
+		$titletag = param( 'titletag', 'string', NULL );
+		if( $titletag !== NULL )
+		{
 			$this->set_from_Request( 'titletag', 'titletag' );
+		}
+		if( empty( $titletag ) && $this->get_type_setting( 'use_title_tag' ) == 'required' )
+		{ // Title tag must be entered
+			param_check_not_empty( 'titletag', T_('Please provide a title tag.'), '' );
 		}
 
 		// <meta> DESC:
-		if( param( 'metadesc', 'string', NULL ) !== NULL ) {
+		$metadesc = param( 'metadesc', 'string', NULL );
+		if( $metadesc !== NULL ) {
 			$this->set_setting( 'metadesc', get_param( 'metadesc' ) );
+		}
+		if( empty( $metadesc ) && $this->get_type_setting( 'use_meta_desc' ) == 'required' )
+		{ // Meta description must be entered
+			param_check_not_empty( 'metadesc', T_('Please provide a meta description.'), '' );
 		}
 
 		// <meta> KEYWORDS:
-		if( param( 'metakeywords', 'string', NULL ) !== NULL ) {
+		$metakeywords = param( 'metakeywords', 'string', NULL );
+		if( $metakeywords !== NULL ) {
 			$this->set_setting( 'metakeywords', get_param( 'metakeywords' ) );
+		}
+		if( empty( $metakeywords ) && $this->get_type_setting( 'use_meta_keywds' ) == 'required' )
+		{ // Meta keywords must be entered
+			param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
 		}
 
 		// TAGS:
-		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
+		$item_tags = param( 'item_tags', 'string', NULL );
+		if( $item_tags !== NULL ) {
 			$this->set_tags_from_string( get_param('item_tags') );
-			// pre_dump( $this->tags );
+			// Update setting 'suggest_item_tags' of the current User
+			global $UserSettings;
+			$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
+			$UserSettings->dbupdate();
+		}
+		if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
+		{ // Tags must be entered
+			param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
 		}
 
 		// WORKFLOW stuff:
@@ -635,7 +726,7 @@ class Item extends ItemLight
 		}
 
 		// LOCATION COORDINATES:
-		if( $this->Blog->get_setting( 'show_location_coordinates' ) )
+		if( $this->get_type_setting( 'use_coordinates' ) != 'never' )
 		{ // location coordinates are enabled, save map settings
 			param( 'item_latitude', 'double', NULL ); // get par value
 			$this->set_setting( 'latitude', get_param( 'item_latitude' ), true );
@@ -645,29 +736,30 @@ class Item extends ItemLight
 			$this->set_setting( 'map_zoom', get_param( 'google_map_zoom' ), true );
 			param( 'google_map_type', 'string', NULL ); // get par value
 			$this->set_setting( 'map_type', get_param( 'google_map_type' ), true );
+			if( $this->get_type_setting( 'use_coordinates' ) == 'required' )
+			{ // The location coordinates are required
+				param_check_not_empty( 'item_latitude', T_('Please provide a latitude.'), '' );
+				param_check_not_empty( 'item_longitude', T_('Please provide a longitude.'), '' );
+			}
 		}
 
 		// CUSTOM FIELDS:
-		foreach( array( 'double', 'varchar' ) as $type )
-		{
-			$field_count = $this->Blog->get_setting( 'count_custom_'.$type );
-			for( $i = 1 ; $i <= $field_count; $i++ )
-			{ // update each custom field
-				$field_guid = $this->Blog->get_setting( 'custom_'.$type.$i );
-				$param_name = 'item_'.$type.'_'.$field_guid;
-				if( isset_param( $param_name ) )
-				{ // param is set
-					$param_type = ( $type == 'varchar' ) ? 'string' : $type;
-					param( $param_name, $param_type, NULL ); // get par value
-					$custom_field_make_null = $type != 'double'; // store '0' values in DB for numeric fields
-					$this->set_setting( 'custom_'.$type.'_'.$field_guid, get_param( $param_name ), $custom_field_make_null );
-				}
+		$custom_fields = $this->get_type_custom_fields();
+		foreach( $custom_fields as $custom_field )
+		{ // update each custom field
+			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			if( isset_param( $param_name ) )
+			{ // param is set
+				$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
+				param( $param_name, $param_type, NULL ); // get par value
+				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
 			}
 		}
 
 		// COMMENTS:
-		if( ( $this->Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $this->Blog->get_setting( 'disable_comments_bypost' ) ) )
-		{	// Save status of "Allow comments for this item" (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
+		if( $this->allow_comment_statuses() )
+		{ // Save status of "Allow comments for this item" (only if comments are allowed in this blog, and by current item type
 			$post_comment_status = param( 'post_comment_status', 'string', 'open' );
 			if( !empty( $post_comment_status ) )
 			{ // 'open' or 'closed' or ...
@@ -680,6 +772,10 @@ class Item extends ItemLight
 		if( empty( $expiry_delay ) )
 		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
 			$expiry_delay = param( 'expiry_delay', 'string', NULL );
+		}
+		if( empty( $expiry_delay ) && $this->get_type_setting( 'use_comment_expiration' ) == 'required' )
+		{ // Comment expiration must be entered
+			param_check_not_empty( 'expiry_delay', T_('Please provide a comment expiration.'), '' );
 		}
 		$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 
@@ -699,7 +795,7 @@ class Item extends ItemLight
 		}
 
 		// CONTENT + TITLE:
-		if( $this->Blog->get_setting( 'allow_html_post' ) )
+		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:
 			$text_format = 'html';
 		}
@@ -714,7 +810,8 @@ class Item extends ItemLight
 			$this->set_setting( 'editor_code', $editor_code );
 		}
 
-		if( param( 'content', $text_format, NULL ) !== NULL )
+		$content = param( 'content', $text_format, NULL );
+		if( $content !== NULL )
 		{
 			// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
 			param( 'post_title', 'htmlspecialchars', NULL );
@@ -728,9 +825,9 @@ class Item extends ItemLight
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
 			// Title checking:
-			$require_title = $this->Blog->get_setting('require_title');
+			$use_title = $this->get_type_setting( 'use_title' );
 
-			if( ( ! $editing || $creating ) && $require_title == 'required' ) // creating is important, when the action is create_edit
+			if( ( ! $editing || $creating ) && $use_title == 'required' ) // creating is important, when the action is create_edit
 			{
 				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
 			}
@@ -743,6 +840,10 @@ class Item extends ItemLight
 
 			$this->set( 'title', get_param( 'post_title' ) );
 		}
+		if( empty( $content ) && $this->get_type_setting( 'use_text' ) == 'required' )
+		{ // Content must be entered
+			param_check_not_empty( 'content', T_('Please provide a text.'), '' );
+		}
 
 		// EXCERPT: (must come after content (to handle excerpt_autogenerated))
 		$post_excerpt = param( 'post_excerpt', 'text', NULL );
@@ -751,45 +852,49 @@ class Item extends ItemLight
 			$this->set( 'excerpt_autogenerated', 0 ); // Set this to the '0' for saving a field 'excerpt' from a request
 			$this->set_from_Request( 'excerpt' );
 		}
+		if( empty( $post_excerpt ) && $this->get_type_setting( 'use_excerpt' ) == 'required' )
+		{ // Content must be entered
+			param_check_not_empty( 'post_excerpt', T_('Please provide an excerpt.'), '' );
+		}
 
 		// LOCATION (COUNTRY -> CITY):
 		load_funcs( 'regional/model/_regional.funcs.php' );
 		// Check if this item has a special post type. Location is not required for special posts.
 		$not_special_post = ! $this->is_special();
-		if( $this->Blog->country_visible() )
+		if( $this->country_visible() )
 		{ // Save country
 			$country_ID = param( 'item_ctry_ID', 'integer', 0 );
-			$country_is_required = $this->Blog->get_setting( 'location_country' ) == 'required'
+			$country_is_required = $this->get_type_setting( 'use_country' ) == 'required'
 					&& $not_special_post
 					&& countries_exist();
 			param_check_number( 'item_ctry_ID', T_('Please select a country'), $country_is_required );
 			$this->set_from_Request( 'ctry_ID', 'item_ctry_ID', true );
 		}
 
-		if( $this->Blog->region_visible() )
+		if( $this->region_visible() )
 		{ // Save region
 			$region_ID = param( 'item_rgn_ID', 'integer', 0 );
-			$region_is_required = $this->Blog->get_setting( 'location_region' ) == 'required'
+			$region_is_required = $this->get_type_setting( 'use_region' ) == 'required'
 					&& $not_special_post
 					&& regions_exist( $country_ID );
 			param_check_number( 'item_rgn_ID', T_('Please select a region'), $region_is_required );
 			$this->set_from_Request( 'rgn_ID', 'item_rgn_ID', true );
 		}
 
-		if( $this->Blog->subregion_visible() )
+		if( $this->subregion_visible() )
 		{ // Save subregion
 			$subregion_ID = param( 'item_subrg_ID', 'integer', 0 );
-			$subregion_is_required = $this->Blog->get_setting( 'location_subregion' ) == 'required'
+			$subregion_is_required = $this->get_type_setting( 'use_sub_region' ) == 'required'
 					&& $not_special_post
 					&& subregions_exist( $region_ID );
 			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), $subregion_is_required );
 			$this->set_from_Request( 'subrg_ID', 'item_subrg_ID', true );
 		}
 
-		if( $this->Blog->city_visible() )
+		if( $this->city_visible() )
 		{ // Save city
 			param( 'item_city_ID', 'integer', 0 );
-			$city_is_required = $this->Blog->get_setting( 'location_city' ) == 'required'
+			$city_is_required = $this->get_type_setting( 'use_city' ) == 'required'
 					&& $not_special_post
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
@@ -878,8 +983,12 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
-		$this->load_Blog();
-		if( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
+		if( ! $this->get_type_setting( 'use_comments' ) )
+		{ // Comments are not allowed on this post by item type
+			return false;
+		}
+
+		if( $this->get_type_setting( 'allow_disabling_comments' ) && ( $this->comment_status == 'disabled' ) )
 		{ // Comments are disabled on this post
 			return false;
 		}
@@ -894,6 +1003,7 @@ class Item extends ItemLight
 			return false;
 		}
 
+		$this->load_Blog();
 		$number_of_comments = $this->get_number_of_comments( 'published' );
 		$allow_view_comments = $this->Blog->get_setting( 'allow_view_comments' );
 		$user_can_be_validated = check_user_status( 'can_be_validated' );
@@ -1010,9 +1120,14 @@ class Item extends ItemLight
 			echo '<a id="form_p'.$this->ID.'"></a>';
 		}
 
+		if( ! $this->get_type_setting( 'use_comments' ) )
+		{ // Comments are not allowed on this post by item type
+			return false;
+		}
+
 		if( $this->check_blog_settings( 'allow_comments' ) )
 		{
-			if( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
+			if( $this->get_type_setting( 'allow_disabling_comments' ) && ( $this->comment_status == 'disabled' ) )
 			{ // Comments are disabled on this post
 				return false;
 			}
@@ -1853,7 +1968,7 @@ class Item extends ItemLight
 	{
 		if( empty( $this->custom_fields ) )
 		{ // load item custom_fields
-			$this->custom_fields = get_item_custom_fields();
+			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
 		if( empty( $this->custom_fields[$field_index] ) )
@@ -1863,7 +1978,7 @@ class Item extends ItemLight
 
 		if( empty( $this->custom_fields[$field_index]['value'] ) )
 		{ // get custom item field value from the item setting
-			$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['name'] );
+			$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['type'].'_'.$this->custom_fields[$field_index]['ID'] );
 		}
 		return true;
 	}
@@ -1872,7 +1987,7 @@ class Item extends ItemLight
 	/**
 	 * Get item custom field value by index
 	 *
-	 * @param String field index, see {@link load_custom_field_value()}
+	 * @param String field index which by default is the field name, see {@link load_custom_field_value()}
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
 	function get_custom_field_value( $field_index )
@@ -1910,7 +2025,7 @@ class Item extends ItemLight
 		if( !$this->load_custom_field_value( $field_index ) )
 		{ // Custom field with this index doesn't exist
 			echo $params['before']
-				.'<span class="red">'.sprintf( T_('The custom field %s does not exist!'), $field_index ).'</span>'
+				.'<span class="red">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
 				.$params['after'];
 			return;
 		}
@@ -1955,7 +2070,7 @@ class Item extends ItemLight
 
 		if( empty( $this->custom_fields ) )
 		{
-			$this->custom_fields = get_item_custom_fields();
+			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
 		if( count( $this->custom_fields ) == 0 )
@@ -1970,11 +2085,11 @@ class Item extends ItemLight
 		$mask = array( '$title$', '$value$' );
 		foreach( $this->custom_fields as $field )
 		{
-			$custom_field_value = $this->get_setting( 'custom_'.$field['name'] );
+			$custom_field_value = $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] );
 			if( !empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{ // Display only the filled field AND also numeric field with '0' value
-				$values = array( $field['title'], $custom_field_value );
+				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
 			}
@@ -2183,9 +2298,25 @@ class Item extends ItemLight
 		}
 
 		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
-		array_walk( $this->tags, create_function( '& $tag', '$tag = utf8_strtolower( $tag );' ) );
+		foreach( $this->tags as $t => $tag )
+		{
+			$tag = evo_strtolower( $tag );
+			if( substr( $tag, 0, 1 ) == '-' )
+			{ // Prevent chars '-' in first position
+				$tag = preg_replace( '/^-+/', '', $tag );
+			}
+			if( empty( $tag ) )
+			{ // Don't save empty tag
+				unset( $this->tags[ $t ] );
+			}
+			else
+			{ // Save the modifications for each tag
+				$this->tags[ $t ] = $tag;
+			}
+		}
+
+		// Remove the duplicate tags
 		$this->tags = array_unique( $this->tags );
-		// pre_dump( $this->tags );
 	}
 
 
@@ -3238,6 +3369,12 @@ class Item extends ItemLight
 				if( $more == '#' ) $more = T_('%d pingbacks');
 				break;
 
+			case 'metas':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 meta comment');
+				if( $more == '#' ) $more = T_('%d meta comments');
+				break;
+
 			default:
 				debug_die( "Unknown feedback type [$type]" );
 		}
@@ -3747,7 +3884,7 @@ class Item extends ItemLight
 	 * @param array Params:
 	 *  - 'save_context': redirect to current URL?
 	 */
-	function get_edit_url($params = array())
+	function get_edit_url( $params = array() )
 	{
 		global $admin_url, $current_User;
 
@@ -3764,7 +3901,7 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array('save_context' => true);
+		$params += array( 'save_context' => true );
 
 		$this->load_Blog();
 		$url = false;
@@ -3777,7 +3914,7 @@ class Item extends ItemLight
 		}
 		else if( $current_User->check_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
-			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
+			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
 			if( $params['save_context'] )
 			{
 				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
@@ -4278,7 +4415,7 @@ class Item extends ItemLight
 			), $params );
 
 		$classes = array( $params['item_class'],
-						  $params['item_type_class'].$this->ptyp_ID,
+						  $params['item_type_class'].$this->ityp_ID,
 						  $params['item_status_class'].$this->status,
 						  $params['item_disp_class'].$disp,
 						);
@@ -4486,7 +4623,7 @@ class Item extends ItemLight
 
 		if( $params['podcast'] == '#' )
 		{	// Check if this post is a podcast
-			$params['podcast'] = ( $this->ptyp_ID == 2000 );
+			$params['podcast'] = ( $this->ityp_ID == 2000 );
 		}
 
 		if( $params['podcast'] && $params['format'] == 'htmlbody' )
@@ -4690,7 +4827,7 @@ class Item extends ItemLight
 		$field_ID = $locations[$location];
 
 		$this->load_Blog();
-		if( $this->Blog->{$location.'_visible'}() )
+		if( $this->{$location.'_visible'}() )
 		{	// Location is visible
 			if( empty( $this->$field_ID ) )
 			{	// Set default location
@@ -4727,6 +4864,16 @@ class Item extends ItemLight
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
+		if( $item_typ_ID == 1 )
+		{ // Try to set default item type ID from blog setting
+			$ChapterCache = & get_ChapterCache();
+			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
+			    $Blog = & $Chapter->get_Blog() )
+			{ // Use default item type what used for the blog
+				$item_typ_ID = $Blog->get_setting( 'default_post_type' );
+			}
+		}
+
 		if( $post_locale == '#' ) $post_locale = $default_locale;
 
 		// echo 'INSERTING NEW POST ';
@@ -4752,7 +4899,7 @@ class Item extends ItemLight
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
-		$this->set( 'ptyp_ID', $item_typ_ID );
+		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $post_order );
 
@@ -5493,7 +5640,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( in_array( $this->ptyp_ID, $posttypes_nopermanentURL ) )
+		if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
 		{
 			// TODO: discard any notification that may be pending!
 			if( $verbose )
@@ -5881,13 +6028,13 @@ class Item extends ItemLight
 
 			case 't_type':
 				// Item type (name):
-				if( empty($this->ptyp_ID) )
+				if( empty($this->ityp_ID) )
 				{
 					return '';
 				}
 
 				$ItemTypeCache = & get_ItemTypeCache();
-				$type_Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID );
+				$type_Element = & $ItemTypeCache->get_by_ID( $this->ityp_ID );
 				return $type_Element->get_name();
 
 			case 't_priority':
@@ -6414,7 +6561,7 @@ class Item extends ItemLight
 			), $params );
 
 		$this->load_Blog();
-		if( $this->ctry_ID == 0 || ! $this->Blog->country_visible() )
+		if( $this->ctry_ID == 0 || ! $this->country_visible() )
 		{	// Country is not defined for current Item OR Counries are hidden
 			return;
 		}
@@ -6450,7 +6597,7 @@ class Item extends ItemLight
 			), $params );
 
 		$this->load_Blog();
-		if( $this->rgn_ID == 0 || ! $this->Blog->region_visible() )
+		if( $this->rgn_ID == 0 || ! $this->region_visible() )
 		{	// Region is not defined for current Item
 			return;
 		}
@@ -6486,7 +6633,7 @@ class Item extends ItemLight
 			), $params );
 
 		$this->load_Blog();
-		if( $this->subrg_ID == 0 || ! $this->Blog->subregion_visible() )
+		if( $this->subrg_ID == 0 || ! $this->subregion_visible() )
 		{	// Subregion is not defined for current Item
 			return;
 		}
@@ -6523,7 +6670,7 @@ class Item extends ItemLight
 			), $params );
 
 		$this->load_Blog();
-		if( $this->city_ID == 0 || ! $this->Blog->city_visible() )
+		if( $this->city_ID == 0 || ! $this->city_visible() )
 		{	// City is not defined for current Item
 			return;
 		}
@@ -7075,6 +7222,177 @@ class Item extends ItemLight
 			VALUES ( '.$Goal->ID.', '.$Hit->ID.', '.$DB->quote( 'item_ID='.$this->ID ).' )',
 			'Record goal hit of item #'.$this->ID );
 	}
-}
 
+
+	/**
+	 * Get link to edit item type
+	 *
+	 * @param string What attibute to return:
+	 *                    'link' - html tag <a>
+	 *                    'url' - URL
+	 *                    'onclick' - javascript event onclick
+	 * @param string Link text
+	 * @param string Link title
+	 */
+	function get_type_edit_link( $attr = 'link', $link_text = '', $link_title = '' )
+	{
+		global $admin_url;
+
+		if( $attr != 'onclick' )
+		{ // Init an url
+			if( $this->ID > 0 )
+			{
+				$attr_href = $admin_url.'?ctrl=items&amp;action=edit_type&amp;post_ID='.$this->ID;
+			}
+			else
+			{
+				$attr_href = $admin_url.'?ctrl=items&amp;action=new_type';
+			}
+		}
+
+		if( $attr != 'url' )
+		{ // Init an event 'onclick'
+			$attr_onclick = 'return b2edit_type( \''.TS_('Do you want to save your changes before changing the item type?').'\','
+				.' \''.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'\','
+				.' \''.( $this->ID > 0 ? 'edit_type' : 'new_type' ).'\' );';
+		}
+
+		switch( $attr )
+		{
+			case 'link':
+				return '<a href="'.$attr_href.'" onclick="'.$attr_onclick.'" title="'.$link_title.'">'.$link_text.'</a>';
+				break;
+
+			case 'onclick':
+				return $attr_onclick;
+				break;
+
+			case 'url':
+				return $attr_href;
+				break;
+		}
+	}
+
+
+	/**
+	 * Get the ItemType object for the Item.
+	 *
+	 * @return object ItemType
+	 */
+	function & get_ItemType()
+	{
+		if( is_null( $this->ItemType ) )
+		{
+			$ItemTypeCache = & get_ItemTypeCache();
+			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
+		}
+
+		return $this->ItemType;
+	}
+
+
+	/**
+	 * Get setting of the post type
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_type_setting( $setting_name )
+	{
+		if( ! $this->get_ItemType() )
+		{ // Unknown item type
+			return false;
+		}
+
+		return $this->ItemType->get( $setting_name );
+	}
+
+
+	/**
+	 * Get custom fields of item type
+	 *
+	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @return array
+	 */
+	function get_type_custom_fields( $type = 'all' )
+	{
+		if( ! $this->get_ItemType() )
+		{ // Unknown item type
+			return array();
+		}
+
+		return $this->ItemType->get_custom_fields( $type );
+	}
+
+
+	/**
+	 * Check if item allows the statuses for the comments (closed or disabled)
+	 *
+	 * @return boolean TRUE when item can has the comment status different of 'opened'
+	 */
+	function allow_comment_statuses()
+	{
+		if( ! $this->get_type_setting( 'use_comments' ) )
+		{ // The comments are not allowed for this item type
+			return false;
+		}
+
+		if( ! $this->get_type_setting( 'allow_closing_comments' ) && ! $this->get_type_setting( 'allow_disabling_comments' ) )
+		{ // The statuses 'closed' & 'disabled' are not allowed for comments of this item type
+			return false;
+		}
+
+		$this->load_Blog();
+		if( $this->Blog->get_setting( 'allow_comments' ) == 'never' )
+		{ // The comments are not allowed by Blog
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Country is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a country for posts of current blog
+	 */
+	function country_visible()
+	{
+		return $this->get_type_setting( 'use_country' ) != 'never' || $this->region_visible();
+	}
+
+
+	/**
+	 * Region is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a region for this post
+	 */
+	function region_visible()
+	{
+		return $this->get_type_setting( 'use_region' ) != 'never' || $this->subregion_visible();
+	}
+
+
+	/**
+	 * Subregion is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a subregion for this post
+	 */
+	function subregion_visible()
+	{
+		return $this->get_type_setting( 'use_sub_region' ) != 'never' || $this->city_visible();
+	}
+
+
+	/**
+	 * City is visible for defining
+	 *
+	 * @return boolean TRUE if users can define a city for this post
+	 */
+	function city_visible()
+	{
+		return $this->get_type_setting( 'use_city' ) != 'never';
+	}
+}
 ?>

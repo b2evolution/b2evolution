@@ -70,9 +70,9 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 	global $Debuglog;
 	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true), 'skins' );
 
-	if( $this->get_path(0) == 'files'
-			|| ($this->get_path_range(0,1) == array('blogs', 'perm') )
-			|| ($this->get_path_range(0,1) == array('blogs', 'permgroup') ) )
+	if( $this->get_path( 0 ) == 'files'
+			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'perm' ) )
+			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'permgroup' ) ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 
@@ -84,7 +84,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 JS;
 			add_headline( $begin_script );
 
-			switch( $this->get_path(0) )
+			switch( $this->get_path( 0 ) )
 			{
 				case 'files':
 				/**

@@ -227,19 +227,21 @@ function create_default_data()
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
 	$DB->query( "
-		INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
-		VALUES ( 1, 'Post' ),
-					 ( 1000, 'Page' ),
-					 ( 1400, 'Intro-Front' ),
-					 ( 1500, 'Intro-Main' ),
-					 ( 1520, 'Intro-Cat' ),
-					 ( 1530, 'Intro-Tag' ),
-					 ( 1570, 'Intro-Sub' ),
-					 ( 1600, 'Intro-All' ),
-					 ( 2000, 'Podcast' ),
-					 ( 3000, 'Sidebar link' ),
-					 ( 4000, 'Advertisement' ),
-					 ( 5000, 'Reserved' ) " );
+		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html )
+		VALUES ( 1,    'Post',          'Posts',         'single', 1 ),
+					 ( 100,  'Manual Page',   'Posts',         'single', 0 ),
+					 ( 200,  'Forum Topic',   'Posts',         'single', 0 ),
+					 ( 1000, 'Page',          'Pages',         'page',   1 ),
+					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1 ),
+					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1 ),
+					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1 ),
+					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1 ),
+					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1 ),
+					 ( 1600, 'Intro-All',     'Intros',        NULL,     1 ),
+					 ( 2000, 'Podcast',       'Podcasts',      'single', 1 ),
+					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1 ),
+					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1 ),
+					 ( 5000, 'Reserved',      NULL,            NULL,     1 )" );
 	task_end();
 
 
@@ -1113,10 +1115,6 @@ function create_blog(
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
 		$Blog->set_setting( 'in_skin_editing', '1' );
-		$Blog->set_setting( 'location_country', 'required' );
-		$Blog->set_setting( 'location_region', 'required' );
-		$Blog->set_setting( 'location_subregion', 'required' );
-		$Blog->set_setting( 'location_city', 'required' );
 
 		if( $kind == 'manual' )
 		{	// Set a posts ordering by 'post_order ASC'
@@ -1135,7 +1133,6 @@ function create_blog(
 
 	if( !$allow_html )
 	{
-		$Blog->set_setting( 'allow_html_post', 0 );
 		$Blog->set_setting( 'allow_html_comment', 0 );
 	}
 
@@ -1501,11 +1498,11 @@ function create_demo_contents()
 
 	if( $install_collection_forums )
 	{ // Create categories for forums
-		$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_forums_ID, NULL, false, NULL, true );
+		$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_forums_ID, NULL, false, NULL, NULL, true );
 		$cat_forums_ann = cat_create( T_('Welcome'), $cat_forums_forum_group, $blog_forums_ID, T_('Welcome description') );
 		$cat_forums_aforum = cat_create( T_('A forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum') );
 		$cat_forums_anforum = cat_create( T_('Another forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum') );
-		$cat_forums_another_group = cat_create( T_('Another group'), 'NULL', $blog_forums_ID, NULL, false, NULL, true );
+		$cat_forums_another_group = cat_create( T_('Another group'), 'NULL', $blog_forums_ID, NULL, false, NULL, NULL, true );
 		$cat_forums_news = cat_create( T_('News'), $cat_forums_another_group, $blog_forums_ID, T_('News description') );
 		$cat_forums_bg = cat_create( T_('Background'), $cat_forums_another_group, $blog_forums_ID, T_('Background description') );
 		$cat_forums_fun = cat_create( T_('Fun'), $cat_forums_another_group, $blog_forums_ID, T_('Fun description') );
@@ -1521,11 +1518,11 @@ function create_demo_contents()
 		$cat_manual_intro = cat_create( T_('Introduction'), NULL, $blog_manual_ID, NULL, false, 10 );
 		$cat_manual_getstarted = cat_create( T_('Getting Started'), NULL, $blog_manual_ID, NULL, false, 20 );
 		$cat_manual_userguide = cat_create( T_('User Guide'), NULL, $blog_manual_ID, NULL, false, 30 );
-		$cat_manual_reference = cat_create( T_('Reference'), NULL, $blog_manual_ID, NULL, false, 40 );
+		$cat_manual_reference = cat_create( T_('Reference'), NULL, $blog_manual_ID, NULL, false, 40, 'alpha' );
 
 		$cat_manual_everyday = cat_create( T_('Collections'), $cat_manual_reference, $blog_manual_ID, NULL, false, 10 );
 		$cat_manual_advanced = cat_create( T_('Other'), $cat_manual_reference, $blog_manual_ID, NULL, false, 5 );
-		
+
 		$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 35 );
 		$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 25 );
 		$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 5 );

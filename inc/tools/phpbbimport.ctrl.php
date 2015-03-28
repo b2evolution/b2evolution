@@ -169,10 +169,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), '?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('phpBB Importer'), '?ctrl=phpbbimport' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( T_('phpBB Importer'), $admin_url.'?ctrl=phpbbimport' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

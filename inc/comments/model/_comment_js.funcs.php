@@ -213,9 +213,68 @@ function setCommentVote( id, type, vote )
 	});
 }
 
-//Delete comment
-function deleteComment( commentId, request_from )
+
+/**
+ * Edit comment
+ *
+ * @param string Action: 'form', 'update', 'cancel'
+ * @param integer Comment ID
+ */
+function edit_comment( action, comment_ID )
 {
+	var content_obj = jQuery( '#editable_comment_' + comment_ID );
+
+	if( content_obj.length == 0 )
+	{ // No container with comment text found, Exit here and allow go to by link url
+		return true;
+	}
+
+	var comment_content = '';
+	if( action == 'update' )
+	{
+		var textarea_obj = content_obj.find( 'textarea' );
+		if( textarea_obj.length == 0 )
+		{ // No textarea with content
+			return;
+		}
+		comment_content = textarea_obj.val();
+	}
+
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		data:
+		{
+			'commentid': comment_ID,
+			'action': 'edit_comment',
+			'comment_action': action,
+			'comment_content': comment_content,
+			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
+		},
+		success: function( result )
+		{
+			content_obj.html( ajax_debug_clear( result ) );
+		}
+	} );
+
+	return false;
+}
+
+
+// Delete comment
+function deleteComment( commentId, request_from, comment_type )
+{
+	if( typeof( comment_type ) == 'undefined' )
+	{
+		comment_type = 'feedback';
+	}
+
+	if( comment_type == 'meta' && ! confirm( '<?php echo TS_('You are about to delete this comment!\\nThis cannot be undone!'); ?>' ) )
+	{ // Meta comments are deleted permanently, We should confirm this
+		return false;
+	}
+
 	var divid = 'comment_' + commentId;
 	var selector = '#' + divid;
 
@@ -232,22 +291,25 @@ function deleteComment( commentId, request_from )
 	var currentpage = get_current_page();
 	var limit = get_limit();
 
-	var recycle_bin = jQuery('#recycle_bin');
-	if( recycle_bin.length > 0 && recycle_bin.html() == '' )
-	{ // Load and display a link to recycle bin
-		jQuery.ajax({
-		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
-		data:
-			{ 'action': 'get_opentrash_link',
-				'blog': '<?php echo $Blog->ID; ?>',
-				'crumb_comment': '<?php echo get_crumb('comment'); ?>',
-			},
-		success: function(result)
-			{
-				recycle_bin.replaceWith( ajax_debug_clear( result ) );
-			}
-		});
+	if( comment_type != 'meta' )
+	{ // Meta comments aren't moved into recycle bin, they are deleted permanently
+		var recycle_bin = jQuery('#recycle_bin');
+		if( recycle_bin.length > 0 && recycle_bin.html() == '' )
+		{ // Load and display a link to recycle bin
+			jQuery.ajax({
+			type: 'POST',
+			url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+			data:
+				{ 'action': 'get_opentrash_link',
+					'blog': '<?php echo $Blog->ID; ?>',
+					'crumb_comment': '<?php echo get_crumb('comment'); ?>',
+				},
+			success: function(result)
+				{
+					recycle_bin.replaceWith( ajax_debug_clear( result ) );
+				}
+			});
+		}
 	}
 
 	jQuery.ajax({
@@ -259,6 +321,7 @@ function deleteComment( commentId, request_from )
 			'action': 'delete_comment',
 			'request_from': request_from,
 			'itemid': item_id,
+			'comment_type': comment_type,
 			'statuses': statuses,
 			'expiry_status': expiry_status,
 			'currentpage': currentpage,
@@ -267,7 +330,8 @@ function deleteComment( commentId, request_from )
 		},
 	success: function(result)
 		{
-			jQuery( selector ).effect( 'transfer', { to: jQuery( '#recycle_bin' ) }, 700, function() {
+			var target_selector = ( comment_type == 'meta' ? '#comments' : '#recycle_bin' );
+			jQuery( selector ).effect( 'transfer', { to: jQuery( target_selector ) }, 700, function() {
 				delete modifieds[divid];
 				if( request_from == 'dashboard' ) {
 					updateCommentsList( divid );
@@ -433,13 +497,13 @@ function refreshComments( request_from )
 	});
 }
 
-function startRefreshComments( request_from, item_id, currentpage )
+function startRefreshComments( request_from, item_id, currentpage, comment_type )
 {
 	if( request_from == "dashboard" ) {
 		jQuery('#comments_container').slideUp('fast', refreshComments( request_from ) );
 	} else {
 		jQuery('#comments_container').fadeTo( 'slow', 0.1, function() {
-			refresh_item_comments( item_id, currentpage );
+			refresh_item_comments( item_id, currentpage, comment_type );
 		} );
 	}
 }
@@ -472,11 +536,11 @@ function get_limit()
 
 function get_show_statuses()
 {
-	if( jQuery('#only_draft') && jQuery('#only_draft').attr('checked') )
+	if( jQuery('#only_draft') && jQuery('#only_draft').is(':checked') )
 	{
 		return '(draft)';
 	}
-	else if( jQuery('#only_published') && jQuery('#only_published').attr('checked') )
+	else if( jQuery('#only_published') && jQuery('#only_published').is(':checked') )
 	{
 		return '(published)';
 	}
@@ -505,7 +569,7 @@ function get_itemid()
 	return item_id;
 }
 
-function refresh_item_comments( item_id, currentpage )
+function refresh_item_comments( item_id, currentpage, comment_type )
 {
 	var statuses = get_show_statuses();
 	var expiry_status = get_expiry_status();
@@ -519,6 +583,11 @@ function refresh_item_comments( item_id, currentpage )
 		item_id = -1;
 	}
 
+	if( typeof( comment_type ) == 'undefined' )
+	{
+		comment_type = 'feedback';
+	}
+
 	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
@@ -530,6 +599,7 @@ function refresh_item_comments( item_id, currentpage )
 				'statuses': statuses,
 				'expiry_status': expiry_status,
 				'currentpage': currentpage,
+				'comment_type': comment_type
 			},
 		success: function(result)
 		{

@@ -63,9 +63,9 @@ $Form->begin_form( '' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'tab3', $tab3 );
 	$Form->hidden( 'blog', $Blog->ID );
-	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
+	$Form->submit( array( 'submit', T_('Search'), 'search btn-info', '', 'float:right' ) );
 
-	echo '<fieldset>';
+	echo '<fieldset class="clear">';
 	echo '<legend>'.T_('Comments to show').'</legend>';
 
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!' ), array( 'redirected' ) );
@@ -194,7 +194,7 @@ $Form->begin_form( '' );
 
 	echo '</fieldset>';
 
-	$Form->submit( array( 'submit', T_('Search'), 'search' ) );
+	$Form->submit( array( 'submit', T_('Search'), 'search btn-info' ) );
 
 $Form->end_form();
 

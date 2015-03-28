@@ -102,6 +102,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
+		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_newsletter_news' => '1',
 		'def_newsletter_ads' => '0',
@@ -145,7 +146,7 @@ class GeneralSettings extends AbstractSettings
 		'webhelp_enabled' => '1',
 
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
-		'chapter_ordering' => 'alpha',
+		'chapter_ordering' => 'alpha',              // TODO: Remove this when this global setting usage were removed from everywhere
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
@@ -156,7 +157,7 @@ class GeneralSettings extends AbstractSettings
 		// Site settings
 		'system_lock' => 0,
 		'site_code' => 'b2evo',
-		'site_color' => '',
+		'site_color' => '#ff8c0f',
 		'site_footer_text' => 'Cookies are required to enable core site functionality. &copy;$year$ by $short_site_name$.',
 		'site_skins_enabled' => 1, // Enables a sitewide header and footer
 		'info_blog_ID' => 0, // Blog for info pages

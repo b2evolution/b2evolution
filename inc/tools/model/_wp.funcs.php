@@ -583,7 +583,7 @@ function wpxml_import()
 
 		// Get post types
 		$SQL = new SQL();
-		$SQL->SELECT( 'LOWER( ptyp_name ), ptyp_ID' );
+		$SQL->SELECT( 'LOWER( ityp_name ), ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
 		$post_types = $DB->get_assoc( $SQL->get() );
 
@@ -647,7 +647,7 @@ function wpxml_import()
 			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'review' );
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
-			$Item->set( 'ptyp_ID', $post_type_ID );
+			$Item->set( 'ityp_ID', $post_type_ID );
 			if( empty( $post['post_excerpt'] ) && !empty( $post['post_content'] ) )
 			{	// Generate excerpt
 				$Item->set( 'excerpt', excerpt( $post['post_content'] ) );

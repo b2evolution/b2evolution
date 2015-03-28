@@ -144,7 +144,7 @@ class sessions_Module extends Module
 				'separator' => true,
 			);
 			$entries['stats'] = array(
-				'text' => T_('Blog analytics'),
+				'text' => T_('Collection analytics'),
 				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
 				'entries' => array(
 					'summary' => array(

@@ -99,14 +99,14 @@ function get_icon_info($name)
 			'size' => array( 15, 15 ),
 			'xy' => array( 64, 0 ),
 			'glyph' => 'chevron-up',
-			'fa' => 'chevron-up'
+			'fa' => 'sort-amount-asc'
 		);
 		case 'descending': return array(    // descending sort order
 			'alt'  => /* TRANS: Short (alt tag) for "Descending" */ T_('D'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 80, 0 ),
 			'glyph' => 'chevron-down',
-			'fa' => 'chevron-down'
+			'fa' => 'sort-amount-desc'
 		);
 
 		case 'sort_desc_on': return array(
@@ -370,7 +370,7 @@ function get_icon_info($name)
 			'size' => array( 16, 15 ),
 			'xy' => array( 0, 64 ),
 			'glyph' => 'plus',
-			'fa' => 'plus-square fa-x-rollover-orange'
+			'fa' => 'plus-square'
 		);
 		case 'compose_new': return array( // for composing a new message or text
 			'rollover' => true,
@@ -378,7 +378,7 @@ function get_icon_info($name)
 			'size' => array( 16, 15 ),
 			'xy' => array( 0, 64 ),
 			'glyph' => 'pencil',			// May need something else
-			'fa' => 'pencil fa-x-rollover-orange'
+			'fa' => 'pencil'
 		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
@@ -406,7 +406,7 @@ function get_icon_info($name)
 			'size' => array( 16, 13 ),
 			'xy' => array( 64, 64 ),
 			'glyph' => 'pencil',
-			'fa' => 'list-alt'
+			'fa' => 'edit'
 		);
 		case 'publish': return array(
 			'alt'  => T_('Publish'),
@@ -431,13 +431,21 @@ function get_icon_info($name)
 			'glyph' => 'screenshot',
 			'fa' => 'bullseye'
 		);
+		case 'recycle': return array(
+			'alt'  => T_('Recycle'),
+			'legend' => T_('Recycle'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 128, 64 ),
+			'glyph' => 'remove',
+			'fa' => 'recycle fa-x-rollover-red-light'
+		);
 		case 'delete': return array(
 			'alt'  => T_('Del'),
 			'legend' => T_('Delete'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 128, 64 ),
 			'glyph' => 'remove',
-			'fa' => 'recycle fa-x-rollover-red-light'
+			'fa' => 'trash-o fa-x-rollover-red-light'
 		);
 		case 'close': return array(
 			'rollover' => true,
@@ -445,7 +453,7 @@ function get_icon_info($name)
 			'size' => array( 14, 14 ),
 			'xy' => array( 0, 224 ),
 			'glyph' => 'remove-sign',
-			'fa' => 'times-circle fa-x-rollover-red-light'
+			'fa' => 'close fa-x-rollover-red-light'
 		);
 		case 'xross': return array(
 			'alt'  => T_('Del'),
@@ -563,8 +571,8 @@ function get_icon_info($name)
 			/* TRANS: Link + space => verb (not noun) */ 'alt' => T_('Link '),
 			'size' => array( 14, 14 ),
 			'xy' => array( 96, 96 ),
-			'glyph' => 'resize-small',
-			'fa' => 'link'
+			'glyph' => 'paperclip',
+			'fa' => 'paperclip'
 		);
 		case 'unlink': return array(
 			'alt'  => T_('Unlink'),

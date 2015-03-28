@@ -1241,7 +1241,7 @@ class Results extends Table
 
 				$out = eval( "return '$output';" );
 				// fp> <input> is needed for checkboxes in the Blog User/Group permissions table > advanced
-				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
+				echo ( trim(strip_tags($out,'<img><input><span>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
 				$this->display_col_end();
@@ -1398,21 +1398,22 @@ class Results extends Table
 	 */
 	function display_nav( $template )
 	{
-		if( empty($this->limit) && isset($this->params[$template.'_text_no_limit']) )
-		{	// No LIMIT (there's always only one page)
+		if( empty( $this->limit ) && isset( $this->params[$template.'_text_no_limit'] ) )
+		{ // No LIMIT (there's always only one page)
 			$navigation = $this->params[$template.'_text_no_limit'];
 		}
 		elseif( ( $this->total_pages <= 1 ) )
-		{	// Single page (we probably don't want to show navigation in this case)
+		{ // Single page (we probably don't want to show navigation in this case)
 			$navigation = $this->replace_vars( $this->params[$template.'_text_single'] );
 		}
 		else
-		{	// Several pages
+		{ // Several pages
 			$navigation = $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
-		if( !empty( $navigation ) )
-		{	// Display navigation
+		$navigation_text = trim( strip_tags( $navigation ) );
+		if( ! empty( $navigation_text ) )
+		{ // Display navigation only when it is really filled with some text
 			echo $this->params[$template.'_start'];
 
 			echo $navigation;
@@ -2080,7 +2081,7 @@ class Results extends Table
 		$html = '<small>';
 		$html .= T_('Lines per page:');
 
-		$html .= ' <select name="'.$this->limit_param.'" onchange="location.href=\''.regenerate_url( $this->page_param.','.$this->limit_param, $this->limit_param, $page_url ).'=\'+this.value" class="form-control">';
+		$html .= ' <select name="'.$this->limit_param.'" onchange="location.href=\''.regenerate_url( $this->page_param.','.$this->limit_param, $this->limit_param, $page_url ).'=\'+this.value" class="form-control input-sm">';
 		foreach( $page_size_options as $value => $name )
 		{
 			$selected = '';
@@ -2110,7 +2111,11 @@ class Results extends Table
 		$page_next_i = $this->page + 1;
 		for( $i=$min; $i<=$max; $i++)
 		{
-			if( isset( $this->params['page_item_before'] ) )
+			if( $i == $this->page && isset( $this->params['page_item_current_before'] ) )
+			{
+				$list .= $this->params['page_item_current_before'];
+			}
+			elseif( isset( $this->params['page_item_before'] ) )
 			{
 				$list .= $this->params['page_item_before'];
 			}
@@ -2147,7 +2152,11 @@ class Results extends Table
 				$list .= '>'.$i.'</a>';
 			}
 
-			if( isset( $this->params['page_item_after'] ) )
+			if( $i == $this->page && isset( $this->params['page_item_current_after'] ) )
+			{
+				$list .= $this->params['page_item_current_after'];
+			}
+			elseif( isset( $this->params['page_item_after'] ) )
 			{
 				$list .= $this->params['page_item_after'];
 			}

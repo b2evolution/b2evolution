@@ -50,6 +50,6 @@ $Form->begin_form( 'fform', T_('Delete') );
 	$Form->end_fieldset();
 
 $Form->end_form( array(
-		array( 'submit', 'submit', T_('Delete'), 'DeleteButton' ) ) );
+		array( 'submit', 'submit', T_('Delete'), 'DeleteButton btn-danger' ) ) );
 
 ?>

@@ -847,9 +847,9 @@ function create_relations()
 											references T_items__status (pst_ID)
 											on delete restrict
 											on update restrict,
-								add constraint FK_post_ptyp_ID
-											foreign key (post_ptyp_ID)
-											references T_items__type (ptyp_ID)
+								add constraint FK_post_ityp_ID
+											foreign key (post_ityp_ID)
+											references T_items__type (ityp_ID)
 											on delete restrict
 											on update restrict' );
 

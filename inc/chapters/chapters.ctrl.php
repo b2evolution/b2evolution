@@ -455,26 +455,12 @@ switch( $action )
 /**
  * Display page header, menus & messages:
  */
-$AdminUI->set_coll_list_params( 'blog_cats', 'edit',
-		array( 'ctrl' => $ctrl ),	NULL );
+$AdminUI->set_coll_list_params( 'blog_cats', 'edit', array( 'ctrl' => $ctrl ) );
 
+$AdminUI->set_path( 'collections', 'categories' );
 
-/**
- * We need make this call to build menu for all modules
- */
-$AdminUI->set_path( 'items' );
-
-/*
- * Add sub menu entries:
- * We do this here instead of _header because we need to include all filter params into regenerate_url()
- */
-attach_browse_tabs();
-
-$AdminUI->set_path( 'items', 'settings', 'chapters' );
-
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Contents'), 'url' => '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' ) );
-$AdminUI->breadcrumbpath_add( T_('Content settings'), '?ctrl=chapters&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Categories'), '?ctrl=chapters&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_add( T_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
 
 $AdminUI->set_page_manual_link( 'categories-tab' );
 
@@ -544,7 +530,7 @@ switch( $action )
 		}
 		else
 		{
-			$AdminUI->disp_view( 'generic/_generic_category.form.php' );
+			$AdminUI->disp_view( 'generic/views/_generic_category.form.php' );
 		}
 
 		// End payload block:

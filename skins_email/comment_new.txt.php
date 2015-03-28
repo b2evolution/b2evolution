@@ -32,9 +32,20 @@ $Comment = $params['Comment'];
 $Blog = $params['Blog'];
 $Item = $params['Item'];
 
+if( $params['notify_type'] == 'meta_comment' )
+{ // Meta comment
+	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
+}
+else
+{ // Normal comment
+	$info_text = T_( '%s posted a new comment on %s in %s.' );
+}
+$notify_message = sprintf( $info_text, $params['author_name'], '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+
 if( $params['notify_full'] )
-{	// Long format notification:
-	$notify_message = T_('New comment').': '
+{ // Long format notification:
+	$notify_message .=
+		( $params['notify_type'] == 'meta_comment' ? T_('New meta comment') : T_('New comment') ).': '
 		.$Comment->get_permanent_url( '&' )."\n"
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 		.T_('Blog').': '.$Blog->get('shortname')."\n"
@@ -99,8 +110,7 @@ if( $params['notify_full'] )
 	}
 }
 else
-{	// Shot format notification:
-	$notify_message = sprintf( T_( '%s posted a new comment on %s in %s.' ), $params['author_name'], '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+{ // Shot format notification:
 	$notify_message .= T_( 'To read the full content of the comment click here:' ).' '
 					.$Comment->get_permanent_url( '&' )."\n";
 					// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
@@ -117,36 +127,49 @@ $notify_message .= "\n\n";
 
 // add unsubscribe and edit links
 $params['unsubscribe_text'] = '';
-if( $params['notify_type'] == 'moderator' )
-{ // moderation email
-	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
-	{ // quick moderation is permitted, and comment secret was set
-		$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
-	}
-	$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
-	$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n";
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
-						.$htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
-}
-else if( $params['notify_type'] == 'blog_subscription' )
-{ // blog subscription
-	$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' )."\n";
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
-						.$htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
-	// subscribers are not allowed to see comment author email
-}
-else if( $params['notify_type'] == 'item_subscription' )
-{ // item subscription
-	$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n";
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
-						.$htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
-	// subscribers are not allowed to see comment author email
-}
-else if( $params['notify_type'] == 'creator' )
-{ // user is the creator of the post
-	$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' )."\n";
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).': '
-						.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$';
+switch( $params['notify_type'] )
+{
+	case 'moderator':
+		// moderation email
+		if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
+		{ // quick moderation is permitted, and comment secret was set
+			$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
+		}
+		$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
+		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
+	case 'blog_subscription':
+		// blog subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'item_subscription':
+		// item subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'creator':
+		// user is the creator of the post
+		$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
+	case 'meta_comment':
+		// meta comment subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
+			.$htsrv_url.'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
 }
 
 echo $notify_message;

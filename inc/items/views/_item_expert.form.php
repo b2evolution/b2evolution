@@ -33,10 +33,14 @@ global $Plugins;
  * @var GeneralSettings
  */
 global $Settings;
+/**
+ * @var UserSettings
+ */
+global $UserSettings;
 
 global $pagenow;
 
-global $Session, $evo_charset;
+global $Session;
 
 global $mode, $admin_url, $rsc_url;
 global $post_comment_status, $trackback_url, $item_tags;
@@ -46,6 +50,9 @@ global $redirect_to;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
+
+// Used to mark the required fields (in non-standard template)
+$required_star = '<span class="label_field_required">*</span>';
 
 $Form = new Form( NULL, 'item_checkchanges', 'post' );
 $Form->labelstart = '<strong>';
@@ -82,6 +89,8 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'more', 1 );
 	$Form->hidden( 'preview_userid', $current_User->ID );
 
+	// Item type
+	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 ?>
 <div class="row">
 
@@ -135,32 +144,38 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
+	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
+	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
 
 	$Form->switch_layout( 'none' );
 
-	echo '<table cellspacing="0" class="compose_layout"><tr>';
-	$display_title_field = $Blog->get_setting('require_title') != 'none';
+	echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
+	$display_title_field = $edited_Item->get_type_setting( 'use_title' ) != 'never';
 	if( $display_title_field )
-	{
-		echo '<td width="1%"><strong>'.T_('Title').':</strong></td>';
+	{ // Display title
+		$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
+		echo '<td width="1%">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
 		echo '<td width="97%" class="input">';
-		$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;', 'required' => $Blog->get_setting('require_title') == 'required') );
+		$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td>';
+	}
+	else
+	{ // Hide title
+		$Form->hidden( 'post_title', $item_title );
 	}
 
 	// -- Language chooser BEGIN --
 	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
 
-	if ( is_array( $locale_options ) )
-	{	// We've only one enabled locale.
+	if( is_array( $locale_options ) )
+	{ // We've only one enabled locale.
 		// Tblue> The locale name is not really needed here, but maybe we
 		//        want to display the name of the only locale?
 		$Form->hidden( 'post_locale', $locale_options[0] );
 		//pre_dump( $locale_options );
 	}
 	else
-	{	// More than one locale => select field.
+	{ // More than one locale => select field.
 		echo '<td width="1%">';
 		if( $display_title_field )
 		{
@@ -174,47 +189,57 @@ $Form->begin_form( '', '', $params );
 	// -- Language chooser END --
 	echo '</tr></table>';
 
-	echo '<table cellspacing="0" class="compose_layout"><tr>';
-	echo '<td width="1%"><strong>'.T_('Link to url').':</strong></td>';
-	echo '<td class="input">';
-	$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td>';
-	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
-	echo '<td width="1%" class="select">';
-	$ItemTypeCache = & get_ItemTypeCache();
-	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache,
-								'', '', false, '', 'get_option_list_usable_only' );
-	echo '</td>';
+	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
+	{ // Display url
+		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
+		echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
+		echo '<td width="1%">'.$field_required.'<strong>'.T_('Link to url').':</strong></td>';
+		echo '<td class="input" style="padding-right:2px">';
+		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+		echo '</td>';
+		echo '</tr></table>';
+	}
+	else
+	{ // Hide url
+		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+	}
 
-	echo '</tr></table>';
+	$Form->switch_layout( NULL );
 
- 	$Form->switch_layout( NULL );
+	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{ // Display text
+		// --------------------------- TOOLBARS ------------------------------------
+		echo '<div class="edit_toolbars">';
+		// CALL PLUGINS NOW:
+		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+				'target_type' => 'Item',
+				'edit_layout' => 'expert',
+				'Item' => $edited_Item,
+			) );
+		echo '</div>';
 
-	// --------------------------- TOOLBARS ------------------------------------
-	echo '<div class="edit_toolbars">';
-	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-			'target_type' => 'Item',
-			'edit_layout' => 'expert',
-			'Item' => $edited_Item,
-		) );
-	echo '</div>';
+		// ---------------------------- TEXTAREA -------------------------------------
+		$Form->fieldstart = '<div class="edit_area">';
+		$Form->fieldend = "</div>\n";
+		$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames' ) );
+		?>
+		<script type="text/javascript" language="JavaScript">
+			<!--
+			// This is for toolbar plugins
+			var b2evoCanvas = document.getElementById('itemform_post_content');
+			// -->
+		</script>
 
-	// ---------------------------- TEXTAREA -------------------------------------
-	$Form->fieldstart = '<div class="edit_area">';
-	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames' ) );
+	<?php
+	}
+	else
+	{ // Hide text
+		$Form->hidden( 'content', $item_content );
+	}
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
-	?>
-	<script type="text/javascript" language="JavaScript">
-		<!--
-		// This is for toolbar plugins
-		var b2evoCanvas = document.getElementById('itemform_post_content');
-		// -->
-	</script>
 
-	<?php // ------------------------------- ACTIONS ----------------------------------
+	// ------------------------------- ACTIONS ----------------------------------
 	echo '<div class="edit_actions">';
 
 	// CALL PLUGINS NOW:
@@ -240,18 +265,22 @@ $Form->begin_form( '', '', $params );
 
 	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
-	// CUSTOM FIELDS varchar
 	echo '<table cellspacing="0" class="compose_layout">';
-	$field_count = $Blog->get_setting( 'count_custom_varchar' );
-	for( $i = 1 ; $i <= $field_count; $i++ )
-	{ // Loop through custom varchar fields
-		$field_guid = $Blog->get_setting( 'custom_varchar'.$i );
-		$field_name = $Blog->get_setting( 'custom_varchar_'.$field_guid );
-		// Display field
-		echo '<tr><td class="label"><label for="item_varchar_'.$field_guid.'"><strong>'.$field_name.':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'item_varchar_'.$field_guid, $edited_Item->get_setting( 'custom_varchar_'.$field_guid ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td></tr>';
+
+	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
+	{ // All CUSTOM FIELDS are hidden by item type
+		display_hidden_custom_fields( $Form, $edited_Item );
+	}
+	else
+	{ // CUSTOM FIELDS varchar
+		$custom_fields = $edited_Item->get_type_custom_fields( 'varchar' );
+		foreach( $custom_fields as $custom_field )
+		{ // Loop through custom varchar fields
+			echo '<tr><td class="label"><label for="item_varchar_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
+			echo '<td class="input" width="97%">';
+			$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+			echo '</td></tr>';
+		}
 	}
 
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
@@ -280,38 +309,85 @@ $Form->begin_form( '', '', $params );
 	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$tiny_slug_info, array('maxlength'=>210, 'style'=>'width: 100%;') );
 	echo '</td></tr>';
 
-	echo '<tr><td class="label"><label for="titletag"><strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
-	echo '<td class="input" width="97%">';
-	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td></tr>';
+	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
+	{ // Display <title> tag
+		$field_required = ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="titletag">'.$field_required.'<strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide <title> tag
+		$Form->hidden( 'titletag', $edited_Item->get('titletag') );
+	}
 
-	echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;"><strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
-	echo '<td class="input" width="97%">';
-	$Form->text_input( 'metadesc', $edited_Item->get_setting('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td></tr>';
+	if( $edited_Item->get_type_setting( 'use_meta_desc' ) != 'never' )
+	{ // Display <meta> description
+		$field_required = ( $edited_Item->get_type_setting( 'use_meta_desc' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;">'.$field_required.'<strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'metadesc', $edited_Item->get_setting('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide <meta> description
+		$Form->hidden( 'metadesc', $edited_Item->get_setting('metadesc') );
+	}
 
-	echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
-	echo '<td class="input" width="97%">';
-	$Form->text_input( 'metakeywords', $edited_Item->get_setting('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td></tr>';
+	if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
+	{ // Display <meta> keywords
+		$field_required = ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;">'.$field_required.'<strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'metakeywords', $edited_Item->get_setting('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide <meta> keywords
+		$Form->hidden( 'metakeywords', $edited_Item->get_setting('metakeywords') );
+	}
 
-	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong></label></td>';
-	echo '<td class="input" width="97%">';
-	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td></tr>';
+	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
+	{ // Display tags
+		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').'</strong></label> '
+			// Checkbox to suggest tags
+			.'<span title="'.format_to_output( T_('Check this to let b2evolution auto-suggest tags as you type, based on the tags existing on other posts.'), 'htmlattr' ).'">'
+				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
+				.'<label for="suggest_item_tags"><strong>'.T_('suggest').':</strong></label>'
+			.'</span>'
+		.'</td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'item_tags', $item_tags, 40, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide tags
+		$Form->hidden( 'item_tags', $item_tags );
+	}
 
 	echo '</table>';
 
 	$edited_Item_excerpt = $edited_Item->get('excerpt');
+	if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
+	{ // Display excerpt
+		$field_required = ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ) ? $required_star : '';
+		$field_class = param_has_error( 'post_excerpt' ) ? ' field_error' : '';
 	?>
 
 	<div id="itemform_post_excerpt" class="edit_fieldgroup">
-		<label for="post_excerpt"><strong><?php echo T_('Excerpt') ?>:</strong>
+		<label for="post_excerpt"><?php echo $field_required; ?><strong><?php echo T_('Excerpt') ?>:</strong>
 		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
-		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input" id="post_excerpt"><?php echo htmlspecialchars( $edited_Item_excerpt, NULL, $evo_charset ) ?></textarea>
+		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input<?php echo $field_class; ?>" id="post_excerpt"><?php echo htmlspecialchars( $edited_Item_excerpt ) ?></textarea>
 	</div>
 
 	<?php
+	}
+	else
+	{ // Hide excerpt
+		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_Item_excerpt ) );
+	}
 
 	if( $edited_Item->get('excerpt_autogenerated') )
 	{ // store hash of current post_excerpt to detect if it was changed.
@@ -367,7 +443,14 @@ $Form->begin_form( '', '', $params );
 
 	$Form->switch_layout( 'linespan' );
 
-	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+	if( $edited_Item->get_type_setting( 'allow_featured' ) )
+	{ // Display featured
+		$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+	}
+	else
+	{ // Hide featured
+		$Form->hidden( 'item_featured', $edited_Item->featured );
+	}
 
 	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
 
@@ -392,26 +475,26 @@ $Form->begin_form( '', '', $params );
 		echo '</td></tr>';
 	}
 
-	if( $Blog->get_setting( 'show_location_coordinates' ) )
+	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	{ // Dispaly Latitude & Longitude settings
-		echo '<tr><td><strong>'.T_('Latitude').':</strong></td><td>';
+		$field_required = ( $edited_Item->get_type_setting( 'use_coordinates' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td>'.$field_required.'<strong>'.T_('Latitude').':</strong></td><td>';
 		$Form->text( 'item_latitude', $edited_Item->get_setting( 'latitude' ), 10, '' );
 		echo '</td></tr>';
-		echo '<tr><td><strong>'.T_('Longitude').':</strong></td><td>';
+		echo '<tr><td>'.$field_required.'<strong>'.T_('Longitude').':</strong></td><td>';
 		$Form->text( 'item_longitude', $edited_Item->get_setting( 'longitude' ), 10, '' );
 		echo '</td></tr>';
 	}
 
-	// CUSTOM FIELDS double
-	$field_count = $Blog->get_setting( 'count_custom_double' );
-	for( $i = 1 ; $i <= $field_count; $i++ )
-	{ // Loop through custom double fields
-		$field_guid = $Blog->get_setting( 'custom_double'.$i );
-		$field_name = $Blog->get_setting( 'custom_double_'.$field_guid );
-		// Display field
-		echo '<tr><td><strong>'.$field_name.':</strong></td><td>';
-		$Form->text( 'item_double_'.$field_guid, $edited_Item->get_setting( 'custom_double_'.$field_guid ), 10, '', T_('can be decimal') );
-		echo '</td></tr>';
+	if( $edited_Item->get_type_setting( 'use_custom_fields' ) )
+	{ // Display CUSTOM FIELDS double only when its are allowed by item type setting
+		$custom_fields = $edited_Item->get_type_custom_fields( 'double' );
+		foreach( $custom_fields as $custom_field )
+		{ // Loop through custom double fields
+			echo '<tr><td><strong>'.$custom_field['label'].':</strong></td><td>';
+			$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', T_('can be decimal') );
+			echo '</td></tr>';
+		}
 	}
 
 	echo '</table>';
@@ -444,25 +527,43 @@ $Form->begin_form( '', '', $params );
 
 	// ################### COMMENT STATUS ###################
 
-	if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
+	if( $edited_Item->allow_comment_statuses() )
 	{
 		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments', 'fold' => true ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Open') ?></label><br />
-
+		<?php
+		if( $edited_Item->get_type_setting( 'allow_closing_comments' ) )
+		{ // Allow closing comments
+		?>
 			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="closed" class="checkbox" <?php if( $post_comment_status == 'closed' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Closed') ?></label><br />
+		<?php
+		}
 
+		if( $edited_Item->get_type_setting( 'allow_disabling_comments' ) )
+		{ // Allow disabling comments
+		?>
 			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
+		}
 
-		$Form->switch_layout( 'table' );
-		$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
-							array( 'minutes_step' => 1, 'required' => false, 'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
-		$Form->switch_layout( NULL );
+		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
+		{ // Display comment expiration
+			$Form->switch_layout( 'table' );
+			$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
+							array( 'minutes_step' => 1,
+								'required' => $edited_Item->get_type_setting( 'use_comment_expiration' ) == 'required',
+								'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
+			$Form->switch_layout( NULL );
+		}
+		else
+		{ // Hide comment expiration
+			$Form->hidden( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ) );
+		}
 
 		$Form->end_fieldset();
 	}
@@ -532,7 +633,7 @@ $Form->end_form();
 // ####################### JS BEHAVIORS #########################
 echo_publishnowbutton_js();
 echo_link_files_js();
-echo_autocomplete_tags( $edited_Item->get_tags() );
+echo_autocomplete_tags();
 if( empty( $edited_Item->ID ) )
 { // if we creating new post - we add slug autofiller JS
 	echo_slug_filler();
@@ -543,9 +644,8 @@ else
 }
 // New category input box:
 echo_onchange_newcat();
-$edited_Item->load_Blog();
 // Location
-echo_regional_js( 'item', $edited_Item->Blog->region_visible() );
+echo_regional_js( 'item', $edited_Item->region_visible() );
 // Item type
 echo_onchange_item_type_js();
 // Goal

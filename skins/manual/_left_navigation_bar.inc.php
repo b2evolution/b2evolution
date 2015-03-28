@@ -26,6 +26,9 @@ global $Settings, $Session;
 				// The following params will be used as defaults for widgets included in this container:
 				'block_title_start'   => '',
 				'block_title_end'     => '',
+				// Widget 'Content Hierarchy':
+				'expand_all'           => false,
+				'sorted'               => true
 			) );
 		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 	?>

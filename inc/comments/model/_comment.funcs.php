@@ -78,7 +78,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'comments'   => $statuses_array,
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
-						'feedbacks'  => $statuses_array
+						'feedbacks'  => $statuses_array,
+						'metas'      => $statuses_array
 					);
 			}
 
@@ -93,11 +94,14 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				// Total for type on post:
 				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
-				// Total for status on post:
-				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+				if( $row->comment_type != 'meta' )
+				{ // Exclude meta comments from feedbacks
+					// Total for status on post:
+					$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
-				// Total for post:
-				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
+					// Total for post:
+					$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
+				}
 			}
 		}
 	}
@@ -113,10 +117,11 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 
 		// Initializes post to nocount!
 		$cache_ctp_number[$filter_index][intval($post_id)] = array(
-				'comments' => $statuses_array,
+				'comments'   => $statuses_array,
 				'trackbacks' => $statuses_array,
-				'pingbacks' => $statuses_array,
-				'feedbacks' => $statuses_array
+				'pingbacks'  => $statuses_array,
+				'feedbacks'  => $statuses_array,
+				'metas'      => $statuses_array
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -129,15 +134,18 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			// Total for type on post:
 			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
-			// Total for status on post:
-			$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+			if( $row->comment_type != 'meta' )
+			{ // Exclude meta comments from feedbacks
+				// Total for status on post:
+				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
-			// Total for post:
-			$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
+				// Total for post:
+				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks']['total'] += $row->type_count;
+			}
 		}
 	}
 
-	if( ($mode != 'comments') && ($mode != 'trackbacks') && ($mode != 'pingbacks') )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
 	{
 		$mode = 'feedbacks';
 	}
@@ -291,7 +299,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	$Form->submit( array(
 		'actionArray[update_publish]',
 		$publish_text,
-		'SaveButton',
+		'SaveButton btn-status-published',
 		'',
 		$publish_style
 	) );
@@ -494,7 +502,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 		$show_recycle_bin = ( $DB->get_var( $SQL->get() ) > 0 );
 	}
 
-	$result = '<div id="recycle_bin">';
+	$result = '<div id="recycle_bin" class="floatright">';
 	if( $show_recycle_bin )
 	{ // show "Open recycle bin"
 		global $CommentList;
@@ -504,7 +512,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 			$comment_list_param_prefix = $CommentList->param_prefix;
 		}
 		$result .= '<span class="floatright">'.action_icon( T_('Open recycle bin'), 'recycle_full',
-						$admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3 ).'</span> ';
+						$admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3, array( 'class' => 'action_icon btn btn-default btn-sm' ) ).'</span> ';
 	}
 	return $result.'</div>';
 }
@@ -1028,7 +1036,7 @@ function comments_results_block( $params = array() )
 
 	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
-		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
+		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'recycle', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
 
 	// Initialize Results object
@@ -1436,7 +1444,7 @@ function comment_edit_actions( $Comment )
 				$title = T_('Recycle this comment!');
 			}
 
-			$r .=  action_icon( $title, 'delete',
+			$r .=  action_icon( $title, 'recycle',
 				$admin_url.'?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=delete&amp;'.url_crumb('comment')
 				.'&amp;redirect_to='.$redirect_to, NULL, NULL, NULL, $params );
 		}

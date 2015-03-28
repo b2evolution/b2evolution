@@ -298,21 +298,21 @@ if( empty($tab) )
 	}
 }
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 switch( $tab3 )
 {
 	case 'import':
-		$AdminUI->breadcrumbpath_add( T_('Import'), '?ctrl=tools&amp;tab3=import' );
+		$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 		break;
 
 	case 'test':
-		$AdminUI->breadcrumbpath_add( T_('Testing'), '?ctrl=tools&amp;tab3=import' );
+		$AdminUI->breadcrumbpath_add( T_('Testing'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 		break;
 
 	case 'tools':
 	default:
-		$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=tools' );
+		$AdminUI->breadcrumbpath_add( T_('Tools'), $admin_url.'?ctrl=tools' );
 		break;
 }
 

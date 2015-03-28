@@ -22,18 +22,37 @@ global $current_User;
 
 global $dispatcher, $allow_evo_stats, $blog;
 
+
+if( empty( $_GET['blog'] ) )
+{ // Use dashboard for selected blog only from GET request
+	$blog = 0;
+	unset( $Blog );
+}
+
 if( $blog )
-{
+{ // Collection dashboard
 	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
-	{	// We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
+	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
 		unset( $Blog );
 	}
+
+	$AdminUI->set_path( 'collections', 'dashboard' );
+
+	// Init params to display a panel with blog selectors
+	$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'dashboard' ) );
+
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_add( T_('Collection Dashboard'), $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
 }
+else
+{ // Site dashboard
+	$AdminUI->set_path( 'site', 'dashboard' );
 
-$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), '?blog=0' );
-
-$AdminUI->set_path( 'dashboard' );
+	$AdminUI->breadcrumbpath_init( false );
+	$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+	$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+}
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 require_js( '#jqueryUI#' );
@@ -48,7 +67,13 @@ require_js_helper( 'colorbox' );
 require_js( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Dashboard'), 'url' => '?ctrl=dashboard' ) );
+if( empty( $blog ) )
+{ // Init JS to quick edit an order of the blogs in the table cell by AJAX
+	init_field_editor_js( array(
+			'field_prefix' => 'order-blog-',
+			'action_url' => $ReqURI.'&order_action=update&order_data=',
+		) );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -57,7 +82,7 @@ $AdminUI->disp_html_head();
 $AdminUI->disp_body_top();
 
 if( $blog )
-{	// We want to look at a specific blog:
+{ // We want to look at a specific blog:
 
 	// load dashboard functions
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
@@ -221,7 +246,7 @@ if( $blog )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton btn btn-default',
+					'class'     => 'ActionButton btn btn-primary',
 					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 			echo '</div>';
@@ -248,7 +273,7 @@ if( $blog )
 					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
 				) );
 
-			echo '<span class="small">'.htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset ).'</span>';
+			echo htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset );
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
@@ -364,8 +389,7 @@ if( $blog )
 	echo '</div>'."\n";
 }
 else
-{	// We're on the GLOBAL tab...
-
+{ // We're on the GLOBAL tab...
 	$AdminUI->disp_payload_begin();
 	// Display blog list VIEW:
 	$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );

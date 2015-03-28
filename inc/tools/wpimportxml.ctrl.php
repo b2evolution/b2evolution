@@ -64,10 +64,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), '?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), '?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), '?ctrl=wpimportxml' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

@@ -218,7 +218,7 @@ function syslog_object_link( $object_type, $object_ID )
 			{
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{ // Current user has permission to edit this item
-					$link = '<a href="'.$admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'">'.$Item->title.'</a>';
+					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->title.'</a>';
 				}
 			}
 			else

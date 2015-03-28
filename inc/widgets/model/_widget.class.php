@@ -365,13 +365,17 @@ class ComponentWidget extends DataObject
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
 		{
-			if( isset( $parmeta['defaultvalue'] ) )
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' )
 			{
-				$widget_defaults[ $parname ] = $parmeta['defaultvalue'];
+				$widget_defaults[ $parname ] = array();
+				foreach( $parmeta['options'] as $parmeta_option )
+				{
+					$widget_defaults[ $parname ][ $parmeta_option[0] ] = $parmeta_option[2];
+				}
 			}
 			else
 			{
-				$widget_defaults[ $parname ] = NULL;
+				$widget_defaults[ $parname ] = ( isset( $parmeta['defaultvalue'] ) ) ? $parmeta['defaultvalue'] : NULL;
 			}
 		}
 

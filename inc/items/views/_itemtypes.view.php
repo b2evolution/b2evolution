@@ -13,9 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'items/model/_itemtype.class.php', 'ItemType' );
-
-global $dispatcher;
 
 // Create query
 $SQL = new SQL();
@@ -23,13 +20,13 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_items__type' );
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'ptyp_' );
+$Results = new Results( $SQL->get(), 'ityp_' );
 
 $Results->title = T_('Item/Post/Page types');
 
-// get reserved ids
-global $reserved_ids;
-$reserved_ids = ItemType::get_reserved_ids();
+// get reserved and default ids
+global $default_ids;
+$default_ids = ItemType::get_default_ids();
 
 /**
  * Callback to build possible actions depending on item type id
@@ -37,16 +34,21 @@ $reserved_ids = ItemType::get_reserved_ids();
  */
 function get_actions_for_itemtype( $id )
 {
-	global $reserved_ids;
+	global $default_ids;
 	$action = action_icon( T_('Duplicate this item type...'), 'copy',
-										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=new') );
-	if( ($id < $reserved_ids[0]) || ($id > $reserved_ids[1]) )
-	{ // not reserved id
+										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
+
+	if( ! ItemType::is_reserved( $id ) )
+	{ // Edit all item types except of not reserved item type
 		$action = action_icon( T_('Edit this item type...'), 'edit',
-										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=edit') )
-							.$action
-							.action_icon( T_('Delete this item type!'), 'delete',
-										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
+										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
+							.$action;
+	}
+
+	if( ! ItemType::is_special( $id ) && ! in_array( $id, $default_ids ) )
+	{ // Delete only the not reserved and not default item types
+		$action .= action_icon( T_('Delete this item type!'), 'delete',
+									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
 	}
 	return $action;
 }
@@ -57,11 +59,9 @@ function get_actions_for_itemtype( $id )
  */
 function get_name_for_itemtype( $id, $name )
 {
-	global $reserved_ids;
-
-	if( ($id < $reserved_ids[0]) || ($id > $reserved_ids[1]) )
-	{	// not reserved id
-		$ret_name = '<strong><a href="'.regenerate_url( 'action,ID', 'ptyp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a></strong>';
+	if( ! ItemType::is_reserved( $id ) )
+	{ // not reserved id
+		$ret_name = '<strong><a href="'.regenerate_url( 'action,ID', 'ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a></strong>';
 	}
 	else
 	{
@@ -73,16 +73,23 @@ function get_name_for_itemtype( $id, $name )
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
-		'order' => 'ptyp_ID',
+		'order' => 'ityp_ID',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'td' => '$ptyp_ID$',
+		'td' => '$ityp_ID$',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'order' => 'ptyp_name',
-		'td' => '%get_name_for_itemtype(#ptyp_ID#, #ptyp_name#)%',
+		'order' => 'ityp_name',
+		'td' => '%get_name_for_itemtype(#ityp_ID#, #ityp_name#)%',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Template name'),
+		'order' => 'ityp_template_name',
+		'td' => '$ityp_template_name$',
+		'th_class' => 'shrinkwrap',
 	);
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -91,7 +98,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%get_actions_for_itemtype( #ptyp_ID# )%',
+							'td' => '%get_actions_for_itemtype( #ityp_ID# )%',
 						);
 
 	$Results->global_icon( T_('Create a new element...'), 'new',

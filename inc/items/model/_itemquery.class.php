@@ -583,16 +583,16 @@ class ItemQuery extends SQL
 
 		if( $types == '-' )
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
-			$this->WHERE_and( $this->dbprefix.'ptyp_ID IS NULL' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
 		}
 		elseif( substr( $types, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
-			$this->WHERE_and( '( '.$this->dbprefix.'ptyp_ID IS NULL
-			                  OR '.$this->dbprefix.'ptyp_ID NOT IN ('.substr( $types, 1 ).') )' );
+			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
+			                  OR '.$this->dbprefix.'ityp_ID NOT IN ('.substr( $types, 1 ).') )' );
 		}
 		else
 		{
-			$this->WHERE_and( $this->dbprefix.'ptyp_ID IN ('.$types.')' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IN ('.$types.')' );
 		}
 	}
 

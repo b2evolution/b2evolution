@@ -625,15 +625,7 @@ div.item_location {
 }
 
 // Not published comments display
-#styled_content_block .status_draft,
-#styled_content_block .status_review,
-#styled_content_block .status_community,
-#styled_content_block .status_protected,
-#styled_content_block .status_private,
-#styled_content_block .status_published,
-#styled_content_block .status_deprecated,
-#styled_content_block .status_redirected,
-#styled_content_block .status_meta {
+#styled_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -675,23 +667,15 @@ div.item_location {
 	background-color: #663399;
 }
 .note.status_trash span {
-	color: #f00;
-	background-color: #FFAAAA;
+	color: #fff;
+	background-color: #f66;
 }
 .note.status_meta span {
 	color: #fff;
 	background-color: #5133ab;
 }
 
-#styled_content_block .status_draft span,
-#styled_content_block .status_review span,
-#styled_content_block .status_community span,
-#styled_content_block .status_protected span,
-#styled_content_block .status_private span,
-#styled_content_block .status_published span,
-#styled_content_block .status_deprecated span,
-#styled_content_block .status_redirected span,
-#styled_content_block .status_meta span {
+#styled_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -729,15 +713,7 @@ div.results .status_meta span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block .status_draft span,
-	#styled_content_block .status_review span,
-	#styled_content_block .status_community span,
-	#styled_content_block .status_protected span,
-	#styled_content_block .status_private span,
-	#styled_content_block .status_published span,
-	#styled_content_block .status_deprecated span,
-	#styled_content_block .status_redirected span,
-	#styled_content_block .status_meta span {
+	#styled_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}

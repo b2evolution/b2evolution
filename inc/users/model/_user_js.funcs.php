@@ -51,8 +51,9 @@ for(var c = 0; c < jQuery( 'select[id^=criteria_type]' ).length; c++ )
 jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
 { // Add new criteria to search
 	var params = '<?php
-			global $b2evo_icons_type;
+			global $b2evo_icons_type, $blog;
 			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
+			echo is_admin_page() ? '&is_backoffice=1' : '&blog='.$blog;
 		?>';
 
 	obj_this = jQuery( this ).parent().parent();

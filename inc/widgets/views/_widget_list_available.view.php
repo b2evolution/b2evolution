@@ -35,6 +35,7 @@ $core_componentwidget_defs = array(
 			'coll_xml_feeds',
 			'content_hierarchy',
 			'breadcrumb_path',
+			'coll_current_filters',
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_item_list',			// Universal Item List
 			'coll_post_list',			// Simple List

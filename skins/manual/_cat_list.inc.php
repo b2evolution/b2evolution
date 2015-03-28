@@ -43,6 +43,8 @@ if( !empty( $Chapter ) )
 			.$Chapter->dget( 'description' )
 			.$params['after_content'];
 	}
+
+	echo '<div class="clear"></div>';
 ?></li>
 <?php
 }

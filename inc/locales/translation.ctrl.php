@@ -131,11 +131,11 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional settings'), '?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Locales'), '?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Translation editor'), '?ctrl=translation&locale='.$locale );
+$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( T_('Locales'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( T_('Translation editor'), $admin_url.'?ctrl=translation&locale='.$locale );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

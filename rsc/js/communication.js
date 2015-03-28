@@ -2,7 +2,7 @@
  * Server communication functions - Ajax without the pain
  * b2evolution - http://b2evolution.net/
  * @author yabs {@link http://innervisions.org.uk/ }
- * @version $Id: communication.js 1329 2012-05-02 17:37:41Z yura $
+ * @version $Id: communication.js 8591 2015-03-26 15:47:08Z yura $
  */
 
 
@@ -13,7 +13,14 @@
 jQuery(document).ready(function()
 {
 	// placeholder for error/success messages:
-	jQuery( '<div id="server_messages"></div>' ).prependTo( '.pblock' );
+	if( jQuery( '.pblock' ).length )
+	{
+		jQuery( '<div id="server_messages"></div>' ).prependTo( '.pblock' );
+	}
+	else
+	{
+		jQuery( '.navbar.level1' ).after( '<div id="server_messages"></div>' );
+	}
 	// used for POST requests:
 	jQuery( '<iframe id="server_postback" name="server_postback"></iframe>' ).appendTo( 'body' ).css( { position:'absolute',left:"-1000em",top:"-1000em" } );
 });

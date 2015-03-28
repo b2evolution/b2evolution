@@ -24,14 +24,14 @@ global $Blog;
 global $ItemList;
 
 global $edit_item_url, $delete_item_url;
-global $tab;
+global $tab, $tab_type;
 global $Session;
 
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
 	$result_fadeout = array( 'post_ID' => array($highlight) );
 
-} 
+}
 elseif ( $highlight = $Session->get( 'highlight_id' ) )
 {
 	$result_fadeout = array( 'post_ID' => array($highlight) );
@@ -62,7 +62,7 @@ echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 */
 
 
-$ItemList->title = T_('Post list');
+$ItemList->title = sprintf( T_('%s list'), $tab_type );
 
 // Initialize Results object
 items_results( $ItemList, array(
@@ -76,58 +76,59 @@ if( $ItemList->is_filtered() )
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	switch( $tab )
+	$selected_tab = ( $tab == 'type' ) ? strtolower( $tab_type ) : $tab;
+	switch( $selected_tab )
 	{
 		case 'pages':
 			$label = T_('New page');
 			$title = T_('Create a new page...');
-			$new_ptyp_ID = 1000;
+			$new_ityp_ID = 1000;
 			$perm = 'page';
 			break;
 
 		case 'intros':
 			$label = T_('New intro');
 			$title = T_('Write a new intro text...');
-			$new_ptyp_ID = 1600;
+			$new_ityp_ID = 1600;
 			$perm = 'intro';
 			break;
 
 		case 'podcasts':
 			$label = T_('New episode');
 			$title = T_('Package a new podcast episode...');
-			$new_ptyp_ID = 2000;
+			$new_ityp_ID = 2000;
 			$perm = 'podcast';
 			break;
 
 		case 'links':
 			$label = T_('New link');
 			$title = T_('Add a sidebar link...');
-			$new_ptyp_ID = 3000;
+			$new_ityp_ID = 3000;
 			$perm = 'sidebar';
 			break;
 
 		case 'ads':
 			$label = T_('New advertisement');
 			$title = T_('Add an advertisement...');
-			$new_ptyp_ID = 4000;
+			$new_ityp_ID = 4000;
 			$perm = 'sidebar';
 			break;
 
 		default:
 			$label = T_('New post');
 			$title = T_('Write a new post...');
-			$new_ptyp_ID = 1;
+			$new_ityp_ID = 1;
 			$perm = ''; // No need to check
 
-			$ItemList->global_icon( T_( 'Create multiple posts...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
+			$ItemList->global_icon( T_( 'Create multiple posts...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ityp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
 
 			break;
 	}
 
 	if( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) )
 	{	// We have the permission to create and edit posts with this post type:
-		$ItemList->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
-		$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, $label.' &raquo;', 3, 4 );
+		$ItemList->global_icon( T_('Mass edit the current post list...'), 'edit', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
+		$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ityp_ID, $label.' &raquo;', 3, 4 );
 	}
 }
 

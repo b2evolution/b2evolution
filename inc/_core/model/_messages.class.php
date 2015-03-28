@@ -198,6 +198,11 @@ class Messages
 
 		$disp = '';
 
+		if( isset( $this->params['class_outerdiv'] ) && $outerdivclass == 'log_container' )
+		{ // Use default class from object params instead of default function param
+			$outerdivclass = $this->params['class_outerdiv'];
+		}
+
 		if( $outerdivclass )
 		{
 			$disp .= "\n<div class=\"$outerdivclass\">";

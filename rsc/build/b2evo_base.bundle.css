@@ -449,6 +449,34 @@ span.roundbutton.rbtn_black:hover,
     top: 0;
   }
 }
+span.fa {
+  line-height: inherit;
+  font-size: 14px;
+}
+a.action_icon span.fa {
+  margin-right: 2px;
+}
+a.roundbutton .fa,
+a.roundbutton:hover .fa,
+a.roundbutton_text .fa,
+a.roundbutton_text:hover .fa {
+  color: #000;
+}
+a:hover .fa-x-rollover-green {
+  color: #0C0 !important;
+}
+a:hover .fa-x-rollover-red {
+  color: #C00 !important;
+}
+a:hover .fa-x-rollover-red-light {
+  color: #F00 !important;
+}
+a:hover .fa-x-rollover-orange {
+  color: #F90 !important;
+}
+a:hover .fa-x-rollover-black {
+  color: #000 !important;
+}
 div.edit_toolbars {
   margin-top: 1ex;
   width: 100%;
@@ -498,6 +526,100 @@ span.loader_img.loader_user_deldata {
 }
 .widget_core_coll_category_list .meta input[disabled="disabled"] {
   visibility: hidden;
+}
+.filter_item {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 1px;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000000;
+}
+.filter_item div {
+  margin: 0;
+  padding: 3px 5px;
+  color: #FFF;
+  float: left;
+  height: 16px;
+  line-height: 16px;
+}
+.filter_item div:first-child {
+  border-radius: 5px 0 0 5px;
+}
+.filter_item div.icon {
+  border-radius: 0 5px 5px 0;
+  float: right;
+  padding: 0;
+  height: 22px;
+}
+.filter_item div.icon a {
+  display: block;
+  padding: 4px 5px 5px;
+  margin: 0;
+}
+.filter_item .name {
+  background: #3d8f3d;
+}
+.filter_item:hover .name,
+.filter_item div.group,
+.filter_item div.icon {
+  background: #45a145;
+}
+.filter_item div.icon:hover {
+  background: #4db34d;
+}
+.filter_item.yellow .name {
+  background: #caca3f;
+}
+.filter_item.yellow:hover .name,
+.filter_item.yellow div.group,
+.filter_item.yellow div.icon {
+  background: #dbdb57;
+}
+.filter_item.yellow div.icon:hover {
+  background: #ecec73;
+}
+.filter_item.orange .name {
+  background: #d18335;
+}
+.filter_item.orange:hover .name,
+.filter_item.orange div.group,
+.filter_item.orange div.icon {
+  background: #e09952;
+}
+.filter_item.orange div.icon:hover {
+  background: #edac6b;
+}
+.filter_item.red .name {
+  background: #c12d2d;
+}
+.filter_item.red:hover .name,
+.filter_item.red div.group,
+.filter_item.red div.icon {
+  background: #cb4d4d;
+}
+.filter_item.red div.icon:hover {
+  background: #e57373;
+}
+.filter_item.magenta .name {
+  background: #8618bd;
+}
+.filter_item.magenta:hover .name,
+.filter_item.magenta div.group,
+.filter_item.magenta div.icon {
+  background: #9933cc;
+}
+.filter_item.magenta div.icon:hover {
+  background: #b053df;
+}
+.filter_item.blue .name {
+  background: #2f60c0;
+}
+.filter_item.blue:hover .name,
+.filter_item.blue div.group,
+.filter_item.blue div.icon {
+  background: #4d77cb;
+}
+.filter_item.blue div.icon:hover {
+  background: #6a91df;
 }
 
 /*
@@ -2251,14 +2373,7 @@ div.item_location {
   text-align: center;
   display: block;
 }
-#styled_content_block .status_draft,
-#styled_content_block .status_review,
-#styled_content_block .status_community,
-#styled_content_block .status_protected,
-#styled_content_block .status_private,
-#styled_content_block .status_published,
-#styled_content_block .status_deprecated,
-#styled_content_block .status_redirected {
+#styled_content_block span[class*=status_] {
   background: transparent;
   width: 75px;
   height: 75px;
@@ -2299,17 +2414,14 @@ div.item_location {
   background-color: #663399;
 }
 .note.status_trash span {
-  color: #f00;
-  background-color: #FFAAAA;
+  color: #fff;
+  background-color: #f66;
 }
-#styled_content_block .status_draft span,
-#styled_content_block .status_review span,
-#styled_content_block .status_community span,
-#styled_content_block .status_protected span,
-#styled_content_block .status_private span,
-#styled_content_block .status_published span,
-#styled_content_block .status_deprecated span,
-#styled_content_block .status_redirected span {
+.note.status_meta span {
+  color: #fff;
+  background-color: #5133ab;
+}
+#styled_content_block span[class*=status_] span {
   display: block;
   width: 120px;
   text-align: center;
@@ -2325,15 +2437,7 @@ div.item_location {
   -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)";
   /* IE8 */
 }
-div.results .status_draft span,
-div.results .status_review span,
-div.results .status_community span,
-div.results .status_protected span,
-div.results .status_private span,
-div.results .status_published span,
-div.results .status_deprecated span,
-div.results .status_redirected span,
-div.results .status_trash span {
+div.results span[class*=status_] span {
   text-align: center;
   padding: 3px 0;
   font-size: 11px;
@@ -2345,14 +2449,7 @@ div.results .status_trash span {
 }
 @media \0screen {
   /* IE8 */
-  #styled_content_block .status_draft span,
-  #styled_content_block .status_review span,
-  #styled_content_block .status_community span,
-  #styled_content_block .status_protected span,
-  #styled_content_block .status_private span,
-  #styled_content_block .status_published span,
-  #styled_content_block .status_deprecated span,
-  #styled_content_block .status_redirected span {
+  #styled_content_block span[class*=status_] span {
     top: -15px;
     left: -2px;
   }

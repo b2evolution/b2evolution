@@ -31,7 +31,7 @@ global $subset_ID;
 
 global $current_default_cat_ID;
 
-global $Session;
+global $Session, $AdminUI;
 
 $result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -100,10 +100,8 @@ function cat_line( $Chapter, $level )
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	// Order
-	if( $Settings->get('chapter_ordering') == 'manual' )
-	{
-		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
-	}
+	$order_value = ( $Chapter->get_parent_subcat_ordering() == 'manual' ) ? $Chapter->dget('order') : T_('Alphabetic');
+	$r .= '<td class="center">'.$order_value.'</td>';
 
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display these columns:
@@ -234,13 +232,12 @@ $Table->cols[] = array(
 $Table->cols[] = array(
 						'th' => T_('URL "slug"'),
 					);
-if( $Settings->get('chapter_ordering') == 'manual' )
-{
-	$Table->cols[] = array(
-							'th' => T_('Order'),
-							'th_class' => 'shrinkwrap',
-						);
-}
+
+$Table->cols[] = array(
+						'th' => T_('Order'),
+						'th_class' => 'shrinkwrap',
+					);
+
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display these columns:
 	$Table->cols[] = array(
@@ -275,11 +272,11 @@ $number_of_posts_in_cat = $DB->get_assoc('
 	WHERE cat_blog_ID = '.$DB->quote($subset_ID).'
 	GROUP BY cat_ID');
 
-$Table->display_init( NULL, $result_fadeout );
+$Table->display_init( array( 'list_attrib' => 'id="chapter_list"' ), $result_fadeout );
 
-// add an id for jquery to hook into
-// TODO: fp> Awfully dirty. This should be handled by the Table object
-$Table->params['list_start'] = str_replace( '<table', '<table id="chapter_list"', $Table->params['list_start'] );
+$results_params = $AdminUI->get_template( 'Results' );
+
+echo $results_params['before'];
 
 $Table->display_head();
 
@@ -291,12 +288,15 @@ $Table->display_list_start();
 
 	$Table->display_body_start();
 
-	echo $GenericCategoryCache->recurse( $callbacks, $subset_ID );
+	echo $GenericCategoryCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
 
 	$Table->display_body_end();
 
 $Table->display_list_end();
 
+echo $Table->params['content_end'];
+
+echo $results_params['after'];
 
 /* fp> TODO: maybe... (a general group move of posts would be more useful actually)
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
@@ -304,8 +304,23 @@ echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not 
 
 global $Settings, $dispatcher;
 
-echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sblogs settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#fieldset_wrapper_categories">', '</a>' ).'</p> ';
+// Use a wrapper div to have margin around the form
+echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
+
+$Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->add_crumb( 'collection' );
+$Form->hidden( 'ctrl', 'coll_settings' );
+$Form->hidden( 'action', 'update' );
+$Form->hidden( 'blog', $Blog->ID );
+$Form->hidden( 'tab', 'chapters' );
+$Form->radio_input( 'category_ordering', $Blog->get_setting('category_ordering'), array(
+					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
+					array( 'value'=>'manual', 'label'=>T_('Manually') ),
+			 ), T_('Sort categories'), array( 'note'=>'('.T_('Note: can be overridden for sub-categories').')' ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) )  );
+
+echo '</div>'; // form wrapper end
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm

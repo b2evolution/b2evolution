@@ -533,7 +533,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 					$Form->hidden( 'selection_ID', $selection_ID );
 					$Form->hidden( 'selection_name', $selection_name );
 					$Form->hidden( 'confirm', 1 );
-					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
+					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
 					$Form->end_form();
 
 					unset( $Form );

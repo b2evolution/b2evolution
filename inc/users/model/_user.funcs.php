@@ -2953,10 +2953,7 @@ function callback_filter_userlist( & $Form )
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
 	echo '</span>';
-	if( !is_admin_page() )
-	{
-		echo '<br />';
-	}
+	echo is_admin_page() ? '' : '<br />';
 
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
@@ -2975,7 +2972,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array();
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array, T_('User group'), '', array( 'force_keys_as_values' => true ) );
-		echo '<br />';
+		echo is_admin_page() ? '' : '<br />';
 	}
 
 	$location_filter_displayed = false;
@@ -3023,11 +3020,11 @@ function callback_filter_userlist( & $Form )
 
 	if( $location_filter_displayed )
 	{
-		echo '<br />';
+		echo is_admin_page() ? '' : '<br />';
 	}
 
 	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
-	echo '<br />';
+	echo is_admin_page() ? '' : '<br />';
 
 	$criteria_types = param( 'criteria_type', 'array:integer' );
 	$criteria_values = param( 'criteria_value', 'array:string' );
@@ -4607,7 +4604,7 @@ function users_results_block( $params = array() )
 	 */
 	if( $params['display_btn_refresh'] )
 	{ // Display a button to refresh the users list
-		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh').' &raquo;', 3, 4 );
+		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
 	if( $current_User->check_perm( 'users', 'edit', false ) )
 	{

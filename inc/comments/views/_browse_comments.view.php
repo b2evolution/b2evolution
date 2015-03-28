@@ -43,8 +43,8 @@ display_comment_mass_delete( $CommentList );
 $block_item_Widget = new Widget( 'block_item' );
 
 if( check_comment_mass_delete( $CommentList ) )
-{	// A form for mass deleting is availabl, Display link
-	$block_item_Widget->global_icon( T_('Delete all comments!'), 'delete', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
+{	// A form for mass deleting is available, Display link
+	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
 if( $CommentList->is_filtered() )
@@ -58,7 +58,7 @@ if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 ).'</span> ';
+		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3, array( 'class' => 'action_icon btn btn-default btn-sm' ) ).'</span> ';
 	}
 	else
 	{
@@ -70,6 +70,11 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
 echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+
+$block_item_Widget->disp_template_replaced( 'block_end' );
+
+// This block is used to keep correct css style for the comment status banners
+echo '<div id="styled_content_block" class="block_item">';
 
 global $AdminUI;
 $admin_template = $AdminUI->get_template( 'Results' );
@@ -90,13 +95,13 @@ load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 // Display list of comments:
 // comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
-echo '<div id="comments_container" value="-1">';
+echo '<div id="comments_container" value="-1" class="full_comment_list">';
 require dirname(__FILE__).'/_comment_list.inc.php';
 echo '</div>';
 
 // Display navigation:
 $CommentList->display_nav( 'footer' );
 
-$block_item_Widget->disp_template_replaced( 'block_end' );
+echo '</div>';// END OF <div id="styled_content_block">
 
 ?>

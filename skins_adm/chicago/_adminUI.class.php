@@ -70,8 +70,9 @@ class AdminUI extends AdminUI_general
 		global $UserSettings, $current_User;
 
 		$r = '';
-		if( $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) ) {
-			$r = $this->breadcrumbpath_get_html();
+		if( $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) )
+		{
+			$r .= $this->breadcrumbpath_get_html();
 		}
 
 		if( $UserSettings->get( 'show_menu', $current_User->ID) )

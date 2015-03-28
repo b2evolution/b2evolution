@@ -234,6 +234,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->checkbox_input( $input_name, $set_value, $set_label, $params );
 			break;
 
+		case 'checklist':
+			$options = array();
+			foreach( $parmeta['options'] as $meta_option )
+			{
+				$meta_option_checked = $set_value === NULL ?
+					/* default value */ $meta_option[2] :
+					/* saved value */   ! empty( $set_value[ $meta_option[0] ] );
+				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked );
+			}
+			$Form->checklist( $options, $input_name, $set_label, false, false, $params );
+			break;
+
 		case 'textarea':
 			$textarea_rows = isset($parmeta['rows']) ? $parmeta['rows'] : 3;
 			$Form->textarea_input( $input_name, $set_value, $textarea_rows, $set_label, $params );
@@ -667,6 +679,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			case 'checkbox':
 				$l_param_type = 'integer';
 				$l_param_default = 0;
+				break;
+
+			case 'checklist':
+				$l_param_type = 'array';
+				$l_param_default = array();
 				break;
 
 			case 'html_input':

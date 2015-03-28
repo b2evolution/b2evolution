@@ -430,6 +430,11 @@ table.filelist th span {
 	display: block;
 	padding: 2px 8px;
 }
+table.grouped th span.fa,
+table.filelist th span.fa {
+	display: inline-block;
+	padding: 0;
+}
 table.grouped th a.basic_sort_link:hover,
 table.filelist th a.basic_sort_link:hover {
 	background-color: #BACEDF;
@@ -665,7 +670,7 @@ div.block_item form.bComment /* New comment form */
 {
 	border: 1px solid #becdd6;
 	padding: 0;
-	margin: 1ex;
+	margin: 1ex 0;
 }
 div.bComment > p { /* padding for e.g. "No feedback for this post yet..." */
 	padding: 1ex;
@@ -693,7 +698,10 @@ div.bPost {
 	padding: 0;
 	margin: 0 0 1ex 0;
 }
-
+.bContent {
+	padding: 1ex;
+	margin: 0;
+}
 div.bPostpublished {
 	border: 1px solid #becdd6;
 	background-color: #fff;
@@ -760,6 +768,9 @@ div.bPostreview {
 .bPostdraft,
 div.block_item div.bCommentdraft {
 	border: 1px solid #fc3;
+}
+.bPostdraft > .bContent,
+div.block_item div.bCommentdraft {
 	background-color: #ffb;
 }
 .bPostdraft span.bStatus,
@@ -797,6 +808,8 @@ div.bCommentdraft div.CommentActionsArea {
 .bPostdeprecated,
 div.block_item div.bCommentdeprecated {
 	border: 1px solid #000;
+}
+.bPostdraft > .bContent, .bCommentdeprecated {
 	background-color: #eee;
 	color: #888;
 }
@@ -859,13 +872,14 @@ div.bCommentexpired div.CommentActionsArea {
 	border-top: 1px solid #f66;
 	background-color: #F6F5CB;
 }
-div.bCommentexpired span.bExpired
-{
+div.bCommentexpired span.bExpired {
 	color: #f66;
 }
 
 .bPostredirected {
 	border: 1px solid #639;
+}
+.bPostredirected > .bContent {
 	background-color: #dcf;
 }
 .bPostredirected span.bStatus,
@@ -888,11 +902,6 @@ div.bCommentexpired span.bExpired
 	background-color: #c0b0e0;
 }
 
-.bContent,
-.bCommentContent,
-.bFeedback {
-	margin: 1ex;
-}
 .bTitle {
 	font-weight: bold;
 	margin: 0;
@@ -1173,14 +1182,7 @@ div#ffield_item_tags ul.token-input-list-facebook {
 }
 
 /* Statuses of posts & comments display */
-#styled_content_block .status_draft,
-#styled_content_block .status_review,
-#styled_content_block .status_community,
-#styled_content_block .status_protected,
-#styled_content_block .status_private,
-#styled_content_block .status_published,
-#styled_content_block .status_deprecated,
-#styled_content_block .status_redirected {
+#styled_content_block span[class*=status_] {
 	top: -7px;
 	left: 7px;
 }

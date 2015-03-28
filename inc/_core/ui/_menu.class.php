@@ -261,14 +261,14 @@ class Menu extends Widget
 
 			foreach( $menuEntries as $loop_key => $loop_details )
 			{
-				if( empty($loop_details) )
-				{	// Empty placeholder, skip it. Might happen if the files module is disabled for example, then we had a file placeholder
+				if( empty( $loop_details ) )
+				{ // Empty placeholder, skip it. Might happen if the files module is disabled for example, then we had a file placeholder
 					// in the blog menu that will never be used. So don't display it...
 					continue;
 				}
 
 				if( !empty( $loop_details['separator'] ) )
-				{	// Separator
+				{ // Separator
 					$r .= $templateForLevel['separator'];
 					continue;
 				}
@@ -279,7 +279,7 @@ class Menu extends Widget
 				{
 					$href = $loop_details['href'];
 				}
-				elseif( !empty($loop_details['href_eval']) )
+				elseif( ! empty( $loop_details['href_eval'] ) )
 				{ // Useful for passing dynamic context vars (fp>> I AM using it)
 					$href = eval( $loop_details['href_eval'] );
 				}
@@ -318,15 +318,15 @@ class Menu extends Widget
 				// CLASS
 				$class = '';
 				if( !empty( $loop_details['class'] ) )
-				{	// disabled
+				{ // disabled
 					$class .= ' '.$loop_details['class'];
 				}
 				if( !empty( $loop_details['disabled'] ) )
-				{	// disabled
+				{ // disabled
 					$class .= ' '.$templateForLevel['disabled_class'];
 				}
-				if( !empty($class) )
-				{	// disabled
+				if( ! empty( $class ) )
+				{ // disabled
 					$anchor .= ' class="'.trim($class).'"';
 				}
 
@@ -356,9 +356,19 @@ class Menu extends Widget
 					}
 					else
 					{
-						$r .= $templateForLevel['beforeEachSel'];
-						$r .= $anchor;
-						$r .= $templateForLevel['afterEachSel'];
+						if( isset( $loop_details['order'] ) && $loop_details['order'] == 'group_last' &&
+						    isset( $templateForLevel['beforeEachSelGrpLast'], $templateForLevel['afterEachSelGrpLast'] ) )
+						{ // This selected menu item is last in a group
+							$r .= $templateForLevel['beforeEachSelGrpLast'];
+							$r .= $anchor;
+							$r .= $templateForLevel['afterEachSelGrpLast'];
+						}
+						else
+						{ // Normal selected menu item
+							$r .= $templateForLevel['beforeEachSel'];
+							$r .= $anchor;
+							$r .= $templateForLevel['afterEachSel'];
+						}
 					}
 				}
 				else
@@ -376,9 +386,19 @@ class Menu extends Widget
 					}
 					else
 					{
-						$r .= $templateForLevel['beforeEach'];
-						$r .= $anchor;
-						$r .= $templateForLevel['afterEach'];
+						if( isset( $loop_details['order'] ) && $loop_details['order'] == 'group_last' &&
+						    isset( $templateForLevel['beforeEachGrpLast'], $templateForLevel['afterEachGrpLast'] ) )
+						{ // This menu item is last in a group
+							$r .= $templateForLevel['beforeEachGrpLast'];
+							$r .= $anchor;
+							$r .= $templateForLevel['afterEachGrpLast'];
+						}
+						else
+						{ // Normal menu item
+							$r .= $templateForLevel['beforeEach'];
+							$r .= $anchor;
+							$r .= $templateForLevel['afterEach'];
+						}
 					}
 				}
 			}

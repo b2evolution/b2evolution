@@ -171,11 +171,11 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog, $Settings;
+		global $Blog, $Settings, $admin_url;
 
 		// Path to site root
 		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
-		$this->breadcrumbpath_add( $Settings->get( 'site_code' ), '?ctrl=dashboard&amp;blog=0', NULL, $site_style );
+		$this->breadcrumbpath_add( $Settings->get( 'site_code' ), $admin_url.'?ctrl=dashboard', NULL, $site_style );
 
 		if( !empty( $additional_path ) )
 		{ // Additional path
@@ -191,7 +191,7 @@ class AdminUI_general extends Menu
 
 		if( $add_blog && isset( $Blog ) )
 		{ // Add path to Blog
-			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : '?ctrl=dashboard&amp;blog=$blog$' );
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
 		}
 
 		// Initialize the default manual link, this is always visible when explicit manual link is not set for a page
@@ -753,7 +753,6 @@ class AdminUI_general extends Menu
 		$buttons = '';
 		$select_options = '';
 		$not_favorite_blogs = false;
-
 		foreach( $blog_array as $l_blog_ID )
 		{ // Loop through all blogs that match the requested permission:
 

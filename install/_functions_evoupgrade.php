@@ -5169,12 +5169,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			) ENGINE = myisam" );
 		task_end();
 
-		/*
-		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i7 branches
-		 */
-
 		set_upgrade_checkpoint( '11300' );
 	}
 
@@ -5369,12 +5363,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass BINARY(16) NOT NULL' );
 		task_end();
 
-		/*
-		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i7 branches
-		 */
-
 		set_upgrade_checkpoint( '11310' );
 	}
 
@@ -5441,12 +5429,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		/*
-		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i7 branches
-		 */
-
 		set_upgrade_checkpoint( '11320' );
 	}
 
@@ -5464,12 +5446,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			WHERE blog_in_bloglist = ""' );
 		task_end();
 
-		/*
-		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i7 branches
-		 */
-
 		set_upgrade_checkpoint( '11330' );
 	}
 
@@ -5481,13 +5457,364 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY blog_type ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL" );
 		task_end();
 
+		set_upgrade_checkpoint( '11340' );
+	}
+
+	if( $old_db_version < 11350 )
+	{ // part 18.d trunk aka 6th part of "i7"
+
+		task_begin( 'Update category ordering...' );
+		$DB->query( 'REPLACE INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
+				SELECT blog_ID, "category_ordering", IFNULL( set_value, "alpha" )
+				FROM T_blogs LEFT JOIN T_settings ON set_name = "chapter_ordering"' );
+		$DB->query( 'DELETE FROM T_settings WHERE set_name = "chapter_ordering"');
+		db_add_col( 'T_categories', 'cat_subcat_ordering', "enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL AFTER cat_order" );
+		task_end();
+
 		/*
 		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
 		 *
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		//set_upgrade_checkpoint( '11340' );
+		set_upgrade_checkpoint( '11350' );
+	}
+
+	if( $old_db_version < 11360 )
+	{ // part 18.e trunk aka 7th part of "i7"
+
+		task_begin( 'Upgrade table posts... ' );
+		$DB->query( 'ALTER TABLE T_items__item
+			CHANGE post_ptyp_ID post_ityp_ID int(10) unsigned NOT NULL DEFAULT 1,
+			DROP INDEX post_ptyp_ID ,
+			ADD INDEX post_ityp_ID ( post_ityp_ID )' );
+		task_end();
+
+		task_begin( 'Upgrade table post types... ' );
+		$DB->query( "ALTER TABLE T_items__type
+			CHANGE ptyp_ID   ityp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			CHANGE ptyp_name ityp_name VARCHAR(30) NOT NULL,
+			ADD ityp_description       TEXT NULL DEFAULT NULL,
+			ADD ityp_backoffice_tab    VARCHAR(30) NULL DEFAULT NULL,
+			ADD ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
+			ADD ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
+			ADD ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_use_text          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_allow_html        TINYINT DEFAULT 1,
+			ADD ityp_allow_attachments TINYINT DEFAULT 1,
+			ADD ityp_use_excerpt       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_use_title_tag     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_use_meta_desc     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_use_meta_keywds   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_use_tags          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ADD ityp_allow_featured    TINYINT DEFAULT 1,
+			ADD ityp_use_country       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ADD ityp_use_region        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ADD ityp_use_sub_region    ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ADD ityp_use_city          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ADD ityp_use_coordinates   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			ADD ityp_use_custom_fields TINYINT DEFAULT 1,
+			ADD ityp_use_comments      TINYINT DEFAULT 1,
+			ADD ityp_allow_closing_comments   TINYINT DEFAULT 1,
+			ADD ityp_allow_disabling_comments TINYINT DEFAULT 0,
+			ADD ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional'" );
+		$DB->query( 'UPDATE T_items__type SET
+			ityp_backoffice_tab = CASE
+				WHEN ityp_ID = 1    THEN "Posts"
+				WHEN ityp_ID = 1000 THEN "Pages"
+				WHEN ityp_ID >= 1400 AND ityp_ID <= 1600 THEN "Intros"
+				WHEN ityp_ID = 2000 THEN "Podcasts"
+				WHEN ityp_ID = 3000 THEN "Sidebar links"
+				WHEN ityp_ID = 4000 THEN "Advertisement"
+				WHEN ityp_ID = 5000 THEN NULL
+				ELSE "Posts"
+			END,
+			ityp_template_name = CASE
+				WHEN ityp_ID = 1 OR ityp_ID = 2000 THEN "single"
+				WHEN ityp_ID = 1000 THEN "page"
+				ELSE NULL
+			END' );
+		task_end();
+
+		task_begin( 'Adding new post types...' );
+		$DB->begin();
+		$new_item_types = array(
+				/* 'blog type' => array( 'min item type ID', 'title for new type' ) */
+				'manual' => array( 'type_ID' => 100, 'title' => 'Manual Page' ),
+				'forum'  => array( 'type_ID' => 200, 'title' => 'Forum Topic' ),
+			);
+		$item_types_insert_data = array();
+		foreach( $new_item_types as $blog_type => $item_type_data )
+		{
+			$item_type_ID = $new_item_types[ $blog_type ]['type_ID'];
+			while( $item_type_ID !== NULL )
+			{ // Find first free item type ID starting with 100
+				$free_item_type_ID = $item_type_ID;
+				$item_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_ID = '.$DB->quote( $item_type_ID ) );
+				if( $item_type_ID === NULL )
+				{ // Use this free ID for new type
+					$item_types_insert_data[] = '( '.$free_item_type_ID.', '.$DB->quote( $new_item_types[ $blog_type ]['title'] ).', "Posts", "single", 0 )';
+					$new_item_types[ $blog_type ]['new_type_ID'] = $free_item_type_ID;
+					break;
+				}
+				$item_type_ID++;
+			}
+		}
+		if( count( $item_types_insert_data ) )
+		{
+			// Insert new item types
+			$DB->query( 'INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html )
+						VALUES '.implode( ', ', $item_types_insert_data ) );
+			// Update types of all post with "Post" type to new created (only for blogs with type 'forum' and 'manual')
+			foreach( $new_item_types as $blog_type => $item_type_data )
+			{
+				$DB->query( 'UPDATE T_items__item
+					INNER JOIN T_categories
+					   ON post_main_cat_ID = cat_ID
+					  AND post_ityp_ID = 1
+					INNER JOIN T_blogs
+					   ON cat_blog_ID = blog_ID
+					  AND blog_type = '.$DB->quote( $blog_type ).'
+					  SET post_ityp_ID = '.$DB->quote( $item_type_data['new_type_ID'] ) );
+			}
+		}
+		$DB->commit();
+		task_end();
+
+		task_begin( 'Upgrade table comments... ' );
+		$DB->query( "ALTER TABLE T_comments
+			CHANGE comment_type comment_type enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment'" );
+		task_end();
+
+		task_begin( 'Creating table for custom fields of Post Types... ' );
+		$DB->query( 'CREATE TABLE T_items__type_custom_field (
+			itcf_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
+			itcf_label   VARCHAR(255) NOT NULL,
+			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( \'double\', \'varchar\' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_order   INT NULL,
+			PRIMARY KEY ( itcf_ID ),
+			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
+		) ENGINE = innodb' );
+
+		global $posttypes_perms;
+		// Create item types for each blog that has at aleast one custom field
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_coll_settings' );
+		$SQL->WHERE( 'cset_name LIKE '.$DB->quote( 'custom_%' ) );
+		$SQL->ORDER_BY( 'cset_coll_ID' );
+		$setting_rows = $DB->get_results( $SQL->get() );
+		$custom_fields = array();
+		$blog_setting_delete_data = array();
+		$blog_setting_item_types = array();
+		if( count( $setting_rows ) )
+		{ // Initialize an array of custom fields from blog settings
+			foreach( $setting_rows as $setting_row )
+			{
+				if( preg_match( '/custom_(double|varchar)\d+/', $setting_row->cset_name, $matches ) )
+				{ // It is a custom field
+					if( ! isset( $custom_fields[ $setting_row->cset_coll_ID ] ) )
+					{
+						$custom_fields[ $setting_row->cset_coll_ID ] = array();
+					}
+					// Delete this blog setting
+					$blog_setting_delete_data[] = 'cset_coll_ID = '.$DB->quote( $setting_row->cset_coll_ID ).' AND cset_name = '.$DB->quote( $setting_row->cset_name );
+
+					$cf_type = $matches[1];
+					$cf_key = $setting_row->cset_value;
+					$cf_label = '';
+					$cf_name = '';
+					foreach( $setting_rows as $s_row )
+					{
+						if( $s_row->cset_name == 'custom_'.$cf_type.'_'.$cf_key )
+						{ // Label
+							$cf_label = $s_row->cset_value;
+							// Delete this blog setting
+							$blog_setting_delete_data[] = 'cset_coll_ID = '.$DB->quote( $s_row->cset_coll_ID ).' AND cset_name = '.$DB->quote( $s_row->cset_name );
+						}
+						if( $s_row->cset_name == 'custom_fname_'.$cf_key )
+						{ // Name
+							$cf_name = $s_row->cset_value;
+							// Delete this blog setting
+							$blog_setting_delete_data[] = 'cset_coll_ID = '.$DB->quote( $s_row->cset_coll_ID ).' AND cset_name = '.$DB->quote( $s_row->cset_name );
+						}
+					}
+					$custom_fields[ $setting_row->cset_coll_ID ][] = array(
+							'type'  => $cf_type,
+							'key'   => $cf_key,
+							'label' => $cf_label,
+							'name'  => $cf_name
+						);
+				}
+			}
+			if( count( $custom_fields ) )
+			{ // Create item type for each blog with custom fields
+				$BlogCache = & get_BlogCache();
+				$itypes_insert_data = array();
+				$item_type_max_ID = $DB->get_var( 'SELECT MAX( ityp_ID ) FROM T_items__type' ) + 1;
+				foreach( $custom_fields as $blog_ID => $c_fields )
+				{
+					if( ! ( $cf_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+					{ // Skip incorrect blog ID
+						continue;
+					}
+					$itypes_insert_data[] = '( '.$item_type_max_ID.', '
+						.$DB->quote( 'custom_'.$cf_Blog->get( 'shortname' ) ).', '
+						.'"Posts", '
+						.'"single", '
+						.$DB->quote( $cf_Blog->get_setting( 'require_title' ) == 'none' ? 'never' : $cf_Blog->get_setting( 'require_title' ) ).', '
+						.$DB->quote( intval( $cf_Blog->get_setting( 'allow_html_post' ) ) ).', '
+						.$DB->quote( $cf_Blog->get_setting( 'location_country' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_country' ) ).', '
+						.$DB->quote( $cf_Blog->get_setting( 'location_region' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_region' ) ).', '
+						.$DB->quote( $cf_Blog->get_setting( 'location_subregion' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_subregion' ) ).', '
+						.$DB->quote( $cf_Blog->get_setting( 'location_city' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_city' ) ).', '
+						.$DB->quote( $cf_Blog->get_setting( 'show_location_coordinates' ) ? 'optional' : 'never' ).', '
+						.$DB->quote( intval( $cf_Blog->get_setting( 'disable_comments_bypost' ) ) ).' )';
+					// Update default item type
+					$blog_setting_item_types[ $cf_Blog->ID ] = $item_type_max_ID;
+					$blog_categories = $DB->get_col( 'SELECT cat_ID FROM T_categories WHERE cat_blog_ID = '.$cf_Blog->ID );
+					if( count( $blog_categories ) )
+					{ // Set new item type for each post
+						$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$item_type_max_ID.'
+							WHERE post_ityp_ID = 1
+							  AND post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
+
+						if( ! empty( $posttypes_perms['page'] ) )
+						{ // Find the Pages that have at least one defined custom field:
+							$pages_SQL = new SQL();
+							$pages_SQL->SELECT( 'post_ID' );
+							$pages_SQL->FROM( 'T_items__item' );
+							$pages_SQL->FROM_add( 'INNER JOIN T_items__item_settings ON post_ID = iset_item_ID' );
+							$pages_SQL->WHERE( 'post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
+							$pages_SQL->WHERE_and( 'post_ityp_ID IN ( '.implode( ', ', $posttypes_perms['page'] ).' )' );
+							$pages_SQL->WHERE_and( 'iset_name LIKE '.$DB->quote( 'custom_double_%' )
+							                  .' OR iset_name LIKE '.$DB->quote( 'custom_varchar_%' ) );
+							$pages_SQL->WHERE_and( 'iset_value != ""' );
+							$pages_SQL->GROUP_BY( 'post_ID' );
+							$pages_IDs = $DB->get_col( $pages_SQL->get() );
+							$page_type_max_ID = 0;
+							if( count( $pages_IDs ) > 0 )
+							{ // We have the Pages that have the defined custom fields
+								// Increase item type ID for new special item type for pages
+								$page_type_max_ID = $item_type_max_ID + 1;
+								$itypes_insert_data[] = '( '.$page_type_max_ID.', '
+									.$DB->quote( 'page_'.$cf_Blog->get( 'shortname' ) ).', '
+									.'"Pages", '
+									.'"page", '
+									.$DB->quote( $cf_Blog->get_setting( 'require_title' ) == 'none' ? 'never' : $cf_Blog->get_setting( 'require_title' ) ).', '
+									.$DB->quote( intval( $cf_Blog->get_setting( 'allow_html_post' ) ) ).', '
+									.$DB->quote( $cf_Blog->get_setting( 'location_country' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_country' ) ).', '
+									.$DB->quote( $cf_Blog->get_setting( 'location_region' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_region' ) ).', '
+									.$DB->quote( $cf_Blog->get_setting( 'location_subregion' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_subregion' ) ).', '
+									.$DB->quote( $cf_Blog->get_setting( 'location_city' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_city' ) ).', '
+									.$DB->quote( $cf_Blog->get_setting( 'show_location_coordinates' ) ? 'optional' : 'never' ).', '
+									.$DB->quote( intval( $cf_Blog->get_setting( 'disable_comments_bypost' ) ) ).' )';
+								foreach( $c_fields as $c_field )
+								{
+									// Insert custom field to get new ID
+									$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
+										VALUES ( '.$page_type_max_ID.', '
+										.$DB->quote( $c_field['label'] ).', '
+										.$DB->quote( $c_field['name'] ).', '
+										.$DB->quote( $c_field['type'] ).' )' );
+									$itcf_ID = $DB->insert_id;
+									// Change the UID of the item settings to the new inserted itcf_ID (ID of the custom field)
+									$DB->query( 'UPDATE T_items__item_settings
+											SET iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$itcf_ID ).'
+										WHERE iset_item_ID IN ( '.implode( ', ', $pages_IDs ).' )
+											AND iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
+								}
+								// Set new item type for each page
+								$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$page_type_max_ID.'
+									WHERE post_ID IN ( '.implode( ', ', $pages_IDs ).' )' );
+							}
+						}
+					}
+					// Insert custom fields for standard posts (not pages)
+					foreach( $c_fields as $c_field )
+					{
+						// Insert custom field to get new ID
+						$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
+							VALUES ( '.$item_type_max_ID.', '
+							.$DB->quote( $c_field['label'] ).', '
+							.$DB->quote( $c_field['name'] ).', '
+							.$DB->quote( $c_field['type'] ).' )' );
+						$itcf_ID = $DB->insert_id;
+						// Change the UID of the item settings to the new inserted itcf_ID (ID of the custom field)
+						$DB->query( 'UPDATE T_items__item_settings
+								SET iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$itcf_ID ).'
+							WHERE iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
+					}
+					// Increase item type ID for next
+					$item_type_max_ID += $page_type_max_ID > 0 ? 2 : 1;
+				}
+				// Insert item types
+				$DB->query( 'INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_use_title, ityp_allow_html, ityp_use_country, ityp_use_region, ityp_use_sub_region, ityp_use_city, ityp_use_coordinates, ityp_allow_disabling_comments )
+					VALUES '.implode( ', ', $itypes_insert_data ) );
+				// Delete old blog settings from DB (custom fields)
+				$blog_setting_delete_data[] = 'cset_name LIKE "count_custom_%"';
+				$DB->query( 'DELETE FROM T_coll_settings
+					WHERE ( '.implode( ') OR (', $blog_setting_delete_data ).' )' );
+			}
+		}
+
+		// Update default item types
+		$blogs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		$sql_update_blog_settings = array();
+		foreach( $blogs as $blog_ID )
+		{
+			if( isset( $blog_setting_item_types[ $blog_ID ] ) )
+			{ // Set it from custom item type
+				$current_item_type = $blog_setting_item_types[ $blog_ID ];
+			}
+			else
+			{ // Set it from first non reserved item type
+				if( ! isset( $first_item_type ) )
+				{
+					$reserved_types = array();
+					foreach( $posttypes_perms as $r_types )
+					{
+						$reserved_types = array_merge( $reserved_types, $r_types );
+					}
+					$SQL = new SQL();
+					$SQL->SELECT( 'ityp_ID' );
+					$SQL->FROM( 'T_items__type' );
+					if( ! empty( $reserved_types ) )
+					{
+						$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $reserved_types ).' )' );
+					}
+					$SQL->ORDER_BY( 'ityp_ID' );
+					$SQL->LIMIT( '1' );
+					$first_item_type = $DB->get_var( $SQL->get() );;
+				}
+				$current_item_type = $first_item_type;
+			}
+			$sql_update_blog_settings[] = '( '.$DB->quote( $blog_ID ).', "default_post_type", '.$DB->quote( $current_item_type ).' )';
+		}
+		if( ! empty( $sql_update_blog_settings ) )
+		{ // Execute a query to update the blog settings
+			$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				VALUES '.implode( ', ', $sql_update_blog_settings ) );
+		}
+		task_end();
+
+		task_begin( 'Updating site settings... ' );
+		if( $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "site_color"' ) === NULL )
+		{ // Set default site color only when it is not defined yet
+			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )'
+								.' VALUES ( "site_color", "#ff8c0f" )' );
+		}
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11360' );
 	}
 
 	/*

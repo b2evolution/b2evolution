@@ -818,9 +818,9 @@ if( isset($edit_Plugin) && is_object($edit_Plugin) && isset( $admin_Plugins->plu
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), '?ctrl=system',
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Plugin configuration'), '?ctrl=plugins' );
+$AdminUI->breadcrumbpath_add( T_('Plugin configuration'), $admin_url.'?ctrl=plugins' );
 
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
@@ -931,7 +931,7 @@ switch( $action )
 
 			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
-			$Form->submit( array( '', T_('I am sure!'), 'DeleteButton' ) );
+			$Form->submit( array( '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
 			$Form->end_form();
 			?>
 
