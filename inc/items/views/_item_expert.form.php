@@ -288,8 +288,10 @@ $Form->begin_form( '', '', $params );
 
 	$edit_slug_link = '';
 	if( $edited_Item->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
-	{	// user has permission to view slugs:
-		$edit_slug_link = '&nbsp;'.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID );
+	{ // user has permission to view slugs:
+		$edit_slug_link = action_icon( T_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, T_('Edit slugs'), 3, 4 )
+			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
+			.' '.T_('for this post').' - ';
 	}
 
 	if( empty( $edited_Item->tiny_slug_ID ) )
@@ -304,9 +306,9 @@ $Form->begin_form( '', '', $params );
 			) );
 	}
 
-	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').$edit_slug_link.':</strong></label></td>';
+	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$tiny_slug_info, array('maxlength'=>210, 'style'=>'width: 100%;') );
+	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210, 'style' => 'width: 100%;' ) );
 	echo '</td></tr>';
 
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
@@ -351,15 +353,15 @@ $Form->begin_form( '', '', $params );
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
 	{ // Display tags
 		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').'</strong></label> '
-			// Checkbox to suggest tags
-			.'<span title="'.format_to_output( T_('Check this to let b2evolution auto-suggest tags as you type, based on the tags existing on other posts.'), 'htmlattr' ).'">'
-				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
-				.'<label for="suggest_item_tags"><strong>'.T_('suggest').':</strong></label>'
-			.'</span>'
-		.'</td>';
+		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+
+		// Checkbox to suggest tags
+		$suggest_checkbox = '<label>'
+				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
+				.T_('Auto-suggest tags as you type (based on existing tag)')
+			.'</label>';
+		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
 	}
 	else

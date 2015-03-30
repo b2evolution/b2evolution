@@ -28,7 +28,7 @@ if( $blog_kinds = get_collection_kinds() )
 	foreach( $blog_kinds as $kind => $info )
 	{
 		echo '<tr>';
-			echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'">'.$info['name'].' &raquo;</a></h3></td>';
+			echo '<td class="coll_kind"><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'" class="btn '.( $kind == 'std' ? 'btn-primary' : 'btn-default' ).'">'.$info['name'].' &raquo;</a></td>';
 			echo '<td>'.$info['desc'].'</td>';
 		echo '</tr>';
 	}

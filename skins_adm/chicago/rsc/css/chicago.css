@@ -1167,11 +1167,6 @@ div.input ul.token-input-list-facebook {
 	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 }
-@media screen and (-webkit-min-device-pixel-ratio:0) { /* Safari & Chrome only */
-	div.input ul.token-input-list-facebook {
-		margin-left: 2px;
-	}
-}
 div#ffield_item_tags ul.token-input-list-facebook {
 	width: 100%;
 }

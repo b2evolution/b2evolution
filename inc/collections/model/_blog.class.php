@@ -2560,6 +2560,8 @@ class Blog extends DataObject
 		}
 
 		if( $echo ) echo '<br />Done.</p>';
+
+		return true;
 	}
 
 

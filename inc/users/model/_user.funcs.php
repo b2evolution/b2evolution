@@ -4599,25 +4599,6 @@ function users_results_block( $params = array() )
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
-	/*
-	 * Table icons:
-	 */
-	if( $params['display_btn_refresh'] )
-	{ // Display a button to refresh the users list
-		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-	}
-	if( $current_User->check_perm( 'users', 'edit', false ) )
-	{
-		if( $params['display_btn_adduser'] )
-		{ // Display a button to add user
-			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4 );
-		}
-		if( $params['display_btn_adduser'] )
-		{ // Display a button to add group
-			$UserList->global_icon( T_('Create a new group...'), 'new', $admin_url.'?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
-		}
-	}
-
 	$UserList->set_default_filters( $default_filters );
 	$UserList->load_from_Request();
 
@@ -4651,8 +4632,8 @@ function users_results_block( $params = array() )
 		}
 
 		if( $UserList->is_filtered() )
-		{	// Display link to reset filters only if some filter is applied
-			$filter_presets['reset'] = array( T_('Reset Filters'), url_add_param( $params['page_url'], 'filter=reset' ), 'class="floatright"' );
+		{ // Display link to reset filters only if some filter is applied
+			$UserList->global_icon( T_('Reset filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Reset filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 		}
 
 		$UserList->filter_area = array(
@@ -4660,6 +4641,25 @@ function users_results_block( $params = array() )
 			'url_ignore' => 'users_paged,u_paged,keywords',
 			'presets' => $filter_presets,
 			);
+	}
+
+	/*
+	 * Table icons:
+	 */
+	if( $params['display_btn_refresh'] )
+	{ // Display a button to refresh the users list
+		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+	}
+	if( $current_User->check_perm( 'users', 'edit', false ) )
+	{
+		if( $params['display_btn_adduser'] )
+		{ // Display a button to add user
+			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4 );
+		}
+		if( $params['display_btn_adduser'] )
+		{ // Display a button to add group
+			$UserList->global_icon( T_('Create a new group...'), 'new', $admin_url.'?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
+		}
 	}
 
 	// Display result :

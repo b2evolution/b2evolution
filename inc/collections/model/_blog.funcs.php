@@ -318,14 +318,18 @@ function get_working_blog()
 		}
 	}
 
+	$BlogCache = & get_BlogCache();
+
+	// Try to use the blog which is selected by current user last time
 	$blog_ID = intval( $UserSettings->get( 'selected_blog' ) );
-	if( $blog_ID > 0 && $current_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
-	{ // Use the blog which is selected by current user last time
+	// Check if it really exists in DB
+	$selected_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	if( $selected_Blog && $current_User->check_perm( 'blog_ismember', 'view', false, $selected_Blog->ID ) )
+	{ // Allow to use this blog only when current user is a member of it
 		return $blog_ID;
 	}
 
 	// Use first blog from DB which current user can views
-	$BlogCache = & get_BlogCache();
 	if( $blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', NULL, '', '', 1 ) )
 	{
 		foreach( $blog_array as $blog_ID )

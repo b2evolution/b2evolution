@@ -78,9 +78,8 @@ div.dashboard_sidebar li li {
 	color: #999;
 }
 .dashboard_thumbnails {
-	display: inline;
-	margin-right: 2px;
-	width: 100%;
+	padding-top: 5px;
+	clear: both;
 }
 .dashboard_thumbnails img {
 	border: 1px solid #000;
@@ -450,8 +449,9 @@ table.coll_kind td.coll_kind {
 	white-space: nowrap;
 	padding-right: 3ex;
 }
-td.coll_kind h3 {
-	margin: 0;
+td.coll_kind a {
+	font-size: 16px;
+	font-weight: bold;
 }
 
 div.seo_presets {

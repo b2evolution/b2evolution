@@ -116,7 +116,7 @@ a.btn.action_icon {
 				margin: 0;
 			}
 		}
-		td.input div.tile label {
+		td.input div.tile label.control-label {
 			display: none;
 		}
 	}
@@ -214,19 +214,29 @@ a.action_icon {
 	font-size: 12px;
 }
 
-// Field to enter multi usernames
-ul.token-input-list-facebook {
-	width: auto;
+// jQuery plugin "jquery.tokeninput.js" (helps to select the recipients for thread)
+form ul.token-input-list-facebook {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 14px;
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 	transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
 	border-radius: 4px;
+	padding: 4px 4px 0 4px;
 	input, input:focus {
 		box-shadow: none;
 	}
 	li {
-		margin-left: 1px;
+		font: inherit;
+		height: 24px;
+		input {
+			padding: 2px 0 1px 0;
+		}
+		&.token-input-token-facebook, &.token-input-input-token-facebook {
+			border-radius: 4px;
+			margin: 0 4px 4px 0;
+		}
 	}
 }
 
@@ -566,16 +576,4 @@ a.evo_messages_link .badge {
 .btn-status-redirected:hover {
 	color: #fff;
 	background-color: #613192;
-}
-
-// jQuery plugin "jquery.tokeninput.js" (helps to select the recipients for thread)
-div.controls ul.token-input-list-facebook {
-	padding: 6px 12px;
-	li input {
-		padding: 2px 0 1px 0;
-	}
-	.token-input-token-facebook {
-		margin-bottom: 0;
-		border-radius: 4px;
-	}
 }

@@ -1430,7 +1430,7 @@ a.btn.action_icon.hoverlink {
 .form-horizontal .compose_layout td.label label {
   margin: 0;
 }
-.form-horizontal .compose_layout td.input div.tile label {
+.form-horizontal .compose_layout td.input div.tile label.control-label {
   display: none;
 }
 .form-horizontal #itemform_categories .panel-body.extracats {
@@ -1516,20 +1516,31 @@ a.btn.action_icon.hoverlink {
 a.action_icon {
   font-size: 12px;
 }
-ul.token-input-list-facebook {
-  width: auto;
+form ul.token-input-list-facebook {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
   background-color: #FFFFFF;
   border: 1px solid #CCCCCC;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
   transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
   border-radius: 4px;
+  padding: 4px 4px 0 4px;
 }
-ul.token-input-list-facebook input,
-ul.token-input-list-facebook input:focus {
+form ul.token-input-list-facebook input,
+form ul.token-input-list-facebook input:focus {
   box-shadow: none;
 }
-ul.token-input-list-facebook li {
-  margin-left: 1px;
+form ul.token-input-list-facebook li {
+  font: inherit;
+  height: 24px;
+}
+form ul.token-input-list-facebook li input {
+  padding: 2px 0 1px 0;
+}
+form ul.token-input-list-facebook li.token-input-token-facebook,
+form ul.token-input-list-facebook li.token-input-input-token-facebook {
+  border-radius: 4px;
+  margin: 0 4px 4px 0;
 }
 div.results {
   margin-top: 20px;
@@ -1831,14 +1842,4 @@ a.evo_messages_link .badge {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
-}
-div.controls ul.token-input-list-facebook {
-  padding: 6px 12px;
-}
-div.controls ul.token-input-list-facebook li input {
-  padding: 2px 0 1px 0;
-}
-div.controls ul.token-input-list-facebook .token-input-token-facebook {
-  margin-bottom: 0;
-  border-radius: 4px;
 }

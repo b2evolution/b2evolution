@@ -339,6 +339,15 @@ class Form extends Widget
 					$this->radio_newline_end      = $template['radio_newline_end'];
 					$this->radio_oneline_start    = $template['radio_oneline_start'];
 					$this->radio_oneline_end      = $template['radio_oneline_end'];
+
+					if( isset( $template['global_icons_class'] ) )
+					{ // Set class for global icons
+						if( ! isset( $this->params ) )
+						{
+							$this->params = array();
+						}
+						$this->params['global_icons_class'] = $template['global_icons_class'];
+					}
 				}
 			}
 		}

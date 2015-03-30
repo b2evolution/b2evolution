@@ -15,6 +15,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// load dashboard functions
+load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
 /**
  * @var User
  */
@@ -83,9 +87,6 @@ $AdminUI->disp_body_top();
 
 if( $blog )
 { // We want to look at a specific blog:
-
-	// load dashboard functions
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 
 	// Begin payload block:
 	// This div is to know where to display the message after overlay close:
@@ -249,7 +250,34 @@ if( $blog )
 					'class'     => 'ActionButton btn btn-primary',
 					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
+
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before'              => '<div class="dashboard_thumbnails">',
+					'before_image'        => '',
+					'before_image_legend' => NULL,	// No legend
+					'after_image_legend'  => NULL,
+					'after_image'         => '',
+					'after'               => '</div>',
+					'image_size'          => 'crop-80x80',
+					'limit'               => 1,
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'albumart'
+					'restrict_to_image_position' => 'albumart,teaser,teaserperm,teaserlink,aftermore,inline',
+					// Sort the attachments to get firstly "Album Art", then "Teaser", and "After more" as last order
+					'links_sql_select'    => ', CASE '
+							.'WHEN link_position = "albumart"   THEN "1" '
+							.'WHEN link_position = "teaser"     THEN "2" '
+							.'WHEN link_position = "teaserperm" THEN "3" '
+							.'WHEN link_position = "teaserlink" THEN "4" '
+							.'WHEN link_position = "aftermore"  THEN "5" '
+							.'WHEN link_position = "inline"     THEN "6" '
+							// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+						.'END AS position_order',
+					'links_sql_orderby'   => 'position_order, link_order',
+				) );
 			echo '</div>';
+
+			echo '<div class="dashboard_content">';
 
 			echo '<h3 class="dashboard_post_title">';
 			$item_title = $Item->dget('title');
@@ -260,22 +288,11 @@ if( $blog )
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 			echo '</h3>';
 
-			// Display images that are linked to this post:
-			$Item->images( array(
-					'before' =>              '<div class="dashboard_thumbnails">',
-					'before_image' =>        '',
-					'before_image_legend' => NULL,	// No legend
-					'after_image_legend' =>  NULL,
-					'after_image' =>         '',
-					'after' =>               '</div>',
-					'image_size' =>          'fit-80x80',
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
-				) );
-
 			echo htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset );
 
-			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
+			echo '</div>';
+
+			echo '<div class="clear"></div>';
 			echo '</div>';
 		}
 
@@ -319,7 +336,23 @@ if( $blog )
 
 	$side_item_Widget = new Widget( 'side_item' );
 
-	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-6 col-xs-12">';
+	$perm_options_edit = $current_User->check_perm( 'options', 'edit' );
+	$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
+	// Set column size of the right blocks for bootstrap skin depending on current user permissions
+	if( $perm_options_edit && $perm_blog_properties )
+	{
+		$right_block_col_size = '4';
+	}
+	elseif( $perm_options_edit || $perm_blog_properties )
+	{
+		$right_block_col_size = '6';
+	}
+	else
+	{
+		$right_block_col_size = '12';
+	}
+
+	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-'.$right_block_col_size.' col-xs-12">';
 
 	$side_item_Widget->title = T_('Manage this collection');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -333,7 +366,7 @@ if( $blog )
 
  		echo '<li>'.T_('Browse').':<ul>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
+		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=type&tab_type=posts&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
 		if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
 		{
 			echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
@@ -351,10 +384,12 @@ if( $blog )
 
 	$side_item_Widget->disp_template_raw( 'block_end' );
 
-	echo '</div><div class="col-lg-12 col-sm-6 col-xs-12">';
+	echo '</div>';
 
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	if( $perm_blog_properties )
 	{
+		echo '<div class="col-lg-12 col-sm-'.$right_block_col_size.' col-xs-12">';
+
 		$side_item_Widget->title = T_('Customize this collection');
 		$side_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -371,9 +406,54 @@ if( $blog )
 		echo '</div>';
 
 		$side_item_Widget->disp_template_raw( 'block_end' );
+
+		echo '</div>';
 	}
 
-	echo '</div></div>';
+	if( $perm_options_edit )
+	{ // We have some serious admin privilege:
+
+		// -- Collection stats -- //{
+		$chart_data = array();
+
+		// Posts
+		$posts_sql_from = 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID';
+		$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
+		$chart_data[] = array(
+				'title' => T_('Posts'),
+				'value' => $post_all_counter = get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from ),
+				'type'  => 'number',
+			);
+		// Slugs
+		$slugs_sql_from = 'INNER JOIN T_items__item ON post_ID = slug_itm_ID '.$posts_sql_from;
+		$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
+		$chart_data[] = array(
+				'title' => T_('Slugs'),
+				'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from ),
+				'type'  => 'number',
+			);
+		// Comments
+		$comments_sql_from = 'INNER JOIN T_items__item ON post_ID = comment_item_ID '.$posts_sql_from;
+		$comments_sql_where = $posts_sql_where;
+		$chart_data[] = array(
+				'title' => T_('Comments'),
+				'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from ),
+				'type'  => 'number',
+			);
+
+		echo '<div class="col-lg-12 col-sm-'.$right_block_col_size.' col-xs-12">';
+
+		$side_item_Widget->title = T_('Collection metrics');
+		$side_item_Widget->disp_template_replaced( 'block_start' );
+
+		display_charts( $chart_data );
+
+		$side_item_Widget->disp_template_raw( 'block_end' );
+
+		echo '</div>';
+	}
+
+	echo '</div>';
 
 	/*
 	 * DashboardBlogSide to be added here (anyone?)
@@ -407,10 +487,7 @@ else
  */
 
 if( $current_User->check_perm( 'options', 'edit' ) )
-{	// We have some serious admin privilege:
-
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-
+{ // We have some serious admin privilege:
 	/**
 	 * @var AbstractSettings
 	 */
@@ -421,208 +498,97 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	echo '<div class="row browse"><div class="col-lg-12">';
 
-	//---- START OF - System & Collection stats ----//
+	if( empty( $blog ) )
+	{ // -- System stats -- //
 
-	// -- Collection stats -- //
-	if( ! empty( $blog ) )
-	{
 		$chart_data = array();
-
-		// Posts
-		$posts_sql_from = 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID';
-		$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
+		// Users
 		$chart_data[] = array(
-				'title' => T_('Posts'),
-				'value' => $post_all_counter = get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from ),
+				'title' => T_('Users'),
+				'value' => get_table_count( 'T_users' ),
 				'type'  => 'number',
 			);
-		// Slugs
-		$slugs_sql_from = 'INNER JOIN T_items__item ON post_ID = slug_itm_ID '.$posts_sql_from;
-		$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
+		// Blogs
 		$chart_data[] = array(
-				'title' => T_('Slugs'),
-				'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from ),
+				'title' => T_('Blogs'),
+				'value' => get_table_count( 'T_blogs' ),
 				'type'  => 'number',
 			);
-		// Comments
-		$comments_sql_from = 'INNER JOIN T_items__item ON post_ID = comment_item_ID '.$posts_sql_from;
-		$comments_sql_where = $posts_sql_where;
+		$post_all_counter = get_table_count( 'T_items__item' );
+		if( empty( $blog ) )
+		{
+			// Posts
+			$chart_data[] = array(
+					'title' => T_('Posts'),
+					'value' => $post_all_counter,
+					'type'  => 'number',
+				);
+		}
+		// Web posts
 		$chart_data[] = array(
-				'title' => T_('Comments'),
-				'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from ),
+				'title' => T_('Web posts'),
+				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter ),
+				'100%'  => $post_all_counter,
+				'type'  => 'percent',
+			);
+		// XMLRPC posts
+		$chart_data[] = array(
+				'title' => T_('XMLRPC posts'),
+				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter ),
+				'100%'  => $post_all_counter,
+				'type'  => 'percent',
+			);
+		// Email posts
+		$chart_data[] = array(
+				'title' => T_('Email posts'),
+				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter ),
+				'100%'  => $post_all_counter,
+				'type'  => 'percent',
+			);
+		if( empty( $blog ) )
+		{
+			// Slugs
+			$chart_data[] = array(
+					'title' => T_('Slugs'),
+					'value' => get_table_count( 'T_slug' ),
+					'type'  => 'number',
+				);
+			// Comments
+			$chart_data[] = array(
+					'title' => T_('Comments'),
+					'value' => get_table_count( 'T_comments' ),
+					'type'  => 'number',
+				);
+		}
+		// Files
+		$chart_data[] = array(
+				'title' => T_('Files'),
+				'value' => get_table_count( 'T_files' ),
+				'type'  => 'number',
+			);
+		// Conversations
+		$chart_data[] = array(
+				'title' => T_('Conversations'),
+				'value' => get_table_count( 'T_messaging__thread' ),
+				'type'  => 'number',
+			);
+		// Messages
+		$chart_data[] = array(
+				'title' => T_('Messages'),
+				'value' => get_table_count( 'T_messaging__message' ),
 				'type'  => 'number',
 			);
 
-		echo '<div class="row"><div class="col-lg-6">';
-
-		// Display a block with charts
 		$stat_item_Widget = new Widget( 'block_item' );
 
-		$stat_item_Widget->title = T_('Collection metrics');
+		$stat_item_Widget->title = T_('System metrics');
 		$stat_item_Widget->disp_template_replaced( 'block_start' );
 
 		display_charts( $chart_data );
 
 		$stat_item_Widget->disp_template_raw( 'block_end' );
 
-		echo '</div>';
-	}
-
-	// -- System stats -- //
-
-	$chart_data = array();
-	// Users
-	$chart_data[] = array(
-			'title' => T_('Users'),
-			'value' => get_table_count( 'T_users' ),
-			'type'  => 'number',
-		);
-	// Blogs
-	$chart_data[] = array(
-			'title' => T_('Blogs'),
-			'value' => get_table_count( 'T_blogs' ),
-			'type'  => 'number',
-		);
-	$post_all_counter = get_table_count( 'T_items__item' );
-	if( empty( $blog ) )
-	{
-		// Posts
-		$chart_data[] = array(
-				'title' => T_('Posts'),
-				'value' => $post_all_counter,
-				'type'  => 'number',
-			);
-	}
-	// Web posts
-	$chart_data[] = array(
-			'title' => T_('Web posts'),
-			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter ),
-			'100%'  => $post_all_counter,
-			'type'  => 'percent',
-		);
-	// XMLRPC posts
-	$chart_data[] = array(
-			'title' => T_('XMLRPC posts'),
-			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter ),
-			'100%'  => $post_all_counter,
-			'type'  => 'percent',
-		);
-	// Email posts
-	$chart_data[] = array(
-			'title' => T_('Email posts'),
-			'value' => limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter ),
-			'100%'  => $post_all_counter,
-			'type'  => 'percent',
-		);
-	if( empty( $blog ) )
-	{
-		// Slugs
-		$chart_data[] = array(
-				'title' => T_('Slugs'),
-				'value' => get_table_count( 'T_slug' ),
-				'type'  => 'number',
-			);
-		// Comments
-		$chart_data[] = array(
-				'title' => T_('Comments'),
-				'value' => get_table_count( 'T_comments' ),
-				'type'  => 'number',
-			);
-	}
-	// Files
-	$chart_data[] = array(
-			'title' => T_('Files'),
-			'value' => get_table_count( 'T_files' ),
-			'type'  => 'number',
-		);
-	// Conversations
-	$chart_data[] = array(
-			'title' => T_('Conversations'),
-			'value' => get_table_count( 'T_messaging__thread' ),
-			'type'  => 'number',
-		);
-	// Messages
-	$chart_data[] = array(
-			'title' => T_('Messages'),
-			'value' => get_table_count( 'T_messaging__message' ),
-			'type'  => 'number',
-		);
-
-	if( ! empty( $blog ) )
-	{ // Open second column if first was opened above
-		echo '<div class="col-lg-6">';
-	}
-
-	$stat_item_Widget = new Widget( 'block_item' );
-
-	$stat_item_Widget->title = T_('System metrics');
-	$stat_item_Widget->disp_template_replaced( 'block_start' );
-
-	display_charts( $chart_data );
-
-	$stat_item_Widget->disp_template_raw( 'block_end' );
-
-	if( ! empty( $blog ) )
-	{ // End of <div class="row"><div class="col-lg-6">
-		echo '</div><div class="clear"></div></div>';
-	}
-
-?>
-<script type="text/javascript">
-jQuery( 'document' ).ready( function()
-{
-	var chart_params = {
-		barColor: function(percent)
-		{
-			return get_color_by_percent( {r:0, g:255, b:0}, {r:255, g:204, b:0}, {r:255, g:0, b:0}, percent );
-		},
-		size: 75,
-		trackColor: '#eee',
-		scaleColor: false,
-		lineCap: 'round',
-		lineWidth: 6,
-		animate: 700
-	}
-	jQuery( '.chart .number' ).easyPieChart( chart_params );
-
-	chart_params['barColor'] = '#00F';
-	jQuery( '.chart .percent' ).easyPieChart( chart_params );
-} );
-
-function get_color_by_percent( color_from, color_middle, color_to, percent )
-{
-	function get_color_hex( start_color, end_color )
-	{
-		num = start_color + Math.round( ( end_color - start_color ) * ( percent / 100 ) );
-		num = Math.min( num, 255 ); // not more than 255
-		num = Math.max( num, 0 ); // not less than 0
-		var str = num.toString( 16 );
-		if( str.length < 2 )
-		{
-			str = "0" + str;
-		}
-		return str;
-	}
-
-	if( percent < 50 )
-	{
-		color_to = color_middle;
-		percent *= 2;
-	}
-	else
-	{
-		color_from = color_middle;
-		percent = ( percent - 50 ) * 2;
-	}
-
-	return "#" +
-		get_color_hex( color_from.r, color_to.r ) +
-		get_color_hex( color_from.g, color_to.g ) +
-		get_color_hex( color_from.b, color_to.b );
-}
-</script>
-<?php
-	//---- END OF - System & Collection stats ----//
+	} //---- END OF - System stats ----//
 
 	$block_item_Widget = new Widget( 'block_item' );
 
@@ -684,6 +650,65 @@ function get_color_by_percent( color_from, color_middle, color_to, percent )
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
+}
+
+if( ! empty( $chart_data ) )
+{ // JavaScript to initialize charts
+?>
+<script type="text/javascript">
+jQuery( 'document' ).ready( function()
+{
+	var chart_params = {
+		barColor: function(percent)
+		{
+			return get_color_by_percent( {r:0, g:255, b:0}, {r:255, g:204, b:0}, {r:255, g:0, b:0}, percent );
+		},
+		size: 75,
+		trackColor: '#eee',
+		scaleColor: false,
+		lineCap: 'round',
+		lineWidth: 6,
+		animate: 700
+	}
+	jQuery( '.chart .number' ).easyPieChart( chart_params );
+
+	chart_params['barColor'] = '#00F';
+	jQuery( '.chart .percent' ).easyPieChart( chart_params );
+} );
+
+function get_color_by_percent( color_from, color_middle, color_to, percent )
+{
+	function get_color_hex( start_color, end_color )
+	{
+		num = start_color + Math.round( ( end_color - start_color ) * ( percent / 100 ) );
+		num = Math.min( num, 255 ); // not more than 255
+		num = Math.max( num, 0 ); // not less than 0
+		var str = num.toString( 16 );
+		if( str.length < 2 )
+		{
+			str = "0" + str;
+		}
+		return str;
+	}
+
+	if( percent < 50 )
+	{
+		color_to = color_middle;
+		percent *= 2;
+	}
+	else
+	{
+		color_from = color_middle;
+		percent = ( percent - 50 ) * 2;
+	}
+
+	return "#" +
+		get_color_hex( color_from.r, color_to.r ) +
+		get_color_hex( color_from.g, color_to.g ) +
+		get_color_hex( color_from.b, color_to.b );
+}
+</script>
+<?php
 }
 
 // Display body bottom, debug info and close </html>:

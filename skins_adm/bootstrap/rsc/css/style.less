@@ -526,6 +526,15 @@ div.skinshot {
 	.dashboard_float_actions {
 		float: left;
 		margin-right: 10px;
+		.dashboard_thumbnails {
+			margin-top: 5px;
+		}
+		.btn {
+			width: 80px;
+		}
+	}
+	.dashboard_content {
+		margin-left: 90px;
 	}
 	span[class*=status_] {
 		line-height: 20px;
@@ -556,14 +565,23 @@ div.skinshot {
 	}
 }
 #itemform_adv_props {
-	div.controls {
-		margin-left: 10px;
+	div.tile, div.controls {
+		width: 100%;
 	}
-	.label {
+	td.label {
 		background: none;
 		color: #000;
 		text-shadow: none;
-		padding: 0;
+		text-align: right;
+		vertical-align: top;
+		padding: 9px 10px 0 0;
+	}
+	.help-inline label {
+		font-weight: normal;
+		display: block;
+	}
+	ul.token-input-list-facebook {
+		width: 100%;
 	}
 }
 #itemform_comments {
@@ -916,20 +934,29 @@ div.available_widgets {
 // Table to select a collection type
 .coll_kind {
 	h3 {
-		margin: 0 10px 0 0;
-		font-size: 20px;
+		margin: 0;
 	}
 	td {
-		padding-bottom: 10px;
+		padding: 0 10px 10px 0;
+	}
+	.btn {
+		width: 100%;
 	}
 }
 
-// Support for buttons in panel headings
+// Support for buttons in panel blocks
 .btn-right{
 	float: right;
 }
 .panel-heading .btn {
 	margin: -6px 0 0 6px;
+}
+.panel-footer.control-buttons {
+	margin: 0 -15px -15px -15px;
+	[class*="col-"] {
+		float: none;
+		padding-left: 0;
+	}
 }
 
 // Support for multiline inline forms
@@ -1027,4 +1054,9 @@ nav {
 		list-style: disc;
 		margin-left: 20px;
 	}
+}
+
+// New thread form
+form#thread_checkchanges ul.token-input-list-facebook {
+	width: 97%;
 }
