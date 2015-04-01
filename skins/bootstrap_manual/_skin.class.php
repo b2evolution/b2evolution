@@ -122,9 +122,8 @@ class bootstrap_manual_Skin extends Skin
 
 		require_js( '#jquery#', 'blog' );
 
-		// Use glyph icons, @see get_icon()
-		global $b2evo_icons_type;
-		$b2evo_icons_type = 'glyphicons';
+		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+		init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );
@@ -497,6 +496,7 @@ class bootstrap_manual_Skin extends Skin
 					'login_form_class'      => 'form-login',
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
+					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 					// Register
 					'register_page_before'      => '<div class="wrap-form-register">',
 					'register_page_after'       => '</div>',
@@ -552,6 +552,18 @@ class bootstrap_manual_Skin extends Skin
 					'msgform_form_title' => T_('Sending a message'),
 				);
 				break;
+
+			case 'plugin_template':
+				// Template for plugins
+				return array(
+						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+						'toolbar_after'        => '</div>',
+						'toolbar_title_before' => '<div class="btn-toolbar-title">',
+						'toolbar_title_after'  => '</div>',
+						'toolbar_group_before' => '<div class="btn-group btn-group-xs" role="group">',
+						'toolbar_group_after'  => '</div>',
+						'toolbar_button_class' => 'btn btn-default',
+					);
 
 			default:
 				// Delegate to parent class:

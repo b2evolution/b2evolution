@@ -261,6 +261,13 @@ class Plugin
 	 */
 	private $_plugin_url = array();
 
+	/**
+	 * Plugin template
+	 *
+	 * @var array
+	 */
+	var $template;
+
 	/**#@-*/
 
 
@@ -314,6 +321,89 @@ class Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Load template params from current skin
+	 */
+	function load_template()
+	{
+		$params = array(
+				'toolbar_before'       => '<div class="edit_toolbar $toolbar_class$">',
+				'toolbar_after'        => '</div>',
+				'toolbar_title_before' => '',
+				'toolbar_title_after'  => '',
+				'toolbar_group_before' => '',
+				'toolbar_group_after'  => ' ',
+				'toolbar_button_class' => 'quicktags',
+			);
+
+		if( is_admin_page() )
+		{ // Get plugin template from backoffice skin
+			if( is_logged_in() )
+			{
+				global $current_User, $UserSettings, $adminskins_path;
+				$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+				require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+				$AdminUI = new AdminUI();
+				$skin_template = $AdminUI->get_template( 'plugin_template' );
+			}
+		}
+		else
+		{ // Get plugin template from frontoffice skin
+			global $Blog;
+			if( ! empty( $Blog ) )
+			{
+				$skin_ID = $Blog->get_skin_ID();
+				$SkinCache = & get_SkinCache();
+				if( $Skin = & $SkinCache->get_by_ID( $skin_ID, false, false ) )
+				{
+					$skin_template = $Skin->get_template( 'plugin_template' );
+				}
+			}
+		}
+
+		if( empty( $skin_template ) )
+		{ // Use default template params when they are not set by skin
+			$this->template = $params;
+		}
+		else
+		{ // Merge default params with current skin params
+			$this->template = array_merge( $params, $skin_template );
+		}
+	}
+
+
+	/**
+	 * Get param of the current loaded template
+	 *
+	 * @param string Param name
+	 * @param array What should be replaced in the param (e.g. array( '$toolbar_class$' => 'quicktags_toolbar' ) )
+	 */
+	function get_template( $param_name, $replaces = NULL )
+	{
+		if( is_null( $this->template ) )
+		{ // Load template only first time
+			$this->load_template();
+		}
+
+		if( ! isset( $this->template[ $param_name ] ) )
+		{ // Return empty string if no defined param
+			return '';
+		}
+
+		$param_value = $this->template[ $param_name ];
+
+		if( is_array( $replaces ) )
+		{
+			foreach( $replaces as $search => $replace )
+			{
+				$param_value = str_replace( $search, $replace, $param_value );
+			}
+		}
+
+		return $param_value;
 	}
 
 

@@ -246,18 +246,14 @@ class content_hierarchy_Widget extends ComponentWidget
 		$item_before = $params['item_before_closed'];
 
 		$classes = array();
-		if( ! empty( $params['chapter_path'] ) && in_array( $Chapter->ID, $params['chapter_path'] ) )
+
+		if( $params['is_selected'] )
 		{ // A category is selected
 			$is_selected = true;
 			$classes[] = $params['class_selected'];
 		}
-		if( ! empty( $Chapter->children ) && ( $params['open_children_levels'] > $this->chapter_level || $is_selected ) )
-		{ // A category is opened
-			$classes[] = $params['class_opened'];
-			$item_before = $params['item_before_opened'];
-		}
-		else if( $Chapter->has_posts() && ( $params['open_children_levels'] > $this->chapter_level || $is_selected ) )
-		{ // A category is selected and it has the posts
+		if( $params['is_opened'] )
+		{ // A category is opened/expanded
 			$classes[] = $params['class_opened'];
 			$item_before = $params['item_before_opened'];
 		}

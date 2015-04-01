@@ -211,7 +211,7 @@ if( $action != 'view' )
 			$user_pictures .= '<br />'
 					.action_icon( T_('No longer use this as main profile picture'), 'move_down', $remove_picture_url, ' '.T_('No longer use this as main profile picture'), 3, 4 ).'<br />'
 					.$forbid_link
-					.action_icon( T_('Delete this profile picture'), 'xross', $delete_picture_url, ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
+					.action_icon( T_('Delete this profile picture'), 'delete', $delete_picture_url, ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
 					.$edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
 							'before'   => '',
 							'after'    => '<br />',

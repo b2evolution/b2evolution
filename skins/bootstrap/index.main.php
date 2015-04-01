@@ -292,6 +292,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'login_form_class'      => 'form-login',
 				'display_reg_link'      => true,
 				'abort_link_position'   => 'form_title',
+				'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 				// Register
 				'register_page_before'      => '<div class="wrap-form-register">',
 				'register_page_after'       => '</div>',
@@ -406,7 +407,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'after'       => ' &bull; ',
 				) );
 
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ptyp_ID though..?!
+		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
 		?>
 
 		<?php

@@ -191,6 +191,15 @@ jQuery( '#thrd_recipients' ).tokenInput(
 		{
 			check_multiple_recipients();
 		},
+		<?php
+		if( param_has_error( 'thrd_recipients' ) )
+		{ // Mark this field as error
+		?>
+		onReady: function()
+		{
+			jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+		}
+		<?php } ?>
 	}
 );
 

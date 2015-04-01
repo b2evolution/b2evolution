@@ -117,22 +117,24 @@ class videoplug_plugin extends Plugin
 			return false;
 		}
 
-		echo '<div class="edit_toolbar" id="video_toolbar">';
-		echo T_('Video').': ';
-		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" data-func="videotag|youtube" value="YouTube" />';
-		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" data-func="videotag|google" value="Google video" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" data-func="videotag|dailymotion" value="DailyMotion" />';
-		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" data-func="videotag|livevideo" value="LiveVideo" />';
-		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" data-func="videotag|ifilm" value="iFilm" />';
-		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="quicktags" data-func="videotag|vimeo" value="vimeo" />';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'video_toolbar' ) );
+		
+		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
+		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|google" value="Google video" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
+		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|livevideo" value="LiveVideo" />';
+		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|ifilm" value="iFilm" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="vimeo" />';
+		echo $this->get_template( 'toolbar_group_after' );
 
-		echo '</div>';
+		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?>
-		<script type="text/javascript">
+		?><script type="text/javascript">
 			//<![CDATA[
 			function videotag( tag )
 			{
@@ -189,8 +191,7 @@ class videoplug_plugin extends Plugin
 				textarea_wrap_selection( b2evoCanvas, tag, '', 1 );
 			}
 			//]]>
-		</script>
-		<?php
+		</script><?php
 
 		return true;
 	}

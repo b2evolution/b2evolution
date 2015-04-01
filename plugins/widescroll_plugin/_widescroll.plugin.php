@@ -79,8 +79,7 @@ class widescroll_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?>
-		<script type="text/javascript">
+		?><script type="text/javascript">
 		//<![CDATA[
 		var widescroll_buttons = new Array();
 
@@ -96,19 +95,20 @@ class widescroll_plugin extends Plugin
 
 		widescroll_buttons[widescroll_buttons.length] = new widescroll_button(
 				'widescroll', 'wide scroll', '<div class="wide_scroll">', '</div>',
-				'<?php echo TS_('Teaser break') ?>', 'margin-left:8px;'
+				'<?php echo TS_('Teaser break') ?>', ''
 			);
 
 		function widescroll_toolbar( title )
 		{
-			document.write( '<div>' + title );
+			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
+			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
 			for( var i = 0; i < widescroll_buttons.length; i++ )
 			{
 				var button = widescroll_buttons[i];
 				document.write( '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="widescroll" data-func="widescroll_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
 			}
-			document.write('</div>');
+			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
 		}
 
 		function widescroll_insert_tag( canvas_field, i )
@@ -121,11 +121,12 @@ class widescroll_plugin extends Plugin
 			textarea_wrap_selection( canvas_field, widescroll_buttons[i].tag_open, widescroll_buttons[i].tag_close, 0 );
 		}
 		//]]>
-		</script>
+		</script><?php
 
-		<div class="edit_toolbar widescroll_toolbar"><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?>' );</script></div>
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'widescroll_toolbar' ) );
+		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?> ' );</script><?php
+		echo $this->get_template( 'toolbar_after' );
 
-		<?php
 		return true;
 	}
 

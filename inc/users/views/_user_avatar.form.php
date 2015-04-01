@@ -163,7 +163,7 @@ if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Li
 		$action_picture_links = '<div class="avatar_actions">'.
 				action_icon( $remove_picture_text, 'move_down', $remove_picture_url, ' '.$remove_picture_text, 3, 4 ).'<br />'.
 				$forbid_link.
-				action_icon( $delete_picture_text, 'xross', $delete_picture_url, ' '.$delete_picture_text, 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'.
+				action_icon( $delete_picture_text, 'delete', $delete_picture_url, ' '.$delete_picture_text, 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'.
 				$rotate_icons.
 				$crop_icon.
 				$duplicated_files_message.
@@ -219,7 +219,7 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 				$url_delete = is_admin_page() ?
 					regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' ), '', '&') :
 					get_secure_htsrv_url().'profile_update.php?user_tab=avatar&blog='.$Blog->ID.'&user_ID='.$edited_User->ID.'&action=delete_avatar&file_ID='.$user_Link->File->ID.'&'.url_crumb( 'user' );
-				$info_content .= '<br />'.action_icon( T_('Delete this picture'), 'xross', $url_delete, T_('Delete'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) );
+				$info_content .= '<br />'.action_icon( T_('Delete this picture'), 'delete', $url_delete, T_('Delete'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ), array( 'style' => 'margin-right:4px' ) );
 				// Links to rotate picture
 				$info_content .= $edited_User->get_rotate_avatar_icons( $user_Link->File->ID );
 				$info_content .= $edited_User->get_crop_avatar_icon( $user_Link->File->ID, array(

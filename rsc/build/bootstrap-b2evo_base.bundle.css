@@ -252,36 +252,6 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
-div.edit_toolbars {
-  margin-top: 1ex;
-  width: 100%;
-  text-align: center;
-}
-div.edit_toolbar {
-  background-color: #f1f6f8;
-  border: 1px solid #becdd6;
-  padding: 1px 2px;
-  margin: 1px auto;
-}
-div.edit_toolbar input {
-  background: #fefefe url(../img/whitebar24.png) repeat-x center;
-  border: 1px solid #becdd6;
-  margin: 0 1px;
-  padding: 0 1px;
-}
-div.edit_toolbar input:hover {
-  border-color: #00f;
-}
-div.comment_toolbars,
-div.message_toolbars {
-  text-align: center;
-}
-div.comment_toolbars div.edit_toolbar,
-div.message_toolbars div.edit_toolbar {
-  margin: 0;
-  width: 100%;
-  border-bottom: none;
-}
 span.loader_img {
   display: inline-block;
   width: 32px;
@@ -2157,6 +2127,14 @@ ol {
   margin: 0 0 10px 25px;
   padding: 0;
 }
+.btn.active[disabled] {
+  opacity: 1;
+  color: #333;
+  background: #e6e6e6;
+  border-color: #adadad;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
 a.btn.action_icon {
   font-weight: normal;
   text-decoration: none;
@@ -2239,13 +2217,20 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
+.form-horizontal .compose_layout {
+  margin-bottom: 15px;
+}
 .form-horizontal .compose_layout td {
   padding: 0 2px 2px 0;
   vertical-align: middle;
 }
+.form-horizontal .compose_layout th.label,
 .form-horizontal .compose_layout td.label {
   display: table-cell;
+  color: #333;
+  font-size: 100%;
 }
+.form-horizontal .compose_layout th.label label,
 .form-horizontal .compose_layout td.label label {
   margin: 0;
 }
@@ -2340,10 +2325,21 @@ form ul.token-input-list-facebook {
   font-size: 14px;
   background-color: #FFFFFF;
   border: 1px solid #CCCCCC;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-  transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   padding: 4px 4px 0 4px;
+}
+form ul.token-input-list-facebook.token-input-list-error {
+  background: #fbf2ee;
+  border: 1px solid #d99;
 }
 form ul.token-input-list-facebook input,
 form ul.token-input-list-facebook input:focus {
@@ -2358,6 +2354,10 @@ form ul.token-input-list-facebook li input {
 }
 form ul.token-input-list-facebook li.token-input-token-facebook,
 form ul.token-input-list-facebook li.token-input-input-token-facebook {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   margin: 0 4px 4px 0;
 }
@@ -2505,6 +2505,10 @@ select:focus:invalid:focus {
 .panel-heading h4 {
   margin: 0;
 }
+.panel-heading .close {
+  position: relative;
+  top: -4px;
+}
 legend.panel-heading {
   font-size: 16px;
   font-weight: normal;
@@ -2536,10 +2540,43 @@ legend.panel-heading {
 .form-horizontal .controls .form-control.form_textarea_input {
   display: block;
 }
-div.comment_toolbars div.edit_toolbar,
-div.message_toolbars div.edit_toolbar {
-  padding-left: 0;
-  padding-right: 0;
+div.edit_toolbars {
+  margin-top: 5px;
+  text-align: left;
+}
+div.edit_toolbars,
+div.message_toolbars {
+  line-height: 1;
+}
+div.edit_toolbars .btn-toolbar,
+div.message_toolbars .btn-toolbar {
+  display: inline-block;
+  margin-right: 2px;
+}
+.btn-toolbar {
+  margin-left: 0;
+  line-height: 1.42857143;
+}
+.btn-toolbar[class*="_toolbar"] {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  padding: 2px;
+}
+.btn-toolbar .btn-group:first-child {
+  margin-left: 0;
+}
+.btn-toolbar-title {
+  padding-left: 5px;
+  float: left;
+  font-weight: bold;
+}
+.edit_plugin_actions {
+  padding-top: 7px;
 }
 .badge {
   border: none;
@@ -2558,22 +2595,18 @@ a.evo_messages_link .badge {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
-.modal-dialog {
-  width: 100%;
-  height: 100%;
-}
-.modal-dialog .modal-content {
-  height: 100%;
-}
-.modal-dialog .modal-content .modal-body {
-  height: 90%;
-}
-.modal_fixed_height .modal-dialog {
-  height: auto;
+.modal-body .panel {
+  border: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
 }
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
   border-radius: 8px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   padding: 8px 0;
@@ -2661,4 +2694,7 @@ a.evo_messages_link .badge {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
+}
+.popover.right {
+  text-align: left;
 }

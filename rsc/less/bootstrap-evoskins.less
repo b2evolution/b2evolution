@@ -1,5 +1,13 @@
 	/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
 
+.border-radius (@radius: 4px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	-ms-border-radius: @radius;
+	-o-border-radius: @radius;
+	border-radius: @radius;
+}
+
 // Don't rewrite a font family of glyph icons
 .glyphicon {
 	font-family: 'Glyphicons Halflings' !important;
@@ -8,6 +16,16 @@
 ul, ol {
 	margin: 0 0 10px 25px;
 	padding: 0;
+}
+
+// Keep almost same style for active disabled buttons (used by TinyMCE plugin)
+.btn.active[disabled] {
+	opacity: 1;
+	color: #333;
+	background: #e6e6e6;
+	border-color: #adadad;
+	-webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+					box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
 }
 
 // Make action icon normal font style
@@ -106,12 +124,15 @@ a.btn.action_icon {
 	}
 	// Table on the edit post form where Title/Language  & Advanced Properties are located
 	.compose_layout {
+		margin-bottom: 15px;
 		td {
 			padding: 0 2px 2px 0;
 			vertical-align: middle;
 		}
-		td.label {
+		th.label, td.label {
 			display: table-cell;
+			color: #333;
+			font-size: 100%;
 			label {
 				margin: 0;
 			}
@@ -220,10 +241,17 @@ form ul.token-input-list-facebook {
 	font-size: 14px;
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-	transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-	border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+					box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+			 -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+					transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	.border-radius;
 	padding: 4px 4px 0 4px;
+	&.token-input-list-error {
+		background: #fbf2ee;
+		border: 1px solid #d99;
+	}
 	input, input:focus {
 		box-shadow: none;
 	}
@@ -234,7 +262,7 @@ form ul.token-input-list-facebook {
 			padding: 2px 0 1px 0;
 		}
 		&.token-input-token-facebook, &.token-input-input-token-facebook {
-			border-radius: 4px;
+			.border-radius;
 			margin: 0 4px 4px 0;
 		}
 	}
@@ -400,8 +428,14 @@ select:focus:invalid:focus {
 }
 
 // Panels
-.panel-heading h4 {
-	margin: 0;
+.panel-heading {
+	h4 {
+		margin: 0;
+	}
+	.close {
+		position: relative;
+		top: -4px;
+	}
 }
 legend.panel-heading {
 	font-size: 16px;
@@ -439,12 +473,41 @@ legend.panel-heading {
 		display: block;
 	}
 }
-div.comment_toolbars div.edit_toolbar,
-div.message_toolbars div.edit_toolbar {
-	padding-left: 0;
-	padding-right: 0;
-}
 
+// Plugin toolbars
+div.edit_toolbars {
+	margin-top: 5px;
+	text-align: left;
+}
+div.edit_toolbars, div.message_toolbars {
+	line-height: 1;
+	.btn-toolbar {
+		display: inline-block;
+		margin-right: 2px;
+	}
+}
+.btn-toolbar {
+	margin-left: 0;
+	line-height: 1.42857143;
+	&[class*="_toolbar"] {
+		background-color: #f5f5f5;
+		border: 1px solid #ddd;
+		.border-radius;
+		padding: 2px;
+	}
+	.btn-group:first-child {
+		margin-left: 0;
+	}
+}
+.btn-toolbar-title {
+	padding-left: 5px;
+	float: left;
+	font-weight: bold;
+}
+// Plugin buttons
+.edit_plugin_actions {
+	padding-top: 7px;
+}
 
 // Remove borders from badge
 .badge {
@@ -467,25 +530,20 @@ a.evo_messages_link .badge {
 	box-sizing: content-box;
 }
 
-.modal-dialog {
-	width: 100%;
-	height: 100%;
-	.modal-content {
-		height: 100%;
-		.modal-body {
-			height: 90%;
-		}
+// Modal windows
+.modal-body {
+	.panel {
+		border: none;
+		box-shadow: none;
+		-webkit-box-shadow: none;
 	}
-}
-.modal_fixed_height .modal-dialog {
-	height: auto;
 }
 
 // Typeahead plugin
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 8px;
+	.border-radius(8px);
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	padding: 8px 0;
 	.tt-suggestion {
@@ -576,4 +634,9 @@ a.evo_messages_link .badge {
 .btn-status-redirected:hover {
 	color: #fff;
 	background-color: #613192;
+}
+
+// Fix alignment in popover
+.popover.right {
+	text-align: left;
 }

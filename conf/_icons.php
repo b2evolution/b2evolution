@@ -89,7 +89,7 @@ function get_icon_info($name)
 			'legend'=>T_('Delete'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 128, 16 ),
-			'glyph' => 'remove-sign',
+			'glyph' => 'trash',
 			'fa' => 'trash-o'
 		);
 
@@ -380,12 +380,27 @@ function get_icon_info($name)
 			'glyph' => 'pencil',			// May need something else
 			'fa' => 'pencil'
 		);
+		case 'contacts': return array(
+			'rollover' => true,
+			'alt'  => T_('Contacts'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'users'
+		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
 			'size' => array( 14, 15 ),
 			'xy' => array( 32, 64 ),
 			'glyph' => 'share',
 			'fa' => 'copy'
+		);
+		case 'choose': return array(
+			'alt'  => T_('Choose'),
+			'size' => array( 16, 13 ),
+			'xy' => array( 64, 64 ),
+			'glyph' => 'hand-up',
+			'fa' => 'hand-o-up'
 		);
 		case 'edit': return array(
 			'alt'  => T_('Edit'),
@@ -440,28 +455,37 @@ function get_icon_info($name)
 			'fa' => 'recycle fa-x-rollover-red-light'
 		);
 		case 'delete': return array(
-			'alt'  => T_('Del'),
+			'alt'  => /* TRANS: Delete */ T_('Del'),
 			'legend' => T_('Delete'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 128, 64 ),
 			'glyph' => 'remove',
-			'fa' => 'trash-o fa-x-rollover-red-light'
+			'color' => '#F00',
+			'fa' => 'trash-o'
+		);
+		case 'remove': return array(
+			'alt' => /* TRANS: Remove */ T_('Rem'),
+			'size' => array( 13, 13 ),
+			'xy' => array( 144, 64 ),
+			'glyph' => 'remove-sign',
+			'fa' => 'times-circle',
+			'color' => '#F00',
+		);
+		case 'xross': return array(	// Do NOT use for actions. Use only to indicate Mismatch
+			'alt' => 'x',
+			'size' => array( 13, 13 ),
+			'xy' => array( 144, 64 ),
+			'glyph' => 'remove-sign',
+			'fa' => 'times-circle',
+			'color' => '#F00',
 		);
 		case 'close': return array(
 			'rollover' => true,
 			'alt' => T_('Close'),
 			'size' => array( 14, 14 ),
 			'xy' => array( 0, 224 ),
-			'glyph' => 'remove-sign',
+			'glyph' => 'remove', // Looks like "X"
 			'fa' => 'close fa-x-rollover-red-light'
-		);
-		case 'xross': return array(
-			'alt'  => T_('Del'),
-			'size' => array( 13, 13 ),
-			'xy' => array( 144, 64 ),
-			'glyph' => 'remove',
-			'fa' => 'times',
-			'color' => '#F00',
 		);
 
 		case 'bullet_black':

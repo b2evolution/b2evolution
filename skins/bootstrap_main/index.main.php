@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8577 2015-03-25 16:18:45Z yura $
+	 * @version $Id: index.main.php 8640 2015-04-01 12:23:10Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -295,6 +295,7 @@ if( $disp != 'front' )
 				'login_form_class'      => 'form-login',
 				'display_reg_link'      => true,
 				'abort_link_position'   => 'form_title',
+				'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 				// Register
 				'register_page_before'      => '<div class="wrap-form-register">',
 				'register_page_after'       => '</div>',

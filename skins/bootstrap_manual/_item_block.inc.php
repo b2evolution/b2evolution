@@ -25,7 +25,7 @@ $params = array_merge( array(
 		'image_class'       => 'img-responsive',
 		'image_size'        => 'fit-1280x720',
 		'disp_comment_form' => true,
-		'item_link_type'    => 'permalink',
+		'item_link_type'    => 'post',
 	), $params );
 
 if( $disp == 'single' )

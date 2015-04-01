@@ -133,7 +133,7 @@ if( isset( $edited_User ) )
 						}
 					?>
 
-					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-default btn-sm"
+					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-warning btn-sm"
 						value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 					<?php
@@ -342,7 +342,7 @@ if( isset( $edited_User ) )
 						else
 						{	// We can create both files and directories:
 							echo T_('New').': ';
-							echo '<select name="create_type" class="form-control input-sm">';
+							echo '<select name="create_type" class="form-control">';
 							echo '<option value="dir"';
 							if( isset($create_type) &&  $create_type == 'dir' )
 							{
@@ -363,7 +363,7 @@ if( isset( $edited_User ) )
 						if( isset( $create_name ) )
 						{
 							echo $create_name;
-						} ?>" size="15" class="form-control input-sm" />
+						} ?>" size="15" class="form-control" />
 					<input class="ActionButton btn btn-default" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
 					<?php
 					$Form->end_form();
@@ -388,7 +388,7 @@ if( isset( $edited_User ) )
 						$Form->hiddens_by_key( get_memorized('ctrl') );
 						echo '<div>';
 						echo '<input name="uploadfile[]" type="file" size="10" />';
-						echo '<input class="ActionButton btn btn-primary" type="submit" value="&gt; '.T_('Quick upload!').'" />';
+						echo '<input class="ActionButton btn btn-default" type="submit" value="&gt; '.T_('Quick upload!').'" />';
 						echo '</div>';
 					$Form->end_form();
 					echo '</div>';

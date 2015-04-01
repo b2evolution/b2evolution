@@ -259,17 +259,21 @@ XX(      graydead.gif
 			{ // include any smiley only once
 				$smiled[] = $smiley['image'];
 
-				$grins .= $this->get_smiley_img_tag( $smiley, array(
-					'class' => 'top',
-					'data-func' => 'textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1' ) )
-					.' ';
+				$grins .= '<span class="'.$this->get_template( 'toolbar_button_class' ).'"'
+					.' data-func="textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
+						.$this->get_smiley_img_tag( $smiley )
+					.'</span> ';
 			}
 		}
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo '<div class="edit_toolbar" id="smiley_toolbar">'.$grins.'</div>' ;
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'smiley_toolbar' ) );
+		echo $this->get_template( 'toolbar_group_before' );
+		echo $grins;
+		echo $this->get_template( 'toolbar_group_after' );
+		echo $this->get_template( 'toolbar_after' );
 
 		return true;
 	}

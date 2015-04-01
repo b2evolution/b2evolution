@@ -1678,7 +1678,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$next_action = ($creating ? 'create' : 'update');
 	if( !$inskin )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-default' ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
 	}
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
@@ -1765,11 +1765,12 @@ function echo_publishnowbutton_js()
 				publishnow_btn.css( 'display', 'inline' );
 			}
 
-			// Change title of the save button
+			// Change title of the save buttons
 			var status = jQuery( this ).val();
 			var save_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>]"]' );
 			save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
-			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-[^\s]+/, 'btn-status-' + this.value ) );
+			save_btn = save_btn.add( '.edit_actions input[name="actionArray[update_edit]"]' );
+			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + this.value ) );
 		} );
 	</script>
 	<?php

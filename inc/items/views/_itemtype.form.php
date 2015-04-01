@@ -128,7 +128,7 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 			{
 				continue;
 			}
-			$action_delete = get_icon( 'xross', 'imgtag', array( 'id' => 'delete_'.$field_id_suffix, 'style' => 'cursor:pointer', 'title' => T_('Delete custom field') ) );
+			$action_delete = get_icon( 'remove', 'imgtag', array( 'id' => 'delete_'.$field_id_suffix, 'style' => 'cursor:pointer', 'title' => T_('Remove custom field') ) );
 			$custom_field_name = $custom_field['name'];
 			$custom_field_label = $custom_field['label'];
 			$custom_field_label_class = '';

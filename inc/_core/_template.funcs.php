@@ -2172,6 +2172,7 @@ function display_login_form( $params )
 			'transmit_hashed_password' => false,
 			'display_abort_link'  => true,
 			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
+			'abort_link_text'     => T_('Abort login!'),
 			'display_reg_link'    => false, // Display registration link after login button
 		), $params );
 
@@ -2210,14 +2211,15 @@ function display_login_form( $params )
 		{ // logged in user isn't required for redirect_to url, set abort url to redirect_to
 			$abort_url = $redirect_to;
 		}
+		// Gets displayed as link to the location on the login form if no login is required
+		$abort_link = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'.$params['abort_link_text'].'</a>';
 		if( $params['abort_link_position'] == 'above_form' )
 		{ // Display an abort link under login form
-			$links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'
-			./* Gets displayed as link to the location on the login form if no login is required */ T_('Abort login!').'</a>';
+			$links[] = $abort_link;
 		}
 		elseif( $params['abort_link_position'] == 'form_title' )
 		{ // Display an abort link in form title block
-			$form_links[] = '<a href="'.htmlspecialchars( url_rel_to_same_host( $abort_url, $ReqHost ) ).'">'.get_icon( 'close' ).'</a>';
+			$form_links[] = $abort_link;
 		}
 	}
 

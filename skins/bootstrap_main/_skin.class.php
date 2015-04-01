@@ -181,9 +181,8 @@ class bootstrap_main_Skin extends Skin
 
 		require_js( '#jquery#', 'blog' );
 
-		// Use glyph icons, @see get_icon()
-		global $b2evo_icons_type;
-		$b2evo_icons_type = 'glyphicons';
+		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+		init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );
@@ -553,6 +552,18 @@ class bootstrap_main_Skin extends Skin
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'popover';
 				break;
+
+			case 'plugin_template':
+				// Template for plugins
+				return array(
+						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+						'toolbar_after'        => '</div>',
+						'toolbar_title_before' => '<div class="btn-toolbar-title">',
+						'toolbar_title_after'  => '</div>',
+						'toolbar_group_before' => '<div class="btn-group btn-group-xs" role="group">',
+						'toolbar_group_after'  => '</div>',
+						'toolbar_button_class' => 'btn btn-default',
+					);
 
 			default:
 				// Delegate to parent class:

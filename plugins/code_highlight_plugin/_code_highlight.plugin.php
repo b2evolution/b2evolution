@@ -271,29 +271,36 @@ class code_highlight_plugin extends Plugin
 
 	function DisplayCodeToolbar()
 	{
-		echo '<div class="edit_toolbar code_toolbar">';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'code_toolbar' ) );
+
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
-		echo T_('Code').': ';
-		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="quicktags" data-func="code_tag|samp" value="samp" />';
-		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="quicktags" data-func="code_tag|kbd" value="kbd" />';
-		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="quicktags" data-func="code_tag|var" value="var" />';
-		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="quicktags" data-func="code_tag|code" value="code" />';
-		/* space */
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" style="margin-left:8px;" class="quicktags" data-func="codespan_tag| " value="codespan" />';
-		/* space */
-		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" data-func="codeblock_tag| " value="codeblock" />';
-		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="quicktags" data-func="codeblock_tag|xml" value="XML" />';
-		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="quicktags" data-func="codeblock_tag|html" value="HTML" />';
-		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="quicktags" data-func="codeblock_tag|php" value="PHP" />';
-		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="quicktags" data-func="codeblock_tag|css" value="CSS" />';
-		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="quicktags" data-func="codeblock_tag|shell" value="Shell" />';
-		echo '</div>';
+		echo $this->get_template( 'toolbar_title_before' ).T_('Code').': '.$this->get_template( 'toolbar_title_after' );
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|samp" value="samp" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|kbd" value="kbd" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|var" value="var" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|code" value="code" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codespan_tag| " value="codespan" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag| " value="codeblock" />';
+		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|xml" value="XML" />';
+		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|html" value="HTML" />';
+		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|php" value="PHP" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|css" value="CSS" />';
+		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|shell" value="Shell" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?>
-		<script type="text/javascript">
+		?><script type="text/javascript">
 			//<![CDATA[
 			function code_tag( tag_name )
 			{
@@ -314,8 +321,7 @@ class code_highlight_plugin extends Plugin
 				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
 			}
 			//]]>
-		</script>
-		<?php
+		</script><?php
 
 		return true;
 	}

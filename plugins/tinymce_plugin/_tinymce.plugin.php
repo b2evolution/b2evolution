@@ -274,15 +274,15 @@ class tinymce_plugin extends Plugin
 
 		?>
 
-		<input id="tinymce_plugin_toggle_button"
-			type="button"
-			value="WYSIWYG"
-			class="btn btn-default"
-			style="display:none"
-			title="<?php echo htmlspecialchars($this->T_('Toggle between WYSIWYG and plain HTML editor')); ?>" />
+		<div class="btn-group">
+			<input id="tinymce_plugin_toggle_button_html" type="button" value="HTML" class="btn btn-default active" disabled="disabled"
+				title="<?php echo format_to_output( $this->T_('Toggle to plain HTML editor'), 'htmlattr' ); ?>" />
+			<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
+				title="<?php echo format_to_output( $this->T_('Toggle to WYSIWYG editor'), 'htmlattr' ); ?>" />
+		</div>
 
 		<script type="text/javascript">
-			jQuery("#tinymce_plugin_toggle_button").click( function()
+			jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
 			{
 				tinymce_plugin_toggleEditor('<?php echo $this->tmce_editor_id; ?>');
 			} );
@@ -293,8 +293,8 @@ class tinymce_plugin extends Plugin
 			 */
 			function tinymce_plugin_toggleEditor(id)
 			{
-				jQuery('#tinymce_plugin_toggle_button').attr("disabled", "disabled");
-				//jQuery('#tinymce_plugin_toggle_button').removeAttr("disabled");
+				jQuery( '[id^=tinymce_plugin_toggle_button_]' ).removeClass( 'active' ).attr( 'disabled', 'disabled' );
+
 				if( ! tinymce_plugin_init_done )
 				{
 					tinymce_plugin_init_done = true;
@@ -307,7 +307,8 @@ class tinymce_plugin extends Plugin
 				{ // Turn on WYSIWYG editor
 					tinymce.execCommand( 'mceAddEditor', false, id );
 					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 1, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
-					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'HTML' );
+					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
+					jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 					// Hide the plugin toolbars that allow to insert html tags
 					jQuery( '.quicktags_toolbar, .code_toolbar, .prism_toolbar' ).hide();
@@ -325,7 +326,8 @@ class tinymce_plugin extends Plugin
 				{ // Hide the editor, Display only source HTML
 					tinymce.execCommand( 'mceRemoveEditor', false, id );
 					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 0, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
-					jQuery( '#tinymce_plugin_toggle_button' ).attr( 'value', 'WYSIWYG' );
+					jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
+					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 					// Show the plugin toolbars that allow to insert html tags
 					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).show();
@@ -339,11 +341,7 @@ class tinymce_plugin extends Plugin
 						jQuery( this ).removeAttr( 'disabled' );
 					} );
 				}
-				jQuery( '#tinymce_plugin_toggle_button' ).removeAttr( 'disabled' );
 			}
-
-			// Make the "toggle" button visible using JS:
-			jQuery('#tinymce_plugin_toggle_button').css('display', '');
 
 			// Init array with all usernames from the page for autocomplete plugin
 			var autocomplete_static_options = [];

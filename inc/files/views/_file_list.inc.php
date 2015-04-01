@@ -417,7 +417,7 @@ $Form->begin_form();
 
 		/*****************  Action icons  ****************/
 
-		echo '<td class="actions lastcol">';
+		echo '<td class="actions lastcol nowrap">';
 
 		if( $edit_perm )
 		{ // User can edit:

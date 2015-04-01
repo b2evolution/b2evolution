@@ -59,6 +59,7 @@ $params = array_merge( array(
 		'transmit_hashed_password' => $transmit_hashed_password,
 		'display_abort_link'       => true,
 		'abort_link_position'      => 'above_form',
+		'abort_link_text'          => T_('Abort login!'),
 		'display_reg_link'         => false,
 		'display_form_messages'    => false,
 		'login_form_footer'        => true,
@@ -85,6 +86,7 @@ $login_form_params = array(
 	'transmit_hashed_password' => $params['transmit_hashed_password'],
 	'display_abort_link'       => $params['display_abort_link'],
 	'abort_link_position'      => $params['abort_link_position'],
+	'abort_link_text'          => $params['abort_link_text'],
 	'display_reg_link'         => $params['display_reg_link'],
 );
 

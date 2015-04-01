@@ -511,8 +511,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?>
-		<script type="text/javascript">
+		?><script type="text/javascript">
 		//<![CDATA[
 		var bbButtons = new Array();
 		var bbOpenTags = new Array();
@@ -546,7 +545,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		function bbGetButton(button, i)
 		{
 			return '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-					+ '" style="' + button.style + '" class="quicktags" data-func="bbInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="bbInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
 		}
 
 		// Memorize a new open tag
@@ -604,14 +603,16 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 		function bbToolbar()
 		{
-			var bbcode_toolbar = '<div><?php echo T_('BB code:'); ?> ';
+			var bbcode_toolbar = '<?php echo $this->get_template( 'toolbar_title_before' ).T_('BB code:').' '.$this->get_template( 'toolbar_title_after' ); ?>';
+			bbcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
 			for( var i = 0; i < bbButtons.length; i++ )
 			{
 				bbcode_toolbar += bbGetButton( bbButtons[i], i );
 			}
-			bbcode_toolbar += '<input type="button" id="bb_close" class="quicktags" data-func="bbCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" style="margin-left:8px;" />'
-			bbcode_toolbar += '</div>';
-			jQuery( '#bbcode_toolbar' ).html( bbcode_toolbar );
+			bbcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
+			bbcode_toolbar += '<input type="button" id="bb_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="bbCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" />';
+			bbcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+			jQuery( '.bbcode_toolbar' ).html( bbcode_toolbar );
 		}
 
 		/**
@@ -666,11 +667,12 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 			}
 		}
 		//]]>
-		</script>
+		</script><?php
 
-		<div id="bbcode_toolbar" class="edit_toolbar"><script type="text/javascript">bbToolbar();</script></div>
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'bbcode_toolbar' ) );
+		?><script type="text/javascript">bbToolbar();</script><?php
+		echo $this->get_template( 'toolbar_after' );
 
-		<?php
 		return true;
 	}
 

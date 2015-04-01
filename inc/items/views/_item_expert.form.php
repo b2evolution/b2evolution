@@ -154,7 +154,7 @@ $Form->begin_form( '', '', $params );
 	if( $display_title_field )
 	{ // Display title
 		$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
-		echo '<td width="1%">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
+		echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
 		echo '<td width="97%" class="input">';
 		$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td>';
@@ -176,7 +176,7 @@ $Form->begin_form( '', '', $params );
 	}
 	else
 	{ // More than one locale => select field.
-		echo '<td width="1%">';
+		echo '<td width="1%" class="label">';
 		if( $display_title_field )
 		{
 			echo '&nbsp;&nbsp;';
@@ -193,7 +193,7 @@ $Form->begin_form( '', '', $params );
 	{ // Display url
 		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
 		echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
-		echo '<td width="1%">'.$field_required.'<strong>'.T_('Link to url').':</strong></td>';
+		echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Link to url').':</strong></td>';
 		echo '<td class="input" style="padding-right:2px">';
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 		echo '</td>';
@@ -242,10 +242,16 @@ $Form->begin_form( '', '', $params );
 	// ------------------------------- ACTIONS ----------------------------------
 	echo '<div class="edit_actions">';
 
+	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	echo '</div>';
 
+	echo '<div class="pull-right">';
 	echo_publish_buttons( $Form, $creating, $edited_Item );
+	echo '</div>';
+
+	echo '<div class="clear"></div>';
 
 	echo '</div>';
 

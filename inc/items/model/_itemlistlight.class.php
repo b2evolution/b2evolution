@@ -956,7 +956,7 @@ class ItemListLight extends DataObjectList2
 						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
 							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
 						}
-						$cat_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', $cat_clear_url ) : '';
+						$cat_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $cat_clear_url ) : '';
 						$cat_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( $params['category_text'], $tmp_Chapter->name, $cat_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask'] );
@@ -1025,7 +1025,7 @@ class ItemListLight extends DataObjectList2
 				}
 
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
-				$arch_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'m' ) ) : '';
+				$arch_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'m' ) ) : '';
 				$arch = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( $params['archives_text'], $arch, $arch_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask'] );
@@ -1056,7 +1056,7 @@ class ItemListLight extends DataObjectList2
 				$keyword_names = array();
 				foreach( $keywords as $keyword )
 				{
-					$word_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'s='.$keyword ) ) : '';
+					$word_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'s='.$keyword ) ) : '';
 					$keyword_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( $params['keyword_text'], $keyword, $word_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask'] );
@@ -1089,7 +1089,7 @@ class ItemListLight extends DataObjectList2
 					{ // Remove tag url from $ReqPath when we use tag url instead of tag ID
 						$tag_clear_url = str_replace( '/'.$tag.':', '', $tag_clear_url );
 					}
-					$tag_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', $tag_clear_url ) : '';
+					$tag_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $tag_clear_url ) : '';
 					$tag_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( $params['tag_text'], $tag, $tag_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask'] );
@@ -1127,7 +1127,7 @@ class ItemListLight extends DataObjectList2
 					{
 						if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
 						{
-							$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'author='.$author_ID ) ) : '';
+							$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'author='.$author_ID ) ) : '';
 							$author_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 								array( $params['author_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
 								$params['filter_mask'] );
@@ -1164,7 +1164,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				if( $this->filters['assignees'] == '-' )
 				{
-					$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'assgn' ) ) : '';
+					$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'assgn' ) ) : '';
 					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( T_('Not assigned'), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask_nogroup'] );
@@ -1181,7 +1181,7 @@ class ItemListLight extends DataObjectList2
 						{
 							if( $tmp_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
 							{
-								$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'assgn='.$user_ID ) ) : '';
+								$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'assgn='.$user_ID ) ) : '';
 								$assignees_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 									array( $params['assignes_text'], $tmp_User->get_identity_link( array( 'link_text' => 'name' ) ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
 									$params['filter_mask'] );
@@ -1206,7 +1206,7 @@ class ItemListLight extends DataObjectList2
 			if( $this->filters['lc'] != 'all' )
 			{
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
-				$user_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'lc' ) ) : '';
+				$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'lc' ) ) : '';
 				$loc = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( T_('Locale').': ', $this->filters['lc'], $user_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask'] );
@@ -1226,7 +1226,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				if( $this->filters['statuses'] == '-' )
 				{
-					$status_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'status=-' ) ) : '';
+					$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'status=-' ) ) : '';
 					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask_nogroup'] );
@@ -1240,7 +1240,7 @@ class ItemListLight extends DataObjectList2
 					{
 						if( $ItemStatus = & $ItemStatusCache->get_by_ID( $status_ID ) )
 						{
-							$status_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'status='.$status_ID ) ) : '';
+							$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'status='.$status_ID ) ) : '';
 							$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 								array( $params['status_text'], $ItemStatus->get_name(), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
 								$params['filter_mask'] );
@@ -1269,7 +1269,7 @@ class ItemListLight extends DataObjectList2
 					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 					foreach( $this->filters['visibility_array'] as $status )
 					{
-						$vis_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_statuses='.$status ) ) : '';
+						$vis_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses='.$status ) ) : '';
 						$status_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( $params['visibility_text'], $post_statuses[ $status ], $vis_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask'] );
@@ -1293,7 +1293,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				if( ! empty( $this->filters['ymdhms_min'] ) )
 				{
-					$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'dstart' ) ) : '';
+					$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'dstart' ) ) : '';
 					$title_array['ts_min'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( T_('Start at').': ', date2mysql( $this->filters['ymdhms_min'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask'] );
@@ -1302,14 +1302,14 @@ class ItemListLight extends DataObjectList2
 				{
 					if( $this->filters['ts_min'] == 'now' )
 					{
-						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
+						$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
 						$title_array['ts_min'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( T_('Hide past'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask_nogroup'] );
 					}
 					else
 					{
-						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
+						$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
 						$title_array['ts_min'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( T_('Start at').': ', date2mysql( $this->filters['ts_min'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask'] );
@@ -1325,7 +1325,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				if( ! empty( $this->filters['ymdhms_max'] ) )
 				{
-					$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'dstop' ) ) : '';
+					$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'dstop' ) ) : '';
 					$title_array['ts_max'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( T_('Stop at').': ', date2mysql( $this->filters['ymdhms_max'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask'] );
@@ -1336,7 +1336,7 @@ class ItemListLight extends DataObjectList2
 					{
 						if( ! in_array( 'hide_future', $ignore ) )
 						{
-							$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
+							$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
 							$title_array['ts_max'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 								array( T_('Hide future'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 								$params['filter_mask_nogroup'] );
@@ -1344,7 +1344,7 @@ class ItemListLight extends DataObjectList2
 					}
 					else
 					{
-						$time_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
+						$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
 						$title_array['ts_max'] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( T_('Stop at').': ', date2mysql( $this->filters['ts_max'] ), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask'] );
@@ -1381,7 +1381,7 @@ class ItemListLight extends DataObjectList2
 					else
 					{ // We are going to limit to LAST x days:
 						// TODO: rename 'posts' to 'limit'
-						$unit_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'unit' ) ) : '';
+						$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'unit' ) ) : '';
 						$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( sprintf( T_('Limited to %d last days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask_nogroup'] );
@@ -1389,7 +1389,7 @@ class ItemListLight extends DataObjectList2
 				}
 				else
 				{ // We have a start date, we'll display x days starting from that point:
-					$unit_clear_icon = $clear_icon ? action_icon( T_('Delete this filter'), 'xross', regenerate_url( $this->param_prefix.'unit' ) ) : '';
+					$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'unit' ) ) : '';
 					$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( sprintf( T_('Limited to %d days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 						$params['filter_mask_nogroup'] );

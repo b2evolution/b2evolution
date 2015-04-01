@@ -92,6 +92,7 @@ $params = array(
 	'transmit_hashed_password' => $transmit_hashed_password,
 	'display_abort_link'       => true,
 	'abort_link_position'      => 'form_title',
+	'abort_link_text'          => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 	'display_reg_link'         => true,
 	'login_form_footer'        => false,
 );

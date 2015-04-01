@@ -46,7 +46,7 @@ global $Settings, $Session;
 				// Widget 'Content Hierarchy':
 				'item_before_opened'   => get_icon( 'collapse' ),
 				'item_before_closed'   => get_icon( 'expand' ),
-				'item_before_post'     => get_icon( 'permalink' ),
+				'item_before_post'     => get_icon( 'post' ),
 				'expand_all'           => false,
 				'sorted'               => true
 			) );

@@ -1757,13 +1757,19 @@ class Form extends Widget
 		// Need to add event click on links at the form end.
 		$this->check_all = true;
 
+		$r = '<span class="btn-group">';
+
 		// fp> This is "name=" and I mean it!!! The JS is looking for all elements with this name!
-		return '<a name="check_all_nocheckchanges" href="'.regenerate_url().'">'
+		$r .= '<a name="check_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
 				//.T_('Check all').' '
 				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> | <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'">'
+				.'</a> <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
 				//.T_('Uncheck all').' '
 				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
+
+		$r .= '</span>';
+
+		return $r;
 	}
 
 

@@ -2098,7 +2098,7 @@ class Plugins
 		foreach( $RendererPlugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
 			// echo ' ',$loop_RendererPlugin->code;
-			if( empty($loop_RendererPlugin->code) )
+			if( empty( $loop_RendererPlugin->code ) )
 			{ // No unique code!
 				continue;
 			}
@@ -2171,12 +2171,42 @@ class Plugins
 			$r .= "</div>\n";
 		}
 
-		if( !$atLeastOneRenderer )
+		if( ! $atLeastOneRenderer )
 		{
 			if( is_admin_page() )
-			{	// Display info about no renderer plugins only in backoffice
-				global $admin_url;
-				$r .= '<a title="'.T_('Configure plugins').'" href="'.$admin_url.'?ctrl=plugins"'.'>'.T_('No renderer plugins are installed.').'</a>';
+			{ // Display info about no renderer plugins only in backoffice
+				global $current_User;
+				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
+				{
+					switch( $setting_name )
+					{
+						case 'msg_apply_rendering':
+							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							{ // Check if current user can edit the messaging settings
+								$settings_url = $admin_url.'?ctrl=msgsettings#fieldset_wrapper_msgplugins';
+							}
+							break;
+
+						case 'coll_apply_comment_rendering':
+						case 'coll_apply_rendering':
+						default:
+							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
+							{ // Check if current user can edit the blog plugin settings
+								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$setting_Blog->ID;
+							}
+							break;
+					}
+				}
+
+				if( ! empty( $settings_url ) )
+				{ // Display a link to plugin settings only when current user has a permission to edit them
+					$r .= '<a title="'.T_('Configure plugins').'" href="'.$settings_url.'"'.'>';
+				}
+				$r .= T_('No renderer plugins can be selected by the user.');
+				if( ! empty( $settings_url ) )
+				{
+					$r .= '</a>';
+				}
 			}
 			else
 			{

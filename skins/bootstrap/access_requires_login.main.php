@@ -115,6 +115,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'login_form_class'      => 'form-login',
 				'display_reg_link'      => true,
 				'abort_link_position'   => 'form_title',
+				'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

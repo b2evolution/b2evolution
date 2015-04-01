@@ -477,7 +477,7 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
-div.edit_toolbars {
+.edit_toolbars {
   margin-top: 1ex;
   width: 100%;
   text-align: center;

@@ -111,7 +111,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 if( !empty( $plugins_settings_content ) )
 { // Display fieldset only when at least one renderer plugin exists
-	$Form->begin_fieldset( T_( 'Renderer plugins settings' ) );
+	$Form->begin_fieldset( T_( 'Renderer plugins settings' ), array( 'id' => 'msgplugins' ) );
 
 	echo $plugins_settings_content;
 

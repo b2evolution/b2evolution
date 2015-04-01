@@ -168,8 +168,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 	if( $use_title != 'never' )
 	{
 		$Form->switch_layout( 'none' );
-		echo '<table width="100%"><tr>';
-		$Form->labelstart = '<th width="10%">';
+		echo '<table width="100%" class="compose_layout"><tr>';
+		$Form->labelstart = '<th width="1%" class="label">';
 		$Form->labelend = '</th>';
 		$Form->inputstart = '<td>';
 		$Form->inputend = '</td>';
@@ -209,8 +209,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 		</script>
 
 		<?php
+		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
 		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		echo '</div>';
 	}
 	else
 	{ // Hide text
