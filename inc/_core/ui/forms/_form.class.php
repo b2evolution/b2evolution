@@ -2866,10 +2866,13 @@ class Form extends Widget
 		$field_params['class'] .= ' btn';
 		if( strpos( $field_params['class'], 'btn-' ) === false )
 		{ // Only when it is not defined from skin
-			if( strpos( $field_params['class'], 'SaveButton' ) !== false ||
-					strpos( $field_params['class'], 'SaveEditButton' ) !== false )
+			if( empty( $this->btn_primary_is_used ) &&
+					( strpos( $field_params['class'], 'SaveButton' ) !== false ||
+					  strpos( $field_params['class'], 'SaveEditButton' ) !== false ) )
 			{ // Submit button
 				$field_params['class'] .= ' btn-primary';
+				// Set this var to true in order to don't use a primary button twice on one form
+				$this->btn_primary_is_used = true;
 			}
 			elseif( strpos( $field_params['class'], 'ResetButton' ) !== false )
 			{ // Reset button

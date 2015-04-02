@@ -19,7 +19,7 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
-$login = param( $dummy_fields[ 'login' ], 'string', '' );
+$login = param( $dummy_fields['login'], 'string', '' );
 param_action( 'req_login' );
 param( 'mode', 'string', '' );
 param( 'inskin', 'boolean', false );
@@ -100,7 +100,7 @@ switch( $action )
 
 		if( empty( $login ) )
 		{ // Don't allow empty request
-			$Messages->add( T_('You must enter your username or your email address so we know where to send the password recovery email.') );
+			param_error( $dummy_fields['login'], T_('You must enter your username or your email address so we know where to send the password recovery email.'), '' );
 			$action = 'lostpassword';
 			break;
 		}
@@ -633,6 +633,9 @@ switch( $action )
 		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
 		$wrap_width = '480px';
 
+		// Use the links in the form title
+		$use_form_links = true;
+
 		// Include page header:
 		require $adminskins_path.'login/_html_header.inc.php';
 
@@ -646,6 +649,7 @@ switch( $action )
 			'login_form_class'     => 'form-login form-lostpass',
 			'lostpass_form_params' => $login_form_params,
 			'lostpass_form_footer' => false,
+			'abort_link_text'      => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 		);
 		require $skins_path.'_lostpassword.disp.php';
 

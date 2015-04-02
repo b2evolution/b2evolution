@@ -2470,22 +2470,34 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	global $secure_htsrv_url, $dummy_fields, $redirect_to;
 
 	$params = array_merge( array(
-			'form_before'   => '',
-			'form_after'    => '',
-			'form_action'   => $secure_htsrv_url.'login.php',
-			'form_name'     => 'lostpass_form',
-			'form_class'    => 'fform',
-			'form_template' => NULL,
-			'inskin'        => true,
-			'inskin_urls'   => true,
+			'form_before'     => '',
+			'form_after'      => '',
+			'form_action'     => $secure_htsrv_url.'login.php',
+			'form_name'       => 'lostpass_form',
+			'form_class'      => 'fform',
+			'form_template'   => NULL,
+			'inskin'          => true,
+			'inskin_urls'     => true,
+			'abort_link_text' => '',
 		), $params );
 
-	echo $params['form_before'];
+	$login_url = get_login_url( get_param( 'source' ), $redirect_to );
+
+	$form_links = array();
+	if( ! empty( $params['abort_link_text'] ) )
+	{ // A link to "close" the window
+		$form_links[] = '<a href="'.$login_url.'">'.$params['abort_link_text'].'</a>';
+	}
+
+	$form_links = count( $form_links ) ? '<span class="pull-right">'.implode( ' ', $form_links ).'</span>' : '';
+	echo str_replace( '$form_links$', $form_links, $params['form_before'] );
 
 	$Form = new Form( $params['form_action'], $params['form_name'], 'post', 'fieldset' );
 
 	if( ! empty( $params['form_template'] ) )
 	{ // Switch layout to template from array
+		$params['form_template']['formstart'] = str_replace( '$form_links$', $form_links, $params['form_template']['formstart'] );
+
 		$Form->switch_template_parts( $params['form_template'] );
 	}
 
@@ -2521,7 +2533,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
-	$login_link = '<a href="'.get_login_url( get_param( 'source' ), $redirect_to ).'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
+	$login_link = '<a href="'.$login_url.'" class="floatleft">'.'&laquo; '.T_('Back to login form').'</a>';
 
 	if( $params['inskin'] )
 	{

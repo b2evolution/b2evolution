@@ -92,7 +92,7 @@ switch( $action )
 			b2evonet_get_updates( true );
 
 			// Display info & error messages
-			echo $Messages->display( NULL, NULL, false, 'action_messages' );
+			$Messages->display();
 
 			/**
 			 * @var AbstractSettings

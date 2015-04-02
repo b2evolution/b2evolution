@@ -268,7 +268,9 @@ function get_icon_info($name)
 			'glyph' => 'expand',
 			'toggle-glyph' => 'collapse-down',
 			'size-glyph' => array( 10 ),
-			'fa' => 'minus-square-o'
+			'fa' => 'caret-right',
+			'toggle-fa' => 'caret-down',
+			'size-fa' => array( 3 )
 		);
 		case 'collapse': return array(
 			'alt'  => '-',
@@ -278,7 +280,9 @@ function get_icon_info($name)
 			'glyph' => 'collapse-down',
 			'toggle-glyph' => 'expand',
 			'size-glyph' => array( 10 ),
-			'fa' => 'plus-square-o'
+			'fa' => 'caret-down',
+			'toggle-fa' => 'caret-right',
+			'size-fa' => array( 3 )
 		);
 
 		case 'filters_show': return array(
@@ -286,14 +290,18 @@ function get_icon_info($name)
 			'size' => array( 15, 15 ),
 			'xy' => array( 64, 16 ),
 			'glyph' => 'expand',
-			'fa' => 'caret-right'
+			'toggle-glyph' => 'collapse-down',
+			'fa' => 'caret-right',
+			'toggle-fa' => 'caret-down'
 		);
 		case 'filters_hide': return array(
 			'alt'  => T_('Collapse'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 80, 16 ),
 			'glyph' => 'collapse-down',
-			'fa' => 'caret-down'
+			'toggle-glyph' => 'expand',
+			'fa' => 'caret-down',
+			'toggle-fa' => 'caret-right'
 		);
 
 		case 'refresh': return array(
@@ -607,7 +615,7 @@ function get_icon_info($name)
 		);
 
 		case 'parent_childto_arrow': return array(
-			'alt'  => T_('+'),
+			'alt'  => '+',
 			'size' => array( 14, 16 ),
 			'xy' => array( 16, 128 )
 		);

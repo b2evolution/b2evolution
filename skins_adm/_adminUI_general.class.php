@@ -534,7 +534,9 @@ class AdminUI_general extends Menu
 
 			if( $display_messages )
 			{ // Display info & error messages
-				$Messages->display( NULL, NULL, true, 'action_messages' );
+				$Messages->display();
+				// Clear the messages to avoid double displaying
+				$Messages->clear();
 			}
 			return;
 		}

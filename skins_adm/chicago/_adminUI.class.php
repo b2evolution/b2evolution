@@ -35,7 +35,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Hit;
+		global $Hit, $Messages;
 
 		// This is included before controller specifc require_css() calls:
 		require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
@@ -57,6 +57,11 @@ class AdminUI extends AdminUI_general
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+
+		// Set css classes for messages
+		$Messages->set_params( array(
+				'class_outerdiv' => 'action_messages',
+			) );
 	}
 
 
@@ -108,7 +113,7 @@ class AdminUI extends AdminUI_general
 			."\n\n";
 
 		// Display info & error messages
-		$r .= $Messages->display( NULL, NULL, false, 'action_messages' );
+		$r .= $Messages->display( NULL, NULL, false );
 
 		return $r;
 	}

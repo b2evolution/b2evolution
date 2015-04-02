@@ -26,14 +26,17 @@ $params = array_merge( array(
 		'login_form_class'     => 'bComment',
 		'lostpass_form_params' => NULL,
 		'lostpass_form_footer' => true,
+		'display_form_messages'=> false,
+		'abort_link_text'      => '',
 	), $params );
 
 $form_params = array(
-	'form_before'   => str_replace( '$form_title$', $params['form_title_lostpass'], $params['skin_form_before'] ),
-	'form_after'    => $params['skin_form_after'],
-	'inskin'        => $params['login_form_inskin'],
-	'form_class'    => $params['login_form_class'],
-	'form_template' => $params['lostpass_form_params'],
+	'form_before'     => str_replace( '$form_title$', $params['form_title_lostpass'], $params['skin_form_before'] ),
+	'form_after'      => $params['skin_form_after'],
+	'inskin'          => $params['login_form_inskin'],
+	'form_class'      => $params['login_form_class'],
+	'form_template'   => $params['lostpass_form_params'],
+	'abort_link_text' => $params['abort_link_text'],
 );
 
 $redirect_to = param( 'redirect_to', 'url', '' );

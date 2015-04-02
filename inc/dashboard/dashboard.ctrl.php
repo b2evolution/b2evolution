@@ -606,7 +606,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Updates are allowed, display them:
 
 		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'action_messages' );
+		$Messages->display();
 
 		$version_status_msg = $global_Cache->get( 'version_status_msg' );
 		if( !empty($version_status_msg) )

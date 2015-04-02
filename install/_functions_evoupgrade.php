@@ -5814,7 +5814,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11360' );
+		set_upgrade_checkpoint( '11360' );
+	}
+
+	if( $old_db_version < 11370 )
+	{ // part 18.f trunk aka 8th part of "i7"
+
+		task_begin( 'Updating user settings... ' );
+		$DB->query( 'DELETE FROM T_users__usersettings WHERE uset_name = "admin_skin"' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11370' );
 	}
 
 	/*

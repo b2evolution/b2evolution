@@ -190,7 +190,7 @@ $Form->begin_form();
 
 		/********************  Icon / File type:  *******************/
 
-		echo '<td class="icon_type">';
+		echo '<td class="icon_type text-nowrap">';
 		if( $UserSettings->get( 'fm_imglistpreview' ) )
 		{	// Image preview OR full type:
 			if( $lFile->is_dir() )
@@ -263,7 +263,7 @@ $Form->begin_form();
 				$popup_url = url_add_param( $browse_dir_url, 'mode=popup' );
 				$target = 'evo_fm_'.$lFile->get_md5_ID();
 
-				echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="filenameIcon"
+				echo '<a href="'.$browse_dir_url.'" target="'.$target.' " class="pull-right"
 							title="'.T_('Open in a new window').'" onclick="'
 							."return pop_up_window( '$popup_url', '$target' )"
 							.'">'.get_icon( 'window_new' ).'</a>';
@@ -417,7 +417,7 @@ $Form->begin_form();
 
 		/*****************  Action icons  ****************/
 
-		echo '<td class="actions lastcol nowrap">';
+		echo '<td class="actions lastcol text-nowrap">';
 
 		if( $edit_perm )
 		{ // User can edit:

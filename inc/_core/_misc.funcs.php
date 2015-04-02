@@ -4403,7 +4403,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 			if( isset( $b2evo_icons_type ) )
 			{ // Specific icons type is defined
-				switch( $b2evo_icons_type )
+				$current_icons_type = $b2evo_icons_type;
+				if( $current_icons_type == 'fontawesome-glyphicons' )
+				{ // Use fontawesome icons as a priority over the glyphicons
+					$current_icons_type = isset( $icon['fa'] ) ? 'fontawesome' : 'glyphicons';
+				}
+				switch( $current_icons_type )
 				{
 					case 'glyphicons':
 						// Use glyph icons of bootstrap

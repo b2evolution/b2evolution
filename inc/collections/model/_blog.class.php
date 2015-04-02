@@ -1567,16 +1567,16 @@ class Blog extends DataObject
 			if( $this->get_setting('category_ordering') == 'manual' )
 			{	// Manual order
 				$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
-				$sql_order = ' ORDER BY temp_order';
+				$sql_order = ' ORDER BY cat_parent_ID, temp_order';
 			}
 			else
 			{	// Alphabetic order
 				$select_temp_order = '';
-				$sql_order = ' ORDER BY cat_name';
+				$sql_order = ' ORDER BY cat_parent_ID, cat_name';
 			}
 			$sql = 'SELECT cat_ID'.$select_temp_order.'
 			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID.' AND cat_parent_ID IS NULL'
+			         WHERE cat_blog_ID = '.$this->ID.' AND cat_meta = 0'
 			         .$sql_order
 			         .' LIMIT 1';
 

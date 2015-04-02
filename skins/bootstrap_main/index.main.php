@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8640 2015-04-01 12:23:10Z yura $
+	 * @version $Id: index.main.php 8659 2015-04-02 15:18:27Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -287,7 +287,7 @@ if( $disp != 'front' )
 				'display_form_messages' => true,
 				'form_title_login'      => T_('Log in to your account').'$form_links$',
 				'form_class_login'      => 'wrap-form-login',
-				'form_title_lostpass'   => get_request_title(),
+				'form_title_lostpass'   => get_request_title().'$form_links$',
 				'form_class_lostpass'   => 'wrap-form-lostpass',
 				'login_form_inskin'     => false,
 				'login_page_before'     => '<div class="$form_class$">',
