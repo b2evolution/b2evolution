@@ -330,7 +330,9 @@ class Menu extends Widget
 					$anchor .= ' class="'.trim($class).'"';
 				}
 
-				$anchor .= '>'.(isset($loop_details['text']) ? format_to_output( $loop_details['text'], 'htmlbody' ) : '?')."</a>";
+				$anchor .= '>'.(isset($loop_details['text']) ? format_to_output( $loop_details['text'], 'htmlbody' ) : '?');
+				$anchor_end = '</a>';
+				$anchor_end_with_sub = $templateForLevel['arrow'].'</a>';
 
 				if( $loop_key == $selected )
 				{ // Highlight selected entry
@@ -342,14 +344,17 @@ class Menu extends Widget
 						$r .= isset($templateForLevel['beforeEachSelWithSub']) ? $templateForLevel['beforeEachSelWithSub'] : $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
 
-						if( $templateForLevel['_props']['recurse'] != 'no' )
-						{ // Recurse:
-							if( ! isset( $templateForLevel['_props']['recurse_level'] ) ||
+						if( $templateForLevel['_props']['recurse'] != 'no' && // Recurse:
+							  ( ! isset( $templateForLevel['_props']['recurse_level'] ) ||
 							    ( isset( $templateForLevel['_props']['recurse_level'] ) &&
-							      $templateForLevel['_props']['recurse_level'] > $level + 1 ) )
-							{ // Display submenus if this level is not limited by param 'recurse_level'
-								$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
-							}
+							      $templateForLevel['_props']['recurse_level'] > $level + 1 ) ) )
+						{ // Display submenus if this level is not limited by param 'recurse_level'
+							$r .= $anchor_end_with_sub;
+							$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
+						}
+						else
+						{ // End anchor without sub menus
+							$r .= $anchor_end;
 						}
 
 						$r .= isset($templateForLevel['afterEachSelWithSub']) ? $templateForLevel['afterEachSelWithSub'] : $templateForLevel['afterEachSel'];
@@ -360,13 +365,13 @@ class Menu extends Widget
 						    isset( $templateForLevel['beforeEachSelGrpLast'], $templateForLevel['afterEachSelGrpLast'] ) )
 						{ // This selected menu item is last in a group
 							$r .= $templateForLevel['beforeEachSelGrpLast'];
-							$r .= $anchor;
+							$r .= $anchor.$anchor_end;
 							$r .= $templateForLevel['afterEachSelGrpLast'];
 						}
 						else
 						{ // Normal selected menu item
 							$r .= $templateForLevel['beforeEachSel'];
-							$r .= $anchor;
+							$r .= $anchor.$anchor_end;
 							$r .= $templateForLevel['afterEachSel'];
 						}
 					}
@@ -379,7 +384,7 @@ class Menu extends Widget
 							&& $this->get_menu_entries($recursePath) )
 					{
 						$r .= isset($templateForLevel['beforeEachWithSub']) ? $templateForLevel['beforeEachWithSub'] : $templateForLevel['beforeEachSel'];
-						$r .= $anchor;
+						$r .= $anchor.$anchor_end_with_sub;
 						// recurse:
 						$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
 						$r .= isset($templateForLevel['afterEachWithSub']) ? $templateForLevel['afterEachWithSub'] : $templateForLevel['afterEachSel'];
@@ -390,17 +395,30 @@ class Menu extends Widget
 						    isset( $templateForLevel['beforeEachGrpLast'], $templateForLevel['afterEachGrpLast'] ) )
 						{ // This menu item is last in a group
 							$r .= $templateForLevel['beforeEachGrpLast'];
-							$r .= $anchor;
+							$r .= $anchor.$anchor_end;
 							$r .= $templateForLevel['afterEachGrpLast'];
 						}
 						else
 						{ // Normal menu item
 							$r .= $templateForLevel['beforeEach'];
-							$r .= $anchor;
+							$r .= $anchor.$anchor_end;
 							$r .= $templateForLevel['afterEach'];
 						}
 					}
 				}
+
+				// Additional attribures for each menu entry
+				$entry_attrs = '';
+				$entry_class = '';
+				if( ! empty( $loop_details['entry_class'] ) )
+				{ // Css class for entry
+					if( strpos( $r, '$entry_class$' ) === false )
+					{
+						$entry_attrs .= ' class="'.$loop_details['entry_class'].'"';
+					}
+					$entry_class .= ' '.$loop_details['entry_class'];
+				}
+				$r = str_replace( array( '$entry_attrs$', '$entry_class$' ), array( $entry_attrs, $entry_class ), $r );
 			}
 			$r .= $templateForLevel['after'];
 		}
@@ -427,11 +445,12 @@ class Menu extends Widget
 				return array(
 					'before' => '<ul class="sf-menu '.$name.'">',
 					'after' => '</ul>',
-					'beforeEach' => '<li>',
+					'beforeEach' => '<li$entry_attrs$>',
 					'afterEach' => '</li>',
-					'beforeEachSel' => '<li class="current">',
+					'beforeEachSel' => '<li class="current$entry_class$"$entry_attrs$>',
 					'afterEachSel' => '</li>',
-					'separator' => '<li class="separator"><div><hr /></div></li>',
+					'separator' => '<li class="separator"><hr /></li>',
+					'arrow' => '<span class="sf-sub-indicator"></span>',
 					'disabled_class' => 'disabled',
 					'_props' => array(
 						'recurse' => 'always',  // options are: 'no' 'always' or 'intoselected'

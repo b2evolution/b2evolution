@@ -1260,28 +1260,10 @@ function add_css_headline($headline)
 /**
  * Registers all the javascripts needed by the toolbar menu
  *
- * @todo fp> include basic.css ? -- rename to add_headlines_for* -- potential problem with inclusion order of CSS files!!
- *       dh> would be nice to have the batch of CSS in a separate file. basic.css would get included first always, then e.g. this toolbar.css.
+ * @deprecated because #evo_toolbar doesn't use js anymore, only css is enough
  */
 function add_js_for_toolbar( $relative_to = 'rsc_url' )
 {
-	if( ! is_logged_in() )
-	{ // the toolbar (blogs/skins/_toolbar.inc.php) gets only used when logged in.
-		return false;
-	}
-
-	require_js( '#jquery#', $relative_to );
-	// Superfish menus:
-	require_js( 'superfish.js', $relative_to );
-	add_js_headline( '
-	jQuery( function() {
-	  jQuery("ul.sf-menu").superfish( {
-	    delay: 500, // mouseout
-	    animation: {opacity:"show",height:"show"},
-	    speed: "fast"
-	  } );
-	} );');
-
 	return true;
 }
 

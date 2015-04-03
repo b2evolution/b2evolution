@@ -570,6 +570,7 @@ class collections_Module extends Module
 								'href' => get_manual_url( NULL ),
 								'target' => '_blank',
 							);
+		$entries[] = array( 'separator' => true );
 		$entries['twitter'] = array(
 								'text' => T_('b2evolution on twitter'),
 								'href' => 'http://twitter.com/b2evolution',

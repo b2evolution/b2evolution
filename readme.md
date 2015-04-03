@@ -1,12 +1,12 @@
 # b2evolution CCMS
 
-This is version **6.1.2-alpha** (from the so-called "i7" branch).
+This is version **6.1.3-alpha** (from the so-called "i7" branch).
 
 ## A complete engine for your website !
 
 Multiblog/CMS + user community + email marketing + social network + more...
 b2evolution includes everything you need to run and maintain a modern website.
-Plus, it's optimized for low maintenance with easy upgrades and effective antispam. Full RWD & bootstrap support currently being added to version 6.0.
+Plus, it's optimized for low maintenance with easy upgrades and effective antispam. Full Bootstrap & RWD support.
 
 More info: http://b2evolution.net
 

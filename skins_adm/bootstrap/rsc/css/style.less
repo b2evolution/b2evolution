@@ -1057,13 +1057,19 @@ div.level2 {
 .navbar-right {
 	margin-right: -15px;
 }
-nav {
-	&.level1 {
-		z-index: 1;
+nav.level1 {
+	z-index: 1;
+}
+div.level3 nav .nav>li>a {
+	padding: 4px 10px;
+	font-size: 92%;
+}
+.user_header_content {
+	div.level3 {
+		padding: 5px 0 15px;
 	}
-	&.level3 .nav>li>a {
-		padding: 4px 10px;
-		font-size: 92%;
+	.user_title .login {
+		margin-left: 10px;
 	}
 }
 
@@ -1095,4 +1101,9 @@ form#thread_checkchanges ul.token-input-list-facebook {
 // Plugin toolbars
 .message_toolbars {
 	width: 97%;
+}
+
+// Fix for jCrop plugin
+.jcrop-keymgr {
+	visibility: hidden;
 }

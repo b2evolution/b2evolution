@@ -96,7 +96,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 
 			if( $debug )
 			{
-				echo '<div style="float:left;line-height:18px;color:#666;z-index:-1;">'.$request_transaction_name.'</div>';
+				echo '<div style="line-height:26px;color:#666;z-index:-1;float:left">'.$request_transaction_name.'</div>';
 			}
 		}
 		?>

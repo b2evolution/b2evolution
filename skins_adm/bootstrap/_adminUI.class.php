@@ -252,7 +252,7 @@ class AdminUI extends AdminUI_general
 				// a payload block with embedded submenu
 				return array(
 						'before' => '<div class="container-fluid level2">'."\n"
-									.'<nav class="subnav level2">'."\n"
+									.'<nav>'."\n"
 								.'<ul class="nav nav-tabs">'."\n",
 						'after' => '</ul>'."\n"
 										.'</nav>'."\n"
@@ -273,8 +273,8 @@ class AdminUI extends AdminUI_general
 			case 'menu3':
 				// level 3 submenu:
 				return array(
-						'before' => '<div class="container-fluid">'."\n"
-										.'<nav class="subnav level3">'."\n"
+						'before' => '<div class="container-fluid level3">'."\n"
+										.'<nav>'."\n"
 									.'<ul class="nav nav-pills">'."\n",
 						'after' => '</ul>'."\n"
 									.'</nav>'."\n"
@@ -289,7 +289,7 @@ class AdminUI extends AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div class="container-fluid coll-selector"><nav class="subnav"><div class="btn-group">',
+						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
 						'after' => '</div></nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
@@ -680,7 +680,7 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 
 	if( jQuery( '#modal_window' ).length == 0 )
 	{ // Build modal window
-		var modal_html = '<div id=\"modal_window\" class=\"modal fade\"><div class=\"modal-dialog\" style=\"' + style_width + style_height +'\"><div class=\"modal-content\"' + style_height_fixed + '>';
+		var modal_html = '<div id=\"modal_window\" class=\"modal fade\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\"><div class=\"modal-dialog\" style=\"' + style_width + style_height +'\"><div class=\"modal-content\"' + style_height_fixed + '>';
 		if( typeof title != 'undefined' && title != '' )
 		{
 			modal_html += '<div class=\"modal-header\">' +
@@ -692,13 +692,12 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 
 		if( use_buttons )
 		{
-			modal_html += '<div class=\"modal-footer\">' +
-					'<button class=\"btn btn-default\" data-dismiss=\"modal\" aria-hidden=\"true\">".TS_( 'Close' )."</button>';
+			modal_html += '<div class=\"modal-footer\">';
 			if( button != '' )
 			{
 				modal_html += '<button class=\"btn btn-primary\" type=\"submit\">' + button + '</button>';
 			}
-			modal_html += '</div>';
+			modal_html += '<button class=\"btn btn-default\" data-dismiss=\"modal\" aria-hidden=\"true\">".TS_( 'Cancel' )."</button></div>';
 		}
 		modal_html += '</div></div></div>';
 		jQuery( 'body' ).append( modal_html );

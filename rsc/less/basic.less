@@ -249,21 +249,17 @@ div.avatartag.main > img:first-child {
 // Note: there may be some properties that seem overkill but the fact is we need to override
 // any too general styles a skin may want to bring in for its own body/general display.
 div#evo_toolbar {
-	background-color: ThreeDFace;
+	background-color: #f4f4f4;
 	color: ButtonText;
-	border-top: 1px solid ThreeDHighlight;
-	border-bottom: 1px solid ThreeDShadow;
+	border-top: 1px solid #676767;
 	text-align: left;
 	margin: 0;
-	// font: menu; /* -- poorly supported */
-	font-size: 11px;
-	font-family: "Microsoft sans serif", sans-serif, Arial, Helvetica;
+	font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
 
 	position: fixed;
 	z-index: 11000;
 	left: 0px;
 	top: 0px;
-	height: 21px;
 	width:100%; // Safari Windows
 	-webkit-text-size-adjust: none; // iPhone
 }
@@ -272,232 +268,150 @@ div#evo_toolbar {
 @media only screen and (max-device-width: 1024px) {
 	div#evo_toolbar {
 		position: relative;
-		height: auto;
 	}
 	div#skin_wrapper.skin_wrapper_loggedin {
 		margin-top: 0;
 	}
 }
 div.skin_wrapper_loggedin {
-	margin-top: 22px;
+	margin-top: 26px;
 	padding-top: 1px;
 }
-div#evo_toolbar .actions_left {
-	padding: 1px 4px;
-	float: left;
+div#evo_toolbar {
+	.actions_left {
+		float: left;
+	}
+	.actions_right {
+		float: right;
+	}
 }
-div#evo_toolbar .actions_right {
-	padding: 1px 4px;
-	float: right;
-}
-div#evo_toolbar img {
-	position: relative;
-	top: -2px;
-	vertical-align: top; // required in strict mode (where no 'align="top"' gets added to IMGs, FF3). Otherwise text next to the img wraps out of the evobar
-}
-
-// *** SuperFish *** //
-
-//** ESSENTIAL STYLES **//
 .sf-menu, .sf-menu * {
 	margin: 0;
 	padding: 0;
 	list-style: none;
+	box-sizing: content-box;
+	-webkit-font-smoothing: antialiased;
 }
 .sf-menu {
-	line-height: 1.0;
+	ul {
+		position: absolute;
+		top: -999em;
+		opacity: 0;
+		width: 25ex; // left offset of submenus need to match (see below)
+		border: 1px solid #CCC;
+		box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
+		transition: opacity 0.2s linear;
+		display: none;
+		li {
+			width: 100%;
+		}
+	}
+	> li:hover > ul {
+		opacity: 1;
+		z-index: 99;
+		top: 26px;
+		display: block;
+	}
+	li {
+		float: left;
+		position: relative;
+		&:hover li ul {
+			top: -999em;
+		}
+		ul li:last-child a {
+			border: none;
+		}
+		li {
+			ul {
+				top: -999em;
+				left: 25ex;
+			}
+			&:hover {
+				ul {
+					top: 0;
+					opacity: 1;
+				}
+				li ul {
+					top: -999em;
+					opacity: 0;
+				}
+			}
+			li:hover ul {
+				top: 0;
+				opacity: 1;
+			}
+			a, a:hover, a:link, a:visited {
+				display: block;
+				background: #f4f4f4;
+				color: #4f4f4f;
+			}
+			a:hover {
+				background: #e7e7e7;
+			}
+			a > .sf-sub-indicator:after {
+				content: "\25B6";
+			}
+		}
+		&.separator {
+			background: #f4f4f4;
+			hr {
+				border: none;
+				background: #4f4f4f;
+				height: 1px;
+				margin: 10px 4px;
+			}
+		}
+	}
+	a {
+		display: inline-block;
+		position: relative;
+		background-color: #f4f4f4;
+		padding: 6px 1ex;  // .5em need to macth global height above
+		text-decoration:none;
+		min-height: 14px;
+		line-height: 14px;
+		color: #4f4f4f;
+		// Set one color for each link status to don't rewrite from skins
+		&:hover, &:link, &:visited {
+			color: #4f4f4f;
+		}
+		&:hover {
+			background: #e7e7e7;
+			text-decoration: none;
+		}
+		&.disabled, &.disabled:hover {
+			color: #666;
+		}
+	}
+	.sf-sub-indicator {
+		display: inline-block;
+		margin-left: 6px;
+		float: right;
+		font-size: 10px;
+		&:after {
+			width: 10px;
+			height: 10px;
+			content: "\25BC";
+		}
+	}
 }
-.sf-menu ul {
-	position: absolute;
-	top: -999em;
-	width: 25ex; // left offset of submenus need to match (see below)
+// Hide several menu entries on small screens
+@media (max-width: 800px) {
+	.sf-menu li.rwdhide {
+		display: none;
+	}
 }
-.sf-menu ul li {
-	width: 100%;
-}
-.sf-menu li {
+.actions_left .sf-menu.sf-menu-left {
 	float: left;
-	position: relative;
 }
-.sf-menu a {
-	display: block;
-	position: relative;
-}
-.sf-menu li:hover ul,
-.sf-menu li.sfHover ul {
-	left: 0;
-	top: 19px; // 2em / match top ul list item height including padding below
-	z-index: 99;
-}
-ul.sf-menu li:hover li ul,
-ul.sf-menu li.sfHover li ul {
-	top: -999em;
-}
-ul.sf-menu li li:hover ul,
-ul.sf-menu li li.sfHover ul {
-	left: 25ex; // match ul width
-	top: 0;
-}
-ul.sf-menu li li:hover li ul,
-ul.sf-menu li li.sfHover li ul {
-	top: -999em;
-}
-ul.sf-menu li li li:hover ul,
-ul.sf-menu li li li.sfHover ul {
-	left: 25ex; // match ul width
-	top: 0;
-}
-
-//** DEMO SKIN **//
-.sf-menu {
-	float: left;
-}
-.sf-menu a {
-	border: 1px solid ThreeDFace;
-	background-color: ThreeDFace;
-	padding: 3px 1ex;  // .5em need to macth global height above
-	text-decoration:none;
-	color: ButtonText;
-}
-.sf-menu-right a {
-	padding: 3px 1ex 0px;  // .5em need to macth global height above
-}
-// Set one color for each link status to don't rewrite from skins
-.sf-menu a, .sf-menu a:link, .sf-menu a:visited {
-	color: ButtonText;
-}
-.sf-menu li li {
-	background: ThreeDFace;
-}
-.sf-menu li li a, .sf-menu li li.separator div {
-	border: none;
-	border-left: 1px solid ThreeDHighlight;
-	border-right: 1px solid ThreeDShadow;
-}
-.sf-menu li li a {
-	padding: 6px 2ex;
-}
-.sf-menu li li:first-child > a {
-	border-top: 1px solid ThreeDHighlight;
-}
-.sf-menu li li:last-child > a {
-	border-bottom: 1px solid ThreeDShadow;
-}
-
-.sf-menu li.separator {
-	padding: 0;
-	margin: 0;
-	height: 10px;
-	overflow: hidden;
-}
-.sf-menu li.separator div {
-	padding: 4px 2px;
-	margin: 0;
-}
-.sf-menu li.separator div:hover {
-	background-color: ThreeDFace;
-}
-.sf-menu hr {
-	height: 0px;
-	display: block;
-	padding: 0;
-	margin: 0;
-	border: none;
-	border-top: 1px solid ThreeDShadow;
-	border-bottom: 1px solid ThreeDHighlight;
-	width: 100%;
-}
-.evo_toolbar_msie hr {
-	position: relative;
-	top: -6px;
-	margin: 6px 0 0;
-	height: 2px;
-}
-
-.sf-menu a.disabled,
-.sf-menu a.disabled:hover {
-	color: GrayText;
-}
-
-.sf-menu a.noborder {
-	border: none;
-}
-
-.sf-menu li:hover, .sf-menu li.sfHover,
-.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
-	text-decoration: none;
-	outline: 0;
-	border-top-color: ThreeDHighlight;
-	border-left-color: ThreeDHighlight;
-	border-bottom-color: ThreeDShadow;
-	border-right-color: ThreeDShadow;
-	color: ButtonText;
-}
-
-.sf-menu li li:hover, .sf-menu li li.sfHover,
-.sf-menu li li a:focus, .sf-menu li li a:hover, .sf-menu li li a:active {
-	border: none;
-	background-color: Highlight;
-	color: HighlightText;
-}
-.sf-menu li li a:focus, .sf-menu li li a:hover, .sf-menu li li a:active {
-	border-left: 1px solid ThreeDHighlight;
-	border-right: 1px solid ThreeDShadow;
-}
-.sf-menu li li:first-child > a:focus, .sf-menu li li:first-child > a:hover, .sf-menu li li:first-child > a:active {
-	border-top: 1px solid ThreeDHighlight;
-}
-.sf-menu li li:last-child > a:focus, .sf-menu li li:last-child > a:hover, .sf-menu li li:last-child > a:active {
-	border-bottom: 1px solid ThreeDShadow;
-}
-
-//** arrows **//
-.sf-menu a.sf-with-ul {
-	padding-right: 2.25em;
-	min-width: 1px; // trigger IE7 hasLayout so spans position accurately
-}
-.sf-sub-indicator {
-	position: absolute;
-	display: block;
-	right: .75em;
-	top: 4px;
-	width: 10px;
-	height: 10px;
-	text-indent: -999em;
-	overflow: hidden;
-	background: url('../icons/icons_sprite.png') no-repeat -80px -256px;
-}
-li li a > .sf-sub-indicator {  // give all except IE6 the correct values
-	top: 6px;
-}
-// apply hovers to modern browsers
-a:focus > .sf-sub-indicator,
-a:hover > .sf-sub-indicator,
-a:active > .sf-sub-indicator,
-li:hover > a > .sf-sub-indicator,
-li.sfHover > a > .sf-sub-indicator {
-	background-position: -80px -256px; // arrow hovers for modern browsers
-}
-
-// point right for anchors in subs
-.sf-menu ul .sf-sub-indicator { background-position:  -112px -256px; }
-.sf-menu ul a > .sf-sub-indicator { background-position:  -96px -256px; }
-// apply hovers to modern browsers
-.sf-menu ul a:focus > .sf-sub-indicator,
-.sf-menu ul a:hover > .sf-sub-indicator,
-.sf-menu ul a:active > .sf-sub-indicator,
-.sf-menu ul li:hover > a > .sf-sub-indicator,
-.sf-menu ul li.sfHover > a > .sf-sub-indicator {
-	background-position: -112px -256px; // arrow hovers for modern browsers
-}
-
-//** shadows for all but IE6 **//
-.sf-shadow ul {
-	padding: 0;
-	box-shadow: 3px 4px 6px -2px rgba(0, 0, 0, 0.35);
-}
-.sf-shadow ul.sf-shadow-off {
-	background: transparent;
+.actions_right .sf-menu {
+	> li > ul {
+		right: 0;
+	}
+	li li ul {
+		left: -25.2ex;
+		z-index: -1;
+	}
 }
 // ---------------- //
 
@@ -618,7 +532,7 @@ label.radiooption {
 .fform fieldset {
 	border: 1px solid #ddd;
 	margin: 0 0 1ex 0;
-	background-color: #fff; // dh> change to "transparent"?
+	background-color: #fff; /* dh> change to "transparent"? */
 	padding: .5ex 1ex;
 }
 legend {
@@ -848,9 +762,6 @@ div.widget_not_in_cache div.debug_widget_name {
 }
 // ---------------- //
 
-a.evo_messages_link {
-	padding: 3px 1ex;
-}
 // Badge that display how much the unread messages user has
 .badge {
 	position: relative;
@@ -993,7 +904,7 @@ a.jslog_switcher {
 div#debug_ajax_info {
 	display: none;
 	position: fixed;
-	top: 23px;
+	top: 27px;
 	left: 0;
 	z-index: 100000;
 	min-width: 190px;

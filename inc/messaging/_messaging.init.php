@@ -330,13 +330,28 @@ class messaging_Module extends Module
 			}
 
 			$messages_url = get_dispctrl_url( 'threads' );
+			$contacts_url = get_dispctrl_url( 'contacts' );
+
+			if( ! empty( $messages_url ) || ! empty( $contacts_url )  )
+			{
+				$right_entries[] = array( 'separator' => true );
+			}
+
 			if( ! empty( $messages_url ) )
 			{ // Display this menu item only when url is available to current user
-				$right_entries['messaging'] = array(
-					'text'  => T_('Messages'),
-					'href'  => $messages_url,
-					'class' => 'evo_messages_link',
-				);
+				$right_entries['messages'] = array(
+						'text' => T_('Messages'),
+						'href' => $messages_url,
+						'class' => 'evo_messages_link',
+					);
+			}
+			if( ! empty( $contacts_url ) )
+			{ // Display this menu item only when url is available to current user
+				$right_entries['contacts'] = array(
+						'text' => T_('Contacts'),
+						'href' => $contacts_url,
+						'class' => 'evo_messages_link',
+					);
 			}
 
 			// Count unread messages for current user
@@ -348,7 +363,7 @@ class messaging_Module extends Module
 		}
 
 		$topleft_Menu->add_menu_entries( 'tools', $left_entries );
-		$topright_Menu->insert_menu_entries_after( 'userprefs', $right_entries );
+		$topright_Menu->insert_menu_entries_after( array( 'userprefs', 'name' ), $right_entries );
 	}
 
 	/**

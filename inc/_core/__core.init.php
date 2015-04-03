@@ -906,14 +906,15 @@ class _core_Module extends Module
 				'b2evo' => array(
 						'text' => '<strong>b2evolution</strong>',
 						'href' => $home_url,
+						'entry_class' => 'rwdhide'
 					),
 				'dashboard' => array(
-						'text' => T_('Dashboard'),
+						'text' => T_('Back-office'),
 						'href' => $admin_url,
 						'title' => T_('Go to admin dashboard'),
 					),
 				'see' => array(
-						'text' => T_('See'),
+						'text' => T_('Front-office'),
 						'href' => $home_url,
 						'title' => T_('See the home page'),
 					),
@@ -921,6 +922,7 @@ class _core_Module extends Module
 						'text' => T_('New post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
+						'entry_class' => 'rwdhide',
 					)
 			);
 			if( $working_blog )
@@ -1001,9 +1003,18 @@ class _core_Module extends Module
 					'href' => $collection_url,
 				);
 
+				$display_separator = false;
 				if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 				{ // Check if current user has an access to post lists
 					$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
+
+					// Collection dashboard
+					$entries['blog']['entries']['coll_dashboard'] = array(
+							'text' => T_('Collection Dashboard.').'&hellip;',
+							'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$Blog->ID
+						);
+
+					$entries['blog']['entries'][] = array( 'separator' => true );
 
 					if( $Blog->get_setting( 'use_workflow' ) )
 					{ // Workflow view
@@ -1025,6 +1036,7 @@ class _core_Module extends Module
 							'text' => T_('Posts').'&hellip;',
 							'href' => $items_url,
 						);
+					$display_separator = true;
 				}
 
 				// Check if user has permission for published, draft or depreceted comments (any of these)
@@ -1034,6 +1046,7 @@ class _core_Module extends Module
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
 						);
+					$display_separator = true;
 				}
 
 				// Chapters / Categories:
@@ -1043,6 +1056,12 @@ class _core_Module extends Module
 							'text' => T_('Categories').'&hellip;',
 							'href' => $admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID,
 						);
+					$display_separator = true;
+				}
+
+				if( $display_separator )
+				{
+					$entries['blog']['entries'][] = array( 'separator' => true );
 				}
 
 				// PLACE HOLDER FOR FILES MODULE:
@@ -1053,35 +1072,30 @@ class _core_Module extends Module
 				{ // We have permission to edit blog properties:
 					$blog_param = '&amp;blog='.$Blog->ID;
 
-					if( ! empty($entries['blog']['entries']) )
-					{	// There are already entries aboce, insert a separator:
-						$entries['blog']['entries'][] = array(
-							'separator' => true,
+					$entries['blog']['entries']['features'] = array(
+							'text' => T_('Features').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
 						);
-					}
+					$entries['blog']['entries']['skin'] = array(
+							'text' => T_('Skin').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
+						);
+					$entries['blog']['entries']['plugin_settings'] = array(
+							'text' => T_('Plugins').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings'.$blog_param,
+						);
+					$entries['blog']['entries']['widgets'] = array(
+							'text' => T_('Widgets').'&hellip;',
+							'href' => $admin_url.'?ctrl=widgets'.$blog_param,
+						);
+
 					$entries['blog']['entries']['general'] = array(
-								'text' => T_('Collection settings'),
+								'text' => T_('Settings'),
 								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
 								'entries' => array(
 									'general' => array(
 										'text' => T_('General').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=general'.$blog_param,
-									),
-									'features' => array(
-										'text' => T_('Features').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
-									),
-									'skin' => array(
-										'text' => T_('Skin').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
-									),
-									'plugin_settings' => array(
-										'text' => T_('Plugins').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings'.$blog_param,
-									),
-									'widgets' => array(
-										'text' => T_('Widgets').'&hellip;',
-										'href' => $admin_url.'?ctrl=widgets'.$blog_param,
 									),
 									'urls' => array(
 										'text' => T_('URLs').'&hellip;',
@@ -1091,24 +1105,45 @@ class _core_Module extends Module
 										'text' => T_('SEO').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
-									'advanced' => array(
-										'text' => T_('Advanced').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced'.$blog_param,
-									),
 								)
 						);
 
-						if( $Blog && $Blog->advanced_perms )
-						{
-							$entries['blog']['entries']['general']['entries']['userperms'] = array(
-								'text' => T_('User perms').'&hellip;',
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm'.$blog_param,
+					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
+					{ // Item Types & Statuses
+						$entries['blog']['entries']['general']['entries']['item_types'] = array(
+								'text' => T_('Item Types').'&hellip;',
+								'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'.$blog_param,
 							);
-							$entries['blog']['entries']['general']['entries']['groupperms'] = array(
-								'text' => T_('Group perms').'&hellip;',
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup'.$blog_param,
+						$entries['blog']['entries']['general']['entries']['item_statuses'] = array(
+								'text' => T_('Item Statuses').'&hellip;',
+								'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'.$blog_param,
 							);
-						}
+					}
+
+					$entries['blog']['entries']['general']['entries']['advanced'] = array(
+							'text' => T_('Advanced').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced'.$blog_param,
+						);
+
+					if( $current_User->check_perm( 'options', 'view' ) )
+					{ // Check if current user has a permission to view the common settings of the blogs
+						$entries['blog']['entries']['general']['entries']['common_settings'] = array(
+								'text' => T_('Common Settings').'&hellip;',
+								'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
+							);
+					}
+
+					if( $Blog && $Blog->advanced_perms )
+					{
+						$entries['blog']['entries']['general']['entries']['userperms'] = array(
+							'text' => T_('User perms').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=perm'.$blog_param,
+						);
+						$entries['blog']['entries']['general']['entries']['groupperms'] = array(
+							'text' => T_('Group perms').'&hellip;',
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup'.$blog_param,
+						);
+					}
 				}
 
 				if( ! is_admin_page() )
@@ -1156,7 +1191,7 @@ class _core_Module extends Module
 						'text' => $debug_text,
 						'disabled' => true,
 					);
-				$entries['tools']['entries'][''] = array(
+				$entries['tools']['entries'][] = array(
 						'separator' => true,
 					);
 			}
@@ -1176,14 +1211,16 @@ class _core_Module extends Module
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['tools']['entries']['files'] = NULL;
 
-			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 			$perm_options = $current_User->check_perm( 'options', 'view' );
+			$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
 			$perm_emails = $current_User->check_perm( 'emails', 'view' );
 			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
 			$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
 
 			if( $perm_spam || $perm_options || $perm_slugs || $perm_maintenance )
 			{
+				$entries['tools']['entries'][] = array( 'separator' => true );
+
 				if( $perm_emails )
 				{
 					$entries['tools']['entries']['email'] = array(
@@ -1235,43 +1272,9 @@ class _core_Module extends Module
 				if( $perm_spam )
 				{
 					$entries['tools']['entries']['system']['entries']['antispam'] = array(
-							'text' => T_('Antispam'),
+							'text' => T_('Antispam').'&hellip;',
 							'href' => $admin_url.'?ctrl=antispam',
-							'entries' => array(
-									'blacklist' => array(
-										'text' => T_('Blacklist').'&hellip;',
-										'href' => $admin_url.'?ctrl=antispam' )
-								)
 						);
-
-					if( $perm_options )
-					{	// If we have access to options, then we add a submenu:
-						$entries['tools']['entries']['system']['entries']['antispam']['entries']['ipranges'] = array(
-								'text' => T_('IP Ranges').'&hellip;',
-								'href' => $admin_url.'?ctrl=antispam&amp;tab3=ipranges' );
-
-						$entries['tools']['entries']['system']['entries']['antispam']['entries']['countries'] = array(
-								'text' => T_('Countries').'&hellip;',
-								'href' => $admin_url.'?ctrl=antispam&amp;tab3=countries' );
-
-						if( $current_User->check_perm( 'stats', 'list' ) )
-						{
-							$entries['tools']['entries']['system']['entries']['antispam']['entries']['domains'] = array(
-									'text' => T_('Referring domains').'&hellip;',
-									'href' => $admin_url.'?ctrl=antispam&amp;tab3=domains' );
-						}
-
-						$entries['tools']['entries']['system']['entries']['antispam']['entries']['settings'] = array(
-								'text' => T_('Settings').'&hellip;',
-								'href' => $admin_url.'?ctrl=antispam&amp;tab3=settings' );
-
-						if( $current_User->check_perm( 'options', 'edit' ) )
-						{
-							$entries['tools']['entries']['system']['entries']['antispam']['entries']['tools'] = array(
-									'text' => T_('Tools').'&hellip;',
-									'href' => $admin_url.'?ctrl=antispam&amp;tab3=tools' );
-						}
-					}
 				}
 
 				if( $perm_slugs )
@@ -1291,31 +1294,8 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=gensettings',
 					);
 				$entries['tools']['entries']['system']['entries']['regional'] = array(
-						'text' => T_('Regional'),
+						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
-						'entries' => array(
-							'locales' => array(
-								'text' => T_('Locales').'&hellip;',
-								'href' => $admin_url.'?ctrl=locales' ),
-							'time' => array(
-								'text' => T_('Time').'&hellip;',
-								'href' => $admin_url.'?ctrl=time' ),
-							'countries' => array(
-								'text' => T_('Countries').'&hellip;',
-								'href' => $admin_url.'?ctrl=countries' ),
-							'regions' => array(
-								'text' => T_('Regions').'&hellip;',
-								'href' => $admin_url.'?ctrl=regions' ),
-							'subregions' => array(
-								'text' => T_('Sub-regions').'&hellip;',
-								'href' => $admin_url.'?ctrl=subregions' ),
-							'cities' => array(
-								'text' => T_('Cities').'&hellip;',
-								'href' => $admin_url.'?ctrl=cities' ),
-							'currencies' => array(
-								'text' => T_('Currencies').'&hellip;',
-								'href' => $admin_url.'?ctrl=currencies' ),
-						)
 					);
 				$entries['tools']['entries']['system']['entries']['plugins'] = array(
 						'text' => T_('Plugins').'&hellip;',
@@ -1326,25 +1306,8 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=remotepublish',
 					);
 				$entries['tools']['entries']['system']['entries']['maintenance'] = array(
-						'text' => T_('Maintenance'),
+						'text' => T_('Maintenance').'&hellip;',
 						'href' => $admin_url.'?ctrl=tools',
-						'entries' => array(
-							'tools' => array(
-								'text' => T_('Tools').'&hellip;',
-								'href' => $admin_url.'?ctrl=tools' ),
-							'import' => array(
-								'text' => T_('Import').'&hellip;',
-								'href' => $admin_url.'?ctrl=tools&amp;tab3=import' ),
-							'test' => array(
-								'text' => T_('Testing').'&hellip;',
-								'href' => $admin_url.'?ctrl=tools&amp;tab3=test' ),
-							'backup' => array(
-								'text' => T_('Backup').'&hellip;',
-								'href' => $admin_url.'?ctrl=backup' ),
-							'upgrade' => array(
-								'text' => T_('Check for updates').'&hellip;',
-								'href' => $admin_url.'?ctrl=upgrade' ),
-							)
 					);
 			}
 		}
@@ -1374,7 +1337,18 @@ class _core_Module extends Module
 		 */
 		global $localtimenow, $is_admin_page;
 
-		$userprefs_entries = array();
+		$current_user_Group = $current_User->get_Group();
+		$userprefs_entries = array(
+			'name' => array(
+					'text' => $current_User->get_avatar_imgtag( 'crop-top-32x32', '', 'left' ).'&nbsp;'
+										.$current_User->get_preferred_name()
+										.'<br />&nbsp;<span class="note">'.$current_user_Group->get_name().'</span>',
+					'href' => get_user_profile_url(),
+				),
+			);
+
+		$userprefs_entries[] = array( 'separator' => true );
+
 		$user_profile_url = get_user_profile_url();
 		if( ! empty( $user_profile_url ) )
 		{ // Display this menu item only when url is available to current user
@@ -1418,17 +1392,22 @@ class _core_Module extends Module
 	
 		$entries = array(
 			'userprefs' => array(
-					'text'    => $current_User->get_avatar_imgtag( 'crop-top-15x15', '', 'top' ).' <strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+					'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
 					'href'    => get_user_profile_url(),
 					'entries' => $userprefs_entries,
 				),
 			'time' => array(
 					'text' => date( locale_shorttimefmt(), $localtimenow ),
-					// fp> TODO href to Timezone settings if permission
 					'disabled' => true,
-					'class' => 'noborder',
+					'entry_class' => 'rwdhide'
 				),
 		);
+
+		if( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'options', 'view' ) )
+		{ // Make time as link to Timezone settings if permission
+			$entries['time']['disabled'] = false;
+			$entries['time']['href'] = $admin_url.'?ctrl=time';
+		}
 
 		// ADMIN SKINS:
 		if( $is_admin_page )
@@ -1436,9 +1415,6 @@ class _core_Module extends Module
 			$admin_skins = get_admin_skins();
 			if( count( $admin_skins ) > 1 )
 			{	// We have several admin skins available: display switcher:
-				$entries['userprefs']['entries']['admskins_sep'] = array(
-						'separator' => true,
-					);
 				$entries['userprefs']['entries']['admskins'] = array(
 						'text' => T_('Admin skin'),
 					);
@@ -1454,54 +1430,14 @@ class _core_Module extends Module
 			}
 		}
 
+		$entries['userprefs']['entries'][] = array( 'separator' => true );
 
-		$entries['userprefs']['entries']['logout_sep'] = array(
-				'separator' => true,
-			);
 		$entries['userprefs']['entries']['logout'] = array(
-				'text' => T_('Log out'),
+				'text' => T_('Log out!'),
 				'href' => get_user_logout_url(),
 			);
-
-		// AB switch:
-		if( $perm_admin_normal )
-		{	// User must have permission to access admin...
-			if( $is_admin_page )
-			{
-				if( !empty( $Blog ) )
-				{
-					$entries['abswitch'] = array(
-							'text' => T_('Blog').' '.get_icon('switch-to-blog'),
-							'href' => $Blog->get( 'url' ),
-						);
-				}
-				else
-				{
-					$entries['abswitch'] = array(
-							'text' => T_('Home').' '.get_icon('switch-to-blog'),
-							'href' => $home_url,
-						);
-				}
-			}
-			else
-			{
-				$entries['abswitch'] = array(
-						'text' => T_('Admin').' '.get_icon('switch-to-admin'),
-						'href' => $admin_url,
-					);
-			}
-		}
 
 		$topright_Menu->add_menu_entries( NULL, $entries );
-
-		$topright_Menu->add_menu_entries( NULL, array(
-			'logout' => array(
-				'text' => T_('Logout').' '.get_icon('close'),
-				'class' => get_icon( 'close', 'rollover' ) ? 'rollover_sprite' : '',
-				'href' => get_user_logout_url(),
-				)
-		 ) );
-
 	}
 
 

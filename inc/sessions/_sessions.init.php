@@ -139,34 +139,32 @@ class sessions_Module extends Module
 
 		if( !empty($Blog) && $current_User->check_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
-			$entries = array();
-			$entries['stats_sep'] = array(
-				'separator' => true,
-			);
-			$entries['stats'] = array(
-				'text' => T_('Collection analytics'),
-				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
-				'entries' => array(
-					'summary' => array(
-						'text' => T_('Hit summary').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID ),
-					'refsearches' => array(
-						'text' => T_('Search B-hits').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$Blog->ID ),
-					'referers' => array(
-						'text' => T_('Referered B-hits').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog='.$Blog->ID ),
-					'other' => array(
-						'text' => T_('Direct B-hits').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog='.$Blog->ID ),
-					'hits' => array(
-						'text' => T_('All Hits').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$Blog->ID ),
-					'domains' => array(
-						'text' => T_('Referring domains').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$Blog->ID ),
-					)
-			);
+			$entries = array(
+				'stats_separator' => array( 'separator' => true ),
+				'stats' => array(
+					'text' => T_('Collection Analytics'),
+					'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
+					'entries' => array(
+						'summary' => array(
+							'text' => T_('Hit summary').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID ),
+						'refsearches' => array(
+							'text' => T_('Search B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$Blog->ID ),
+						'referers' => array(
+							'text' => T_('Referered B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=referers&amp;blog='.$Blog->ID ),
+						'other' => array(
+							'text' => T_('Direct B-hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=other&amp;blog='.$Blog->ID ),
+						'hits' => array(
+							'text' => T_('All Hits').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$Blog->ID ),
+						'domains' => array(
+							'text' => T_('Referring domains').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$Blog->ID ),
+						)
+				) );
 
 			$topleft_Menu->add_menu_entries( 'blog', $entries );
 		}
@@ -177,20 +175,10 @@ class sessions_Module extends Module
 			// TODO: this is hackish and would require a proper function call
 			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
 
-			// TODO: this is hackish and would require a proper function call
-			if( ! empty($topleft_Menu->_menus['entries']['tools']['entries']) )
-			{	// There are already entries aboce, insert a separator:
-				$topleft_Menu->add_menu_entries( 'tools', array(
-						'stats_sep' => array(
-								'separator' => true,
-							),
-					)
-				);
-			}
-
-			$entries = array();
-			$entries['stats'] = array(
-					'text' => T_('Global analytics'),
+			$entries = array(
+				'stats_separator' => array( 'separator' => true ),
+				'stats' => array(
+					'text' => T_('Global Analytics'),
 					'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0',
 					'entries' => array(
 						'summary' => array(
@@ -208,14 +196,21 @@ class sessions_Module extends Module
 						'hits' => array(
 							'text' => T_('All Hits').'&hellip;',
 							'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0' ),
+						array( 'separator' => true ),
+						'ips' => array(
+							'text' => T_('IPs').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog=0' ),
 						'domains' => array(
 							'text' => T_('Referring domains').'&hellip;',
 							'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog=0' ),
 						'goals' => array(
 							'text' => T_('Goals').'&hellip;',
 							'href' => $admin_url.'?ctrl=goals' ),
+						'settings' => array(
+							'text' => T_('Settings').'&hellip;',
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings' ),
 						)
-				);
+				) );
 
 			if( !is_admin_page() )
 			{

@@ -44,7 +44,6 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );
 
-	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
 	init_results_js(); // Add functions to work with Results tables
 
