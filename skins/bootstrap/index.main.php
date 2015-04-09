@@ -44,9 +44,8 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="container">
 	<div class="row">
-		<div class="col-md-12">
-
-<div class="PageTop">
+		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+			<div class="PageTop">
 	<?php
 		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
@@ -62,9 +61,10 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 	?>
-</div>
-
-<div class="pageHeader">
+			</div>
+		</div>
+		<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+			<div class="pageHeader">
 	<?php
 		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
@@ -77,8 +77,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// ----------------------------- END OF "Header" CONTAINER -----------------------------
 	?>
-</div>
-
+			</div>
 		</div>
 	</div>
 

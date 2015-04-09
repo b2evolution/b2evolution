@@ -94,6 +94,39 @@ class Organization extends DataObject
 	{
 		return $this->name;
 	}
+
+
+	/**
+	 * Get all users of this organization
+	 *
+	 * return array User objects
+	 */
+	function get_users()
+	{
+		global $DB;
+
+		$users = array();
+
+		if( empty( $this->ID ) )
+		{ // Return empty array for new creating organization
+			return $users;
+		}
+
+		$users_SQL = new SQL();
+		$users_SQL->SELECT( 'uorg_user_ID' );
+		$users_SQL->FROM( 'T_users__user_org' );
+		$users_SQL->WHERE( 'uorg_org_ID = '.$DB->quote( $this->ID ) );
+		$user_IDs = $DB->get_col( $users_SQL->get() );
+
+		$UserCache = & get_UserCache();
+
+		foreach( $user_IDs as $user_ID )
+		{
+			$users[] = & $UserCache->get_by_ID( $user_ID, false, false );
+		}
+
+		return $users;
+	}
 }
 
 ?>

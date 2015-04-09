@@ -936,19 +936,23 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	padding: 1ex;
 	margin-top: 0;
 }
+.feedback-actions {
+	float: right;
+	margin: 1ex;
+}
+.feedback-actions #recycle_bin {
+	margin-left: 5px;
+}
 .feedback-tabs {
 	list-style: none;
 	margin: 1ex 1ex 0 1ex;
 	padding: 0;
 	text-align: center;
 }
-.feedback-tabs li {
+.feedback-tabs a {
 	display: inline-block;
 	position: relative;
 	margin: 0 1px;
-}
-.feedback-tabs li a {
-	display: block;
 	padding: 1ex;
 	background-color: #F1F6F8;
 	text-decoration: none;
@@ -958,12 +962,13 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	-khtml-border-radius: 4px;
 	border-radius: 4px 4px 0 0;
 }
-.feedback-tabs li.active a {
+.feedback-tabs a.btn-primary {
 	border-bottom-color: #FFF;
 }
-.feedback-tabs li a:hover,
-.feedback-tabs li.active a {
+.feedback-tabs a:hover,
+.feedback-tabs a.btn-primary {
 	background-color: #FFF;
+	text-decoration: none;
 }
 
 div.block_item form.bComment.meta_comment_form {
@@ -1003,4 +1008,15 @@ div.block_item div.bComment.bCommentmeta p, div.block_item div.bComment.bComment
 
 #itemform_extra > label {
 	display: block;
+}
+
+.global_actions {
+	position: relative;
+	float: right;
+}
+.global_actions a {
+	position: absolute;
+	top: -28px;
+	right: 0;
+	margin-right: 0;
 }

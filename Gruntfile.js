@@ -44,6 +44,7 @@ module.exports = function(grunt) {
 					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
 					'rsc/css/item_base.css':    'rsc/less/item_base.less',
 					// Bootstrap frontoffice styles:
+					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
 					'rsc/build/bootstrap-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
 							'rsc/less/bootstrap-basic_styles.less',

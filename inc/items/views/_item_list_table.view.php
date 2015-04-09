@@ -44,7 +44,7 @@ else
 
 
 // Display title depending on selection params:
-echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
+echo $ItemList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
 
 /*

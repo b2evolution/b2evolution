@@ -154,7 +154,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $random_password;
+	global $new_db_version, $admin_url, $random_password, $create_sample_contents;
 
 	/*
 	 * -----------------------------------------------------------------------------------

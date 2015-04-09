@@ -37,6 +37,7 @@ class Userfield extends DataObject
 	var $order = '';
 	var $suggest = '1';
 	var $bubbletip;
+	var $icon_name;
 
 	/**
 	 * Constructor
@@ -63,9 +64,7 @@ class Userfield extends DataObject
 			$this->order      = $db_row->ufdf_order;
 			$this->suggest    = $db_row->ufdf_suggest;
 			$this->bubbletip  = $db_row->ufdf_bubbletip;
-		}
-		else
-		{	// Create a new user field:
+			$this->icon_name  = $db_row->ufdf_icon_name;
 		}
 	}
 
@@ -174,6 +173,10 @@ class Userfield extends DataObject
 		// Name
 		param_string_not_empty( 'ufdf_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
+
+		// Icon name
+		param( 'ufdf_icon_name', 'string' );
+		$this->set_from_Request( 'icon_name', 'ufdf_icon_name', true );
 
 		// Options
 		if( param( 'ufdf_type', 'string' ) == 'list' )

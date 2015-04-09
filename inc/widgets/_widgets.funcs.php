@@ -155,6 +155,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 							VALUES ( '.$blog_id.', "show_location_coordinates" , 1 )' );
 	}
 
+	/* Page Top */
+	if( in_array( $blog_id, array( $blog_home_ID, $blog_a_ID, $blog_manual_ID ) ) )
+	{
+		add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
+	}
+
 	/* Menu Top */
 	$menu_top_params = NULL;
 	if( $kind == 'forum' )
@@ -252,6 +258,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$featured_intro_params = array( 'disp_title' => 0 );
 	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
 	$post_list_params = NULL;
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
@@ -262,6 +269,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Don't install the "Recent Commnets" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
+
+	/* Front Page Secondary Area */
+	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'user_organizations', 'core', 10 );
 
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );

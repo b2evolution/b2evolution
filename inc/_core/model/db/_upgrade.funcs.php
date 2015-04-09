@@ -1753,7 +1753,7 @@ function db_upgrade_to_utf8( $load_db_schema = false )
 {
 	global $db_config, $tableprefix, $DB;
 
-	echo '<h2>'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
+	echo '<h2 class="page-title">'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
 	evo_flush();
 
 	if( $load_db_schema )

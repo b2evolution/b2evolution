@@ -42,7 +42,7 @@ else
 
 
 // Display title depending on selection params:
-echo $ItemList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
+echo $ItemList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
 /*
 	**
@@ -218,7 +218,7 @@ $ItemList->cols[] = array(
 
 if( $ItemList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
-	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters') );
+	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )

@@ -221,7 +221,9 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 
 $ProfileForm->end_fieldset();
 
-$ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
+if( ! is_logged_in() || $current_User->ID != $User->ID )
+{ // Don't display this for own user
+	$ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 
 	$contacts = array();
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) && ( $current_User->check_perm( 'perm_messaging', 'reply' ) ) )
@@ -291,7 +293,8 @@ $ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
 			'cancel_url' => url_add_param( $Blog->get( 'contactsurl' ), 'user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ),
 		) );
 
-$ProfileForm->end_fieldset();
+	$ProfileForm->end_fieldset();
+}
 
 
 // Load the user fields:
@@ -302,19 +305,26 @@ $group_ID = 0;
 foreach( $User->userfields as $userfield )
 {
 	if( $group_ID != $userfield->ufgp_ID )
-	{	// Start new group
+	{ // Start new group
 		if( $group_ID > 0 )
-		{	// End previous group
+		{ // End previous group
 			$ProfileForm->end_fieldset();
 		}
 		$ProfileForm->begin_fieldset( T_( $userfield->ufgp_name ) );
 	}
 
 	if( $userfield->ufdf_type == 'text' )
-	{	// convert textarea values
+	{ // convert textarea values
 		$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 	}
-	$ProfileForm->info( $userfield->ufdf_name, $userfield->uf_varchar );
+
+	$userfield_icon = '';
+	if( ! empty( $userfield->ufdf_icon_name ) )
+	{ // Icon
+		$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
+	}
+
+	$ProfileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
 
 	$group_ID = $userfield->ufgp_ID;
 }

@@ -1,4 +1,4 @@
-	/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -26,6 +26,16 @@
 ul, ol {
 	margin: 0 0 10px 25px;
 	padding: 0;
+}
+
+// Custom styles for buttons
+.btn {
+	&.btn-success, &.btn-danger {
+		.fa {
+			// Use only white icons in color buttons
+			color: #FFF !important;
+		}
+	}
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
@@ -522,15 +532,14 @@ div.edit_toolbars, div.message_toolbars {
 	padding-top: 7px;
 }
 
-// Remove borders from badge
-.badge {
-	border: none;
-	background-color: #F00;
+// Badge
+.badge-important {
+	background-color: #F00 !important;
+	color: #FFF !important;
 }
-a.evo_messages_link .badge {
-	font-size: 10px;
-	margin: -2px 2px;
-	padding: 2px 7px 3px;
+.panel-heading .badge {
+	position: relative;
+	top: -1px;
 }
 
 // Fix colorbox sizes
@@ -657,4 +666,36 @@ a.evo_messages_link .badge {
 // Fix label width on TinyMCE modal windows
 .mce-container label.mce-label {
 	max-width: none;
+}
+
+// Make rounded corners for all images in content
+#styled_content_block {
+	img {
+		.border-radius;
+	}
+	a.user img {
+		.border-radius(0);
+	}
+}
+
+// User links widget
+.widget--social-media-links a {
+	display: inline-block;
+	text-decoration: none;
+	color: #FFF;
+	background: #ddd;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	margin: 2px;
+	position: relative;
+	&:hover {
+		background: #23527c; 
+		// TODO: use @variable name
+	}
+	.fa {
+		font-size: 20px;
+		line-height: 40px;
+		display: block;
+	}
 }

@@ -14,6 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'users/model/_group.class.php', 'Group' );
 load_funcs( 'collections/model/_category.funcs.php' );
+load_class( 'users/model/_organization.class.php', 'Organization' );
 
 /**
  * Used for fresh install
@@ -43,7 +44,7 @@ function create_default_data()
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
-	global $test_install_all_features;
+	global $test_install_all_features, $create_sample_contents;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -131,37 +132,40 @@ function create_default_data()
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest)
-		 VALUES ( 1, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0'),
-						( 1, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0'),
-						( 1, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0'),
-						( 1, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0'),
-						( 1, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0'),
-						( 2, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0'),
-						( 2, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0'),
-						( 2, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0'),
-						( 2, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0'),
-						( 2, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0'),
-						( 2, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0'),
-						( 3, 'url',    'Website',       NULL, 'recommended', 'allowed',   '1',  '0'),
-						( 3, 'url',    'Blog',          NULL, 'optional',    'allowed',   '2',  '0'),
-						( 3, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '3',  '0'),
-						( 3, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '4',  '0'),
-						( 3, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '5',  '0'),
-						( 3, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '6',  '0'),
-						( 3, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '7',  '0'),
-						( 3, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '8',  '0'),
-						( 3, 'url',    'Digg',          NULL, 'optional',    'forbidden', '9',  '0'),
-						( 3, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '10', '0'),
-						( 4, 'word',   'Role',          NULL, 'optional',    'list',      '1',  '1'),
-						( 4, 'word',   'Organization',  NULL, 'optional',    'forbidden', '2',  '1'),
-						( 4, 'word',   'Division',      NULL, 'optional',    'forbidden', '3',  '1'),
-						( 4, 'word',   'VAT ID',        NULL, 'optional',    'forbidden', '4',  '0'),
-						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0'),
-						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0'),
-						( 6, 'text',   'About me',      NULL, 'recommended', 'forbidden', '1',  '0'),
-						( 6, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1'),
-						( 6, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1');" );
+		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_icon_name)
+		 VALUES ( 1, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', NULL ),
+						( 1, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'fa fa-yahoo' ),
+						( 1, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', NULL ),
+						( 1, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', NULL ),
+						( 1, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'fa fa-skype' ),
+						( 2, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'fa fa-phone' ),
+						( 2, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'fa fa-mobile-phone' ),
+						( 2, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'fa fa-phone' ),
+						( 2, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'fa fa-phone' ),
+						( 2, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'fa fa-fax' ),
+						( 2, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'fa fa-fax' ),
+						( 3, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'fa fa-twitter' ),
+						( 3, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'fa fa-facebook' ),
+						( 3, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'fa fa-google-plus' ),
+						( 3, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'fa fa-x-linkedin' ),
+						( 3, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'fa fa-github-alt' ),
+						( 3, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', NULL ),
+						( 3, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', NULL ),
+						( 3, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', NULL ),
+						( 3, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'fa fa-flickr' ),
+						( 3, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'fa fa-youtube' ),
+						( 3, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'fa fa-digg' ),
+						( 3, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'fa fa-stumbleupon' ),
+						( 3, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'fa fa-pinterest-p' ),
+						( 4, 'word',   'Role',          NULL, 'optional',    'list',      '1',  '1', NULL ),
+						( 4, 'word',   'Organization',  NULL, 'optional',    'forbidden', '2',  '1', NULL ),
+						( 4, 'word',   'Division',      NULL, 'optional',    'forbidden', '3',  '1', NULL ),
+						( 4, 'word',   'VAT ID',        NULL, 'optional',    'forbidden', '4',  '0', NULL ),
+						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'fa fa-building' ),
+						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'fa fa-home' ),
+						( 6, 'text',   'About me',      NULL, 'recommended', 'forbidden', '1',  '0', 'fa fa-info' ),
+						( 6, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'fa fa-thumbs-o-up' ),
+						( 6, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'fa fa-thumbs-o-down' )" );
 	task_end();
 
 
@@ -176,6 +180,20 @@ function create_default_data()
 	task_begin( 'Creating admin user... ' );
 	global $timestamp, $admin_email, $default_locale, $default_country, $install_password;
 	global $random_password;
+
+	// Create organization
+	global $user_org_IDs;
+	$user_org_IDs = NULL;
+	if( $create_sample_contents )
+	{ // Only when demo content is installing
+		$Organization = new Organization();
+		$Organization->set( 'name', 'Company XYZ' );
+		$Organization->set( 'url', 'http://b2evolution.net/' );
+		if( $Organization->dbinsert() )
+		{ // Use this organization for new created users
+			$user_org_IDs = array( $Organization->ID );
+		}
+	}
 
 	// Set default country from locale code
 	$country_code = explode( '-', $default_locale );
@@ -197,10 +215,23 @@ function create_default_data()
 	}
 
 	create_user( array(
-			'login'  => 'admin',
-			'level'  => 10,
-			'gender' => 'M',
-			'Group'  => $Group_Admins,
+			'login'     => 'admin',
+			'firstname' => 'Johnny',
+			'lastname'  => 'Admin',
+			'level'     => 10,
+			'gender'    => 'M',
+			'Group'     => $Group_Admins,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => array( 'Site administrator', 'Moderator' ),
+					'About me'    => 'I am the demo administrator of this site. I love having so much power!',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
 		) );
 	task_end();
 
@@ -212,15 +243,6 @@ function create_default_data()
 				( 1, 'enable_email', '1' ),
 				( 1, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
 				( 1, 'user_domain', 'localhost' )" );
-	task_end();
-
-	// Creating a default additional info for administrator
-	task_begin( 'Creating default additional info for administrator... ' );
-	$DB->query( "
-		INSERT INTO T_users__fields ( uf_user_ID, uf_ufdf_ID, uf_varchar )
-		VALUES ( 1, 22, 'Site administrator' ),
-					 ( 1, 22, 'Moderator' ),
-					 ( 1, 12, '".$baseurl."' )" );
 	task_end();
 
 
@@ -1156,7 +1178,9 @@ function create_user( $params = array() )
 	global $default_locale, $default_country;
 
 	$params = array_merge( array(
-			'login'   => '',
+			'login'     => '',
+			'firstname' => NULL,
+			'lastname'  => NULL,
 			'pass'    => $random_password, // random
 			'email'   => $admin_email,
 			'status'  => 'autoactivated', // assume it's active
@@ -1165,10 +1189,14 @@ function create_user( $params = array() )
 			'ctry_ID' => $default_country,
 			'gender'  => 'M',
 			'Group'   => NULL,
+			'org_IDs' => NULL, // array of organization IDs
+			'fields'  => NULL, // array of additional user fields
 		), $params );
 
 	$User = new User();
 	$User->set( 'login', $params['login'] );
+	$User->set( 'firstname', $params['firstname'] );
+	$User->set( 'lastname', $params['lastname'] );
 	$User->set_password( $params['pass'] );
 	$User->set_email( $params['email'] );
 	$User->set( 'status', $params['status'] );
@@ -1181,7 +1209,48 @@ function create_user( $params = array() )
 	$User->set( 'gender', $params['gender'] );
 	$User->set_datecreated( $timestamp++ );
 	$User->set_Group( $params['Group'] );
-	$User->dbinsert( false );
+	if( ! $User->dbinsert( false ) )
+	{ // Don't continue if user creating has been failed
+		return false;
+	}
+
+	if( ! empty( $params['org_IDs'] ) )
+	{ // Add user to organizations
+		$User->update_organizations( $params['org_IDs'], true );
+	}
+
+	if( ! empty( $params['fields'] ) )
+	{ // Additional user fields
+		global $DB;
+		$fields_SQL = new SQL();
+		$fields_SQL->SELECT( 'ufdf_ID, ufdf_name' );
+		$fields_SQL->FROM( 'T_users__fielddefs' );
+		$fields_SQL->WHERE( 'ufdf_name IN ( '.$DB->quote( array_keys( $params['fields'] ) ).' )' );
+		$fields = $DB->get_assoc( $fields_SQL->get() );
+		$user_field_records = array();
+		foreach( $fields as $field_ID => $field_name )
+		{
+			if( ! isset( $params['fields'][ $field_name ] ) )
+			{ // Skip wrong field
+				continue;
+			}
+
+			if( is_string( $params['fields'][ $field_name ] ) )
+			{
+				$params['fields'][ $field_name ] = array( $params['fields'][ $field_name ] );
+			}
+
+			foreach( $params['fields'][ $field_name ] as $field_value )
+			{ // SQL record for each field value
+				$user_field_records[] = '( '.$User->ID.', '.$field_ID.', '.$DB->quote( $field_value ).' )';
+			}
+		}
+		if( count( $user_field_records ) )
+		{ // Insert all user fields by single SQL query
+			$DB->query( 'INSERT INTO T_users__fields ( uf_user_ID, uf_ufdf_ID, uf_varchar ) VALUES '
+				.implode( ', ', $user_field_records ) );
+		}
+	}
 
 	return $User->ID;
 }
@@ -1202,6 +1271,7 @@ function create_demo_contents()
 	global $default_locale, $default_country;
 	global $Plugins;
 	global $test_install_all_features;
+	global $user_org_IDs;
 
 	/**
 	 * @var FileRootCache
@@ -1238,59 +1308,125 @@ function create_demo_contents()
 	$edit_File->link_to_Object( $LinkOwner );
 	task_end();
 
-	task_begin('Creating demo amoderator user... ');
-	$amoderator_ID = create_user( array(
-			'login'  => 'amoderator',
-			'level'  => 2,
-			'gender' => 'M',
-			'Group'  => $Group_Privileged,
+	task_begin('Creating demo jay user... ');
+	$jay_moderator_ID = create_user( array(
+			'login'     => 'jay',
+			'firstname' => 'Jay',
+			'lastname'  => 'Parker',
+			'level'     => 2,
+			'gender'    => 'M',
+			'Group'     => $Group_Privileged,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => 'Moderator',
+					'About me'    => 'I am a demo moderator for this site. I like to keep things clean!',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
 		) );
 	task_end();
 
-	task_begin('Creating demo bmoderator user... ');
-	$bmoderator_ID = create_user( array(
-			'login'  => 'bmoderator',
-			'level'  => 2,
-			'gender' => 'F',
-			'Group'  => $Group_Privileged,
+	task_begin('Creating demo jenny user... ');
+	$jenny_moderator_ID = create_user( array(
+			'login'     => 'jenny',
+			'firstname' => 'Jenny',
+			'lastname'  => 'Anderson',
+			'level'     => 2,
+			'gender'    => 'F',
+			'Group'     => $Group_Privileged,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => 'Moderator',
+					'About me'    => 'I am a demo moderator for this site. I love it when things are neat!',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
 		) );
 	task_end();
 
-	task_begin('Creating demo ablogger user... ');
-	$ablogger_ID = create_user( array(
-			'login'  => 'ablogger',
-			'level'  => 1,
-			'gender' => 'M',
-			'Group'  => $Group_Bloggers,
+	task_begin('Creating demo larry user... ');
+	$larry_blogger_ID = create_user( array(
+			'login'     => 'larry',
+			'firstname' => 'Larry',
+			'lastname'  => 'Smith',
+			'level'     => 1,
+			'gender'    => 'M',
+			'Group'     => $Group_Bloggers,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => 'Author',
+					'About me'    => 'I\'m a demo author. I like to write!',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
 		) );
 	task_end();
 
-	task_begin('Creating demo bblogger user... ');
-	$bblogger_ID = create_user( array(
-			'login'  => 'bblogger',
-			'level'  => 1,
-			'gender' => 'F',
-			'Group'  => $Group_Bloggers,
+	task_begin('Creating demo kate user... ');
+	$kate_blogger_ID = create_user( array(
+			'login'     => 'kate',
+			'firstname' => 'Kate',
+			'lastname'  => 'Adams',
+			'level'     => 1,
+			'gender'    => 'F',
+			'Group'     => $Group_Bloggers,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => 'Author',
+					'About me'    => 'I\'m a demo author. I like to think before I write ;)',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
 		) );
 	task_end();
 
-	task_begin('Creating demo auser user... ');
-	$auser_ID = create_user( array(
-			'login'  => 'auser',
-			'level'  => 0,
-			'gender' => 'M',
-			'Group'  => $Group_Users,
+	task_begin('Creating demo bart user... ');
+	$bart_user_ID = create_user( array(
+			'login'     => 'bart',
+			'firstname' => 'Bart',
+			'lastname'  => 'Davis',
+			'level'     => 0,
+			'gender'    => 'M',
+			'Group'     => $Group_Users,
+			'fields'    => array(
+					'About me' => 'Hi there!',
+				)
 		) );
 	task_end();
 
-	task_begin('Creating demo buser user... ');
-	$buser_ID = create_user( array(
-			'login'  => 'buser',
-			'level'  => 0,
-			'gender' => 'F',
-			'Group'  => $Group_Users,
+	task_begin('Creating demo mary user... ');
+	$mary_user_ID = create_user( array(
+			'login'     => 'mary',
+			'firstname' => 'Mary',
+			'lastname'  => 'Jones',
+			'level'     => 0,
+			'gender'    => 'F',
+			'Group'     => $Group_Users,
+			'fields'    => array(
+					'About me' => 'Just me!',
+				)
 		) );
 	task_end();
+
+	// Use only these users to create the demo comments, @see create_demo_comment()
+	global $b2evo_demo_comment_users;
+	$b2evo_demo_comment_users = array( $bart_user_ID, $mary_user_ID, 0 );
 
 	task_begin( 'Set settings for demo users... ' );
 	$DB->query( "
@@ -1338,6 +1474,9 @@ function create_demo_contents()
 
 	task_begin( 'Creating default blogs... ' );
 
+	// Store the item IDs in this array in order to create additional comments
+	$additional_comments_item_IDs = array();
+
 	if( $install_collection_home )
 	{ // Install Home blog
 		$blog_shortname = T_('Home');
@@ -1358,7 +1497,7 @@ function create_demo_contents()
 			$blog_home_access_type,
 			true,
 			'never',
-			$ablogger_ID );
+			$larry_blogger_ID );
 
 		if( ! empty( $blog_home_ID ) )
 		{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
@@ -1385,7 +1524,7 @@ function create_demo_contents()
 			$blog_a_access_type,
 			true,
 			'public',
-			$ablogger_ID );
+			$larry_blogger_ID );
 		$BlogCache = & get_BlogCache();
 		if( $Blog_a = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
 		{
@@ -1412,7 +1551,7 @@ function create_demo_contents()
 			$blog_b_access_type,
 			true,
 			'public',
-			$bblogger_ID );
+			$kate_blogger_ID );
 	}
 
 	if( $install_collection_photos )
@@ -1430,7 +1569,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 			4, // Skin ID
 			'photo', '', 0, 'relative', true, 'public',
-			$ablogger_ID );
+			$larry_blogger_ID );
 	}
 
 	if( $install_collection_forums )
@@ -1445,7 +1584,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			5, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
-			$ablogger_ID );
+			$larry_blogger_ID );
 	}
 
 	if( $install_collection_manual )
@@ -1460,7 +1599,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			6, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
-			$ablogger_ID );
+			$larry_blogger_ID );
 	}
 
 	$BlogCache = & get_BlogCache();
@@ -1737,7 +1876,7 @@ function create_demo_contents()
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$Item_BlogA_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+		$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
 			T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -2054,7 +2193,7 @@ The rain---not the reign---in Spain.');
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$Item_Forum_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+		$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
 			T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -2433,7 +2572,7 @@ Hello
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$Item_Manual_welcome_ID = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
+		$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
 			T_("<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>
 
 <ul>
@@ -2482,77 +2621,25 @@ Hello
 
 	task_begin( 'Creating sample comments... ' );
 
-	if( $install_collection_bloga )
-	{ // ---------------- Insert the COMMENTS for Blog A ---------------- //
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
-																					comment_author_email, comment_author_url, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
-							VALUES( '".$Item_BlogA_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-										 '$now', '$now', '".
-										 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.'))."', 'default', 0)";
-		$DB->query( $query );
-
-		if( $test_install_all_features )
-		{ // Insert the comments from each user
-			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
-			{
-				$now = date('Y-m-d H:i:s');
-				$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
-									VALUES( '".$Item_BlogA_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
-												 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished' )";
-				$DB->query( $query );
-			}
-		}
+	// Create two demo comments for each new created item
+	$new_created_item_IDs = $DB->get_col( 'SELECT post_ID FROM T_items__item ORDER BY post_ID' );
+	foreach( $new_created_item_IDs as $new_created_item_ID )
+	{
+		create_demo_comment( $new_created_item_ID, 'published' );
+		create_demo_comment( $new_created_item_ID, 'draft' );
 	}
 
-	if( $install_collection_forums )
-	{ // ---------------- Insert the COMMENTS for Forums blog ---------------- //
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
-																					comment_author_email, comment_author_url, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
-							VALUES( '".$Item_Forum_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-										 '$now', '$now', '".
-										 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 'default', 0)";
-		$DB->query( $query );
-
-		if( $test_install_all_features )
-		{ // Insert the comments from each user
+	if( $test_install_all_features && count( $additional_comments_item_IDs ) )
+	{ // Create the additional comments when we install all features
+		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
+		{
 			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
-			{
-				$now = date('Y-m-d H:i:s');
-				$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
-									VALUES( '".$Item_Forum_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
-												 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
-				$DB->query( $query );
-			}
-		}
-	}
-
-	if( $install_collection_manual )
-	{ // ---------------- Insert the COMMENTS for Manual blog ---------------- //
-		$now = date('Y-m-d H:i:s');
-		$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author,
-																					comment_author_email, comment_author_url, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma)
-							VALUES( '".$Item_Manual_welcome_ID."', 'comment', 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1',
-										 '$now', '$now', '".
-										 $DB->escape(T_('Hi, this is a comment.<br />To delete a comment, just log in, and view the posts\' comments, there you will have the option to edit or delete them.')). "', 'default', 0)";
-		$DB->query( $query );
-
-		if( $test_install_all_features )
-		{ // Insert the comments from each user
-			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
-			{
-				$now = date('Y-m-d H:i:s');
-				$query = "INSERT INTO T_comments( comment_item_ID, comment_type, comment_author_user_ID, comment_author_IP,
-																					comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_karma, comment_notif_status)
-									VALUES( '".$Item_Manual_welcome_ID."', 'comment', '$i_user_ID', '127.0.0.1', '$now', '$now', '".
-												 $DB->escape( T_('Hi, this is my comment.') ). "', 'default', 0, 'finished')";
-				$DB->query( $query );
+			{ // Insert the comments from each user
+				$now = date( 'Y-m-d H:i:s' );
+				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
+						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
+						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi, this is my comment.') ).', "default", "finished" )' );
 			}
 		}
 	}
@@ -2673,6 +2760,65 @@ Hello
 	{
 		echo "<br />\n";
 	}
+}
+
+
+/**
+ * Create a demo comment
+ *
+ * @param integer Item ID
+ * @param string Comment status
+ */
+function create_demo_comment( $item_ID, $status )
+{
+	global $DB, $b2evo_demo_comment_users, $b2evo_demo_comment_user_num;
+
+	// Get next user ID for new creating comment
+	if( ! isset( $b2evo_demo_comment_user_num ) )
+	{
+		$b2evo_demo_comment_user_num = 0;
+	}
+	else
+	{
+		$b2evo_demo_comment_user_num++;
+		if( $b2evo_demo_comment_user_num > count( $b2evo_demo_comment_users ) - 1 )
+		{
+			$b2evo_demo_comment_user_num = 0;
+		}
+	}
+	$user_ID = $b2evo_demo_comment_users[ $b2evo_demo_comment_user_num ];
+	if( $user_ID > 0 )
+	{ // An existing user
+		$author = NULL;
+		$author_email = NULL;
+		$author_email_url = NULL;
+	}
+	else
+	{ // Anonymous user
+		$user_ID = NULL;
+		$author = 'miss b2';
+		$author_email = 'missb2@example.com';
+		$author_email_url = 'http://example.com';
+	}
+
+	// Set demo content depending on status
+	if( $status == 'published' )
+	{
+		$content = T_('Hi!<br />This is a sample comment that has been approved by default!<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
+	}
+	else
+	{ // draft
+		$content = T_('Hi!<br />This is a sample comment that has not been approved by default.<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
+	}
+
+	$now = date( 'Y-m-d H:i:s' );
+
+	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
+			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
+			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+		VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
+			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
+			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
 }
 
 

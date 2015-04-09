@@ -72,7 +72,7 @@ $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilita
 $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
-echo '<h2>'.T_('System status').'</h2>';
+echo '<h2 class="page-title">'.T_('System status').'</h2>';
 
 // Get system stats to display:
 $system_stats = get_system_stats();

@@ -46,13 +46,15 @@ $postIDarray = $ItemList->get_page_ID_array();
 
 $block_item_Widget = new Widget( 'block_item' );
 
+// This block is used to keep correct css style for the post status banners
+echo '<div id="styled_content_block">';
+
 if( $action == 'view' )
 { // We are displaying a single post:
-	$block_item_Widget->title = $ItemList->get_filter_title( '', '', ' - ', NULL, 'htmlbody' );
-	$block_item_Widget->global_icon( T_('Close post'), 'close',
-				regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ), T_('close'), 4, 1 );
-
-	$block_item_Widget->disp_template_replaced( 'block_start' );
+	echo '<div class="global_actions">'
+			.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ),
+				NULL, NULL, NULL, array( 'class' => 'action_icon btn btn-default' ) )
+		.'</div>';
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
@@ -99,9 +101,6 @@ else
 	// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
 
 	$block_item_Widget->disp_template_replaced( 'block_end' );
-
-	// This block is used to keep correct css style for the post status banners
-	echo '<div id="styled_content_block">';
 
 	global $AdminUI;
 	$admin_template = $AdminUI->get_template( 'Results' );
@@ -364,30 +363,48 @@ while( $Item = & $ItemList->get_item() )
 
 			// ---------- comments ----------
 
+			// Actions "Recycle bin" and "Refresh"
+			echo '<div class="feedback-actions">';
+			echo action_icon( T_('Refresh comment list'), 'refresh', url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID.'#comments' ),
+					' '.T_('Refresh'), 3, 4, array(
+						'onclick' => 'startRefreshComments( \''.request_from().'\', '.$Item->ID.', 1, \''.$comment_type.'\' ); return false;',
+						'class'   => 'btn btn-default'
+					) );
+			if( $comment_type != 'meta' )
+			{ // Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
+				echo get_opentrash_link( true, false, array(
+						'before' => ' <span id="recycle_bin">',
+						'after' => '</span>',
+						'class' => 'btn btn-default'
+					) );
+			}
+			echo '</div>';
+
 			if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
 			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
+				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 				$switch_comment_type_tabs = array(
 						'feedback' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=feedback#comments',
-							'title' => T_('User comments') ),
+							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
-							'title' => T_('Meta discussion') )
+							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
 					);
 				?>
-				<ul class="feedback-tabs nav nav-pills">
+				<div class="feedback-tabs btn-group">
 				<?php
 					foreach( $switch_comment_type_tabs as $comment_tab_type => $comment_tab )
 					{
-						echo '<li'.( $comment_type == $comment_tab_type ? ' class="active"' : '' ).'>';
-						echo '<a href="'.$comment_tab['url'].'">'.$comment_tab['title'].'</a>';
-						echo '</li>';
+						echo '<a href="'.$comment_tab['url'].'" class="btn'.( $comment_type == $comment_tab_type ? ' btn-primary' : ' btn-default' ).'">'.$comment_tab['title'].'</a>';
 					}
 				?>
-				</ul>
+				</div>
 				<?php
 			}
+
+			echo '<div class="clear"></div>';
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
 			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
@@ -436,37 +453,13 @@ while( $Item = & $ItemList->get_item() )
 			param( 'show_comments', 'string', $show_comments, false, true );
 
 			// Display status filter
-			// Get "Refresh" link
-			$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID.'#comments' ), NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\', '.$Item->ID.', 1, \''.$comment_type.'\' ); return false;' ) ).'</span> ';
 			?>
 			<div class="bFeedback">
 			<a id="comments"></a>
 			<?php
-			if( $comment_type == 'meta' )
-			{ // Display only "Refresh" link for meta comments
-				echo $refresh_link;
-			}
-			else
-			{ // Feedbacks
-			?>
-			<h4>
-			<?php
-				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).')';
-				// Display "Recycle bin" and "Refresh" links
-				echo $refresh_link.get_opentrash_link();
-			?>:</h4>
-			<?php
-			}
-			echo '<div class="clear"></div>';
-
 			if( $display_params['disp_rating_summary'] )
 			{ // Display a ratings summary
-				if( $comment_type != 'meta' )
-				{
-					echo '<h3>'.$Item->get_feedback_title( ( $comment_type == 'meta' ? 'metas' : 'comments' ), '#', '#', '#', 'total' ).'</h3>';
-				}
 				echo $Item->get_rating_summary();
-				echo '<br />';
 			}
 
 			if( $comment_type != 'meta' )
@@ -574,13 +567,6 @@ if( $action == 'view' )
 // Display navigation:
 $ItemList->display_nav( 'footer' );
 
-if( $action == 'view' )
-{ // End block of a single post
-	$block_item_Widget->disp_template_replaced( 'block_end' );
-}
-else
-{ // End block of the multiple posts
-	echo '</div>';// END OF <div id="styled_content_block">
-}
+echo '</div>';// END OF <div id="styled_content_block">
 
 ?>

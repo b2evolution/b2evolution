@@ -511,11 +511,11 @@ switch( $action )
 		if( isset( $blog_ID ) && ( $blog_ID != 0 ) )
 		{ // delete by comment ids
 			$query = 'SELECT comment_ID
-					FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
-						LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
-						LEFT OUTER JOIN T_comments ON post_ID = comment_item_ID
-					WHERE comment_status = "trash" AND blog_ID = '.$blog_ID;
-			$comment_ids = $DB->query->get_col( $query, 'get trash comment ids' );
+					 FROM T_comments
+					INNER JOIN T_items__item ON post_ID = comment_item_ID
+					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
+			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
 			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
 		}
 		else
@@ -671,7 +671,7 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'elevate' ) ) 
 	init_datepicker_js();
 }
 
-require_css( 'rsc/css/blog_base.css', true ); // Default styles for the blog navigation
+require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );

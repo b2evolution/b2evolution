@@ -5830,7 +5830,51 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11370' );
+		set_upgrade_checkpoint( '11370' );
+	}
+
+	if( $old_db_version < 11375 )
+	{ // part 18.g trunk aka 9th part of "i7"
+
+		task_begin( 'Upgrade table user field definitions... ' );
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+			ADD ufdf_icon_name varchar(40) COLLATE ascii_general_ci NULL' );
+		$DB->query( 'UPDATE T_users__fielddefs SET
+			ufdf_icon_name = CASE
+				WHEN ufdf_name = "Yahoo IM"      THEN "fa fa-yahoo"
+				WHEN ufdf_name = "Skype"         THEN "fa fa-skype"
+				WHEN ufdf_name = "Main phone"    THEN "fa fa-phone"
+				WHEN ufdf_name = "Cell phone"    THEN "fa fa-mobile-phone"
+				WHEN ufdf_name = "Office phone"  THEN "fa fa-phone"
+				WHEN ufdf_name = "Home phone"    THEN "fa fa-phone"
+				WHEN ufdf_name = "Office FAX"    THEN "fa fa-fax"
+				WHEN ufdf_name = "Home FAX"      THEN "fa fa-fax"
+				WHEN ufdf_name = "Linkedin"      THEN "fa fa-x-linkedin"
+				WHEN ufdf_name = "Twitter"       THEN "fa fa-twitter"
+				WHEN ufdf_name = "Facebook"      THEN "fa fa-facebook"
+				WHEN ufdf_name = "Flickr"        THEN "fa fa-flickr"
+				WHEN ufdf_name = "YouTube"       THEN "fa fa-youtube"
+				WHEN ufdf_name = "Digg"          THEN "fa fa-digg"
+				WHEN ufdf_name = "StumbleUpon"   THEN "fa fa-stumbleupon"
+				WHEN ufdf_name = "GitHub"        THEN "fa fa-github-alt"
+				WHEN ufdf_name = "Google Plus"   THEN "fa fa-google-plus"
+				WHEN ufdf_name = "Pinterest"     THEN "fa fa-pinterest-p"
+				WHEN ufdf_name = "Main address"  THEN "fa fa-building"
+				WHEN ufdf_name = "Home address"  THEN "fa fa-home"
+				WHEN ufdf_name = "About me"      THEN "fa fa-info"
+				WHEN ufdf_name = "I like"        THEN "fa fa-thumbs-o-up"
+				WHEN ufdf_name = "I don\'t like" THEN "fa fa-thumbs-o-down"
+				ELSE ufdf_icon_name
+			END' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11375' );
 	}
 
 	/*

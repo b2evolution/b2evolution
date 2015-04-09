@@ -2,6 +2,12 @@
 .pageHeader {
 	margin-bottom: 30px;
 }
+.PageTop {
+	margin-top: 20px;
+	.widget--social-media-links {
+		text-align: right;
+	}
+}
 div.widget_core_coll_tagline {
 	margin-bottom: 30px;
 }
@@ -18,6 +24,9 @@ body.pictured .footer {
 	color: #666;
 	a {
 		color: #666;
+	}
+	.widget--social-media-links a {
+		color: #FFF;
 	}
 }
 
@@ -562,5 +571,26 @@ div.action_messages, div.log_container {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
+	}
+}
+
+// User links widget
+body.pictured .front_main_content .widget--social-media-links a {
+	width: 60px;
+	height: 60px;
+	margin: 5px;
+	.fa {
+		font-size: 30px;
+		line-height: 60px;
+	}
+}
+
+// Organization Members widget
+.widget_core_user_organizations {
+	color: #333;
+	img {
+		width: 200px;
+		height: 200px;
+		display: inline-block;
 	}
 }

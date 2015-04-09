@@ -48,7 +48,7 @@ $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'org_name',
 		'td' => $current_User->check_perm( 'users', 'edit', false )
-			? '<a href="'.$admin_url.'?ctrl=organization&amp;action=edit&amp;org_ID=$org_ID$"><b>$org_name$</b></a>'
+			? '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID=$org_ID$"><b>$org_name$</b></a>'
 			: '$org_name$',
 	);
 

@@ -565,6 +565,11 @@ class bootstrap_manual_Skin extends Skin
 						'toolbar_button_class' => 'btn btn-default',
 					);
 
+			case 'modal_window_js_func':
+				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
+				return 'echo_modalwindow_js_bootstrap';
+				break;
+
 			default:
 				// Delegate to parent class:
 				return parent::get_template( $name );

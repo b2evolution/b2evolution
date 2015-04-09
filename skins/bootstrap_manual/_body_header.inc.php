@@ -18,8 +18,7 @@ global $Settings, $disp, $cat;
 
 <div class="container">
 	<div id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
-		<div class="col-md-12">
-
+		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 			<div class="PageTop">
 			<?php
 				// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
@@ -37,7 +36,8 @@ global $Settings, $disp, $cat;
 				// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 			?>
 			</div>
-
+		</div>
+		<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 			<?php
 				// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
@@ -50,7 +50,6 @@ global $Settings, $disp, $cat;
 					) );
 				// ----------------------------- END OF "Header" CONTAINER -----------------------------
 			?>
-
 		</div>
 	</div>
 

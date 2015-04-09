@@ -2492,7 +2492,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		}
 		echo '<div class="bCommentText">';
 		$Comment->rating();
-		$Comment->avatar();
+		$Comment->avatar( 'crop-top-80x80' );
 		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
 		{ // Put the comment content into this container to edit by ajax
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
@@ -2510,7 +2510,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="floatleft">';
 
 		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ), '#', button_class(), '&amp;', $save_context, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
 
 		echo '<span class="'.button_class( 'group' ).'">';
 		// Display publish NOW button if current user has the rights:
@@ -2594,13 +2594,20 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
  * @param string link text
  * @param integer the page number
  */
-function echo_comment_pagenumber( $item_ID, $text, $page )
+function echo_comment_pagenumber( $item_ID, $text, $page, $params = array() )
 {
+	$params = array_merge( array(
+			'page_before' => ' ',
+			'page_after'  => '',
+		), $params );
+
 	global $blog, $admin_url;
 	$page_param = $page > 1 ? '&amp;currentpage='.$page : '';
 	$comment_type = get_param( 'comment_type' );
 	$page_param .= $comment_type == 'meta' ? '&amp;comment_type=meta' : '';
-	echo ' <a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$item_ID.$page_param.'#comments' ).'" onclick="startRefreshComments( \''.request_from().'\', '.$item_ID.', '.$page.', \''.$comment_type.'\' ); return false;">'.$text.'</a>';
+	echo $params['page_before']
+			.'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$blog.'&amp;p='.$item_ID.$page_param.'#comments' ).'" onclick="startRefreshComments( \''.request_from().'\', '.$item_ID.', '.$page.', \''.$comment_type.'\' ); return false;">'.$text.'</a>'
+		.$params['page_after'];
 }
 
 
@@ -2624,6 +2631,10 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 			'prev_text'  => T_('Previous'),
 			'next_text'  => T_('Next'),
 			'pages_text' => '<strong>'.T_('Pages').'</strong>:',
+			'page_before'         => ' ',
+			'page_after'          => '',
+			'page_current_before' => ' <strong>',
+			'page_current_after'  => '</strong>',
 		), $params );
 
 	if( $comments_number == 0 )
@@ -2632,6 +2643,11 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 	}
 
 	$total_pages = ceil( $comments_number / $params['page_size'] );
+
+	if( $total_pages < 2 )
+	{ // No pages
+		return;
+	}
 
 	if( $currentpage > $total_pages )
 	{ // current page number is greater then all page number, set current page to the last existing page
@@ -2669,40 +2685,40 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 		echo $params['pages_text'];
 		if( $currentpage > 1 )
 		{ // link to previous page
-			echo_comment_pagenumber( $item_ID, $params['prev_text'], $currentpage - 1 );
+			echo_comment_pagenumber( $item_ID, $params['prev_text'], $currentpage - 1, $params );
 		}
 		if( $first_page > 1 )
 		{ // link to first page
-			echo_comment_pagenumber( $item_ID, '1', '1' );
+			echo_comment_pagenumber( $item_ID, '1', '1', $params );
 		}
 		if( $first_page > 2 )
 		{ // link to previous pages
 			$page_i = ceil( $first_page / 2 );
-			echo_comment_pagenumber( $item_ID, '...', $page_i );
+			echo_comment_pagenumber( $item_ID, '...', $page_i, $params );
 		}
 		for( $i = $first_page; $i <= $last_page; $i++ )
 		{ // Display list with pages
 			if( $i == $currentpage )
 			{
-				echo ' <strong>'.$i.'</strong>';
+				echo $params['page_current_before'].$i.$params['page_current_after'];
 			}
 			else
 			{
-				echo_comment_pagenumber( $item_ID, $i, $i );
+				echo_comment_pagenumber( $item_ID, $i, $i, $params );
 			}
 		}
 		if( $last_page < $total_pages - 1 )
 		{ // link to next pages
 			$page_i = $last_page + floor( ( $total_pages - $last_page ) / 2 );
-			echo_comment_pagenumber( $item_ID, '...', $page_i );
+			echo_comment_pagenumber( $item_ID, '...', $page_i, $params );
 		}
 		if( $last_page < $total_pages )
 		{ // link to last page
-			echo_comment_pagenumber( $item_ID, $total_pages, $total_pages );
+			echo_comment_pagenumber( $item_ID, $total_pages, $total_pages, $params );
 		}
 		if( $currentpage < $total_pages )
 		{ // link to next page
-			echo_comment_pagenumber( $item_ID, $params['next_text'], $currentpage + 1 );
+			echo_comment_pagenumber( $item_ID, $params['next_text'], $currentpage + 1, $params );
 		}
 	}
 	echo $params['list_end'];

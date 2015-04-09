@@ -1105,7 +1105,7 @@ function get_icon_info($name)
 			'size' => array( 10, 16 ),
 			'xy' => array( 0, 32 ),
 			'fa' => 'flash',
-			'color' => '#efc944'
+			'color' => '#ff9900'
 		);
 	}
 }

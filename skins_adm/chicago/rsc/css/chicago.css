@@ -590,6 +590,17 @@ div.edit_actions input.SaveButton:hover {
 .dashboard_post .small {
 	margin: 4px 0 2px 0;
 }
+.dashboard_comment_avatar {
+	float: left;
+	margin: 0 5px 5px 0;
+}
+.dashboard_comment_avatar a {
+	display: inline-block;
+}
+.dashboard_comment_title {
+	font-size: 16px;
+	margin: 0;
+}
 
 
 /*

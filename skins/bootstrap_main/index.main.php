@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8659 2015-04-02 15:18:27Z yura $
+	 * @version $Id: index.main.php 8716 2015-04-09 13:49:19Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -68,9 +68,8 @@ if( $disp != 'front' )
 { // Don't display header on disp=front
 ?>
 	<div class="row">
-		<div class="col-md-12">
-
-<div class="PageTop">
+		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+			<div class="PageTop">
 	<?php
 		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
@@ -86,9 +85,10 @@ if( $disp != 'front' )
 			) );
 		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 	?>
-</div>
-
-<div class="pageHeader">
+			</div>
+		</div>
+		<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+			<div class="pageHeader">
 	<?php
 		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
@@ -101,8 +101,7 @@ if( $disp != 'front' )
 			) );
 		// ----------------------------- END OF "Header" CONTAINER -----------------------------
 	?>
-</div>
-
+			</div>
 		</div>
 	</div>
 <?php
@@ -363,13 +362,35 @@ if( $disp != 'front' )
 <div class="footer">
 	<div class="container">
 		<div class="row">
+<?php
+if( $disp == 'front' )
+{
+?>
+			<div class="col-md-12">
+	<?php
+		// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		skin_container( NT_('Front Page Secondary Area'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start'       => '<div class="widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h2 class="page-header">',
+				'block_title_end'   => '</h2>',
+			) );
+		// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
+	?>
+			</div>
+<?php
+}
+?>
 			<div class="col-md-12 center">
 	<?php
+		// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 		// Display container and contents:
-		skin_container( NT_("Footer"), array(
+		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
-		// Note: Double quotes have been used around "Footer" only for test purposes.
+		// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 	?>
 	<p>
 		<?php

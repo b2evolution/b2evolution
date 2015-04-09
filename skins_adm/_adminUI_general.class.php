@@ -1207,9 +1207,19 @@ class AdminUI_general extends Menu
 				return 'hintbox';
 				break;
 
-			case 'modal_window_js':
-				// JavaScript to init Modals, @see echo_user_ajaxwindow_js()
-				return false;
+			case 'modal_window_js_func':
+				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
+				return false; // Use standard functions
+				break;
+
+			case 'pagination':
+				// Pagination, @see echo_comment_pages()
+				return array();
+				break;
+
+			case 'blog_base.css':
+				// File name of blog_base.css that are used on several back-office pages
+				return 'blog_base.css';
 				break;
 
 			default:

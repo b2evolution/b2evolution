@@ -188,16 +188,9 @@ div.avatartag.main > img:first-child {
 	.crop_button.bottom { display: none; }
 	#image_crop legend{ padding: 10px; box-sizing: border-box; }
 }
-.disp_avatar .preview_cropped_images {
-	width: auto;
-	text-align: left;
-}
-.disp_avatar .preview_cropped_image {
-	margin-right: 8px;
-}
-.disp_avatar #target_cropped_image img {
-	max-width: 400px;
-	max-height: 320px;
+// Fix to hide radio button
+.jcrop-keymgr {
+	visibility: hidden;
 }
 // ---------------- //
 
@@ -205,9 +198,9 @@ div.avatartag.main > img:first-child {
 // Note: there may be some properties that seem overkill but the fact is we need to override
 // any too general styles a skin may want to bring in for its own body/general display.
 div#evo_toolbar {
-	background-color: #f4f4f4;
+	background-color: #f5f5f5;
 	color: ButtonText;
-	border-top: 1px solid #676767;
+	border-bottom: 1px solid #ddd;
 	text-align: left;
 	margin: 0;
 	font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
@@ -241,23 +234,25 @@ div#evo_toolbar {
 		float: right;
 	}
 }
-.sf-menu, .sf-menu * {
+.evobar-menu, .evobar-menu * {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	box-sizing: content-box;
 	-webkit-font-smoothing: antialiased;
 }
-.sf-menu {
+.evobar-menu {
 	ul {
 		position: absolute;
-		top: -999em;
+		top: -99999em;
 		opacity: 0;
 		width: 25ex; // left offset of submenus need to match (see below)
 		border: 1px solid #CCC;
 		box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
 		transition: opacity 0.2s linear;
-		display: none;
+		-webkit-transition: opacity .2s ease-in-out;
+		     -o-transition: opacity .2s ease-in-out;
+		        transition: opacity .2s ease-in-out;
 		li {
 			width: 100%;
 		}
@@ -266,7 +261,6 @@ div#evo_toolbar {
 		opacity: 1;
 		z-index: 99;
 		top: 26px;
-		display: block;
 	}
 	li {
 		float: left;
@@ -304,9 +298,6 @@ div#evo_toolbar {
 			a:hover {
 				background: #e7e7e7;
 			}
-			a > .sf-sub-indicator:after {
-				content: "\25B6";
-			}
 		}
 		&.separator {
 			background: #f4f4f4;
@@ -336,31 +327,25 @@ div#evo_toolbar {
 			text-decoration: none;
 		}
 		&.disabled, &.disabled:hover {
-			color: #666;
+			color: #aaa;
 		}
 	}
-	.sf-sub-indicator {
-		display: inline-block;
+	// .evobar-icon-down, .evobar-icon-right, .evobar-icon-left
+	[class^=evobar-icon-] {
 		margin-left: 6px;
 		float: right;
-		font-size: 10px;
-		&:after {
-			width: 10px;
-			height: 10px;
-			content: "\25BC";
-		}
 	}
 }
 // Hide several menu entries on small screens
 @media (max-width: 800px) {
-	.sf-menu li.rwdhide {
+	.evobar-menu li.rwdhide {
 		display: none;
 	}
 }
-.actions_left .sf-menu.sf-menu-left {
+.actions_left .evobar-menu.evobar-menu-left {
 	float: left;
 }
-.actions_right .sf-menu {
+.actions_right .evobar-menu {
 	> li > ul {
 		right: 0;
 	}
@@ -564,20 +549,6 @@ div.widget_not_in_cache div.debug_widget_name {
 }
 // ---------------- //
 
-// Badge that display how much the unread messages user has
-.badge {
-	position: relative;
-	top: -1px;
-	border-radius:12px;
-	-moz-border-radius:12px;
-	-webkit-border-radius:12px;
-	background-color:red;
-	border:2px solid #fff;
-	color:#fff;
-	font-size:10px;
-	padding:0 6px
-}
-
 // User Genders:
 .user, user.anonymous{
 	font-weight: bold;
@@ -701,7 +672,6 @@ div.debug td.odd {
 // AJAX Debug output formatting:
 a.jslog_switcher {
 	cursor: pointer;
-	float: right;
 }
 div#debug_ajax_info {
 	display: none;
@@ -893,3 +863,11 @@ ul.jslog_error {
 	text-align: center;
 }
 // ---------------- //
+
+// User links widget
+.widget--social-media-links {
+	text-align: center;
+	a {
+		text-align: center;
+	}
+}

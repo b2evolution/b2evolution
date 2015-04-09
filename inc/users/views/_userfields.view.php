@@ -10,7 +10,7 @@
  *
  * @package evocore
  *
- * @version  $Id: _userfields.view.php 8608 2015-03-27 23:47:19Z fplanque $
+ * @version  $Id: _userfields.view.php 8706 2015-04-08 15:33:11Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -177,17 +177,24 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 /*
  * Data columns:
  */
-if( $current_User->check_perm( 'users', 'edit' ) )
-{ // We have permission to modify:
-	$td_field_name = '<a href="%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\' )%"><strong>%T_(#ufdf_name#)%</strong></a>';
-}
-else
+function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name )
 {
-	$td_field_name = '<strong>%T_(#ufdf_name#)%</strong>';
+	global $current_User;
+
+	$field_icon = empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span> ';
+
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // We have permission to modify:
+		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
+	}
+	else
+	{
+		return $field_icon.'<strong>'.T_( $ufdf_name ).'</strong>';
+	}
 }
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '&nbsp; &nbsp; '.$td_field_name,
+		'td' => '&nbsp; &nbsp; %ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name# )%',
 	);
 
 $Results->cols[] = array(

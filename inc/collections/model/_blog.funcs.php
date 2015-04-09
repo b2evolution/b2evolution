@@ -1406,7 +1406,7 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $admin_url;
-		$blogs_Results->global_icon( T_('New blog...'), 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New blog...'), 3, 4 );
+		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4 );
 	}
 
 	// Initialize Results object

@@ -279,15 +279,25 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->status();
 		echo '</span></span></div>';
 
+		echo $Comment->get_author( array(
+				'before'      => '<div class="dashboard_comment_avatar">',
+				'after'       => '</div>',
+				'before_user' => '<div class="dashboard_comment_avatar">',
+				'after_user'  => '</div>',
+				'link_text'   => 'only_avatar',
+				'link_class'  => 'user',
+				'thumb_size'  => 'crop-top-80x80',
+				'thumb_class' => 'user',
+			) );
+
+		echo '<h3 class="dashboard_comment_title">';
 		if( ( $Comment->status !== 'draft' ) || ( $Comment->author_user_ID == $current_User->ID ) )
-		{// Display Comment permalink icon
-			echo '<span style="float: left; padding-right: 5px; margin-top: 4px">'.$Comment->get_permanent_link( '#icon#' ).'</span>';
+		{ // Display Comment permalink icon
+			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
-		echo '<h3 class="dashboard_post_title">';
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
-				'link_text'     => 'avatar',
-				'thumb_size'    => 'crop-top-15x15',
+				'link_text'     => 'login',
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')
@@ -326,9 +336,9 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '<div class="floatleft">';
 
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit' ), '#', button_class(), '&amp;', true, $redirect_to );
+		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' btn-sm w80px', '&amp;', true, $redirect_to );
 
-		echo '<span class="'.button_class( 'group' ).'">';
+		echo '<span class="'.button_class( 'group' ).' btn-group-sm">';
 		// Display publish NOW button if current user has the rights:
 		$Comment->publish_link( '', '', '#', '#', button_class( 'text' ), '&amp;', true, true );
 
@@ -342,7 +352,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		echo '</div>';
 
 		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', true, true );
+		$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
 
 		echo '<div class="clear"></div>';
 		echo '</div>';

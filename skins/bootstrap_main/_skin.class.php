@@ -44,7 +44,7 @@ class bootstrap_main_Skin extends Skin
 	function get_declared_containers()
 	{
 		return array_merge( parent::get_declared_containers(), array(
-				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top' ),
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top', 'front_page_secondary_area' ),
 				'_item_block.inc.php' => array( 'item_single' ),
 			) );
 	}
@@ -82,6 +82,12 @@ class bootstrap_main_Skin extends Skin
 					'label' => T_('Front page link color'),
 					'note' => T_('E-g: #0000ff for blue'),
 					'defaultvalue' => '#FFFFFF',
+					'type' => 'color',
+				),
+				'front_icon_color' => array(
+					'label' => T_('Front page inverse icon color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#CCCCCC',
 					'type' => 'color',
 				),
 				'front_bg_color' => array(
@@ -259,9 +265,16 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured, body.pictured h1 small { color: '.$color." }\n";
 			}
 
-			if( $color = $this->get_setting( 'front_link_color' ) )
+			$link_color = $this->get_setting( 'front_link_color' );
+			$icon_color = $this->get_setting( 'front_icon_color' );
+			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured a { color: '.$color." }\n";
+				$custom_css .= 'body.pictured a { color: '.$link_color." }\n";
+			}
+			if( $link_color && $icon_color )
+			{ // Custom icon color:
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a { color: '.$icon_color.'; background-color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a:hover { color: '.$link_color.'; background-color: '.$icon_color." }\n";
 			}
 
 			if( ! empty( $custom_css ) )
@@ -564,6 +577,11 @@ class bootstrap_main_Skin extends Skin
 						'toolbar_group_after'  => '</div>',
 						'toolbar_button_class' => 'btn btn-default',
 					);
+
+			case 'modal_window_js_func':
+				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
+				return 'echo_modalwindow_js_bootstrap';
+				break;
 
 			default:
 				// Delegate to parent class:

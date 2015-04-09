@@ -855,7 +855,7 @@ if( $display_mode != 'js')
 			break;
 		case 'activity':
 			$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
-			require_css( 'blog_base.css' ); // Default styles for the blog navigation
+			require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 			break;
 	}
 

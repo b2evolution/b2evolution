@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
 
-echo '<h2>'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
+echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36

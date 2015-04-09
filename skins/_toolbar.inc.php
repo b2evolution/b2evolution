@@ -84,7 +84,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 	<div class="actions_right">
 		<?php
 			// Display evobar menu:
-			echo $topright_Menu->get_html_menu( NULL, 'sf-menu-right' );
+			echo $topright_Menu->get_html_menu( NULL, 'evobar-menu-right' );
 		?>
 	</div>
 	<div class="actions_left">
@@ -92,12 +92,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 		if( $topleft_Menu->has_entires() )
 		{ // The Menu has entries, it means that current User has permission to at least one action
 			// Display evobar menu:
-			echo $topleft_Menu->get_html_menu( NULL, 'sf-menu-left' );
-
-			if( $debug )
-			{
-				echo '<div style="line-height:26px;color:#666;z-index:-1;float:left">'.$request_transaction_name.'</div>';
-			}
+			echo $topleft_Menu->get_html_menu( NULL, 'evobar-menu-left' );
 		}
 		?>
 	</div>

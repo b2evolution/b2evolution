@@ -33,18 +33,18 @@ $CommentList->query();
 display_comment_mass_delete( $CommentList );
 
 // Display title depending on selection params:
-echo $CommentList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
+echo $CommentList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
 $CommentList->title = T_('Comment List');
+
+if( $CommentList->is_filtered() )
+{	// List is filtered, offer option to reset filters:
+	$CommentList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=listview&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+}
 
 if( check_comment_mass_delete( $CommentList ) )
 {	// A form for mass deleting is availabl, Display link
 	$CommentList->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
-}
-
-if( $CommentList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$CommentList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=listview&amp;filter=reset', T_('Reset filters'), 3, 3 );
 }
 
 // Initialize Results object

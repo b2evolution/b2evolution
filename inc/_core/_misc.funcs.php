@@ -6726,6 +6726,8 @@ function button_class( $type = 'button', $jQuery_selector = false )
 			'button_green' => 'roundbutton_green', // Button with green background
 			'text'         => 'roundbutton_text', // Button with text
 			'text_primary' => 'roundbutton_text', // Button with text with special style color
+			'text_success' => 'roundbutton_text', // Button with text with special style color
+			'text_danger'  => 'roundbutton_text', // Button with text with special style color
 			'group'        => 'roundbutton_group', // Group of the buttons
 		);
 
@@ -6857,19 +6859,33 @@ function get_chapter_children( $blog_ID, $parent_ID = 0 )
  */
 function echo_modalwindow_js()
 {
-	global $modalwindow_js_initialized;
+	global $AdminUI, $Blog, $modal_window_js_initialized;
 
-	if( $modalwindow_js_initialized )
-	{ // Don't initialize these js-functions twice
+	if( ! empty( $modal_window_js_initialized ) )
+	{ // Don't print out these functions twice
 		return;
 	}
 
-	global $AdminUI;
+	// TODO: asimo> Should not use AdminUI templates for the openModalWindow function. The style part should be handled by css.
+	if( is_admin_page() && isset( $AdminUI ) && $AdminUI->get_template( 'modal_window_js_func' ) !== false )
+	{ // Use the modal functions from back-office skin
+		$skin_modal_window_js_func = $AdminUI->get_template( 'modal_window_js_func' );
+	}
+	elseif( ! empty( $Blog ) )
+	{ // Use the modal functions from front-office skin
+		$blog_skin_ID = $Blog->get_skin_ID();
+		$SkinCache = & get_SkinCache();
+		$Skin = & $SkinCache->get_by_ID( $blog_skin_ID, false, false );
+		if( $Skin && $Skin->get_template( 'modal_window_js_func' ) !== false )
+		{
+			$skin_modal_window_js_func = $Skin->get_template( 'modal_window_js_func' );
+		}
+	}
 
-	if( isset( $AdminUI ) && $AdminUI->get_template( 'modal_window_js' ) !== false )
-	{ // Use the functions from admin skin
-		echo $AdminUI->get_template( 'modal_window_js' );
-		$modalwindow_js_initialized = true;
+	if( isset( $skin_modal_window_js_func ) && function_exists( $skin_modal_window_js_func ) )
+	{ // Call skin function only if it exists
+		call_user_func( $skin_modal_window_js_func );
+		$modal_window_js_initialized = true;
 		return;
 	}
 
@@ -6958,9 +6974,119 @@ jQuery(document).keyup(function(e)
 } );
 JS_CODE;
 
-	$modalwindow_js_initialized = true;
+	$modal_window_js_initialized = true;
 }
 
+/**
+ * Initialize JavaScript to build and open window for bootstrap skins
+ */
+function echo_modalwindow_js_bootstrap()
+{
+?>
+var modal_window_js_initialized = false;
+/*
+ * Build and open madal window
+ *
+ * @param string HTML content
+ * @param string Width value in css format
+ * @param boolean TRUE - to use transparent template
+ * @param string Title of modal window (Used in bootstrap)
+ * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
+ */
+function openModalWindow( body_html, width, height, transparent, title, button )
+{
+	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
+	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
+	var style_height_fixed = style_height.match( /%\$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
+	var use_buttons = ( typeof( button ) == 'undefined' || button != false );
+
+	if( jQuery( '#modal_window' ).length == 0 )
+	{ // Build modal window
+		var modal_html = '<div id="modal_window" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content"' + style_height_fixed + '>';
+		if( typeof title != 'undefined' && title != '' )
+		{
+			modal_html += '<div class="modal-header">' +
+					'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+					'<h4 class="modal-title">' + title + '</h4>' +
+				'</div>';
+		}
+		modal_html += '<div class="modal-body"' + style_height_fixed + '>' + body_html + '</div>';
+
+		if( use_buttons )
+		{
+			modal_html += '<div class="modal-footer">';
+			if( button != '' )
+			{
+				modal_html += '<button class="btn btn-primary" type="submit">' + button + '</button>';
+			}
+			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Cancel' ) ?></button></div>';
+		}
+		modal_html += '</div></div></div>';
+		jQuery( 'body' ).append( modal_html );
+	}
+	else
+	{ // Use existing modal window
+		jQuery( '#modal_window .modal-body' ).html( body_html );
+	}
+
+	if( use_buttons )
+	{
+		// Remove these elements, they are displayed as title and button of modal window
+		jQuery( '#modal_window legend' ).remove();
+		jQuery( '#modal_window #close_button' ).remove();
+
+		if( jQuery( '#modal_window input[type=submit]' ).length == 0 )
+		{ // Hide a submit button in the fotter if real submit input doesn't exist
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
+		}
+		else
+		{
+			jQuery( '#modal_window input[type=submit]' ).hide();
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
+		}
+
+		jQuery( '#modal_window' ).change( function()
+		{ // Find the submit inputs when html is changed
+			var input_submit = jQuery( this ).find( 'input[type=submit]' )
+			if( input_submit.length > 0 )
+			{ // Hide a real submit input and Show button of footer
+				input_submit.hide();
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
+			}
+			else
+			{ // Hide button of footer if real submit input doesn't exist
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
+			}
+		} );
+
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
+		{ // Copy a click event from real submit input to button of footer
+			jQuery( '#modal_window input[type=submit]' ).click();
+		} );
+	}
+
+	// Init modal window and show
+	var options = {};
+	if( modal_window_js_initialized )
+	{
+		options = 'show';
+	}
+	jQuery( '#modal_window' ).modal( options );
+	if( style_width == '' )
+	{
+		jQuery( '#modal_window .modal-dialog' ).css( { 'display': 'table', 'width': 'auto' } );
+		jQuery( '#modal_window .modal-dialog .modal-content' ).css( { 'display': 'table-cell' } );
+	}
+
+	jQuery( '#modal_window').on( 'hidden', function ()
+	{ // Remove modal window on hide event to draw new window in next time with new title and button
+		jQuery( this ).remove();
+	} );
+
+	modal_window_js_initialized = true;
+}
+<?php
+} // end of echo_modalwindow_js_bootstrap
 
 /**
  * Handle fatal error in order to display info message when debug is OFF

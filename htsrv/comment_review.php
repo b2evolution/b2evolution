@@ -235,8 +235,8 @@ else
 				$posted_Comment->author_url( '', ' &middot; Url: <span class="bUrl">', '</span>' );
 				if( $posted_Comment->author_url != null )
 				{
-					echo ' '.action_icon( T_('Delete comment URL'), 'delete', regenerate_url( '', array( 'action=deleteurl', 'cmt_ID='.$cmt_ID, 'secret='.$secret ) ) ).' ';
-					echo ' '.action_icon( T_('Antispam tool'), 'ban', $antispam_url );
+					echo ' '.action_icon( T_('Delete comment URL'), 'remove', regenerate_url( '', array( 'action=deleteurl', 'cmt_ID='.$cmt_ID, 'secret='.$secret ) ) ).' ';
+					echo ' '.action_icon( T_('Antispam tool'), 'lightning', $antispam_url );
 				}
 				$posted_Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
 				$posted_Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>', 'antispam' );

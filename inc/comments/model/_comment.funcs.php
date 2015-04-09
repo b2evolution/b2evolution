@@ -480,11 +480,18 @@ function add_ban_icons_callback( $content )
  *
  * @param boolean check permission or not. Should be false only if it was already checked.
  * @param boolean show "Open recycle bin" link even if there is no comment with 'trash' status
+ * @param array Additional params
  * @return Open recycle bin link if user has the corresponding 'blogs' - 'editall' permission, empty string otherwise
  */
-function get_opentrash_link( $check_perm = true, $force_show = false )
+function get_opentrash_link( $check_perm = true, $force_show = false, $params = array() )
 {
 	global $admin_url, $current_User, $DB, $blog;
+
+	$params = array_merge( array(
+			'before' => '<div id="recycle_bin" class="floatright">',
+			'after'  => ' </div>',
+			'class'  => 'action_icon btn btn-default btn-sm',
+		), $params );
 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
@@ -502,7 +509,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 		$show_recycle_bin = ( $DB->get_var( $SQL->get() ) > 0 );
 	}
 
-	$result = '<div id="recycle_bin" class="floatright">';
+	$result = $params['before'];
 	if( $show_recycle_bin )
 	{ // show "Open recycle bin"
 		global $CommentList;
@@ -511,10 +518,10 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 		{
 			$comment_list_param_prefix = $CommentList->param_prefix;
 		}
-		$result .= '<span class="floatright">'.action_icon( T_('Open recycle bin'), 'recycle_full',
-						$admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3, array( 'class' => 'action_icon btn btn-default btn-sm' ) ).'</span> ';
+		$result .= action_icon( T_('Open recycle bin'), 'recycle_full',
+						$admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$comment_list_param_prefix.'show_statuses[]=trash', ' '.T_('Open recycle bin'), 5, 3, array( 'class' => $params['class'] ) );
 	}
-	return $result.'</div>';
+	return $result.$params['after'];
 }
 
 

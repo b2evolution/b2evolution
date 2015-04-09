@@ -339,9 +339,18 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
+		// Set admin skin, used for buttons, @see button_class()
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
 		param( 'blog', 'integer', 0 );
 
-		echo get_opentrash_link( true, true );
+		echo get_opentrash_link( true, true, array(
+				'before' => ' <span id="recycle_bin">',
+				'after' => '</span>',
+				'class' => 'btn btn-default'
+			) );
 		break;
 
 	case 'delete_comment':
@@ -351,6 +360,11 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		$result_success = false;
+
+		// Set admin skin, used for buttons, @see button_class()
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
 
 		// Check comment moderate permission below after we have the $edited_Comment objects
 

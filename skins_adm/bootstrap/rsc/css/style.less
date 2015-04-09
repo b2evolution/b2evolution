@@ -16,15 +16,24 @@
 	border-radius: @radius;
 }
 
-// Add space above page content when no navigation level2 and level3 before this
+// Page content
 .page-content {
+	// Add space above page content when no navigation level2 and level3 before this
 	margin-top: 16px;
+	h2.page-title {
+		// Page title
+		margin: 4px 0 20px 0;
+	}
 }
 #iframe_wrapper {
 	.container-fluid.page-content {
 		padding: 0;
 		margin: 0;
 	}
+}
+
+.w80px {
+	width: 80px;
 }
 
 table.browse {
@@ -223,8 +232,21 @@ div.bPost {
 		margin-left: 0;
 		margin-right: 0;
 	}
+	.bCommentAvatar {
+		border: 0;
+		.border-radius(50%);
+		padding: 0;
+		margin-top: 0;
+	}
 }
 .bFeedback {
+	#comments_container {
+		border: none;
+		div.bComment {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
 	.tile {
 		display: inline-block;
 		padding-right: 10px;
@@ -326,8 +348,12 @@ div.PostActionsArea, div.CommentActionsArea {
 .bPostAttachments {
 	margin: 1ex;
 }
-.feedback-tabs.nav {
-	margin: 0 1ex;
+.feedback-tabs {
+	margin: 0 1ex !important;
+}
+.feedback-actions {
+	margin: 0 1ex !important;
+	float: right;
 }
 .vote_spam {
 	float: left;
@@ -338,6 +364,12 @@ div.PostActionsArea, div.CommentActionsArea {
 		.icon {
 			margin-bottom: 2px;
 		}
+	}
+}
+.dashboard_action_area .vote_spam {
+	line-height: inherit;
+	a.action_icon {
+		font-size: 12px;
 	}
 }
 // Status banner
@@ -524,15 +556,46 @@ div.skinshot {
 		.dashboard_thumbnails {
 			margin-top: 5px;
 		}
-		.btn {
-			width: 80px;
-		}
 	}
 	.dashboard_content {
 		margin-left: 90px;
 	}
 	span[class*=status_] {
 		line-height: 20px;
+	}
+}
+.dashboard_comments_block {
+	#styled_content_block {
+		a.user img, img.user {
+			.border-radius(50%);
+		}
+		.popover a.user img {
+			.border-radius(0);
+		}
+	}
+	#comments_container {
+		border: none;
+		margin: 0;
+	}
+	.panel-body {
+		padding: 0;
+	}
+	.dashboard_comment_avatar {
+		float: left;
+		margin: 0 5px 5px 0;
+		a {
+			display: inline-block;
+		}
+	}
+	.dashboard_comment_title {
+		font-size: 16px;
+		margin: 0;
+	}
+	.hidden_comment {
+		display: none;
+	}
+	.notes {
+		margin-top: 1px;
 	}
 }
 // Charts on dashboard
@@ -1103,7 +1166,14 @@ form#thread_checkchanges ul.token-input-list-facebook {
 	width: 97%;
 }
 
-// Fix for jCrop plugin
-.jcrop-keymgr {
-	visibility: hidden;
+// Global action on the same line where level3 menu
+.global_actions {
+	position: relative;
+	float: right;
+	a {
+		position: absolute;
+		top: -44px;
+		right: 0;
+		margin-right: 0;
+	}
 }

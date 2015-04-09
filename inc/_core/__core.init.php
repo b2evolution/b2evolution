@@ -900,36 +900,40 @@ class _core_Module extends Module
 		{ // Set collection url only when current user has an access to the working blog
 			$collection_url = $admin_url.'?ctrl=dashboard&amp;blog='.$working_blog;
 		}
-		if( $perm_admin_normal )
-		{ // Normal Access to Admin:
-			$entries = array(
-				'b2evo' => array(
+		if( $perm_admin_normal || $perm_admin_restricted )
+		{ // Normal OR Restricted Access to Admin:
+			$entries = array();
+			if( $perm_admin_normal )
+			{ // Only for normal access
+				$entries['b2evo'] = array(
 						'text' => '<strong>b2evolution</strong>',
 						'href' => $home_url,
 						'entry_class' => 'rwdhide'
-					),
-				'dashboard' => array(
-						'text' => T_('Back-office'),
-						'href' => $admin_url,
-						'title' => T_('Go to admin dashboard'),
-					),
-				'see' => array(
-						'text' => T_('Front-office'),
-						'href' => $home_url,
-						'title' => T_('See the home page'),
-					),
-				'write' => array(
-						'text' => T_('New post'),
+					);
+			}
+			$entries['front'] = array(
+					'text' => T_('Home'),
+					'href' => $home_url,
+					'title' => T_('Go to the home page (Front-office)'),
+				);
+			$entries['dashboard'] = array(
+					'text' => T_('Admin'),
+					'href' => $admin_url,
+					'title' => T_('Go to the site dashboard (Back-office)'),
+				);
+			if( $perm_admin_normal )
+			{ // Only for normal access
+				$entries['write'] = array(
+						'text' => '<span class="fa fa-plus-square"></span> '.T_('Post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 						'entry_class' => 'rwdhide',
-					)
-			);
+					);
+			}
 			if( $working_blog )
-			{
+			{ // Display a link to manage first available collection
 				$entries['blog'] = array(
 					'text' => T_('Collection'),
-					'title' => T_('No blog is currently selected'),
 					'href' => $collection_url,
 				);
 			}
@@ -939,37 +943,14 @@ class _core_Module extends Module
 					'disabled' => true,
 				);
 		}
-		elseif( $perm_admin_restricted )
-		{ // restricted Access to Admin:
-			$entries = array(
-				'see' => array(
-						'text' => T_('Structure'),
-						'href' => $home_url,
-						'title' => T_('See the home page'),
-					),
-			);
-			if( $working_blog )
-			{
-				$entries['blog'] = array(
-					'text' => T_('Collection'),
-					'title' => T_('No blog is currently selected'),
-					'href' => $collection_url,
-				);
-			}
-			$entries['tools'] = array(
-				'text' => T_('More'),
-				'href' => $admin_url.'#',
-				'disabled' => true,
-			);
-		}
 
 
 		if( ! empty( $Blog ) )
 		{ // A blog is currently selected:
 			if( $perm_admin_restricted )
 			{
-				$entries['see']['href'] = $Blog->get( 'url' );
-				$entries['see']['title'] = T_('See the public view of this blog');
+				$entries['front']['href'] = $Blog->get( 'url' );
+				$entries['front']['title'] = T_('Go to the front page of the current collection');
 			}
 
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
@@ -980,7 +961,7 @@ class _core_Module extends Module
 					if( !$perm_admin_normal )
 					{
 						$entries[ 'write' ] = array(
-							'text' => T_('New post'),
+							'text' => '<span class="fa fa-plus-square"></span> '.T_('Post'),
 						);
 					}
 					$entries['write']['href'] = $write_item_url;
@@ -1016,19 +997,19 @@ class _core_Module extends Module
 
 					$entries['blog']['entries'][] = array( 'separator' => true );
 
-					if( $Blog->get_setting( 'use_workflow' ) )
-					{ // Workflow view
-						$entries['blog']['entries']['workflow'] = array(
-								'text' => T_('Workflow view').'&hellip;',
-								'href' => $items_url.'&amp;tab=tracker',
-							);
-					}
-
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						$entries['blog']['entries']['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
 								'href' => $items_url.'&amp;tab=manual',
+							);
+					}
+
+					if( $Blog->get_setting( 'use_workflow' ) )
+					{ // Workflow view
+						$entries['blog']['entries']['workflow'] = array(
+								'text' => T_('Workflow view').'&hellip;',
+								'href' => $items_url.'&amp;tab=tracker',
 							);
 					}
 
@@ -1089,6 +1070,26 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=widgets'.$blog_param,
 						);
 
+					if( ! is_admin_page() )
+					{ // Display a menu to turn on/off the debug containers
+						global $ReqURI, $Session;
+
+						if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
+						{ // To hide the debug containers
+							$entries['blog']['entries']['containers'] = array(
+								'text' => T_('Hide containers'),
+								'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
+							);
+						}
+						else
+						{ // To show the debug containers
+							$entries['blog']['entries']['containers'] = array(
+								'text' => T_('Show containers'),
+								'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
+							);
+						}
+					}
+
 					$entries['blog']['entries']['general'] = array(
 								'text' => T_('Settings'),
 								'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
@@ -1125,14 +1126,6 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=advanced'.$blog_param,
 						);
 
-					if( $current_User->check_perm( 'options', 'view' ) )
-					{ // Check if current user has a permission to view the common settings of the blogs
-						$entries['blog']['entries']['general']['entries']['common_settings'] = array(
-								'text' => T_('Common Settings').'&hellip;',
-								'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
-							);
-					}
-
 					if( $Blog && $Blog->advanced_perms )
 					{
 						$entries['blog']['entries']['general']['entries']['userperms'] = array(
@@ -1144,25 +1137,13 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=permgroup'.$blog_param,
 						);
 					}
-				}
 
-				if( ! is_admin_page() )
-				{ // Display a menu to turn on/off the debug containers
-					global $ReqURI, $Session;
-
-					if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
-					{ // To hide the debug containers
-						$entries['blog']['entries']['containers'] = array(
-							'text' => T_('Hide containers'),
-							'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
-						);
-					}
-					else
-					{ // To show the debug containers
-						$entries['blog']['entries']['containers'] = array(
-							'text' => T_('Show containers'),
-							'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
-						);
+					if( $current_User->check_perm( 'options', 'view' ) )
+					{ // Check if current user has a permission to view the common settings of the blogs
+						$entries['blog']['entries']['general']['entries']['common_settings'] = array(
+								'text' => T_('Common Settings').'&hellip;',
+								'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
+							);
 					}
 				}
 			}
@@ -1171,11 +1152,13 @@ class _core_Module extends Module
 		// SYSTEM MENU:
 		if( $perm_admin_restricted )
 		{
+			$dev_entries = array();
 			if( $debug )
 			{
+				global $request_transaction_name;
 				$debug_text = 'DEBUG: ';
-				if( !empty($seo_page_type) )
-				{	// Set in skin_init()
+				if( ! empty( $seo_page_type ) )
+				{ // Set in skin_init()
 					$debug_text = $seo_page_type.': ';
 				}
 				if( $robots_index === false )
@@ -1187,17 +1170,43 @@ class _core_Module extends Module
 					$debug_text .= 'do index';
 				}
 
-				$entries['tools']['entries']['noindex'] = array(
+				if( ! empty( $request_transaction_name ) )
+				{
+					$dev_entries['request'] = array(
+						'text' => $request_transaction_name,
+						'disabled' => true,
+					);
+				}
+				$dev_entries['noindex'] = array(
 						'text' => $debug_text,
 						'disabled' => true,
 					);
-				$entries['tools']['entries'][] = array(
+				$dev_entries[] = array(
 						'separator' => true,
 					);
 			}
 
+			global $debug_jslog;
+			if( $debug || $debug_jslog )
+			{ // Show JS log menu if debug is enabled
+				$dev_entries['jslog'] = array(
+					'text'  => T_('JS log'),
+					'title' => T_('JS log'),
+					'class' => 'jslog_switcher'
+				);
+			}
+
+			if( ! empty( $dev_entries ) )
+			{ // Add Dev menu if at least one entry is should be displayed
+				$entries['dev'] = array(
+						'href'    => $admin_url.'#',
+						'text'    => 'Dev',
+						'entries' => $dev_entries,
+					);
+			}
+
 			if( $current_User->check_perm( 'users', 'view' ) )
-			{	// Users:
+			{ // Users:
 				$entries['tools']['disabled'] = false;
 				$entries['tools']['entries']['users'] = array(
 						'text' => T_('Users').'&hellip;',
@@ -1310,16 +1319,6 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=tools',
 					);
 			}
-		}
-
-		global $debug, $debug_jslog;
-		if( $debug || $debug_jslog )
-		{	// Show JS log menu if debug is enabled
-			$entries['jslog'] = array(
-				'text'  => T_('JS log'),
-				'title' => T_('JS log'),
-				'class' => 'jslog_switcher'
-			);
 		}
 
 		if( $entries !== NULL )

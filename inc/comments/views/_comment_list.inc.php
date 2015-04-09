@@ -19,17 +19,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Comment;
 /**
- * @var Blog
- */
-global $Blog;
-/**
  * @var CommentList
  */
 global $CommentList;
 
-global $current_User;
-
-global $dispatcher;
+global $AdminUI;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -42,7 +36,7 @@ $currentpage = param( 'currentpage', 'integer', 0 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 {
-	echo_comment_pages( $item_id, $currentpage, $comments_number );
+	echo_comment_pages( $item_id, $currentpage, $comments_number, $AdminUI->get_template( 'pagination' ) );
 }
 
 while( $Comment = & $CommentList->get_next() )
@@ -56,7 +50,7 @@ while( $Comment = & $CommentList->get_next() )
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 {
-	echo_comment_pages( $item_id, $currentpage, $comments_number );
+	echo_comment_pages( $item_id, $currentpage, $comments_number, $AdminUI->get_template( 'pagination' ) );
 }
 
 ?>

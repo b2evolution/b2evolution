@@ -477,6 +477,17 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
+.fa-x-external-link:before {
+  content: "\f08e";
+  position: relative;
+  top: 0.05em;
+  left: 0.11em;
+}
+.fa-x-linkedin:before {
+  content: "\f0e1";
+  position: relative;
+  top: -0.11em;
+}
 .edit_toolbars {
   margin-top: 1ex;
   width: 100%;
@@ -868,9 +879,9 @@ div.avatartag.main > img:first-child {
   max-height: 320px;
 }
 div#evo_toolbar {
-  background-color: #f4f4f4;
+  background-color: #f5f5f5;
   color: ButtonText;
-  border-top: 1px solid #676767;
+  border-bottom: 1px solid #ddd;
   text-align: left;
   margin: 0;
   font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
@@ -899,83 +910,81 @@ div#evo_toolbar .actions_left {
 div#evo_toolbar .actions_right {
   float: right;
 }
-.sf-menu,
-.sf-menu * {
+.evobar-menu,
+.evobar-menu * {
   margin: 0;
   padding: 0;
   list-style: none;
   box-sizing: content-box;
   -webkit-font-smoothing: antialiased;
 }
-.sf-menu ul {
+.evobar-menu ul {
   position: absolute;
-  top: -999em;
+  top: -99999em;
   opacity: 0;
   width: 25ex;
   border: 1px solid #CCC;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
   transition: opacity 0.2s linear;
-  display: none;
+  -webkit-transition: opacity 0.2s ease-in-out;
+  -o-transition: opacity 0.2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
-.sf-menu ul li {
+.evobar-menu ul li {
   width: 100%;
 }
-.sf-menu > li:hover > ul {
+.evobar-menu > li:hover > ul {
   opacity: 1;
   z-index: 99;
   top: 26px;
-  display: block;
 }
-.sf-menu li {
+.evobar-menu li {
   float: left;
   position: relative;
 }
-.sf-menu li:hover li ul {
+.evobar-menu li:hover li ul {
   top: -999em;
 }
-.sf-menu li ul li:last-child a {
+.evobar-menu li ul li:last-child a {
   border: none;
 }
-.sf-menu li li ul {
+.evobar-menu li li ul {
   top: -999em;
   left: 25ex;
 }
-.sf-menu li li:hover ul {
+.evobar-menu li li:hover ul {
   top: 0;
   opacity: 1;
 }
-.sf-menu li li:hover li ul {
+.evobar-menu li li:hover li ul {
   top: -999em;
   opacity: 0;
 }
-.sf-menu li li li:hover ul {
+.evobar-menu li li li:hover ul {
   top: 0;
   opacity: 1;
 }
-.sf-menu li li a,
-.sf-menu li li a:hover,
-.sf-menu li li a:link,
-.sf-menu li li a:visited {
+.evobar-menu li li a,
+.evobar-menu li li a:hover,
+.evobar-menu li li a:link,
+.evobar-menu li li a:visited {
   display: block;
   background: #f4f4f4;
   color: #4f4f4f;
 }
-.sf-menu li li a:hover {
+.evobar-menu li li a:hover {
   background: #e7e7e7;
 }
-.sf-menu li li a > .sf-sub-indicator:after {
-  content: "\25B6";
-}
-.sf-menu li.separator {
+.evobar-menu li.separator {
   background: #f4f4f4;
 }
-.sf-menu li.separator hr {
+.evobar-menu li.separator hr {
   border: none;
   background: #4f4f4f;
   height: 1px;
   margin: 10px 4px;
 }
-.sf-menu a {
+.evobar-menu a {
   display: inline-block;
   position: relative;
   background-color: #f4f4f4;
@@ -985,42 +994,48 @@ div#evo_toolbar .actions_right {
   line-height: 14px;
   color: #4f4f4f;
 }
-.sf-menu a:hover,
-.sf-menu a:link,
-.sf-menu a:visited {
+.evobar-menu a:hover,
+.evobar-menu a:link,
+.evobar-menu a:visited {
   color: #4f4f4f;
 }
-.sf-menu a:hover {
+.evobar-menu a:hover {
   background: #e7e7e7;
   text-decoration: none;
 }
-.sf-menu a.disabled,
-.sf-menu a.disabled:hover {
-  color: #666;
+.evobar-menu a.disabled,
+.evobar-menu a.disabled:hover {
+  color: #aaa;
 }
-.sf-menu .sf-sub-indicator {
+.evobar-menu [class^=evobar-icon-] {
   display: inline-block;
   margin-left: 6px;
   float: right;
   font-size: 10px;
 }
-.sf-menu .sf-sub-indicator:after {
+.evobar-menu [class^=evobar-icon-]:before {
   width: 10px;
   height: 10px;
   content: "\25BC";
 }
+.evobar-menu .evobar-icon-right:before {
+  content: "\25B6";
+}
+.evobar-menu .evobar-icon-left:before {
+  content: "\25C0";
+}
 @media (max-width: 800px) {
-  .sf-menu li.rwdhide {
+  .evobar-menu li.rwdhide {
     display: none;
   }
 }
-.actions_left .sf-menu.sf-menu-left {
+.actions_left .evobar-menu.evobar-menu-left {
   float: left;
 }
-.actions_right .sf-menu > li > ul {
+.actions_right .evobar-menu > li > ul {
   right: 0;
 }
-.actions_right .sf-menu li li ul {
+.actions_right .evobar-menu li li ul {
   left: -25.2ex;
   z-index: -1;
 }
@@ -1457,7 +1472,6 @@ div.debug td.odd {
 }
 a.jslog_switcher {
   cursor: pointer;
-  float: right;
 }
 div#debug_ajax_info {
   display: none;
@@ -1642,6 +1656,12 @@ ul.jslog_error {
 }
 #overlay_page .preview_cropped_images {
   width: 128px;
+  text-align: center;
+}
+.widget--social-media-links {
+  text-align: center;
+}
+.widget--social-media-links a {
   text-align: center;
 }
 

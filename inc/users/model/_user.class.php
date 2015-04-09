@@ -661,40 +661,8 @@ class User extends DataObject
 
 
 			// ---- Organizations / START ----
-			$old_org_IDs = array_keys( $this->get_organizations_data() );
 			$organizations = array_unique( param( 'organizations', 'array:string' ) );
-			$new_org_IDs = array();
-			foreach( $organizations as $o => $organization_ID )
-			{
-				$organization_ID = intval( $organization_ID );
-				if( empty( $organization_ID ) )
-				{ // Organization is not selected, Skip it
-					unset( $organizations[ $o ] );
-					continue;
-				}
-				if( in_array( $organization_ID, $old_org_IDs ) )
-				{ // User is already in this organization, Skip it
-					continue;
-				}
-				$new_org_IDs[] = $organization_ID;
-			}
-			if( count( $new_org_IDs ) > 0 )
-			{ // Insert new records with user-org relations
-				$new_orgs_accepted = '0';
-				if( $current_User->check_perm( 'users', 'edit' ) )
-				{ // If admin adds new organization for other users and for himself, it must be autoaccepted
-					$new_orgs_accepted = '1';
-				}
-				$DB->query( 'INSERT INTO T_users__user_org ( uorg_accepted, uorg_user_ID, uorg_org_ID )
-					VALUES ( '.$new_orgs_accepted.', '.$this->ID.', '.implode( ' ), ( '.$new_orgs_accepted.', '.$this->ID.', ', $new_org_IDs ).' )' );
-			}
-			if( count( $old_org_IDs ) > 0 )
-			{ // Delete old records that were replaced with new
-				$organizations[] = '-1';// to remove all old records
-				$DB->query( 'DELETE FROM T_users__user_org
-					WHERE uorg_user_ID = '.$this->ID.'
-					  AND uorg_org_ID NOT IN ( '.implode( ', ', $organizations ).' )' );
-			}
+			$this->update_organizations( $organizations );
 			// ---- Organizations / END ----
 
 
@@ -4162,6 +4130,55 @@ class User extends DataObject
 
 
 	/**
+	 * Get all user extra fields with selected type
+	 *
+	 * @param string Field type: 'email', 'word', 'number', 'phone', 'text'
+	 * @param boolean TRUE to get only the fields with icon
+	 * @return array Fields
+	 */
+	function userfields_by_type( $field_type, $only_with_icon = true )
+	{
+		global $DB;
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'uf_varchar, ufdf_icon_name' );
+		$SQL->FROM( 'T_users__fields' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
+		$SQL->WHERE( 'uf_user_ID = '.$this->ID );
+		$SQL->WHERE_and( 'ufdf_type = '.$DB->quote( $field_type ) );
+		if( $only_with_icon )
+		{
+			$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+		}
+
+		return $DB->get_results( $SQL->get() );
+	}
+
+
+	/**
+	 * Get user field value by ID
+	 *
+	 * @param integer Field ID
+	 * @return string Field value
+	 */
+	function userfield_value_by_ID( $field_ID )
+	{
+		global $DB;
+
+		// Load all user fields once
+		$this->userfields_load();
+
+		if( isset( $this->userfields_by_type[ $field_ID ], $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ] ) )
+		{ // Get value from cache
+			return $this->userfields[ $this->userfields_by_type[ $field_ID ][0] ]->uf_varchar;
+		}
+
+		// No field value
+		return '';
+	}
+
+
+	/**
 	 * Load userfields
 	 */
 	function userfields_load()
@@ -4169,10 +4186,10 @@ class User extends DataObject
 		global $DB;
 
 		$userfields = $DB->get_results( '
-			SELECT uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufgp_ID, ufgp_name
+			SELECT uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufgp_ID, ufgp_name
 				FROM T_users__fields
-					LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-					LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
+					INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+					INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
 			WHERE uf_user_ID = '.$this->ID.'
 				AND ufdf_required != "hidden"
 			ORDER BY ufgp_order, ufdf_order, uf_ID' );
@@ -5895,6 +5912,60 @@ class User extends DataObject
 		$SQL->ORDER_BY( 'org_name' );
 
 		return $DB->get_results( $SQL->get() );
+	}
+
+
+	/**
+	 * Update user's organizations in DB
+	 *
+	 * @param array Organization IDs
+	 * @param boolean TRUE to auto accept user to organization (Used on install demo users)
+	 */
+	function update_organizations( $organization_IDs, $force_accept = false )
+	{
+		global $DB, $current_User;
+
+		$old_org_IDs = array_keys( $this->get_organizations_data() );
+		$new_org_IDs = array();
+		foreach( $organization_IDs as $o => $organization_ID )
+		{
+			$organization_ID = intval( $organization_ID );
+			if( empty( $organization_ID ) )
+			{ // Organization is not selected, Skip it
+				unset( $organization_IDs[ $o ] );
+				continue;
+			}
+			if( in_array( $organization_ID, $old_org_IDs ) )
+			{ // User is already in this organization, Skip it
+				continue;
+			}
+			$new_org_IDs[] = $organization_ID;
+		}
+		if( count( $new_org_IDs ) > 0 )
+		{ // Insert new records with user-org relations
+			$new_orgs_accepted = '0';
+			if( $force_accept || ( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) ) )
+			{ // If admin adds new organization for other users and for himself, it must be autoaccepted
+				$new_orgs_accepted = '1';
+			}
+			$new_org_SQL = 'INSERT INTO T_users__user_org ( uorg_accepted, uorg_user_ID, uorg_org_ID ) VALUES ';
+			foreach( $new_org_IDs as $o => $new_org_ID )
+			{
+				if( $o > 0 )
+				{ // separator
+					$new_org_SQL .= ', ';
+				}
+				$new_org_SQL .= '( '.$new_orgs_accepted.', '.$this->ID.', '.$new_org_ID.' )';
+			}
+			$DB->query( $new_org_SQL );
+		}
+		if( count( $old_org_IDs ) > 0 )
+		{ // Delete old records that were replaced with new
+			$organization_IDs[] = '-1';// to remove all old records
+			$DB->query( 'DELETE FROM T_users__user_org
+				WHERE uorg_user_ID = '.$this->ID.'
+					AND uorg_org_ID NOT IN ( '.implode( ', ', $organization_IDs ).' )' );
+		}
 	}
 
 

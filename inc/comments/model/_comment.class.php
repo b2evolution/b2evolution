@@ -973,7 +973,7 @@ class Comment extends DataObject
 			$Blog = $comment_Item->get_Blog();
 		}
 
-		if( $Blog->get_setting( 'allow_comments' ) != 'any' )
+		if( $Blog->get_setting( 'allow_comments' ) != 'any' && $params['after_user'] == '#' && $params['after'] == '#' )
 		{ // The blog does not allow anonymous comments, Don't display a type of comment author
 			$params['after_user'] = '';
 			$params['after'] = '';
@@ -1365,11 +1365,11 @@ class Comment extends DataObject
 		$delete_url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment').$redirect_to;
 		if( $ajax_button )
 		{
-			echo ' <a href="'.$delete_url.'" onclick="delete_comment_url('.$this->ID.'); return false;">'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="'.$delete_url.'" onclick="delete_comment_url('.$this->ID.'); return false;">'.get_icon( 'remove' ).'</a>';
 		}
 		else
 		{
-			echo ' <a href="'.$delete_url.'">'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="'.$delete_url.'">'.get_icon( 'remove' ).'</a>';
 		}
 	}
 
@@ -1414,11 +1414,11 @@ class Comment extends DataObject
 
 		if( $ajax_button )
 		{
-			echo ' <a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$ban_domain.'\'); return false;">'.get_icon( 'ban' ).'</a>';
+			echo ' <a id="ban_url" href="'.$ban_url.'" onclick="ban_url(\''.$ban_domain.'\'); return false;">'.get_icon( 'lightning' ).'</a>';
 		}
 		else
 		{
-			echo ' <a href="'.$ban_url.'">'.get_icon( 'ban' ).'</a> ';
+			echo ' <a href="'.$ban_url.'">'.get_icon( 'lightning' ).'</a> ';
 		}
 	}
 
@@ -1751,6 +1751,7 @@ class Comment extends DataObject
 				'title_ok'            => T_('Mark this comment as OK!'),
 				'title_ok_voted'      => T_('You think this comment is OK'),
 				'title_empty'         => T_('No votes on spaminess yet.'),
+				'button_group_class'  => button_class( 'group' ),
 			), $params );
 
 		global $current_User;
@@ -1781,7 +1782,7 @@ class Comment extends DataObject
 		{ // Display form to vote
 			echo T_('Spam Vote:').' ';
 
-			echo '<span class="'.button_class( 'group' ).'">';
+			echo '<span class="'.$params['button_group_class'].'">';
 			foreach( $vote_result['icons_statuses'] as $vote_type => $vote_class )
 			{ // Print out 3 buttons for spam voting
 				echo $this->get_vote_link( 'spam', $vote_type, $vote_class, $glue, $save_context, $ajax_button, $params );

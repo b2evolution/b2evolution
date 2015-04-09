@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
-echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').get_manual_link( 'robots-hits-summary' ).'</h2>';
+echo '<h2 class="page-title">'.T_('Hits from indexing robots / spiders / crawlers - Summary').get_manual_link( 'robots-hits-summary' ).'</h2>';
 
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 

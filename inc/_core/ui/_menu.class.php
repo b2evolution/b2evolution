@@ -332,7 +332,7 @@ class Menu extends Widget
 
 				$anchor .= '>'.(isset($loop_details['text']) ? format_to_output( $loop_details['text'], 'htmlbody' ) : '?');
 				$anchor_end = '</a>';
-				$anchor_end_with_sub = $templateForLevel['arrow'].'</a>';
+				$anchor_end_with_sub = $templateForLevel['arrow_level_'.( $level + 1 )].'</a>';
 
 				if( $loop_key == $selected )
 				{ // Highlight selected entry
@@ -440,17 +440,19 @@ class Menu extends Widget
 	{
 		switch( $name )
 		{
-			case 'sf-menu-left':
-			case 'sf-menu-right':
+			case 'evobar-menu-right':
+				$arrow_level_2 = '<span class="evobar-icon-left fa fa-caret-left"></span>';
+			case 'evobar-menu-left':
 				return array(
-					'before' => '<ul class="sf-menu '.$name.'">',
-					'after' => '</ul>',
-					'beforeEach' => '<li$entry_attrs$>',
-					'afterEach' => '</li>',
-					'beforeEachSel' => '<li class="current$entry_class$"$entry_attrs$>',
-					'afterEachSel' => '</li>',
-					'separator' => '<li class="separator"><hr /></li>',
-					'arrow' => '<span class="sf-sub-indicator"></span>',
+					'before'         => '<ul class="evobar-menu '.$name.'">',
+					'after'          => '</ul>',
+					'beforeEach'     => '<li$entry_attrs$>',
+					'afterEach'      => '</li>',
+					'beforeEachSel'  => '<li class="current$entry_class$"$entry_attrs$>',
+					'afterEachSel'   => '</li>',
+					'separator'      => '<li class="separator"><hr /></li>',
+					'arrow_level_1'  => '<span class="evobar-icon-down fa fa-caret-down"></span>',
+					'arrow_level_2'  => isset( $arrow_level_2 ) ? $arrow_level_2 : '<span class="evobar-icon-right fa fa-caret-right"></span>',
 					'disabled_class' => 'disabled',
 					'_props' => array(
 						'recurse' => 'always',  // options are: 'no' 'always' or 'intoselected'

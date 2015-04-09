@@ -57,6 +57,8 @@ $core_componentwidget_defs = array(
 			'user_login',
 			'user_register',
 			'user_avatars',
+			'user_links',
+			'user_organizations',
 			'online_users',
 			'member_count',
 			'mobile_skin_switcher',

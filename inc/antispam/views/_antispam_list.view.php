@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 if( get_param('display_mode') == 'js' )
 {	// This is an Ajax response
-	echo '<h2>'.T_('Antispam blacklist').'</h2>';
+	echo '<h2 class="page-title">'.T_('Antispam blacklist').'</h2>';
 }
 
 // ADD KEYWORD FORM:

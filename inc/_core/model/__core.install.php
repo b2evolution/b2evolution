@@ -121,6 +121,7 @@ $schema_queries = array(
 			ufdf_order      int(11) NOT NULL,
 			ufdf_suggest    tinyint(1) NOT NULL DEFAULT 0,
 			ufdf_bubbletip  varchar(2000) NULL,
+			ufdf_icon_name  varchar(40) COLLATE ascii_general_ci NULL,
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

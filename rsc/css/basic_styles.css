@@ -475,6 +475,17 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
+.fa-x-external-link:before {
+  content: "\f08e";
+  position: relative;
+  top: 0.05em;
+  left: 0.11em;
+}
+.fa-x-linkedin:before {
+  content: "\f0e1";
+  position: relative;
+  top: -0.11em;
+}
 .edit_toolbars {
   margin-top: 1ex;
   width: 100%;

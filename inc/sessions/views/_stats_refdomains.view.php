@@ -51,7 +51,7 @@ else
 	$page_title = sprintf( T_('Referring domains for collection %s'), $Blog->get( 'shortname' ) );
 }
 
-echo '<h2>'.$page_title.'</h2>';
+echo '<h2 class="page-title">'.$page_title.'</h2>';
 
 $SQL = new SQL();
 

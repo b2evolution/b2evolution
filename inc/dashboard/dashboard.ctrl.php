@@ -63,7 +63,7 @@ require_js( '#jqueryUI#' );
 
 require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
-require_css( 'blog_base.css' ); // Default styles for the blog navigation
+require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
@@ -94,7 +94,7 @@ if( $blog )
 
 	$AdminUI->disp_payload_begin();
 
-	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
+	echo '<h2 class="page-title">'.$Blog->dget( 'name' ).'</h2>';
 
 	echo '<div class="row browse"><div class="col-lg-9 col-xs-12 floatleft">';
 
@@ -146,14 +146,16 @@ if( $blog )
 	}
 
 	if( $user_perm_moderate_cmt && $CommentList->result_num_rows )
-	{	// We have comments awaiting moderation
+	{ // We have comments awaiting moderation
 
 		load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 		$nb_blocks_displayed++;
 
-		$opentrash_link = get_opentrash_link();
-		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, NULL, NULL, NULL, array( 'onclick' => 'startRefreshComments( \''.request_from().'\' ); return false;' ) ).'</span> ';
+		$opentrash_link = get_opentrash_link( true, false, array(
+				'class' => 'btn btn-default'
+			) );
+		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \''.request_from().'\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
 
 		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
@@ -161,7 +163,7 @@ if( $blog )
 			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
 		echo '<div id="styled_content_block">';
-		echo '<div id="comments_block">';
+		echo '<div id="comments_block" class="dashboard_comments_block">';
 
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -247,7 +249,7 @@ if( $blog )
 			$Item->edit_link( array( // Link to backoffice for editing
 					'before'    => ' ',
 					'after'     => ' ',
-					'class'     => 'ActionButton btn btn-primary',
+					'class'     => 'ActionButton btn btn-primary w80px',
 					'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 

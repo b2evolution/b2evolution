@@ -2868,10 +2868,15 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$field_params['autocomplete'] = 'on';
 		}
 
+		$userfield_icon = '';
+		if( ! empty( $userfield->ufdf_icon_name ) )
+		{ // Field icon
+			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
+		}
 
 		if( $action == 'view' )
 		{	// Only view
-			$Form->info( $userfield->ufdf_name, $uf_val.' '.$field_note );
+			$Form->info( $userfield_icon.$userfield->ufdf_name, $uf_val.' '.$field_note );
 		}
 		else
 		{	// Edit mode
@@ -2880,7 +2885,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				case 'text':
 					$field_params['cols'] = 38;
 					$field_params['note'] = $field_note;
-					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield->ufdf_name, $field_params );
+					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield_icon.$userfield->ufdf_name, $field_params );
 					break;
 
 				case 'list':
@@ -2891,12 +2896,12 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 					{	// Add empty value
 						$uf_options = array_merge( array( '---' ), $uf_options );
 					}
-					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield->ufdf_name, $field_note, $field_params );
+					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
 					break;
 
 				default:
 					$field_params['maxlength'] = 255;
-					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield->ufdf_name, $field_note, $field_params );
+					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
 			}
 		}
 
