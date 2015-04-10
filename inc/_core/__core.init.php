@@ -1155,32 +1155,63 @@ class _core_Module extends Module
 			$dev_entries = array();
 			if( $debug )
 			{
-				global $request_transaction_name;
-				$debug_text = 'DEBUG: ';
+				if( isset($Blog) )
+				{
+					$dev_entries['coll'] = array(
+						'text' => 'Collection = '.$Blog->shortname,
+						'disabled' => true,
+					);					
+				}
+
+				global $disp, $is_front;
+				if( !empty($disp) )
+				{
+					$dev_entries['disp'] = array(
+						'text' => '$disp = '.$disp,
+						'disabled' => true,
+					);					
+				}
+
+				global $disp_detail;
+				if( !empty($disp_detail) )
+				{
+					$dev_entries['disp_detail'] = array(
+						'text' => '$disp_detail = '.$disp_detail,
+						'disabled' => true,
+					);					
+				}
+
 				if( ! empty( $seo_page_type ) )
 				{ // Set in skin_init()
-					$debug_text = $seo_page_type.': ';
+					$dev_entries['seo_page_type'] = array(
+						'text' => '> '.$seo_page_type,
+						'disabled' => true,
+					);					
 				}
+
+				global $is_front;
+				if( !empty($is_front) )
+				{
+					$dev_entries['front'] = array(
+						'text' => 'This is the FRONT page',
+						'disabled' => true,
+					);					
+				}
+
 				if( $robots_index === false )
 				{
-					$debug_text .= 'NO INDEX';
+					$debug_text = 'NO INDEX';
 				}
 				else
 				{
-					$debug_text .= 'do index';
+					$debug_text = 'do index';
 				}
 
-				if( ! empty( $request_transaction_name ) )
-				{
-					$dev_entries['request'] = array(
-						'text' => $request_transaction_name,
-						'disabled' => true,
-					);
-				}
 				$dev_entries['noindex'] = array(
 						'text' => $debug_text,
 						'disabled' => true,
 					);
+
 				$dev_entries[] = array(
 						'separator' => true,
 					);

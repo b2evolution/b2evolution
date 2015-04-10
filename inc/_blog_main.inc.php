@@ -531,6 +531,7 @@ elseif( $disp == '-' )
 { // No specific request of any kind...
 	// We consider this to be the home page:
 	$disp = $Blog->get_setting('front_disp');
+	// Note: the above is where we MIGHT in fact set $disp = 'front';
 
 	$is_front = true; // we have detected that we are displaying the front page
 

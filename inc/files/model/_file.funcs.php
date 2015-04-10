@@ -832,14 +832,14 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		$r['string'] = '<span class="folder_in_tree"';
 
 		if( $ads_full_path == $ads_selected_full_path )
-		{	// This is the current open path
-	 		$r['opened'] = true;
+		{ // This is the current open path
+			$r['opened'] = true;
 
-	 		if( $fm_highlight && $fm_highlight == substr($rds_rel_path, 0, -1) )
-	 		{
-	 			$r['string'] .= ' id="fm_highlighted"';
-	 			unset($fm_highlight);
-	 		}
+			if( $fm_highlight && $fm_highlight == substr($rds_rel_path, 0, -1) )
+			{
+				$r['string'] .= ' id="fm_highlighted"';
+				unset($fm_highlight);
+			}
 		}
 		else
 		{

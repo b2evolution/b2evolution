@@ -39,7 +39,7 @@ global $Settings, $Session;
 					'after'       => ' &bull; ',
 				) );
 
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ptyp_ID though..?!
+		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
 		?>
 
 		<?php
