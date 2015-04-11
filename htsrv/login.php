@@ -101,6 +101,9 @@ switch( $action )
 		if( empty( $login ) )
 		{ // Don't allow empty request
 			param_error( $dummy_fields['login'], T_('You must enter your username or your email address so we know where to send the password recovery email.'), '' );
+			// Save this to know after redirection if error was here
+			$Session->set( 'lostpassword_login_error', '1' );
+			$Session->dbsave();
 			$action = 'lostpassword';
 			break;
 		}

@@ -52,10 +52,22 @@ else
  */
 $display_errors_on_production = true;
 
+
+/**
+ * Do you want to display the "Dev" menu in the evobar?
+ * This allows to display the dev menu without necessarily enabling debugging.
+ * This is useful for skin development on local machines.
+ *
+ * @var boolean - set to 1 to display the dev menu in the evobar.
+ */
+$dev_menu = 0;
+
+
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
 // ini_set( 'memory_limit', '128M' );
+
 
 /**
  * Log application errors through {@link error_log() PHP's logging facilities}?

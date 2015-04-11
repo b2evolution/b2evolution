@@ -494,24 +494,25 @@ class ComponentWidget extends DataObject
 		$this->init_display( $params );
 
 		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
-		$show_debug_containers = $Session->get( 'debug_containers_'.$Blog->ID ) == 1 || $debug == 2;
+		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
 
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 			|| ! $this->disp_params['allow_blockcache'] )
 		{	// NO CACHING - We do NOT want caching for this collection or for this specific widget:
 
-			if( $show_debug_containers )
+			if( $display_containers )
 			{	// DEBUG:
-				echo '<div class="debug_widget"><div class="debug_widget_name" title="'.
-							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'"><span class="debug_container_action"><a href="'
-							.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>CACHE OFF: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
+				echo '<div class="dev-blocks dev-blocks--widget"><div class="dev-blocks-name" title="'.
+							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">'
+							.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
+							.'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
 			$this->display( $params );
 
-			if( $show_debug_containers )
+			if( $display_containers )
 			{	// DEBUG:
-				echo "</div></div>\n";
+				echo "</div>\n";
 			}
 		}
 		else
@@ -529,27 +530,29 @@ class ComponentWidget extends DataObject
 			if( $content !== false )
 			{ // cache hit, let's display:
 
-				if( $show_debug_containers )
+				if( $display_containers )
 				{	// DEBUG:
-					echo '<div class="debug_widget widget_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
-								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>FROM CACHE: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
+								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
+								.'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				echo $content;
 
-				if( $show_debug_containers )
+				if( $display_containers )
 				{	// DEBUG:
-					echo "</div></div>\n";
+					echo "</div>\n";
 				}
 
 			}
 			else
 			{	// Cache miss, we have to generate:
 
-				if( $show_debug_containers )
+				if( $display_containers )
 				{	// DEBUG:
-					echo '<div class="debug_widget widget_not_in_cache"><div class="debug_widget_name" title="'.$this->BlockCache->serialized_keys.'"><span class="debug_container_action"><a href="'
-								.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>NOT IN CACHE: '.$this->get_name().'</div><div class="widget $wi_class$">'."\n";
+					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
+								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
+								.'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
 				$this->BlockCache->start_collect();
@@ -559,9 +562,9 @@ class ComponentWidget extends DataObject
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
 
-				if( $show_debug_containers )
+				if( $display_containers )
 				{	// DEBUG:
-					echo "</div></div>\n";
+					echo "</div>\n";
 				}
 
 			}

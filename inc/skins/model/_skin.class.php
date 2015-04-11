@@ -200,13 +200,13 @@ class Skin extends DataObject
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
-		$show_debug_containers = $Session->get( 'debug_containers_'.$Blog->ID ) == 1;
+		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1;
 
-		if( $show_debug_containers )
-		{ // DEBUG:
-			echo '<div class="debug_container">';
-			echo '<div class="debug_container_name"><span class="debug_container_action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>'.$sco_name.'</div>';
+		if( $display_containers )
+		{ // Wrap container in visible container:
+			echo '<div class="dev-blocks dev-blocks--container">';
+			echo '<div class="dev-blocks-name"><span class="dev-blocks-action"><a href="'
+						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>Container: <b>'.$sco_name.'</b></div>';
 		}
 
 		/**
@@ -245,9 +245,9 @@ class Skin extends DataObject
 			}
 		}
 
-		if( $show_debug_containers )
-		{ // DEBUG:
-			echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+		if( $display_containers )
+		{ // End of visible container:
+			//echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 			echo '</div>';
 		}
 

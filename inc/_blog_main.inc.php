@@ -57,15 +57,26 @@ if( empty( $Blog ) )
 }
 
 
-// Show/Hide the debug containers:
-$debug_containers = param( 'debug_containers', 'string' );
-if( $debug_containers == 'show' )
+// Show/Hide the containers:
+$display_containers = param( 'display_containers', 'string' );
+if( $display_containers == 'show' )
 {
-	$Session->set( 'debug_containers_'.$blog, 1 );
+	$Session->set( 'display_containers_'.$blog, 1 );
 }
-elseif( $debug_containers == 'hide' )
+elseif( $display_containers == 'hide' )
 {
-	$Session->delete( 'debug_containers_'.$blog );
+	$Session->delete( 'display_containers_'.$blog );
+}
+
+// Show/Hide the includes:
+$display_includes = param( 'display_includes', 'string' );
+if( $display_includes == 'show' )
+{
+	$Session->set( 'display_includes_'.$blog, 1 );
+}
+elseif( $display_includes == 'hide' )
+{
+	$Session->delete( 'display_includes_'.$blog );
 }
 
 
@@ -541,10 +552,10 @@ elseif( $disp == '-' )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url($ReqURL, $canonical_url) )
-		{	// We are not on the canocial blog url:
+		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, empty( $debug_containers ) ? true : 303 );
+				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
 			}
 			else
 			{	// Use link rel="canoncial":

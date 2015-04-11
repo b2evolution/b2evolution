@@ -10,7 +10,7 @@
  *
  * @package evocore
  *
- * @version  $Id: _userfields.view.php 8706 2015-04-08 15:33:11Z yura $
+ * @version  $Id: _userfields.view.php 8728 2015-04-10 12:58:53Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -181,7 +181,9 @@ function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name )
 {
 	global $current_User;
 
-	$field_icon = empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span> ';
+	$field_icon = '<span class="uf_icon_block">'
+			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
+		.'</span>';
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // We have permission to modify:
@@ -194,7 +196,7 @@ function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name )
 }
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '&nbsp; &nbsp; %ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name# )%',
+		'td' => '%ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name# )%',
 	);
 
 $Results->cols[] = array(

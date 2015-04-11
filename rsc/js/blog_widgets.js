@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 8591 2015-03-26 15:47:08Z yura $
+ * @version $Id: blog_widgets.js 8723 2015-04-10 07:36:59Z yura $
  */
 
 
@@ -391,7 +391,7 @@ function widgetSettings( the_html )
 	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
-	jQuery( '#widget_settings > form > span > a' ).bind( 'click', closeWidgetSettings );
+	jQuery( '#widget_settings > form > span > a.close_link' ).bind( 'click', closeWidgetSettings );
 
 	// Close widget Settings if Escape key is pressed:
 	var keycode_esc = 27;

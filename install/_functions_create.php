@@ -146,8 +146,8 @@ function create_default_data()
 						( 2, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'fa fa-fax' ),
 						( 3, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'fa fa-twitter' ),
 						( 3, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'fa fa-facebook' ),
-						( 3, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'fa fa-google-plus' ),
-						( 3, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'fa fa-x-linkedin' ),
+						( 3, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'fa fa-google-plus fa-x-google-plus--nudge' ),
+						( 3, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'fa fa-linkedin fa-x-linkedin--nudge' ),
 						( 3, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'fa fa-github-alt' ),
 						( 3, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', NULL ),
 						( 3, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', NULL ),
@@ -224,7 +224,7 @@ function create_default_data()
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Role'        => array( 'Site administrator', 'Moderator' ),
-					'About me'    => 'I am the demo administrator of this site. I love having so much power!',
+					'About me'    => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1319,7 +1319,7 @@ function create_demo_contents()
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Role'        => 'Moderator',
-					'About me'    => 'I am a demo moderator for this site. I like to keep things clean!',
+					'About me'    => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1341,7 +1341,7 @@ function create_demo_contents()
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Role'        => 'Moderator',
-					'About me'    => 'I am a demo moderator for this site. I love it when things are neat!',
+					'About me'    => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1363,7 +1363,7 @@ function create_demo_contents()
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Role'        => 'Author',
-					'About me'    => 'I\'m a demo author. I like to write!',
+					'About me'    => 'I\'m a demo author.'."\n".'I like to write!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1385,7 +1385,7 @@ function create_demo_contents()
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Role'        => 'Author',
-					'About me'    => 'I\'m a demo author. I like to think before I write ;)',
+					'About me'    => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',

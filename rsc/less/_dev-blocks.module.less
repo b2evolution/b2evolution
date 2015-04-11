@@ -1,0 +1,67 @@
+// dev-blocks module
+// NEW visible dev blocks
+
+div.dev-blocks {
+	border: 1px solid #f00;
+	margin: 0;
+	padding: 0;
+	border-radius: 3px;
+	div.dev-blocks {
+		// If blocks are nested, they should have a little bit of breathing space:
+		margin: 2px;
+	}
+}
+div.dev-blocks-name {
+	margin: 0;
+	padding: 0;
+	font-size: 7pt;
+	text-align: left;
+	font-weight: normal;
+	border-radius: 2px 2px 0;
+	padding: 1px 4px;
+}
+span.dev-blocks-action {
+	float: right;
+}
+
+div.dev-blocks--siteinclude {
+	border-color: #f0f;	
+	> .dev-blocks-name {
+		color: #d0d;
+		background-color: #fdf;
+	}	
+}
+div.dev-blocks--include {
+	border-color: #0c0;
+	> .dev-blocks-name {
+		color: #0d0;
+		background-color: #dfd;
+	}	
+}
+div.dev-blocks--container {
+	> .dev-blocks-name {
+		color: #f00;
+		background-color: #fdd;
+	}	
+}
+div.dev-blocks--widget {
+	border-color: #00f;	
+	> .dev-blocks-name {
+		color: #00f;
+		background-color: #eef;
+	}	
+}
+div.dev-blocks--widget--incache {
+	border-color: #00f8f8;	
+	> .dev-blocks-name {
+		color: #0ee;
+		background-color: #e8f8f8;
+	}	
+}
+div.dev-blocks--widget--notincache {
+	border-color: #ec0;	
+	> .dev-blocks-name {
+		color: #f8bb00;
+		background-color: #fff0e0;
+	}	
+}

@@ -2449,7 +2449,7 @@ function display_login_js_handler( $params )
  */
 function display_lostpassword_form( $login, $hidden_params, $params = array() )
 {
-	global $secure_htsrv_url, $dummy_fields, $redirect_to;
+	global $secure_htsrv_url, $dummy_fields, $redirect_to, $Session;
 
 	$params = array_merge( array(
 			'form_before'     => '',
@@ -2462,6 +2462,11 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 			'inskin_urls'     => true,
 			'abort_link_text' => '',
 		), $params );
+
+	if( $lostpassword_login_error = $Session->get( 'lostpassword_login_error' ) )
+	{ // Mark login field as error because it was on page before redirection
+		param_error( $dummy_fields['login'], '', '' );
+	}
 
 	$login_url = get_login_url( get_param( 'source' ), $redirect_to );
 
@@ -2536,6 +2541,12 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 		echo $login_link;
 		echo '<div class="clear"></div>';
 		echo '</div>';
+	}
+
+	if( ! empty( $lostpassword_login_error ) )
+	{ // Unset this var to don't display error field twice
+		$Session->delete( 'lostpassword_login_error' );
+		$Session->dbsave();
 	}
 }
 

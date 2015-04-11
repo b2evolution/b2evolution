@@ -1020,3 +1020,10 @@ div.block_item div.bComment.bCommentmeta p, div.block_item div.bComment.bComment
 	right: 0;
 	margin-right: 0;
 }
+
+.uf_icon_block {
+	width: 30px;
+	display: inline-block;
+	text-align: center;
+	color: #aaa;
+}

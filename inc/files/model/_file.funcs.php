@@ -750,11 +750,13 @@ function rel_path_to_base( $path )
 		$r = basename($path).( is_dir($path) ? '/' : '' );
 	}
 
+	/* fp> The following MUST be moved to the caller if needed:
 	if( $debug )
 	{
 		$r .= ' [DEBUG: '.$path.']';
 	}
-
+	*/
+	
 	return $r;
 }
 

@@ -689,8 +689,13 @@ div.edit_toolbars, div.message_toolbars {
 	height: 40px;
 	margin: 2px;
 	position: relative;
+	-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+	-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+	-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
 	&:hover {
-		background: #23527c; 
+		.border-radius;
+		background: #23527c;
 		// TODO: use @variable name
 	}
 	.fa {

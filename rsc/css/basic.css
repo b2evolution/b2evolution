@@ -2,6 +2,66 @@
  * Obviously, this file no longer contains only basic styles.
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
+div.dev-blocks {
+  border: 1px solid #f00;
+  margin: 0;
+  padding: 0;
+  border-radius: 3px;
+}
+div.dev-blocks div.dev-blocks {
+  margin: 2px;
+}
+div.dev-blocks-name {
+  margin: 0;
+  padding: 0;
+  font-size: 7pt;
+  text-align: left;
+  font-weight: normal;
+  border-radius: 2px 2px 0;
+  padding: 1px 4px;
+}
+span.dev-blocks-action {
+  float: right;
+}
+div.dev-blocks--siteinclude {
+  border-color: #f0f;
+}
+div.dev-blocks--siteinclude > .dev-blocks-name {
+  color: #d0d;
+  background-color: #fdf;
+}
+div.dev-blocks--include {
+  border-color: #0c0;
+}
+div.dev-blocks--include > .dev-blocks-name {
+  color: #0d0;
+  background-color: #dfd;
+}
+div.dev-blocks--container > .dev-blocks-name {
+  color: #f00;
+  background-color: #fdd;
+}
+div.dev-blocks--widget {
+  border-color: #00f;
+}
+div.dev-blocks--widget > .dev-blocks-name {
+  color: #00f;
+  background-color: #eef;
+}
+div.dev-blocks--widget--incache {
+  border-color: #00f8f8;
+}
+div.dev-blocks--widget--incache > .dev-blocks-name {
+  color: #0ee;
+  background-color: #e8f8f8;
+}
+div.dev-blocks--widget--notincache {
+  border-color: #ec0;
+}
+div.dev-blocks--widget--notincache > .dev-blocks-name {
+  color: #f8bb00;
+  background-color: #fff0e0;
+}
 body {
   padding: 0;
   margin: 0;
@@ -667,51 +727,6 @@ table.widget_grid .note {
 }
 .widget_flow_blocks > div img {
   border-radius: 3px;
-}
-div.debug_container {
-  border: 1px solid #f00;
-  margin: 0;
-  padding: 0;
-}
-div.debug_container_name {
-  margin: 0;
-  padding: 0;
-  background-color: #fdd;
-  color: #f00;
-  font-size: 7pt;
-  text-align: left;
-  font-weight: normal;
-}
-span.debug_container_action {
-  float: right;
-}
-div.debug_widget {
-  border: 1px solid #0000f8;
-  margin: 0;
-  padding: 0;
-}
-div.widget_in_cache {
-  border: 1px solid #00f800;
-}
-div.widget_not_in_cache {
-  border: 1px solid #f80000;
-}
-div.debug_widget_name {
-  margin: 0;
-  padding: 0;
-  background-color: #eef;
-  color: #0000f8;
-  font-size: 7pt;
-  text-align: left;
-  font-weight: normal;
-}
-div.widget_in_cache div.debug_widget_name {
-  background-color: #efe;
-  color: #00f800;
-}
-div.widget_not_in_cache div.debug_widget_name {
-  background-color: #fee;
-  color: #f80000;
 }
 .badge {
   position: relative;

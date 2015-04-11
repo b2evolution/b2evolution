@@ -1137,32 +1137,59 @@ function skin_include( $template_name, $params = array() )
 
 	}
 
-	$disp_handled = false;
 
+	// DECIDE WHAT TO INCLUDE:
 	if( $template_name[0] == '#' )
 	{	// This disp mode is handled by a plugin:
-		$plug_ID = substr( $template_name, 1 );
-		$disp_params = array( 'disp' => $disp );
-		$Plugins->call_method( $plug_ID, 'HandleDispMode', $disp_params );
-		$disp_handled = true;
+		$debug_info = 'Call plugin';
+		$disp_handled = 'plugin';
 	}
-
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
-
 		$file = $ads_current_skin_path.$template_name;
-		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
-		require $file;
-		$disp_handled = true;
+		$debug_info = '<b>Skin template</b>: '.rel_path_to_base($file);
+		$disp_handled = 'custom';
+	}
+	elseif( file_exists( $skins_path.$template_name ) )
+	{	// Use the default/fallback template:
+		$file = $skins_path.$template_name;
+		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
+		$disp_handled = 'fallback';
+	}
+	else
+	{
+		$disp_handled = false;
 	}
 
-	elseif( file_exists( $skins_path.$template_name ) )
-	{	// Use the default template:
-		global $Debuglog;
-		$file = $skins_path.$template_name;
-		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
-		require $file;
-		$disp_handled = true;
+	// Do we want a visible container for DEBUG/DEV ?:
+	if( strpos( $template_name, '_html_' ) !== false )
+	{	// We're outside of the page body: NEVER display wrap this include with a <div>
+		$display_includes = false;
+	}
+	else
+	{	// We may wrap with a <div>:
+		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+	}
+	if( $display_includes )
+	{ // Wrap the include with a visible div:
+		echo '<div class="dev-blocks dev-blocks--include">';
+		echo '<div class="dev-blocks-name">skin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
+	}
+
+	switch( $disp_handled )
+	{
+		case 'plugin':
+			// This disp mode is handled by a plugin:
+			$plug_ID = substr( $template_name, 1 );
+			$disp_params = array( 'disp' => $disp );
+			$Plugins->call_method( $plug_ID, 'HandleDispMode', $disp_params );
+			break;
+
+		case 'custom':			// The skin has a customized handler, use that one instead:
+		case 'fallback':		// Use the default/fallback template:
+			$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.$file, 'skins');
+			require $file;
+			break;
 	}
 
 	if( ! $disp_handled )
@@ -1174,6 +1201,12 @@ function skin_include( $template_name, $params = array() )
 		}
 	}
 
+	if( $display_includes )
+	{ // End of visible container:
+		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+		echo '</div>';
+	}
+
 	$Timer->pause( $timer_name );
 }
 
@@ -1181,13 +1214,13 @@ function skin_include( $template_name, $params = array() )
 /**
  * Template tag.
  *
- * @param
- * @param
+ * @param string Template name
+ * @param array Params
  * @param boolean force include even if sitewide header/footer not enabled
  */
 function siteskin_include( $template_name, $params = array(), $force = false )
 {
-	global $Settings, $siteskins_path;
+	global $Settings, $siteskins_path, $Blog;
 
 	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
 	{ // Site skins are not enabled and we don't want to force either
@@ -1213,39 +1246,61 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	$timer_name = 'siteskin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	$is_customized = false;
-
 	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
-	{ // Use the default template:
-		global $Debuglog;
+	{ // Use the custom template:
 		$file = $siteskins_path.'custom/'.$template_name;
+		$debug_info = '<b>Custom template</b>: '.rel_path_to_base($file);
+		$disp_handled = 'custom';
+	}
+	elseif( file_exists( $siteskins_path.$template_name ) ) // Try to include standard template only if custom template doesn't exist
+	{ // Use the default/fallback template:
+		$file = $siteskins_path.$template_name;
+		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
+		$disp_handled = 'fallback';
+	}
+	else
+	{
+		$disp_handled = false;
+	}
+
+
+	// Do we want a visible container for DEBUG/DEV ?:
+	if( strpos( $template_name, '_html_' ) !== false ||  strpos( $template_name, '_init.' ) !== false )
+	{	// We're outside of the page body: NEVER display wrap this include with a <div>
+		$display_includes = false;
+	}
+	else
+	{	// We may wrap with a <div>:
+		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+	}
+	if( $display_includes )
+	{ // Wrap the include with a visible div:
+		echo '<div class="dev-blocks dev-blocks--siteinclude">';
+		echo '<div class="dev-blocks-name">siteskin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
+	}
+
+
+	if($disp_handled)
+	{
 		$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
 		require $file;
-		$disp_handled = true;
-		// This template is customized, Don't include standard template
-		$is_customized = true;
 	}
-
-	if( !$is_customized )
-	{ // Try to include standard template only if custom template doesn't exist
-		if( file_exists( $siteskins_path.$template_name ) )
-		{ // Use the default template:
-			global $Debuglog;
-			$file = $siteskins_path.$template_name;
-			$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
-			require $file;
-			$disp_handled = true;
-		}
-	}
-
-	if( ! $disp_handled )
-	{ // nothing handled the display
+	else
+	{	// nothing handled the display
 		printf( '<div class="skin_error">Site template [%s] not found.</div>', $template_name );
 		if( !empty($current_User) && $current_User->level == 10 )
 		{
 			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $siteskins_path.$template_name );
 		}
 	}
+
+
+	if( $display_includes )
+	{ // End of visible container:
+		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+		echo '</div>';
+	}
+
 
 	$Timer->pause( $timer_name );
 }

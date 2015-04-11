@@ -115,7 +115,9 @@ class Organization extends DataObject
 		$users_SQL = new SQL();
 		$users_SQL->SELECT( 'uorg_user_ID' );
 		$users_SQL->FROM( 'T_users__user_org' );
+		$users_SQL->FROM_add( 'INNER JOIN T_users ON uorg_user_ID = user_ID' );
 		$users_SQL->WHERE( 'uorg_org_ID = '.$DB->quote( $this->ID ) );
+		$users_SQL->ORDER_BY( 'user_level DESC, user_lastname ASC, user_firstname ASC' );
 		$user_IDs = $DB->get_col( $users_SQL->get() );
 
 		$UserCache = & get_UserCache();

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the user_organizations_Widget class.
+ * This file implements the org_members_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -22,15 +22,15 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class user_organizations_Widget extends ComponentWidget
+class org_members_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
 	 */
-	function user_organizations_Widget( $db_row = NULL )
+	function org_members_Widget( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_organizations' );
+		parent::ComponentWidget( $db_row, 'core', 'org_members' );
 	}
 
 
@@ -57,7 +57,7 @@ class user_organizations_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display organization members.');
+		return T_('Display the members of an organization.');
 	}
 
 
@@ -94,15 +94,15 @@ class user_organizations_Widget extends ComponentWidget
 					'defaultvalue' => T_('Our Awesome Team'),
 				),
 				'org_ID' => array(
-					'label' => T_('Team ID'),
-					'note' => '',
+					'label' => T_('Organization ID'),
+					'note' => sprintf( T_('ID of the <a %s>organization</a> to display.'), 'href="?ctrl=organizations"' ),
 					'type' => 'integer',
-					'size' => 40,
+					'size' => 3,
 					'defaultvalue' => 1,
 				),
 				'field_ID' => array(
 					'label' => T_('Extra Info Field'),
-					'note' => T_('Select what user field should be displayed'),
+					'note' => T_('Select what extra user field should be displayed.'),
 					'type' => 'select',
 					'options' => array( '' => T_('None') ) + $user_fields,
 					'defaultvalue' => $default_user_field_ID,
@@ -155,11 +155,30 @@ class user_organizations_Widget extends ComponentWidget
 				{
 					echo '<div class="col-lg-4 col-sm-6 text-center">';
 
+					$user_url = $org_User->get_userpage_url( $Blog->ID );
+
+					if( ! empty( $user_url ) )
+					{ // Display url to user page only when it is allowed for current user
+						echo '<a href="'.$user_url.'" class="user_link">';
+					}
+
 					// Profile picture
 					echo $org_User->get_avatar_imgtag( 'crop-top-320x320', 'img-circle img-responsive img-center' );
 
+					if( ! empty( $user_url ) )
+					{ // End of user link, see above
+ 						echo '</a>';
+
+						echo '<a href="'.$user_url.'" class="user_link">';
+					}
+
 					// Full name
 					echo '<h3>'.$org_User->get( 'fullname' ).'</h3>';
+
+					if( ! empty( $user_url ) )
+					{ // End of user link, see above
+						echo '</a>';
+					}
 
 					// User links
 					$url_fields = $org_User->userfields_by_type( 'url' );
@@ -178,11 +197,13 @@ class user_organizations_Widget extends ComponentWidget
 					// Info
 					if( $field_ID > 0 && ( $field_value = $org_User->userfield_value_by_ID( $field_ID ) ) )
 					{
-						echo '<p>'.$field_value.'</p>';
+						echo '<p class="user_field">'.nl2br( $field_value ).'</p>';
 					}
 
 					echo '</div>';
 				}
+
+				echo '<div class="clear"></div>';
 			}
 		}
 

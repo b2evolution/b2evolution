@@ -5838,7 +5838,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrade table user field definitions... ' );
 		$DB->query( 'ALTER TABLE T_users__fielddefs
-			ADD ufdf_icon_name varchar(40) COLLATE ascii_general_ci NULL' );
+			ADD ufdf_icon_name varchar(100) COLLATE ascii_general_ci NULL' );
 		$DB->query( 'UPDATE T_users__fielddefs SET
 			ufdf_icon_name = CASE
 				WHEN ufdf_name = "Yahoo IM"      THEN "fa fa-yahoo"
@@ -5849,7 +5849,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHEN ufdf_name = "Home phone"    THEN "fa fa-phone"
 				WHEN ufdf_name = "Office FAX"    THEN "fa fa-fax"
 				WHEN ufdf_name = "Home FAX"      THEN "fa fa-fax"
-				WHEN ufdf_name = "Linkedin"      THEN "fa fa-x-linkedin"
+				WHEN ufdf_name = "Linkedin"      THEN "fa fa-linkedin fa-x-linkedin--nudge"
 				WHEN ufdf_name = "Twitter"       THEN "fa fa-twitter"
 				WHEN ufdf_name = "Facebook"      THEN "fa fa-facebook"
 				WHEN ufdf_name = "Flickr"        THEN "fa fa-flickr"
@@ -5857,7 +5857,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHEN ufdf_name = "Digg"          THEN "fa fa-digg"
 				WHEN ufdf_name = "StumbleUpon"   THEN "fa fa-stumbleupon"
 				WHEN ufdf_name = "GitHub"        THEN "fa fa-github-alt"
-				WHEN ufdf_name = "Google Plus"   THEN "fa fa-google-plus"
+				WHEN ufdf_name = "Google Plus"   THEN "fa fa-google-plus fa-x-google-plus--nudge"
 				WHEN ufdf_name = "Pinterest"     THEN "fa fa-pinterest-p"
 				WHEN ufdf_name = "Main address"  THEN "fa fa-building"
 				WHEN ufdf_name = "Home address"  THEN "fa fa-home"

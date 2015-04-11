@@ -886,7 +886,7 @@ class _core_Module extends Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
+		global $home_url, $admin_url, $debug, $dev_menu, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;
@@ -1074,18 +1074,18 @@ class _core_Module extends Module
 					{ // Display a menu to turn on/off the debug containers
 						global $ReqURI, $Session;
 
-						if( $Session->get( 'debug_containers_'.$Blog->ID ) == 1 )
+						if( $Session->get( 'display_containers_'.$Blog->ID ) == 1 )
 						{ // To hide the debug containers
 							$entries['blog']['entries']['containers'] = array(
 								'text' => T_('Hide containers'),
-								'href' => url_add_param( $ReqURI, 'debug_containers=hide' ),
+								'href' => url_add_param( $ReqURI, 'display_containers=hide' ),
 							);
 						}
 						else
 						{ // To show the debug containers
 							$entries['blog']['entries']['containers'] = array(
 								'text' => T_('Show containers'),
-								'href' => url_add_param( $ReqURI, 'debug_containers=show' ),
+								'href' => url_add_param( $ReqURI, 'display_containers=show' ),
 							);
 						}
 					}
@@ -1149,11 +1149,13 @@ class _core_Module extends Module
 			}
 		}
 
-		// SYSTEM MENU:
+
 		if( $perm_admin_restricted )
 		{
+
+			// DEV MENU:
 			$dev_entries = array();
-			if( $debug )
+			if( $dev_menu || $debug || $debug_jslog )
 			{
 				if( isset($Blog) )
 				{
@@ -1211,15 +1213,55 @@ class _core_Module extends Module
 						'text' => $debug_text,
 						'disabled' => true,
 					);
+			}
+
+			if( ($dev_menu || $debug) && !is_admin_page() )
+			{ // Display a menu to turn on/off the debug containers
+				global $ReqURI, $Session;
 
 				$dev_entries[] = array(
 						'separator' => true,
 					);
+
+				if( $Session->get( 'display_containers_'.$Blog->ID ) == 1 )
+				{ // To hide the debug containers
+					$dev_entries['containers'] = array(
+						'text' => T_('Hide containers'),
+						'href' => url_add_param( $ReqURI, 'display_containers=hide' ),
+					);
+				}
+				else
+				{ // To show the debug containers
+					$dev_entries['containers'] = array(
+						'text' => T_('Show containers'),
+						'href' => url_add_param( $ReqURI, 'display_containers=show' ),
+					);
+				}
+
+				if( $Session->get( 'display_includes_'.$Blog->ID ) == 1 )
+				{ // To hide the debug includes
+					$dev_entries['includes'] = array(
+						'text' => T_('Hide includes'),
+						'href' => url_add_param( $ReqURI, 'display_includes=hide' ),
+					);
+				}
+				else
+				{ // To show the debug includes
+					$dev_entries['includes'] = array(
+						'text' => T_('Show includes'),
+						'href' => url_add_param( $ReqURI, 'display_includes=show' ),
+					);
+				}
 			}
 
 			global $debug_jslog;
 			if( $debug || $debug_jslog )
 			{ // Show JS log menu if debug is enabled
+
+				$dev_entries[] = array(
+						'separator' => true,
+					);
+
 				$dev_entries['jslog'] = array(
 					'text'  => T_('JS log'),
 					'title' => T_('JS log'),
@@ -1231,11 +1273,13 @@ class _core_Module extends Module
 			{ // Add Dev menu if at least one entry is should be displayed
 				$entries['dev'] = array(
 						'href'    => $admin_url.'#',
-						'text'    => 'Dev',
+						'text'    => '<span class="fa fa-wrench"></span> Dev',
 						'entries' => $dev_entries,
 					);
 			}
 
+
+			// MORE menu:
 			if( $current_User->check_perm( 'users', 'view' ) )
 			{ // Users:
 				$entries['tools']['disabled'] = false;

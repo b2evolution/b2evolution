@@ -586,11 +586,33 @@ body.pictured .front_main_content .widget--social-media-links a {
 }
 
 // Organization Members widget
-.widget_core_user_organizations {
+.widget_core_org_members {
+	margin: 5em 0 30px;
 	color: #333;
 	img {
 		width: 200px;
 		height: 200px;
 		display: inline-block;
+	}
+	h2.page-header {
+		margin-top: 0;
+	}
+	p.user_field {
+		margin-bottom: 40px;
+	}
+}
+body.pictured .footer .widget_core_org_members {
+	.widget--social-media-links a {
+		color: #FFF;
+		background: #ddd;
+		&:hover {
+			background: #23527c;
+		}
+	}
+	a.user_link {
+		color: #000;
+		&:hover {
+			color: #23527c;
+		}
 	}
 }

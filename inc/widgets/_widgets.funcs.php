@@ -258,7 +258,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$featured_intro_params = array( 'disp_title' => 0 );
 	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
+	if( $kind == 'main' )
+	{ // Add user links widget only for main kind blogs
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
+	}
 	$post_list_params = NULL;
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
@@ -271,7 +274,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 
 	/* Front Page Secondary Area */
-	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'user_organizations', 'core', 10 );
+	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
 
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );
