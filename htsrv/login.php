@@ -101,9 +101,8 @@ switch( $action )
 		if( empty( $login ) )
 		{ // Don't allow empty request
 			param_error( $dummy_fields['login'], T_('You must enter your username or your email address so we know where to send the password recovery email.'), '' );
-			// Save this to know after redirection if error was here
-			$Session->set( 'lostpassword_login_error', '1' );
-			$Session->dbsave();
+			// Set this var to know after redirection if error was here
+			$lostpassword_error = true;
 			$action = 'lostpassword';
 			break;
 		}
@@ -613,6 +612,10 @@ if( $inskin && use_in_skin_login() )
 		elseif( $action == 'lostpassword' )
 		{ // redirect to inskin lost password page
 			$redirect = $Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) );
+			if( ! empty( $lostpassword_error ) )
+			{ // Set this param to know after redirection if error was here
+				$redirect = url_add_param( $redirect, 'field_error=1', '&' );
+			}
 		}
 		else
 		{ // redirect to inskin login page

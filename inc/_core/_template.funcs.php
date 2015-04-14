@@ -2463,7 +2463,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 			'abort_link_text' => '',
 		), $params );
 
-	if( $lostpassword_login_error = $Session->get( 'lostpassword_login_error' ) )
+	if( param( 'field_error', 'integer', 0 ) )
 	{ // Mark login field as error because it was on page before redirection
 		param_error( $dummy_fields['login'], '', '' );
 	}
@@ -2541,12 +2541,6 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 		echo $login_link;
 		echo '<div class="clear"></div>';
 		echo '</div>';
-	}
-
-	if( ! empty( $lostpassword_login_error ) )
-	{ // Unset this var to don't display error field twice
-		$Session->delete( 'lostpassword_login_error' );
-		$Session->dbsave();
 	}
 }
 

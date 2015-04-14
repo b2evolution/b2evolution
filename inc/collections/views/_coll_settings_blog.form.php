@@ -22,10 +22,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
-global $collections_Module;
-
 $Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', '',
 	// enable all form elements on submit (so values get sent):
@@ -38,18 +34,7 @@ $Form->hidden( 'action', 'update_settings_blog' );
 
 // --------------------------------------------
 
-if( isset($collections_Module) )
-{
 	$Form->begin_fieldset( T_('Display options').get_manual_link('collections-display-options') );
-
-	$BlogCache = & get_BlogCache();
-
-		$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default collection to display'), array(
-				'note' => T_('This collection will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>',
-				'allow_none' => true,
-				'class' => '',
-				'loop_object_method' => 'get_maxlen_name',
-				'onchange' => '' )  );
 
 		$Form->select_input_options( 'blogs_order_by', array_to_option_list( get_coll_sort_options(), $Settings->get('blogs_order_by') ), T_('Order blogs by'), T_('Select blog list order.') );
 
@@ -57,7 +42,6 @@ if( isset($collections_Module) )
 				array( 'ASC' => T_('Ascending'), 'DESC' => T_('Descending') ), $Settings->get('blogs_order_dir') ), T_('Order direction'), T_('Select default blog list order direction.') );
 
 	$Form->end_fieldset();
-}
 
 // --------------------------------------------
 

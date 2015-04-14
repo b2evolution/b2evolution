@@ -175,16 +175,7 @@ function install_newdb()
 		return;
 	}
 
-	$installer_version = param( 'installer_version', 'integer', 0 );
-	if( $installer_version >= 10 )
-	{
-		$create_sample_contents = param( 'create_sample_contents', 'integer', 0 );
-	}
-	else
-	{	// OLD INSTALLER call. Probably an automated script calling.
-		// Let's force the sample contents since they haven't been explicitly disabled
-		$create_sample_contents = 1;
-	}
+	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
 	/**
 	 * 1 - If current installation is local, test or intranet
@@ -1235,29 +1226,32 @@ function get_install_steps_count()
 	$steps++;
 
 	// Installing sample contents:
-	$installer_version = param( 'installer_version', 'integer', 0 );
-	if( $installer_version >= 10 )
-	{
-		$create_sample_contents = param( 'create_sample_contents', 'integer', 0 );
-	}
-	else
-	{ // OLD INSTALLER call. Probably an automated script calling.
-		// Let's force the sample contents since they haven't been explicitly disabled
-		$create_sample_contents = 1;
-	}
+	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+
 	if( $create_sample_contents )
 	{
 		// After Creating default sample contents(users, and probably blogs and categories):
 		$steps++;
 
-		// Array contains which collections should be installed
-		$collections = param( 'collections', 'array:string', array() );
-		$install_collection_home = in_array( 'home', $collections );
-		$install_collection_bloga = in_array( 'a', $collections );
-		$install_collection_blogb = in_array( 'b', $collections );
-		$install_collection_photos = in_array( 'photos', $collections );
-		$install_collection_forums = in_array( 'forums', $collections );
-		$install_collection_manual = in_array( 'manual', $collections );
+		if( $create_sample_contents == 'all' )
+		{ // Array contains which collections should be installed
+			$install_collection_home =   1;
+			$install_collection_bloga =  1;
+			$install_collection_blogb =  1;
+			$install_collection_photos = 1;
+			$install_collection_forums = 1;
+			$install_collection_manual = 1;
+		}
+		else
+		{ // Array contains which collections should be installed
+			$collections = param( 'collections', 'array:string', array() );
+			$install_collection_home = in_array( 'home', $collections );
+			$install_collection_bloga = in_array( 'a', $collections );
+			$install_collection_blogb = in_array( 'b', $collections );
+			$install_collection_photos = in_array( 'photos', $collections );
+			$install_collection_forums = in_array( 'forums', $collections );
+			$install_collection_manual = in_array( 'manual', $collections );
+		}
 
 		if( $install_collection_home )
 		{ // After installing of the blog "Home"

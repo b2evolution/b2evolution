@@ -1,0 +1,2 @@
+Version 4.0 (2014-04-16)
+	Initial version of the spellchecker for TinyMCE 4.0 supports Enchant and PSpell engines.

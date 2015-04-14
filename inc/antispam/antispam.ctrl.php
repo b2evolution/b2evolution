@@ -460,9 +460,21 @@ if( $display_mode != 'js' )
 {
 	if( $tab == 'stats' )
 	{
+		if( isset( $collections_Module ) )
+		{ // Display list of blogs:
+			if( $current_User->check_perm( 'stats', 'view' ) )
+			{
+				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+								$admin_url.'?ctrl=antispam&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+			}
+			else
+			{ // No permission to view aggregated stats:
+				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ) );
+			}
+		}
 		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
-		$AdminUI->breadcrumbpath_add( T_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+		$AdminUI->breadcrumbpath_add( T_('IPs'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('IP Ranges'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 		$AdminUI->set_path( 'stats', 'ips', 'ranges' );
 	}
 	else

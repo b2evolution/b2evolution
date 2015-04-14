@@ -259,6 +259,7 @@ class sessions_Module extends Module
 								'summary' => array(
 									'text' => T_('Hit summary'),
 									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
+									'order' => 'group_last',
 									'entries' => array(
 										'global' => array(
 											'text' => T_('Global hits'),
@@ -316,13 +317,10 @@ class sessions_Module extends Module
 								'hits' => array(
 									'text' => T_('All Hits'),
 									'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog ),
-								'ips' => array(
-									'text' => T_('IPs'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog,
-									'entries' => $ips_entries ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
 									'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog,
+									'order' => 'group_last',
 									'entries' => array(
 										'all' => array(
 											'text' => T_('All referrers'),
@@ -332,6 +330,10 @@ class sessions_Module extends Module
 											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top&amp;blog='.$blog ),
 										),
 									),
+								'ips' => array(
+									'text' => T_('IPs'),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=ips&amp;blog='.$blog,
+									'entries' => $ips_entries ),
 							)
 						);
 

@@ -1617,6 +1617,11 @@ if( $mode == 'upload' || $mode == 'import' )
 	require_css( 'fileadd.css', 'rsc_url' );
 }
 
+if( $mode == 'popup' )
+{ // Don't display navigation on popup mode
+	$AdminUI->clear_menu_entries( 'files' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

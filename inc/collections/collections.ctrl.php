@@ -170,11 +170,6 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
-		{
-			$Settings->set( 'default_blog_ID', $default_blog_ID );
-		}
-
 		$Settings->set( 'blogs_order_by', param( 'blogs_order_by', 'string', true ) );
 		$Settings->set( 'blogs_order_dir', param( 'blogs_order_dir', 'string', true ) );
 

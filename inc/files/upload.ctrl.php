@@ -390,6 +390,11 @@ file_controller_build_tabs();
 
 $AdminUI->set_path( 'files', 'upload' );
 
+if( $mode == 'popup' )
+{ // Don't display navigation on popup mode
+	$AdminUI->clear_menu_entries( 'files' );
+}
+
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );

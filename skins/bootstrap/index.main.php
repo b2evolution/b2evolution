@@ -81,6 +81,11 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	</div>
 
+<?php
+global $hide_widget_container_menu;
+if( empty( $hide_widget_container_menu ) )
+{ // Display this widget container only when it is not disabled
+?>
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs">
@@ -107,6 +112,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			</ul>
 		</div>
 	</div>
+<?php } ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
@@ -340,15 +346,15 @@ siteskin_include( '_site_body_header.inc.php' );
 		// copying the matching php file into your skin directory.
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 	?>
+	</div>
 
-		</div>
+
+<!-- =================================== START OF SIDEBAR =================================== -->
 	<?php
 	if( $Skin->get_setting( 'layout' ) != 'single_column' )
 	{
 	?>
-<!-- =================================== START OF SIDEBAR =================================== -->
 		<div class="col-md-3"<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:left;"' : '' ); ?>>
-
 	<?php
 		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
@@ -387,6 +393,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	<?php } ?>
 	</div>
+
 
 <!-- =================================== START OF FOOTER =================================== -->
 	<div class="row">

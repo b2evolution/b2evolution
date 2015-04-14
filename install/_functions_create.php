@@ -1257,6 +1257,26 @@ function create_user( $params = array() )
 
 
 /**
+ * Associate a profile picture with a user.
+ */
+function assign_profile_picture( & $User )
+{
+
+	$File = new File( 'user', $User->ID, $User->login.'.jpg' );
+
+	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+	$File->load_meta( true );
+	$User->set( 'avatar_file_ID', $File->ID );
+	$User->dbupdate();
+
+	// Set link between user and avatar file
+	$LinkOwner = new LinkUser( $User );
+	$File->link_to_Object( $LinkOwner );
+
+}
+
+
+/**
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
  */
@@ -1291,51 +1311,32 @@ function create_demo_contents()
 	task_begin('Assigning avatar to Admin... ');
 	$UserCache = & get_UserCache();
 	$User_Admin = & $UserCache->get_by_ID( 1 );
-	if( $User_Admin->get( 'gender' ) == 'F' )
-	{ // Set girl avatar if user has female gender
-		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_girl.png' );
-	}
-	else
-	{ // Set boy avatar if user has male gender
-		$edit_File = new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
-	}
+	assign_profile_picture( $User_Admin );
+
+	// Associate secondary picture:
+	$File = new File( 'user', $User_Admin->ID, 'faceyourmanga_admin_boy.png' );
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-	$edit_File->load_meta( true );
-	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
-	$User_Admin->dbupdate();
+	$File->load_meta( true );
 	// Set link between user and avatar file
 	$LinkOwner = new LinkUser( $User_Admin );
-	$edit_File->link_to_Object( $LinkOwner );
+	$File->link_to_Object( $LinkOwner );
+
+	// Associate secondary picture:
+	$File = new File( 'user', $User_Admin->ID, 'faceyourmanga_admin_girl.png' );
+	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+	$File->load_meta( true );
+	// Set link between user and avatar file
+	$LinkOwner = new LinkUser( $User_Admin );
+	$File->link_to_Object( $LinkOwner );
+
 	task_end();
 
-	task_begin('Creating demo jay user... ');
-	$jay_moderator_ID = create_user( array(
-			'login'     => 'jay',
-			'firstname' => 'Jay',
-			'lastname'  => 'Parker',
-			'level'     => 2,
-			'gender'    => 'M',
-			'Group'     => $Group_Privileged,
-			'org_IDs'   => $user_org_IDs,
-			'fields'    => array(
-					'Role'        => 'Moderator',
-					'About me'    => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
-				)
-		) );
-	task_end();
-
-	task_begin('Creating demo jenny user... ');
-	$jenny_moderator_ID = create_user( array(
-			'login'     => 'jenny',
-			'firstname' => 'Jenny',
-			'lastname'  => 'Anderson',
-			'level'     => 2,
+	task_begin('Creating demo user mary... ');
+	$mary_moderator_ID = create_user( array(
+			'login'     => 'mary',
+			'firstname' => 'Mary',
+			'lastname'  => 'Wilson',
+			'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
 			'gender'    => 'F',
 			'Group'     => $Group_Privileged,
 			'org_IDs'   => $user_org_IDs,
@@ -1350,14 +1351,38 @@ function create_demo_contents()
 					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 				)
 		) );
+	assign_profile_picture( $UserCache->get_by_ID( $mary_moderator_ID ) );
 	task_end();
 
-	task_begin('Creating demo larry user... ');
-	$larry_blogger_ID = create_user( array(
-			'login'     => 'larry',
-			'firstname' => 'Larry',
-			'lastname'  => 'Smith',
-			'level'     => 1,
+	task_begin('Creating demo user jay... ');
+	$jay_moderator_ID = create_user( array(
+			'login'     => 'jay',
+			'firstname' => 'Jay',
+			'lastname'  => 'Parker',
+			'level'     => 3,
+			'gender'    => 'M',
+			'Group'     => $Group_Privileged,
+			'org_IDs'   => $user_org_IDs,
+			'fields'    => array(
+					'Role'        => 'Moderator',
+					'About me'    => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
+					'Website'     => 'http://b2evolution.net/',
+					'Twitter'     => 'https://twitter.com/b2evolution/',
+					'Facebook'    => 'https://www.facebook.com/b2evolution',
+					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+				)
+		) );
+	assign_profile_picture( $UserCache->get_by_ID( $jay_moderator_ID ) );
+	task_end();
+
+	task_begin('Creating demo user mark... ');
+	$dave_blogger_ID = create_user( array(
+			'login'     => 'dave',
+			'firstname' => 'David',
+			'lastname'  => 'Miller',
+			'level'     => 2,
 			'gender'    => 'M',
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
@@ -1372,15 +1397,16 @@ function create_demo_contents()
 					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 				)
 		) );
+	assign_profile_picture( $UserCache->get_by_ID( $dave_blogger_ID ) );
 	task_end();
 
-	task_begin('Creating demo kate user... ');
-	$kate_blogger_ID = create_user( array(
-			'login'     => 'kate',
-			'firstname' => 'Kate',
-			'lastname'  => 'Adams',
+	task_begin('Creating demo user paul... ');
+	$paul_blogger_ID = create_user( array(
+			'login'     => 'paul',
+			'firstname' => 'Paul',
+			'lastname'  => 'Jones',
 			'level'     => 1,
-			'gender'    => 'F',
+			'gender'    => 'M',
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
@@ -1394,13 +1420,14 @@ function create_demo_contents()
 					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 				)
 		) );
+	assign_profile_picture( $UserCache->get_by_ID( $paul_blogger_ID ) );
 	task_end();
 
-	task_begin('Creating demo bart user... ');
-	$bart_user_ID = create_user( array(
-			'login'     => 'bart',
-			'firstname' => 'Bart',
-			'lastname'  => 'Davis',
+	task_begin('Creating demo user larry... ');
+	$larry_user_ID = create_user( array(
+			'login'     => 'larry',
+			'firstname' => 'Larry',
+			'lastname'  => 'Smith',
 			'level'     => 0,
 			'gender'    => 'M',
 			'Group'     => $Group_Users,
@@ -1408,13 +1435,14 @@ function create_demo_contents()
 					'About me' => 'Hi there!',
 				)
 		) );
+	assign_profile_picture( $UserCache->get_by_ID( $larry_user_ID ) );
 	task_end();
 
-	task_begin('Creating demo mary user... ');
-	$mary_user_ID = create_user( array(
-			'login'     => 'mary',
-			'firstname' => 'Mary',
-			'lastname'  => 'Jones',
+	task_begin('Creating demo user kate... ');
+	$kate_user_ID = create_user( array(
+			'login'     => 'kate',
+			'firstname' => 'Kate',
+			'lastname'  => 'Adams',
 			'level'     => 0,
 			'gender'    => 'F',
 			'Group'     => $Group_Users,
@@ -1422,11 +1450,12 @@ function create_demo_contents()
 					'About me' => 'Just me!',
 				)
 		) );
+	assign_profile_picture( $UserCache->get_by_ID( $kate_user_ID ) );
 	task_end();
 
 	// Use only these users to create the demo comments, @see create_demo_comment()
 	global $b2evo_demo_comment_users;
-	$b2evo_demo_comment_users = array( $bart_user_ID, $mary_user_ID, 0 );
+	$b2evo_demo_comment_users = array( $larry_user_ID, $kate_user_ID, 0 );
 
 	task_begin( 'Set settings for demo users... ' );
 	$DB->query( "
@@ -1497,7 +1526,7 @@ function create_demo_contents()
 			$blog_home_access_type,
 			true,
 			'never',
-			$larry_blogger_ID );
+			$jay_moderator_ID );
 
 		if( ! empty( $blog_home_ID ) )
 		{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
@@ -1524,7 +1553,7 @@ function create_demo_contents()
 			$blog_a_access_type,
 			true,
 			'public',
-			$larry_blogger_ID );
+			$jay_moderator_ID );
 		$BlogCache = & get_BlogCache();
 		if( $Blog_a = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
 		{
@@ -1551,7 +1580,7 @@ function create_demo_contents()
 			$blog_b_access_type,
 			true,
 			'public',
-			$kate_blogger_ID );
+			$paul_blogger_ID );
 	}
 
 	if( $install_collection_photos )
@@ -1569,7 +1598,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 			4, // Skin ID
 			'photo', '', 0, 'relative', true, 'public',
-			$larry_blogger_ID );
+			$dave_blogger_ID );
 	}
 
 	if( $install_collection_forums )
@@ -1584,7 +1613,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			5, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
-			$larry_blogger_ID );
+			$paul_blogger_ID );
 	}
 
 	if( $install_collection_manual )
@@ -1599,7 +1628,7 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			6, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
-			$larry_blogger_ID );
+			$dave_blogger_ID );
 	}
 
 	$BlogCache = & get_BlogCache();

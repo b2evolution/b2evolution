@@ -746,10 +746,8 @@ class tinymce_plugin extends Plugin
 
 		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete' );
 
-		// Requires cURL extension since fsockopen + ssl produce fatal error
-		// if PHP configured without openSSL
-		if( extension_loaded('curl') )
-		{
+		if( function_exists( 'enchant_broker_init' ) )
+		{ // Requires Enchant spelling library
 			$tmce_plugins_array[] = 'spellchecker';
 		}
 
@@ -852,10 +850,8 @@ class tinymce_plugin extends Plugin
 				$tmce_theme_advanced_buttons3_array[] = 'pastetext';
 			}
 
-			// Requires cURL extension since fsockopen + ssl produce fatal error
-			// if PHP configured without openSSL
-			if( extension_loaded('curl') )
-			{
+			if( function_exists( 'enchant_broker_init' ) )
+			{ // Requires Enchant spelling library
 				$tmce_theme_advanced_buttons3_array[] = 'spellchecker';
 			}
 
@@ -920,6 +916,10 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'resize : true';
 		$init_options[] = 'language : "'.$tmce_language.'"';
 		$init_options[] = 'language_url : "'.$rsc_url.'js/tiny_mce/langs/'.$tmce_language.'.js"';
+		if( function_exists( 'enchant_broker_init' ) )
+		{ // Requires Enchant spelling library
+			$init_options[] = 'spellchecker_rpc_url: \'spellchecker.php\'';
+		}
 		// body_class : "my_class"
 		// CSS used in the iframe/editable area: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/content_css
 		// note: $version may not be needed below because of automatic suffix? not sure..

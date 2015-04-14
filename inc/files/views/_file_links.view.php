@@ -125,9 +125,13 @@ if( $mode != 'upload' )
 }
 
 if( $LinkOwner->check_perm( 'edit' ) )
-{	// Check that we have permission to edit item:
-	echo '<div class="center">', $LinkOwner->translate( 'Click on link %s icons below to link additional files to $xxx$.',
-							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), '</div>';
+{ // Check that we have permission to edit item:
+	global $Messages;
+
+	$Messages->add( $LinkOwner->translate( 'Click on link %s icons below to link additional files to $xxx$.',
+							get_icon( 'link', 'imgtag', array('class'=>'top') ) ), 'note' );
+
+	$Messages->display();
 }
 
 ?>

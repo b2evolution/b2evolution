@@ -6871,7 +6871,7 @@ function echo_modalwindow_js()
 	{ // Use the modal functions from back-office skin
 		$skin_modal_window_js_func = $AdminUI->get_template( 'modal_window_js_func' );
 	}
-	elseif( ! empty( $Blog ) )
+	elseif( ! is_admin_page() && ! empty( $Blog ) )
 	{ // Use the modal functions from front-office skin
 		$blog_skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();

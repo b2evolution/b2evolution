@@ -76,23 +76,28 @@ if( isset( $edited_User ) )
 		$close_link_params['onclick'] = 'return closeModalWindow( window.parent.document )';
 	}
 
-	if( ! empty( $LinkOwner ) )
-	{ // Get an url to return to owner(post/comment) editing
-		$icon_close_url = $LinkOwner->get_edit_url();
-	}
-	elseif( get_param( 'mode' ) == 'import' )
-	{ // Get an url to return to WordPress Import page
-		global $admin_url;
-		$icon_close_url = $admin_url.'?ctrl=wpimportxml';
-	}
-	else
-	{ // Unknown case, leave empty url
-		$icon_close_url = '';
-	}
+	global $mode, $AdminUI;
 
-	if( ! empty( $icon_close_url ) || ! empty( $close_link_params ) )
-	{ // Display a link to close file browser
-		$Widget->global_icon( T_('Close file manager'), 'close', $icon_close_url, '', 3, 2, $close_link_params );
+	if( $mode != 'upload' || $AdminUI->skin_name != 'bootstrap' )
+	{ // Don't display a close icon, because it is already displayed on bootstrap modal window header
+		if( ! empty( $LinkOwner ) )
+		{ // Get an url to return to owner(post/comment) editing
+			$icon_close_url = $LinkOwner->get_edit_url();
+		}
+		elseif( $mode == 'import' )
+		{ // Get an url to return to WordPress Import page
+			global $admin_url;
+			$icon_close_url = $admin_url.'?ctrl=wpimportxml';
+		}
+		else
+		{ // Unknown case, leave empty url
+			$icon_close_url = '';
+		}
+
+		if( ! empty( $icon_close_url ) || ! empty( $close_link_params ) )
+		{ // Display a link to close file browser
+			$Widget->global_icon( T_('Close file manager'), 'close', $icon_close_url, '', 3, 2, $close_link_params );
+		}
 	}
 
 	$Widget->title = T_('File browser').get_manual_link('file_browser');

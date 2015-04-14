@@ -566,7 +566,7 @@ class Plugin
 			return array();
 		}
 
-		$render_note = get_manual_link('Plugin/apply_rendering');
+		$render_note = $this->get_help_link( '$apply_rendering' );
 		if( empty( $this->code ) )
 		{
 			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
@@ -612,7 +612,7 @@ class Plugin
 			return array();
 		}
 
-		$render_note = get_manual_link('plugin-apply-rendering');
+		$render_note = $this->get_help_link( '$apply_rendering' );
 		if( empty( $this->code ) )
 		{
 			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
@@ -3190,6 +3190,7 @@ class Plugin
 	 *         - anchor to {@link $help_url} ("#anchor")
 	 *         - absolute link to some URL, e.g. "http://example.com/example.php"
 	 *         - '$help_url' or empty for {@link $help_url}, then also the "www" icon gets used
+	 *         - '$apply_rendering' - url to manual page about "Plugin / Apply Rendering"
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
 	function get_help_link( $target = '' )
@@ -3200,9 +3201,16 @@ class Plugin
 		$word = '';
 		$link_attribs = array( 'target' => '_blank', 'id'=>'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
 
-		if( $target == '$help_url' || empty($target) )
+		if( $target == '$help_url' || $target == '$apply_rendering' || empty( $target ) )
 		{
-			$url = $this->get_help_url();
+			if( $target == '$apply_rendering' )
+			{ // Url to info about plugin apply rendering options
+				$url = get_manual_url( 'plugin-apply-rendering' );
+			}
+			else
+			{ // Url to current plugin info
+				$url = $this->get_help_url();
+			}
 			$title = T_('Homepage of the plugin');
 			$icon = 'help';
 			$link_attribs['class'] = 'action_icon help_plugin_icon';
