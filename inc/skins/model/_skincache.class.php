@@ -154,7 +154,8 @@ class SkinCache extends DataObjectCache
 		{
 			global $skins_path;
 			require_once( $skins_path.$skin_folder.'/_skin.class.php' );
-			$objtype = $skin_folder.'_Skin';
+			$short_skin_folder = preg_replace( '/_skin$/', '', $skin_folder ); // Remove '_skin' suffix
+			$objtype = $short_skin_folder.'_Skin';
 			if( ! class_exists($objtype) )
 			{
 				debug_die( 'There seems to be a _skin.class.php file in the skin directory ['.$skin_folder.'], but it does not contain a properly named class. Expected class name is: '.$objtype );
