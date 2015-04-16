@@ -2,14 +2,8 @@
 /**
  * This file is the template that displays an access denied for non-members
  *
- * This skin only uses one single template which includes most of its features.
- * It will also rely on default includes for specific dispays (like the comment form).
- *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-structure}
- *
- * The main page template is used to display the blog when no specific page template is available
- * to handle the request (based on $disp).
  *
  * @package evoskins
  * @subpackage bootstrap
@@ -17,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $skin_links, $francois_links;
+global $app_version, $disp, $Blog;
 
 if( version_compare( $app_version, '5.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
@@ -109,13 +103,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
 
-	<?php
-		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-		skin_include( '$disp$' );
-		// Note: you can customize any of the sub templates included here by
-		// copying the matching php file into your skin directory.
-		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
-	?>
+			<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>
 
 		</div>
 	</div>

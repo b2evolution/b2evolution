@@ -365,7 +365,9 @@ echo_modalwindow_js();
 // Ban comment url
 function ban_url( authorurl )
 {
-	openModalWindow( '<span class="loader_img loader_ban_url absolute_center" title="<?php echo T_('Loading...'); ?>"></span>', '90%', '', false, '', false );
+	openModalWindow( '<span class="loader_img loader_ban_url absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+			'90%', '', true, '<?php echo TS_('Confirm ban & delete'); ?>',
+			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ] );
 	jQuery.ajax({
 		type: 'POST',
 		url: '<?php echo $admin_url; ?>',
@@ -380,7 +382,8 @@ function ban_url( authorurl )
 			},
 		success: function(result)
 		{
-			openModalWindow( result, '90%', '', false, '', false );
+			openModalWindow( result, '90%', '', true, '<?php echo TS_('Confirm ban & delete'); ?>',
+					[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ] );
 		}
 	});
 }

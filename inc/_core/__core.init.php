@@ -1298,10 +1298,9 @@ class _core_Module extends Module
 			$perm_options = $current_User->check_perm( 'options', 'view' );
 			$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
 			$perm_emails = $current_User->check_perm( 'emails', 'view' );
-			$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
 			$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
 
-			if( $perm_spam || $perm_options || $perm_slugs || $perm_maintenance )
+			if( $perm_spam || $perm_options || $perm_maintenance )
 			{
 				$entries['tools']['entries'][] = array( 'separator' => true );
 
@@ -1360,14 +1359,6 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=antispam',
 						);
 				}
-
-				if( $perm_slugs )
-				{
-					$entries['tools']['entries']['system']['entries']['slugs'] = array(
-							'text' => T_('Slugs').'&hellip;',
-							'href' => $admin_url.'?ctrl=slugs'
-						);
-				}
 			}
 
 
@@ -1381,6 +1372,10 @@ class _core_Module extends Module
 						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
 					);
+				$entries['tools']['entries']['system']['entries']['skins'] = array(
+						'text' => T_('Skins').'&hellip;',
+						'href' => $admin_url.'?ctrl=skins&amp;tab=system'
+					);
 				$entries['tools']['entries']['system']['entries']['plugins'] = array(
 						'text' => T_('Plugins').'&hellip;',
 						'href' => $admin_url.'?ctrl=plugins',
@@ -1392,6 +1387,10 @@ class _core_Module extends Module
 				$entries['tools']['entries']['system']['entries']['maintenance'] = array(
 						'text' => T_('Maintenance').'&hellip;',
 						'href' => $admin_url.'?ctrl=tools',
+					);
+				$entries['tools']['entries']['system']['entries']['syslog'] = array(
+						'text' => T_('System log'),
+						'href' => '?ctrl=syslog',
 					);
 			}
 		}

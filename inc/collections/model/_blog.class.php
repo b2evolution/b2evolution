@@ -3150,10 +3150,6 @@ class Blog extends DataObject
 		{ // Current user has no access to current page
 			$Messages->add( T_( $error_message ), 'error' );
 
-			// Hide widget container "Menu"
-			global $hide_widget_container_menu;
-			$hide_widget_container_menu = true;
-
 			if( ( ! is_logged_in() && $this->get_setting( 'in_skin_login' ) && ! get_setting_Blog( 'login_blog_ID' ) ) ||
 			    ( is_logged_in() && isset( $template ) ) )
 			{ // If blog has in-skin login form we should not display it

@@ -5,7 +5,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @package skins
+ * @package evoskins
  * @subpackage colourise
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );

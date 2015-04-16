@@ -28,6 +28,11 @@ global $dummy_fields;
 </noscript>
 
 <div id="wptouch-menu" class="dropper">
+	<?php
+	global $hide_widget_container_menu;
+	if( empty( $hide_widget_container_menu ) )
+	{ // Display this widget container only when it is not disabled
+	?>
 	<div class="wptouch-menu-inner" rel="blog">
 		<div id="menu-head">
 			<div id="tabnav">
@@ -87,6 +92,7 @@ global $dummy_fields;
 			?>
 		</div>
 	</div>
+	<?php } ?>
 
 	<?php
 		if( is_logged_in() )
@@ -111,7 +117,12 @@ global $dummy_fields;
 		<a href="<?php echo $Blog->get( 'url', 'raw' ); ?>"><?php echo $Blog->dget( 'name', 'htmlbody' ); ?></a>
 	</div>
 	<div id="headerbar-menu">
+		<?php
+		if( empty( $hide_widget_container_menu ) )
+		{ // Display this widget container only when it is not disabled
+		?>
 		<div rel="blog"><?php echo T_( 'Menu' ); ?></div>
+		<?php } ?>
 		<?php
 		if( is_logged_in() )
 		{ // Display user menu

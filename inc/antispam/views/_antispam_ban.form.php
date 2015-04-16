@@ -17,10 +17,41 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $current_User;
+global $Settings, $current_User, $display_mode;
 global $keyword;
 
 global $row_stats;	// for hit functions
+
+
+$Form = new Form( NULL, 'antispam_add', 'post', 'compact' );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keyword') );
+	$Form->add_crumb('antispam');
+	$Form->hidden_ctrl();
+	$Form->hidden( 'action', 'ban' );
+
+	$button = array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' );
+	if( $display_mode == 'js' )
+	{
+		$Form->output = false;
+		$button_html = $Form->button( $button );
+		$Form->output = true;
+	}
+	else
+	{
+		$button_html = '';
+	}
+
+	$Form->text_input( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', array( 'maxlength' => 80, 'input_suffix' => $button_html ) ); // TODO: add note
+	/*
+	 * TODO: explicitly add a domain?
+	 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
+	 */
+	if( $display_mode != 'js' )
+	{
+		$Form->buttons( array( $button ) );
+	}
+$Form->end_form( );
+
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
@@ -32,7 +63,7 @@ if( $redirect_to == NULL )
 
 $Form->global_icon( T_('Cancel!'), 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
 
-$Form->begin_form( 'fform',  T_('Confirm ban & delete') );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delete') );
 
 	$Form->add_crumb( 'antispam' );
 	$Form->hidden_ctrl();
@@ -241,23 +272,16 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		}
 	}
 
-	$Form->buttons( array(
-		array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton btn-danger' ),
-	) );
+	$button = array( '', 'actionArray[ban]', T_('Perform selected operations'), 'DeleteButton btn-danger' );
+	if( $display_mode == 'js' )
+	{
+		$Form->button( $button );
+	}
+	else
+	{
+		$Form->buttons( array( $button ) );
+	}
 
 $Form->end_form();
-
-
-$Form = new Form( NULL, 'antispam_add', 'post', 'compact' );
-$Form->begin_form( 'fform', T_('Add a banned keyword') );
-	$Form->add_crumb('antispam');
-	$Form->hidden_ctrl();
-	$Form->hidden( 'action', 'ban' );
-	$Form->text( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', 80 ); // TODO: add note
-	/*
-	 * TODO: explicitly add a domain?
-	 * $add_Form->text( 'domain', $domain, 30, T_('Add a banned domain'), 'note..', 80 ); // TODO: add note
-	 */
-$Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' ) ) );
 
 ?>

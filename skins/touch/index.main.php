@@ -9,7 +9,7 @@
  * to handle the request (based on $disp).
  *
  * @package evoskins
- * @subpackage clean1
+ * @subpackage touch
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

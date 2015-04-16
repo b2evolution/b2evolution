@@ -2471,7 +2471,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 				echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
 				echo '</div>';
 			}
-			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ', true );
+			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ', true, true );
 			$Comment->ip_country( '', ' &middot; ' );
 			$Comment->author_url_with_actions( /*$redirect_to*/'', true, true );
 		}

@@ -855,7 +855,7 @@ class tinymce_plugin extends Plugin
 				$tmce_theme_advanced_buttons3_array[] = 'spellchecker';
 			}
 
-			$tmce_theme_advanced_buttons3_array[] = 'code | help';
+			$tmce_theme_advanced_buttons3_array[] = 'code';
 
 			/* ----------- button row 4 ------------ */
 

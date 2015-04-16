@@ -81,11 +81,6 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	</div>
 
-<?php
-global $hide_widget_container_menu;
-if( empty( $hide_widget_container_menu ) )
-{ // Display this widget container only when it is not disabled
-?>
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs">
@@ -112,7 +107,6 @@ if( empty( $hide_widget_container_menu ) )
 			</ul>
 		</div>
 	</div>
-<?php } ?>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">

@@ -1048,10 +1048,11 @@ class Comment extends DataObject
 	 *                TRUE|'filter' - create an url to filter by IP
 	 *                'antispam' - to antispam page with filtered by the IP
 	 *                FALSE - display IP as plain text without link
+	 * @param boolean TRUE to display a link to antispam ip page
 	 */
-	function author_ip( $before = '', $after = '', $IP_link_to = false )
+	function author_ip( $before = '', $after = '', $IP_link_to = false, $display_antispam_link = false )
 	{
-		if( !empty( $this->author_IP ) )
+		if( ! empty( $this->author_IP ) )
 		{
 			global $Plugins, $CommentList;
 
@@ -1067,11 +1068,19 @@ class Comment extends DataObject
 			}
 
 			echo $before;
+
 			// Filter the IP by plugins for display, allowing e.g. the DNSBL plugin to add a link that displays info about the IP:
 			echo $Plugins->get_trigger_event( 'FilterIpAddress', array(
 					'format'=>'htmlbody',
 					'data' => $author_IP ),
 				'data' );
+
+			if( $display_antispam_link )
+			{ // Display a link to antispam ip page
+				$antispam_icon = get_icon( 'lightning', 'imgtag', array( 'title' => T_( 'Go to edit this IP address in antispam control panel' ) ) );
+				echo ' '.implode( ', ', get_linked_ip_list( array( $this->author_IP ), NULL, $antispam_icon ) );
+			}
+
 			echo $after;
 		}
 	}

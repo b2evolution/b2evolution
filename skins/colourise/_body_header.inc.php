@@ -8,7 +8,7 @@
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
  *
- * @package colourise
+ * @package evoskins
  * @subpackage colourise
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );

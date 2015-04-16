@@ -130,11 +130,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 
-		<?php
-		global $hide_widget_container_menu;
-		if( empty( $hide_widget_container_menu ) )
-		{ // Display this widget container only when it is not disabled
-		?>
 			<div class="header_right">
 				<ul class="top_menu">
 		<?php
@@ -172,7 +167,6 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 				</ul>
 			</div>
-		<?php } ?>
 			<div class="clear"></div>
 		</div>
 	</div>

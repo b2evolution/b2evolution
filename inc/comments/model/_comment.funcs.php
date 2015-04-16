@@ -1339,9 +1339,20 @@ function get_author_ip( $Comment, $param_prefix = '' )
 
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
-		$filter_IP_url = regenerate_url( 'filter', $param_prefix.'author_IP='.$Comment->get( 'author_IP' ) );
-		$country = $Comment->get_ip_country( ' ' );
-		return '<a href="'.$filter_IP_url.'">'.$Comment->get( 'author_IP' ).'</a>'.$country;
+		if( empty( $Comment->author_IP ) )
+		{
+			return '';
+		}
+		else
+		{
+			$antispam_icon = get_icon( 'lightning', 'imgtag', array( 'title' => T_( 'Go to edit this IP address in antispam control panel' ) ) );
+			$antispam_link = ' '.implode( ', ', get_linked_ip_list( array( $Comment->author_IP ), NULL, $antispam_icon ) );
+
+			$filter_IP_url = regenerate_url( 'filter', $param_prefix.'author_IP='.$Comment->get( 'author_IP' ) );
+			$country = $Comment->get_ip_country( ' ' );
+
+			return '<a href="'.$filter_IP_url.'">'.$Comment->get( 'author_IP' ).'</a>'.$antispam_link.$country;
+		}
 	}
 	else
 	{
