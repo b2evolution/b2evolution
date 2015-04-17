@@ -12,8 +12,5 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $app_version, $disp, $Blog, $skin_links, $francois_links;
 
-// Display in-skin login form
-$disp = 'login';
-
 require $ads_current_skin_path.'index.main.php';
 ?>

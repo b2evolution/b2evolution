@@ -14,10 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $app_version, $disp, $hide_widget_container_menu;
 
 
-// Display in-skin login form
-$disp = 'login';
-
-
 // Hide the widget container "Menu"
 $hide_widget_container_menu = true;
 

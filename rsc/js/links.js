@@ -21,9 +21,9 @@ function evo_display_position_onchange( selectInput, url, crumb )
 		if( r == "OK" ) {
 			evoFadeSuccess( jQuery(oThis.form).closest('tr') );
 			jQuery(oThis.form).closest('td').removeClass('error');
-			if( new_position == 'albumart')
-			{ // Position "Album Art" can be used only by one link
-				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=albumart]:selected' ).each( function()
+			if( new_position == 'cover' )
+			{ // Position "Cover" can be used only by one link
+				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
 				{ // Replace previous position with "Inline"
 					jQuery( this ).parent().val( 'aftermore' );
 					evoFadeSuccess( jQuery( this ).closest('tr') );

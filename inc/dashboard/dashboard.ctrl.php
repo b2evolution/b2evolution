@@ -263,11 +263,11 @@ if( $blog )
 					'after'               => '</div>',
 					'image_size'          => 'crop-80x80',
 					'limit'               => 1,
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'albumart'
-					'restrict_to_image_position' => 'albumart,teaser,teaserperm,teaserlink,aftermore,inline',
-					// Sort the attachments to get firstly "Album Art", then "Teaser", and "After more" as last order
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'cover'
+					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 					'links_sql_select'    => ', CASE '
-							.'WHEN link_position = "albumart"   THEN "1" '
+							.'WHEN link_position = "cover"      THEN "1" '
 							.'WHEN link_position = "teaser"     THEN "2" '
 							.'WHEN link_position = "teaserperm" THEN "3" '
 							.'WHEN link_position = "teaserlink" THEN "4" '

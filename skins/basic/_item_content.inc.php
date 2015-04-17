@@ -24,8 +24,8 @@ $Item->images( array(
 		'after_image' =>         '</td></tr>',
 		'after' =>               '</table>',
 		'image_size' =>          'fit-400x320',
-		// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-		'restrict_to_image_position' => $Item->has_content_parts($params) ? 'teaser,teaserperm,teaserlink' : '',
+		// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+		'restrict_to_image_position' => $Item->has_content_parts($params) ? 'cover,teaser,teaserperm,teaserlink' : '',
 	) );
 ?>
 
@@ -48,7 +48,7 @@ $Item->images( array(
 					'after_image' =>         '</td></tr>',
 					'after' =>               '</table>',
 					'image_size' =>          'fit-400x320',
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 					'restrict_to_image_position' => 'aftermore',
 				) );
 		}

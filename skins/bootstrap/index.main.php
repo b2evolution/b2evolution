@@ -114,7 +114,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' style="float:right;"' : '' ); ?>>
 
 	<?php
-	if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo' ) ) )
+	if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
 	{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 		messages( array(

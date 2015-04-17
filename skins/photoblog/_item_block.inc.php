@@ -52,8 +52,8 @@ $params = array_merge( array(
 				 * crop-15x15
 				 * See also the $thumbnail_sizes array in conf/_advanced.php.
 				 */
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
 			) );
 	?>
 
@@ -121,7 +121,7 @@ $params = array_merge( array(
 					'after_image' =>         '</div>',
 					'after' =>               '</div>',
 					'image_size' =>          'fit-520x390',
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 					'restrict_to_image_position' => 'aftermore',
 				) );
 		?>

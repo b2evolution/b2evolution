@@ -1,6 +1,6 @@
 # b2evolution CCMS
 
-This is version **6.2.2-alpha** (from the so-called "i7" branch).
+This is version **6.3.0-alpha** (from the so-called "i7" branch).
 
 ## A complete engine for your website !
 

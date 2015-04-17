@@ -52,6 +52,7 @@ $params = array_merge( array(
 		'excerpt_image_size'       => 'fit-80x80',
 		'excerpt_image_limit'      => 1,
 		'excerpt_image_link_to'    => 'single',
+		'include_cover_images'     => true,
 
 		'before_gallery'           => '<div class="bGallery">',
 		'after_gallery'            => '</div>',
@@ -136,6 +137,15 @@ if( $content_mode == 'auto' )
 	}
 }
 
+if( $params['include_cover_images'] )
+{ // Include the cover images on teaser place
+	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
+}
+else
+{ // Don't include the cover images
+	$teaser_image_positions = 'teaser,teaserperm,teaserlink';
+}
+
 switch( $content_mode )
 {
 	case 'excerpt':
@@ -162,8 +172,8 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
 
@@ -207,8 +217,8 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink',
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
 
@@ -269,7 +279,7 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}

@@ -19,9 +19,6 @@ if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
 }
 
 
-// Display in-skin login form
-$disp = 'login';
-
 /**
  * @var string Name of cookie for skin width
  */

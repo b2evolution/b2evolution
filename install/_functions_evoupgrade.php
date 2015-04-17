@@ -5874,7 +5874,25 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11375' );
+		set_upgrade_checkpoint( '11375' );
+	}
+
+	if( $old_db_version < 11380 )
+	{ // part 18.h trunk aka 10th part of "i7"
+
+		task_begin( 'Update links table... ' );
+		$DB->query( 'UPDATE T_links
+			  SET link_position = "cover"
+			WHERE link_position = "albumart"' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11380' );
 	}
 
 	/*

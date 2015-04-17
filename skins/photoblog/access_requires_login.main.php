@@ -18,8 +18,6 @@ if( version_compare( $app_version, '3.0' ) < 0 )
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-// Display in-skin login form
-$disp = 'login';
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:

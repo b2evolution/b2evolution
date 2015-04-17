@@ -139,14 +139,14 @@ switch( $action )
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'albumart' && $LinkOwner->type == 'item' )
-			{ // Position "Album Art" can be used only by one link
+			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			{ // Position "Cover" can be used only by one link
 			  // Replace previous position with "Inline"
 				$DB->query( 'UPDATE T_links
 						SET link_position = "aftermore"
 					WHERE link_ID != '.$DB->quote( $link_ID ).'
 						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
-						AND link_position = "albumart"' );
+						AND link_position = "cover"' );
 			}
 		}
 		else

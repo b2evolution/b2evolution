@@ -19,9 +19,6 @@ if( version_compare( $app_version, '5.0' ) < 0 )
 }
 
 
-// Display in-skin login form
-$disp = 'login';
-
 // Hide the widget container "Menu"
 $hide_widget_container_menu = true;
 

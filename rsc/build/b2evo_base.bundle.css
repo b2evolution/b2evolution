@@ -941,7 +941,7 @@ div.avatartag.main > img:first-child {
   max-height: 320px;
 }
 div#evo_toolbar {
-  background-color: #f5f5f5;
+  background-color: #d2d2d2;
   color: ButtonText;
   border-bottom: 1px solid #ddd;
   text-align: left;
@@ -1049,15 +1049,15 @@ div#evo_toolbar .actions_right {
 .evobar-menu a {
   display: inline-block;
   position: relative;
-  background-color: #f4f4f4;
+  background-color: #d2d2d2;
+  -webkit-transition: background 0.15s ease-out;
+  -o-transition: background 0.15s ease-out;
+  transition: background 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
   min-height: 14px;
   line-height: 14px;
   color: #4f4f4f;
-  -webkit-transition: background 0.15s ease-out;
-  -o-transition: background 0.15s ease-out;
-  transition: background 0.15s ease-out;
 }
 .evobar-menu a:hover,
 .evobar-menu a:link,
@@ -1065,7 +1065,7 @@ div#evo_toolbar .actions_right {
   color: #4f4f4f;
 }
 .evobar-menu a:hover {
-  background: #e7e7e7;
+  background-color: #bfbfbf;
   -webkit-transition: none;
   -o-transition: none;
   transition: none;

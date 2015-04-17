@@ -1098,6 +1098,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_usercomments'   => '_usercomments.disp.php',
 				'disp_download'       => '_download.disp.php',
 				'disp_access_denied'  => '_access_denied.disp.php',
+				'disp_access_requires_login' => '_access_requires_login.disp.php',
 			);
 
 		// Add plugin disp handlers:

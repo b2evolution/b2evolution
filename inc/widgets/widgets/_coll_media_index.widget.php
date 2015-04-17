@@ -236,7 +236,7 @@ class coll_media_index_Widget extends ComponentWidget
 		}
 		$ItemQuery->WHERE_and( '( file_type = "image" ) OR ( file_type IS NULL )' );
 		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
-		$ItemQuery->WHERE_and( 'link_position != "albumart"' );
+		$ItemQuery->WHERE_and( 'link_position != "cover"' );
 		if( !empty( $this->disp_params['item_type'] ) )
 		{ // Get items only with specified type
 			$ItemQuery->WHERE_and( 'post_ityp_ID = '.intval( $this->disp_params['item_type'] ) );

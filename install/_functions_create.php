@@ -1856,16 +1856,6 @@ function create_demo_contents()
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
-		$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
-
-<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
-		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
-		$LinkOwner = new LinkItem( $edited_Item );
-		$edit_File->link_to_Object( $LinkOwner );
-
-		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
@@ -1901,6 +1891,27 @@ function create_demo_contents()
 	.'[teaserbreak]
 
 '.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').$lorem_2more, $now, $cat_bg );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
+		$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
+		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
+
+		// Insert a post:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
+
+<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
+		$LinkOwner = new LinkItem( $edited_Item );
+		$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
+		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
+		$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
+		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);

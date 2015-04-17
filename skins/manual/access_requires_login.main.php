@@ -22,10 +22,6 @@ if( version_compare( $app_version, '5.0' ) < 0 )
 // Hide the widget container "Menu"
 $hide_widget_container_menu = true;
 
-// Display in-skin login form
-$disp = 'login';
-
-
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );

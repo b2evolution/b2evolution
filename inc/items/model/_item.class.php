@@ -2651,7 +2651,7 @@ class Item extends ItemLight
 				'gallery_image_limit'        => 1000,
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
-				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
@@ -2773,10 +2773,52 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get URL of a first cover image
+	 *
+	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 */
+	function get_cover_image_url()
+	{
+		$LinkOwner = new LinkItem( $this );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' ) )
+		{ // No cover image
+			return NULL;
+		}
+
+		if( $Link = & $LinkList->get_next() )
+		{
+			if( ! ( $File = & $Link->get_File() ) )
+			{ // No File object
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				return NULL;
+			}
+
+			if( ! $File->exists() )
+			{ // File doesn't exist
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				return NULL;
+			}
+
+			if( ! $File->is_image() )
+			{ // Skip anything that is not an image
+				return NULL;
+			}
+
+			// Return URL when a cover image really exists for this post
+			return $File->get_url();
+		}
+
+		return NULL;
+	}
+
+
+	/**
 	 * Get a number of images linked to the current Item
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
+	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 	 *               Use comma as separator
 	 * @param integer Number of images
 	 */
@@ -2826,8 +2868,8 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'albumart'
-				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore',
 				'data'                       => '',
 				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
 				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$

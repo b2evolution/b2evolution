@@ -3129,6 +3129,7 @@ class Blog extends DataObject
 			$error_message = NT_('You need to log in before you can access this collection.');
 			$template = 'access_requires_login.main.php';
 			$has_access = false;
+			$disp = 'access_requires_login';
 			// Don't use site skin if template doesn't exist, User will be redirect to standard login form instead
 			$use_site_skin = false;
 		}

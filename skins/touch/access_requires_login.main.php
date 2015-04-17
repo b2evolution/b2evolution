@@ -18,8 +18,6 @@ if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-// Display in-skin login form
-$disp = 'login';
 
 // Hide the widget container "Menu"
 $hide_widget_container_menu = true;

@@ -68,26 +68,29 @@ class LinkItem extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		$additional_positions = array();
+		$positions = array(
+				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
+				'teaser'     => T_('Teaser'),
+				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink
+				'teaserperm' => T_('Teaser-Permalink'),
+				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to external link
+				'teaserlink' => T_('Teaser-Ext Link'),
+				// TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator
+				'aftermore'  => T_('After "more"'),
+				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
+				'inline'     => T_('Inline'),
+				// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
+				'fallback'   => T_('Fallback'),
+			);
 
-		if( $this->Item && ( $item_Blog = & $this->Item->get_Blog() ) !== NULL && $item_Blog->get( 'type' ) == 'photo' )
-		{ // Only images of the photo blogs can have this position
-
-			$FileCache = & get_FileCache();
-			if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
-			{ // Must be image
-				$additional_positions['albumart'] = T_('Album Art');
-			}
+		$FileCache = & get_FileCache();
+		if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
+		{ // Only images can have this position
+			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
+			$positions['cover'] = T_('Cover');
 		}
 
-		return array_merge( array(
-				'teaser'     => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content */ T_( 'Teaser' ),
-				'teaserperm' => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink */ T_( 'Teaser-Permalink' ),
-				'teaserlink' => /* TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to external link */ T_( 'Teaser-Ext Link' ),
-				'aftermore'  => /* TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator */ T_( 'After "more"' ),
-				'inline'     => /* TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text */ T_( 'Inline' ),
-				'fallback'   => /* TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file */ T_( 'Fallback' ),
-			), $additional_positions );
+		return $positions;
 	}
 
 	/**
