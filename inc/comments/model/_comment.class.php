@@ -833,6 +833,9 @@ class Comment extends DataObject
 	/**
 	 * Template function: display the avatar of the comment's author.
 	 *
+	 * @param string
+	 * @param string class for the img tag
+	 * @param array
 	 */
 	function avatar( $size = 'crop-top-64x64', $class = 'bCommentAvatar', $params = array() )
 	{
@@ -951,9 +954,9 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'profile_tab'  => 'user',
 				'before'       => ' ',
-				'after'        => '#',
+				'after'        => '#',	// After anonymous user
 				'before_user'  => '',
-				'after_user'   => '#',
+				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
 				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
@@ -986,7 +989,7 @@ class Comment extends DataObject
 
 		if( $this->get_author_User() )
 		{ // Author is a registered user:
-			if( $params['after_user'] == '#' ) $params['after_user'] = ' ['.T_('Member').']';
+			if( $params['after_user'] == '#' ) $params['after_user'] = ' <span class="bUser-member-tag">['.T_('Member').']</span>';
 
 			$r = $this->author_User->get_identity_link( $params );
 
@@ -994,7 +997,7 @@ class Comment extends DataObject
 		}
 		else
 		{ // Not a registered user, display info recorded at edit time:
-			if( $params['after'] == '#' ) $params['after'] = ' ['.T_('Visitor').']';
+			if( $params['after'] == '#' ) $params['after'] = ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>';
 
 			if( utf8_strlen( $this->author_url ) <= 10 )
 			{ // URL is too short anyways...
@@ -3754,13 +3757,17 @@ class Comment extends DataObject
 	 * Trigger event AfterCommentDelete after calling parent method.
 	 *
 	 * @param boolean set true to force permanent delete, leave false otherwise
+	 * @param boolean TRUE to use transaction
 	 * @return boolean true on success
 	 */
-	function dbdelete( $force_permanent_delete = false )
+	function dbdelete( $force_permanent_delete = false, $use_transaction = true )
 	{
 		global $Plugins, $DB;
 
-		$DB->begin();
+		if( $use_transaction )
+		{
+			$DB->begin();
+		}
 
 		$was_published = $this->is_published();
 		if( $this->status != 'trash' )
@@ -3801,11 +3808,17 @@ class Comment extends DataObject
 			{ // Update last touched date of item if a published comment was deleted
 				$this->update_last_touched_date();
 			}
-			$DB->commit();
+			if( $use_transaction )
+			{
+				$DB->commit();
+			}
 		}
 		else
 		{
-			$DB->rollback();
+			if( $use_transaction )
+			{
+				$DB->rollback();
+			}
 		}
 
 		return $r;

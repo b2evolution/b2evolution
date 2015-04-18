@@ -105,6 +105,7 @@ class UserList extends DataObjectList2
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
 				'order'               => '-D',    // Order
 				'users'               => array(), // User IDs
+				'org'                 => NULL,    // integer, Organization ID
 		) );
 	}
 
@@ -215,6 +216,11 @@ class UserList extends DataObjectList2
 			 */
 			memorize_param( 'age_min', 'integer', $this->default_filters['age_min'], $this->filters['age_min'] );
 			memorize_param( 'age_max', 'integer', $this->default_filters['age_max'], $this->filters['age_max'] );
+
+			/*
+			 * Restrict by organization
+			 */
+			memorize_param( 'org', 'integer', $this->default_filters['org'], $this->filters['org'] );
 
 			/*
 			 * Restrict by user fields
@@ -381,6 +387,11 @@ class UserList extends DataObjectList2
 		}
 		$this->filters['userfields'] = $userfields;
 
+		/*
+		 * Restrict by organization ID
+		 */
+		$this->filters['org'] = param( 'org', 'integer', $this->default_filters['org'], true );
+
 		// 'paged'
 		$this->page = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 
@@ -471,6 +482,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_location( 'city', $this->filters['city'] );
 		$this->UserQuery->where_age_group( $this->filters['age_min'], $this->filters['age_max'] );
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
+		$this->UserQuery->where_organization( $this->filters['org'] );
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;

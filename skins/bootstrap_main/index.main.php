@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8716 2015-04-09 13:49:19Z yura $
+	 * @version $Id: index.main.php 8793 2015-04-18 02:35:27Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -203,16 +203,18 @@ if( $disp != 'front' )
 			skin_include( '_item_block.inc.php', array(
 					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
 					// Comment template
-					'comment_start'         => '<div class="panel panel-default">',
+					'comment_start'         => '<div class="evoComment panel panel-default">',
 					'comment_end'           => '</div>',
-					'comment_title_before'  => '<div class="panel-heading">',
-					'comment_title_after'   => '',
-					'comment_rating_before' => '<div class="comment_rating floatright">',
+					'comment_title_before'  => '<div class="panel-heading"><h4 class="evoComment-title panel-title">',
+					'comment_title_after'   => '</h4></div><div class="panel-body">',
+					'comment_avatar_before' => '<div class="evoComment-avatar">',
+					'comment_avatar_after'  => '</div>',
+					'comment_rating_before' => '<div class="evoComment-rating">',
 					'comment_rating_after'  => '</div>',
-					'comment_text_before'   => '</div><div class="panel-body">',
-					'comment_text_after'    => '',
-					'comment_info_before'   => '<div class="bCommentSmallPrint">',
-					'comment_info_after'    => '</div></div>',
+					'comment_text_before'   => '<div class="evoComment-text">',
+					'comment_text_after'    => '</div>',
+					'comment_info_before'   => '<div class="evoComment-info clear text-muted"><small>',
+					'comment_info_after'    => '</small></div></div>',
 					'preview_start'         => '<div class="panel panel-warning" id="comment_preview">',
 					'preview_end'           => '</div>',
 					'comment_attach_info'   => get_icon( 'help', 'imgtag', array(
@@ -318,21 +320,28 @@ if( $disp != 'front' )
 				'search_submit_before' => '<span class="input-group-btn">',
 				'search_submit_after'  => '</span></div>',
 				// Comment template
-				'comment_avatar_position' => 'before_text',
-				'comment_start'         => '<div class="panel panel-default">',
+				'comment_start'         => '<div class="evoComment panel panel-default">',
 				'comment_end'           => '</div>',
-				'comment_post_before'   => '<div class="panel-heading"><h4 class="bTitle floatleft">',
+				'comment_post_before'   => '<div class="panel-heading"><h4 class="panel-title pull-left">',
 				'comment_post_after'    => '</h4>',
-				'comment_title_before'  => '<div class="floatright">',
-				'comment_title_after'   => '</div><div class="clear"></div></div><div class="panel-body">',
-				'comment_rating_before' => '<div class="comment_rating floatright">',
+				'comment_title_before'  => '<h4 class="panel-title pull-right">',
+				'comment_title_after'   => '</h4><div class="clearfix"></div></div><div class="panel-body">',
+				'comment_avatar_before' => '<div class="evoComment-avatar">',
+				'comment_avatar_after'  => '</div>',
+				'comment_rating_before' => '<div class="evoComment-rating">',
 				'comment_rating_after'  => '</div>',
-				'comment_text_before'   => '',
-				'comment_text_after'    => '',
-				'comment_info_before'   => '<div class="bCommentSmallPrint">',
-				'comment_info_after'    => '</div></div>',
-				'preview_start'         => '<div class="panel panel-warning" id="comment_preview">',
-				'preview_end'           => '</div>',
+				'comment_text_before'   => '<div class="evoComment-text">',
+				'comment_text_after'    => '</div>',
+				'comment_info_before'   => '<div class="evoComment-info clear text-muted"><small>',
+				'comment_info_after'    => '</small></div></div>',
+				'comment_attach_info'   => get_icon( 'help', 'imgtag', array(
+						'data-toggle'    => 'tooltip',
+						'data-placement' => 'bottom',
+						'data-html'      => 'true',
+						'title'          => htmlspecialchars( get_upload_restriction( array(
+								'block_after'     => '',
+								'block_separator' => '<br /><br />' ) ) )
+					) ),
 				// Front page
 				'front_block_first_title_start' => '<h1>',
 				'front_block_first_title_end'   => '</h1>',

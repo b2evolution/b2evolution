@@ -2954,10 +2954,8 @@ function callback_filter_userlist( & $Form )
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
-	echo '<span class="nowrap">';
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
-	echo '</span>';
 	echo is_admin_page() ? '' : '<br />';
 
 	if( is_admin_page() )
@@ -3030,6 +3028,15 @@ function callback_filter_userlist( & $Form )
 
 	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
 	echo is_admin_page() ? '' : '<br />';
+
+	$OrganizationCache = & get_OrganizationCache( T_('All') );
+	$OrganizationCache->load_all();
+	if( count( $OrganizationCache->cache ) > 0 )
+	{
+		echo is_admin_page() ? '<br />' : '';
+		$Form->select_input_object( 'org', get_param( 'org' ), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
+		echo '<br />';
+	}
 
 	$criteria_types = param( 'criteria_type', 'array:integer' );
 	$criteria_values = param( 'criteria_value', 'array:string' );
@@ -4040,10 +4047,9 @@ echo_modalwindow_js();
 function user_report( user_ID, user_tab_from )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'auto', '',
-		true,
+		'auto', '', true,
 		'<?php echo TS_('Report User'); ?>',
-		'<?php echo TS_('Report this user now!'); ?>' );
+		[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ], true );
 	jQuery.ajax(
 	{
 		type: 'POST',
@@ -4059,7 +4065,9 @@ function user_report( user_ID, user_tab_from )
 		},
 		success: function(result)
 		{
-			openModalWindow( result, 'auto', '',true, '<?php echo TS_('Report User'); ?>', '<?php echo TS_('Report this user now!'); ?>' );
+			openModalWindow( result, 'auto', '',true,
+			'<?php echo TS_('Report User'); ?>',
+			[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ] );
 		}
 	} );
 	return false;
@@ -4105,10 +4113,9 @@ echo_modalwindow_js();
 		}
 		var window_width = jQuery( window ).width();
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-			'auto', '',
-			true,
+			'auto', '', true,
 			'<?php echo TS_('Crop profile picture'); ?>',
-			'<?php echo TS_('Crop'); ?>' );
+			'<?php echo TS_('Crop'); ?>', true );
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -4125,7 +4132,9 @@ echo_modalwindow_js();
 			},
 			success: function( result )
 			{
-				openModalWindow( result, 'auto', '',true, '<?php echo TS_('Crop profile picture'); ?>', '<?php echo TS_('Crop'); ?>' );
+				openModalWindow( result, 'auto', '',true,
+				'<?php echo TS_('Crop profile picture'); ?>',
+				'<?php echo TS_('Crop'); ?>' );
 			}
 		} );
 		return false;
@@ -4153,10 +4162,9 @@ echo_modalwindow_js();
 function user_deldata( user_ID, user_tab_from )
 {
 	openModalWindow( '<span class="loader_img loader_user_deldata absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'auto', '',
-		true,
+		'auto', '', true,
 		'<?php echo TS_('Delete user data').get_manual_link( 'delete-user-data' ); ?>',
-		'<?php echo TS_('Delete selected data'); ?>');
+		[ '<?php echo TS_('Delete selected data'); ?>', 'btn-danger' ], true );
 	jQuery.ajax(
 	{
 		type: 'POST',
@@ -4172,7 +4180,9 @@ function user_deldata( user_ID, user_tab_from )
 		},
 		success: function(result)
 		{
-			openModalWindow( result, 'auto', '', true,'<?php echo TS_('Delete user data').get_manual_link( 'delete-user-data' ); ?>', '<?php echo TS_('Delete selected data'); ?>' );
+			openModalWindow( result, 'auto', '', true,
+			'<?php echo TS_('Delete user data').get_manual_link( 'delete-user-data' ); ?>',
+			[ '<?php echo TS_('Delete selected data'); ?>', 'btn-danger' ] );
 		}
 	} );
 	return false;
@@ -4189,7 +4199,7 @@ function user_deldata( user_ID, user_tab_from )
  */
 function user_report_form( $params = array() )
 {
-	global $current_User;
+	global $current_User, $display_mode;
 
 	$params = array_merge( array(
 			'Form'       => NULL,
@@ -4210,7 +4220,10 @@ function user_report_form( $params = array() )
 
 	$report_options = array_merge( array( 'none' => '' ), get_report_statuses() );
 
-	$Form->custom_content( '<p><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
+	// Use JS to show/hide textarea only for normal view
+	$use_js = ! ( isset( $display_mode ) && $display_mode == 'js' );
+
+	$Form->custom_content( '<p class="alert alert-warning"><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
 
 	// get current User report from edited User
 	$current_report = get_report_from( $params['user_ID'] );
@@ -4222,28 +4235,36 @@ function user_report_form( $params = array() )
 		{ // add select option, none must be selected
 			$report_content .= '<option '.( ( $option == 'none' ) ? 'selected="selected" ' : '' ).'value="'.$option.'">'.$option_label.'</option>';
 		}
-		$report_content .= '</select><div id="report_info" style="width:100%;"></div>';
+		$report_content .= '</select><div id="report_info" style="width:100%;">$report_info_content$</div>';
 
-		$info_content = '<div><span>'.T_('You can provide additional information below').':</span></div>';
-		$info_content .= '<table style="width:100%;"><td style="width:99%;background-color:inherit;"><textarea id="report_info_content" name="report_info_content" class="form_textarea_input form-control" style="width:100%;" rows="2" maxlength="240"></textarea></td>';
-		$info_content .= '<td style="vertical-align:top;background-color:inherit;"><input type="submit" class="SaveButton" style="color:red;margin-left:2px;" value="'.T_('Report this user now!').'" name="actionArray[report_user]" /></td></table>';
-		$report_content .= '<script type="text/javascript">
-			var info_content = \''.$info_content.'\';
-			jQuery("#report_user_status").change( function() {
-				var report_info = jQuery("#report_info");
-				var value = jQuery(this).val();
-				if( value == "none" )
-				{
-					report_info.html("");
-				}
-				else if( report_info.is(":empty") )
-				{
-					report_info.html( info_content );
-				}
-			});
-			</script>';
-		$report_content .= '<noscript>'.$info_content.'</noscript>';
-		$Form->info( T_('Report NOW'), $report_content );
+		$info_content = '<br />'.T_('You can provide additional information below').':';
+		$info_content .= '<textarea id="report_info_content" name="report_info_content" class="form_textarea_input form-control" rows="2" maxlength="240"></textarea>';
+		$info_content .= '<br /><input type="submit" class="SaveButton btn btn-danger" value="'.T_('Report this user now!').'" name="actionArray[report_user]" />';
+		if( $use_js )
+		{
+			$report_content = str_replace( '$report_info_content$', '', $report_content );
+			$report_content .= '<script type="text/javascript">
+				var info_content = \''.$info_content.'\';
+				jQuery("#report_user_status").change( function() {
+					var report_info = jQuery("#report_info");
+					var value = jQuery(this).val();
+					if( value == "none" )
+					{
+						report_info.html("");
+					}
+					else if( report_info.is(":empty") )
+					{
+						report_info.html( info_content );
+					}
+				});
+				</script>';
+			$report_content .= '<noscript>'.$info_content.'</noscript>';
+		}
+		else
+		{
+			$report_content = str_replace( '$report_info_content$', $info_content, $report_content );
+		}
+		$Form->info( T_('Reason'), $report_content );
 	}
 	else
 	{

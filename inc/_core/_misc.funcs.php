@@ -6992,8 +6992,9 @@ var modal_window_js_initialized = false;
  * @param boolean TRUE - to use transparent template
  * @param string Title of modal window (Used in bootstrap)
  * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
+ * @param boolean TRUE - to clear all previous windows
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -7006,7 +7007,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons 
 		{ // Specific button with params
 			var button_title = buttons[0];
 			var button_class = buttons[1];
-			var button_form = buttons[2];
+			var button_form = typeof( buttons[2] ) == 'undefined' ? 'form' : buttons[2];
 		}
 		else
 		{ // Standard button to submit a single form
@@ -7014,6 +7015,11 @@ function openModalWindow( body_html, width, height, transparent, title, buttons 
 			var button_class = 'btn-primary';
 			var button_form = 'form';
 		}
+	}
+
+	if( typeof( is_new_window ) != 'undefined' && is_new_window )
+	{ // Clear previous opened window
+		jQuery( '#modal_window' ).remove();
 	}
 
 	if( jQuery( '#modal_window' ).length == 0 )
@@ -7033,7 +7039,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons 
 			modal_html += '<div class="modal-footer">';
 			if( typeof( buttons ) != 'undefined' && buttons != '' )
 			{
-				modal_html += '<button class="btn ' + button_class + '" type="submit">' + button_title + '</button>';
+				modal_html += '<button class="btn ' + button_class + '" type="submit" style="display:none">' + button_title + '</button>';
 			}
 			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Cancel' ) ?></button></div>';
 		}
@@ -7048,17 +7054,17 @@ function openModalWindow( body_html, width, height, transparent, title, buttons 
 	if( use_buttons )
 	{
 		// Remove these elements, they are displayed as title and button of modal window
-		jQuery( '#modal_window ' + button_form + ' legend' ).remove();
-		jQuery( '#modal_window ' + button_form + ' #close_button' ).remove();
+		jQuery( '#modal_window legend' ).remove();
+		jQuery( '#modal_window #close_button' ).remove();
 
 		if( jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).length == 0 )
 		{ // Hide a submit button in the fotter if real submit input doesn't exist
-			jQuery( '#modal_window ' + button_form + ' .modal-footer button[type=submit]' ).hide();
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
 		}
 		else
 		{
 			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).hide();
-			jQuery( '#modal_window ' + button_form + ' .modal-footer button[type=submit]' ).show();
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
 		}
 
 		jQuery( '#modal_window' + button_form ).change( function()
@@ -7067,11 +7073,11 @@ function openModalWindow( body_html, width, height, transparent, title, buttons 
 			if( input_submit.length > 0 )
 			{ // Hide a real submit input and Show button of footer
 				input_submit.hide();
-				jQuery( '#modal_window ' + button_form + ' .modal-footer button[type=submit]' ).show();
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
 			}
 			else
 			{ // Hide button of footer if real submit input doesn't exist
-				jQuery( '#modal_window ' + button_form + ' .modal-footer button[type=submit]' ).hide();
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
 			}
 		} );
 

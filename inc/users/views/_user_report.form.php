@@ -49,7 +49,7 @@ if( $display_mode != 'js' )
 $Form = new Form( $form_action, 'user_checkchanges' );
 
 $form_title = '';
-$form_class = 'fform';
+$form_class = 'fform user_report_form';
 $Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 
 if( $display_mode != 'js' )

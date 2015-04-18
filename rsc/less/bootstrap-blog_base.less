@@ -85,45 +85,21 @@ div.error_additional_content {
 
 
 // Styles for comments
-div.bComment, /* Entire comment block */
-form.bComment /* New comment form */
-{
-	margin: 1ex 2ex;
-	padding: 0 1em 1em;
-	border: 1px dotted #999;
-	overflow: hidden;
-}
-form#user_checkchanges.bComment {
-	border-style: solid;
-	margin-top: 0;
-}
-#comment_preview {
-	background-color: #eee;
-}
-#comment_error {
-	background-color: #FBF2EE;
-	border-color: #DD9999;
-	color: #EE0000;
-}
-.comment_recommended_option{
+.comment_recommended_option{  // ???
 	color: #0a0;
 }
-div.bCommentTitle {
-	margin: 1ex 0;
-	font-weight: bold;
+
+.evoComment-rating {
+	margin: 3px;
 }
-div.bCommentSmallPrint {
-	clear: both;
-	font-size: 78%;
-	margin: 1ex 0;
-}
-.bCommentAvatar {
-	margin: 5px 10px 10px 0;
-	padding: 2px;
+// Display round avatars:
+#styled_content_block .evoComment-avatar img {
+	margin: 4px 10px 10px 0;
 	float:left;
-	border:1px solid #ccc;
+	border-radius: 50%;
 }
-.bCommentAvatarCenter {
+
+.bCommentAvatarCenter {  // This is used in tooltips for anonymous users
 	margin: 0 auto;
 	padding: 2px;
 	border:1px solid #ccc;

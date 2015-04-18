@@ -566,10 +566,10 @@ class Plugin
 			return array();
 		}
 
-		$render_note = $this->get_help_link( '$apply_rendering' );
+		$render_note = '';
 		if( empty( $this->code ) )
 		{
-			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
 		}
 		$admin_Plugins = & get_Plugins_admin();
 		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
@@ -612,7 +612,7 @@ class Plugin
 			return array();
 		}
 
-		$render_note = $this->get_help_link( '$apply_rendering' );
+		$render_note = $this->get_help_link();
 		if( empty( $this->code ) )
 		{
 			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');

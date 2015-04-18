@@ -2568,7 +2568,8 @@ class Item extends ItemLight
 				// If post url is empty then use this link position as 'teaserperm':
 
 			case 'teaserperm':
-				// Teaser-Permalink
+			case 'cover':
+				// Teaser-Permalink or Cover
 				global $disp;
 				if( isset( $disp ) && $disp == 'single' )
 				{ // Force link to image url and use colorbox only when we already on permalink page

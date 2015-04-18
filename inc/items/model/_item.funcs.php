@@ -2481,13 +2481,14 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="bCommentContent">';
 		$Comment->status( 'styled' );
 		if( ! $Comment->is_meta() )
-		{
-			echo '<div class="bTitle">';
-			echo T_('In response to:')
-					.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
-			echo '</div>';
+		{ // Don't display the titles for meta comments
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
+			if( get_param( 'p' ) == '' )
+			{ // Don't display this title on a post view page
+				echo ' '.T_('in response to')
+						.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
+			}
 			echo '</div>';
 		}
 		echo '<div class="bCommentText">';

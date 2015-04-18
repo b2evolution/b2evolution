@@ -438,23 +438,23 @@ switch( $action )
 		// Not confirmed
 		if( $current_User->check_perm( 'files', 'view', false ) )
 		{ // User has permission to view files in this blog's fileroot, diplay link
-			$delete_warning = sprintf( T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s <a %s>fileroot</a> !'),
+			$delete_warning = sprintf( T_('Deleting this collection will also delete ALL its categories, posts, comments and ALL its attached files in the collection\'s <a %s>fileroot</a> !'),
 				'href="'.$edited_Blog->get_filemanager_link().'"' );
 		}
 		else
 		{ // User has no permission to view files in this blog's fielroot
-			$delete_warning = T_('Deleting this blog will also delete ALL its categories, posts, comments and ALL its attached files in the blog\'s fileroot !');
+			$delete_warning = T_('Deleting this collection will also delete ALL its categories, posts, comments and ALL its attached files in the collection\'s fileroot !');
 		}
 		?>
 		<div class="panelinfo panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><?php printf( T_('Delete blog [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
+				<h3 class="panel-title"><?php printf( T_('Delete collection [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
 			</div>
 			<div class="panel-body">
 
 			<p class="warning"><?php echo $delete_warning; ?></p>
 
-			<p><?php echo T_('Note: Some files in this blog\'s fileroot may be linked to users or to other blogs posts and comments. Those files will ALSO be deleted, which may be undesirable!') ?></p>
+			<p><?php echo T_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!') ?></p>
 
 			<p class="warning"><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 

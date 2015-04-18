@@ -5365,6 +5365,7 @@ class User extends DataObject
 		// If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
 		$current_user_can_moderate = $current_User->can_moderate_user( $this->ID );
 
+		$result = false;
 		foreach( $comments_IDs as $comment_ID )
 		{
 			$deleted_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
@@ -5373,16 +5374,27 @@ class User extends DataObject
 			      $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
 			{ // Current user has a permission to delete this comment
 				// Delete from DB
-				$deleted_Comment->dbdelete( true );
+				$result = $deleted_Comment->dbdelete( true, false );
+				if( ! $result )
+				{
+					break;
+				}
 			}
 			// Clear a cache to avoid a memory allocation error
 			$CommentCache->clear();
 			$ItemCache->clear();
 		}
 
-		$DB->commit();
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
 
-		return true;
+		return $result;
 	}
 
 

@@ -349,16 +349,17 @@ function & get_InvitationCache()
 /**
  * Get the OrganizationCache
  *
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
  * @return OrganizationCache
  */
-function & get_OrganizationCache()
+function & get_OrganizationCache( $allow_none_text = NULL )
 {
 	global $OrganizationCache;
 
 	if( ! isset( $OrganizationCache ) )
 	{ // Cache doesn't exist yet:
 		load_class( 'users/model/_organization.class.php', 'Organization' );
-		$OrganizationCache = new DataObjectCache( 'Organization', false, 'T_users__organization', 'org_', 'org_ID', 'org_name', 'org_name' ); // COPY (FUNC)
+		$OrganizationCache = new DataObjectCache( 'Organization', false, 'T_users__organization', 'org_', 'org_ID', 'org_name', 'org_name', $allow_none_text ); // COPY (FUNC)
 	}
 
 	return $OrganizationCache;

@@ -943,7 +943,7 @@ div.avatartag.main > img:first-child {
 div#evo_toolbar {
   background-color: #d2d2d2;
   color: ButtonText;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #aeaeae;
   text-align: left;
   margin: 0;
   font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
@@ -985,9 +985,8 @@ div#evo_toolbar .actions_right {
   top: -99999em;
   opacity: 0;
   width: 25ex;
-  border: 1px solid #CCC;
+  border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
-  transition: opacity 0.2s linear;
   -webkit-transition: opacity 0.2s ease-in-out;
   -o-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out;
@@ -1031,18 +1030,18 @@ div#evo_toolbar .actions_right {
 .evobar-menu li li a:link,
 .evobar-menu li li a:visited {
   display: block;
-  background: #f4f4f4;
+  background-color: #d2d2d2;
   color: #4f4f4f;
 }
 .evobar-menu li li a:hover {
-  background: #e7e7e7;
+  background-color: #bfbfbf;
 }
 .evobar-menu li.separator {
-  background: #f4f4f4;
+  background-color: #d2d2d2;
 }
 .evobar-menu li.separator hr {
   border: none;
-  background: #4f4f4f;
+  background-color: #4f4f4f;
   height: 1px;
   margin: 10px 4px;
 }
@@ -1050,9 +1049,9 @@ div#evo_toolbar .actions_right {
   display: inline-block;
   position: relative;
   background-color: #d2d2d2;
-  -webkit-transition: background 0.15s ease-out;
-  -o-transition: background 0.15s ease-out;
-  transition: background 0.15s ease-out;
+  -webkit-transition: background-color 0.15s ease-out;
+  -o-transition: background-color 0.15s ease-out;
+  transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
   min-height: 14px;
@@ -1073,7 +1072,7 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #aaa;
+  color: #999999;
 }
 .evobar-menu [class^=evobar-icon-] {
   display: inline-block;
@@ -1104,7 +1103,7 @@ div#evo_toolbar .actions_right {
   right: 0;
 }
 .actions_right .evobar-menu li li ul {
-  left: -25.2ex;
+  left: -25.3ex;
   z-index: -1;
 }
 form {

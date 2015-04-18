@@ -59,7 +59,7 @@ $Results->cols[] = array(
 		'th' => T_('ID'),
 		'order' => 'ityp_ID',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
+		'td_class' => '%conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, "info shrinkwrap", "shrinkwrap" )%',
 		'td' => '$ityp_ID$',
 	);
 
@@ -67,6 +67,7 @@ $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ityp_name',
 		'td' => '%get_name_for_itemtype( #ityp_ID#, #ityp_name# )%',
+		'td_class' => '%conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, "info", "" )%',
 	);
 
 $Results->cols[] = array(
@@ -74,6 +75,7 @@ $Results->cols[] = array(
 		'order' => 'ityp_template_name',
 		'td' => '$ityp_template_name$',
 		'th_class' => 'shrinkwrap',
+		'td_class' => '%conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, "info", "" )%'
 	);
 
 // Display results:

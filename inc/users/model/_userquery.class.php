@@ -83,12 +83,6 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( ! empty( $params['where_org_ID'] ) )
-		{ // Join Organization
-			$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
-			$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
-		}
-
 		if( isset( $collections_Module ) )
 		{ // We are handling blogs:
 			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
@@ -445,6 +439,10 @@ class UserQuery extends SQL
 		}
 
 		$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $org_ID ) );
+
+		// Join Organization table
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
+		$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
 	}
 
 }

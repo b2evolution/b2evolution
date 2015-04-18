@@ -5,6 +5,12 @@
 
 @import "_dev-blocks.module.less";
 
+.transition( @transition ) {
+	-webkit-transition: @transition;
+			 -o-transition: @transition;
+					transition: @transition;
+}
+
 body {
 	padding: 0;
 	margin: 0;
@@ -250,10 +256,15 @@ div.avatartag.main > img:first-child {
 // Evo Toolbar:
 // Note: there may be some properties that seem overkill but the fact is we need to override
 // any too general styles a skin may want to bring in for its own body/general display.
+@evobar-bg-color: #d2d2d2;
+@evobar-bg-color-hover: #bfbfbf;
+@evobar-text-color: #4f4f4f;
+@evobar-text-color-disabled: #999;
+@evobar-border-color: #aeaeae;
 div#evo_toolbar {
-	background-color: #d2d2d2;
+	background-color: @evobar-bg-color;
 	color: ButtonText;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid @evobar-border-color;
 	text-align: left;
 	margin: 0;
 	font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
@@ -300,12 +311,9 @@ div#evo_toolbar {
 		top: -99999em;
 		opacity: 0;
 		width: 25ex; // left offset of submenus need to match (see below)
-		border: 1px solid #CCC;
+		border: 1px solid @evobar-border-color;
 		box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
-		transition: opacity 0.2s linear;
-		-webkit-transition: opacity .2s ease-in-out;
-		     -o-transition: opacity .2s ease-in-out;
-		        transition: opacity .2s ease-in-out;
+		.transition( opacity .2s ease-in-out );
 		li {
 			width: 100%;
 		}
@@ -345,18 +353,18 @@ div#evo_toolbar {
 			}
 			a, a:hover, a:link, a:visited {
 				display: block;
-				background: #f4f4f4;
-				color: #4f4f4f;
+				background-color: @evobar-bg-color;
+				color: @evobar-text-color;
 			}
 			a:hover {
-				background: #e7e7e7;
+				background-color: @evobar-bg-color-hover;
 			}
 		}
 		&.separator {
-			background: #f4f4f4;
+			background-color: @evobar-bg-color;
 			hr {
 				border: none;
-				background: #4f4f4f;
+				background-color: @evobar-text-color;
 				height: 1px;
 				margin: 10px 4px;
 			}
@@ -365,28 +373,24 @@ div#evo_toolbar {
 	a {
 		display: inline-block;
 		position: relative;
-		background-color: #d2d2d2;
-		-webkit-transition: background .15s ease-out;
-		     -o-transition: background .15s ease-out;
-		        transition: background .15s ease-out;
+		background-color: @evobar-bg-color;
+		.transition( background-color .15s ease-out );
 		padding: 6px 1ex;  // .5em need to macth global height above
 		text-decoration:none;
 		min-height: 14px;
 		line-height: 14px;
-		color: #4f4f4f;
+		color: @evobar-text-color;
 		// Set one color for each link status to don't rewrite from skins
 		&:hover, &:link, &:visited {
-			color: #4f4f4f;
+			color: @evobar-text-color;
 		}
 		&:hover {
-			background-color: #bfbfbf;
-			-webkit-transition: none;
-			     -o-transition: none;
-			        transition: none;
+			background-color: @evobar-bg-color-hover;
+			.transition( none );
 			text-decoration: none;
 		}
 		&.disabled, &.disabled:hover {
-			color: #aaa;
+			color: @evobar-text-color-disabled;
 		}
 	}
 	// .evobar-icon-down, .evobar-icon-right, .evobar-icon-left
@@ -422,7 +426,7 @@ div#evo_toolbar {
 		right: 0;
 	}
 	li li ul {
-		left: -25.2ex;
+		left: -25.3ex;
 		z-index: -1;
 	}
 }

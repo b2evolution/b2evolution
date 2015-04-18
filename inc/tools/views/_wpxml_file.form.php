@@ -183,7 +183,7 @@ if( $import_perm_view )
 function import_files_window()
 {
 	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '' );
+		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '', true );
 	jQuery.ajax(
 	{
 		type: 'POST',

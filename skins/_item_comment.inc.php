@@ -12,13 +12,17 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 // Default params:
 $params = array_merge( array(
 		'comment_start'         => '<div class="bComment">',
 		'comment_end'           => '</div>',
+		'comment_post_display'	=> false,	// Do we want ot display the title of the post we're referring to?
+		'comment_post_before'   => '<h3 class="bTitle">',
+		'comment_post_after'    => '</h3>',
 		'comment_title_before'  => '<div class="bCommentTitle">',
 		'comment_title_after'   => '</div>',
+		'comment_avatar_before' => '<span class="bComment-avatar">',
+		'comment_avatar_after'  => '</span>',
 		'comment_rating_before' => '<div class="comment_rating">',
 		'comment_rating_after'  => '</div>',
 		'comment_text_before'   => '<div class="bCommentText">',
@@ -40,6 +44,9 @@ $params = array_merge( array(
  */
 $Comment = & $params['Comment'];
 
+// Load comment's Item object:
+$Comment->get_Item();
+
 ?>
 <!-- ========== START of a COMMENT/TB/PB ========== -->
 <?php
@@ -48,8 +55,19 @@ $Comment = & $params['Comment'];
 
 	// Status
 	if( $Comment->status != 'published' )
-	{
+	{	// display status of comment (typically an angled banner in the top right corner):
 		$Comment->status( 'styled' );
+	}
+
+	// Post title
+	if( $params['comment_post_display'] )
+	{
+		echo $params['comment_post_before'];
+		echo T_('In response to:').' ';
+		$Comment->Item->title( array(
+				'link_type' => 'permalink',
+			) );
+		echo $params['comment_post_after'];
 	}
 
 	// Title
@@ -59,7 +77,7 @@ $Comment = & $params['Comment'];
 		case 'comment': // Display a comment:
 			if( empty($Comment->ID) )
 			{	// PREVIEW comment
-				echo T_('PREVIEW Comment from:').' ';
+				echo '<span class="bComment-preview-type">'.T_('PREVIEW Comment from:').'</span> ';
 			}
 			else
 			{	// Normal comment
@@ -67,9 +85,11 @@ $Comment = & $params['Comment'];
 						'before'    => '',
 						'after'     => ' '.T_('from:').' ',
 						'text'      => T_('Comment'),
+						'class'		=> 'bComment-type',
 						'nofollow'  => true,
 					) );
 			}
+
 			$Comment->author2( array(
 					'before'       => ' ',
 					'after'        => '#',
@@ -90,7 +110,8 @@ $Comment = & $params['Comment'];
 			$Comment->permanent_link( array(
 					'before'    => '',
 					'after'     => ' '.T_('from:').' ',
-					'text' 			=> T_('Trackback'),
+					'text' 		=> T_('Trackback'),
+					'class'		=> 'bComment-type',
 					'nofollow'	=> true,
 				) );
 			$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
@@ -100,7 +121,8 @@ $Comment = & $params['Comment'];
 			$Comment->permanent_link( array(
 					'before'    => '',
 					'after'     => ' '.T_('from:').' ',
-					'text' 			=> T_('Pingback'),
+					'text' 		=> T_('Pingback'),
+					'class'		=> 'bComment-type',
 					'nofollow'	=> true,
 				) );
 			$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
@@ -108,18 +130,23 @@ $Comment = & $params['Comment'];
 	}
 	echo $params['comment_title_after'];
 
-	// Rating
+	// Avatar:
+	echo $params['comment_avatar_before'];
+	$Comment->avatar();
+	echo $params['comment_avatar_after'];
+
+	// Rating:
 	$Comment->rating( array(
 			'before' => $params['comment_rating_before'],
 			'after'  => $params['comment_rating_after'],
 		) );
 
+	// Text:
 	echo $params['comment_text_before'];
-	$Comment->avatar();
 	$Comment->content( 'htmlbody', false, true, $params );
 	echo $params['comment_text_after'];
 
-	// Info
+	// Info:
 	echo $params['comment_info_before'];
 
 	$commented_Item = & $Comment->get_Item();

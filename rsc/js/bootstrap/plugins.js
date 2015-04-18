@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
- * @version $Id: plugins.js 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: plugins.js 8789 2015-04-17 14:56:15Z yura $
  */
 
 jQuery( document ).ready(function()
@@ -20,11 +20,7 @@ jQuery( document ).ready(function()
 		jQuery( this ).find( 'span' ).removeAttr( 'title' );
 
 		var tip_text = jQuery( this ).attr( 'rel' );
-		if( tip_text != '' )
-		{
-			tip_text += '<br />';
-		}
-		tip_text += '<a href="' + jQuery( this ).attr( 'href' ) + '" target="_blank">Open help in new window</a>';
+		tip_text += '<p><strong>Click <span class="fa fa-question-circle"></span> to access full documentaion for this plugin</strong></p>';
 
 		var placement = 'right';
 		if( jQuery( 'body' ).width() - jQuery( this ).position().left < 220 )
