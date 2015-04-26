@@ -36,7 +36,7 @@ else
 						// CODE for the widget:
 						'widget' => 'colls_list_public',
 						// Optional display params
-						'block_start' => ' ',
+						'block_start' => '',
 						'block_end' => '',
 						'block_display_title' => false,
 						'list_start' => '',
@@ -51,7 +51,7 @@ else
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
 
 	if( $Settings->get( 'info_blog_ID' ) > 0 )
-	{	// We have a collection for info pages:
+	{ // We have a collection for info pages:
 		// --------------------------------- START OF PAGES LIST --------------------------------
 		// Call widget directly (without container):
 		skin_widget( array(
@@ -75,6 +75,27 @@ else
 				) );
 		// ---------------------------------- END OF PAGES LIST ---------------------------------
 	}
+
+	// --------------------------------- START OF CONTACT LINK --------------------------------
+	// Call widget directly (without container):
+	skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'menu_link',
+						// Optional display params
+						'block_start' => '',
+						'block_end' => '',
+						'block_display_title' => false,
+						'list_start' => '',
+						'list_end' => '',
+						'item_start' => '',
+						'item_end' => '',
+						'item_selected_start' => '',
+						'item_selected_end' => '',
+						'link_selected_class' => 'swhead_item swhead_item_selected',
+						'link_default_class' => 'swhead_item ',
+						'link_type' => 'ownercontact',
+				) );
+	// --------------------------------- END OF CONTACT LINK --------------------------------
 ?>
 
 	<div class="floatright">

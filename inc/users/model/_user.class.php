@@ -661,8 +661,9 @@ class User extends DataObject
 
 
 			// ---- Organizations / START ----
-			$organizations = array_unique( param( 'organizations', 'array:string' ) );
-			$this->update_organizations( $organizations );
+			$organizations = param( 'organizations', 'array:string' );
+			$org_roles = param( 'org_roles', 'array:string' );
+			$this->update_organizations( $organizations, $org_roles );
 			// ---- Organizations / END ----
 
 
@@ -3899,9 +3900,10 @@ class User extends DataObject
 	 * @param boolean true if the avatar image should be zoomed on click, false otherwise
 	 * @param string avatar overlay text
 	 * @param string group name for lightbox plugin
+	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '' )
+	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = 1 )
 	{
 		global $current_User;
 
@@ -3916,23 +3918,25 @@ class User extends DataObject
 		if( ! $Link || ! $File = & $Link->get_File() )
 		{ // User doesn't have an avatar
 			return get_avatar_imgtag_default( $size, $class, $align, array(
-					'email'  => $this->get( 'email' ),
-					'gender' => $this->get( 'gender' ),
+					'email'    => $this->get( 'email' ),
+					'gender'   => $this->get( 'gender' ),
+					'tag_size' => $tag_size,
 				) );
 		}
 
 		if( ( !$this->check_status( 'can_display_avatar' ) ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
 		{ // if the user status doesn't allow to display avatar and current User is not an admin in admin interface, then show default avatar
 			return get_avatar_imgtag_default( $size, $class, $align, array(
-					'email' => $this->get( 'email' ),
-					'gender' => $this->get( 'gender' ),
+					'email'    => $this->get( 'email' ),
+					'gender'   => $this->get( 'gender' ),
+					'tag_size' => $tag_size,
 				) );
 		}
 
 		if( $zoomable )
-		{	// return clickable avatar tag, zoom on click
+		{ // return clickable avatar tag, zoom on click
 			if( is_logged_in() )
-			{	// Only logged in users can see a big picture of the avatar
+			{ // Only logged in users can see a big picture of the avatar
 				// set random value to link_rel, this way the pictures on the page won't be grouped
 				// this is usefull because the same avatar picture may appear more times in the same page
 				if( empty( $lightbox_group ) )
@@ -3953,26 +3957,27 @@ class User extends DataObject
 						'image_link_rel'      => $link_rel,
 						'image_class'         => $class,
 						'image_align'         => $align,
+						'tag_size'            => $tag_size,
 					) );
 			}
 			else
-			{	// Anonymous user get an avatar picture with link to login page
+			{ // Anonymous user get an avatar picture with link to login page
 				global $Blog;
 				$redirect_to = '';
 				if( isset( $Blog ) )
-				{	// Redirect user after login
+				{ // Redirect user after login
 					$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$this->ID, '&' );
 				}
-				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align ).'</a>';
+				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align, '', $tag_size ).'</a>';
 			}
 		}
 		else
 		{
-			$r = $File->get_thumb_imgtag( $size, $class, $align );
+			$r = $File->get_thumb_imgtag( $size, $class, $align, '', $tag_size );
 		}
 
 		if( $r != '' && $avatar_overlay_text != '' )
-		{	// Add overlay text if it is enabled
+		{ // Add overlay text if it is enabled
 			$r = $this->get_avatar_overlay_text( $r, $size, $avatar_overlay_text, $class );
 		}
 
@@ -5886,7 +5891,7 @@ class User extends DataObject
 	/**
 	 * Get organizations that user has selected
 	 *
-	 * @return array Organizations( key => org_ID, value => org_is_accepted )
+	 * @return array Organizations( key => org_ID, value => array( 'name', 'accepted', 'role' )
 	 */
 	function get_organizations_data()
 	{
@@ -5894,11 +5899,21 @@ class User extends DataObject
 		{ // Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
-			$SQL->SELECT( 'uorg_org_ID, uorg_accepted' );
+			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role' );
 			$SQL->FROM( 'T_users__user_org' );
+			$SQL->FROM_add( 'INNER JOIN T_users__organization ON org_ID = uorg_org_ID' );
 			$SQL->WHERE( 'uorg_user_ID = '.$DB->quote( $this->ID ) );
 			$SQL->ORDER_BY( 'uorg_accepted DESC, uorg_org_ID' );
-			$this->organizations = $DB->get_assoc( $SQL->get() );
+			$organizations = $DB->get_results( $SQL->get() );
+			$this->organizations = array();
+			foreach( $organizations as $organization )
+			{
+				$this->organizations[ $organization->org_ID ] = array(
+						'name'     => $organization->org_name,
+						'accepted' => $organization->uorg_accepted,
+						'role'     => $organization->uorg_role,
+					);
+			}
 		}
 
 		return $this->organizations;
@@ -5931,52 +5946,79 @@ class User extends DataObject
 	 * Update user's organizations in DB
 	 *
 	 * @param array Organization IDs
+	 * @param array Organization roles
 	 * @param boolean TRUE to auto accept user to organization (Used on install demo users)
 	 */
-	function update_organizations( $organization_IDs, $force_accept = false )
+	function update_organizations( $organization_IDs, $organization_roles = array(), $force_accept = false )
 	{
 		global $DB, $current_User;
 
-		$old_org_IDs = array_keys( $this->get_organizations_data() );
-		$new_org_IDs = array();
+		$perm_edit_users = ( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) );
+
+		$curr_orgs = $this->get_organizations_data();
+		$curr_org_IDs = array_keys( $curr_orgs );
+		$insert_orgs = array();
+		$n = 0;
 		foreach( $organization_IDs as $o => $organization_ID )
 		{
 			$organization_ID = intval( $organization_ID );
 			if( empty( $organization_ID ) )
 			{ // Organization is not selected, Skip it
-				unset( $organization_IDs[ $o ] );
 				continue;
 			}
-			if( in_array( $organization_ID, $old_org_IDs ) )
-			{ // User is already in this organization, Skip it
-				continue;
+			if( in_array( $organization_ID, $curr_org_IDs ) )
+			{ // User is already in this organization
+				if( $perm_edit_users || ! $curr_orgs[ $organization_ID ]['accepted'] )
+				{ // Update if current user has permission or it is not accepted yet by admin
+					$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
+					$n++;
+				}
+				else
+				{ // Don't updated by current user
+					$insert_orgs[ $organization_ID ] = $curr_orgs[ $organization_ID ]['role'];
+				}
 			}
-			$new_org_IDs[] = $organization_ID;
+			else
+			{ // Insert user in new organization
+				$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
+				$n++;
+			}
 		}
-		if( count( $new_org_IDs ) > 0 )
+
+		if( count( $insert_orgs ) > 0 )
 		{ // Insert new records with user-org relations
-			$new_orgs_accepted = '0';
-			if( $force_accept || ( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) ) )
-			{ // If admin adds new organization for other users and for himself, it must be autoaccepted
-				$new_orgs_accepted = '1';
-			}
-			$new_org_SQL = 'INSERT INTO T_users__user_org ( uorg_accepted, uorg_user_ID, uorg_org_ID ) VALUES ';
-			foreach( $new_org_IDs as $o => $new_org_ID )
+			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role ) VALUES ';
+			$o = 0;
+			foreach( $insert_orgs as $insert_org_ID => $insert_org_role )
 			{
+				if( isset( $curr_orgs[ $insert_org_ID ] ) )
+				{ // If we are updating - Don't change the accept status
+					$insert_orgs_accepted = $curr_orgs[ $insert_org_ID ]['accepted'];
+				}
+				else
+				{ // If we are inserting - Set the accept status depends on user perms or func params
+					$insert_orgs_accepted = '0';
+					if( $force_accept || $perm_edit_users )
+					{ // If admin adds new organization for other users and for himself, it must be autoaccepted
+						$insert_orgs_accepted = '1';
+					}
+				}
 				if( $o > 0 )
 				{ // separator
-					$new_org_SQL .= ', ';
+					$insert_org_SQL .= ', ';
 				}
-				$new_org_SQL .= '( '.$new_orgs_accepted.', '.$this->ID.', '.$new_org_ID.' )';
+				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_role ).' )';
+				$o++;
 			}
-			$DB->query( $new_org_SQL );
+			$DB->query( $insert_org_SQL );
 		}
-		if( count( $old_org_IDs ) > 0 )
+
+		$delete_org_IDs = array_diff( $curr_org_IDs, array_keys( $insert_orgs ) );
+		if( count( $delete_org_IDs ) > 0 )
 		{ // Delete old records that were replaced with new
-			$organization_IDs[] = '-1';// to remove all old records
 			$DB->query( 'DELETE FROM T_users__user_org
 				WHERE uorg_user_ID = '.$this->ID.'
-					AND uorg_org_ID NOT IN ( '.implode( ', ', $organization_IDs ).' )' );
+					AND uorg_org_ID IN ( '.implode( ', ', $delete_org_IDs ).' )' );
 		}
 	}
 

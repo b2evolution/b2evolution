@@ -202,8 +202,8 @@ if( $action != 'view' )
 		}
 
 		// Main profile picture with action icons to modify it
-		$user_pictures = '<div class="avatartag main">'
-				.$edited_User->get_avatar_imgtag( 'crop-top-160x160', 'avatar', 'top', true, '', 'user' )
+		$user_pictures = '<div class="avatartag main image_rounded">'
+				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', 0.5 )
 				.'<div class="avatar_actions">'
 					.action_icon( $change_picture_title, $change_picture_icon, get_user_settings_url( 'avatar', $edited_User->ID ), ' '.$change_picture_title, 3, 4 );
 		if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
@@ -233,13 +233,14 @@ if( $action != 'view' )
 		foreach( $user_avatars as $user_Link )
 		{
 			$user_pictures .= $user_Link->get_tag( array(
-					'before_image'        => '<div class="avatartag">',
+					'before_image'        => '<div class="avatartag image_rounded">',
 					'before_image_legend' => '',
 					'after_image_legend'  => '',
 					'after_image'         => '</div>',
-					'image_size'          => 'crop-top-80x80',
+					'image_size'          => 'crop-top-160x160',
 					'image_link_title'    => $edited_User->login,
 					'image_link_rel'      => 'lightbox[user]',
+					'tag_size'            => 0.5
 				) );
 		}
 
@@ -340,42 +341,75 @@ if( $action != 'view' )
 	if( $count_all_orgs > 0 )
 	{ // Display an organization select box if at least one is defined
 		$user_orgs = $edited_User->get_organizations_data();
+		$org_allow_none = false;
 		if( empty( $user_orgs ) )
 		{ // Set it for first(empty) organization select box
 			$user_orgs[0] = 0;
+			// Allow None option for <select> only when user has no organization yet
+			$org_allow_none = true;
 		}
 
 		$count_user_orgs = count( $user_orgs );
-		$org_suffix = '';
-		if( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs )
-		{ // Display a button to add user in new organization only if the user is not in all organizations
-			$org_suffix = get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer' ) );
-		}
+		// Display a button to add user in new organization only if the user is not in all organizations
+		$add_org_icon_style = ( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs ) ? '' : ';display:none';
+		$org_add_icon = ' '.get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer'.$add_org_icon_style ) );
 
-		foreach( $user_orgs as $org_ID => $org_is_accepted )
+		$perm_edit_users = $current_User->check_perm( 'users', 'edit' );
+		foreach( $user_orgs as $org_ID => $org_data )
 		{
+			// Display a button to remove user from organization
+			$remove_org_icon_style = $org_ID > 0 ? '' : ';display:none';
+			$org_remove_icon = ' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_org', 'style' => 'cursor:pointer'.$remove_org_icon_style ) );
+
+			$form_infostart = $Form->infostart;
 			$form_inputstart = $Form->inputstart;
+			$inputstart_icon = '';
 			if( $org_ID > 0 )
 			{ // User is assigned to this organization, Display the accepted status icon
-				if( $current_User->check_perm( 'users', 'edit' ) )
+				if( $perm_edit_users )
 				{ // Set the spec params for icon if user is admin
-					$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$edited_User->ID );
+					$accept_icon_params = array( 'style' => 'cursor:pointer', 'rel' => 'org_status_'.( $org_data['accepted'] ? 'y' : 'n' ).'_'.$org_ID.'_'.$edited_User->ID );
 				}
 				else
 				{
 					$accept_icon_params = array();
 				}
-				if( $org_is_accepted )
+				if( $org_data['accepted'] )
 				{ // Organization is accepted by admin
-					$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+					$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Membership has been accepted.') ), $accept_icon_params ) );
 				}
 				else
 				{ // Organization is not accepted by admin yet
-					$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+					$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Membership pending acceptance.') ), $accept_icon_params ) );
 				}
-				$Form->inputstart = $Form->inputstart.$accept_icon;
+				$inputstart_icon = $accept_icon.' ';
 			}
-			$Form->select_input_object( 'organizations[]', $org_ID, $OrganizationCache, T_('Organization'), array( 'allow_none' => true, 'field_suffix' => $org_suffix ) );
+
+			if( $org_ID > 0 && ! $perm_edit_users && $org_data['accepted'] )
+			{ // Display only info of the assigned organization
+				$Form->infostart = $Form->infostart.$inputstart_icon;
+				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'].' &nbsp; ';
+				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
+				$Form->info_field( T_('Organization'), $org_data['name'], array(
+						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
+						'name'         => 'organizations[]'
+					) );
+			}
+			else
+			{ // Allow to update the oraganization fields
+				$Form->output = false;
+				$Form->switch_layout( 'none' );
+				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				$Form->switch_layout( NULL );
+				$Form->output = true;
+
+				$Form->inputstart = $Form->inputstart.$inputstart_icon;
+				$Form->select_input_object( 'organizations[]', $org_ID, $OrganizationCache, T_('Organization'), array(
+						'allow_none'   => $org_allow_none,
+						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon
+					) );
+			}
+			$Form->infostart = $form_infostart;
 			$Form->inputstart = $form_inputstart;
 		}
 	}
@@ -572,9 +606,10 @@ $Form->end_form();
 
 ?>
 <script type="text/javascript">
-	function replace_form_params( result )
+	function replace_form_params( result, field_id )
 	{
-		return result.replace( '#fieldstart#', '<?php echo format_to_js( str_ireplace( '$id$', '', $Form->fieldstart ) ); ?>' )
+		field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
+		return result.replace( '#fieldstart#', '<?php echo str_ireplace( '$id$', "' + field_id + '", format_to_js( $Form->fieldstart ) ); ?>' )
 			.replace( '#fieldend#', '<?php echo format_to_js( $Form->fieldend ); ?>' )
 			.replace( '#labelclass#', '<?php echo format_to_js( $Form->labelclass ); ?>' )
 			.replace( '#labelstart#', '<?php echo format_to_js( $Form->labelstart ); ?>' )
@@ -752,42 +787,74 @@ $Form->end_form();
 	} );
 
 <?php
-if( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs )
-{ // JS code to add new organization for user
+// JS code to add new organization for user
 ?>
-	var max_organizations = <?php echo $count_all_orgs - $count_user_orgs; ?>;
+	var org_fieldset_selector = '[id^="ffield_organizations_"]';
+	var max_organizations = <?php echo $count_all_orgs; ?>;
+	var user_org_num = 0;
 	jQuery( document ).on( 'click', 'span.add_org', function()
 	{ // Add new organization select box
-		if( max_organizations == 0 )
-		{ // Exit here because the user already is in all organizations
-			return;
-		}
-		max_organizations--;
-
 		var this_obj = jQuery( this );
 		var params = '<?php
 			global $b2evo_icons_type;
 			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
 		?>';
 
+		params += ( typeof( remove_obj_after_org_adding ) != 'undefined' ? '&first_org=1' : '' );
 		jQuery.ajax(
 		{
 			type: 'POST',
 			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
-			data: 'action=get_user_new_org&user_id=<?php echo $edited_User->ID; ?>' + params,
+			data: 'action=get_user_new_org' + params,
 			success: function( result )
 			{
-				result = replace_form_params( ajax_debug_clear( result ) );
-				var cur_fieldset_obj = this_obj.parent().parent();
+				result = replace_form_params( ajax_debug_clear( result ), 'ffield_organizations_' + user_org_num );
+				var cur_fieldset_obj = this_obj.closest( org_fieldset_selector );
 				cur_fieldset_obj.after( result );
-				if( max_organizations == 0 )
-				{ // It was last organization, Remove all buttons to add new
-					jQuery( 'span.add_org' ).remove();
+
+				if( typeof( remove_obj_after_org_adding ) != 'undefined' )
+				{ // Delete last fieldset
+					remove_obj_after_org_adding.remove();
+					delete remove_obj_after_org_adding;
 				}
+
+				if( jQuery( org_fieldset_selector ).length >= max_organizations )
+				{ // It was last organization, Hide all "add" buttons
+					jQuery( 'span.add_org' ).hide();
+				}
+
+				// Show/Hide all "remove" buttons
+				( jQuery( org_fieldset_selector ).length > 1 ) ?
+					jQuery( 'span.remove_org' ).show() :
+					jQuery( 'span.remove_org' ).hide();
+
+				user_org_num++;
 			}
 		} );
 	} );
-<?php } ?>
+
+	jQuery( document ).on( 'click', 'span.remove_org', function()
+	{ // Remove organization select box
+		if( jQuery( org_fieldset_selector ).length > 1 )
+		{
+			jQuery( this ).closest( org_fieldset_selector ).remove();
+		}
+		else
+		{ // Add a form to select an organization
+			remove_obj_after_org_adding = jQuery( this ).closest( org_fieldset_selector );
+			jQuery( this ).parent().find( 'span.add_org' ).click();
+		}
+
+		if( jQuery( org_fieldset_selector ).length < max_organizations )
+		{ // Show the "add" buttons
+			jQuery( 'span.add_org' ).show();
+		}
+
+		// Show/Hide all "remove" buttons
+		( jQuery( org_fieldset_selector ).length > 0 ) ?
+			jQuery( 'span.remove_org' ).show() :
+			jQuery( 'span.remove_org' ).hide();
+	} );
 </script>
 
 <script type="text/javascript">

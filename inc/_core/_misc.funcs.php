@@ -4852,9 +4852,9 @@ function get_manual_url( $topic )
  */
 function get_manual_link( $topic, $link_text = NULL, $action_word = NULL, $word_weight = 1 )
 {
-	global $Settings, $current_locale, $app_shortname, $app_version;
+	global $online_help_links;
 
-	if( isset( $Settings ) &&  $Settings->get('webhelp_enabled') )
+	if( $online_help_links )
 	{
 		$manual_url = get_manual_url( $topic );
 

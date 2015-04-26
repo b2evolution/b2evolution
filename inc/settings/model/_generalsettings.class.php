@@ -143,8 +143,6 @@ class GeneralSettings extends AbstractSettings
 		'passwd_special' => '0',					// Do not require a special character in password by default
 		'strict_logins' => 1,						// Allow only plain ACSII characters in user login
 
-		'webhelp_enabled' => '1',
-
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
 		'chapter_ordering' => 'alpha',              // TODO: Remove this when this global setting usage were removed from everywhere
 

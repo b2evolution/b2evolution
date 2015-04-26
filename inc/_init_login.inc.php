@@ -278,7 +278,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
 			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=gensettings"';
+				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
 				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
 			}
 		}
@@ -353,7 +353,7 @@ elseif( $Session->has_User() /* logged in */
 		{ // Current user is a "super admin"
 			if( ! $Messages->count() )
 			{ // If there are no other messages yet, display a warning about the system lock
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=gensettings"';
+				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
 				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
 			}
 		}

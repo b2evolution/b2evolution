@@ -114,10 +114,6 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // My Profile
 		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 25, array( 'link_type' => 'myprofile' ), 0 );
 	}
-	if( $kind != 'forum' )
-	{ // Blog owner contact form
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 30, array( 'link_type' => 'ownercontact' ) );
-	}
 	if( $kind == 'std' )
 	{ // Categories
 		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 33, array( 'link_type' => 'catdir' ) );

@@ -5892,7 +5892,24 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11380' );
+		set_upgrade_checkpoint( '11380' );
+	}
+
+	if( $old_db_version < 11390 )
+	{ // part 18.i trunk aka 11th part of "i7"
+
+		task_begin( 'Upgrading table of relations users with organizations... ' );
+		$DB->query( 'ALTER TABLE T_users__user_org
+			ADD COLUMN uorg_role VARCHAR(255) NULL' );
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11390' );
 	}
 
 	/*

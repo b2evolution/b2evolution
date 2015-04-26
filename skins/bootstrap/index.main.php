@@ -30,6 +30,7 @@ skin_init( $disp );
 skin_include( '_html_header.inc.php', array(
 	'html_tag' => '<!DOCTYPE html>'."\r\n"
 	             .'<html lang="'.locale_lang( false ).'">',
+	'viewport_tag' => '#responsive#',
 ) );
 // Note: You can customize the default HTML header by copying the generic
 // /skins/_html_header.inc.php file into the current skin folder.

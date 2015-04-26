@@ -179,7 +179,7 @@ span.icon {
   line-height: 16px;
   padding: 0 !important;
   font-size: 9px;
-  display: inline-block !important;
+  display: inline-block;
   overflow: hidden;
   vertical-align: middle;
 }
@@ -470,6 +470,13 @@ div.image_legend {
   color: #aaa;
   margin: 1ex;
 }
+.image_rounded img {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+}
 img.avatar_before_login {
   margin-right: 2px;
   vertical-align: top;
@@ -517,6 +524,27 @@ a.selected {
   border-radius: 2px 2px 0 0;
   margin-bottom: 2px;
 }
+div.avatartag {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0.5em 0.5em 0;
+}
+div.avatartag a {
+  outline: none;
+}
+div.avatartag.main {
+  display: block;
+  float: none !important;
+}
+div.avatartag.main > a {
+  float: left;
+}
+div.avatartag.main a:first-child {
+  margin-right: 25px;
+}
+div.avatartag.main .avatar_actions {
+  margin-right: 25px;
+}
 .avatar_actions {
   float: left;
   line-height: 26px;
@@ -557,6 +585,15 @@ a.selected {
 div.avatartag.main > img:first-child {
   float: left;
   margin-right: 25px;
+}
+@media only screen and (max-width: 480px) {
+  .avatar_main_frame > a:first-child {
+    margin-right: 0;
+  }
+  .avatar_main_frame img {
+    max-width: 245px;
+    max-height: 245px;
+  }
 }
 #image_crop_block {
   display: table;
@@ -2448,7 +2485,7 @@ legend.panel-heading {
 }
 .form_add_contacts {
   display: block;
-  padding-top: 5px;
+  padding: 5px 0 20px 0;
 }
 .form_add_contacts .label {
   color: #333;
@@ -2460,8 +2497,21 @@ legend.panel-heading {
 }
 .form_add_contacts .control-label {
   width: auto;
+  padding-top: 2px;
   padding-left: 0;
   line-height: 24px;
+}
+.form_add_contacts .control-label span.fa {
+  top: -2px !important;
+  left: -5px;
+}
+.form_add_contacts .form-control {
+  display: inline-block;
+  width: auto;
+}
+.form_send_contacts span.fa {
+  top: -2px !important;
+  left: -5px;
 }
 .form-horizontal .controls input.large,
 .form-horizontal .controls .form-control.form_textarea_input {

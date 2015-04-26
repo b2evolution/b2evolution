@@ -577,6 +577,7 @@ switch( $action )
 					load_funcs( 'tools/model/_system.funcs.php' );
 					if( system_check_charset_update() )
 					{
+						$require_charset_update = true;
 						display_install_messages( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the preselected task below:"), utf8_strtoupper( $evo_charset ) ) );
 					}
 				}
@@ -826,6 +827,8 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
+		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
+
 		if( $config_test_install_all_features && $allow_evodb_reset )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 			$delete_contents = param( 'delete_contents', 'integer', 0 );
@@ -859,8 +862,6 @@ switch( $action )
 
 			break;
 		}
-
-		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
 
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		evo_flush();

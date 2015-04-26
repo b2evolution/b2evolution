@@ -5,6 +5,14 @@
 
 @import "_dev-blocks.module.less";
 
+.border-radius (@radius: 4px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	-ms-border-radius: @radius;
+	-o-border-radius: @radius;
+	border-radius: @radius;
+}
+
 .transition( @transition ) {
 	-webkit-transition: @transition;
 			 -o-transition: @transition;
@@ -46,6 +54,10 @@ div.image_legend {
 	font-size: 84%;
 	color: #aaa;
 	margin: 1ex;
+}
+// Rounded images
+.image_rounded img {
+	.border-radius( 50% );
 }
 // Avatar images
 img.avatar_before_login {
@@ -103,6 +115,27 @@ a.selected {
 // ---------------- //
 
 // Layout for editing the avatars on "Profile picture" pages:
+div.avatartag {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 0.5em 0.5em 0;
+	a {
+		outline: none;
+	}
+	&.main {
+		display: block;
+		float: none !important;
+		&>a {
+			float: left;
+		}
+		a:first-child {
+			margin-right: 25px;
+		}
+		.avatar_actions {
+			margin-right: 25px;
+		}
+	}
+}
 .avatar_actions {
 	float: left;
 	line-height: 26px;
@@ -142,7 +175,17 @@ div.avatartag.main > img:first-child {
 	float: left;
 	margin-right: 25px;
 }
-
+@media only screen and (max-width: 480px) {
+	.avatar_main_frame {
+		> a:first-child {
+			margin-right: 0;
+		}
+		img {
+			max-width: 245px;
+			max-height: 245px;
+		}
+	}
+}
 // ---------------- //
 
 // Window to crop profile image:

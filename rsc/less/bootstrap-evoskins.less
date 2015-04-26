@@ -499,7 +499,7 @@ legend.panel-heading {
 // Form to add contacts
 .form_add_contacts {
 	display: block;
-	padding-top: 5px;
+	padding: 5px 0 20px 0;
 	.label {
 		color: #333;
 		font-size: 100%;
@@ -510,8 +510,23 @@ legend.panel-heading {
 	}
 	.control-label {
 		width: auto;
+		padding-top: 2px;
 		padding-left: 0;
 		line-height: 24px;
+		span.fa {
+			top: -2px !important;
+			left: -5px;
+		}
+	}
+	.form-control {
+		display: inline-block;
+		width: auto;
+	}
+}
+.form_send_contacts {
+	span.fa {
+		top: -2px !important;
+		left: -5px;
 	}
 }
 

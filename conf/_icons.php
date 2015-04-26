@@ -1019,7 +1019,7 @@ function get_icon_info($name)
 			'glyph' => 'plus-sign',
 			'fa' => 'plus-circle'
 		);
-		case 'remove': return array(
+		case 'minus': return array(
 			'alt'  => T_('Remove'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 48, 224 ),

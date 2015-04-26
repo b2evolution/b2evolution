@@ -5978,26 +5978,29 @@ class Item extends ItemLight
 
 			if( $Plugin )
 			{
-				$Messages->add( sprintf(T_('Pinging %s...'), $Plugin->ping_service_name), 'note' );
+				$ping_messages = array();
+				$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
 				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
 				$r = $r && ( $Plugin->ItemSendPing( $params ) );
 
-				if( !empty($params['xmlrpcresp']) )
+				if( ! empty( $params['xmlrpcresp'] ) )
 				{
-					if( is_a($params['xmlrpcresp'], 'xmlrpcresp') )
+					if( is_a( $params['xmlrpcresp'], 'xmlrpcresp' ) )
 					{
 						// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
 						ob_start();
 						xmlrpc_displayresult( $params['xmlrpcresp'], true );
-						$Messages->add( ob_get_contents(), 'note' );
+						$ping_messages[] = ob_get_contents();
 						ob_end_clean();
 					}
 					else
 					{
-						$Messages->add( $params['xmlrpcresp'], 'note' );
+						$ping_messages[] = $params['xmlrpcresp'];
 					}
 				}
+
+				$Messages->add( implode( '<br />', $ping_messages ), 'note' );
 			}
 		}
 		return $r;

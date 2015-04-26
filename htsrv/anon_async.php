@@ -987,12 +987,24 @@ switch( $action )
 			break;
 		}
 
-		$user_ID = param( 'user_id', 'integer', 0 );
+		$first_org = param( 'first_org', 'integer', 0 );
 
 		// Use the glyph or font-awesome icons if it is defined by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
 		$Form = new Form();
+
+		$OrganizationCache = & get_OrganizationCache();
+		$OrganizationCache->clear();
+		$OrganizationCache->load_all();
+
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$org_suffix = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', '', 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+
+		// Special form template that will be replaced to current skin on ajax response
 		$Form->fieldstart = '#fieldstart#';
 		$Form->fieldend = '#fieldend#';
 		$Form->labelclass = '#labelclass#';
@@ -1001,25 +1013,9 @@ switch( $action )
 		$Form->inputstart = '#inputstart#';
 		$Form->inputend = '#inputend#';
 
-		// Select the org IDs which user already is in
-		$SQL = new SQL();
-		$SQL->SELECT( 'uorg_org_ID' );
-		$SQL->FROM( 'T_users__user_org' );
-		$SQL->WHERE( 'uorg_user_ID = '.$DB->quote( $user_ID ) );
-		$user_org_IDs = $DB->get_col( $SQL->get() );
-
-		$OrganizationCache = & get_OrganizationCache();
-		$OrganizationCache->clear();
-		if( empty( $user_org_IDs ) )
-		{ // The user has no organizations, Load all
-			$OrganizationCache->load_all();
-		}
-		else
-		{ // Exclude the organizations which user already is in
-			$OrganizationCache->load_where( 'org_ID NOT IN ( '.implode( ', ', $user_org_IDs ).' )' );
-		}
-		$org_siffix = get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer' ) );
-		$Form->select_input_object( 'organizations[]', 0, $OrganizationCache, T_('Organization'), array( 'allow_none' => true, 'field_suffix' => $org_siffix ) );
+		$org_suffix .= ' '.get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer' ) );
+		$org_suffix .= ' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_org', 'style' => 'cursor:pointer' ) );
+		$Form->select_input_object( 'organizations[]', 0, $OrganizationCache, T_('Organization'), array( 'allow_none' => $first_org ? true : false, 'field_suffix' => $org_suffix ) );
 
 		break;
 

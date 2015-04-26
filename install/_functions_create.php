@@ -1216,7 +1216,7 @@ function create_user( $params = array() )
 
 	if( ! empty( $params['org_IDs'] ) )
 	{ // Add user to organizations
-		$User->update_organizations( $params['org_IDs'], true );
+		$User->update_organizations( $params['org_IDs'], array(), true );
 	}
 
 	if( ! empty( $params['fields'] ) )

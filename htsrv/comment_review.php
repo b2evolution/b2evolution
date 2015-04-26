@@ -159,11 +159,13 @@ switch( $action )
 
 headers_content_mightcache( 'text/html', 0 );  // Do NOT cache!
 
+$b2evo_icons_type = 'fontawesome';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo ' '.T_('Comment review').' '; ?></title>
+	<link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css?v=<?php echo $app_version_long; ?>">
 </head>
 
 <body>

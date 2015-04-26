@@ -195,6 +195,7 @@ $schema_queries = array(
 			uorg_user_ID  INT(11) UNSIGNED NOT NULL,
 			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
 			uorg_accepted TINYINT(1) DEFAULT 0,
+			uorg_role     VARCHAR(255) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

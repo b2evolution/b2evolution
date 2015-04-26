@@ -33,6 +33,7 @@ skin_init( $disp );
 skin_include( '_html_header.inc.php', array(
 	'html_tag'   => '<!DOCTYPE html>'."\r\n"
 	               .'<html lang="'.locale_lang( false ).'">',
+	'viewport_tag' => '#responsive#',
 	'front_text' => '',
 	'posts_text' => isset( $bootstrap_manual_posts_text ) ? $bootstrap_manual_posts_text : '',
 ) );

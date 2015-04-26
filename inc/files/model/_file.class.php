@@ -1062,6 +1062,7 @@ class File extends DataObject
 	 * @param string image caption/description
 	 * @param integer Link ID
 	 * @param integer Ratio size, can be 1, 2 and etc.
+	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1076,7 +1077,8 @@ class File extends DataObject
 	                  $image_alt = '',
 	                  $image_desc = '#',
 	                  $image_link_id = '',
-	                  $image_size_x = 1 )
+	                  $image_size_x = 1,
+	                  $tag_size = 1 )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1099,7 +1101,7 @@ class File extends DataObject
 			$img = '';
 			foreach( $x_sizes as $x_size )
 			{
-				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size );
+				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
 
 				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
 				{ // If image larger than 64x64 add class to display animated gif during loading
@@ -2123,7 +2125,7 @@ class File extends DataObject
 	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
 	 * @return string
 	 */
-	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '' )
+	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '', $tag_size = 1 )
 	{
 		global $use_strict;
 
@@ -2132,7 +2134,7 @@ class File extends DataObject
 			return '';
 		}
 
-		$img_attribs = $this->get_img_attribs( $size_name, $title );
+		$img_attribs = $this->get_img_attribs( $size_name, $title, NULL, 1, $tag_size );
 
 		if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
 		{ // If image larger than 64x64 add class to display animated gif during loading
@@ -2149,7 +2151,7 @@ class File extends DataObject
 			$img_attribs['align'] = $align;
 		}
 
-		return '<img'.get_field_attribs_as_string($img_attribs).' />';
+		return '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 	}
 
 
@@ -2165,9 +2167,10 @@ class File extends DataObject
 	 * @param string Title img attribute
 	 * @param string Alt img attribute
 	 * @param integer Ratio size, can be 1, 2 and etc.
+	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1 )
+	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = 1 )
 	{
 		$img_attribs = array(
 				'title' => isset($title) ? $title : $this->get('title'),
@@ -2198,6 +2201,13 @@ class File extends DataObject
 			if( substr( $thumb_path, 0, 1 ) != '!'
 				&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
 			{ // no error, add width and height attribs
+				if( $tag_size != 1 )
+				{ // Change size values
+					foreach( $size_arr as $s => $size_value )
+					{
+						$size_arr[ $s ] = ceil( $size_value * $tag_size );
+					}
+				}
 				$img_attribs += $size_arr;
 			}
 		}

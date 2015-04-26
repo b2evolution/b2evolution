@@ -454,7 +454,7 @@ if( count( $Results->rows ) > 0 )
 
 	$Form->combo_box( 'group', param( 'group_combo', 'string', '' ), get_contacts_groups_options( param( 'group', 'string', '-1' ), false ), $multi_action_icon.T_('Add all selected contacts to this group'), array( 'new_field_size' => '8' ) );
 
-	$Form->buttons( array( array( 'submit', 'actionArray[add_group]', T_('Add'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[add_group]', T_('Add'), 'SaveButton btn-primary btn-sm' ) ) );
 
 	echo '</span>';
 

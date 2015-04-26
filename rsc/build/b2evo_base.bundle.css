@@ -182,7 +182,7 @@ span.icon {
   line-height: 16px;
   padding: 0 !important;
   font-size: 9px;
-  display: inline-block !important;
+  display: inline-block;
   overflow: hidden;
   vertical-align: middle;
 }
@@ -851,6 +851,15 @@ a.selected {
 div.avatartag.main > img:first-child {
   float: left;
   margin-right: 25px;
+}
+@media only screen and (max-width: 480px) {
+  .avatar_main_frame > a:first-child {
+    margin-right: 0;
+  }
+  .avatar_main_frame img {
+    max-width: 245px;
+    max-height: 245px;
+  }
 }
 #image_crop_block {
   display: table;

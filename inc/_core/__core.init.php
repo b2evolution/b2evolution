@@ -887,7 +887,7 @@ class _core_Module extends Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $home_url, $admin_url, $debug, $dev_menu, $seo_page_type, $robots_index;
+		global $baseurl, $home_url, $admin_url, $debug, $dev_menu, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;
@@ -899,7 +899,16 @@ class _core_Module extends Module
 		$working_blog = get_working_blog();
 		if( $working_blog )
 		{ // Set collection url only when current user has an access to the working blog
-			$collection_url = $admin_url.'?ctrl=dashboard&amp;blog='.$working_blog;
+			if( is_admin_page() )
+			{ // Front page of the working blog
+				$BlogCache = & get_BlogCache();
+				$working_Blog = & $BlogCache->get_by_ID( $working_blog );
+				$collection_url = $working_Blog->get( 'url' );
+			}
+			else
+			{ // Dashboard of the working blog
+				$collection_url = $admin_url.'?ctrl=dashboard&amp;blog='.$working_blog;
+			}
 		}
 		if( $perm_admin_normal || $perm_admin_restricted )
 		{ // Normal OR Restricted Access to Admin:
@@ -914,7 +923,7 @@ class _core_Module extends Module
 			}
 			$entries['front'] = array(
 					'text' => T_('Home'),
-					'href' => $home_url,
+					'href' => $baseurl,
 					'title' => T_('Go to the home page (Front-office)'),
 				);
 			$entries['dashboard'] = array(
@@ -948,12 +957,6 @@ class _core_Module extends Module
 
 		if( ! empty( $Blog ) )
 		{ // A blog is currently selected:
-			if( $perm_admin_restricted )
-			{
-				$entries['front']['href'] = $Blog->get( 'url' );
-				$entries['front']['title'] = T_('Go to the front page of the current collection');
-			}
-
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				$write_item_url = $Blog->get_write_item_url();
@@ -990,9 +993,15 @@ class _core_Module extends Module
 				{ // Check if current user has an access to post lists
 					$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
 
+					// Collection front page
+					$entries['blog']['entries']['coll_front'] = array(
+							'text' => T_('Collection Front Page').'&hellip;',
+							'href' => $Blog->get( 'url' )
+						);
+
 					// Collection dashboard
 					$entries['blog']['entries']['coll_dashboard'] = array(
-							'text' => T_('Collection Dashboard.').'&hellip;',
+							'text' => T_('Collection Dashboard').'&hellip;',
 							'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$Blog->ID
 						);
 
@@ -1255,31 +1264,6 @@ class _core_Module extends Module
 				}
 			}
 
-			global $debug_jslog;
-			if( $debug || $debug_jslog )
-			{ // Show JS log menu if debug is enabled
-
-				$dev_entries[] = array(
-						'separator' => true,
-					);
-
-				$dev_entries['jslog'] = array(
-					'text'  => T_('JS log'),
-					'title' => T_('JS log'),
-					'class' => 'jslog_switcher'
-				);
-			}
-
-			if( ! empty( $dev_entries ) )
-			{ // Add Dev menu if at least one entry is should be displayed
-				$entries['dev'] = array(
-						'href'    => $admin_url.'#',
-						'text'    => '<span class="fa fa-wrench"></span> Dev',
-						'entries' => $dev_entries,
-					);
-			}
-
-
 			// MORE menu:
 			if( $current_User->check_perm( 'users', 'view' ) )
 			{ // Users:
@@ -1364,11 +1348,7 @@ class _core_Module extends Module
 
 
 			if( $perm_options )
-			{	// Global settings:
-				$entries['tools']['entries']['system']['entries']['general'] = array(
-						'text' => T_('General').'&hellip;',
-						'href' => $admin_url.'?ctrl=gensettings',
-					);
+			{ // Global settings:
 				$entries['tools']['entries']['system']['entries']['regional'] = array(
 						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
@@ -1411,6 +1391,34 @@ class _core_Module extends Module
 		 */
 		global $localtimenow, $is_admin_page;
 
+		$entries = array();
+
+		// Dev menu:
+		global $debug_jslog;
+		if( $debug || $debug_jslog )
+		{ // Show JS log menu if debug is enabled
+
+			$dev_entries[] = array(
+					'separator' => true,
+				);
+
+			$dev_entries['jslog'] = array(
+				'text'  => T_('JS log'),
+				'title' => T_('JS log'),
+				'class' => 'jslog_switcher'
+			);
+		}
+
+		if( ! empty( $dev_entries ) )
+		{ // Add Dev menu if at least one entry is should be displayed
+			$entries['dev'] = array(
+					'href'    => $admin_url.'#',
+					'text'    => '<span class="fa fa-wrench"></span> Dev',
+					'entries' => $dev_entries,
+				);
+		}
+
+		// User menu:
 		$current_user_Group = $current_User->get_Group();
 		$userprefs_entries = array(
 			'name' => array(
@@ -1464,18 +1472,16 @@ class _core_Module extends Module
 				);
 		}
 	
-		$entries = array(
-			'userprefs' => array(
-					'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
-					'href'    => get_user_profile_url(),
-					'entries' => $userprefs_entries,
-				),
-			'time' => array(
-					'text' => date( locale_shorttimefmt(), $localtimenow ),
-					'disabled' => true,
-					'entry_class' => 'rwdhide'
-				),
-		);
+		$entries['userprefs'] = array(
+				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+				'href'    => get_user_profile_url(),
+				'entries' => $userprefs_entries,
+			);
+		$entries['time'] = array(
+				'text'        => date( locale_shorttimefmt(), $localtimenow ),
+				'disabled'    => true,
+				'entry_class' => 'rwdhide'
+			);
 
 		if( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'options', 'view' ) )
 		{ // Make time as link to Timezone settings if permission
@@ -1711,9 +1717,6 @@ class _core_Module extends Module
 
 
 			$AdminUI->add_menu_entries( 'options', array(
-				'general' => array(
-					'text' => T_('General'),
-					'href' => '?ctrl=gensettings', ),
 				'regional' => array(
 					'text' => T_('Regional'),
 					'href' => '?ctrl=regional',

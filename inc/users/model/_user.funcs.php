@@ -1681,6 +1681,7 @@ function get_user_avatar_styled( $user_ID, $params )
  * @param string Avatar size
  * @param string Style class of image
  * @param string Image align
+ * @param array Params
  * @return string <img> tag
  */
 function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $align = '', $params = array() )
@@ -1698,6 +1699,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 			'username' => '',
 			'default'  => '',
 			'gender'   => '', // M - Men; F - Female/Women; Empty string - Unknown gender
+			'tag_size' => 1, // Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
 		), $params );
 
 	if( ! $Settings->get('use_gravatar') )
@@ -1751,6 +1753,11 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 		}
 	}
 
+	if( $params['tag_size'] != 1 )
+	{ // Change tag size
+		$gravatar_width = ceil( $params['tag_size'] * $gravatar_width );
+		$gravatar_height = ceil( $params['tag_size'] * $gravatar_height );
+	}
 	$img_params = array(
 			'src'    => $img_url,
 			'width'  => $gravatar_width,  // dh> NOTE: works with gravatar, check if extending

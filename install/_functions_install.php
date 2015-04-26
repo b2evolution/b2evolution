@@ -633,7 +633,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
 		install_plugin( 'escapecode_plugin' );
-		install_plugin( 'adsense_plugin' );
 		install_plugin( 'bbcode_plugin', $test_install_all_features );
 		install_plugin( 'star_plugin', $test_install_all_features );
 		install_plugin( 'prism_plugin', $test_install_all_features );
@@ -1060,7 +1059,7 @@ function do_install_htaccess( $upgrade = false )
 	}
 	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
 	{
-		return sprintf( T_('%s was not found as expected.'), 'install/test/index.html' );
+		return sprintf( T_('%s was not found as expected.'), $baseurl.'install/test/index.html' );
 	}
 
 	// Now we consider it's safe, copy .htaccess to its real location:
@@ -1160,6 +1159,7 @@ function stop_install_progress_bar()
 {
 	echo '<script type="text/javascript">'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
+		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-success" ); }, 600 );'
 	.'</script>';
 }
 

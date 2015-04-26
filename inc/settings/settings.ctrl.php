@@ -27,31 +27,6 @@ param( 'action', 'string' );
 
 switch( $action )
 {
-	case 'update':
-		// UPDATE general settings:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'globalsettings' );
-
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
-
-		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
-
-		// Online help
-		param( 'webhelp_enabled', 'integer', 0 );
-		$Settings->set( 'webhelp_enabled', $webhelp_enabled );
-
-		if( ! $Messages->has_errors() )
-		{
-			$Settings->dbupdate();
-			$Messages->add( T_( 'General settings updated.' ), 'success' );
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=gensettings', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
-		break;
-
 	case 'update_tools':
 		// UPDATE general settings from tools:
 
@@ -85,10 +60,11 @@ switch( $action )
 }
 
 
+$AdminUI->set_path( 'options', 'misc', 'tools' );
+
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('General'), $admin_url.'?ctrl=gensettings' );
+$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -100,7 +76,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 // Display VIEW:
-$AdminUI->disp_view( 'settings/views/_settings_general.form.php' );
+$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 
 // End payload block:
 $AdminUI->disp_payload_end();

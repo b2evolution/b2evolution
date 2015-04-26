@@ -186,7 +186,17 @@ div.avatartag.main > img:first-child {
 	float: left;
 	margin-right: 25px;
 }
-
+@media only screen and (max-width: 480px) {
+	.avatar_main_frame {
+		> a:first-child {
+			margin-right: 0;
+		}
+		img {
+			max-width: 245px;
+			max-height: 245px;
+		}
+	}
+}
 // ---------------- //
 
 // Window to crop profile image:
