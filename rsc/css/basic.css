@@ -1052,6 +1052,12 @@ ul.jslog_error {
   width: 128px;
   text-align: center;
 }
+#overlay_page form {
+  background: #FFF;
+}
+#overlay_page form legend {
+  width: 100%;
+}
 .widget--social-media-links {
   text-align: center;
 }

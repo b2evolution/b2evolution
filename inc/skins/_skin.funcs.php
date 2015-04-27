@@ -641,6 +641,8 @@ var downloadInterval = setInterval( function()
 			{	// Used for combo_box contacts groups
 				require_js( 'form_extensions.js', 'blog' );
 			}
+			// Load javascript function to open popup windows fro contacts, report and etc.
+			//load_funcs( 'users/model/_user.funcs.php' );
 			break;
 
 		case 'edit':

@@ -199,7 +199,7 @@ class Link extends DataObject
 				'image_alt'           => '',
 				'image_desc'          => '#',
 				'image_size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'tag_size'            => 1,
+				'tag_size'            => NULL,
 			), $params );
 
 		return $File->get_tag( $params['before_image'],

@@ -123,10 +123,24 @@ function set_contact_blocked( $user_ID, $blocked )
 {
 	global $current_User, $DB;
 
-	$sql = 'UPDATE T_messaging__contact
-				SET mct_blocked = '.$blocked.'
-					WHERE mct_from_user_ID = '.$current_User->ID.'
-					AND mct_to_user_ID = '.$user_ID;
+	// Check if user is in contact list
+	$is_contact = check_contact( $user_ID );
+
+	if( $is_contact === NULL )
+	{ // Add user to the contacts list
+		global $localtimenow;
+		$datetime = date( 'Y-m-d H:i:s', $localtimenow );
+		$sql = 'INSERT INTO T_messaging__contact
+			( mct_from_user_ID, mct_to_user_ID, mct_blocked, mct_last_contact_datetime ) VALUES
+			( '.$current_User->ID.', '.$DB->quote( $user_ID ).', '.$DB->quote( $blocked ).', '.$DB->quote( $datetime ).' )';
+	}
+	else
+	{ // Update the block status
+		$sql = 'UPDATE T_messaging__contact
+		    SET mct_blocked = '.$DB->quote( $blocked ).'
+		  WHERE mct_from_user_ID = '.$current_User->ID.'
+		    AND mct_to_user_ID = '.$DB->quote( $user_ID );
+	}
 
 	return $DB->query( $sql );
 }
@@ -1037,6 +1051,94 @@ function remove_contacts_group_user( $group_ID, $user_ID )
 
 
 /**
+ * Update contact groups for user in database
+ *
+ * @param string Users ID
+ * @param array Group IDs
+ * @param boolean TRUE to block the contact, FALSE to unblock, NULL to don't touch the contact block status
+ * @return boolean TRUE if success, else FALSE
+ */
+function update_contacts_groups_user( $user_ID, $groups, $blocked = NULL )
+{
+	global $DB, $current_User, $Messages;
+
+	if( empty( $user_ID ) )
+	{ // No selected user
+		return false;
+	}
+
+	if( $blocked !== NULL )
+	{ // Update the contact block status
+		set_contact_blocked( $user_ID, intval( $blocked ) );
+	}
+
+	$insert_sql = 'REPLACE INTO T_messaging__contact_groupusers ( cgu_user_ID, cgu_cgr_ID ) VALUES ';
+
+	foreach( $groups as $group )
+	{
+		if( $group == 'new' || intval( $group ) < 0 )
+		{ // Add new group
+			if( intval( $group ) < 0 )
+			{ // Default group
+				$default_groups = get_contacts_groups_default();
+				if( isset( $default_groups[$group] ) )
+				{ // Get group name
+					$group_name = $default_groups[$group];
+				}
+			}
+			else
+			{ // New entered group
+				$group_name = param( 'contact_group_new', 'string' );
+				if( empty( $group_name ) )
+				{
+					$Messages->add( T_('Please enter name for new group.'), 'error' );
+				}
+			}
+
+			if( $group_ID = create_contacts_group( $group_name ) )
+			{ // Create new group
+				$Messages->add( T_('New contacts group has been created.'), 'success' );
+			}
+		}
+		else
+		{ // Existing group
+			$group_ID = intval( $group );
+		}
+
+		if( empty( $group_ID ) )
+		{ // No defined group ID
+			continue;
+		}
+
+		$records[] = '( '.$user_ID.', '.$DB->quote( $group_ID ).' )';
+	}
+
+	$current_user_groups = get_contacts_groups_array( false );
+	if( count( $current_user_groups ) > 0 )
+	{ // Clear previous selected groups for the user before new updating, in order to delete the user from the unchecked groups
+		$DB->query( 'DELETE FROM T_messaging__contact_groupusers
+			WHERE cgu_user_ID = '.$DB->quote( $user_ID ).'
+			  AND cgu_cgr_ID IN ( '.$DB->quote( array_keys( $current_user_groups ) ).' )' );
+	}
+
+	if( count( $records ) == 0 )
+	{ // No data to add
+		return true;
+	}
+
+	$insert_sql .= implode( ', ', $records );
+	if( $DB->query( $insert_sql, 'Insert user for contact groups' ) )
+	{ // Success query
+		return true;
+	}
+	else
+	{ // Failed query
+		return false;
+	}
+}
+
+
+/**
  * Get default groups for user contacts
  *
  * @return array Groups
@@ -1053,6 +1155,67 @@ function get_contacts_groups_default()
 
 
 /**
+ * Get all contact groups of the current User
+ *
+ * @param boolean TRUE to include the default groups
+ * @return array Groups
+ */
+function get_contacts_groups_array( $include_default_groups = true )
+{
+	global $DB, $current_User;
+
+	// Get user groups
+	$SQL = new SQL();
+	$SQL->SELECT( 'cgr_ID AS ID, cgr_name AS name' );
+	$SQL->FROM( 'T_messaging__contact_groups' );
+	$SQL->WHERE( 'cgr_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL->ORDER_BY( 'cgr_name' );
+	$user_groups = $DB->get_assoc( $SQL->get() );
+
+	// Merge default and user groups (don't use a function array_merge() because it clears the keys)
+	$groups = array();
+	if( $include_default_groups )
+	{ // Include the default groups
+		$default_groups = get_contacts_groups_default();
+		foreach( $default_groups as $group_ID => $group_name )
+		{
+			if( ! in_array( $group_name, $user_groups ) )
+			{ // Set this default group If it doesn't exist in DB
+				$groups[ $group_ID ] = $group_name;
+			}
+		}
+	}
+	foreach( $user_groups as $group_ID => $group_name )
+	{
+		$groups[ $group_ID ] = $group_name;
+	}
+
+	return $groups;
+}
+
+
+/**
+ * Get what contact groups are selected for the user by current User
+ *
+ * @param integer
+ * @return array Group IDs
+ */
+function get_contacts_groups_by_user_ID( $user_ID )
+{
+	global $DB, $current_User;
+
+	// Get user groups
+	$SQL = new SQL();
+	$SQL->SELECT( 'cgu_cgr_ID' );
+	$SQL->FROM( 'T_messaging__contact_groups' );
+	$SQL->FROM_add( 'INNER JOIN T_messaging__contact_groupusers ON cgu_cgr_ID=cgr_ID' );
+	$SQL->WHERE( 'cgr_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL->WHERE_and( 'cgu_user_ID = '.$DB->quote( $user_ID ) );
+	return $DB->get_col( $SQL->get() );
+}
+
+
+/**
  * Get tags <option> for contacts groups of current User
  *
  * @param integer Selected group ID
@@ -1061,46 +1224,27 @@ function get_contacts_groups_default()
  */
 function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = true )
 {
-	global $DB, $current_User;
+	global $current_User;
 
-	$default_groups = get_contacts_groups_default();
+	$groups = get_contacts_groups_array();
 	$selected_default_group_name = $default_groups[-1]; // Close Friends
-
-	// Get user groups
-	$SQL = new SQL();
-	$SQL->SELECT( 'cgr_ID AS ID, cgr_name AS name' );
-	$SQL->FROM( 'T_messaging__contact_groups' );
-	$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
-	$SQL->ORDER_BY( 'cgr_name' );
-	$user_groups = $DB->get_assoc( $SQL->get() );
-
-	// Merge default and user groups (don't use a function array_merge() because it clears the keys)
-	$groups = array();
-	foreach( $default_groups as $group_ID => $group_name )
+	foreach( $groups as $group_ID => $group_name )
 	{
-		if( !in_array( $group_name, $user_groups ) )
-		{	// Set this default group If it doesn't exist in DB
-			$groups[$group_ID] = $group_name;
-		}
-	}
-	foreach( $user_groups as $group_ID => $group_name )
-	{
-		$groups[$group_ID] = $group_name;
 		if( $selected_default_group_name == $group_name )
-		{	// To know group ID of selected default group
+		{ // To know group ID of selected default group
 			$selected_default_group_ID = $group_ID;
 		}
 	}
 
 	if( isset( $selected_default_group_ID ) && $selected_group_ID == -1 )
-	{	// If default group already exists in DB we should use this group ID
+	{ // If default group already exists in DB we should use this group ID
 		$selected_group_ID = $selected_default_group_ID;
 	}
 
 	$options = '';
 
 	if( $value_null )
-	{	// Null option
+	{ // Null option
 		$options .= '<option value="0">'.T_('All').'</option>'."\n";
 	}
 
@@ -1108,7 +1252,7 @@ function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = t
 	{
 		$selected = '';
 		if( $selected_group_ID == $group_ID )
-		{	// Group is selected
+		{ // Group is selected
 			$selected = ' selected="selected"';
 		}
 		$options .= '<option value="'.$group_ID.'"'.$selected.'>'.$group_name.'</option>'."\n";
@@ -1253,7 +1397,7 @@ function check_contact( $to_user_ID )
 	$is_blocked = $DB->get_var( 'SELECT mct_blocked
 		 FROM T_messaging__contact
 		WHERE mct_from_user_ID = '.$current_User->ID.'
-		  AND mct_to_user_ID = '.$to_user_ID );
+		  AND mct_to_user_ID = '.$DB->quote( $to_user_ID ) );
 
 	if( is_null( $is_blocked ) )
 	{

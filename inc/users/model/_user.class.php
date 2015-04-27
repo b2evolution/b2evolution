@@ -3900,10 +3900,13 @@ class User extends DataObject
 	 * @param boolean true if the avatar image should be zoomed on click, false otherwise
 	 * @param string avatar overlay text
 	 * @param string group name for lightbox plugin
-	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
+	 * @param string Change size of the attributes "width" & "height".
+	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
+	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
+	 *                        NULL - use real size
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = 1 )
+	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = NULL )
 	{
 		global $current_User;
 

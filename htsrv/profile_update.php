@@ -50,6 +50,13 @@ if( $demo_mode && ( $current_User->ID <= 3 ) )
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'user' );
 
+$Blog = NULL;
+if( $blog > 0 )
+{ // Get Blog
+	$BlogCache = & get_BlogCache();
+	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+}
+
 switch( $action )
 {
 	case 'add_field':
@@ -140,17 +147,139 @@ switch( $action )
 			header_redirect( $redirect_to );
 		}
 		break;
-}
 
-$Blog = NULL;
-if( $blog > 0 )
-{	// Get Blog
-	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	case 'report_user':
+		// Report an user
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		if( ! $current_User->check_status( 'can_report_user' ) )
+		{ // current User status doesn't allow user reporting
+			// Redirect to the account activation page
+			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
+			header_redirect( get_activate_info_url(), 302 );
+			// will have exited
+		}
+
+		$report_status = param( 'report_user_status', 'string', '' );
+		$report_info = param( 'report_info_content', 'text', '' );
+		$user_ID = param( 'user_ID', 'integer', 0 );
+
+		$user_tab = param( 'user_tab', 'string' );
+		if( get_report_status_text( $report_status ) == '' )
+		{ // A report status is incorrect
+			$Messages->add( T_('Please select the correct report reason!'), 'error' );
+			$user_tab = 'report';
+		}
+
+		if( ! param_errors_detected() )
+		{
+			// add report and block contact ( it will be blocked if was already on this user contact list )
+			add_report_from( $user_ID, $report_status, $report_info );
+			$blocked_message = '';
+			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+			{ // user has messaging permission, set/add this user as blocked contact
+				$contact_status = check_contact( $user_ID );
+				if( $contact_status == NULL )
+				{ // contact doesn't exists yet, create as blocked contact
+					create_contacts_user( $user_ID, true );
+					$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+				}
+				elseif( $contact_status )
+				{ // contact exists and it's not blocked, set as blocked
+					set_contact_blocked( $user_ID, 1 );
+					$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
+				}
+			}
+			$Messages->add( T_('The user was reported.').$blocked_message, 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID, 303 ); // Will EXIT
+		}
+		elseif( ! empty( $Blog ) )
+		{
+			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+		}
+		// We have EXITed already at this point!!
+		break;
+
+	case 'remove_report':
+		// Remove current User report from the given user
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		if( ! $current_User->check_status( 'can_report_user' ) )
+		{ // current User status doesn't allow user reporting
+			// Redirect to the account activation page
+			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
+			header_redirect( get_activate_info_url(), 302 );
+			// will have exited
+		}
+
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		$user_tab = param( 'user_tab', 'string' );
+
+		remove_report_from( $user_ID );
+		$unblocked_message = '';
+		if( set_contact_blocked( $user_ID, 0 ) )
+		{ // the user was unblocked
+			$unblocked_message = ' '.T_('You have also unblocked this user. He will be able to contact you again in the future.');
+		}
+		$Messages->add( T_('The report was removed.').$unblocked_message, 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{
+			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID, 303 ); // Will EXIT
+		}
+		elseif( ! empty( $Blog ) )
+		{
+			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+		}
+		// We have EXITed already at this point!!
+		break;
+
+	case 'contact_group_save':
+		// Save an user to the selected contact groups
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
+		    ! $current_User->check_status( 'can_edit_contacts' ) )
+		{ // current User status doesn't allow user reporting
+			// Redirect to the account activation page
+			$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );
+			header_redirect( get_activate_info_url(), 302 );
+			// will have exited
+		}
+
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		$user_tab = param( 'user_tab', 'string' );
+		$contact_groups = param( 'contact_groups', 'array:string' );
+		$contact_blocked = param( 'contact_blocked', 'integer', 0 );
+
+		if( update_contacts_groups_user( $user_ID, $contact_groups, $contact_blocked ) )
+		{
+			$Messages->add( T_('The contact groups have been updated for this user.'), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		if( ! empty( $Blog ) )
+		{
+			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+		}
+		// We have EXITed already at this point!!
+		break;
 }
 
 if( empty( $Blog ) )
-{	// This case should not happen, $blog must be set
+{ // This case should not happen, $blog must be set
 	$Messages->add( T_( 'Unable to find the selected blog' ), 'error' );
 	header_redirect( $baseurl );
 }

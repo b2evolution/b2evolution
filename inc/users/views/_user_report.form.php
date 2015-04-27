@@ -66,7 +66,16 @@ if( $display_mode != 'js' )
 $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 $Form->hidden_ctrl();
-$Form->hidden( 'user_tab', $user_tab );
+if( is_admin_page() )
+{ // Params for backoffice
+	$Form->hidden( 'user_tab', $user_tab );
+	$Form->hidden( 'is_backoffice', 1 );
+}
+else
+{ // Params for frontoffice
+	global $Blog;
+	$Form->hidden( 'blog', $Blog->ID );
+}
 
 $close_icon = '';
 if( $display_mode == 'js' )
@@ -79,7 +88,12 @@ user_report_form( array(
 		'Form'       => $Form,
 		'user_ID'    => $edited_User->ID,
 		'crumb_name' => 'user',
-		'cancel_url' => $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;action=remove_report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb( 'user' ),
+		'cancel_url' => get_secure_htsrv_url().'profile_update.php?'
+										.( is_admin_page() ? 'is_backoffice=1&amp;' : '' )
+										.'action=remove_report&amp;'
+										.'user_ID='.$edited_User->ID.'&amp;'
+										.( empty( $Blog ) || is_admin_page() ? '' : 'blog='.$Blog->ID.'&amp;' )
+										.url_crumb( 'user' ),
 	) );
 
 $Form->end_fieldset();

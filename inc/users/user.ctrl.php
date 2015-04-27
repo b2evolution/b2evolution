@@ -66,7 +66,7 @@ if( ! is_null($user_ID) )
 		// We have EXITed already at this point!!
 	}
 
-	if( $action != 'view' && $action != 'report_user' && $action != 'remove_report' )
+	if( $action != 'view' )
 	{ // check edit permissions
 		if( ! $current_User->can_moderate_user( $edited_User->ID )
 		    && $edited_User->ID != $current_User->ID )
@@ -664,78 +664,6 @@ if( !$Messages->has_errors() )
 			}
 			break;
 
-		case 'report_user':
-			// Report a user
-
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
-			if( !$current_User->check_status( 'can_report_user' ) )
-			{ // current User status doesn't allow user reporting
-				// Redirect to the account activation page
-				$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
-				header_redirect( get_activate_info_url(), 302 );
-				// will have exited
-			}
-
-			$report_status = param( 'report_user_status', 'string', '' );
-			$report_info = param( 'report_info_content', 'text', '' );
-			$user_ID = param( 'user_ID', 'integer', 0 );
-
-			if( get_report_status_text( $report_status ) == '' )
-			{ // A report status is incorrect
-				$Messages->add( T_('Please select the correct report reason!'), 'error' );
-				$user_tab = 'report';
-			}
-
-			if( ! param_errors_detected() )
-			{
-				// add report and block contact ( it will be blocked if was already on this user contact list )
-				add_report_from( $user_ID, $report_status, $report_info );
-				$blocked_message = '';
-				if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-				{ // user has messaging permission, set/add this user as blocked contact
-					$contact_status = check_contact( $user_ID );
-					if( $contact_status == NULL )
-					{ // contact doesn't exists yet, create as blocked contact
-						create_contacts_user( $user_ID, true );
-						$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
-					}
-					elseif( $contact_status )
-					{ // contact exists and it's not blocked, set as blocked
-						set_contact_blocked( $user_ID, 1 );
-						$blocked_message = ' '.T_('You have also blocked this user from contacting you in the future.');
-					}
-				}
-				$Messages->add( T_('The user was reported.').$blocked_message, 'success' );
-			}
-
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID, 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-			break;
-
-		case 'remove_report':
-			// Remove current User report from the given user
-
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
-			$user_ID = param( 'user_ID', 'integer', 0 );
-
-			remove_report_from( $user_ID );
-			$unblocked_message = '';
-			if( set_contact_blocked( $user_ID, 0 ) )
-			{ // the user was unblocked
-				$unblocked_message = ' '.T_('You have also unblocked this user. He will be able to contact you again in the future.');
-			}
-			$Messages->add( T_('The report was removed.').$unblocked_message, 'success' );
-
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
-			// We have EXITed already at this point!!
-			break;
-
 		case 'delete_data':
 			// Delete all posts, comments or private messages of the user
 
@@ -1010,25 +938,6 @@ switch( $action )
 
 				$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
 				$AdminUI->disp_payload_end();
-				break;
-
-			case 'report':
-				if( $display_mode == 'js')
-				{ // Do not append Debuglog & Debug JSlog to response!
-					$debug = false;
-					$debug_jslog = false;
-				}
-
-				if( $display_mode != 'js')
-				{
-					$AdminUI->disp_payload_begin();
-				}
-				$user_tab = param( 'user_tab_from', 'string', 'profile' );
-				$AdminUI->disp_view( 'users/views/_user_report.form.php' );
-				if( $display_mode != 'js')
-				{
-					$AdminUI->disp_payload_end();
-				}
 				break;
 
 			case 'deldata':

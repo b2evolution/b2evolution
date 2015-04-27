@@ -6,6 +6,14 @@
  * Override this with style.css in your skin folder.
  */
 
+.border-radius (@radius: 4px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	-ms-border-radius: @radius;
+	-o-border-radius: @radius;
+	border-radius: @radius;
+}
+
 // Selectors for previous/next posts
 table.prevnext_post {
 	width: 95%;
@@ -620,13 +628,6 @@ div.item_location {
 	padding-right: 5px;
 }
 
-.edit_user_admin_link {
-	float: left;
-	margin-left: 33%;
-	min-width: 33%;
-	text-align: center
-}
-
 // jQuery Tokeninput plugin
 #ffield_item_tags ul.token-input-list-facebook {
 	width: 100%;
@@ -868,5 +869,30 @@ input.btn-lg {
 }
 
 .top_menu div.item_title {
+	display: inline-block;
+}
+
+// Profile page:
+.main_profile_picture {
+	.border-radius;
+}
+.other_profile_pictures {
+	margin-bottom: 10px;
+	img {
+		.border-radius;
+	}
+}
+.profile_column_left {
+	width: 300px;
+	max-width: 300px;
+	margin: 0 auto;
+}
+.profile_buttons {
+	.btn {
+		width: 100%;
+	}
+}
+form.bComment .other_profile_pictures div.avatartag {
+	float: none;
 	display: inline-block;
 }

@@ -1699,7 +1699,10 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 			'username' => '',
 			'default'  => '',
 			'gender'   => '', // M - Men; F - Female/Women; Empty string - Unknown gender
-			'tag_size' => 1, // Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
+			'tag_size' => NULL, // Change size of the attributes "width" & "height".
+			                    // Example: ( $tag_size = '160' ) => width="160" height="160"
+			                    //          ( $tag_size = '160x320' ) => width="160" height="320"
+			                    //          NULL - use real size
 		), $params );
 
 	if( ! $Settings->get('use_gravatar') )
@@ -1753,10 +1756,11 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 		}
 	}
 
-	if( $params['tag_size'] != 1 )
+	if( $params['tag_size'] !== NULL )
 	{ // Change tag size
-		$gravatar_width = ceil( $params['tag_size'] * $gravatar_width );
-		$gravatar_height = ceil( $params['tag_size'] * $gravatar_height );
+		$tag_size = explode( 'x', $params['tag_size'] );
+		$gravatar_width = $tag_size[0];
+		$gravatar_height = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
 	}
 	$img_params = array(
 			'src'    => $img_url,
@@ -4041,17 +4045,16 @@ function display_user_email_status_message( $user_ID = 0 )
  *
  * @param array Params
  */
-function echo_user_report_js( $params = array() )
+function echo_user_report_js()
 {
-	global $admin_url;
+	global $Blog;
 ?>
 <script type="text/javascript">
 <?php
 // Initialize JavaScript to build and open window
 echo_modalwindow_js();
 ?>
-
-function user_report( user_ID, user_tab_from )
+function user_report( user_ID, user_tab )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 		'auto', '', true,
@@ -4060,21 +4063,67 @@ function user_report( user_ID, user_tab_from )
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo $admin_url; ?>',
+		url: '<?php echo get_secure_htsrv_url().'anon_async.php'; ?>',
 		data:
 		{
-			'ctrl': 'user',
-			'user_tab': 'report',
-			'user_tab_from': user_tab_from,
+			'action': 'get_user_report_form',
+			<?php if( is_admin_page() ) { ?>
+			'is_backoffice': 1,
+			'user_tab': user_tab,
+			<?php } else { ?>
+			'blog': <?php echo $Blog->ID; ?>,
+			<?php } ?>
 			'user_ID': user_ID,
-			'display_mode': 'js',
-			'crumb_user': '<?php echo get_crumb('user'); ?>',
+			'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 		},
-		success: function(result)
+		success: function( result )
 		{
 			openModalWindow( result, 'auto', '',true,
-			'<?php echo TS_('Report User'); ?>',
-			[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ] );
+				'<?php echo TS_('Report User'); ?>',
+				[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ] );
+		}
+	} );
+	return false;
+}
+</script>
+<?php
+}
+
+
+/**
+ * Open contact user modal window
+ */
+function echo_user_contact_js()
+{
+	global $Blog;
+?>
+<script type="text/javascript">
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
+function user_contact( user_ID )
+{
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'auto', '', true,
+		'<?php echo TS_('Groups'); ?>',
+		'<?php echo TS_('Save'); ?>', true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_secure_htsrv_url().'anon_async.php'; ?>',
+		data:
+		{
+			'action': 'get_user_contact_form',
+			'blog': <?php echo $Blog->ID; ?>,
+			'user_ID': user_ID,
+			'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, 'auto', '', true,
+				'<?php echo TS_('Groups'); ?>',
+				'<?php echo TS_('Save'); ?>', true );
 		}
 	} );
 	return false;
@@ -4230,13 +4279,13 @@ function user_report_form( $params = array() )
 	// Use JS to show/hide textarea only for normal view
 	$use_js = ! ( isset( $display_mode ) && $display_mode == 'js' );
 
-	$Form->custom_content( '<p class="alert alert-warning"><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
-
 	// get current User report from edited User
 	$current_report = get_report_from( $params['user_ID'] );
 
 	if( $current_report == NULL )
 	{ // currentUser didn't add any report from this user yet
+		$Form->custom_content( '<p class="alert alert-warning"><strong>'.get_icon('warning_yellow').' '.T_( 'If you have an issue with this user, you can report it here:' ).'</strong></p>' );
+
 		$report_content = '<select id="report_user_status" name="report_user_status" class="form-control" style="width:auto">';
 		foreach( $report_options as $option => $option_label )
 		{ // add select option, none must be selected
@@ -4275,9 +4324,12 @@ function user_report_form( $params = array() )
 	}
 	else
 	{
-		$report_content = T_('You have reported this user on %s as "%s" with the additional info "%s" - <a %s>Cancel report</a>');
-		$report_content = sprintf( $report_content, mysql2localedatetime( $current_report[ 'date' ] ), $report_options[ $current_report[ 'status' ] ], $current_report[ 'info' ], 'href="'.$params['cancel_url'].'"' );
-		$Form->info( T_('Already reported'), $report_content );
+		echo '<div id="current_modal_title" style="display:none">'.T_('Already Reported User').'</div>';
+		printf( T_('You have reported this user on %s<br />as "%s"<br />with the additional info "%s"'),
+				mysql2localedatetime( $current_report['date'] ),
+				$report_options[ $current_report['status'] ],
+				nl2br( $current_report['info'] ) );
+		echo '<p><a href="'.$params['cancel_url'].'" class="btn btn-warning">'.T_('Cancel Report').'</a></p>';
 	}
 }
 

@@ -1176,6 +1176,86 @@ switch( $action )
 		require $inc_path.'users/views/_user_crop.form.php';
 		break;
 
+	case 'get_user_report_form':
+		// Get form to report for user
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		if( ! is_logged_in() || $current_User->ID == $User->ID || ! $current_User->check_status( 'can_report_user' ) )
+		{ // Only if current user can reports
+			break;
+		}
+
+		$user_ID = param( 'user_ID', 'integer', true );
+		$UserCache = & get_UserCache();
+		$edited_User = & $UserCache->get_by_ID( $user_ID );
+
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{ // Load the AdminUI class for the skin.
+			$user_tab = param( 'user_tab', 'string' );
+			global $current_User, $UserSettings, $is_admin_page;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{ // Load Blog skin
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$skin_ID = $Blog->get_skin_ID();
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $skin_ID );
+		}
+
+		$display_mode = 'js';
+		$form_action = get_secure_htsrv_url().'profile_update.php';
+
+		require $inc_path.'users/views/_user_report.form.php';
+		break;
+
+	case 'get_user_contact_form':
+		// Get form to add/edit user to contact
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'user' );
+
+		if( ! is_logged_in() || $current_User->ID == $User->ID ||
+		    ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
+				! $current_User->check_status( 'can_edit_contacts' ) )
+		{ // Only if current user can reports
+			break;
+		}
+
+		$user_ID = param( 'user_ID', 'integer', true );
+		$UserCache = & get_UserCache();
+		$edited_User = & $UserCache->get_by_ID( $user_ID );
+
+		if( param( 'is_backoffice', 'integer', 0 ) )
+		{ // Load the AdminUI class for the skin.
+			$user_tab = param( 'user_tab', 'string' );
+			global $current_User, $UserSettings, $is_admin_page;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{ // Load Blog skin
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$skin_ID = $Blog->get_skin_ID();
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $skin_ID );
+		}
+
+		$display_mode = 'js';
+		$form_action = get_secure_htsrv_url().'profile_update.php';
+
+		require $inc_path.'users/views/_user_contact.form.php';
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

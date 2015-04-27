@@ -529,6 +529,17 @@ legend.panel-heading {
 		left: -5px;
 	}
 }
+.panel-body #ffield_contact_groups {
+	label {
+		white-space: nowrap;
+		&.control-label {
+			display: none;
+		}
+	}
+	.contact_group_new input[type=checkbox] {
+		margin-top: 12px;
+	}
+}
 
 .form-horizontal .controls {
 	input.large,
@@ -598,6 +609,9 @@ div.edit_toolbars, div.message_toolbars {
 		border: none;
 		box-shadow: none;
 		-webkit-box-shadow: none;
+	}
+	fieldset .panel {
+		margin-bottom: 0;
 	}
 }
 

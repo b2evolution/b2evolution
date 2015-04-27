@@ -203,7 +203,7 @@ if( $action != 'view' )
 
 		// Main profile picture with action icons to modify it
 		$user_pictures = '<div class="avatartag main image_rounded">'
-				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', 0.5 )
+				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', '160x160' )
 				.'<div class="avatar_actions">'
 					.action_icon( $change_picture_title, $change_picture_icon, get_user_settings_url( 'avatar', $edited_User->ID ), ' '.$change_picture_title, 3, 4 );
 		if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
@@ -240,7 +240,7 @@ if( $action != 'view' )
 					'image_size'          => 'crop-top-160x160',
 					'image_link_title'    => $edited_User->login,
 					'image_link_rel'      => 'lightbox[user]',
-					'tag_size'            => 0.5
+					'tag_size'            => '80x80'
 				) );
 		}
 

@@ -223,7 +223,6 @@ function create_default_data()
 			'Group'     => $Group_Admins,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'Role'        => array( 'Site administrator', 'Moderator' ),
 					'About me'    => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
@@ -1341,7 +1340,6 @@ function create_demo_contents()
 			'Group'     => $Group_Privileged,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'Role'        => 'Moderator',
 					'About me'    => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
@@ -1364,7 +1362,6 @@ function create_demo_contents()
 			'Group'     => $Group_Privileged,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'Role'        => 'Moderator',
 					'About me'    => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
@@ -1387,7 +1384,6 @@ function create_demo_contents()
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'Role'        => 'Author',
 					'About me'    => 'I\'m a demo author.'."\n".'I like to write!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
@@ -1410,7 +1406,6 @@ function create_demo_contents()
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'Role'        => 'Author',
 					'About me'    => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',

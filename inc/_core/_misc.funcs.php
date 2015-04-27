@@ -6939,7 +6939,7 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 					closeModalWindow();
 				}
 			}
-			return false;
+			return true;
 		}
 		closeModalWindow();
 		return false;
@@ -7041,7 +7041,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 			{
 				modal_html += '<button class="btn ' + button_class + '" type="submit" style="display:none">' + button_title + '</button>';
 			}
-			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Cancel' ) ?></button></div>';
+			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Close' ) ?></button></div>';
 		}
 		modal_html += '</div></div></div>';
 		jQuery( 'body' ).append( modal_html );
@@ -7058,7 +7058,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		jQuery( '#modal_window #close_button' ).remove();
 
 		if( jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).length == 0 )
-		{ // Hide a submit button in the fotter if real submit input doesn't exist
+		{ // Hide a submit button in the footer if real submit input doesn't exist
 			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
 		}
 		else
@@ -7085,6 +7085,20 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		{ // Copy a click event from real submit input to button of footer
 			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).click();
 		} );
+	}
+
+	jQuery( '#modal_window ' + button_form + ' a.btn' ).each( function()
+	{ // Move all buttons to the footer
+		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
+			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
+			jQuery( this ).html() +
+			'</button></a>' );
+		jQuery( this ).remove();
+	} );
+
+	if( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).length > 0 )
+	{ // Change window title
+		jQuery( '#modal_window .modal-title' ).html( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).html() );
 	}
 
 	// Init modal window and show

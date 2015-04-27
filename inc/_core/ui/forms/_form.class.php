@@ -2027,7 +2027,7 @@ class Form extends Widget
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label class="" id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( isset( $option[6] ) ? ' class="'.$option[6].'"' : '' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover

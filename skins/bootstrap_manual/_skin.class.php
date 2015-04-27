@@ -511,9 +511,6 @@ class bootstrap_manual_Skin extends Skin
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="wrap-form-activation">',
 					'activate_page_after'  => '</div>',
-					// Profile
-					'profile_avatar_before' => '<div class="panel panel-default profile_avatar">',
-					'profile_avatar_after'  => '</div>',
 					// Search
 					'search_input_before'      => '<div class="input-group">',
 					'search_input_after'       => '',

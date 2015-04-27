@@ -34,16 +34,15 @@ $is_logged_in = is_logged_in();
 
 // Default params:
 $params = array_merge( array(
-		'profile_avatar_before'            => '<span style="position:absolute;right:1em">',
-		'profile_avatar_after'             => '</span>',
-		'avatar_image_size'                => 'fit-160x160',
-		'avatar_image_size_if_anonymous'   => 'fit-160x160-blur-18',
+		'profile_avatar_before'            => '',
+		'profile_avatar_after'             => '',
+		'avatar_image_size'                => 'crop-top-320x320',
+		'avatar_image_size_if_anonymous'   => 'crop-top-320x320-blur-8',
 		'avatar_overlay_text_if_anonymous' => '#default#',
-		'edit_my_profile_link_text'        => T_('Edit my profile').' &raquo;',
-		'edit_user_admin_link_text'        => T_('Edit this user in backoffice'),
+		'edit_my_profile_link_text'        => T_('Edit my profile'),
+		'edit_user_admin_link_text'        => T_('Edit in Back-Office'),
 		'skin_form_params'                 => array(),
 	), $params );
-
 
 // ------------------- PREV/NEXT USER LINKS (SINGLE USER MODE) -------------------
 user_prevnext_links();
@@ -62,119 +61,196 @@ $UserCache = & get_UserCache();
  */
 $User = & $UserCache->get_by_ID( $user_ID );
 
-/**
- * form to update the profile
- * @var Form
- */
-$ProfileForm = new Form( get_dispctrl_url( 'contacts' ), 'ProfileForm' );
+$profileForm = new Form();
 
-$ProfileForm->switch_template_parts( $params['skin_form_params'] );
+$profileForm->switch_template_parts( $params['skin_form_params'] );
 
-if( $is_logged_in )
-{ // user is logged in
-	if( $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) )
-	{ // Current user can edit other user's profiles
-		global $admin_url;
-		echo '<div class="edit_user_admin_link">';
-		echo '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'">'.$params['edit_user_admin_link_text'].'</a>';
-		echo '</div>';
-	}
+$profileForm->begin_form( 'bComment' );
 
-	if( $User->ID == $current_User->ID && !empty($params['edit_my_profile_link_text']) )
-	{	// Display edit link profile for owner:
-		echo '<div class="floatright">';
-		echo '<a href="'.url_add_param( $Blog->get('url'), 'disp=profile' ).'">'.$params['edit_my_profile_link_text'].'</a>';
-		echo '</div>';
-	}
-}
+// ---- START OF LEFT COLUMN ---- //
+echo '<div class="profile_column_left">';
 
-echo '<div class="clear"></div>';
-
-$ProfileForm->begin_form( 'bComment' );
-
-$avatar_overlay_text = '';
-if( $is_logged_in )
-{	// Avatar size for logged in user
-	$avatar_image_size = $params['avatar_image_size'];
-}
-else
-{	// Avatar settings for anonymous user
-	$avatar_image_size = $params['avatar_image_size_if_anonymous'];
-	if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
-	{	// Get overlay text from params
-		$avatar_overlay_text = $params['avatar_overlay_text_if_anonymous'];
+	// Main profile picture:
+	$avatar_overlay_text = '';
+	if( $is_logged_in )
+	{ // Avatar size for logged in user
+		$avatar_image_size = $params['avatar_image_size'];
 	}
 	else
-	{	// Get default overlay text from Back-office settings
-		$avatar_overlay_text = $Settings->get('bubbletip_overlay');
-	}
-}
-
-$avatar_imgtag = $params['profile_avatar_before'].$User->get_avatar_imgtag( $avatar_image_size, '', '', true, $avatar_overlay_text, 'user' ).$params['profile_avatar_after'];
-
-if( $is_logged_in )
-{
-	if( $User->ID == $current_User->ID && ! $User->has_avatar() )
-	{	// If user hasn't an avatar, add a link to go for uploading of avatar
-		$avatar_imgtag = '<a href="'.get_user_avatar_url().'">'.$avatar_imgtag.'</a>';
-	}
-}
-
-echo $avatar_imgtag;
-
-$ProfileForm->begin_fieldset( T_('Identity') );
-
-	echo '<div class="profile_pictured_fieldsets">';
-
-	$login_note = '';
-	if( $is_logged_in && ( $User->ID == $current_User->ID ) && ( $User->check_status( 'can_be_validated' ) ) )
-	{ // Remind the current user that he has not activated his account yet:
-		$login_note = '<span style="color:red; font-weight:bold">[<a style="color:red" href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_('Not activated').'</a>]</span>';
+	{ // Avatar settings for anonymous user
+		$avatar_image_size = $params['avatar_image_size_if_anonymous'];
+		if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
+		{ // Get overlay text from params
+			$avatar_overlay_text = $params['avatar_overlay_text_if_anonymous'];
+		}
+		else
+		{ // Get default overlay text from Back-office settings
+			$avatar_overlay_text = $Settings->get('bubbletip_overlay');
+		}
 	}
 
-	$ProfileForm->info( T_('Login'), $User->get_colored_login(), $login_note );
+	$avatar_imgtag = $User->get_avatar_imgtag( $avatar_image_size, 'main_profile_picture', '', true, $avatar_overlay_text, 'user', '300x300' );
 
+	if( $is_logged_in )
+	{
+		if( $User->ID == $current_User->ID && ! $User->has_avatar() )
+		{ // If user hasn't an avatar, add a link to go for uploading of avatar
+			$avatar_imgtag = '<a href="'.get_user_avatar_url().'">'.$avatar_imgtag.'</a>';
+		}
+	}
+
+	echo $params['profile_avatar_before'].$avatar_imgtag.$params['profile_avatar_after'];
+
+	// First Last Names:
+	$first_last_name = '';
 	if( $Settings->get( 'firstname_editing' ) != 'hidden' && $User->get( 'firstname' ) != '' )
 	{
-		$ProfileForm->info( T_('First Name'), $User->get( 'firstname' ) );
+		$first_last_name .= $User->get( 'firstname' );
 	}
-
 	if( $Settings->get( 'lastname_editing' ) != 'hidden' && $User->get( 'lastname' ) != '' )
 	{
-		$ProfileForm->info( T_('Last Name'), $User->get( 'lastname' ) );
+		$first_last_name .= ' '.$User->get( 'lastname' );
+	}
+	$first_last_name = utf8_trim( $first_last_name );
+	if( ! empty( $first_last_name ) )
+	{ // Display first last name of it is not empty
+		echo '<h1>'.$first_last_name.'</h1>';
 	}
 
-	$ProfileForm->info( T_( 'I am' ), $User->get_gender() );
-
-	if( ! empty( $User->ctry_ID ) && user_country_visible() )
-	{	// Display country
-		load_class( 'regional/model/_country.class.php', 'Country' );
-		$ProfileForm->info( T_( 'Country' ), $User->get_country_name() );
+	// Nickname:
+	if( $Settings->get( 'nickname_editing' ) != 'hidden' && $User->get( 'nickname' ) != '' )
+	{
+		echo '<h2>'.$User->get( 'nickname' ).'</h2>';
 	}
 
-	if( ! empty( $User->rgn_ID ) && user_region_visible() )
-	{	// Display region
-		load_class( 'regional/model/_region.class.php', 'Region' );
-		$ProfileForm->info( T_( 'Region' ), $User->get_region_name() );
-	}
+	// Login:
+	echo '<h2 class="text-muted">'.$User->get( 'login' ).'</h2>';
 
-	if( ! empty( $User->subrg_ID ) && user_subregion_visible() )
-	{	// Display sub-region
-		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
-		$ProfileForm->info( T_( 'Sub-region' ), $User->get_subregion_name() );
-	}
+	echo '<hr class="profile_separator" />'."\n";
 
-	if( ! empty( $User->city_ID ) && user_city_visible() )
-	{	// Display city
-		load_class( 'regional/model/_city.class.php', 'City' );
-		$ProfileForm->info( T_( 'City' ), $User->get_city_name() );
-	}
-
+	// Gender & age group:
+	$gender_age_group = $User->get_gender();
 	if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
 	{
-		$ProfileForm->info( T_( 'My age group' ), sprintf( T_('from %d to %d years old'), $User->get('age_min'), $User->get('age_max') ) );
+		if( ! empty( $gender_age_group ) )
+		{
+			$gender_age_group .= ' &bull; ';
+		}
+		$gender_age_group .= sprintf( T_('%s years old'), $User->get( 'age_min' ).'-'.$User->get( 'age_max' ) );
+	}
+	echo '<p>'.$gender_age_group.'</p>';
+
+	// Location:
+	$location = array();
+	if( ! empty( $User->city_ID ) && user_city_visible() )
+	{ // Display city
+		load_class( 'regional/model/_city.class.php', 'City' );
+		$location[] = $User->get_city_name();
+	}
+	if( ! empty( $User->subrg_ID ) && user_subregion_visible() )
+	{ // Display sub-region
+		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
+		$location[] = $User->get_subregion_name();
+	}
+	if( ! empty( $User->rgn_ID ) && user_region_visible() )
+	{ // Display region
+		load_class( 'regional/model/_region.class.php', 'Region' );
+		$location[] = $User->get_region_name();
+	}
+	if( ! empty( $User->ctry_ID ) && user_country_visible() )
+	{ // Display country
+		load_class( 'regional/model/_country.class.php', 'Country' );
+		$location[] = $User->get_country_name();
+	}
+	if( ! empty( $location ) )
+	{ // Display location only if at least one selected
+		echo '<p>'.implode( ', ', $location ).'</p>';
 	}
 
+	// Buttons:
+	$buttons = array();
+
+	// - Edit my profile:
+	if( $is_logged_in && $User->ID == $current_User->ID && ! empty( $params['edit_my_profile_link_text'] ) )
+	{ // Display edit link profile for owner:
+		$buttons[] = '<a href="'.url_add_param( $Blog->get( 'url' ), 'disp=profile' ).'">'
+				.'<button type="button" class="btn btn-primary">'.$params['edit_my_profile_link_text'].'</button>'
+			.'</a>';
+	}
+
+	// - Message:
+	if( ! $is_logged_in || $current_User->ID != $User->ID )
+	{ // Display a message to send a button only for other users
+		$msgform_url = $User->get_msgform_url( $Blog->get( 'msgformurl' ) );
+		if( ! empty( $msgform_url ) )
+		{
+			$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
+			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn btn-primary">'.T_('Send Message').'</button></a>';
+		}
+	}
+
+	// - Contact:
+	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
+			$current_User->check_perm( 'perm_messaging', 'reply' ) &&
+			$current_User->check_status( 'can_edit_contacts' ) )
+	{ // User is logged in, has messaging access permission and is not the same user as displayed user
+		$is_contact = check_contact( $User->ID );
+		if( $is_contact === NULL )
+		{ // User is not in current User contact list, so allow "Add to my contacts" action
+			$buttons[] = '<button type="button" class="btn btn-default" onclick="return user_contact( '.$User->ID.' )">'.T_('Add to Contacts').'</button>';
+		}
+		else
+		{ // User is on current User contact list
+			$buttons[] = '<button type="button" class="btn btn-success" onclick="return user_contact( '.$User->ID.' )">'.T_('Edit Contact').'</button>';
+		}
+
+		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
+		if( $is_contact === NULL || $is_contact === true )
+		{ // Display a button to block user
+			$buttons[] = '<a href="'.$contact_block_url.'&action=block">'
+					.'<button type="button" class="btn btn-warning">'.T_('Block Contact').'</button>'
+				.'</a>';
+		}
+		else
+		{ // Display a button to unblock user
+			$buttons[] = '<a href="'.$contact_block_url.'&action=unblock">'
+					.'<button type="button" class="btn btn-danger">'.T_('Unblock Contact').'</button>'
+				.'</a>';
+		}
+	}
+
+	// - Report:
+	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
+			$current_User->check_status( 'can_report_user' ) )
+	{ // Current user must be logged in, cannot report own account, and must has a permission to report
+		// get current User report from edited User
+		$current_report = get_report_from( $User->ID );
+		if( $current_report == NULL )
+		{ // current User didn't add any report from this user yet
+			$buttons[] = '<button type="button" class="btn btn-warning" onclick="return user_report( '.$User->ID.' )">'.T_('Report User').'</button>';
+		}
+		else
+		{
+			$buttons[] = '<button type="button" class="btn btn-danger" onclick="return user_report( '.$User->ID.' )">'.T_('Edit Reported User').'</button>';
+		}
+	}
+
+	// - Edit in back-office:
+	if( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) )
+	{ // Current user can edit other user's profiles
+		global $admin_url;
+		$buttons[] = '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'">'
+				.'<button type="button" class="btn btn-default">'.$params['edit_user_admin_link_text'].'</button>'
+			.'</a>';
+	}
+
+	if( count( $buttons ) )
+	{ // Dispaly all available buttons
+		echo '<hr class="profile_separator" />'."\n";
+		echo '<div class="profile_buttons"><p>'.implode( "</p>\n<p>", $buttons ).'</p></div>';
+	}
+
+	// Organizations:
 	$user_organizations = $User->get_organizations();
 	$count_organizations = count( $user_organizations );
 	if( $count_organizations > 0 )
@@ -191,21 +267,29 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 				$org_names[] = '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
 			}
 		}
-		$ProfileForm->info( $count_organizations > 1 ? T_( 'Organizations' ) : T_( 'Organization' ), implode( '<br />', $org_names ) );
+		echo '<hr class="profile_separator" />'."\n";
+		echo '<p><b>'.T_('Organizations').':</b>';
+		echo '<ul><li>'.implode( '</li><li>', $org_names ).'</li></ul>';
 	}
 
-	echo '</div>';
+	echo '</p>';
+
+echo '</div>';
+// ---- END OF LEFT COLUMN ---- //
+
+// ---- START OF RIGHT COLUMN ---- //
+echo '<div class="profile_column_right">';
 
 	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
 	{ // Display other pictures, but only for logged in and activated users:
 		$user_avatars = $User->get_avatar_Links();
 		if( count( $user_avatars ) > 0 )
 		{
-			$info_content = '';
+			echo '<div class="other_profile_pictures">';
 			foreach( $user_avatars as $uLink )
 			{
-				$info_content .= $uLink->get_tag( array(
-					'before_image' => '<div class="avatartag">',
+				echo $uLink->get_tag( array(
+					'before_image'        => '<div class="avatartag">',
 					'before_image_legend' => NULL,
 					'after_image_legend'  => NULL,
 					'image_size'          => 'crop-top-80x80',
@@ -214,152 +298,73 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 					'image_link_rel'      => 'lightbox[user]'
 				) );
 			}
-			$info_content .= '<div class="clear"></div>';
-			$ProfileForm->info( T_('Other pictures'), $info_content );
+			echo '</div>';
 		}
 	}
 
-$ProfileForm->end_fieldset();
+	// Load the user fields:
+	$User->userfields_load();
 
-if( ! is_logged_in() || $current_User->ID != $User->ID )
-{ // Don't display this for own user
-	$ProfileForm->begin_fieldset( sprintf( T_('You and %s...'), $User->login ) );
-
-	$contacts = array();
-	if( $is_logged_in && ( $current_User->ID != $User->ID ) && ( $current_User->check_perm( 'perm_messaging', 'reply' ) ) )
-	{ // User is logged in, has messaging access permission and is not the same user as displayed user
-		$is_contact = check_contact( $User->ID );
-		if( $is_contact )
-		{ // displayed user is on current User contact list
-			$contacts[] = action_icon( T_('On my contacts list'), 'allowback', $Blog->get( 'contactsurl' ), T_('On my contacts list'), 3, 4, array(), array( 'style' => 'margin: 0 2px' ) );
-			$contacts_groups = get_contacts_groups_list( $User->ID );
-		}
-		elseif( $is_contact !== NULL )
-		{ // displayed user is on current User contact list but it's blocked by current User
-			$contacts[] = get_icon( 'file_not_allowed', 'imgtag', array( 'style' => 'margin-left: 4px' ) ).T_('You have blocked this user').' - <a href="'.url_add_param( $Blog->get( 'contactsurl' ), 'action=unblock&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ).'">'.T_('Unblock').'</a>';
-		}
-		elseif( $current_User->check_status( 'can_edit_contacts' ) )
-		{ // user is not in current User contact list, so allow "Add to my contacts" action, but only if current User is activated
-			$contacts[] = action_icon( T_('Add to my contacts'), 'add', url_add_param( $Blog->get( 'contactsurl' ), 'action=add_user&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'messaging_contacts' ) ), T_('Add to my contacts'), 3, 4, array(), array( 'style' => 'margin: 0 2px 0 0' ) );
-		}
-	}
-
-	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl') );
-	if( !empty($msgform_url) )
+	// fp> TODO: have some clean iteration support
+	$group_ID = 0;
+	foreach( $User->userfields as $userfield )
 	{
-		$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
-		$contacts[] = action_icon( T_('Send a message'), 'email', $msgform_url, T_('Send a message'), 3, 4, array(), array( 'style' => 'margin-right:2px' ) );
-	}
-	else
-	{ // No message form possibility to contact with User, get the reason why
-		$contacts[] = $User->get_no_msgform_reason();
-	}
-
-	$ProfileForm->info( T_('Contact'), implode( '<div style="height:6px"> </div>', $contacts ) );
-
-	if( $is_logged_in && $current_User->check_status( 'can_edit_contacts' ) && $current_User->check_perm( 'perm_messaging', 'reply' ) )
-	{ // user is logged in, the account was activated and has the minimal messaging permission
-		$ProfileForm->add_crumb( 'messaging_contacts' );
-		$ProfileForm->hidden( 'user_ID', $User->ID );
-
-		$ProfileForm->output = false;
-		$button_add_group = $ProfileForm->submit_input( array(
-				'name' => 'actionArray[add_user]',
-				'value' => T_('Add'),
-				'class' => 'SaveButton'
-			) );
-		$ProfileForm->output = true;
-
-		if( !empty( $contacts_groups ) )
-		{	// Display contacts groups for current User
-			$ProfileForm->custom_content( '<p><strong>'.T_( 'You can organize your contacts into groups. You can decide in which groups to put this user here:' ).'</strong></p>' );
-			$ProfileForm->info( sprintf( T_('%s is'), $User->login ), $contacts_groups );
-
-			// Form to create a new group
-			$ProfileForm->hidden( 'group_ID', 'new' );
-			$ProfileForm->text_input( 'group_ID_combo', param( 'group_ID_combo', 'string', '' ), 18, T_('Create a new group'), '', array( 'field_suffix' => $button_add_group, 'maxlength' => 50 ) );
+		if( $group_ID != $userfield->ufgp_ID )
+		{ // Start new group
+			if( $group_ID > 0 )
+			{ // End previous group
+				$profileForm->end_fieldset();
+			}
+			$profileForm->begin_fieldset( T_( $userfield->ufgp_name ) );
 		}
-		else if( $User->ID != $current_User->ID )
-		{	// Form to add this user into the group
-			$ProfileForm->combo_box( 'group_ID', param( 'group_ID_combo', 'string', '' ), get_contacts_groups_options( param( 'group', 'string', '-1' ), false ), T_('Add this user to a group'), array( 'new_field_size' => '8', 'field_suffix' => $button_add_group ) );
+
+		if( $userfield->ufdf_type == 'text' )
+		{ // convert textarea values
+			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 		}
-	}
 
-	// Display Report User part
-	user_report_form( array(
-			'Form'       => $ProfileForm,
-			'user_ID'    => $User->ID,
-			'crumb_name' => 'messaging_contacts',
-			'cancel_url' => url_add_param( $Blog->get( 'contactsurl' ), 'user_ID='.$User->ID.'&amp;action=remove_report&amp;'.url_crumb( 'messaging_contacts' ) ),
-		) );
-
-	$ProfileForm->end_fieldset();
-}
-
-
-// Load the user fields:
-$User->userfields_load();
-
-// fp> TODO: have some clean iteration support
-$group_ID = 0;
-foreach( $User->userfields as $userfield )
-{
-	if( $group_ID != $userfield->ufgp_ID )
-	{ // Start new group
-		if( $group_ID > 0 )
-		{ // End previous group
-			$ProfileForm->end_fieldset();
+		$userfield_icon = '';
+		if( ! empty( $userfield->ufdf_icon_name ) )
+		{ // Icon
+			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
 		}
-		$ProfileForm->begin_fieldset( T_( $userfield->ufgp_name ) );
+
+		$profileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
+
+		$group_ID = $userfield->ufgp_ID;
+	}
+	if( $group_ID > 0 )
+	{	// End fieldset if userfields are exist
+		$profileForm->end_fieldset();
 	}
 
-	if( $userfield->ufdf_type == 'text' )
-	{ // convert textarea values
-		$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
-	}
+	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
-	$userfield_icon = '';
-	if( ! empty( $userfield->ufdf_icon_name ) )
-	{ // Icon
-		$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
-	}
+		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
-	$ProfileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
+		$profileForm->info( T_('Comments'), $User->get_reputation_comments() );
 
-	$group_ID = $userfield->ufgp_ID;
-}
-if( $group_ID > 0 )
-{	// End fieldset if userfields are exist
-	$ProfileForm->end_fieldset();
-}
+		$profileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
 
-$ProfileForm->begin_fieldset( T_( 'Reputation' ) );
+		$profileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
 
-	$ProfileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
+		$profileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
 
-	$ProfileForm->info( T_('Comments'), $User->get_reputation_comments() );
+		$profileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
 
-	$ProfileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
+	$profileForm->end_fieldset();
 
-	$ProfileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+	$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $profileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
 
-	$ProfileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
+echo '</div>';
+// ---- END OF RIGHT COLUMN ---- //
 
-	$ProfileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
-
-$ProfileForm->end_fieldset();
-
-$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $ProfileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
-
-// Make sure we're below the floating user avatar on the right
 echo '<div class="clear"></div>';
 
-$ProfileForm->end_form();
+$profileForm->end_form();
 
-if( $is_logged_in && ( $User->ID == $current_User->ID ) && ( !empty( $params['edit_my_profile_link_text'] ) ) )
-{ // Display edit link profile for owner:
-	echo '<div class="center" style="font-size:150%">';
-	echo '<a href="'.url_add_param( $Blog->get('url'), 'disp=profile' ).'">'.$params['edit_my_profile_link_text'].'</a>';
-	echo '</div>';
-}
+// Init JS for user reporting
+echo_user_report_js();
+// Init JS for user contact editing
+echo_user_contact_js();
 ?>

@@ -1062,7 +1062,10 @@ class File extends DataObject
 	 * @param string image caption/description
 	 * @param integer Link ID
 	 * @param integer Ratio size, can be 1, 2 and etc.
-	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
+	 * @param string Change size of the attributes "width" & "height".
+	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
+	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
+	 *                        NULL - use real size
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1078,7 +1081,7 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = 1 )
+	                  $tag_size = NULL )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -2123,9 +2126,18 @@ class File extends DataObject
 
 	/**
 	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
+	 *
+	 * @param string Size
+	 * @param string Class
+	 * @param string Alignment
+	 * @param string Title
+	 * @param string Change size of the attributes "width" & "height".
+	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
+	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
+	 *                        NULL - use real size
 	 * @return string
 	 */
-	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '', $tag_size = 1 )
+	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '', $tag_size = NULL )
 	{
 		global $use_strict;
 
@@ -2167,10 +2179,13 @@ class File extends DataObject
 	 * @param string Title img attribute
 	 * @param string Alt img attribute
 	 * @param integer Ratio size, can be 1, 2 and etc.
-	 * @param float Change size of the attributes "width" & "height". Example: ( $size = 'crop-top-64x64' + $tag_size = 0.5 ) => width="32" height="32"
+	 * @param string Change size of the attributes "width" & "height".
+	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
+	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
+	 *                        NULL - use real size
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = 1 )
+	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL )
 	{
 		$img_attribs = array(
 				'title' => isset($title) ? $title : $this->get('title'),
@@ -2198,16 +2213,15 @@ class File extends DataObject
 		{ // We want src to link to a thumbnail
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
 			$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
-			if( substr( $thumb_path, 0, 1 ) != '!'
+			if( $tag_size !== NULL )
+			{ // Change size values
+				$tag_size = explode( 'x', $tag_size );
+				$img_attribs['width'] = $tag_size[0];
+				$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+			}
+			elseif( substr( $thumb_path, 0, 1 ) != '!'
 				&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
 			{ // no error, add width and height attribs
-				if( $tag_size != 1 )
-				{ // Change size values
-					foreach( $size_arr as $s => $size_value )
-					{
-						$size_arr[ $s ] = ceil( $size_value * $tag_size );
-					}
-				}
 				$img_attribs += $size_arr;
 			}
 		}

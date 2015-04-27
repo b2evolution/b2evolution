@@ -120,6 +120,7 @@ $thumbnail_sizes = array(
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
 			'crop-32x32' => array( 'crop', 32, 32, 85 ),
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
 			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
 			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),

@@ -567,12 +567,6 @@ div.item_location {
 #edit_group_contacts label {
   padding-right: 5px;
 }
-.edit_user_admin_link {
-  float: left;
-  margin-left: 33%;
-  min-width: 33%;
-  text-align: center;
-}
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
 }
@@ -793,5 +787,34 @@ input.btn-lg {
   -khtml-border-radius: 3px;
 }
 .top_menu div.item_title {
+  display: inline-block;
+}
+.main_profile_picture {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+.other_profile_pictures {
+  margin-bottom: 10px;
+}
+.other_profile_pictures img {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+.profile_column_left {
+  width: 300px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.profile_buttons .btn {
+  width: 100%;
+}
+form.bComment .other_profile_pictures div.avatartag {
+  float: none;
   display: inline-block;
 }
