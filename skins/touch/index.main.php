@@ -52,12 +52,13 @@ skin_include( '_body_header.inc.php' );
 	<?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
+				'title_before'      => '<h2>',
+				'title_after'       => '</h2>',
+				'title_none'        => '',
+				'glue'              => ' - ',
 				'title_single_disp' => true,
-				'format'      => 'htmlbody',
+				'format'            => 'htmlbody',
+				'user_text'         => '',
 			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>

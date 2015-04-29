@@ -80,7 +80,8 @@ skin_include( '_body_header.inc.php' );
 				'edit_text_update'  => T_('Edit post'),
 				'category_text'     => '',
 				'categories_text'   => '',
-				'catdir_text'       => ''
+				'catdir_text'       => '',
+				'user_text'         => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

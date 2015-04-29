@@ -180,16 +180,17 @@ if( $disp == 'single' )
 	{ // Don't display page title on access restricted pages
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
+				'title_before'      => '<h2>',
+				'title_after'       => '</h2>',
+				'title_none'        => '',
+				'glue'              => ' - ',
 				'title_single_disp' => false,
-				'format'      => 'htmlbody',
-				'arcdir_text' => T_('Index'),
-				'catdir_text' => '',
-				'category_text' => T_('Gallery').': ',
-				'categories_text' => T_('Galleries').': ',
+				'format'            => 'htmlbody',
+				'arcdir_text'       => T_('Index'),
+				'catdir_text'       => '',
+				'category_text'     => T_('Gallery').': ',
+				'categories_text'   => T_('Galleries').': ',
+				'user_text'         => '',
 			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	}

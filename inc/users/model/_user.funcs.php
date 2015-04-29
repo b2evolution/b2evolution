@@ -2882,7 +2882,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		$userfield_icon = '';
 		if( ! empty( $userfield->ufdf_icon_name ) )
 		{ // Field icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
+			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld-'.$userfield->ufdf_code.' ufld--textcolor"></span> ';
 		}
 
 		if( $action == 'view' )
@@ -4045,7 +4045,7 @@ function display_user_email_status_message( $user_ID = 0 )
  *
  * @param array Params
  */
-function echo_user_report_js()
+function echo_user_report_window()
 {
 	global $Blog;
 ?>
@@ -4091,9 +4091,9 @@ function user_report( user_ID, user_tab )
 
 
 /**
- * Open contact user modal window
+ * Open contact groups user modal window
  */
-function echo_user_contact_js()
+function echo_user_contact_groups_window()
 {
 	global $Blog;
 ?>
@@ -4102,11 +4102,11 @@ function echo_user_contact_js()
 // Initialize JavaScript to build and open window
 echo_modalwindow_js();
 ?>
-function user_contact( user_ID )
+function user_contact_groups( user_ID )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 		'auto', '', true,
-		'<?php echo TS_('Groups'); ?>',
+		'<?php echo TS_('Contact Groups'); ?>',
 		'<?php echo TS_('Save'); ?>', true );
 	jQuery.ajax(
 	{
@@ -4122,7 +4122,7 @@ function user_contact( user_ID )
 		success: function( result )
 		{
 			openModalWindow( result, 'auto', '', true,
-				'<?php echo TS_('Groups'); ?>',
+				'<?php echo TS_('Contact Groups'); ?>',
 				'<?php echo TS_('Save'); ?>', true );
 		}
 	} );

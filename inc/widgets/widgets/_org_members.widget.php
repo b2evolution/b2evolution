@@ -73,17 +73,10 @@ class org_members_Widget extends ComponentWidget
 		load_class( 'users/model/_userfield.class.php', 'Userfield' );
 		$UserFieldCache = & get_UserFieldCache();
 		$UserFieldCache->load_all();
-		$user_fields = $UserFieldCache->get_option_array();
-
-		// Set default user field as "About me"
-		$default_user_field_ID = 0;
-		foreach( $user_fields as $user_field_ID => $user_field_name )
+		$user_fields = array();
+		foreach( $UserFieldCache->cache as $UserField )
 		{
-			if( $user_field_name == 'About me' )
-			{
-				$default_user_field_ID = $user_field_ID;
-				break;
-			}
+			$user_fields[ $UserField->get( 'code' ) ] = $UserField->get_name();
 		}
 
 		$r = array_merge( array(
@@ -100,12 +93,34 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
-				'field_ID' => array(
+				'field_code' => array(
 					'label' => T_('Extra Info Field'),
 					'note' => T_('Select what extra user field should be displayed.'),
 					'type' => 'select',
 					'options' => array( '' => T_('None') ) + $user_fields,
-					'defaultvalue' => $default_user_field_ID,
+					'defaultvalue' => 'microbio',
+				),
+				'link_profile' => array(
+					'label' => T_('Link to profile'),
+					'note' => T_('Check this to link each user to his profile.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+				'display_icons' => array(
+					'label' => T_('Contact icons'),
+					'note' => T_('Check this to display icons for User Field URLs with an icon.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+				'icon_colors' => array(
+					'label' => T_('Icon color'),
+					'type' => 'checklist',
+					'options' => array(
+							array( 'text',      T_('Use for normal text'), 0 ),
+							array( 'bg',        T_('Use for normal background'), 0 ),
+							array( 'hovertext', T_('Use for hover text'), 0 ),
+							array( 'hoverbg',   T_('Use for hover background'), 1/* default checked */ ),
+						),
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -148,17 +163,31 @@ class org_members_Widget extends ComponentWidget
 			// Get all users of the selected organization
 			$users = $Organization->get_users();
 
+			if( $this->disp_params['display_icons'] )
+			{ // Initialise css classes for icons depending on widget setting and only when they are displayed
+				$icon_colors_classes = '';
+				if( ! empty( $this->disp_params['icon_colors'] ) )
+				{ // If at least one color status is selected
+					foreach( $this->disp_params['icon_colors'] as $class_name => $is_selected )
+					{
+						if( ! empty( $is_selected ) )
+						{
+							$icon_colors_classes .= ' ufld--'.$class_name.'color';
+						}
+					}
+				}
+			}
+
 			if( count( $users ) )
 			{
-				$field_ID = intval( $this->disp_params['field_ID'] );
 				foreach( $users as $org_User )
 				{
 					echo '<div class="col-lg-4 col-sm-6 text-center">';
 
-					$user_url = $org_User->get_userpage_url( $Blog->ID );
+					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
 					if( ! empty( $user_url ) )
-					{ // Display url to user page only when it is allowed for current user
+					{ // Display url to user page only when it is allowed by widget setting
 						echo '<a href="'.$user_url.'" class="user_link">';
 					}
 
@@ -180,24 +209,35 @@ class org_members_Widget extends ComponentWidget
 						echo '</a>';
 					}
 
-					// User links
-					$url_fields = $org_User->userfields_by_type( 'url' );
-					if( count( $url_fields ) )
-					{
-						echo '<div class="widget--social-media-links">';
-						foreach( $url_fields as $field )
+					if( $this->disp_params['display_icons'] )
+					{ // Display user links as icons
+						$url_fields = $org_User->userfields_by_type( 'url' );
+						if( count( $url_fields ) )
 						{
-							echo '<a href="'.$field->uf_varchar.'">'
-									.'<span class="'.$field->ufdf_icon_name.'"></span>'
-								.'</a>';
+							echo '<div class="widget--social-media-links">';
+							foreach( $url_fields as $field )
+							{
+								echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld-'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
+										.'<span class="'.$field->ufdf_icon_name.'"></span>'
+									.'</a>';
+							}
+							echo '</div>';
 						}
-						echo '</div>';
 					}
 
 					// Info
-					if( $field_ID > 0 && ( $field_value = $org_User->userfield_value_by_ID( $field_ID ) ) )
+					if( ! empty( $this->disp_params['field_code'] ) && ( $field_values = $org_User->userfield_values_by_code( $this->disp_params['field_code'] ) ) )
 					{
-						echo '<p class="user_field">'.nl2br( $field_value ).'</p>';
+						echo '<p class="user_field">';
+						foreach( $field_values as $f => $field_value )
+						{
+							if( $f > 0 )
+							{ // New line between each field value
+								echo '<br />';
+							}
+							echo nl2br( $field_value );
+						}
+						echo '</p>';
 					}
 
 					echo '</div>';

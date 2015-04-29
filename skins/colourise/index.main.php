@@ -52,6 +52,7 @@ skin_include( '_body_header.inc.php' );
 					'glue'        => ' - ',
 					'title_single_disp' => true,
 					'format'      => 'htmlbody',
+					'user_text'   => '',
 				) );
 			// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?>

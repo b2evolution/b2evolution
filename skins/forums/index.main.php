@@ -200,6 +200,7 @@ if( $disp == 'front' || $disp == 'posts' )
 				'posts_text'        => '',
 				'useritems_text'    => T_('User\'s topics'),
 				'usercomments_text' => T_('User\'s replies'),
+				'user_text'         => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

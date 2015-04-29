@@ -788,6 +788,10 @@ input.btn-lg {
 }
 
 // Profile page:
+.profile_content {
+	max-width: 960px;
+	margin: 0 auto;
+}
 .main_profile_picture {
 	.border-radius;
 }
@@ -803,15 +807,22 @@ input.btn-lg {
 	max-width: 300px;
 }
 .profile_column_right {
-	margin: 20px 0 0 315px;
-	div.form-group {
-		margin-left: 0;
-		margin-right: 0;
+	margin: 20px 0 0 320px;
+	#fieldset_user_fields {
+		overflow: hidden;
 	}
 }
 .profile_buttons {
-	.btn {
+	.btn, .btn-group {
 		width: 100%;
+	}
+	.btn-group .btn {
+		width: 50%;
+	}
+	a.btn button {
+		background: none;
+		border: none;
+		padding: 0;
 	}
 }
 form.bComment {
@@ -822,7 +833,7 @@ form.bComment {
 		padding: 10px 15px;
 	}
 }
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 	.profile_column_left {
 		margin: 0 auto;
 		float: none;
@@ -831,5 +842,15 @@ form.bComment {
 		margin-left: 0;
 		width: 100%;
 		float: left;
+	}
+}
+@media (max-width: 1199px) {
+	.profile_content {
+		.col-sm-3 {
+			width: 35%;
+		}
+		.col-sm-9 {
+			width: 65%;
+		}
 	}
 }

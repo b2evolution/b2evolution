@@ -38,6 +38,7 @@ class Userfield extends DataObject
 	var $suggest = '1';
 	var $bubbletip;
 	var $icon_name;
+	var $code;
 
 	/**
 	 * Constructor
@@ -65,6 +66,7 @@ class Userfield extends DataObject
 			$this->suggest    = $db_row->ufdf_suggest;
 			$this->bubbletip  = $db_row->ufdf_bubbletip;
 			$this->icon_name  = $db_row->ufdf_icon_name;
+			$this->code       = $db_row->ufdf_code;
 		}
 	}
 
@@ -170,6 +172,12 @@ class Userfield extends DataObject
 		param_string_not_empty( 'ufdf_type', T_('Please enter a type.') );
 		$this->set_from_Request( 'type' );
 
+		// Code
+		$code = param( 'ufdf_code', 'string' );
+		param_check_not_empty( 'ufdf_code', T_('Please provide a code to uniquely identify this field.') );
+		param_check_regexp( 'ufdf_code', '#^[a-z0-9_]{1,20}$#', T_('The field code must contain only lowercase letters, digits or the "_" sign. 20 characters max.') );
+		$this->set_from_Request( 'code' );
+
 		// Name
 		param_string_not_empty( 'ufdf_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
@@ -219,6 +227,16 @@ class Userfield extends DataObject
 		param( 'ufdf_bubbletip', 'text', '' );
 		$this->set_from_Request( 'bubbletip', NULL, true );
 
+		if( ! param_errors_detected() )
+		{ // Field code must be unique, Check it only when no errors on the form
+			if( $field_ID = $this->dbexists( 'ufdf_code', $this->get( 'code' ) ) )
+			{ // We have a duplicate entry:
+				param_error( 'ufdf_code',
+					sprintf( T_('Another user field already uses this code. Do you want to <a %s>edit the existing user field</a>?'),
+						'href="?ctrl=userfields&amp;action=edit&amp;ufdf_ID='.$field_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -254,37 +272,5 @@ class Userfield extends DataObject
 	{
 		return $this->name;
 	}
-
-
-	/**
-	 * Check existence of specified user field ID in ufdf_ID unique field.
-	 *
-	 * @todo dh> Two returns here!!
-	 * @return int ID if user field exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
-
-		return parent::dbexists('ufdf_ID', $this->ID);
-	}
 }
-
-
-/*
- * _userfield.class.php,v
- * Revision 1.5  2009/09/16 18:11:51  fplanque
- * Readded with -kkv option
- *
- * Revision 1.1  2009/09/11 18:34:06  fplanque
- * userfields editing module.
- * needs further cleanup but I think it works.
- *
- */
 ?>

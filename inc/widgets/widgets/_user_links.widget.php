@@ -84,6 +84,16 @@ class user_links_Widget extends ComponentWidget
 					'size' => 20,
 					'defaultvalue' => '',
 				),
+				'icon_colors' => array(
+					'label' => T_('Icon color'),
+					'type' => 'checklist',
+					'options' => array(
+							array( 'text',      T_('Use for normal text'), 0 ),
+							array( 'bg',        T_('Use for normal background'), 0 ),
+							array( 'hovertext', T_('Use for hover text'), 0 ),
+							array( 'hoverbg',   T_('Use for hover background'), 1/* default checked */ ),
+						),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -102,6 +112,19 @@ class user_links_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
+
+		// Initialise css classes for icons depending on widget setting
+		$icon_colors_classes = '';
+		if( ! empty( $this->disp_params['icon_colors'] ) )
+		{ // If at least one color status is selected
+			foreach( $this->disp_params['icon_colors'] as $class_name => $is_selected )
+			{
+				if( ! empty( $is_selected ) )
+				{
+					$icon_colors_classes .= ' ufld--'.$class_name.'color';
+				}
+			}
+		}
 
 		$this->disp_title();
 
@@ -122,7 +145,7 @@ class user_links_Widget extends ComponentWidget
 				echo '<div class="widget--social-media-links">';
 				foreach( $url_fields as $field )
 				{
-					echo '<a href="'.$field->uf_varchar.'">'
+					echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld-'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
 							.'<span class="'.$field->ufdf_icon_name.'"></span>'
 						.'</a>';
 				}

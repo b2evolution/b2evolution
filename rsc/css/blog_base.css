@@ -789,6 +789,10 @@ input.btn-lg {
 .top_menu div.item_title {
   display: inline-block;
 }
+.profile_content {
+  max-width: 960px;
+  margin: 0 auto;
+}
 .main_profile_picture {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -811,8 +815,21 @@ input.btn-lg {
   max-width: 300px;
   margin: 0 auto;
 }
-.profile_buttons .btn {
+.profile_buttons a.btn {
+  display: inline-block;
+}
+.profile_buttons a.btn button {
   width: 100%;
+}
+.profile_buttons .btn,
+.profile_buttons .btn-group {
+  width: 100%;
+}
+.profile_buttons .btn-group {
+  white-space: nowrap;
+}
+.profile_buttons .btn-group .btn {
+  width: 50%;
 }
 form.bComment .other_profile_pictures div.avatartag {
   float: none;

@@ -273,8 +273,10 @@ class bootstrap_main_Skin extends Skin
 			}
 			if( $link_color && $icon_color )
 			{ // Custom icon color:
-				$custom_css .= 'body.pictured .widget--social-media-links a { color: '.$icon_color.'; background-color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .widget--social-media-links a:hover { color: '.$link_color.'; background-color: '.$icon_color." }\n";
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a:not([class*="ufld--textcolor"]):not(:hover) { color: '.$icon_color." }\n";
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a:not([class*="ufld--bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a:hover:not([class*="ufld--hovertextcolor"]) { color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured .front_main_content .widget--social-media-links a:hover:not([class*="ufld--hoverbgcolor"]) { background-color: '.$icon_color." }\n";
 			}
 
 			if( ! empty( $custom_css ) )

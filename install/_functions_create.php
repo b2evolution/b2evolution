@@ -121,51 +121,51 @@ function create_default_data()
 	task_begin( 'Creating groups for user field definitions... ' );
 	$DB->query( "
 		INSERT INTO T_users__fieldgroups ( ufgp_name, ufgp_order )
-		VALUES ( 'Instant Messaging', '1' ),
-					 ( 'Phone', '2' ),
-					 ( 'Web', '3' ),
-					 ( 'Organization', '4' ),
-					 ( 'Address', '5' ),
-					 ( 'Other', '6' )" );
+		VALUES ( 'About me', '1' ),
+					 ( 'Instant Messaging', '2' ),
+					 ( 'Phone', '3' ),
+					 ( 'Web', '4' ),
+					 ( 'Organization', '5' ),
+					 ( 'Address', '6' )" );
 	task_end();
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_icon_name)
-		 VALUES ( 1, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', NULL ),
-						( 1, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'fa fa-yahoo' ),
-						( 1, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', NULL ),
-						( 1, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', NULL ),
-						( 1, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'fa fa-skype' ),
-						( 2, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'fa fa-phone' ),
-						( 2, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'fa fa-mobile-phone' ),
-						( 2, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'fa fa-phone' ),
-						( 2, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'fa fa-phone' ),
-						( 2, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'fa fa-fax' ),
-						( 2, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'fa fa-fax' ),
-						( 3, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'fa fa-twitter' ),
-						( 3, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'fa fa-facebook' ),
-						( 3, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'fa fa-google-plus fa-x-google-plus--nudge' ),
-						( 3, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'fa fa-linkedin fa-x-linkedin--nudge' ),
-						( 3, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'fa fa-github-alt' ),
-						( 3, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', NULL ),
-						( 3, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', NULL ),
-						( 3, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', NULL ),
-						( 3, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'fa fa-flickr' ),
-						( 3, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'fa fa-youtube' ),
-						( 3, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'fa fa-digg' ),
-						( 3, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'fa fa-stumbleupon' ),
-						( 3, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'fa fa-pinterest-p' ),
-						( 4, 'word',   'Role',          NULL, 'optional',    'list',      '1',  '1', NULL ),
-						( 4, 'word',   'Organization',  NULL, 'optional',    'forbidden', '2',  '1', NULL ),
-						( 4, 'word',   'Division',      NULL, 'optional',    'forbidden', '3',  '1', NULL ),
-						( 4, 'word',   'VAT ID',        NULL, 'optional',    'forbidden', '4',  '0', NULL ),
-						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'fa fa-building' ),
-						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'fa fa-home' ),
-						( 6, 'text',   'About me',      NULL, 'recommended', 'forbidden', '1',  '0', 'fa fa-info' ),
-						( 6, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'fa fa-thumbs-o-up' ),
-						( 6, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'fa fa-thumbs-o-down' )" );
+		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
+		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info' ),
+						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
+						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
+						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
+						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
+						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
+						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
+						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
+						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
+						( 3, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
+						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
+						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
+						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
+						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
+						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
+						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
+						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
+						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
+						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
+						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
+						( 4, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
+						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
+						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
+						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 5, 'word',   'Role',          NULL, 'optional',    'list',      '1',  '1', 'role',         NULL ),
+						( 5, 'word',   'Organization',  NULL, 'optional',    'forbidden', '2',  '1', 'organization', NULL ),
+						( 5, 'word',   'Division',      NULL, 'optional',    'forbidden', '3',  '1', 'division',     NULL ),
+						( 5, 'word',   'VAT ID',        NULL, 'optional',    'forbidden', '4',  '0', 'vatid',        NULL ),
+						( 6, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
+						( 6, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
 	task_end();
 
 
@@ -223,7 +223,7 @@ function create_default_data()
 			'Group'     => $Group_Admins,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'About me'    => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1340,7 +1340,7 @@ function create_demo_contents()
 			'Group'     => $Group_Privileged,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'About me'    => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
+					'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1362,7 +1362,7 @@ function create_demo_contents()
 			'Group'     => $Group_Privileged,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'About me'    => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
+					'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1384,7 +1384,7 @@ function create_demo_contents()
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'About me'    => 'I\'m a demo author.'."\n".'I like to write!',
+					'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1406,7 +1406,7 @@ function create_demo_contents()
 			'Group'     => $Group_Bloggers,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
-					'About me'    => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
+					'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
 					'Website'     => 'http://b2evolution.net/',
 					'Twitter'     => 'https://twitter.com/b2evolution/',
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
@@ -1427,7 +1427,7 @@ function create_demo_contents()
 			'gender'    => 'M',
 			'Group'     => $Group_Users,
 			'fields'    => array(
-					'About me' => 'Hi there!',
+					'Micro bio' => 'Hi there!',
 				)
 		) );
 	assign_profile_picture( $UserCache->get_by_ID( $larry_user_ID ) );
@@ -1442,7 +1442,7 @@ function create_demo_contents()
 			'gender'    => 'F',
 			'Group'     => $Group_Users,
 			'fields'    => array(
-					'About me' => 'Just me!',
+					'Micro bio' => 'Just me!',
 				)
 		) );
 	assign_profile_picture( $UserCache->get_by_ID( $kate_user_ID ) );

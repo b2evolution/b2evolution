@@ -995,7 +995,7 @@ switch( $action )
 if( $display_mode != 'js')
 {
 	// Init JS for user reporting
-	echo_user_report_js();
+	echo_user_report_window();
 
 	// Display body bottom, debug info and close </html>:
 	$AdminUI->disp_global_footer();

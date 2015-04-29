@@ -18,6 +18,13 @@
 	}
 }
 
+// Make container fluid only on disp=user for width <=992px
+@media (max-width: 992px) {
+	body.disp_user .container {
+		width: 100%;
+	}
+}
+
 // Don't rewrite a font family of glyph icons
 .glyphicon {
 	font-family: 'Glyphicons Halflings' !important;
@@ -532,9 +539,6 @@ legend.panel-heading {
 .panel-body #ffield_contact_groups {
 	label {
 		white-space: nowrap;
-		&.control-label {
-			display: none;
-		}
 	}
 	.contact_group_new input[type=checkbox] {
 		margin-top: 12px;
@@ -601,6 +605,9 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Modal windows
+.modal {
+	z-index: 10001; // to be over sitewide header
+}
 .modal-backdrop {
 	position: fixed;
 }
@@ -746,6 +753,7 @@ div.edit_toolbars, div.message_toolbars {
 	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
 	&:hover {
 		.border-radius;
+		color: #FFF;
 		background: #23527c;
 		// TODO: use @variable name
 	}

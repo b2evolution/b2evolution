@@ -266,7 +266,7 @@ switch( $action )
 
 		if( update_contacts_groups_user( $user_ID, $contact_groups, $contact_blocked ) )
 		{
-			$Messages->add( T_('The contact groups have been updated for this user.'), 'success' );
+			$Messages->add( T_('Your contact groups have been updated.'), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:

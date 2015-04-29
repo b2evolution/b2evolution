@@ -132,16 +132,17 @@ siteskin_include( '_site_body_header.inc.php' );
 	<?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '<h2>&nbsp;</h2>',
-				'glue'        => ' - ',
+				'title_before'      => '<h2>',
+				'title_after'       => '</h2>',
+				'title_none'        => '<h2>&nbsp;</h2>',
+				'glue'              => ' - ',
 				'title_single_disp' => false,
-				'format'      => 'htmlbody',
-				'arcdir_text' => T_('Index'),
-				'catdir_text' => T_('Galleries'),
-				'category_text' => T_('Gallery').': ',
-				'categories_text' => T_('Galleries').': ',
+				'format'            => 'htmlbody',
+				'arcdir_text'       => T_('Index'),
+				'catdir_text'       => T_('Galleries'),
+				'category_text'     => T_('Gallery').': ',
+				'categories_text'   => T_('Galleries').': ',
+				'user_text'         => '',
 			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>

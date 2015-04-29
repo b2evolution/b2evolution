@@ -38,6 +38,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 	$Form->select_input_array( 'ufdf_ufgp_ID', $edited_Userfield->ufgp_ID, $edited_Userfield->get_groups(),
 		T_('Group'), '', array( 'required' => true, 'force_keys_as_values' => true ) );
 
+	$Form->text_input( 'ufdf_code', $edited_Userfield->code, 20, T_('Field code'), '', array( 'maxlength' => 20, 'required' => true ) );
+
 	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Field name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
 	$Form->text_input( 'ufdf_icon_name', $edited_Userfield->icon_name, 20, T_('Icon name'), '', array( 'maxlength' => 40 ) );

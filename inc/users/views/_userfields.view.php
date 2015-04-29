@@ -10,7 +10,7 @@
  *
  * @package evocore
  *
- * @version  $Id: _userfields.view.php 8728 2015-04-10 12:58:53Z yura $
+ * @version  $Id: _userfields.view.php 8840 2015-04-29 14:40:13Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -177,11 +177,11 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 /*
  * Data columns:
  */
-function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name )
+function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
 	global $current_User;
 
-	$field_icon = '<span class="uf_icon_block">'
+	$field_icon = '<span class="uf_icon_block ufld-'.$ufdf_code.' ufld--textcolor">'
 			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
 		.'</span>';
 
@@ -196,7 +196,7 @@ function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name )
 }
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '%ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name# )%',
+		'td' => '%ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name#, #ufdf_code# )%',
 	);
 
 $Results->cols[] = array(

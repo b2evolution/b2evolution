@@ -209,6 +209,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'posts_text'        => '',
 				'useritems_text'    => T_('User\'s topics'),
 				'usercomments_text' => T_('User\'s replies'),
+				'user_text'         => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

@@ -133,5 +133,6 @@ global $Settings, $disp, $cat;
 					'lostpassword_text' => '',
 					'account_activation' => '',
 					'msgform_text'      => '',
+					'user_text'         => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------

@@ -22,11 +22,8 @@ div.widget_core_coll_tagline {
 }
 body.pictured .footer {
 	color: #666;
-	a {
+	a:not([class^=ufld-]) {
 		color: #666;
-	}
-	.widget--social-media-links a {
-		color: #FFF;
 	}
 }
 
@@ -602,13 +599,6 @@ body.pictured .front_main_content .widget--social-media-links a {
 	}
 }
 body.pictured .footer .widget_core_org_members {
-	.widget--social-media-links a {
-		color: #FFF;
-		background: #ddd;
-		&:hover {
-			background: #23527c;
-		}
-	}
 	a.user_link {
 		color: #000;
 		&:hover {

@@ -634,6 +634,102 @@ span.loader_img.loader_user_deldata {
 .filter_item.blue div.icon:hover {
   background: #6a91df;
 }
+.ufld-yahooim.ufld--textcolor,
+.ufld-yahooim.ufld--hovertextcolor:hover {
+  color: #7b0099;
+}
+.ufld-yahooim.ufld--bgcolor,
+.ufld-yahooim.ufld--hoverbgcolor:hover {
+  background-color: #7b0099;
+}
+.ufld-skype.ufld--textcolor,
+.ufld-skype.ufld--hovertextcolor:hover {
+  color: #00aff0;
+}
+.ufld-skype.ufld--bgcolor,
+.ufld-skype.ufld--hoverbgcolor:hover {
+  background-color: #00aff0;
+}
+.ufld-twitter.ufld--textcolor,
+.ufld-twitter.ufld--hovertextcolor:hover {
+  color: #00aced;
+}
+.ufld-twitter.ufld--bgcolor,
+.ufld-twitter.ufld--hoverbgcolor:hover {
+  background-color: #00aced;
+}
+.ufld-facebook.ufld--textcolor,
+.ufld-facebook.ufld--hovertextcolor:hover {
+  color: #3b5998;
+}
+.ufld-facebook.ufld--bgcolor,
+.ufld-facebook.ufld--hoverbgcolor:hover {
+  background-color: #3b5998;
+}
+.ufld-googleplus.ufld--textcolor,
+.ufld-googleplus.ufld--hovertextcolor:hover {
+  color: #dd4b39;
+}
+.ufld-googleplus.ufld--bgcolor,
+.ufld-googleplus.ufld--hoverbgcolor:hover {
+  background-color: #dd4b39;
+}
+.ufld-linkedin.ufld--textcolor,
+.ufld-linkedin.ufld--hovertextcolor:hover {
+  color: #007bb6;
+}
+.ufld-linkedin.ufld--bgcolor,
+.ufld-linkedin.ufld--hoverbgcolor:hover {
+  background-color: #007bb6;
+}
+.ufld-github.ufld--textcolor,
+.ufld-github.ufld--hovertextcolor:hover {
+  color: #333333;
+}
+.ufld-github.ufld--bgcolor,
+.ufld-github.ufld--hoverbgcolor:hover {
+  background-color: #333333;
+}
+.ufld-flickr.ufld--textcolor,
+.ufld-flickr.ufld--hovertextcolor:hover {
+  color: #ff0084;
+}
+.ufld-flickr.ufld--bgcolor,
+.ufld-flickr.ufld--hoverbgcolor:hover {
+  background-color: #ff0084;
+}
+.ufld-youtube.ufld--textcolor,
+.ufld-youtube.ufld--hovertextcolor:hover {
+  color: #bb0000;
+}
+.ufld-youtube.ufld--bgcolor,
+.ufld-youtube.ufld--hoverbgcolor:hover {
+  background-color: #bb0000;
+}
+.ufld-digg.ufld--textcolor,
+.ufld-digg.ufld--hovertextcolor:hover {
+  color: #356aa0;
+}
+.ufld-digg.ufld--bgcolor,
+.ufld-digg.ufld--hoverbgcolor:hover {
+  background-color: #356aa0;
+}
+.ufld-stumbleupon.ufld--textcolor,
+.ufld-stumbleupon.ufld--hovertextcolor:hover {
+  color: #eb4924;
+}
+.ufld-stumbleupon.ufld--bgcolor,
+.ufld-stumbleupon.ufld--hoverbgcolor:hover {
+  background-color: #eb4924;
+}
+.ufld-pinterest.ufld--textcolor,
+.ufld-pinterest.ufld--hovertextcolor:hover {
+  color: #cb2027;
+}
+.ufld-pinterest.ufld--bgcolor,
+.ufld-pinterest.ufld--hoverbgcolor:hover {
+  background-color: #cb2027;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -2493,6 +2589,10 @@ input.btn-lg {
 .top_menu div.item_title {
   display: inline-block;
 }
+.profile_content {
+  max-width: 960px;
+  margin: 0 auto;
+}
 .main_profile_picture {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -2515,8 +2615,21 @@ input.btn-lg {
   max-width: 300px;
   margin: 0 auto;
 }
-.profile_buttons .btn {
+.profile_buttons a.btn {
+  display: inline-block;
+}
+.profile_buttons a.btn button {
   width: 100%;
+}
+.profile_buttons .btn,
+.profile_buttons .btn-group {
+  width: 100%;
+}
+.profile_buttons .btn-group {
+  white-space: nowrap;
+}
+.profile_buttons .btn-group .btn {
+  width: 50%;
 }
 form.bComment .other_profile_pictures div.avatartag {
   float: none;

@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8826 2015-04-27 16:54:19Z yura $
+	 * @version $Id: index.main.php 8828 2015-04-28 10:15:51Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -155,6 +155,7 @@ if( $disp != 'front' )
 				'lostpassword_text' => '',
 				'account_activation' => '',
 				'msgform_text'      => '',
+				'user_text'         => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

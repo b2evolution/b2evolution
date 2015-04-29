@@ -114,6 +114,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'glue'        => ' - ',
 				'title_single_disp' => false,
 				'format'      => 'htmlbody',
+				'user_text'   => '',
 			) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>

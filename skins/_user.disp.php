@@ -48,6 +48,8 @@ $params = array_merge( array(
 user_prevnext_links();
 // ------------------------- END OF PREV/NEXT USER LINKS -------------------------
 
+// ---- START OF PROFILE CONTENT ---- //
+echo '<div class="profile_content">';
 
 $user_ID = param( 'user_ID', 'integer', '' );
 if( empty($user_ID) )
@@ -197,24 +199,29 @@ echo '<div class="profile_column_left">';
 		$is_contact = check_contact( $User->ID );
 		if( $is_contact === NULL )
 		{ // User is not in current User contact list, so allow "Add to my contacts" action
-			$buttons[] = '<button type="button" class="btn btn-default" onclick="return user_contact( '.$User->ID.' )">'.T_('Add to Contacts').'</button>';
+			$buttons[] = '<button type="button" class="btn btn-default" onclick="return user_contact_groups( '.$User->ID.' )">'.T_('Add to Contacts').'</button>';
+		}
+		elseif( $is_contact === false )
+		{ // User is blocked
+			$buttons[] = '<button type="button" class="btn btn-danger" onclick="return user_contact_groups( '.$User->ID.' )">'.T_('Edit Blocked Contact').'</button>';
 		}
 		else
 		{ // User is on current User contact list
-			$buttons[] = '<button type="button" class="btn btn-success" onclick="return user_contact( '.$User->ID.' )">'.T_('Edit Contact').'</button>';
+			$buttons[] = '<button type="button" class="btn btn-success" onclick="return user_contact_groups( '.$User->ID.' )">'.T_('Edit Contact').'</button>';
 		}
 
+		$buttons['group'] = array();
 		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
-			$buttons[] = '<a href="'.$contact_block_url.'&action=block">'
-					.'<button type="button" class="btn btn-warning">'.T_('Block Contact').'</button>'
+			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block" class="btn btn-warning">'
+					.'<button type="button">'.T_('Block Contact').'</button>'
 				.'</a>';
 		}
 		else
 		{ // Display a button to unblock user
-			$buttons[] = '<a href="'.$contact_block_url.'&action=unblock">'
-					.'<button type="button" class="btn btn-danger">'.T_('Unblock Contact').'</button>'
+			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=unblock" class="btn btn-danger">'
+					.'<button type="button">'.T_('Unblock Contact').'</button>'
 				.'</a>';
 		}
 	}
@@ -223,15 +230,19 @@ echo '<div class="profile_column_left">';
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
 			$current_User->check_status( 'can_report_user' ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
+		if( ! isset( $buttons['group'] ) )
+		{
+			$buttons['group'] = array();
+		}
 		// get current User report from edited User
 		$current_report = get_report_from( $User->ID );
 		if( $current_report == NULL )
 		{ // current User didn't add any report from this user yet
-			$buttons[] = '<button type="button" class="btn btn-warning" onclick="return user_report( '.$User->ID.' )">'.T_('Report User').'</button>';
+			$buttons['group'][] = '<button type="button" class="btn btn-warning" onclick="return user_report( '.$User->ID.' )">'.T_('Report User').'</button>';
 		}
 		else
 		{
-			$buttons[] = '<button type="button" class="btn btn-danger" onclick="return user_report( '.$User->ID.' )">'.T_('Edit Reported User').'</button>';
+			$buttons['group'][] = '<button type="button" class="btn btn-danger" onclick="return user_report( '.$User->ID.' )">'.T_('Edit Reported User').'</button>';
 		}
 	}
 
@@ -247,7 +258,19 @@ echo '<div class="profile_column_left">';
 	if( count( $buttons ) )
 	{ // Dispaly all available buttons
 		echo '<hr class="profile_separator" />'."\n";
-		echo '<div class="profile_buttons"><p>'.implode( "</p>\n<p>", $buttons ).'</p></div>';
+		echo '<div class="profile_buttons">';
+		foreach( $buttons as $button )
+		{
+			if( is_array( $button ) )
+			{ // The grouped buttons
+				echo '<p'.( count( $button ) > 1 ? ' class="btn-group' : '' ).'">'.implode( "\n", $button ).'</p>';
+			}
+			else
+			{ // Single button
+				echo '<p>'.$button.'</p>';
+			}
+		}
+		echo '</div>';
 	}
 
 	// Organizations:
@@ -315,7 +338,7 @@ echo '<div class="profile_column_right">';
 			{ // End previous group
 				$profileForm->end_fieldset();
 			}
-			$profileForm->begin_fieldset( T_( $userfield->ufgp_name ) );
+			$profileForm->begin_fieldset( T_( $userfield->ufgp_name ), array( 'id' => 'fieldset_user_fields' ) );
 		}
 
 		if( $userfield->ufdf_type == 'text' )
@@ -326,7 +349,7 @@ echo '<div class="profile_column_right">';
 		$userfield_icon = '';
 		if( ! empty( $userfield->ufdf_icon_name ) )
 		{ // Icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.'"></span> ';
+			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld-'.$userfield->ufdf_code.' ufld--textcolor"></span> ';
 		}
 
 		$profileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
@@ -361,10 +384,13 @@ echo '</div>';
 
 echo '<div class="clear"></div>';
 
+// ---- END OF PROFILE CONTENT ---- //
+echo '</div>';
+
 $profileForm->end_form();
 
 // Init JS for user reporting
-echo_user_report_js();
+echo_user_report_window();
 // Init JS for user contact editing
-echo_user_contact_js();
+echo_user_contact_groups_window();
 ?>

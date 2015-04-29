@@ -708,6 +708,10 @@ input.btn-lg {
 .top_menu div.item_title {
   display: inline-block;
 }
+.profile_content {
+  max-width: 960px;
+  margin: 0 auto;
+}
 .main_profile_picture {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -731,14 +735,22 @@ input.btn-lg {
   max-width: 300px;
 }
 .profile_column_right {
-  margin: 20px 0 0 315px;
+  margin: 20px 0 0 320px;
 }
-.profile_column_right div.form-group {
-  margin-left: 0;
-  margin-right: 0;
+.profile_column_right #fieldset_user_fields {
+  overflow: hidden;
 }
-.profile_buttons .btn {
+.profile_buttons .btn,
+.profile_buttons .btn-group {
   width: 100%;
+}
+.profile_buttons .btn-group .btn {
+  width: 50%;
+}
+.profile_buttons a.btn button {
+  background: none;
+  border: none;
+  padding: 0;
 }
 form.bComment .other_profile_pictures div.avatartag {
   float: none;
@@ -746,7 +758,7 @@ form.bComment .other_profile_pictures div.avatartag {
 form.bComment .profile_column_right legend.panel-heading {
   padding: 10px 15px;
 }
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .profile_column_left {
     margin: 0 auto;
     float: none;
@@ -755,5 +767,13 @@ form.bComment .profile_column_right legend.panel-heading {
     margin-left: 0;
     width: 100%;
     float: left;
+  }
+}
+@media (max-width: 1199px) {
+  .profile_content .col-sm-3 {
+    width: 35%;
+  }
+  .profile_content .col-sm-9 {
+    width: 65%;
   }
 }

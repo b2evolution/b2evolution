@@ -1253,7 +1253,7 @@ switch( $action )
 		$display_mode = 'js';
 		$form_action = get_secure_htsrv_url().'profile_update.php';
 
-		require $inc_path.'users/views/_user_contact.form.php';
+		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
 	default:
