@@ -18,13 +18,6 @@
 	}
 }
 
-// Make container fluid only on disp=user for width <=992px
-@media (max-width: 992px) {
-	body.disp_user .container {
-		width: 100%;
-	}
-}
-
 // Don't rewrite a font family of glyph icons
 .glyphicon {
 	font-family: 'Glyphicons Halflings' !important;
@@ -267,6 +260,30 @@ select#report_user_status {
 	margin-top: -7px;
 }
 
+// Form with fixed label width:
+.fixedform-group {
+	.fixedform-label {
+		clear: both;
+		float: left;
+		width: 150px;
+	}
+	.fixedform-controls {
+		margin-left: 165px;
+	}
+}
+@media (max-width: 639px) {
+	.fixedform-group {
+		.fixedform-label {
+			clear: both;
+			float: none;
+			width: 100%;
+		}
+		.fixedform-controls {
+			margin-left: 0;
+		}
+	}
+}
+
 // Used to set a font size of action icons to normal view
 a.action_icon {
 	font-size: 12px;
@@ -307,7 +324,7 @@ form ul.token-input-list-facebook {
 
 // Results table
 div.results {
-	margin-top: 20px;
+	margin-top: 0;
 	div.table_scroll {
 		overflow: auto;
 		width: 100%;
@@ -482,6 +499,9 @@ select:focus:invalid:focus {
 	.close {
 		position: relative;
 		top: -4px;
+	}
+	.btn {
+		margin: -6px 0 0 6px;
 	}
 }
 legend.panel-heading {

@@ -260,8 +260,9 @@ class Form extends Widget
 	 * Switch to other layout
 	 *
 	 * @param string|NULL the form layout : 'fieldset', 'table' or ''; NULL to restore previsouly saved layout
+	 * @param boolean TRUE to use default layout params when current skin has no the selected layout
 	 */
-	function switch_layout( $layout )
+	function switch_layout( $layout, $use_default_layout = true )
 	{
 		if( $layout == NULL )
 		{ // we want to restore previous layout:
@@ -353,11 +354,17 @@ class Form extends Widget
 		}
 		else
 		{ // We want to switch to a new layout
-			array_unshift( $this->saved_layouts, $this->layout );
-			$this->layout = $layout;
 
 			// Try to get template of current skin
-			$template = $this->get_template( $this->layout, false );
+			$template = $this->get_template( $layout, false );
+
+			if( empty( $template ) && ! $use_default_layout )
+			{ // Don't use default layout
+				return;
+			}
+
+			array_unshift( $this->saved_layouts, $this->layout );
+			$this->layout = $layout;
 
 			if( is_array( $template ) && ! empty( $template ) )
 			{ // Template is detected on current skin, Use it

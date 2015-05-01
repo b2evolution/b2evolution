@@ -1358,11 +1358,6 @@ ul.jslog_error {
     padding-bottom: 7px;
   }
 }
-@media (max-width: 992px) {
-  body.disp_user .container {
-    width: 100%;
-  }
-}
 .glyphicon {
   font-family: 'Glyphicons Halflings' !important;
 }
@@ -1574,6 +1569,24 @@ a.btn.action_icon.hoverlink {
 select#report_user_status {
   margin-top: -7px;
 }
+.fixedform-group .fixedform-label {
+  clear: both;
+  float: left;
+  width: 150px;
+}
+.fixedform-group .fixedform-controls {
+  margin-left: 165px;
+}
+@media (max-width: 639px) {
+  .fixedform-group .fixedform-label {
+    clear: both;
+    float: none;
+    width: 100%;
+  }
+  .fixedform-group .fixedform-controls {
+    margin-left: 0;
+  }
+}
 a.action_icon {
   font-size: 12px;
 }
@@ -1619,7 +1632,7 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
   margin: 0 4px 4px 0;
 }
 div.results {
-  margin-top: 20px;
+  margin-top: 0;
 }
 div.results div.table_scroll {
   overflow: auto;
@@ -1774,6 +1787,9 @@ select:focus:invalid:focus {
 .panel-heading .close {
   position: relative;
   top: -4px;
+}
+.panel-heading .btn {
+  margin: -6px 0 0 6px;
 }
 legend.panel-heading {
   font-size: 16px;

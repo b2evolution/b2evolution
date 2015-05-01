@@ -67,6 +67,8 @@ $profileForm = new Form();
 
 $profileForm->switch_template_parts( $params['skin_form_params'] );
 
+$profileForm->switch_layout( 'fixed', false );
+
 $profileForm->begin_form( 'bComment' );
 
 // ---- START OF LEFT COLUMN ---- //

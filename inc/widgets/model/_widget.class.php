@@ -220,6 +220,34 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get manual URL
+	 *
+	 * @return string URL
+	 */
+	function get_manual_url()
+	{
+		$widget_manual_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $this->get_name() ) ).'-widget';
+
+		return get_manual_url( $widget_manual_slug );
+	}
+
+
+	/**
+	 * Get manual icon
+	 *
+	 * @return string icon
+	 */
+	function get_manual_icon()
+	{
+		return action_icon( '', 'help', $this->get_manual_url(), NULL, NULL, NULL, array(
+				'class'  => 'action_icon help_plugin_icon',
+				'rel'    => format_to_output( $this->get_desc(), 'htmlattr' ),
+				'target' => '_blank',
+			) );
+	}
+
+
+	/**
 	 * Get definitions for editable params.
 	 *
 	 * @see Plugin::GetDefaultSettings()

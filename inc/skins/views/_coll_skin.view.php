@@ -56,6 +56,8 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+	echo '<div class="skin_selector_block">';
+
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
 
@@ -95,6 +97,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	}
 
 	echo '<div class="clear"></div>';
+	echo '</div>';
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 

@@ -522,16 +522,6 @@ fieldset ul {
 	margin: 8px 0;
 }
 
-// Block to select skin
-div.skinshot {
-	background-color: #F5F5F5;
-	border: 1px solid #E3E3E3;
-	.border-radius;
-	padding: 5px;
-	float: left;
-	margin: 1ex;
-}
-
 // Dashboard
 #comments_container, .items_container {
 	border: 1px solid #DDD;
@@ -846,18 +836,6 @@ h2.user_title {
 	margin-bottom: 18px;
 }
 
-// Skin settings
-.skin_settings {
-	float: left;
-	width: 30%;
-	.control-label {
-		width: 40%;
-	}
-	.controls-info {
-		width: 60%;
-	}
-}
-
 // phpBB importer
 .tool_steps {
 	text-align: center;
@@ -1013,7 +991,7 @@ div.available_widgets {
 	.border-radius;
 	.available_widgets_toolbar {
 		border-bottom: 1px solid #ddd;
-		background: #F5F5F5;
+		background: #FFF;
 		padding: 10px 15px;
 	}
 	.widget_list {
@@ -1021,7 +999,7 @@ div.available_widgets {
 		margin: 0;
 	}
 	#available_widgets_inner {
-		top: 82px;
+		top: 87px;
 	}
 }
 
@@ -1041,9 +1019,6 @@ div.available_widgets {
 // Support for buttons in panel blocks
 .btn-right{
 	float: right;
-}
-.panel-heading .btn {
-	margin: -6px 0 0 6px;
 }
 .panel-footer.control-buttons {
 	margin: 0 -15px -15px -15px;
@@ -1145,6 +1120,17 @@ div.level3 nav .nav>li>a {
 	}
 }
 
+// Skin settings
+.skin_settings {
+	float: left;
+	width: 30%;
+	.control-label {
+		width: 40%;
+	}
+	.controls-info {
+		width: 60%;
+	}
+}
 // Skin info
 .skin_settings {
 	div.controls.col-xs-10 {
@@ -1153,6 +1139,53 @@ div.level3 nav .nav>li>a {
 	ul {
 		list-style: disc;
 		margin-left: 20px;
+	}
+}
+// Skin selector form
+.skin_selector_filters {
+	border-bottom: 1px solid #ddd;
+	padding: 15px;
+	margin: -15px -15px 15px -15px;
+	.form-group {
+		margin-bottom: 0;
+	}
+}
+.skin_selector_form .control-buttons {
+	margin-top: 15px;
+	[class^=col-] {
+		text-align: right;
+		padding-right: 0;
+		margin: 0;
+		width: 100%;
+	}
+}
+.skinshot {
+	background-color: #F5F5F5;
+	border: 1px solid #E3E3E3;
+	.border-radius;
+	padding: 5px;
+	float: left;
+	margin: 15px;
+	.skinshot_placeholder {
+		width: 240px;
+		height: 180px;
+		margin: 1ex 1ex .5ex 1ex;
+		background: #FFF;
+		text-align: center;
+		.border-radius;
+		.skinshot_noshot {
+			padding-top: 36px;
+		}
+		.skinshot_name {
+			padding-top: 24px;
+			font-size: 170%;
+		}
+	}
+}
+.skin_selector_block {
+	margin: -15px 0 0 -15px;
+	.skinshot {
+		margin: 15px 0 0 15px;
 	}
 }
 

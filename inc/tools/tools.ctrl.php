@@ -295,8 +295,37 @@ if( empty($tab) )
 			load_funcs('_core/model/db/_upgrade.funcs.php');
 			$template_action = $action;
 			break;
+
+		case 'update_tools':
+			// UPDATE general settings from tools:
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'edit', true );
+
+			// Lock system
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{
+				$system_lock = param( 'system_lock', 'integer', 0 );
+				if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )
+				{ // System lock was turned off and there was no error, remove the warning about the system lock
+					$Messages->clear();
+				}
+				$Settings->set( 'system_lock', $system_lock );
+			}
+
+			if( ! $Messages->has_errors() )
+			{
+				$Settings->dbupdate();
+				$Messages->add( T_('Site settings updated.'), 'success' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=tools', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
+
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );

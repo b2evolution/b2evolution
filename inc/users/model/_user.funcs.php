@@ -2850,6 +2850,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		}
 
 		$field_note = '';
+		$field_size = 40;
 		if( $action != 'view' )
 		{
 			if( in_array( $userfield->ufdf_duplicated, array( 'allowed', 'list' ) ) )
@@ -2858,14 +2859,18 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			}
 		}
 
-		if( $userfield->ufdf_type == 'url' && !empty( $uf_val ) )
-		{
-			$url = format_to_output( $uf_val, 'formvalue' );
-			if( !preg_match('#://#', $url) )
+		if( $userfield->ufdf_type == 'url' )
+		{ // URL field
+			$field_size = 80; // use double size
+			if( ! empty( $uf_val ) )
 			{
-				$url = 'http://'.$url;
+				$url = format_to_output( $uf_val, 'formvalue' );
+				if( !preg_match('#://#', $url) )
+				{
+					$url = 'http://'.$url;
+				}
+				$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 			}
-			$field_note .= '<a href="'.$url.'" target="_blank" class="action_icon" style="vertical-align: 0;">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
 		}
 
 		$field_params = array();
@@ -2912,7 +2917,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 				default:
 					$field_params['maxlength'] = 255;
-					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 40, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
 			}
 		}
 
@@ -2960,14 +2965,12 @@ function callback_filter_userlist( & $Form )
 	if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
 	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
 		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), T_('Restrict to members of this blog') );
-		echo '<br />';
 	}
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
-	echo is_admin_page() ? '' : '<br />';
 
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
@@ -2986,7 +2989,6 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array();
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array, T_('User group'), '', array( 'force_keys_as_values' => true ) );
-		echo is_admin_page() ? '' : '<br />';
 	}
 
 	$location_filter_displayed = false;
@@ -3032,13 +3034,7 @@ function callback_filter_userlist( & $Form )
 		echo '</span>';
 	}
 
-	if( $location_filter_displayed )
-	{
-		echo is_admin_page() ? '' : '<br />';
-	}
-
 	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
-	echo is_admin_page() ? '' : '<br />';
 
 	$OrganizationCache = & get_OrganizationCache( T_('All') );
 	$OrganizationCache->load_all();
@@ -3046,8 +3042,8 @@ function callback_filter_userlist( & $Form )
 	{
 		echo is_admin_page() ? '<br />' : '';
 		$Form->select_input_object( 'org', get_param( 'org' ), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
-		echo '<br />';
 	}
+	echo '<br />';
 
 	$criteria_types = param( 'criteria_type', 'array:integer' );
 	$criteria_values = param( 'criteria_value', 'array:string' );
@@ -4623,10 +4619,15 @@ function users_results_block( $params = array() )
 			'org_ID'               => NULL,
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
-			'results_title'        => T_('Groups & Users').get_manual_link('users_and_groups'),
+			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
 			'results_no_text'      => T_('No users'),
 			'results_order'        => '/user_lastseen_ts/D',
 			'page_url'             => get_dispctrl_url( 'users' ),
+			'join_group'           => true,
+			'join_city'            => false,
+			'join_country'         => true,
+			'keywords_fields'      => NULL,
+			'where_status_closed'  => NULL,
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -4640,6 +4641,7 @@ function users_results_block( $params = array() )
 			'display_name'         => true,
 			'display_gender'       => true,
 			'display_country'      => true,
+			'display_city'         => false,
 			'display_blogs'        => true,
 			'display_source'       => true,
 			'display_regdate'      => true,
@@ -4677,8 +4679,12 @@ function users_results_block( $params = array() )
 	// Create result set:
 	load_class( 'users/model/_userlist.class.php', 'UserList' );
 	$UserList = new UserList( $params['filterset_name'], $UserSettings->get('results_per_page'), $params['results_param_prefix'], array(
-			'join_city'    => false,
-			'where_org_ID' => $params['org_ID']
+			'join_group'          => $params['join_group'],
+			'join_city'           => $params['join_city'],
+			'join_country'        => $params['join_country'],
+			'keywords_fields'     => $params['keywords_fields'],
+			'where_status_closed' => $params['where_status_closed'],
+			'where_org_ID'        => $params['org_ID'],
 		) );
 	$default_filters = array( 'order' => $params['results_order'] );
 	$UserList->title = $params['results_title'];
@@ -4792,6 +4798,13 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_actions'    => true,
+			'th_class_avatar'    => 'shrinkwrap small',
+			'td_class_avatar'    => 'shrinkwrap center small',
+			'avatar_size'        => 'crop-top-48x48',
+			'th_class_login'     => 'shrinkwrap small',
+			'td_class_login'     => 'small',
+			'th_class_city'      => 'shrinkwrap small',
+			'td_class_city'      => 'shrinkwrap small',
 		), $params );
 
 	if( $UserList->filters['group'] != -1 )
@@ -4845,11 +4858,11 @@ function users_results( & $UserList, $params = array() )
 	{ // Display avatar
 		$UserList->cols[] = array(
 				'th' => T_('Picture'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'shrinkwrap center small',
+				'th_class' => $params['th_class_avatar'],
+				'td_class' => $params['th_class_avatar'],
 				'order' => 'has_picture',
 				'default_dir' => 'D',
-				'td' => '%user_td_avatar( #user_ID#, #user_avatar_file_ID# )%',
+				'td' => '%user_td_avatar( #user_ID#, "'.$params['avatar_size'].'" )%',
 			);
 	}
 
@@ -4857,8 +4870,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display login
 		$UserList->cols[] = array(
 				'th' => T_('Login'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'small',
+				'th_class' => $params['th_class_login'],
+				'td_class' => $params['th_class_login'],
 				'order' => 'user_login',
 				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
 			);
@@ -4911,6 +4924,17 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => 'shrinkwrap small',
 				'order' => 'c.ctry_name',
 				'td' => '%country_flag( #ctry_code#, #ctry_name#, "w16px", "flag", "", false, true, "", false )% $ctry_name$',
+			);
+	}
+
+	if( $params['display_city'] )
+	{ // Display city
+		$UserList->cols[] = array(
+				'th' => T_('City'),
+				'th_class' => $params['th_class_city'],
+				'td_class' => $params['th_class_city'],
+				'order' => 'city_name',
+				'td' => '$city_name$<div class="note">$city_postcode$</div>',
 			);
 	}
 
@@ -5119,14 +5143,14 @@ function user_td_grp_actions( & $row )
 	return $r;
 }
 
-function user_td_avatar( $user_ID )
+function user_td_avatar( $user_ID, $thumb_size = 'crop-top-48x48' )
 {
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_ID( $user_ID );
 
 	return $User->get_identity_link( array(
-		'link_text' => 'only_avatar',
-		'thumb_size' => 'crop-top-48x48',
+		'link_text'  => 'only_avatar',
+		'thumb_size' => $thumb_size,
 		) );
 }
 

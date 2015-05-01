@@ -154,6 +154,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'account_activation' => '',
 				'msgform_text'      => '',
 				'user_text'         => '',
+				'users_text'        => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

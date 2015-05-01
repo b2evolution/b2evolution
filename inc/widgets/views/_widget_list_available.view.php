@@ -23,11 +23,11 @@ $core_componentwidget_defs = array(
 		'*'.T_('General purpose widgets'),
 			'free_html',
 			'coll_logo',
-			'coll_avatar',
-		'*'.T_('Blog navigation'),
+		'*'.T_('Menu Items'),
 			'menu_link',
 			'msg_menu_link',
 			'profile_menu_link',
+		'*'.T_('Navigation'),
 			'coll_tag_cloud',
 			'coll_category_list',
 			'coll_common_links',
@@ -50,6 +50,7 @@ $core_componentwidget_defs = array(
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
+			'coll_avatar',
 		'*'.T_('Other'),
 			'colls_list_public',
 			'colls_list_owner',
@@ -85,7 +86,7 @@ foreach( $core_componentwidget_defs as $code )
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
-		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span>';
+		echo '</a> '.$ComponentWidget->get_manual_icon();
 		echo '</li>';
 	}
 }

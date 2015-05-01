@@ -16,40 +16,67 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load classes
 load_class( 'users/model/_user.class.php', 'User' );
 
-// init variables
-global $inc_path;
-global $Users;
-global $edited_User;
+global $Blog, $Skin, $Settings;
 
-global $Skin;
-if( !empty( $Skin ) )
+if( ! empty( $Skin ) )
 {
 	$display_params = array_merge( $Skin->get_template( 'Results' ), $Skin->get_template( 'users' ) );
 }
 else
 {
-	$display_params = NULL;
+	$display_params = array();
 }
 
-
-// ----------------------- End Init variables --------------------------
-
-// set params
-if( !isset( $params ) )
-{
+if( ! isset( $params ) )
+{ // Init template params
 	$params = array();
 }
 
 $params = array_merge( array(
-	'form_class' => 'bComment',
-	'form_title' => '',
-	'form_action' => '',
-	'form_name' => '',
-	'form_layout' => NULL,
-	'cols' => 40
+		'filterset_name'       => '',
+		'results_param_prefix' => 'u_',
+		'results_title'        => T_('Users'),
+		'results_order'        => $Settings->get( 'allow_avatars' ) ? 'D' : 'A',
+		'join_group'           => is_logged_in() ? false : true, /* Anonymous users have a limit by user group level */
+		'join_city'            => true,
+		'join_country'         => false,
+		'keywords_fields'      => 'user_login, user_firstname, user_lastname, user_nickname',
+		'where_status_closed'  => false,
+		'display_params'       => $display_params,
+		'display_btn_refresh'  => true,
+		'display_btn_adduser'  => false,
+		'display_btn_addgroup' => false,
+		'display_ID'           => false,
+		'display_avatar'       => true,
+		'display_login'        => true,
+		'display_nickname'     => false,
+		'display_name'         => false,
+		'display_gender'       => false,
+		'display_country'      => false,
+		'display_city'         => true,
+		'display_blogs'        => false,
+		'display_source'       => false,
+		'display_regdate'      => false,
+		'display_regcountry'   => false,
+		'display_update'       => false,
+		'display_lastvisit'    => false,
+		'display_contact'      => false,
+		'display_reported'     => false,
+		'display_group'        => false,
+		'display_level'        => false,
+		'display_status'       => false,
+		'display_actions'      => false,
+		'display_newsletter'   => false,
+		'th_class_avatar'      => 'shrinkwrap',
+		'td_class_avatar'      => 'shrinkwrap center',
+		'avatar_size'          => $Blog->get_setting( 'image_size_user_list' ),
+		'th_class_login'       => '',
+		'td_class_login'       => '',
+		'th_class_city'        => 'shrinkwrap',
+		'td_class_city'        => 'shrinkwrap',
 	), $params );
 
+users_results_block( $params );
 
-require $inc_path.'users/views/_user_list_short.view.php';
-
+load_funcs( 'users/model/_user_js.funcs.php' );
 ?>

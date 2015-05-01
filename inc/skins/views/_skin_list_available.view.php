@@ -35,13 +35,12 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Skin type selector:
-$Form = new Form( $admin_url, '', 'get' );
+$Form = new Form( $admin_url, '', 'get', 'blockspan' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', $action );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'kind', get_param( 'kind' ) );
-$Form->switch_layout( 'linespan' );
-$Form->begin_form();
+$Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'skin_type', $skin_type, array(
 		''        => T_('All skins'),
 		'normal'  => T_('Normal skins'),
@@ -63,6 +62,18 @@ $filename_params = array(
 // Get all skin folder names:
 $skin_folders = get_filenames( $skins_path, $filename_params );
 
+$Form = new Form( $admin_url, '', 'post', 'blockspan' );
+$Form->hidden_ctrl();
+$Form->hidden( 'action', 'install' );
+$Form->hidden( 'tab', $tab );
+$Form->hidden( 'redirect_to', $redirect_to );
+$Form->add_crumb( 'skin' );
+
+$Form->begin_form( 'skin_selector_form' );
+
+echo '<div class="skin_selector_block">';
+
+$skins_exist = false;
 // Go through all skin folders:
 foreach( $skin_folders as $skin_folder )
 {
@@ -97,9 +108,30 @@ foreach( $skin_folders as $skin_folder )
 		'skin_compatible' => $skin_compatible,
 	);
 	Skin::disp_skinshot( $skin_folder, $skin_folder, $disp_params );
+	$skins_exist = true;
 }
 
 echo '<div class="clear"></div>';
+echo '</div>';
+
+if( $skins_exist && empty( $kind ) )
+{ // Display form buttons only when at least one skin exists for installation
+	$form_buttons = array(
+		array( 'type' => 'button', 'id'  => 'check_all_skins', 'value' => T_('Check All'), 'class' => 'btn btn-default' ),
+		array( 'type' => 'submit', 'value' => T_('Install Checked'), 'class' => 'btn btn-primary' ),
+	);
+}
+else
+{
+	$form_buttons = array();
+}
+$Form->end_form( $form_buttons );
+
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 ?>
+<script type="text/javascript">
+jQuery( '#check_all_skins' ).click( function() {
+	jQuery( 'input[name="skin_folders[]"]' ).attr( 'checked', 'checked' );
+} );
+</script>

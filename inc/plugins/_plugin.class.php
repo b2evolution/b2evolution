@@ -3203,6 +3203,8 @@ class Plugin
 
 		if( $target == '$help_url' || $target == '$apply_rendering' || empty( $target ) )
 		{
+			global $help_plugin_info_suffix;
+
 			if( $target == '$apply_rendering' )
 			{ // Url to info about plugin apply rendering options
 				$url = get_manual_url( 'plugin-apply-rendering' );
@@ -3215,6 +3217,14 @@ class Plugin
 			$icon = 'help';
 			$link_attribs['class'] = 'action_icon help_plugin_icon';
 			$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
+
+			if( empty( $help_plugin_info_suffix ) )
+			{ // Display additional info for help plugin icon only one time. It is used on plugins.js
+				echo '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
+						.sprintf( T_('Click %s to access full documentaion for this plugin'), get_icon( 'help' ) )
+					.'</strong></p></div>';
+				$help_plugin_info_suffix = true;
+			}
 		}
 		elseif( $target == '$readme' )
 		{ // README

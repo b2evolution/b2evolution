@@ -134,5 +134,6 @@ global $Settings, $disp, $cat;
 					'account_activation' => '',
 					'msgform_text'      => '',
 					'user_text'         => '',
+					'users_text'        => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------

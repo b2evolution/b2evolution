@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8828 2015-04-28 10:15:51Z yura $
+	 * @version $Id: index.main.php 8854 2015-05-01 18:54:22Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -61,7 +61,7 @@ if( $is_pictured_page )
 }
 ?>
 
-<div class="container body">
+<div class="container main_page_wrapper">
 
 <?php
 if( $disp != 'front' )
@@ -156,6 +156,7 @@ if( $disp != 'front' )
 				'account_activation' => '',
 				'msgform_text'      => '',
 				'user_text'         => '',
+				'users_text'        => '',
 			) );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>

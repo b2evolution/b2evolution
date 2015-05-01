@@ -26,8 +26,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'form' );
 
 // Manual link
-$manual_url = preg_replace( '/[^a-z0-9]/', '-', strtolower( $edited_ComponentWidget->get_name() ) ).'-widget';
-$Form->global_icon( T_('View manual'), 'manual', get_manual_url( $manual_url ), '', 3, 2, array( 'target' => '_blank' ) );
+$Form->global_icon( T_('View manual'), 'manual', $edited_ComponentWidget->get_manual_url(), '', 3, 2, array( 'target' => '_blank' ) );
 // Close link
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 

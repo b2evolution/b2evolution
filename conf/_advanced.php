@@ -644,14 +644,6 @@ $cross_post_nav_in_same_blog = true;
 
 
 /**
- * Do you want to display the help links to online documentaion?
- *
- * @global boolean
- */
-$online_help_links = true;
-
-
-/**
  * File extensions that the admin will not be able to enable in the Settings
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );

@@ -86,8 +86,8 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 	$Form = new Form( NULL, 'settings_checkchanges' );
 	$Form->begin_form( 'fform' );
 
-	$Form->add_crumb( 'globalsettings' );
-	$Form->hidden( 'ctrl', 'gensettings' );
+	$Form->add_crumb( 'tools' );
+	$Form->hidden( 'ctrl', 'tools' );
 	$Form->hidden( 'action', 'update_tools' );
 
 	$Form->begin_fieldset( T_('Locking down b2evolution for maintenance, upgrade or server switching...').get_manual_link('system-lock') );

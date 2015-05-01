@@ -79,6 +79,40 @@ switch( $action )
 		break;
 
 
+	case 'install':
+		// Install several skins
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+		// Check permission to edit:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'skin_folders', 'array:/([-A-Za-z0-9._]|\.\.)/', array() );
+
+		if( empty( $skin_folders ) )
+		{ // No selected skins
+			$Messages->add( T_('Please select at least one skin to install.'), 'error' );
+			header_redirect( $admin_url.'?ctrl=skins&action=new' );
+		}
+
+		$new_installed_skin_IDs = array();
+		foreach( $skin_folders as $skin_folder )
+		{ // CREATE NEW SKIN:
+			$edited_Skin = & skin_install( $skin_folder );
+			$new_installed_skin_IDs[] = $edited_Skin->ID;
+		}
+
+		$Messages->add( T_('The selected skins have been installed.'), 'success' );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( 'skin_ID' => $new_installed_skin_IDs ) );
+
+		// PREVENT RELOAD & Switch to list mode:
+		header_redirect( $redirect_to );
+		break;
+
+
 	case 'update':
 		// Update skin properties:
 

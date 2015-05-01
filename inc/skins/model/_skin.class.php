@@ -493,7 +493,7 @@ class Skin extends DataObject
 	 */
 	function disp_skinshot( $skin_folder, $skin_name, $disp_params = array() )
 	{
-		global $skins_path, $skins_url;
+		global $skins_path, $skins_url, $kind;
 
 		$disp_params = array_merge( array(
 				'selected'        => false,
@@ -560,6 +560,11 @@ class Skin extends DataObject
 					{ // If skin is compatible for current selected type
 						echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
 						echo T_('Install NOW!').'</a>';
+						if( empty( $kind ) )
+						{ // Don't display the checkob on new collection creating form
+							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+							$skin_name_after = '</label>';
+						}
 					}
 					else
 					{ // Inform about skin type is wrong for current case
@@ -577,7 +582,11 @@ class Skin extends DataObject
 			}
 			echo '</div>';
 		}
-		echo '<strong>'.$skin_name.'</strong>';
+		echo '<strong>'
+				.( empty( $skin_name_before ) ? '' : $skin_name_before )
+					.$skin_name
+				.( empty( $skin_name_after ) ? '' : $skin_name_after )
+			.'</strong>';
 		echo '</div>';
 		echo '</div>';
 	}

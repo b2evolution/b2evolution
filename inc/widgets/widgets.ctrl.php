@@ -220,7 +220,9 @@ switch( $action )
 						$edited_ComponentWidget->ID,
 						$container,
 						$edited_ComponentWidget->get( 'order' ),
-						$edited_ComponentWidget->get_name(),
+						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
+							.$edited_ComponentWidget->get_desc_for_list()
+						.'</a> '.$edited_ComponentWidget->get_manual_icon(),
 					),
 					// Open widget settings:
 					'editWidget' => array(
@@ -568,7 +570,10 @@ switch( $action )
 
 		// this will be enabled if js available:
 		echo '<div class="available_widgets">'."\n";
-		echo '<div class="available_widgets_toolbar"><a href="#" class="rollover floatright" style="padding: 1px 0;">'.get_icon('close').'</a>'.T_( 'Select widget to add:' ).'</div>'."\n";
+		echo '<div class="available_widgets_toolbar modal-header">'
+						.'<a href="#" class="floatright close">'.get_icon('close').'</a>'
+						.'<h4 class="modal-title">'.T_( 'Select widget to add:' ).'</h4>'
+					.'</div>'."\n";
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";

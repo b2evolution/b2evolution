@@ -125,7 +125,7 @@ switch ( $action )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=settings' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('Profiles'), '?ctrl=usersettings' );
 
 

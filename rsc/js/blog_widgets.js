@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 8723 2015-04-10 07:36:59Z yura $
+ * @version $Id: blog_widgets.js 8852 2015-05-01 09:48:58Z yura $
  */
 
 
@@ -113,7 +113,7 @@ jQuery(document).ready( function()
 		{ // grab each widget in container
 			var widget = jQuery( this ).attr( "id" );
 			the_widgets[ container ][ widget ] = new Array();
-			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget ).find('.widget_name' ).html();
+			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget ).find( '.widget_name' ).parent().html();
 			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
 			the_widgets[ container ][ widget ]["enabled"] = jQuery( '#' + widget + ' .widget_is_enabled' ).size();
 		} );
@@ -482,7 +482,7 @@ function convertAvailableList()
 		the_link = the_link.substr( the_link.indexOf( '&type' ) + 1, the_link.length );
 
 		// replace href with JS addnewwidget action:
-		jQuery( this ).children( 'a' ).attr( 'href', '#' ).bind( 'click', function(){
+		jQuery( this ).children( 'a:first' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
 			// cancel default href action:
 			return false;
@@ -552,8 +552,11 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  */
 function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
 {
-	//	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><a class="widget_name" href="#" onclick="return editWidget( \''+wi_ID+'\' );">'+wi_name+'</a></li>' );
+	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span>'+wi_name+'</span></li>' );
+	newWidget.find( 'a.widget_name' ).click( function()
+	{
+		return editWidget( wi_ID );
+	} );
 	if( wi_class )
 	{ // add class
 		jQuery( newWidget ).addClass( wi_class );
