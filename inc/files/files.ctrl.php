@@ -935,7 +935,7 @@ switch( $action )
 						}
 
 						// Let's make the link!
-						$LinkOwner->add_link( $l_File->ID, 'teaser', $order++ );
+						$LinkOwner->add_link( $l_File->ID, ( $order == 1 ? 'teaser' : 'aftermore' ), $order++ );
 
 						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
 

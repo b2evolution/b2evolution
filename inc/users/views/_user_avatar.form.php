@@ -26,7 +26,8 @@ global $form_action;
 
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'       => array(),
+		'form_class_user_avatar' => 'bComment',
 	);
 
 if( isset( $params ) )
@@ -68,7 +69,7 @@ else
 {
 	global $Blog;
 	$form_title = '';
-	$form_class = 'bComment';
+	$form_class = $params['form_class_user_avatar'];
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
 }
 

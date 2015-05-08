@@ -484,7 +484,8 @@ a:hover .fa-x-rollover-black {
 }
 .fa-x-linkedin--nudge:before {
   position: relative;
-  top: -0.11em;
+  top: -0.05em;
+  left: 0.04em;
 }
 .fa-x-google-plus--nudge:before {
   position: relative;
@@ -634,100 +635,100 @@ span.loader_img.loader_user_deldata {
 .filter_item.blue div.icon:hover {
   background: #6a91df;
 }
-.ufld-yahooim.ufld--textcolor,
-.ufld-yahooim.ufld--hovertextcolor:hover {
+.ufld_yahooim.ufld__textcolor,
+.ufld_yahooim.ufld__hovertextcolor:hover {
   color: #7b0099;
 }
-.ufld-yahooim.ufld--bgcolor,
-.ufld-yahooim.ufld--hoverbgcolor:hover {
+.ufld_yahooim.ufld__bgcolor,
+.ufld_yahooim.ufld__hoverbgcolor:hover {
   background-color: #7b0099;
 }
-.ufld-skype.ufld--textcolor,
-.ufld-skype.ufld--hovertextcolor:hover {
+.ufld_skype.ufld__textcolor,
+.ufld_skype.ufld__hovertextcolor:hover {
   color: #00aff0;
 }
-.ufld-skype.ufld--bgcolor,
-.ufld-skype.ufld--hoverbgcolor:hover {
+.ufld_skype.ufld__bgcolor,
+.ufld_skype.ufld__hoverbgcolor:hover {
   background-color: #00aff0;
 }
-.ufld-twitter.ufld--textcolor,
-.ufld-twitter.ufld--hovertextcolor:hover {
+.ufld_twitter.ufld__textcolor,
+.ufld_twitter.ufld__hovertextcolor:hover {
   color: #00aced;
 }
-.ufld-twitter.ufld--bgcolor,
-.ufld-twitter.ufld--hoverbgcolor:hover {
+.ufld_twitter.ufld__bgcolor,
+.ufld_twitter.ufld__hoverbgcolor:hover {
   background-color: #00aced;
 }
-.ufld-facebook.ufld--textcolor,
-.ufld-facebook.ufld--hovertextcolor:hover {
+.ufld_facebook.ufld__textcolor,
+.ufld_facebook.ufld__hovertextcolor:hover {
   color: #3b5998;
 }
-.ufld-facebook.ufld--bgcolor,
-.ufld-facebook.ufld--hoverbgcolor:hover {
+.ufld_facebook.ufld__bgcolor,
+.ufld_facebook.ufld__hoverbgcolor:hover {
   background-color: #3b5998;
 }
-.ufld-googleplus.ufld--textcolor,
-.ufld-googleplus.ufld--hovertextcolor:hover {
+.ufld_googleplus.ufld__textcolor,
+.ufld_googleplus.ufld__hovertextcolor:hover {
   color: #dd4b39;
 }
-.ufld-googleplus.ufld--bgcolor,
-.ufld-googleplus.ufld--hoverbgcolor:hover {
+.ufld_googleplus.ufld__bgcolor,
+.ufld_googleplus.ufld__hoverbgcolor:hover {
   background-color: #dd4b39;
 }
-.ufld-linkedin.ufld--textcolor,
-.ufld-linkedin.ufld--hovertextcolor:hover {
+.ufld_linkedin.ufld__textcolor,
+.ufld_linkedin.ufld__hovertextcolor:hover {
   color: #007bb6;
 }
-.ufld-linkedin.ufld--bgcolor,
-.ufld-linkedin.ufld--hoverbgcolor:hover {
+.ufld_linkedin.ufld__bgcolor,
+.ufld_linkedin.ufld__hoverbgcolor:hover {
   background-color: #007bb6;
 }
-.ufld-github.ufld--textcolor,
-.ufld-github.ufld--hovertextcolor:hover {
+.ufld_github.ufld__textcolor,
+.ufld_github.ufld__hovertextcolor:hover {
   color: #333333;
 }
-.ufld-github.ufld--bgcolor,
-.ufld-github.ufld--hoverbgcolor:hover {
+.ufld_github.ufld__bgcolor,
+.ufld_github.ufld__hoverbgcolor:hover {
   background-color: #333333;
 }
-.ufld-flickr.ufld--textcolor,
-.ufld-flickr.ufld--hovertextcolor:hover {
+.ufld_flickr.ufld__textcolor,
+.ufld_flickr.ufld__hovertextcolor:hover {
   color: #ff0084;
 }
-.ufld-flickr.ufld--bgcolor,
-.ufld-flickr.ufld--hoverbgcolor:hover {
+.ufld_flickr.ufld__bgcolor,
+.ufld_flickr.ufld__hoverbgcolor:hover {
   background-color: #ff0084;
 }
-.ufld-youtube.ufld--textcolor,
-.ufld-youtube.ufld--hovertextcolor:hover {
+.ufld_youtube.ufld__textcolor,
+.ufld_youtube.ufld__hovertextcolor:hover {
   color: #bb0000;
 }
-.ufld-youtube.ufld--bgcolor,
-.ufld-youtube.ufld--hoverbgcolor:hover {
+.ufld_youtube.ufld__bgcolor,
+.ufld_youtube.ufld__hoverbgcolor:hover {
   background-color: #bb0000;
 }
-.ufld-digg.ufld--textcolor,
-.ufld-digg.ufld--hovertextcolor:hover {
+.ufld_digg.ufld__textcolor,
+.ufld_digg.ufld__hovertextcolor:hover {
   color: #356aa0;
 }
-.ufld-digg.ufld--bgcolor,
-.ufld-digg.ufld--hoverbgcolor:hover {
+.ufld_digg.ufld__bgcolor,
+.ufld_digg.ufld__hoverbgcolor:hover {
   background-color: #356aa0;
 }
-.ufld-stumbleupon.ufld--textcolor,
-.ufld-stumbleupon.ufld--hovertextcolor:hover {
+.ufld_stumbleupon.ufld__textcolor,
+.ufld_stumbleupon.ufld__hovertextcolor:hover {
   color: #eb4924;
 }
-.ufld-stumbleupon.ufld--bgcolor,
-.ufld-stumbleupon.ufld--hoverbgcolor:hover {
+.ufld_stumbleupon.ufld__bgcolor,
+.ufld_stumbleupon.ufld__hoverbgcolor:hover {
   background-color: #eb4924;
 }
-.ufld-pinterest.ufld--textcolor,
-.ufld-pinterest.ufld--hovertextcolor:hover {
+.ufld_pinterest.ufld__textcolor,
+.ufld_pinterest.ufld__hovertextcolor:hover {
   color: #cb2027;
 }
-.ufld-pinterest.ufld--bgcolor,
-.ufld-pinterest.ufld--hoverbgcolor:hover {
+.ufld_pinterest.ufld__bgcolor,
+.ufld_pinterest.ufld__hoverbgcolor:hover {
   background-color: #cb2027;
 }
 
@@ -944,8 +945,25 @@ a.selected {
 .duplicated_avatars a.user img {
   vertical-align: text-top;
 }
-div.avatartag.main > img:first-child {
+div.avatartag {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0.5em 0.5em 0;
+}
+div.avatartag a {
+  outline: none;
+}
+div.avatartag.main {
+  display: block;
+  float: none !important;
+}
+div.avatartag.main > a {
   float: left;
+}
+div.avatartag.main a:first-child {
+  margin-right: 25px;
+}
+div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 @media only screen and (max-width: 480px) {
@@ -1704,7 +1722,7 @@ ul.jslog_error {
   -khtml-border-radius: 3px;
   z-index: 11000;
 }
-.form-login-links {
+.evo_form__login_links {
   padding: 0 1em;
 }
 #screen_mask {
@@ -1791,10 +1809,10 @@ ul.jslog_error {
 #overlay_page form legend {
   width: 100%;
 }
-.widget--social-media-links {
+.ufld_icon_links {
   text-align: center;
 }
-.widget--social-media-links a {
+.ufld_icon_links a {
   text-align: center;
 }
 
@@ -1969,63 +1987,72 @@ a.comment_reply_current:hover {
   vertical-align: middle;
 }
 /* 18/80% forms: comments and profile */
+div.bComment fieldset,
 form.bComment fieldset {
-  /* one form line */
   border: none;
   margin: 1em 0 0 0;
   padding: 0ex;
-  /* border: 1px solid #00f; */
 }
+div.bComment fieldset label,
 form.bComment fieldset label {
   font-weight: bold;
 }
+div.bComment fieldset div.label,
 form.bComment fieldset div.label {
-  /* label of form line */
   float: left;
   width: 100px;
   text-align: right;
   font-weight: bold;
-  /* border: 1px solid #f00; */
 }
+div.bComment fieldset.field_wide div.label,
 form.bComment fieldset.field_wide div.label,
+div.bComment fieldset.field_inline div.label,
 form.bComment fieldset.field_inline div.label {
   float: none;
   text-align: left;
   width: auto;
   margin-bottom: 5px;
 }
+div.bComment fieldset.field_inline div.label,
 form.bComment fieldset.field_inline div.label {
   float: left;
 }
+div.bComment fieldset div.input,
 form.bComment fieldset div.input {
-  /* input zone of form line */
   margin: 0 0 0 108px;
-  /* border: 1px solid #f00; */
 }
+div.bComment fieldset.field_wide div.input,
 form.bComment fieldset.field_wide div.input {
   margin-left: 20px;
 }
+div.bComment fieldset.field_inline div.input,
 form.bComment fieldset.field_inline div.input {
   float: left;
   margin-left: 5px;
   line-height: 20px;
 }
+div.bComment fieldset.input,
 form.bComment fieldset.input {
   margin: 0;
 }
+div.bComment fieldset div.info,
 form.bComment fieldset div.info {
   margin: 0 0 0 108px;
 }
+div.bComment fieldset.info_full div.info,
 form.bComment fieldset.info_full div.info {
   margin-left: 5px;
 }
+div.bComment fieldset div.label select,
 form.bComment fieldset div.label select {
   width: 91%;
 }
+div.bComment div.avatartag,
 form.bComment div.avatartag {
   float: left;
   margin: 0 0.5em 0.5em 0;
 }
+div.bComment div.avatartag a,
 form.bComment div.avatartag a {
   outline: none;
 }
@@ -2586,9 +2613,6 @@ input.btn-lg {
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
 }
-.top_menu div.item_title {
-  display: inline-block;
-}
 .profile_content {
   max-width: 960px;
   margin: 0 auto;
@@ -2631,7 +2655,7 @@ input.btn-lg {
 .profile_buttons .btn-group .btn {
   width: 50%;
 }
-form.bComment .other_profile_pictures div.avatartag {
+.bComment .other_profile_pictures div.avatartag {
   float: none;
   display: inline-block;
 }

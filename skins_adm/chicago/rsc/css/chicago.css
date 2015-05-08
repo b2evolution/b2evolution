@@ -676,9 +676,7 @@ div.bSideItem {
 	color: #929292;
 }
 
-div.block_item div.bComment, /* Entire comment block */
-div.block_item form.bComment /* New comment form */
-{
+div.block_item .evo_form { /* Entire comment block / Form */
 	border: 1px solid #becdd6;
 	padding: 0;
 	margin: 1ex 0;

@@ -541,6 +541,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 			'comments_disabled_text_registered' => T_( 'You must be logged in to leave a comment.' ),
 			'comments_disabled_text_validated'  => T_( 'You must activate your account before you can leave a comment.' ),
 			'form_comment_text'                 => T_('Comment text'),
+			'form_class_comment'                => 'bComment',
 		), $params );
 
 	if( empty( $params['form_params'] ) )
@@ -597,7 +598,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 
 	// disabled comment form
-	echo '<form class="bComment" action="">';
+	echo '<form class="'.$params['form_class_comment'].'" action="">';
 
 	echo $params['form_params']['formstart'];
 

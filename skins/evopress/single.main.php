@@ -132,34 +132,6 @@ while( $Item = & mainlist_get_item() )
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
-    <?php
-      // ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
-      // WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
-      // Display container contents:
-      skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
-          // The following (optional) params will be used as defaults for widgets included in this container:
-          // This will enclose each widget in a block:
-          'block_start' => '<div class="widget $wi_class$">',
-          'block_end' => '</div>',
-          // This will enclose the title of each widget:
-          'block_title_start' => '<h3>',
-          'block_title_end' => '</h3>',
-          // If a widget displays a list, this will enclose that list:
-          'list_start' => '<ul>',
-          'list_end' => '</ul>',
-          // This will enclose each item in a list:
-          'item_start' => '<li>',
-          'item_end' => '</li>',
-          // This will enclose sub-lists in a list:
-          'group_start' => '<ul>',
-          'group_end' => '</ul>',
-          // This will enclose (foot)notes:
-          'notes_start' => '<div class="notes">',
-          'notes_end' => '</div>',
-        ) );
-      // ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
-    ?>
-
 		<p class="postmetadata alt">
 			<small>
 				<?php

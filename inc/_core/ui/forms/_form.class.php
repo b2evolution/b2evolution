@@ -126,6 +126,16 @@ class Form extends Widget
 
 
 	/**
+	 * Form type:
+	 *     - 'form' - use standard form tag,
+	 *     - 'div'  - use <div> tag instead of <form>
+	 *
+	 * @var string
+	 */
+	var $form_type;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param string the action destination of the form (NULL for pagenow)
@@ -134,7 +144,7 @@ class Form extends Widget
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 * @param string Form encoding ("application/x-www-form-urlencoded" (default), "multipart/form-data" (uploads))
 	 */
-	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
+	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
 	{
 		global $pagenow;
 
@@ -142,6 +152,7 @@ class Form extends Widget
 		$this->form_action = (is_null($form_action) ? $pagenow : $form_action );
 		$this->form_method = $form_method;
 		$this->enctype = $enctype;
+		$this->form_type = $form_type;
 
 		// Get form template depending on current skin
 		$template = $this->get_template( $layout, true );
@@ -1839,7 +1850,17 @@ class Form extends Widget
 			unset( $form_params['title'] );
 		}
 
-		$r = "\n\n<form".get_field_attribs_as_string( $form_params ).">\n";
+		if( $this->form_type == 'div' )
+		{ // Use <div> tag instead of <form>
+			unset( $form_params['action'] );
+			unset( $form_params['method'] );
+			unset( $form_params['enctype'] );
+			$r = "\n\n<div".get_field_attribs_as_string( $form_params ).">\n";
+		}
+		else
+		{ // Standard form
+			$r = "\n\n<form".get_field_attribs_as_string( $form_params ).">\n";
+		}
 
 		// $r .= '<div>'; // for XHTML (dh> removed 'style="display:inline"' because it's buggy with FireFox 1.0.x, at least at the "Write" admin page; see http://forums.b2evolution.net/viewtopic.php?t=10130)
 		// fp> inline was needed for inline forms like the DELETE confirmation.
@@ -1952,8 +1973,14 @@ class Form extends Widget
 		// Display all buffered hidden fields in a 0 height DIV (for XHTML):
 		$r .= '<div class="inline">'.implode( '', $this->hiddens ).'</div>';
 
-		// $r .= '</div>';
-		$r .= "\n</form>\n\n";
+		if( $this->form_type == 'div' )
+		{ // Use <div> tag instead of <form>
+			$r .= "\n</div>\n\n";
+		}
+		else
+		{ // Standard form
+			$r .= "\n</form>\n\n";
+		}
 
 		// When the page loads, Initialize all the parent child select lists + other javascripts
 		$r .= '

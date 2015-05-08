@@ -1143,20 +1143,20 @@ function skin_include( $template_name, $params = array() )
 
 	// DECIDE WHAT TO INCLUDE:
 	if( $template_name[0] == '#' )
-	{	// This disp mode is handled by a plugin:
+	{ // This disp mode is handled by a plugin:
 		$debug_info = 'Call plugin';
 		$disp_handled = 'plugin';
 	}
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
-	{	// The skin has a customized handler, use that one instead:
+	{ // The skin has a customized handler, use that one instead:
 		$file = $ads_current_skin_path.$template_name;
-		$debug_info = '<b>Skin template</b>: '.rel_path_to_base($file);
+		$debug_info = '<b>Skin template</b>: '.rel_path_to_base( $file );
 		$disp_handled = 'custom';
 	}
-	elseif( file_exists( $skins_path.$template_name ) )
-	{	// Use the default/fallback template:
-		$file = $skins_path.$template_name;
-		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
+	elseif( $fallback_template_path = skin_fallback_path( $template_name ) )
+	{ // Use the default/fallback template:
+		$file = $fallback_template_path;
+		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base( $file );
 		$disp_handled = 'fallback';
 	}
 	else
@@ -1211,6 +1211,66 @@ function skin_include( $template_name, $params = array() )
 	}
 
 	$Timer->pause( $timer_name );
+}
+
+
+/**
+ * Get file path to fallback file depending on skin API version
+ *
+ * @param string Template name
+ * @param integer Skin API version, NULL - to get API version of the current Skin
+ * @return string|FALSE File path OR FALSE if fallback file doesn't exist
+ */
+function skin_fallback_path( $template_name, $skin_api_version = NULL )
+{
+	global $Skin, $basepath;
+
+	if( $skin_api_version === NULL && ! empty( $Skin ) )
+	{ // Get API version of the current skin
+		$skin_api_version = $Skin->get_api_version();
+	}
+
+	if( $skin_api_version == 6 )
+	{ // Check fallback file for v6 API skin
+		$fallback_path = $basepath.'skins_fallback_v6/'.$template_name;
+		if( file_exists( $fallback_path ) )
+		{
+			return $fallback_path;
+		}
+	}
+
+	// Check fallback file for v5 API skin
+	$fallback_path = $basepath.'skins_fallback_v5/'.$template_name;
+	if( file_exists( $fallback_path ) )
+	{
+		return $fallback_path;
+	}
+
+	// No fallback file
+	return false;
+}
+
+
+/**
+ * Get file path to template file
+ *
+ * @param string Template name
+ * @return string|FALSE File path OR FALSE if fallback file doesn't exist
+ */
+function skin_template_path( $template_name )
+{
+	global $Skin, $ads_current_skin_path;
+
+	if( ! empty( $Skin ) && file_exists( $ads_current_skin_path.$template_name ) )
+	{ // Template file exists for the current skin
+		return $ads_current_skin_path.$template_name;
+	}
+	elseif( $fallback_path = skin_fallback_path( $template_name ) )
+	{ // Falback file exists
+		return $fallback_path;
+	}
+
+	return false;
 }
 
 

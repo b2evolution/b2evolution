@@ -47,12 +47,13 @@ $reqID = param( 'reqID', 'string', '' );
 
 // Default params:
 $default_params = array(
-		'skin_form_params'          => array(),
-		'display_abandon_link'      => true,
-		'button_class'              => '',
-		'form_button_action'        => 'update',
-		'form_hidden_crumb'         => 'user',
-		'form_hidden_reqID'         => $reqID,
+		'skin_form_params'     => array(),
+		'form_class_user_pass' => 'bComment',
+		'display_abandon_link' => true,
+		'button_class'         => '',
+		'form_button_action'   => 'update',
+		'form_hidden_crumb'    => 'user',
+		'form_hidden_reqID'    => $reqID,
 	);
 
 if( isset( $params ) )
@@ -90,7 +91,7 @@ if( $is_admin )
 else
 {
 	$form_title = '';
-	$form_class = 'bComment';
+	$form_class = $params['form_class_user_pass'];
 }
 
 $has_full_access = $current_User->check_perm( 'users', 'edit' );

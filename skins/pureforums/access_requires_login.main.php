@@ -131,30 +131,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-		skin_include( '$disp$', array(
-			'skin_form_params'      => array(
-					'formstart'      => '<table class="forums_table" cellspacing="0" cellpadding="0">',
-					'formend'        => '</table>',
-					'fieldset_begin' => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$</th></tr>',
-					'fieldset_end'   => '',
-					'fieldstart'     => '<tr $ID$>',
-					'fieldend'       => '</tr>',
-					'labelstart'     => '<td class="form_label">',
-					'labelend'       => '</td>',
-					'inputstart'     => '<td class="form_input">',
-					'inputend'       => '</td>',
-					'infostart'      => '<td class="form_info" colspan="2">',
-					'infoend'        => '</td>',
-					'buttonsstart'   => '<tr><td colspan="2" class="buttons">',
-					'buttonsend'     => '</td></tr>',
-					'inline_labelstart' => '<td class="form_label_inline" colspan="2">',
-					'inline_labelend'   => '</td>',
-					'inline_inputstart' => '',
-					'inline_inputend'   => '',
-					'customstart'       => '<tr><td colspan="2" class="form_custom_content">',
-					'customend'         => '</td></tr>',
-				),
-		) );
+		skin_include( '$disp$' );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------

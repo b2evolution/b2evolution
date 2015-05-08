@@ -125,15 +125,14 @@ function create_default_data()
 					 ( 'Instant Messaging', '2' ),
 					 ( 'Phone', '3' ),
 					 ( 'Web', '4' ),
-					 ( 'Organization', '5' ),
-					 ( 'Address', '6' )" );
+					 ( 'Address', '5' )" );
 	task_end();
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
-		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info' ),
+		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
 						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
 						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
 						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
@@ -160,12 +159,8 @@ function create_default_data()
 						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
 						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
 						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
-						( 5, 'word',   'Role',          NULL, 'optional',    'list',      '1',  '1', 'role',         NULL ),
-						( 5, 'word',   'Organization',  NULL, 'optional',    'forbidden', '2',  '1', 'organization', NULL ),
-						( 5, 'word',   'Division',      NULL, 'optional',    'forbidden', '3',  '1', 'division',     NULL ),
-						( 5, 'word',   'VAT ID',        NULL, 'optional',    'forbidden', '4',  '0', 'vatid',        NULL ),
-						( 6, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
-						( 6, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
+						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
+						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
 	task_end();
 
 

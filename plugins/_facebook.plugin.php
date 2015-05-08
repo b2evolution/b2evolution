@@ -13,7 +13,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory - Attila Simo
  * 
- * @version $Id: _facebook.plugin.php 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: _facebook.plugin.php 8856 2015-05-02 01:25:05Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -35,6 +35,7 @@ class facebook_plugin extends Plugin
 	var $version = '1.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
+	var $subgroup = 'other';
 
 	/**
 	 * Init

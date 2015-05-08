@@ -663,8 +663,8 @@ div.results div.filters {
 	background: none;
 	border: none;
 }
-.messages_list .bComment .forums_table,
-.messages_list .bComment .forums_table tr:first-child td {
+.messages_list form.bComment .forums_table,
+.messages_list form.bComment .forums_table tr:first-child td {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 	background: #FFF;

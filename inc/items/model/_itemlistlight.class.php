@@ -1383,7 +1383,7 @@ class ItemListLight extends DataObjectList2
 						// TODO: rename 'posts' to 'limit'
 						$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'unit' ) ) : '';
 						$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
-							array( sprintf( T_('Limited to %d last days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+							array( sprintf( T_('Limited to last %d days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask_nogroup'] );
 					}
 				}

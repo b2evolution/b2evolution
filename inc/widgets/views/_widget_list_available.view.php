@@ -86,7 +86,7 @@ foreach( $core_componentwidget_defs as $code )
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
-		echo '</a> '.$ComponentWidget->get_manual_icon();
+		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 		echo '</li>';
 	}
 }
@@ -121,7 +121,7 @@ if( ! empty($Plugin_array) )
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).' <strong>'.$Plugin->name.'</strong>';
-		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
+		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 		echo '</li>';
 	}
 }

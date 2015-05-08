@@ -601,7 +601,7 @@ switch( $action )
 							echo 'checked="checked"';
 						}
 					?>/>
-					<?php echo T_('<strong>New Install</strong>: Install b2evolution database tables.')?>
+					<?php echo T_('<strong>New Install</strong>: Install the b2evolution database tables. Optionally add some default contents.')?>
 				</label>
 			</div>
 			
@@ -719,8 +719,7 @@ switch( $action )
 			<div class="radio">
 				<label>
 					<input type="radio" name="action" id="deletedb" value="deletedb" />
-					<strong><?php echo T_('Delete b2evolution tables &amp; cache files')?></strong>:
-					<?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.')?>
+					<?php echo T_('<strong>Delete b2evolution tables &amp; cache files. WARNING:</strong> All your b2evolution tables and data will be lost! Any non-b2evolution tables will remain untouched.')?>
 				</label>
 			</div>
 
@@ -749,15 +748,13 @@ switch( $action )
 			?>
 
 			<p>
-			<input type="submit" value="&nbsp; <?php echo T_('GO!')?> &nbsp;"
-				onclick="var dc = document.getElementById( 'deletedb' ); if( dc && dc.checked ) { if ( confirm( '<?php
-					printf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name );
-					?>' ) ) { this.form.confirmed.value = 1; return true; } else return false; }" class="btn btn-primary btn-lg" />
+				<button id="install_button" type="submit" class="btn btn-primary btn-lg">&nbsp; <?php echo T_('GO!')?> &nbsp;</button>
 			</p>
 			</form>
 		<?php
 
 		display_base_config_recap();
+		echo_install_button_js();
 		break;
 
 	case 'localeinfo':
@@ -966,8 +963,12 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-		// Progress bar
-		start_install_progress_bar( T_('Deletion in progress') );
+		$confirmed = param( 'confirmed', 'integer', 1 );
+
+		if( $confirmed )
+		{ // Progress bar
+			start_install_progress_bar( T_('Deletion in progress') );
+		}
 
 		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
 		evo_flush();
@@ -983,7 +984,7 @@ switch( $action )
 			break;
 		}
 
-		if( ! param('confirmed', 'integer', 1) )
+		if( ! $confirmed )
 		{
 			?>
 			<p>
@@ -992,16 +993,16 @@ switch( $action )
 			?>
 			</p>
 			<p>
-			<form class="inline" name="form" action="index.php" method="post">
+			<form name="form" action="index.php" method="post" style="display:inline-block">
 				<input type="hidden" name="action" value="deletedb" />
 				<input type="hidden" name="confirmed" value="1" />
 				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
-				<input type="submit" value="&nbsp; <?php echo T_('I am sure!')?> &nbsp;" />
+				<input type="submit" value="&nbsp; <?php echo T_('I am sure!')?> &nbsp;" class="btn btn-danger btn-lg" />
 			</form>
 
-			<form class="inline" name="form" action="index.php" method="get">
+			<form name="form" action="index.php" method="get" style="display:inline-block">
 				<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
-				<input type="submit" value="&nbsp; <?php echo T_('CANCEL')?> &nbsp;" />
+				<input type="submit" value="&nbsp; <?php echo T_('CANCEL')?> &nbsp;" class="btn btn-default btn-lg" />
 			</form>
 			</p>
 			<?php

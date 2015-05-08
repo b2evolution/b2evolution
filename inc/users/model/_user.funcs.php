@@ -2887,7 +2887,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		$userfield_icon = '';
 		if( ! empty( $userfield->ufdf_icon_name ) )
 		{ // Field icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld-'.$userfield->ufdf_code.' ufld--textcolor"></span> ';
+			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
 		}
 
 		if( $action == 'view' )
@@ -3036,11 +3036,12 @@ function callback_filter_userlist( & $Form )
 
 	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
 
+	$Form->interval( 'level_min', get_param('level_min'), 'level_max', get_param('level_max'), 3, T_('Level') );
+
 	$OrganizationCache = & get_OrganizationCache( T_('All') );
 	$OrganizationCache->load_all();
 	if( count( $OrganizationCache->cache ) > 0 )
 	{
-		echo is_admin_page() ? '<br />' : '';
 		$Form->select_input_object( 'org', get_param( 'org' ), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
 	}
 	echo '<br />';
@@ -4655,17 +4656,20 @@ function users_results_block( $params = array() )
 			'display_status'       => true,
 			'display_actions'      => true,
 			'display_newsletter'   => true,
+			'force_check_user'     => false,
 		), $params );
 
-	if( ! is_logged_in() )
-	{ // Only logged in users can access to this function
-		return;
-	}
-
 	global $current_User;
-	if( ! $current_User->check_perm( 'users', 'view' ) )
-	{ // Check minimum permission:
-		return;
+	if( ! $params['force_check_user'] )
+	{
+		if( ! is_logged_in() )
+		{ // Only logged in users can access to this function
+			return;
+		}
+		if( ! $current_User->check_perm( 'users', 'view' ) )
+		{ // Check minimum permission:
+			return;
+		}
 	}
 
 	global $DB, $UserSettings, $Settings, $action, $admin_url;
@@ -4716,7 +4720,7 @@ function users_results_block( $params = array() )
 		if( is_admin_page() )
 		{ // Add show only activated users filter only on admin interface
 			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], 'status_activated=1&amp;filter=new' ) );
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
 			{ // Show "Reported Users" filter only for users with edit user permission
 				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], 'reported=1&amp;filter=new' ) );
 			}
@@ -4741,7 +4745,7 @@ function users_results_block( $params = array() )
 	{ // Display a button to refresh the users list
 		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add user
@@ -4756,7 +4760,7 @@ function users_results_block( $params = array() )
 	// Display result :
 	$UserList->display( $params['display_params'] );
 
-	if( $params['display_newsletter'] && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{ // Newsletter button
 		global $admin_url;
 		echo '<p class="center">';
@@ -5046,7 +5050,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( ! $current_User->check_perm( 'users', 'moderate', false ) )
+	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate', false ) )
 	{ // Current user has no permissions to moderate the users
 		if( isset( $userlist_col_reputaion ) )
 		{ // Display the reported users

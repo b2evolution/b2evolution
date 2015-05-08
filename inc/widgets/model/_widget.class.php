@@ -220,30 +220,42 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get manual URL
+	 * Get help URL
 	 *
 	 * @return string URL
 	 */
-	function get_manual_url()
+	function get_help_url()
 	{
-		$widget_manual_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $this->get_name() ) ).'-widget';
-
-		return get_manual_url( $widget_manual_slug );
+		if( $widget_Plugin = & $this->get_Plugin() )
+		{ // Get url of the plugin widget
+			return $widget_Plugin->get_help_url( '$widget_url' );
+		}
+		else
+		{ // Get url of the standard widget
+			$widget_manual_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $this->get_name() ).'-widget' );
+			return get_manual_url( $widget_manual_slug );
+		}
 	}
 
 
 	/**
-	 * Get manual icon
+	 * Get help link
 	 *
+	 * @param string Icon
+	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string icon
 	 */
-	function get_manual_icon()
+	function get_help_link( $icon = 'help', $use_tooltip = true )
 	{
-		return action_icon( '', 'help', $this->get_manual_url(), NULL, NULL, NULL, array(
-				'class'  => 'action_icon help_plugin_icon',
-				'rel'    => format_to_output( $this->get_desc(), 'htmlattr' ),
-				'target' => '_blank',
-			) );
+		$link_attrs = array( 'target' => '_blank' );
+
+		if( $use_tooltip )
+		{ // Add these data only for tooltip
+			$link_attrs['class']  = 'action_icon help_plugin_icon';
+			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+		}
+
+		return action_icon( '', $icon, $this->get_help_url(), NULL, NULL, NULL, $link_attrs );
 	}
 
 
@@ -413,7 +425,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
-					'block_start' => '<div class="widget $wi_class$">',
+					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
 					'block_title_start' => '<h3>',

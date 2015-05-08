@@ -449,7 +449,7 @@ div.action_messages {
 	margin: 1ex 0 2ex 0;
 }
 
-form.bComment{
+div.bComment, form.bComment {
 	border: none;
 	padding: 0;
 	margin: 10px 0 0 0;

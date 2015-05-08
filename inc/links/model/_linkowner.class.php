@@ -243,36 +243,14 @@ class LinkOwner
 	/**
 	 * Get default position for a new link
 	 *
-	 * @param boolean new link file is image or not
+	 * @param integer File ID
+	 * @return string Position
 	 */
-	function get_default_position( $is_image = false )
+	function get_default_position( $file_ID )
 	{
-		$this->load_Links();
-
-		if( $this->Links )
-		{
-			$position = NULL;
-			$last_Link = array_pop( $this->Links );
-			$last_File = & $last_Link->get_File();
-
-			if( $last_File && $is_image && $last_File->is_image() && ! count( $this->Links ) )
-			{ // there's only one image attached yet, the second becomes "aftermore"
-				$position = 'aftermore';
-			}
-			else
-			{ // default: use position of previous link/attachment
-				$position = $last_Link->get('position');
-			}
-
-			// Re-add popped link.
-			$this->Links[] = $last_Link;
-		}
-		else
-		{ // no attachment yet
-			$position = $is_image ? 'teaser' : 'aftermore';
-		}
-
-		return $position;
+		// Use by default this position for all simple link owner such as "comment" and "user"
+		// For "item" we set default position depending on file type and order
+		return 'aftermore';
 	}
 
 

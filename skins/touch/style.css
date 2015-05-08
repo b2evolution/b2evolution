@@ -1198,12 +1198,12 @@ p.logged {
 	margin-top: 35px;
 }
 
-form.bComment {
+div.bComment, form.bComment {
 	margin-left: 10px;
 	margin-right: 10px;
 }
 
-form.bComment input {
+.bComment input {
 	border-radius: 8px;
 	border: 1px solid #adadad;
 	padding: 3px;
@@ -1213,11 +1213,11 @@ form.bComment input {
 	width: 170px;
 }
 
-form.bComment input.checkbox, form.bComment input[type=radio]{
+.bComment input.checkbox, .bComment input[type=radio]{
 	width: auto;
 }
 
-form.bComment input.submit, form.bComment input[type=submit], form.bComment input[type=reset] {
+.bComment input.submit, .bComment input[type=submit], .bComment input[type=reset] {
 	color: #555;
 	font-weight: bold;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
@@ -1244,7 +1244,7 @@ textarea {
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 
-form.bComment label, form.bComment div.label {
+.bComment label, .bComment div.label {
 	color: #475d79;
 	text-shadow: #eee 1px 1px 0;
 	font-size: 12px;
@@ -1457,32 +1457,32 @@ color: #000;
 }
 
 fieldset,
-form.bComment fieldset {
+.bComment fieldset {
 	border: none;
 }
 fieldset legend,
-form.bComment fieldset legend {
+.bComment fieldset legend {
 	color: #000;
 	font-size: 120%;
 }
 fieldset div.label,
-form.bComment fieldset div.label {
+.bComment fieldset div.label {
 	float: left;
 	padding-right: 5px;
 	min-width: 50px;
 	padding-top: 4px;
 }
 fieldset div.input,
-form.bComment fieldset div.input {
+.bComment fieldset div.input {
 	float: left;
 	margin: 0;
 }
 fieldset.info_full div.label,
-form.bComment fieldset.info_full div.label {
+.bComment fieldset.info_full div.label {
 	min-width: 0;
 }
 fieldset div.info,
-form.bComment fieldset div.info {
+.bComment fieldset div.info {
 	padding-top: 4px;
 }
 
@@ -1629,11 +1629,11 @@ div.average_rating .star_rating{
 }
 
 /* bComment Avatar */
-form.bComment fieldset div.avatartag {
+.bComment fieldset div.avatartag {
 	float: left;
 	margin: 0 0.3em 0.4em 0;
 }
-form.bComment fieldset div.avatartag a {
+.bComment fieldset div.avatartag a {
 	outline: none;
 }
 

@@ -4454,14 +4454,18 @@ class Item extends ItemLight
 				'item_class'        => 'bPost',
 				'item_type_class'   => 'bPost_ptyp',
 				'item_status_class' => 'bPost',
-				'item_disp_class'   => 'bPost_disp_',
+				'item_disp_class'   => 'bPost_disp_', // NULL - to don't use this class
 			), $params );
 
 		$classes = array( $params['item_class'],
-						  $params['item_type_class'].$this->ityp_ID,
-						  $params['item_status_class'].$this->status,
-						  $params['item_disp_class'].$disp,
-						);
+				$params['item_type_class'].$this->ityp_ID,
+				$params['item_status_class'].$this->status,
+			);
+
+		if( $params['item_disp_class'] !== NULL )
+		{ // Use disp class only when it is requested
+			$classes[] = $params['item_disp_class'].$disp;
+		}
 
 		$r = implode( ' ', $classes );
 

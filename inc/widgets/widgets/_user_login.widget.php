@@ -188,7 +188,7 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $redirect_to, $skins_path;
+		global $Blog, $redirect_to;
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// No display a duplicate form for inskin login mode
@@ -220,7 +220,7 @@ class user_login_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_start'];
 
 			// display widget login form
-			require $skins_path.'_widget_login.form.php';
+			require skin_template_path( '_widget_login.form.php' );
 
 			echo $this->disp_params['block_body_end'];
 		}

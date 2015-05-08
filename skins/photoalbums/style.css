@@ -693,7 +693,7 @@ span.loader_img.loader_ajax_form {
 	padding-top: 10px;
 	margin-top: 76px;
 }
-form.bComment {
+div.bComment, form.bComment {
 	border: none;
 }
 

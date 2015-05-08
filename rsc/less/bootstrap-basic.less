@@ -35,7 +35,7 @@ img.loadimg {
 	min-height: 64px;
 	background: url(../img/ajax-loader/fff.gif) no-repeat center;
 }
-div.image_block {
+div.evo_image_block {
 	// WARNING: this will screw out backoffice layout (fulltext edit screen)
 	text-align: center;
 	img {
@@ -45,7 +45,7 @@ div.image_block {
 // Used to limit max width of the replied comments,
 // because width of the replied comment can be very small
 // (Each level of the replied comments has additional 20px margin left)
-.replied_comment div.image_block img {
+.replied_comment div.evo_image_block img {
 	max-width: 100%;
 	height: auto;
 }
@@ -229,7 +229,7 @@ div.avatartag.main > img:first-child {
 #image_crop_block.short_width .preview_cropped_image { margin-right: 10px; }
 @media only screen and (max-width: 800px) {
 	#fieldset_wrapper_image_crop fieldset,
-	#overlay_page form.bComment{ padding: 0 !important; }
+	#overlay_page .evo_form{ padding: 0 !important; }
 	#target_cropped_image{ margin-right: 0; }
 	#image_crop_block > div { display: block; }
 	#overlay_page .preview_cropped_images,
@@ -849,10 +849,10 @@ ul.jslog_error {
 	right:auto;
 	left:auto;
 }
-#overlay_page form.bComment {
+#overlay_page .evo_form {
 	padding: 0 10px;
 }
-#overlay_page form.bComment legend {
+#overlay_page .evo_form legend {
 	width: 100%;
 	text-align: left;
 }
@@ -874,7 +874,7 @@ ul.jslog_error {
 // ---------------- //
 
 // User links widget
-.widget--social-media-links {
+.ufld_icon_links {
 	text-align: center;
 	a {
 		text-align: center;

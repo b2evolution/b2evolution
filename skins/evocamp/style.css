@@ -309,7 +309,7 @@ padding-left: 0;
 
 /* -------------------[ Form Elements ]------------------- */
 
-form.bComment {
+div.bComment, form.bComment {
 font-size:8pt;
 background: #F2ECCE;
 padding: 15px 15px 15px;

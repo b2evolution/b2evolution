@@ -94,6 +94,40 @@ class LinkItem extends LinkOwner
 	}
 
 	/**
+	 * Get default position for a new link
+	 *
+	 * @param integer File ID
+	 * @return string Position
+	 */
+	function get_default_position( $file_ID )
+	{
+		$FileCache = & get_FileCache();
+		$File = & $FileCache->get_by_ID( $file_ID, false, false );
+		if( empty( $File ) )
+		{ // If file is broken then get simple default position as "aftermore"
+			return 'aftermore';
+		}
+
+		if( $File->is_image() )
+		{ // If file is image then get position depending on order
+			$this->load_Links();
+
+			if( $this->Links )
+			{ // There's only one file attached yet, the second becomes "aftermore"
+				return 'aftermore';
+			}
+			else
+			{ // No attachment yet
+				return 'teaser';
+			}
+		}
+		else
+		{ // If file is not image then always use "aftermore"
+			return 'aftermore';
+		}
+	}
+
+	/**
 	 * Load all links of owner Item if it was not loaded yet
 	 */
 	function load_Links()
@@ -114,8 +148,13 @@ class LinkItem extends LinkOwner
 	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
 	 * @return integer|boolean Link ID on success, false otherwise
 	 */
-	function add_link( $file_ID, $position, $order = 1, $update_owner = true )
+	function add_link( $file_ID, $position = NULL, $order = 1, $update_owner = true )
 	{
+		if( is_null( $position ) )
+		{ // Use default link position
+			$position = $this->get_default_position( $file_ID );
+		}
+
 		$edited_Link = new Link();
 		$edited_Link->set( 'itm_ID', $this->Item->ID );
 		$edited_Link->set( 'file_ID', $file_ID );

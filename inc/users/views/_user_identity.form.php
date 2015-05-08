@@ -58,7 +58,8 @@ global $is_admin_page;
 
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'         => array(),
+		'form_class_user_identity' => 'bComment',
 	);
 
 if( isset( $params ) )
@@ -107,7 +108,7 @@ if( $is_admin )
 else
 {
 	$form_title = '';
-	$form_class = 'bComment';
+	$form_class = $params['form_class_user_identity'];
 }
 
 	$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );

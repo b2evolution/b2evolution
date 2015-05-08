@@ -228,7 +228,7 @@ else
 ?>
 <fieldset>
 <legend><?php echo T_('Posted comment')?></legend>
-<div class=bComment>
+<div class="bComment">
 	<div class="bSmallHead">
 		<span class="bDate"><?php $posted_Comment->date(); ?></span>
 		@

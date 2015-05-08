@@ -100,9 +100,14 @@ class LinkUser extends LinkOwner
 	 * @param int order of the link
 	 * @return integer|boolean Link ID on success, false otherwise
 	 */
-	function add_link( $file_ID, $position, $order = 1 )
+	function add_link( $file_ID, $position = NULL, $order = 1 )
 	{
 		global $current_User;
+
+		if( is_null( $position ) )
+		{ // Use default link position
+			$position = $this->get_default_position( $file_ID );
+		}
 
 		$edited_Link = new Link();
 		$edited_Link->set( 'usr_ID', $this->User->ID );

@@ -121,7 +121,7 @@ class user_links_Widget extends ComponentWidget
 			{
 				if( ! empty( $is_selected ) )
 				{
-					$icon_colors_classes .= ' ufld--'.$class_name.'color';
+					$icon_colors_classes .= ' ufld__'.$class_name.'color';
 				}
 			}
 		}
@@ -142,10 +142,10 @@ class user_links_Widget extends ComponentWidget
 			$url_fields = $widget_User->userfields_by_type( 'url' );
 			if( count( $url_fields ) )
 			{
-				echo '<div class="widget--social-media-links">';
+				echo '<div class="ufld_icon_links">';
 				foreach( $url_fields as $field )
 				{
-					echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld-'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
+					echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
 							.'<span class="'.$field->ufdf_icon_name.'"></span>'
 						.'</a>';
 				}

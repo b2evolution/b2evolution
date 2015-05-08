@@ -222,7 +222,7 @@ switch( $action )
 						$edited_ComponentWidget->get( 'order' ),
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
-						.'</a> '.$edited_ComponentWidget->get_manual_icon(),
+						.'</a> '.$edited_ComponentWidget->get_help_link(),
 					),
 					// Open widget settings:
 					'editWidget' => array(

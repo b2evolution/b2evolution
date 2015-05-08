@@ -3191,40 +3191,40 @@ class Plugin
 	 *         - absolute link to some URL, e.g. "http://example.com/example.php"
 	 *         - '$help_url' or empty for {@link $help_url}, then also the "www" icon gets used
 	 *         - '$apply_rendering' - url to manual page about "Plugin / Apply Rendering"
+	 *         - '$widget_url' - url to manual page about widget plugin
+	 * @param string Icon
+	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
-	function get_help_link( $target = '' )
+	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true )
 	{
 		static $target_counter = 0;
 		$title = '';
-		$icon = 'help';
 		$word = '';
-		$link_attribs = array( 'target' => '_blank', 'id'=>'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
+		$link_attribs = array( 'target' => '_blank', 'id' => 'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
 
-		if( $target == '$help_url' || $target == '$apply_rendering' || empty( $target ) )
+		$info_suffix_text = '';
+		if( empty( $target ) || in_array( $target, array( '$help_url', '$apply_rendering', '$widget_url' ) ) )
 		{
-			global $help_plugin_info_suffix;
-
 			if( $target == '$apply_rendering' )
 			{ // Url to info about plugin apply rendering options
 				$url = get_manual_url( 'plugin-apply-rendering' );
 			}
 			else
 			{ // Url to current plugin info
-				$url = $this->get_help_url();
+				$url = $this->get_help_url( $target );
 			}
 			$title = T_('Homepage of the plugin');
-			$icon = 'help';
-			$link_attribs['class'] = 'action_icon help_plugin_icon';
-			$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
-
-			if( empty( $help_plugin_info_suffix ) )
-			{ // Display additional info for help plugin icon only one time. It is used on plugins.js
-				echo '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-						.sprintf( T_('Click %s to access full documentaion for this plugin'), get_icon( 'help' ) )
-					.'</strong></p></div>';
-				$help_plugin_info_suffix = true;
+			if( $use_tooltip )
+			{ // Add these data only for tooltip
+				$link_attribs['class'] = 'action_icon help_plugin_icon';
+				$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
 			}
+
+			// Display additional info for help plugin icon only one time. It is used on plugins.js
+			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
+					.sprintf( T_('Click %s to access full documentaion for this plugin'), get_icon( 'help' ) )
+				.'</strong></p></div>';
 		}
 		elseif( $target == '$readme' )
 		{ // README
@@ -3244,7 +3244,7 @@ class Plugin
 			debug_die( 'Invalid get_help_link() target: '.$target );
 		}
 
-		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs ).$info_suffix_text;
 	}
 
 
@@ -3253,17 +3253,30 @@ class Plugin
 	 *
 	 * If {@link Plugin::$help_url} is empty, it defaults to the manual wiki.
 	 *
+	 * @param string Target; one of the following:
+	 *         - '$help_url' or empty for standard help url
+	 *         - '$widget_url' - url to manual page about widget plugin
 	 * @return string
 	 */
-	function get_help_url()
+	function get_help_url( $target = '' )
 	{
-		if( empty( $this->help_url ) )
-		{
-			return get_manual_url( empty( $this->help_topic ) ? $this->classname : $this->help_topic );
+		if( $target == '$widget_url' )
+		{ // Get url for widget plugin manual
+			$plugin_slug = ( empty( $this->help_topic ) ? $this->classname : $this->help_topic );
+			$plugin_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $plugin_slug ).'-widget' );
+			$plugin_slug = str_replace( '-plugin', '', $plugin_slug );
+			return get_manual_url( $plugin_slug );
 		}
 		else
-		{
-			return $this->help_url;
+		{ // Get standard help url of the plugin
+			if( empty( $this->help_url ) )
+			{
+				return get_manual_url( empty( $this->help_topic ) ? $this->classname : $this->help_topic );
+			}
+			else
+			{
+				return $this->help_url;
+			}
 		}
 	}
 

@@ -72,8 +72,3 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 </head>
 
 <body<?php skin_body_attrs( array( 'class' => 'low-contrast-linen-wptouch-bg' ) ); ?>>
-
-<?php
-// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-//require $skins_path.'_toolbar.inc.php';
-// ------------------------------- END OF TOOLBAR --------------------------------

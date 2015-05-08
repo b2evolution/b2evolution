@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $disp, $skins_path;
+global $disp;
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -25,7 +25,7 @@ siteskin_include( '_html_header.inc.php' );
 
 
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-require $skins_path.'_toolbar.inc.php';
+require skin_fallback_path( '_toolbar.inc.php' );
 // ------------------------------- END OF TOOLBAR --------------------------------
 echo "\n";
 if( show_toolbar() )

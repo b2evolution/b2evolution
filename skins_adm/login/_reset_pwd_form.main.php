@@ -32,7 +32,7 @@ $params = array(
 	);
 $disp = 'pwdchange'; // Select a form to change a password
 $Session->set( 'core.unsaved_User', $forgetful_User );
-require $skins_path.'_profile.disp.php';
+require skin_fallback_path( '_profile.disp.php', 6 );
 
 // Footer
 require dirname(__FILE__).'/_html_footer.inc.php';

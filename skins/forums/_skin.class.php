@@ -423,6 +423,45 @@ class forums_Skin extends Skin
 		// Don't display status banner
 		return false;
 	}
+
+
+	/**
+	 * Those templates are used for example by the messaging screens.
+	 */
+	function get_template( $name )
+	{
+		switch( $name )
+		{
+			case 'Form':
+				// Default Form settings:
+				return array(
+					'formstart'         => '<table class="bForums" width="100%" cellspacing="1" cellpadding="2" border="0">',
+					'formend'           => '</table>',
+					'fieldset_begin'    => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$</th></tr>',
+					'fieldset_end'      => '',
+					'fieldstart'        => '<tr $ID$>',
+					'fieldend'          => '</tr>',
+					'labelstart'        => '<td class="row1 left">',
+					'labelend'          => '</td>',
+					'inputstart'        => '<td class="row2 left">',
+					'inputend'          => '</td>',
+					'infostart'         => '<td class="row2 left" colspan="2">',
+					'infoend'           => '</td>',
+					'buttonsstart'      => '<tr><td colspan="2" class="buttons">',
+					'buttonsend'        => '</td></tr>',
+					'inline_labelstart' => '<td class="left" colspan="2">',
+					'inline_labelend'   => '</td>',
+					'inline_inputstart' => '',
+					'inline_inputend'   => '',
+					'customstart'       => '<tr><td colspan="2" class="custom_content">',
+					'customend'         => '</td></tr>',
+				);
+
+			default:
+				// Delegate to parent class:
+				return parent::get_template( $name );
+		}
+	}
 }
 
 ?>

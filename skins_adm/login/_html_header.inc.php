@@ -14,6 +14,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_funcs('skins/_skin.funcs.php');
+
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 

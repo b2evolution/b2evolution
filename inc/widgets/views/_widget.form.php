@@ -26,7 +26,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'form' );
 
 // Manual link
-$Form->global_icon( T_('View manual'), 'manual', $edited_ComponentWidget->get_manual_url(), '', 3, 2, array( 'target' => '_blank' ) );
+$Form->global_icon( T_('View manual'), 'manual', $edited_ComponentWidget->get_help_url(), '', 3, 2, array( 'target' => '_blank' ) );
 // Close link
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 

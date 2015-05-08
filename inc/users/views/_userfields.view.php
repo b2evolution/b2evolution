@@ -10,7 +10,7 @@
  *
  * @package evocore
  *
- * @version  $Id: _userfields.view.php 8840 2015-04-29 14:40:13Z yura $
+ * @version  $Id: _userfields.view.php 8881 2015-05-06 10:26:02Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -181,7 +181,7 @@ function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
 	global $current_User;
 
-	$field_icon = '<span class="uf_icon_block ufld-'.$ufdf_code.' ufld--textcolor">'
+	$field_icon = '<span class="uf_icon_block ufld_'.$ufdf_code.' ufld__textcolor">'
 			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
 		.'</span>';
 

@@ -595,10 +595,10 @@ class Filelist
 				// same type: continue to name:
 			default:
 			case 'name':
-				$r = strcasecmp( $FileA->get_name(), $FileB->get_name() );
+				$r = strnatcmp( $FileA->get_name(), $FileB->get_name() );
 				if( $r == 0 )
 				{ // same name: look at path
-					$r = strcasecmp( $FileA->get_dir(), $FileB->get_dir() );
+					$r = strnatcmp( $FileA->get_dir(), $FileB->get_dir() );
 				}
 				break;
 		}

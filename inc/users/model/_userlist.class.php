@@ -105,6 +105,8 @@ class UserList extends DataObjectList2
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
 				'order'               => '-D',    // Order
 				'users'               => array(), // User IDs
+				'level_min'           => NULL,    // integer, Level min
+				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
 		) );
 	}
@@ -388,6 +390,12 @@ class UserList extends DataObjectList2
 		$this->filters['userfields'] = $userfields;
 
 		/*
+		 * Restrict by level
+		 */
+		$this->filters['level_min'] = param( 'level_min', 'integer', $this->default_filters['level_min'], true );
+		$this->filters['level_max'] = param( 'level_max', 'integer', $this->default_filters['level_max'], true );
+
+		/*
 		 * Restrict by organization ID
 		 */
 		$this->filters['org'] = param( 'org', 'integer', $this->default_filters['org'], true );
@@ -482,6 +490,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_location( 'city', $this->filters['city'] );
 		$this->UserQuery->where_age_group( $this->filters['age_min'], $this->filters['age_max'] );
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
+		$this->UserQuery->where_level( $this->filters['level_min'], $this->filters['level_max'] );
 		$this->UserQuery->where_organization( $this->filters['org'] );
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users

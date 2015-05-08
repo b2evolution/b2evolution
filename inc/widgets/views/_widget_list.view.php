@@ -143,7 +143,7 @@ function display_container( $container, $legend_suffix = '' )
 			$ComponentWidget->init_display( array() );
 			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ).'" class="widget_name">'
 						.$ComponentWidget->get_desc_for_list().'</a> '
-						.$ComponentWidget->get_manual_icon();
+						.$ComponentWidget->get_help_link();
 			$Table->display_col_end();
 
 			// Note: this is totally useless, but we need more cols for the screen to feel "right":

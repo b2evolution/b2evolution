@@ -211,8 +211,25 @@ a.selected {
 .duplicated_avatars a.user img {
   vertical-align: text-top;
 }
-div.avatartag.main > img:first-child {
+div.avatartag {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0.5em 0.5em 0;
+}
+div.avatartag a {
+  outline: none;
+}
+div.avatartag.main {
+  display: block;
+  float: none !important;
+}
+div.avatartag.main > a {
   float: left;
+}
+div.avatartag.main a:first-child {
+  margin-right: 25px;
+}
+div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 @media only screen and (max-width: 480px) {
@@ -971,7 +988,7 @@ ul.jslog_error {
   -khtml-border-radius: 3px;
   z-index: 11000;
 }
-.form-login-links {
+.evo_form__login_links {
   padding: 0 1em;
 }
 #screen_mask {
@@ -1058,9 +1075,9 @@ ul.jslog_error {
 #overlay_page form legend {
   width: 100%;
 }
-.widget--social-media-links {
+.ufld_icon_links {
   text-align: center;
 }
-.widget--social-media-links a {
+.ufld_icon_links a {
   text-align: center;
 }

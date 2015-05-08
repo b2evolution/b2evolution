@@ -169,63 +169,72 @@ a.comment_reply_current:hover {
   vertical-align: middle;
 }
 /* 18/80% forms: comments and profile */
+div.bComment fieldset,
 form.bComment fieldset {
-  /* one form line */
   border: none;
   margin: 1em 0 0 0;
   padding: 0ex;
-  /* border: 1px solid #00f; */
 }
+div.bComment fieldset label,
 form.bComment fieldset label {
   font-weight: bold;
 }
+div.bComment fieldset div.label,
 form.bComment fieldset div.label {
-  /* label of form line */
   float: left;
   width: 100px;
   text-align: right;
   font-weight: bold;
-  /* border: 1px solid #f00; */
 }
+div.bComment fieldset.field_wide div.label,
 form.bComment fieldset.field_wide div.label,
+div.bComment fieldset.field_inline div.label,
 form.bComment fieldset.field_inline div.label {
   float: none;
   text-align: left;
   width: auto;
   margin-bottom: 5px;
 }
+div.bComment fieldset.field_inline div.label,
 form.bComment fieldset.field_inline div.label {
   float: left;
 }
+div.bComment fieldset div.input,
 form.bComment fieldset div.input {
-  /* input zone of form line */
   margin: 0 0 0 108px;
-  /* border: 1px solid #f00; */
 }
+div.bComment fieldset.field_wide div.input,
 form.bComment fieldset.field_wide div.input {
   margin-left: 20px;
 }
+div.bComment fieldset.field_inline div.input,
 form.bComment fieldset.field_inline div.input {
   float: left;
   margin-left: 5px;
   line-height: 20px;
 }
+div.bComment fieldset.input,
 form.bComment fieldset.input {
   margin: 0;
 }
+div.bComment fieldset div.info,
 form.bComment fieldset div.info {
   margin: 0 0 0 108px;
 }
+div.bComment fieldset.info_full div.info,
 form.bComment fieldset.info_full div.info {
   margin-left: 5px;
 }
+div.bComment fieldset div.label select,
 form.bComment fieldset div.label select {
   width: 91%;
 }
+div.bComment div.avatartag,
 form.bComment div.avatartag {
   float: left;
   margin: 0 0.5em 0.5em 0;
 }
+div.bComment div.avatartag a,
 form.bComment div.avatartag a {
   outline: none;
 }
@@ -786,9 +795,6 @@ input.btn-lg {
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
 }
-.top_menu div.item_title {
-  display: inline-block;
-}
 .profile_content {
   max-width: 960px;
   margin: 0 auto;
@@ -831,7 +837,7 @@ input.btn-lg {
 .profile_buttons .btn-group .btn {
   width: 50%;
 }
-form.bComment .other_profile_pictures div.avatartag {
+.bComment .other_profile_pictures div.avatartag {
   float: none;
   display: inline-block;
 }

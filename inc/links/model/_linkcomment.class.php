@@ -99,8 +99,13 @@ class LinkComment extends LinkOwner
 	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
 	 * @return integer|boolean Link ID on success, false otherwise
 	 */
-	function add_link( $file_ID, $position, $order, $update_owner = true )
+	function add_link( $file_ID, $position = NULL, $order = 1, $update_owner = true )
 	{
+		if( is_null( $position ) )
+		{ // Use default link position
+			$position = $this->get_default_position( $file_ID );
+		}
+
 		$edited_Link = new Link();
 		$edited_Link->set( 'cmt_ID', $this->Comment->ID );
 		$edited_Link->set( 'file_ID', $file_ID );

@@ -72,9 +72,9 @@ module.exports = function(grunt) {
 				files: {
 					// Bootstrap skins
 					'skins_adm/bootstrap/rsc/css/style.css': 'skins_adm/bootstrap/rsc/css/style.less',
-					'skins/bootstrap/style.css':             'skins/bootstrap/style.less',
-					'skins/bootstrap_main/style.css':        'skins/bootstrap_main/style.less',
-					'skins/bootstrap_manual/style.css':      'skins/bootstrap_manual/style.less',
+					'skins/bootstrap_blog_skin/style.css':   'skins/bootstrap_blog_skin/style.less',
+					'skins/bootstrap_main_skin/style.css':   'skins/bootstrap_main_skin/style.less',
+					'skins/bootstrap_manual_skin/style.css': 'skins/bootstrap_manual_skin/style.less',
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
 				}

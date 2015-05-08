@@ -1,0 +1,602 @@
+// Header
+.evo_container__header {
+	margin-bottom: 30px;
+}
+.evo_container__page_top {
+	margin-top: 20px;
+	.ufld_icon_links {
+		text-align: right;
+	}
+}
+div.widget_core_coll_tagline {
+	margin-bottom: 30px;
+}
+
+// Footer
+.evo_container__footer {
+	background-color: #FFF;
+	width: 100%;
+	p {
+		margin-top: 10px;
+	}
+}
+body.pictured .evo_container__footer {
+	color: #666;
+	a:not([class^=ufld_]) {
+		color: #666;
+	}
+}
+
+// Body content
+html {
+	// TODO: this should NOT apply to all pages. It must apply to a certain class only!
+	height: 100%;
+}
+body {
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+
+// SPECIAL FRONT PAGE:
+div.front_main_area {
+	width: 450px;
+	max-width: 100%;
+	padding: 0;
+	margin-top: 85px;
+	margin-bottom: 100px;
+	// border: 1px solid white;
+	.front_main_content {
+		border-radius: 6px;
+		padding: 5px 15px;
+	}
+
+	// Widgets need to be spaced
+	div.widget {
+		margin: 30px 0;
+	}
+
+	// Universal item list:
+	div.widget_core_coll_item_list {
+		// We want to display the first image cleanly before the title
+		// This may need further tweaking...
+		ul {
+			padding: 0;
+			margin-left: 0;
+		}
+		li {
+			clear: both;
+			list-style: none;
+			height: 80px;
+			margin: 5px 0;
+			padding: 0;
+		}
+		div.item_first_image {
+			float: left; 
+			margin-right: 6px;
+		}
+		div.item_title {
+			vertical-align: middle;
+			line-height: 80px;
+		}
+		img {
+			border-radius: 3px;
+		}
+	}
+}
+
+body.pictured {
+	height: 100%;
+	#skin_wrapper {
+		display: table;
+		width: 100%;
+		height: 100%;
+	}
+	.container.main_page_wrapper {
+		height: 100%;
+		min-height: 100%;
+	}
+	.panel {
+		color: #333;
+		a:not([class]) {
+			color: #337ab7;
+			text-decoration: none;
+		}
+		a:not([class]):hover {
+			color: #23527c;
+			text-decoration: underline;
+		}
+		input {
+			-webkit-font-smoothing: subpixel-antialiased;
+		}
+	}
+}
+#bg_picture {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center center;
+	z-index: -999999;
+	img {
+		display: none;
+		width: 100%;
+	}
+}
+@media only screen and (max-width: 640px) {
+	body.disp_front {
+		.sitewide_header {
+			margin-bottom: 0;
+		}
+		#bg_picture {
+			position: relative;
+			height: auto;
+			img {
+				display: block;
+			}
+		}
+		div.front_main_area {
+			width: auto;
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+}
+
+// Login widget form
+.widget_core_user_login {
+	#login_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+	.submit {
+		font-size: 12px;
+	}
+	.field_login_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+	.register_link {
+		display: block;
+		padding-top: 10px;
+	}
+}
+
+// Register widget form
+.widget_core_user_register {
+	#register_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+	.submit {
+		font-size: 12px;
+	}
+	.field_register_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+				#submit_login_form {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+}
+
+// Profile tabs on ?disp=profile
+ul.profile_tabs {
+	margin: 0 2ex 2ex;
+	position: relative;
+	top: 1px;
+}
+
+.profile_avatar {
+	float: right;
+	padding: 10px;
+	margin-left: 10px;
+}
+
+// Set border color of form the same as profile tabs
+.evo_form {
+	border-color: #DDD;
+	padding: 1em;
+	.controls textarea.form-control {
+		width: 100%;
+	}
+}
+
+// A search button
+input.search_field {
+	margin-bottom: 0;
+	display: inline-block;
+}
+form.search .search_options {
+	width: 100%;
+	.search_option input {
+		margin-right: 5px;
+	}
+	.search_option label {
+		margin-bottom: 0;
+		margin-top: 5px;
+	}
+}
+div.compact_search_form {
+	input.search_field {
+		width: 100%;
+		margin: 0;
+	}
+}
+div.extended_search_form {
+	text-align: center;
+	margin: 0 auto 2em auto;
+	max-width: 530px;
+	.search_options {
+		text-align: center;
+		.search_option {
+			display: inline-block;
+			margin-right: 10px;
+		}
+	}
+}
+
+// Table for select categories of item
+table.catselect {
+	input#new_category_name {
+		width: 98% !important;
+	}
+}
+
+// Form elements on item edit page
+label.control-label[for=post_title] {
+	width: auto;
+}
+.item_tags {
+	td.label {
+		background: none;
+		color: #000;
+		text-shadow: none;
+		padding: 0;
+		font-size: 100%;
+	}
+	td.input {
+		width: 90%;
+		label {
+			display: none;
+		}
+	}
+	.controls {
+		margin-left: 0;
+	}
+}
+
+// A form to create a new message/thread
+.evo_private_messages_list .evo_form {
+	background: none;
+}
+textarea.message_text {
+	width: 95%;
+}
+
+// Fix the form elements
+.comment_form {
+	h3 {
+		margin: 0;
+	}
+	.panel {
+		margin: 0;
+		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		.panel-body {
+			padding: 0;
+		}
+	}
+}
+.evo_form {
+	border: none;
+	padding: 0;
+	overflow: visible;
+	.form-actions {
+		margin-bottom: 0;
+	}
+	div.form-group, div.custom_content {
+		padding: 0 20px;
+	}
+	fieldset {
+		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
+	}
+}
+#comment_date_field {
+	input {
+		width: 80px;
+	}
+	label {
+		font-weight: normal;
+	}
+}
+.form-group[id^="ffield_uploadfile"] .controls {
+	padding-top: 5px;
+	input {
+		line-height: 10px;
+	}
+}
+// Comment template
+.comment_rating {
+	margin-top: 2px;
+}
+#comment_edit .comment_rating {
+	margin-top: 9px;
+}
+.ratings_table {
+	margin-bottom: 10px;
+	.rating_summary {
+		border-spacing: 1px;
+		border-collapse: separate;
+	}
+	.progress {
+		border-radius: 0;
+		height: 13px;
+	}
+}
+#comment_preview {
+	background-color: #FFF;
+}
+#comment_date_field .panel {
+	border: none;
+	box-shadow: none;
+	margin-bottom: 0;
+	.panel-body {
+		padding: 0;
+		.control-label {
+			font-weight: bold;
+		}
+		.controls .form-group {
+			display: inline-block;
+			padding-left: 15px;
+			margin-bottom: 0;
+		}
+	}
+}
+
+.evo_post {
+	margin-bottom: 2em;
+	.small.text-muted {
+		margin: 4px 0 10px;
+		a, a .glyphicon {
+			color: inherit;
+		}
+	}
+}
+form#user_checkchanges.evo_form {
+	border: none;
+}
+
+div.bSideItem {
+	background: #F7F5FA;
+	border-radius: 5px;
+	padding: 10px;
+	margin-bottom: 10px;
+	text-shadow: 0 1px 0 #FFFFFF;
+	h4 {
+		margin-top: 0;
+	}
+}
+
+// Login/Register forms:
+.skin-form {
+	.panel-body {
+		.panel {
+			border: none;
+			box-shadow: none;
+		}
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.fieldset {
+		margin: 0;
+		div.input {
+			margin: 0;
+		}
+	}
+	.control-buttons, div.input {
+		padding: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+.evo_panel__login, .evo_panel__lostpass, .evo_panel__register, .evo_panel__activation {
+	min-width: 290px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding: 20px 30px 0;
+	}
+}
+.evo_panel__login {
+	max-width: 400px;
+}
+.evo_panel__lostpass {
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
+}
+.evo_panel__activation {
+	max-width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.evo_panel__register {
+	max-width: 580px;
+	.control-buttons{
+		text-align: left;
+	}
+	&.register-disabled {
+		width: 350px;
+	}
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
+	}
+}
+.evo_form__login_links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+.evo_form__login {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	}
+	.control-buttons {
+		margin-left: 0;
+	}
+	input.form-control[type=text], input.form-control[type=password] {
+		width: 100%;
+	}
+	.btn {
+		margin-top: 5px;
+	}
+	.form-actions {
+		padding: 0;
+		margin: 0 0 20px;
+		background: none;
+		border: none;
+	}
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
+	}
+}
+.standard_login_link {
+	text-align: center;
+	margin: 3em 0 1ex 0;
+}
+.form_footer_notes {
+	margin-top: 0;
+}
+
+// Pagination
+.pagination {
+	margin: 0;
+}
+
+// Current filters
+.filter_item div {
+	height: 22px;
+}
+
+// Messages
+div.action_messages, div.log_container {
+	margin: 0;
+}
+
+// Positions on the action buttons near page titles
+.post_title {
+	display: table;
+	h2 {
+		display: table-cell;
+		margin: 0;
+		padding: 20px 0 10px;
+	}
+	.btn-group {
+		display: table-cell;
+		padding: 20px 0 10px 30px;
+		vertical-align: middle;
+	}
+}
+
+// User links widget
+body.pictured .front_main_content .ufld_icon_links a {
+	width: 60px;
+	height: 60px;
+	margin: 5px;
+	.fa {
+		font-size: 30px;
+		line-height: 60px;
+	}
+}
+
+// Organization Members widget
+.widget_core_org_members {
+	margin: 5em 0 30px;
+	color: #333;
+	img {
+		width: 200px;
+		height: 200px;
+		display: inline-block;
+	}
+	h2.page-header {
+		margin-top: 0;
+	}
+	p.user_field {
+		margin-bottom: 40px;
+	}
+}
+body.pictured .evo_container__footer .widget_core_org_members {
+	a.user_link {
+		color: #000;
+		&:hover {
+			color: #23527c;
+		}
+	}
+}

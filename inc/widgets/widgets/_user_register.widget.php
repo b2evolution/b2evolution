@@ -40,7 +40,7 @@ class user_register_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Email capture / Quick registration widget');
+		return T_('Email capture / Quick registration');
 	}
 
 

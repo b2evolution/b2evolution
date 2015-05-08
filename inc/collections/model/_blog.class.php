@@ -3162,13 +3162,12 @@ class Blog extends DataObject
 					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 					$ads_current_skin_path = $skins_path.$Skin->folder.'/';
 					$skin_template_name = $ads_current_skin_path.$template;
-					$global_template_name = $skins_path.$template;
 					if( file_exists( $skin_template_name ) )
 					{ // Display a special template of this skin
 						require $skin_template_name;
 						exit;
 					}
-					elseif( file_exists( $global_template_name ) )
+					elseif( $global_template_name = skin_fallback_path( $template ) )
 					{ // Display a special template for all skins
 						require $global_template_name;
 						exit;

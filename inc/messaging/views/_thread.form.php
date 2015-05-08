@@ -37,7 +37,7 @@ if( !isset( $params ) )
 	$params = array();
 }
 $params = array_merge( array(
-	'form_class' => 'fform',
+	'form_class_thread' => 'fform',
 	'form_title' => T_('New thread'),
 	'form_action' => NULL,
 	'form_name' => 'thread_checkchanges',
@@ -61,7 +61,7 @@ if( is_admin_page() )
 	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 }
 
-$Form->begin_form( $params['form_class'], $params['form_title'], array( 'onsubmit' => 'return check_form_thread()') );
+$Form->begin_form( $params['form_class_thread'], $params['form_title'], array( 'onsubmit' => 'return check_form_thread()') );
 
 	$Form->add_crumb( 'messaging_threads' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

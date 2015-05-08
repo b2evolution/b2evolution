@@ -1,0 +1,4 @@
+# We don't want any PHP execution in this folder! (Prevent direct invocation of PHP files)
+<IfModule mod_php5.c>
+	php_flag engine off
+</IfModule>

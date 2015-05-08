@@ -71,14 +71,14 @@ $params = array(
 	'skin_form_before'         => $login_form_params['formstart'],
 	'skin_form_after'          => $login_form_params['formend'],
 	'form_title_login'         => $page_title,
-	'form_class_login'         => 'wrap-form-login',
+	'login_page_class'         => 'evo_panel__login',
 	'login_page_before'        => '',
 	'login_page_after'         => '',
 	'login_form_action'        => $secure_htsrv_url.'login.php',
 	'login_form_name'          => 'login_form',
 	'login_form_title'         => '',
 	'login_form_layout'        => 'fieldset',
-	'login_form_class'         => 'form-horizontal form-login',
+	'form_class_login'         => 'form-horizontal evo_form__login',
 	'login_form_source'        => param( 'source', 'string', 'std login form' ),
 	'login_form_inskin'        => false,
 	'login_form_inskin_urls'   => false,
@@ -96,7 +96,7 @@ $params = array(
 	'display_reg_link'         => true,
 	'login_form_footer'        => false,
 );
-require $skins_path.'_login.disp.php';
+require skin_fallback_path( '_login.disp.php', 6 );
 
 // Footer
 require dirname(__FILE__).'/_html_footer.inc.php';

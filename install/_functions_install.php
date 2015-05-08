@@ -507,10 +507,10 @@ function install_basic_skins( $install_mobile_skins = true )
 	task_begin( 'Installing default skins... ' );
 
 	// Note: Skin #1 will we used by Home
-	skin_install( 'bootstrap_main' );
+	skin_install( 'bootstrap_main_skin' );
 
 	// Note: Skin #2 will we used by Blog A
-	skin_install( 'bootstrap' );
+	skin_install( 'bootstrap_blog_skin' );
 
 	// Note: Skin #3 will we used by Blog B
 	skin_install( 'evocamp' );
@@ -522,7 +522,7 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'pureforums' );
 
 	// Note: Skin #6 will we used by Manual
-	skin_install( 'bootstrap_manual' );
+	skin_install( 'bootstrap_manual_skin' );
 
 	skin_install( 'asevo' );
 	skin_install( 'dating_mood' );
@@ -1360,5 +1360,81 @@ function display_install_messages( $messages, $type = 'error' )
 	}
 
 	echo $r;
+}
+
+
+/**
+ * Print JavaScript to control button on install page
+ */
+function echo_install_button_js()
+{
+	global $app_name;
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#install_button' ).click( function()
+	{
+		if( jQuery( '#deletedb' ).is( ':checked' ) )
+		{
+			if( confirm( '<?php printf( /* TRANS: %s gets replaced by app name, usually "b2evolution" */ TS_( 'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' ), $app_name ); ?>' ) )
+			{
+				jQuery( 'input[name=confirmed]' ).val( 1 );
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	} );
+
+	function update_install_button_info()
+	{
+		switch( jQuery( 'input[type=radio][name=action]:checked' ).val() )
+		{
+			case 'newdb':
+				var btn_title = '<?php echo TS_('Next &raquo;'); ?>';
+				var btn_class = 'btn-success';
+				break;
+
+			case 'evoupgrade':
+				var btn_title = '<?php echo TS_('UPGRADE!'); ?>';
+				var btn_class = 'btn-warning';
+				break;
+
+			case 'deletedb':
+				var btn_title = '<?php echo TS_('DELETE ALL!'); ?>';
+				var btn_class = 'btn-danger';
+				break;
+
+			case 'start':
+				var btn_title = '<?php echo TS_('Change config &raquo;'); ?>';
+				var btn_class = 'btn-primary';
+				break;
+
+			case 'utf8upgrade':
+				var btn_title = '<?php echo TS_('CONVERT DB!'); ?>';
+				var btn_class = 'btn-primary';
+				break;
+
+			default:
+				return true;
+		}
+
+		jQuery( '#install_button' )
+			.html( btn_title )
+			.attr( 'class', 'btn btn-lg ' + btn_class );
+	}
+
+	jQuery( 'input[type=radio][name=action]' ).click( function()
+	{
+		update_install_button_info();
+	} );
+
+	update_install_button_info();
+} );
+</script>
+<?php
 }
 ?>

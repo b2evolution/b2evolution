@@ -281,16 +281,18 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
-				'item_first_image_before' => '<div class="item_first_image">',
-				'item_first_image_after'  => '</div>',
-				'item_title_before'       => '<div class="item_title">',
-				'item_title_after'        => '</div>',
-				'item_excerpt_before'     => '<div class="item_excerpt">',
-				'item_excerpt_after'      => '</div>',
-				'item_content_before'     => '<div class="item_content">',
-				'item_content_after'      => '</div>',
-				'item_images_before'      => '<div class="item_images">',
-				'item_images_after'       => '</div>',
+				'item_first_image_before'  => '<div class="item_first_image">',
+				'item_first_image_after'   => '</div>',
+				'item_title_before'        => '<div class="item_title">',
+				'item_title_after'         => '</div>',
+				'item_title_single_before' => '',
+				'item_title_single_after'  => '',
+				'item_excerpt_before'      => '<div class="item_excerpt">',
+				'item_excerpt_after'       => '</div>',
+				'item_content_before'      => '<div class="item_content">',
+				'item_content_after'       => '</div>',
+				'item_images_before'       => '<div class="item_images">',
+				'item_images_after'        => '</div>',
 			), $this->disp_params );
 
 		// Create ItemList
@@ -397,6 +399,14 @@ class coll_item_list_Widget extends ComponentWidget
 		{	// Nothing to display:
 			return;
 		}
+
+		// Check if the widget displays only single title
+		$this->disp_params['disp_only_title'] = ! (
+				( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] ) || // display first image
+				( $this->disp_params['disp_excerpt'] ) || // display excerpt
+				( $this->disp_params['disp_teaser'] ) || // display teaser
+				( $this->disp_params['attached_pics'] == 'all' || ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) ) // display other images
+			);
 
 		// Start to capture display content here in order to solve the issue to don't display empty widget
 		ob_start();
@@ -518,7 +528,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
-		{	// Display first image before title
+		{ // Display first image before title
 			$this->disp_images( array(
 					'before' => $this->disp_params['item_first_image_before'],
 					'after'  => $this->disp_params['item_first_image_after'],
@@ -527,10 +537,10 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['disp_title'] )
-		{	// Display title
+		{ // Display title
 			$disp_Item->title( array(
-					'before'     => $this->disp_params['item_title_before'],
-					'after'      => $this->disp_params['item_title_after'],
+					'before'     => $this->disp_params['disp_only_title'] ? $this->disp_params['item_title_single_before'] : $this->disp_params['item_title_before'],
+					'after'      => $this->disp_params['disp_only_title'] ? $this->disp_params['item_title_single_after'] : $this->disp_params['item_title_after'],
 					'link_type'  => $this->disp_params['item_title_link_type'],
 					'link_class' => $link_class,
 				) );
@@ -538,7 +548,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['disp_excerpt'] )
-		{
+		{ // Display excerpt
 			$excerpt = $disp_Item->dget( 'excerpt', 'htmlbody' );
 			if( !empty($excerpt) )
 			{	// Note: Excerpts are plain text -- no html (at least for now)
@@ -573,7 +583,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
 		    ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
-		{	// Display attached pictures
+		{ // Display attached pictures
 			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
 			$this->disp_images( array(
 					'before' => $this->disp_params['item_images_before'],

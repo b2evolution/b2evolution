@@ -760,12 +760,6 @@ if( !empty( $skin ) )
 					// All others will default to index.main.php
 				);
 
-			if( $disp == 'search' && ! file_exists( $ads_current_skin_path.'_item_block.inc.php' ) )
-			{	// Skins from 2.x don't have '_item_block.inc.php' file, and there's no fallback file in /skins directory
-				// So we simply load the 'posts' disp handler
-				$disp = 'posts';
-			}
-
 			if( !empty($disp_handlers[$disp]) )
 			{
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
@@ -773,7 +767,7 @@ if( !empty( $skin ) )
 					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skins' );
 					require $disp_handler;
 				}
-				elseif( file_exists( $disp_handler = $skins_path.$disp_handlers[$disp] ) )
+				elseif( $disp_handler = skin_fallback_path( $disp_handlers[$disp] ) )
 				{	// Skins have a general page handler for this display:
 					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (for CSS include -- added in v 4.1)', 'skins' );
 					require $disp_handler;

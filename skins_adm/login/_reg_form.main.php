@@ -33,9 +33,9 @@ require dirname(__FILE__).'/_html_header.inc.php';
 // Register form
 
 $params = array_merge( array(
-		'register_page_before'      => '<div class="wrap-form-register">',
+		'register_page_before'      => '<div class="evo_panel__register">',
 		'register_page_after'       => '</div>',
-		'register_form_class'       => 'form-register',
+		'form_class_register'       => 'evo_form__register',
 		'register_links_attrs'      => '',
 		'register_use_placeholders' => true,
 		'register_field_width'      => 252,
@@ -46,7 +46,7 @@ $params = array_merge( array(
 		'register_disabled_page_after'  => $login_form_params['formend'],
 	), $params );
 
-require $skins_path.'_register.disp.php';
+require skin_fallback_path( '_register.disp.php', 6 );
 
 // Footer
 require dirname(__FILE__).'/_html_footer.inc.php';

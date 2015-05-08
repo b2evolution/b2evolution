@@ -515,7 +515,9 @@ class AdminUI_general extends Menu
 			return;
 		}
 
-		global $skins_path, $mode;
+		load_funcs('skins/_skin.funcs.php');
+
+		global $mode;
 
 		/**
 		 * @var Hit
@@ -546,13 +548,13 @@ class AdminUI_general extends Menu
 		{ // user is logged in
 			if( $this->get_show_evobar() )
 			{ // show evobar options is enabled for this admin skin
-				require $skins_path.'_toolbar.inc.php';
+				require skin_fallback_path( '_toolbar.inc.php' );
 				$skin_wrapper_class = $skin_wrapper_class.'_loggedin';
 			}
 		}
 		else
 		{ // user is not logged in
-			require $skins_path.'_toolbar.inc.php';
+			require skin_fallback_path( '_toolbar.inc.php' );
 			$skin_wrapper_class = $skin_wrapper_class.'_anonymous';
 		}
 

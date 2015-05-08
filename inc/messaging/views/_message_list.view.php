@@ -41,7 +41,7 @@ if( !isset( $params ) )
 	$params = array();
 }
 $params = array_merge( array(
-	'form_class' => 'fform',
+	'form_class_msg' => 'fform',
 	'form_action' => NULL,
 	'form_name' => 'messages_checkchanges',
 	'form_layout' => 'compact',
@@ -265,7 +265,7 @@ if( $is_recipient )
 
 		$Form->switch_template_parts( $params['skin_form_params'] );
 
-		$Form->begin_form( $params['form_class'], '' );
+		$Form->begin_form( $params['form_class_msg'], '' );
 
 			$Form->add_crumb( 'messaging_messages' );
 			if( $perm_abuse_management )

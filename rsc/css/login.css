@@ -41,21 +41,21 @@ div.log_container {
 .panel-body {
 	padding: 20px 30px 0;
 }
-.form-login-links {
+.evo_form__login_links {
 	padding: 0 5px;
 	font-size: 92%;
 }
 
-.form-login {
+.evo_form__login {
 	padding: 10px 0;
 }
-.form-login fieldset {
+.evo_form__login fieldset {
 	margin-bottom: 20px;
 }
-.form-login fieldset:last-child {
+.evo_form__login fieldset:last-child {
 	margin-bottom: 0;
 }
-.form-login input[type=text], .form-login input[type=password] {
+.evo_form__login input[type=text], .evo_form__login input[type=password] {
 	width: 100%;
 }
 
@@ -82,18 +82,18 @@ span.help-inline {
 	margin-bottom: 20px;
 }
 
-.form-lostpass .controls {
+.evo_form__lostpass .controls {
 	margin-left: 0;
 	padding: 0;
 	width: 100%;
 }
-.form-lostpass .controls input.form-control {
+.evo_form__lostpass .controls input.form-control {
 	width: 100%;
 }
-.form-lostpass .control-label {
+.evo_form__lostpass .control-label {
 	display: none;
 }
-.form-lostpass .control-buttons {
+.evo_form__lostpass .control-buttons {
 	margin: 0;
 	padding: 0;
 	text-align: center;

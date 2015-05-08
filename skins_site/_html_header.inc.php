@@ -33,7 +33,7 @@ siteskin_init();
 /* In the future we probably want to include the toolbar here...
 
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-require $skins_path.'_toolbar.inc.php';
+require skin_fallback_path( '_toolbar.inc.php' );
 // ------------------------------- END OF TOOLBAR --------------------------------
 
 echo "\n";

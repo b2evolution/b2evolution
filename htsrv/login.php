@@ -647,17 +647,17 @@ switch( $action )
 
 		// Lost password form
 		$params = array(
-			'form_class_login'     => 'wrap-form-login',
 			'form_title_lostpass'  => $page_title,
 			'login_form_inskin'    => false,
-			'login_page_before'    => '<div class="wrap-form-lostpass">',
+			'login_page_class'     => 'evo_panel__login',
+			'login_page_before'    => '<div class="evo_panel__lostpass">',
 			'login_page_after'     => '</div>',
-			'login_form_class'     => 'form-login form-lostpass',
+			'form_class_login'     => 'evo_form__login evo_form__lostpass',
 			'lostpass_form_params' => $login_form_params,
 			'lostpass_form_footer' => false,
 			'abort_link_text'      => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 		);
-		require $skins_path.'_lostpassword.disp.php';
+		require skin_fallback_path( '_lostpassword.disp.php', 6 );
 
 		// Include page footer:
 		require $adminskins_path.'login/_html_footer.inc.php';

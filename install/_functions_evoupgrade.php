@@ -5861,7 +5861,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHEN ufdf_name = "Pinterest"     THEN "fa fa-pinterest-p"
 				WHEN ufdf_name = "Main address"  THEN "fa fa-building"
 				WHEN ufdf_name = "Home address"  THEN "fa fa-home"
-				WHEN ufdf_name = "About me"      THEN "fa fa-info"
+				WHEN ufdf_name = "About me"      THEN "fa fa-info-circle"
 				WHEN ufdf_name = "I like"        THEN "fa fa-thumbs-o-up"
 				WHEN ufdf_name = "I don\'t like" THEN "fa fa-thumbs-o-down"
 				ELSE ufdf_icon_name

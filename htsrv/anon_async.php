@@ -59,21 +59,15 @@ switch( $action )
 		locale_activate( $Blog->get('locale') );
 
 		$disp = param( 'disp', '/^[a-z0-9\-_]+$/', '' );
-		$skin = '';
 		$blog_skin_ID = $Blog->get_skin_ID();
-		if( !empty( $blog_skin_ID ) )
+		if( ! empty( $blog_skin_ID ) )
 		{ // check if Blog skin has specific comment form
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-			$skin = $Skin->folder.'/';
-			$ads_current_skin_path = $skins_path.$skin;
-			if( ! file_exists( $skins_path.$skin.'_item_comment_form.inc.php' ) )
-			{
-				$skin = '';
-			}
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
 		}
 
-		require $skins_path.$skin.'_item_comment_form.inc.php';
+		require skin_template_path( '_item_comment_form.inc.php' );
 		break;
 
 
@@ -108,7 +102,15 @@ switch( $action )
 			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
 		}
 
-		require $skins_path.'_contact_msg.form.php';
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{ // check if Blog skin has specific concact message form
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		require skin_template_path( '_contact_msg.form.php' );
 		break;
 
 

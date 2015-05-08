@@ -445,6 +445,30 @@ class UserQuery extends SQL
 		$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
 	}
 
+	/**
+	 * Restrict with user group level
+	 *
+	 * @param integer Minimum user level
+	 * @param integer Maximum user level
+	 */
+	function where_level( $user_level_min, $user_level_max )
+	{
+		global $DB;
+
+		if( $user_level_min < 0 || is_null($user_level_min) )
+		{ // Min group level is 0
+			$user_level_min = 0;
+		}
+
+		if( $user_level_max > 10 || is_null($user_level_max) )
+		{ // Max group level is 10
+			$user_level_max = 10;
+		}
+
+		$this->WHERE_and( 'user_level >= '.$DB->quote( $user_level_min ) );
+		$this->WHERE_and( 'user_level <= '.$DB->quote( $user_level_max ) );
+	}
+
 }
 
 ?>

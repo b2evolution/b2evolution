@@ -33,11 +33,11 @@ $params = array(
 	'skin_form_before'     => $login_form_params['formstart'],
 	'skin_form_after'      => $login_form_params['formend'],
 	'activate_form_title'  => $page_title,
-	'form_class_login'     => 'wrap-form-login',
+	'login_page_class'     => 'evo_panel__login',
 	'activate_form_params' => $login_form_params,
 	'use_form_wrapper'     => false,
 );
-require $skins_path.'_activateinfo.disp.php';
+require skin_fallback_path( '_activateinfo.disp.php', 6 );
 
 // Footer
 require dirname(__FILE__).'/_html_footer.inc.php';

@@ -38,6 +38,8 @@ if( ! $PageCache->check() )
 { // Cache miss, we have to generate:
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
+// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
@@ -63,7 +65,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<body<?php skin_body_attrs(); ?>>
 		<?php
 		// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-		require $skins_path.'_toolbar.inc.php';
+		require skin_fallback_path( '_toolbar.inc.php' );
 		// ------------------------------- END OF TOOLBAR --------------------------------
 		?>
 		<div id="skin_wrapper" class="<?php echo show_toolbar() ? 'skin_wrapper_loggedin' : 'skin_wrapper_anonymous' ?>">

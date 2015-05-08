@@ -580,7 +580,7 @@ div.error_404 {
 }
 
 /* disp=user */
-body.disp_user form.bComment fieldset.fieldset {
+body.disp_user .bComment fieldset.fieldset {
 	margin: 2em 0;
 }
 body.disp_user legend {

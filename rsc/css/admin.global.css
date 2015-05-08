@@ -971,7 +971,7 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	text-decoration: none;
 }
 
-div.block_item form.bComment.meta_comment_form {
+div.block_item .evo_form.meta_comment_form {
 	background-color: #f7f4ff;
 	border: 2px solid #5133ab;
 }

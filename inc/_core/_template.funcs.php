@@ -2212,7 +2212,7 @@ function display_login_form( $params )
 
 	if( count( $links ) )
 	{
-		echo '<div class="form-login-links">'
+		echo '<div class="evo_form__login_links">'
 				.'<div class="floatright">'.implode( $links, ' &middot; ' ).'</div>'
 				.'<div class="clear"></div>'
 			.'</div>';
@@ -2537,7 +2537,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	if( ! $params['inskin'] )
 	{
-		echo '<div class="form-login-links">';
+		echo '<div class="evo_form__login_links">';
 		echo $login_link;
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -2694,7 +2694,7 @@ function display_activateinfo( $params )
 			$Form->switch_template_parts( $params['form_template'] );
 		}
 
-		$Form->begin_form( 'form-login' );
+		$Form->begin_form( 'evo_form__login' );
 
 		$Form->add_crumb( 'validateform' );
 		$Form->hidden( 'action', 'validatemail' );
@@ -2713,7 +2713,7 @@ function display_activateinfo( $params )
 		echo $params['use_form_wrapper'] ? $params['form_after'] : '';
 	}
 
-	echo '<div class="form-login-links floatright">';
+	echo '<div class="evo_form__login_links floatright">';
 	user_logout_link();
 	echo '</div>';
 }

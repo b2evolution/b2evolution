@@ -2530,7 +2530,7 @@ class File extends DataObject
 	 * @param string Position
 	 * @return integer Link ID
 	 */
-	function link_to_Object( & $LinkOwner, $set_order = 1, $set_position = NULL )
+	function link_to_Object( & $LinkOwner, $set_order = 1, $position = NULL )
 	{
 		global $DB;
 
@@ -2538,7 +2538,6 @@ class File extends DataObject
 		// First image becomes "teaser", otherwise "aftermore".
 
 		$order = $set_order;
-		$position = is_null( $set_position ) ? $LinkOwner->get_default_position( $this->is_image() ) : $set_position;
 		$existing_Links = & $LinkOwner->get_Links();
 
 		// Find highest order

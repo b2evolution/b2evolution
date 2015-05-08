@@ -137,6 +137,18 @@ class Skin extends DataObject
 
 
 	/**
+	 * What evoSkins API does has this skin been designed with?
+	 *
+	 * This determines where we get the fallback templates from (skins_fallback_v*)
+	 * (allows to use new markup in new b2evolution versions)
+	 */
+	function get_api_version()
+	{
+		return 5;
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.

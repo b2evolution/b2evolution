@@ -53,7 +53,8 @@ global $activate_account_reminder_threshold, $comment_moderation_reminder_thresh
 
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'     => array(),
+		'form_class_user_subs' => 'bComment',
 	);
 
 if( isset( $params ) )
@@ -92,7 +93,7 @@ if( $is_admin_page )
 else
 {
 	$form_title = '';
-	$form_class = 'bComment';
+	$form_class = $params['form_class_user_subs'];
 	$checklist_params = array( 'wide' => true );
 }
 
