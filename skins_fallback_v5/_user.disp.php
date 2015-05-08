@@ -42,7 +42,6 @@ $params = array_merge( array(
 		'edit_my_profile_link_text'        => T_('Edit my profile'),
 		'edit_user_admin_link_text'        => T_('Edit in Back-Office'),
 		'skin_form_params'                 => array(),
-		'form_class_user_profile'          => 'bComment',
 	), $params );
 
 // ------------------- PREV/NEXT USER LINKS (SINGLE USER MODE) -------------------
@@ -70,7 +69,7 @@ $profileForm->switch_template_parts( $params['skin_form_params'] );
 
 $profileForm->switch_layout( 'fixed', false );
 
-$profileForm->begin_form( $params['form_class_user_profile'] );
+$profileForm->begin_form( 'bComment' );
 
 // ---- START OF LEFT COLUMN ---- //
 echo '<div class="profile_column_left">';

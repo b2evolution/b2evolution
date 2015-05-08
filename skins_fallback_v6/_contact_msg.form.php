@@ -20,7 +20,6 @@ $default_params = array(
 		'skin_form_before'   => '',
 		'skin_form_after'    => '',
 		'msgform_form_title' => '',
-		'form_class_contact_msg' => 'evo_form',
 	);
 
 if( isset( $params ) )
@@ -53,7 +52,7 @@ $Form = new Form( $submit_url );
 
 $Form->switch_template_parts( $params['skin_form_params'] );
 
-	$Form->begin_form( $params['form_class_contact_msg'] );
+	$Form->begin_form( 'evo_form' );
 
 	$Form->add_crumb( 'newmessage' );
 	if( isset($Blog) )

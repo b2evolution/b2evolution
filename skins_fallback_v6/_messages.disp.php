@@ -97,7 +97,7 @@ if( !isset( $params ) )
 	$params = array();
 }
 $params = array_merge( array(
-	'form_class_msg' => 'evo_form evo_form__private_messages',	// This is nto really a <form>, right?
+	'form_class_msg' => 'evo_form evo_form__private_messages',
 	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,

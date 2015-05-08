@@ -1,7 +1,7 @@
 <?php
 /**
- * This is the template that displays the contents for a post
- * (images, teaser, more link, body, etc...)
+ * This is the template that displays the contents for a post (images, teaser, more link, body, etc...)
+ * It's typically called by the item_block template.
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template (or other templates)
@@ -23,13 +23,18 @@ $params = array_merge( array(
 		'intro_mode'               => 'auto', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
-		'content_display_full'     => true, // Do we want to display post content at all, false to display images/attachments only
+		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
+
+		// Wrap images and text:
 		'content_start_excerpt'    => '<div class="content_excerpt">',
 		'content_end_excerpt'      => '</div>',
 		'content_start_full'       => '<div class="content_full">',
 		'content_end_full'         => '</div>',
+
+		// In case we display a compact version of the post:
 		'excerpt_before_text'      => '<div class="excerpt">',
 		'excerpt_after_text'       => '</div>',
+
 		'excerpt_before_more'      => ' <span class="excerpt_more">',
 		'excerpt_after_more'       => '</span>',
 		'excerpt_more_text'        => T_('more').' &raquo;',
@@ -66,6 +71,7 @@ $params = array_merge( array(
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
 		'url_link_target'          => '', // Link target attribute e.g. '_blank'
+
 		'before_more_link'         => '<p class="bMore">',
 		'after_more_link'          => '</p>',
 		'more_link_text'           => '#',
@@ -149,7 +155,7 @@ else
 switch( $content_mode )
 {
 	case 'excerpt':
-		// Reduced display:
+		// Compact display:
 		echo $params['content_start_excerpt'];
 
 		if( !empty($params['excerpt_image_size']) )
@@ -189,12 +195,13 @@ switch( $content_mode )
 		break;
 
 	case 'full':
+		// Full display:
 		$params['force_more'] = true;
 		$params['anchor_text'] = '';
 		/* continue down */
 	case 'normal':
 	default:
-		// Full dislpay:
+		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
 		if( ! empty($params['image_size']) )
@@ -223,7 +230,8 @@ switch( $content_mode )
 		}
 
 		if( $params['content_display_full'] )
-		{
+		{	// We want to display text, not just images:
+		
 			echo '<div class="bText">';
 
 			// URL link, if the post has one:
@@ -261,7 +269,7 @@ switch( $content_mode )
 
 			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
 			{
-				// Display images that are linked to this post:
+				// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],

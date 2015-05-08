@@ -21,8 +21,7 @@ global $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
-		'disp_comment_form'    => true,
-		'form_class_comment'   => 'bComment',
+		'disp_comment_form'	   =>	true,
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
 		'form_title_text'      => T_('Leave a comment'),
@@ -201,7 +200,7 @@ function validateCommentForm(form)
 
 	$Form->switch_template_parts( $params['form_params'] );
 
-	$Form->begin_form( $params['form_class_comment'], '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
+	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin

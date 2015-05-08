@@ -1,7 +1,7 @@
 <?php
 /**
  * This is the template that displays the contents for a post (images, teaser, more link, body, etc...)
- * It's typically called by theitem_block template.
+ * It's typically called by the item_block template.
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template (or other templates)
@@ -206,7 +206,7 @@ switch( $content_mode )
 		/* continue down */
 	case 'normal':
 	default:
-		// Normal dislpay:  (and Full dusplay if force_more is true)
+		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
 		if( ! empty($params['image_size']) )

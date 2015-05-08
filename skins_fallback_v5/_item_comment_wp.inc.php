@@ -9,6 +9,8 @@
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
+ *
+ * @deprecated Will be removed in a future version.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

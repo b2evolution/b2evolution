@@ -28,6 +28,9 @@ $params = array_merge( array(
 
 // ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
+?>
+<div class="evo_container evo_container__front_page_primary">
+<?php
 skin_container( NT_('Front Page Main Area'), array(
 		// The following params will be used as defaults for widgets included in this container:
 		'author_link_text'        => $params['author_link_text'],
@@ -41,5 +44,5 @@ skin_container( NT_('Front Page Main Area'), array(
 		'block_title_end'         => $params['front_block_title_end'],
 	) );
 // --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
-
 ?>
+</div>

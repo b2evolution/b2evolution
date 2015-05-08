@@ -1,7 +1,6 @@
 <?php
 /**
- * This is the template that displays the feedback for a post
- * (comments, trackback, pingback...)
+ * This is the template that displays the feedback for a post (comments, trackback, pingback...)
  *
  * You may want to call this file multiple time in a row with different $c $tb $pb params.
  * This allow to seprate different kinds of feedbacks instead of displaying them mixed together

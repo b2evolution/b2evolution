@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dummy_fields;
+global $dummy_fields, $Plugins;
 
 // Default params:
 $default_params = array(
@@ -20,7 +20,6 @@ $default_params = array(
 		'skin_form_before'   => '',
 		'skin_form_after'    => '',
 		'msgform_form_title' => '',
-		'form_class_contact_msg' => 'bComment',
 	);
 
 if( isset( $params ) )
@@ -53,7 +52,7 @@ $Form = new Form( $submit_url );
 
 $Form->switch_template_parts( $params['skin_form_params'] );
 
-	$Form->begin_form( $params['form_class_contact_msg'] );
+	$Form->begin_form( 'bComment'  );
 
 	$Form->add_crumb( 'newmessage' );
 	if( isset($Blog) )
@@ -80,18 +79,23 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
 
-	// Form buttons:
-	echo $Form->begin_field( NULL, '' );
+	$Form->begin_fieldset();
+	?>
+		<div class="input">
+			<?php
+			$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit', 'value' => T_('Send message') ) );
 
-		// Standard button to send a message
-		$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit btn-primary btn-lg', 'value' => T_('Send message') ) );
+			$Plugins->trigger_event( 'DisplayMessageFormButton', array( 'Form' => & $Form,
+				'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
+			?>
+		</div>
+		<?php
+	$Form->end_fieldset();
+	?>
 
-		// Additional buttons from plugins
-		$Plugins->trigger_event( 'DisplayMessageFormButton', array( 'Form' => & $Form,
-			'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
+	<div class="clear"></div>
 
-	echo $Form->end_field();
-
+<?php
 $Form->end_form();
 
 echo $params['skin_form_after'];

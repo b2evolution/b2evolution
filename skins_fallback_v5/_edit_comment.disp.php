@@ -28,12 +28,11 @@ $form_action = url_add_param( $admin_url, 'ctrl=comments' );
 $display_params = array_merge( $display_params, array(
 	'textarea_lines'     => 16,
 	'form_comment_text'  => T_('Comment content'),
-	'form_class_comment' => 'bComment',
 ) );
 
 $Form = new Form( $form_action, 'comment_edit', 'post' );
 
-$Form->begin_form( $params['form_class_comment'] );
+$Form->begin_form( 'bComment' );
 
 	$Form->add_crumb( 'comment' );
 	$Form->hidden( 'blog', $Blog->ID );

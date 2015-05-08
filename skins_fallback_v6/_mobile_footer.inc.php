@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 ?>
 <div id="mobile_footer" class="mobile_footer">
 
-	<ul>
+	<ul class="evo_container evo_container__mobile_footer">
 	<?php
 		// ------------------------- "Mobile Footer" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:

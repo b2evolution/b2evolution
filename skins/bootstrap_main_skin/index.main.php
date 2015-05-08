@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8899 2015-05-07 16:05:55Z yura $
+	 * @version $Id: index.main.php 8907 2015-05-08 18:16:32Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -321,85 +321,87 @@ if( $disp != 'front' )
 if( $disp == 'front' )
 {
 ?>
-			<div class="col-md-12">
-	<?php
-		// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Front Page Secondary Area'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="widget $wi_class$">',
-				'block_end'         => '</div>',
-				'block_title_start' => '<h2 class="page-header">',
-				'block_title_end'   => '</h2>',
-			) );
-		// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
-	?>
-			</div>
+		<div class="col-md-12">
+		<div class="evo_container evo_container__front_page_secondary">
+		<?php
+			// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Front Page Secondary Area'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'       => '<div class="widget $wi_class$">',
+					'block_end'         => '</div>',
+					'block_title_start' => '<h2 class="page-header">',
+					'block_title_end'   => '</h2>',
+				) );
+			// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
+		?>
+		</div>
+		</div>
 <?php
 }
 ?>
-			<div class="col-md-12 center">
-	<?php
-		// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Footer'), array(
-				// The following params will be used as defaults for widgets included in this container:
-			) );
-		// ----------------------------- END OF "Footer" CONTAINER -----------------------------
-	?>
-	<p>
+		<div class="col-md-12 center">
 		<?php
-			// Display footer text (text can be edited in Blog Settings):
-			$Blog->footer_text( array(
-					'before' => '',
-					'after'  => ' &bull; ',
+			// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Footer'), array(
+					// The following params will be used as defaults for widgets included in this container:
 				) );
-
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+			// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 		?>
+		<p>
+			<?php
+				// Display footer text (text can be edited in Blog Settings):
+				$Blog->footer_text( array(
+						'before' => '',
+						'after'  => ' &bull; ',
+					) );
+
+			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+			?>
+
+			<?php
+				// Display a link to contact the owner of this blog (if owner accepts messages):
+				$Blog->contact_link( array(
+						'before' => '',
+						'after'  => ' &bull; ',
+						'text'   => T_('Contact'),
+						'title'  => T_('Send a message to the owner of this blog...'),
+					) );
+				// Display a link to help page:
+				$Blog->help_link( array(
+						'before' => ' ',
+						'after'  => ' ',
+						'text'   => T_('Help'),
+					) );
+			?>
+
+			<?php
+				// Display additional credits:
+				// If you can add your own credits without removing the defaults, you'll be very cool :))
+				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+				credits( array(
+						'list_start' => '&bull;',
+						'list_end'   => ' ',
+						'separator'  => '&bull;',
+						'item_start' => ' ',
+						'item_end'   => ' ',
+					) );
+			?>
+		</p>
 
 		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before' => '',
-					'after'  => ' &bull; ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
-				) );
-			// Display a link to help page:
-			$Blog->help_link( array(
-					'before' => ' ',
-					'after'  => ' ',
-					'text'   => T_('Help'),
+			// Please help us promote b2evolution and leave this logo on your blog:
+			powered_by( array(
+					'block_start' => '<div class="powered_by">',
+					'block_end'   => '</div>',
+					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+					'img_width'   => 120,
+					'img_height'  => 32,
 				) );
 		?>
-
-		<?php
-			// Display additional credits:
-			// If you can add your own credits without removing the defaults, you'll be very cool :))
-			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			credits( array(
-					'list_start' => '&bull;',
-					'list_end'   => ' ',
-					'separator'  => '&bull;',
-					'item_start' => ' ',
-					'item_end'   => ' ',
-				) );
-		?>
-	</p>
-
-	<?php
-		// Please help us promote b2evolution and leave this logo on your blog:
-		powered_by( array(
-				'block_start' => '<div class="powered_by">',
-				'block_end'   => '</div>',
-				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-				'img_width'   => 120,
-				'img_height'  => 32,
-			) );
-	?>
-			</div>
+		</div>
 		</div>
 	</div>
 </div>
