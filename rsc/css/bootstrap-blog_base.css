@@ -85,11 +85,13 @@ div.error_additional_content {
   float: left;
   border-radius: 50%;
 }
-.bCommentAvatarCenter {
-  margin: 0 auto;
-  padding: 2px;
-  border: 1px solid #ccc;
+/*
+.bCommentAvatarCenter {  // This is used in tooltips for anonymous users
+	margin: 0 auto;
+	padding: 2px;
+	border:1px solid #ccc;
 }
+*/
 div.moderation_msg {
   margin: 1ex 2ex;
   padding: 0 1ex;

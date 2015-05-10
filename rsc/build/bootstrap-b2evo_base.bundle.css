@@ -49,46 +49,52 @@ code {
 .inline {
   display: inline;
 }
+/* DUPLICATES BOOTSTRAP STYLE
 .hidden {
-  display: none;
+	display: none;
 }
+*/
+/* I DON'T THINK THESE APPLY TO ANYTHING
 .indented {
-  margin-left: 3em;
+	margin-left: 3em;
 }
 .absolute_center {
-  display: block;
-  margin: auto;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+	display: block;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
 }
 .border {
-  border: 1px solid #000;
+	border: 1px solid #000;
 }
 .margin1ex {
-  margin: 1ex;
+	margin: 1ex;
 }
 .margin2ex {
-  margin: 2ex;
+	margin: 2ex;
 }
 .mb1 {
-  margin-bottom: 1px;
+	margin-bottom: 1px;
 }
+*/
+/* UNNECESSARY STYLES, SINCE THERE ARE SMALL STYLES ON BOOTSTRAP
 .small92 {
-  font-size: 92%;
+	font-size: 92%;
 }
 .small84 {
-  font-size: 84%;
+	font-size: 84%;
 }
 .small80 {
-  font-size: 80%;
+	font-size: 80%;
 }
 .small_details {
-  font-size: 84%;
-  color: #555;
+	font-size: 84%;
+	color: #555;
 }
+*/
 .note,
 .notes,
 .dimmed {
@@ -114,7 +120,6 @@ code {
 acronym,
 abbr {
   border-bottom: 1px dotted #000;
-  cursor: help;
 }
 del {
   color: #999999;
@@ -127,9 +132,11 @@ ins {
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
+/* I THINK THIS REFERS TO NOTHING
 a.discreet {
-  text-decoration: none;
+	text-decoration: none;
 }
+*/
 img.leftmargin {
   float: left;
   margin-right: 1ex;
@@ -479,73 +486,20 @@ span.loader_img.loader_user_deldata {
  * Obviously, this file no longer contains only basic styles.
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
-div.dev-blocks {
-  border: 1px solid #f00;
-  margin: 0;
-  padding: 0;
-  border-radius: 3px;
-}
-div.dev-blocks div.dev-blocks {
-  margin: 2px;
-}
-div.dev-blocks-name {
-  margin: 0;
-  padding: 0;
-  font-size: 7pt;
-  text-align: left;
-  font-weight: normal;
-  border-radius: 2px 2px 0;
-  padding: 1px 4px;
-}
-span.dev-blocks-action {
-  float: right;
-}
-div.dev-blocks--siteinclude {
-  border-color: #f0f;
-}
-div.dev-blocks--siteinclude > .dev-blocks-name {
-  color: #d0d;
-  background-color: #fdf;
-}
-div.dev-blocks--include {
-  border-color: #0c0;
-}
-div.dev-blocks--include > .dev-blocks-name {
-  color: #0d0;
-  background-color: #dfd;
-}
-div.dev-blocks--container > .dev-blocks-name {
-  color: #f00;
-  background-color: #fdd;
-}
-div.dev-blocks--widget {
-  border-color: #00f;
-}
-div.dev-blocks--widget > .dev-blocks-name {
-  color: #00f;
-  background-color: #eef;
-}
-div.dev-blocks--widget--incache {
-  border-color: #00f8f8;
-}
-div.dev-blocks--widget--incache > .dev-blocks-name {
-  color: #0ee;
-  background-color: #e8f8f8;
-}
-div.dev-blocks--widget--notincache {
-  border-color: #ec0;
-}
-div.dev-blocks--widget--notincache > .dev-blocks-name {
-  color: #f8bb00;
-  background-color: #fff0e0;
-}
+/* ARE THESE STYLES APPLIED FOR THE V6 THEMES? 
+@import "_dev-blocks.module.less";
+*/
+/* CAN WE PLEASE DELETE THIS? IT IS A PAIN DELETING THIS STYLE AGAIN 
+AND AGAIN ON EVERY NEW SKIN. I PROPOSE WE STYLE IT DIRECTLY ON 
+BOOTSTRAP_BLOG STYLE.CSS SO WE DON'T NEED TO DELETE IT EVERYTIME
 a[rel~=nofollow]:hover {
-  background: #f8e0e0;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  -khtml-border-radius: 2px;
-  border-radius: 2px;
+	background: #f8e0e0;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	border-radius: 2px;
 }
+*/
 img.loadimg {
   display: inline-block;
   min-width: 64px;
@@ -1345,9 +1299,6 @@ ul.jslog_error {
   width: 128px;
   text-align: center;
 }
-.ufld_icon_links {
-  text-align: center;
-}
 .ufld_icon_links a {
   text-align: center;
 }
@@ -1439,11 +1390,13 @@ div.error_additional_content {
   float: left;
   border-radius: 50%;
 }
-.bCommentAvatarCenter {
-  margin: 0 auto;
-  padding: 2px;
-  border: 1px solid #ccc;
+/*
+.bCommentAvatarCenter {  // This is used in tooltips for anonymous users
+	margin: 0 auto;
+	padding: 2px;
+	border:1px solid #ccc;
 }
+*/
 div.moderation_msg {
   margin: 1ex 2ex;
   padding: 0 1ex;
@@ -2130,10 +2083,8 @@ body.disp_user #skin_wrapper > .container {
  * Override this with an item.css file in your skin folder.
  */
 blockquote {
-  border: 2px dotted #ccc;
-  background-color: #eee;
-  margin: 1em 2em;
-  padding: 0 1ex;
+  font-size: 100%;
+  margin: 1em 0;
 }
 pre {
   overflow: hidden;
@@ -2190,12 +2141,14 @@ div.videoblock {
 div.podplayer {
   margin: 1em 0;
 }
+/* THESE STYLES ARE REPLACED
 .bMore {
-  text-align: left;
+	text-align: left;
 }
 .bMore a {
-  font-weight: bold;
+	font-weight: bold;
 }
+*/
 span.NonExistentWikiWord {
   border-bottom: 1px dotted #ccc;
 }

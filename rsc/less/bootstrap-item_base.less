@@ -5,14 +5,12 @@
  */
 
 blockquote {
-	border: 2px dotted #ccc;
-	background-color: #eee;
-	margin: 1em 2em;
-	padding: 0 1ex;
+	font-size: 100%;	// Otherwise bootstrap defines 17.5px
+	margin: 1em 0; // Otherwise bootstrap creates asymetric before/after
 }
 
 pre {
-	overflow:hidden;
+	overflow: hidden;
 }
 
 samp, .codespan, pre.codeblock {
@@ -69,12 +67,14 @@ div.podplayer {
 	margin: 1em 0;
 }
 
+/* THESE STYLES ARE REPLACED
 .bMore {
 	text-align: left;
 }
 .bMore a {
 	font-weight: bold;
 }
+*/
 
 span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;

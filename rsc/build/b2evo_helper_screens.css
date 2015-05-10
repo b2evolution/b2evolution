@@ -1,1 +1,91 @@
-body{padding-top:20px;padding-bottom:20px;font-size:16px}nav ul{margin-top:17px}.header,.footer{padding-right:15px;padding-left:15px}.header h3{padding-bottom:19px;margin-top:0;margin-bottom:0;line-height:40px}.footer{margin-top:48px;padding-top:19px;color:#777;border-top:1px solid #e5e5e5}@media (min-width:768px){.container{max-width:730px}}h1,h2{padding:20px 0 8px;border-bottom:1px solid #eee}.jumbotron{text-align:center;border-bottom:1px solid #e5e5e5;margin-bottom:42px}.jumbotron h2{padding-top:0}.jumbotron .h1_small{font-size:35px}@media screen and (min-width:768px){.header,.footer{padding-right:0;padding-left:0}.header{border-bottom:1px solid #e5e5e5;margin-bottom:30px}.jumbotron .h1{font-size:42px}}span.flag{border:1px solid #000000;background:url(../icons/flags_sprite.png) no-repeat;width:16px;height:11px;line-height:11px;padding:0 !important;font-size:6px;display:inline-block !important;margin-bottom:-2px;box-sizing:content-box}
+/* This file is used to b2evolution help pages */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-size: 16px;
+}
+nav ul {
+  margin-top: 17px;
+}
+.header,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.header h3 {
+  padding-bottom: 19px;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+.footer {
+  margin-top: 48px;
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+h1,
+h2 {
+  padding: 20px 0 8px;
+  border-bottom: 1px solid #eee;
+}
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 42px;
+}
+.jumbotron h2 {
+  padding-top: 0;
+}
+.jumbotron .h1_small {
+  font-size: 35px;
+}
+@media screen and (min-width: 768px) {
+  .header,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .header {
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 30px;
+  }
+  .jumbotron .h1 {
+    font-size: 42px;
+  }
+}
+/* Sprite style for the all flags */
+/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
+ * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
+ * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
+ * **** Also don't forget to save the "flags.PSD"
+ *
+ * NEW ADDED FLAGS:
+ *   aq - Antarctica
+ *   ax - Aland Islands
+ *   bl - Saint Barthelemy
+ *   cc - Cocos Islands
+ *   cx - Christmas Island
+ *   sj - Svalbard And Jan Mayen
+ *
+ * CHANGED FLAGS TO 16px WIDTH:
+ *   np - Nepal
+ *   ch - Switzerland
+ */
+span.flag {
+  border: 1px solid #000000;
+  background: url(../icons/flags_sprite.png) no-repeat;
+  width: 16px;
+  height: 11px;
+  line-height: 11px;
+  padding: 0 !important;
+  font-size: 6px;
+  display: inline-block !important;
+  margin-bottom: -2px;
+  box-sizing: content-box;
+}

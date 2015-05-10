@@ -1848,6 +1848,8 @@ function create_demo_contents()
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
 
+<blockquote><p>This is a Block Quote.</p></blockquote>
+
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 
 [pagebreak]
@@ -2183,6 +2185,8 @@ The rain---not the reign---in Spain.');
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
+
+<blockquote><p>This is a Block Quote.</p></blockquote>
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 
@@ -2559,6 +2563,8 @@ Hello
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
+
+<blockquote><p>This is a Block Quote.</p></blockquote>
 
 <p>You can see the other pages by clicking on the links below the text.</p>').'
 

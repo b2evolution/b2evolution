@@ -38,47 +38,47 @@ module.exports = function(grunt) {
 				files: {
 					// target.css file: source.less file
 					'rsc/build/testless.css': 'rsc/less/test.less',
+					
 					// Basic styles:
 					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
 					'rsc/css/basic.css':        'rsc/less/basic.less',
 					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
 					'rsc/css/item_base.css':    'rsc/less/item_base.less',
-					// Bootstrap frontoffice styles:
+
+					// Fp> the following probaly needs to be merged with the font and back office bundles below					
 					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
+
+					// Bootstrap front-office styles:
 					'rsc/build/bootstrap-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
 							'rsc/less/bootstrap-basic_styles.less',
 							'rsc/less/bootstrap-basic.less',
 							'rsc/less/bootstrap-blog_base.less',
 							'rsc/less/bootstrap-item_base.less',
-							// Common styles for all bootstrap skins
-							'rsc/less/bootstrap-evoskins.less'
+							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
-					// Bootstrap backoffice styles:
+
+					// Bootstrap back-office styles:
 					'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
 							'rsc/less/bootstrap-basic_styles.less',
 							'rsc/less/bootstrap-basic.less',
-							// Common styles for all bootstrap skins
-							'rsc/less/bootstrap-evoskins.less'
+							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styles in the backoffice
+							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
-				}
-			},
-			compress: {
-			// This is a separate task special to compress the less files right here
-				options: {
-					compress: true,
-				},
-				files: {
+
 					// Bootstrap skins
-					'skins_adm/bootstrap/rsc/css/style.css': 'skins_adm/bootstrap/rsc/css/style.less',
 					'skins/bootstrap_blog_skin/style.css':   'skins/bootstrap_blog_skin/style.less',
 					'skins/bootstrap_main_skin/style.css':   'skins/bootstrap_main_skin/style.less',
 					'skins/bootstrap_manual_skin/style.css': 'skins/bootstrap_manual_skin/style.less',
+					'skins_adm/bootstrap/rsc/css/style.css': 'skins_adm/bootstrap/rsc/css/style.less',
+					
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
 				}
-			}
+			},
+
+			// fp> I removed the 'compress' task because when we want to compress, we should use 'cssmin' which is more efficient and also used '*.bmin.css' filenames
 		},
 
 		// Configuration for the scss->css compiling tasks:
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
 		concat: {
 			options: { 
 				// The following will appear on top of the created files:
-				banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
+				// banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
 			/*
 			 * CSS
@@ -137,8 +137,6 @@ module.exports = function(grunt) {
 		// CSS minification:
 		cssmin: {
 			options: {
-				// The following will appear on top of the created files:
-				banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
 			b2evo_base: {
 				nonull: true, // Display missing files
@@ -154,6 +152,15 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: 'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
+			},
+			bootstrap_skins: {
+				files: {
+					// Bootstrap skins
+					'skins/bootstrap_blog_skin/style.min.css':   'skins/bootstrap_blog_skin/style.css',
+					'skins/bootstrap_main_skin/style.min.css':   'skins/bootstrap_main_skin/style.css',
+					'skins/bootstrap_manual_skin/style.min.css': 'skins/bootstrap_manual_skin/style.css',
+					'skins_adm/bootstrap/rsc/css/style.min.css': 'skins_adm/bootstrap/rsc/css/style.css',
+				}	
 			},
 			skin_evopress: {
 				src: 'skins/evopress/evopress.bundle.css',

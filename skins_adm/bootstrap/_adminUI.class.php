@@ -40,7 +40,8 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages;
+		global $Messages, $debug;
+
 		// This is included before controller specifc require_css() calls:
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
 
@@ -52,13 +53,27 @@ class AdminUI extends AdminUI_general
 		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
 
-		// rsc/less/bootstrap-basic_styles.less
-		// rsc/less/bootstrap-basic.less
-		// rsc/less/bootstrap-evoskins.less
-		// rsc/build/bootstrap-backoffice-b2evo_base.bundle.css // CSS concatenation of the above
-		require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
-
-		require_css( 'skins_adm/bootstrap/rsc/css/style.css', true );
+		if( $debug )
+		{	// Use readable CSS:
+			// rsc/less/bootstrap-basic_styles.less
+			// rsc/less/bootstrap-basic.less
+			// rsc/less/bootstrap-evoskins.less
+			require_css( 'bootstrap-backoffice-b2evo_base.bundle.css', 'rsc_url' ); // Concatenation of the above
+		}
+		else
+		{	// Use minified CSS:
+			require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
+		}
+		
+		// Make sure standard CSS is called ahead of custom CSS generated below:
+		if( $debug )
+		{	// Use readable CSS:
+			require_css( 'skins_adm/bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+		}
+		else
+		{	// Use minified CSS:
+			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+		}
 
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(

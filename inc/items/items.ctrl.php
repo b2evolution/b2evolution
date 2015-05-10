@@ -1550,6 +1550,7 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 require_js( 'communication.js' ); // auto requires jQuery
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
+/* fp> I am disabling this. We haven't really used per-blof styles yet and at the moment it creates interference with boostrap Admin
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
 // It's possible that we have no Blog on the restricted admin interface, when current User doesn't have permission to any blog
 if( !empty( $Blog ) )
@@ -1558,9 +1559,6 @@ if( !empty( $Blog ) )
 	if( ! empty( $blog_sking_ID ) )
 	{
 		$SkinCache = & get_SkinCache();
-		/**
-		 * @var Skin
-		 */
 		$Skin = $SkinCache->get_by_ID( $blog_sking_ID );
 		require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
 		require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
@@ -1569,6 +1567,7 @@ if( !empty( $Blog ) )
 	}
 	// else item_default.css ? is it still possible to have no skin set?
 }
+*/
 
 if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
 { // Initialize js to autocomplete usernames in post/comment form

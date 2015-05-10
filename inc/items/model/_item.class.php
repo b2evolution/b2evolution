@@ -2435,7 +2435,7 @@ class Item extends ItemLight
 		}
 		else
 		{	// Deprecated since v5, left for compatibility with old skins
-			$params['before']		= isset($args[0]) ? $args[0] : '<p class="right">'.T_('Pages:').' ';
+			$params['before']		= isset($args[0]) ? $args[0] : '<p class="evo_post_pagination">'.T_('Pages:').' ';
 			$params['after']		= isset($args[1]) ? $args[1] : '</p>';
 			$params['separator']	= isset($args[2]) ? $args[2] : ' ';
 			$params['single']		= isset($args[3]) ? $args[3] : '';
@@ -2458,7 +2458,7 @@ class Item extends ItemLight
 	function get_page_links( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-					'before'       => '<p class="right">'.T_('Pages:').' ',
+					'before'       => '<p class="evo_post_pagination">'.T_('Pages:').' ',
 					'after'        => '</p>',
 					'separator'    => ' ',
 					'single'       => '',

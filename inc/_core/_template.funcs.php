@@ -837,11 +837,11 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * @param string File or Alias name
  * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
- * @param string File type: 'js' or 'css'
+ * @param string 'js' or 'css' or 'build'
  * @return string URL
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $version = '#' )
+function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
 	global $Blog, $baseurl, $assets_baseurl;
@@ -883,16 +883,16 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $type = 'js', $ve
 	{ // Get the file from $rsc_uri relative to the current blog's domain (may be a subdomain or a custom domain):
 		if( $assets_baseurl !== $baseurl )
 		{ // We are using a specific domain, don't try to load from blog specific domain
-			$lib_url = $rsc_url.$type.'/'.$lib_file;
+			$lib_url = $rsc_url.$subfolder.'/'.$lib_file;
 		}
 		else
 		{
-			$lib_url = $Blog->get_local_rsc_url().$type.'/'.$lib_file;
+			$lib_url = $Blog->get_local_rsc_url().$subfolder.'/'.$lib_file;
 		}
 	}
 	else
 	{ // Get the file from $rsc_url:
-		$lib_url = $rsc_url.$type.'/'.$lib_file;
+		$lib_url = $rsc_url.$subfolder.'/'.$lib_file;
 	}
 
 	if( ! empty( $version ) )
@@ -982,7 +982,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
  * @param string alias, url or filename (relative to rsc/css) for CSS file
- * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
@@ -998,14 +998,14 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		return;
 	}
 
-	// WHich subfolder do we want to use?
-	if( preg_match( '/\.(bundle|bmin)\.css$/', $css_file ) )
+	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
+	$subfolder = 'css';
+	if( $relative_to == 'rsc_url' || $relative_to == 'blog' )
 	{
-		$subfolder = 'build';
-	}
-	else
-	{
-		$subfolder = 'css';
+		if( preg_match( '/\.(bundle|bmin|min)\.css$/', $css_file ) )
+		{
+			$subfolder = 'build';
+		}
 	}
 
 	// Get library url of CSS file by alias name

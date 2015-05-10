@@ -141,16 +141,29 @@ class bootstrap_manual_Skin extends Skin
 		require_css( '#bootstrap_css#', 'blog' );
 		//require_css( '#bootstrap_theme_css#', 'blog' );
 
-		// rsc/less/bootstrap-basic_styles.less
-		// rsc/less/bootstrap-basic.less
-		// rsc/less/bootstrap-blog_base.less
-		// rsc/less/bootstrap-item_base.less
-		// rsc/less/bootstrap-evoskins.less
-		// rsc/build/bootstrap-b2evo_base.bundle.css // CSS concatenation of the above
-		require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
-
+		if( $debug )
+		{	// Use readable CSS:
+			// rsc/less/bootstrap-basic_styles.less
+			// rsc/less/bootstrap-basic.less
+			// rsc/less/bootstrap-blog_base.less
+			// rsc/less/bootstrap-item_base.less
+			// rsc/less/bootstrap-evoskins.less
+			require_css( 'bootstrap-b2evo_base.bundle.css', 'blog' );  // CSS concatenation of the above
+		}
+		else
+		{	// Use minified CSS:
+			require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+		}
+		
 		// Make sure standard CSS is called ahead of custom CSS generated below:
-		require_css( 'style.css', true );
+		if( $debug )
+		{	// Use readable CSS:
+			require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+		}
+		else
+		{	// Use minified CSS:
+			require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+		}
 
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
