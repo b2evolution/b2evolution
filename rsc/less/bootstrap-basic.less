@@ -3,9 +3,8 @@
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
 
-/* ARE THESE STYLES APPLIED FOR THE V6 THEMES? 
+// CSS to show containers, widgets and includes: 
 @import "_dev-blocks.module.less";
-*/
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -22,9 +21,7 @@
 }
 
 // Mark the nofollow links with pink background color on mouseover event
-/* CAN WE PLEASE DELETE THIS? IT IS A PAIN DELETING THIS STYLE AGAIN 
-AND AGAIN ON EVERY NEW SKIN. I PROPOSE WE STYLE IT DIRECTLY ON 
-BOOTSTRAP_BLOG STYLE.CSS SO WE DON'T NEED TO DELETE IT EVERYTIME
+// fp> I actually want to keep this on all skins. It's an attempt to dissuade spammers to spam by showing visually them that the links are nofollow.
 a[rel~=nofollow]:hover {
 	background: #f8e0e0;
 	-moz-border-radius: 2px;
@@ -32,7 +29,6 @@ a[rel~=nofollow]:hover {
 	-khtml-border-radius: 2px;
 	border-radius: 2px;
 }
-*/
 
 // Image styles:
 img.loadimg {
@@ -881,7 +877,9 @@ ul.jslog_error {
 
 // User links widget
 .ufld_icon_links {
-	// text-align: center; *** Already styled with 'text-align: right;' in Starter style.less (line 7)
+	text-align: center; 
+	// milos> Already styled with 'text-align: right;' in Starter style.less (line 7)
+	// fp> I put this back because you say 'already'. It's not 'already'. starter/style.less comes after this basic style. If we want to remove this we have to know that this style is overriden by ALL boostrap skins.
 	a {
 		text-align: center;
 	}
