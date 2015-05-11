@@ -1172,7 +1172,7 @@ function stats_goal_hit_extra_params( $ghit_params )
 				return $Item->get_title( array( 'link_type' => 'admin_view' ) );
 			}
 			else
-			{ // Link to permament url (it is allowed fir current item type)
+			{ // Link to permament url (it is allowed for current post type)
 				return $Item->get_title();
 			}
 		}

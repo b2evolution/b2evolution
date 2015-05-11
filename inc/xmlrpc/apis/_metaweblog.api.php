@@ -64,7 +64,7 @@ $mwnewpost_sig = array(
  *					2 password (string): Password for said username.
  *					3 struct (struct)
  * 					4 publish (bool)
- * @param string item type 'post' or 'page'
+ * @param string post type 'post' or 'page'
  */
 function mw_newpost($m, $item_type = 'post' )
 {
@@ -117,7 +117,7 @@ function mw_newpost($m, $item_type = 'post' )
 
 	$item_typ_ID = isset($contentstruct['wp_post_format']) ? $contentstruct['wp_post_format'] : 1;
 	if( $item_type == 'page' )
-	{	// Force item type 'page'
+	{	// Force post type 'page'
 		$item_typ_ID = 1000;
 	}
 
@@ -191,7 +191,7 @@ $mweditpost_sig = array(
  *					2 password (string): Password for said username.
  *					3 struct (struct)
  *					4 publish (bool)
- * @param string item type 'post' or 'page'
+ * @param string post type 'post' or 'page'
  */
 function mw_editpost( $m, $item_type = 'post' )
 {

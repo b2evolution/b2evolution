@@ -277,14 +277,14 @@ class Blog extends DataObject
 				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 
-				// Try to find item type "Forum Topic" in DB
+				// Try to find post type "Forum Topic" in DB
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
 					WHERE ityp_ID = 200
 					  AND ityp_name = "Forum Topic"' );
 				if( $forum_topic_type_ID )
-				{ // Set default item type as "Forum Topic"
+				{ // Set default post type as "Forum Topic"
 					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
 				}
 				break;
@@ -300,14 +300,14 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'category_ordering', 'manual' );
 
-				// Try to find item type "Manual Page" in DB
+				// Try to find post type "Manual Page" in DB
 				global $DB;
 				$manual_page_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
 					WHERE ityp_ID = 100
 					  AND ityp_name = "Manual Page"' );
 				if( $manual_page_type_ID )
-				{ // Set default item type as "Manual Page"
+				{ // Set default post type as "Manual Page"
 					$this->set_setting( 'default_post_type', $manual_page_type_ID );
 				}
 				break;

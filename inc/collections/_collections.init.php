@@ -796,16 +796,16 @@ class collections_Module extends Module
 			}
 
 			if( $current_User->check_perm( 'options', 'view', false, $blog ) )
-			{ // Item Types & Statuses
+			{ // Post Types & Statuses
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'types' => array(
-						'text' => T_('Item Types'),
-						'title' => T_('Item Types Management'),
+						'text' => T_('Post Types'),
+						'title' => T_('Post Types Management'),
 						'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$blog
 						),
 					'statuses' => array(
-						'text' => T_('Item Statuses'),
-						'title' => T_('Item Statuses Management'),
+						'text' => T_('Post Statuses'),
+						'title' => T_('Post Statuses Management'),
 						'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses&amp;blog='.$blog
 						),
 					)

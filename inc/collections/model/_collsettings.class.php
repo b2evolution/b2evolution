@@ -159,7 +159,7 @@ class CollectionSettings extends AbstractSettings
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
-			'default_post_type' => '1', // Default type for new posts, value is ID of item type from table T_items__type
+			'default_post_type' => '1', // Default type for new posts, value is ID of post type from table T_items__type
 			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag

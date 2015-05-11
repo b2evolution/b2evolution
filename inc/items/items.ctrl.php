@@ -121,7 +121,7 @@ switch( $action )
 		{ // Load post from Session
 			$edited_Item = get_session_Item( $post_ID );
 
-			// Memorize action for list of item types
+			// Memorize action for list of post types
 			memorize_param( 'action', 'string', '', $action );
 		}
 
@@ -404,7 +404,7 @@ switch( $action )
 			{ // Load post from Session
 				$edited_Item = get_session_Item( 0 );
 
-				// Memorize action for list of item types
+				// Memorize action for list of post types
 				memorize_param( 'action', 'string', '', $action );
 			}
 		}
@@ -993,10 +993,10 @@ switch( $action )
 		// Load post from Session
 		$edited_Item = get_session_Item( $post_ID );
 
-		// Set new item type
+		// Set new post type
 		$edited_Item->set( 'ityp_ID', $ityp_ID );
 
-		// Unset old object of Item Type to reload it on next page
+		// Unset old object of Post Type to reload it on next page
 		unset( $edited_Item->ItemType );
 
 		// Check edit permission:
@@ -1626,7 +1626,7 @@ switch( $action )
 
 		// Display VIEW:
 		if( in_array( $action, array( 'new_type', 'edit_type' ) ) )
-		{ // Form to change item type
+		{ // Form to change post type
 			$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
 		}
 		else

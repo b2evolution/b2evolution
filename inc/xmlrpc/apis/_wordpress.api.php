@@ -11,7 +11,7 @@
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @package xmlsrv
- * @version $Id: _wordpress.api.php 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: _wordpress.api.php 8935 2015-05-11 16:42:29Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -499,8 +499,8 @@ function wp_getpostformats( $m )
 	$all = $ItemTypeCache->get_option_array();
 	ksort($all);
 
-	logIO( "All item types:\n".var_export($all, true) );
-	logIO( "Supported item types:\n".var_export($supported, true) );
+	logIO( "All Post Types:\n".var_export($all, true) );
+	logIO( "Supported Post Types:\n".var_export($supported, true) );
 
 	$all_types = $supported_types = array();
 	foreach( $all as $k=>$v )

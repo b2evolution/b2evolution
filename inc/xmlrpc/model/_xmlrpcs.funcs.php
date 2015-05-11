@@ -1809,7 +1809,7 @@ function xmlrpc_get_items( $params, & $Blog )
 	$params = array_merge( array(
 			'limit' => 0,
 			'item_ID' => 0,
-			'types' => '', // all item types
+			'types' => '', // all post types
 		), $params);
 
 	// Protected and private get checked by statuses_where_clause().

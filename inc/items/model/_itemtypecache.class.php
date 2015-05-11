@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the item type cache class.
+ * This file implements the post type cache class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -24,12 +24,12 @@ load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCac
 class ItemTypeCache extends DataObjectCache
 {
 	/**
-	 * Item type cache for each collection
+	 * Post type cache for each collection
 	 */
 	var $col_cache = array();
 
 	/**
-	 * Default item type for each collection
+	 * Default post type for each collection
 	 */
 	var $col_default = array();
 

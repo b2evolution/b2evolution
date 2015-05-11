@@ -97,7 +97,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type'] = '#';	// Use default item types
+		$params['item_type'] = '#';	// Use default post types
 		$params['follow_mainlist'] = 'tags';	// Follow tags for relation
 
 		parent::init_display( $params );

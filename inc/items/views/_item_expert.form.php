@@ -89,7 +89,7 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'more', 1 );
 	$Form->hidden( 'preview_userid', $current_User->ID );
 
-	// Item type
+	// Post type
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
 ?>
 <div class="row">
@@ -274,7 +274,7 @@ $Form->begin_form( '', '', $params );
 	echo '<table cellspacing="0" class="compose_layout">';
 
 	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // All CUSTOM FIELDS are hidden by item type
+	{ // All CUSTOM FIELDS are hidden by post type
 		display_hidden_custom_fields( $Form, $edited_Item );
 	}
 	else
@@ -495,7 +495,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // Display CUSTOM FIELDS double only when its are allowed by item type setting
+	{ // Display CUSTOM FIELDS double only when its are allowed by post type setting
 		$custom_fields = $edited_Item->get_type_custom_fields( 'double' );
 		foreach( $custom_fields as $custom_field )
 		{ // Loop through custom double fields
@@ -654,7 +654,7 @@ else
 echo_onchange_newcat();
 // Location
 echo_regional_js( 'item', $edited_Item->region_visible() );
-// Item type
+// Post type
 echo_onchange_item_type_js();
 // Goal
 echo_onchange_goal_cat();

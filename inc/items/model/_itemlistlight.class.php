@@ -266,9 +266,9 @@ class ItemListLight extends DataObjectList2
 			memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
 
 			/*
-			 * Restrict to selected item type:
+			 * Restrict to selected post type:
 			 */
-			memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of item types to restrict to
+			memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of post types to restrict to
 
 			/*
 			 * Restrict by keywords

@@ -294,10 +294,10 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 
 /**
- * Get item type ID by type code
+ * Get post type ID by type code
  *
  * @param string Type code
- * @return integer Item type ID
+ * @return integer Post type ID
  */
 function get_item_type_ID( $type_code )
 {
@@ -1467,7 +1467,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 
 /**
- * Get back-office tabs from item types
+ * Get back-office tabs from post types
  *
  * @return array Tabs
  */
@@ -1486,7 +1486,7 @@ function get_item_type_tabs()
 
 
 /**
- * Get item type IDs by tab name
+ * Get post type IDs by tab name
  *
  * @return string Item IDs separated by comma
  */
@@ -2986,7 +2986,7 @@ function get_session_Item( $item_ID = 0 )
 		$edited_Item->main_Chapter = NULL;
 		$edited_Item->get_main_Chapter();
 
-		// Reload Item Type
+		// Reload Post Type
 		$edited_Item->ItemType = NULL;
 		$edited_Item->get_ItemType();
 

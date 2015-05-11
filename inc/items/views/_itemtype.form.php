@@ -31,8 +31,8 @@ if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
 	if( ! $edited_Itemtype->is_special() && ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{ // Allow delete item type only if it is not default of blogs
-		$Form->global_icon( T_('Delete this item type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
+	{ // Allow delete post type only if it is not default of blogs
+		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,ityp_ID' ) );
@@ -42,7 +42,7 @@ $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->begin_fieldset( $creating ?  T_('New item type') : T_('Item type').get_manual_link('item-type-form') );
+$Form->begin_fieldset( $creating ?  T_('New Post Type') : T_('Post type').get_manual_link('item-type-form') );
 
 	if( $creating )
 	{
@@ -54,7 +54,7 @@ $Form->begin_fieldset( $creating ?  T_('New item type') : T_('Item type').get_ma
 	}
 
 	if( $edited_Itemtype->is_special() )
-	{ // Don't edit a name of special item types
+	{ // Don't edit a name of special post types
 		$Form->info( T_('Name'), $edited_Itemtype->name );
 	}
 	else

@@ -759,7 +759,7 @@ class Item extends ItemLight
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
-		{ // Save status of "Allow comments for this item" (only if comments are allowed in this blog, and by current item type
+		{ // Save status of "Allow comments for this item" (only if comments are allowed in this blog, and by current post type
 			$post_comment_status = param( 'post_comment_status', 'string', 'open' );
 			if( !empty( $post_comment_status ) )
 			{ // 'open' or 'closed' or ...
@@ -984,7 +984,7 @@ class Item extends ItemLight
 		global $Settings;
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
-		{ // Comments are not allowed on this post by item type
+		{ // Comments are not allowed on this post by post type
 			return false;
 		}
 
@@ -1121,7 +1121,7 @@ class Item extends ItemLight
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
-		{ // Comments are not allowed on this post by item type
+		{ // Comments are not allowed on this post by post type
 			return false;
 		}
 
@@ -4912,11 +4912,11 @@ class Item extends ItemLight
 		global $default_locale;
 
 		if( $item_typ_ID == 1 )
-		{ // Try to set default item type ID from blog setting
+		{ // Try to set default post type ID from blog setting
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
 			    $Blog = & $Chapter->get_Blog() )
-			{ // Use default item type what used for the blog
+			{ // Use default post type what used for the blog
 				$item_typ_ID = $Blog->get_setting( 'default_post_type' );
 			}
 		}
@@ -6077,7 +6077,7 @@ class Item extends ItemLight
 				return $Element->get_name();
 
 			case 't_type':
-				// Item type (name):
+				// Post type (name):
 				if( empty($this->ityp_ID) )
 				{
 					return '';
@@ -7275,7 +7275,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get link to edit item type
+	 * Get link to edit post type
 	 *
 	 * @param string What attibute to return:
 	 *                    'link' - html tag <a>
@@ -7302,7 +7302,7 @@ class Item extends ItemLight
 
 		if( $attr != 'url' )
 		{ // Init an event 'onclick'
-			$attr_onclick = 'return b2edit_type( \''.TS_('Do you want to save your changes before changing the item type?').'\','
+			$attr_onclick = 'return b2edit_type( \''.TS_('Do you want to save your changes before changing the Post Type?').'\','
 				.' \''.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'\','
 				.' \''.( $this->ID > 0 ? 'edit_type' : 'new_type' ).'\' );';
 		}
@@ -7350,7 +7350,7 @@ class Item extends ItemLight
 	function get_type_setting( $setting_name )
 	{
 		if( ! $this->get_ItemType() )
-		{ // Unknown item type
+		{ // Unknown post type
 			return false;
 		}
 
@@ -7359,7 +7359,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get custom fields of item type
+	 * Get custom fields of post type
 	 *
 	 * @param string Type of custom field: 'all', 'varchar', 'double'
 	 * @return array
@@ -7367,7 +7367,7 @@ class Item extends ItemLight
 	function get_type_custom_fields( $type = 'all' )
 	{
 		if( ! $this->get_ItemType() )
-		{ // Unknown item type
+		{ // Unknown post type
 			return array();
 		}
 
@@ -7383,12 +7383,12 @@ class Item extends ItemLight
 	function allow_comment_statuses()
 	{
 		if( ! $this->get_type_setting( 'use_comments' ) )
-		{ // The comments are not allowed for this item type
+		{ // The comments are not allowed for this post type
 			return false;
 		}
 
 		if( ! $this->get_type_setting( 'allow_closing_comments' ) && ! $this->get_type_setting( 'allow_disabling_comments' ) )
-		{ // The statuses 'closed' & 'disabled' are not allowed for comments of this item type
+		{ // The statuses 'closed' & 'disabled' are not allowed for comments of this post type
 			return false;
 		}
 

@@ -38,11 +38,11 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Item Statuses'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
+$AdminUI->breadcrumbpath_add( T_('Post Statuses'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
 $AdminUI->set_page_manual_link( 'managing-item-statuses' );
 
-$list_title = T_('Item Statuses');
+$list_title = T_('Post Statuses');
 $default_col_order = 'A';
 $edited_name_maxlen = 30;
 $perm_name = 'options';
@@ -56,7 +56,7 @@ $delete_restrictions = array(
 		array( 'table'=>'T_items__item', 'fk'=>'post_pst_ID', 'msg'=>T_('%d related items') ),
 	);
 
-$restrict_title = T_('Cannot delete item status');	 //&laquo;%s&raquo;
+$restrict_title = T_('Cannot delete Post Status');	 //&laquo;%s&raquo;
 
 // Used to know if the element can be deleted, so to display or not display confirm delete dialog (true:display, false:not display)
 // It must be initialized to false before checking the delete restrictions

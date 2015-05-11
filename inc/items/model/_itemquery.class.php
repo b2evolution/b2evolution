@@ -568,7 +568,7 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restrict to specific item types
+	 * Restrict to specific post types
 	 *
 	 * @param string List of types to restrict to (must have been previously validated)
 	 */

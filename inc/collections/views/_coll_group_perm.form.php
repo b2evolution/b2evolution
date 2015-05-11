@@ -141,7 +141,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Item Statuses'),
+						'th' => T_('Post Statuses'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.format_to_output( TS_('Permission to post into this blog with published status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.format_to_output( TS_('Permission to post into this blog with community status'), 'htmlattr' ).'\', \'post\' )%'.
@@ -155,7 +155,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Item Types'),
+						'th' => T_('Post Types'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_page\', \''.format_to_output( TS_('Permission to create pages'), 'htmlattr' ).'\' )%'.
 								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_intro\', \''.format_to_output( TS_('Permission to create intro posts (Intro-* post types)'), 'htmlattr' ).'\' )%'.

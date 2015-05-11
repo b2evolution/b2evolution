@@ -97,7 +97,7 @@ class coll_link_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type'] = '3000';	// Use item types 3000 (sidebar links) only
+		$params['item_type'] = '3000';	// Use post types 3000 (sidebar links) only
 
 		parent::init_display( $params );
 	}

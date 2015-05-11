@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Item Type class.
+ * This file implements the Post Type class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -141,7 +141,7 @@ class ItemType extends DataObject
 
 		// Name
 		if( ! $this->is_special() )
-		{ // Update the name only of not special item types
+		{ // Update the name only of not special post types
 			param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
 			$this->set_from_Request( 'name' );
 		}
@@ -293,7 +293,7 @@ class ItemType extends DataObject
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
 
 				// Add each new/existing custom field in this array
-				// in order to see all them on the form when item type is not updated because some errors
+				// in order to see all them on the form when post type is not updated because some errors
 				$this->custom_fields[] = array(
 						'temp_i'  => $i, // Used only on submit form to know the number of the field on the form
 						'ID'      => $custom_field_ID,
@@ -354,9 +354,9 @@ class ItemType extends DataObject
 	}
 
 	/**
-	 * Check existence of specified item type ID in ityp_ID unique field.
+	 * Check existence of specified post type ID in ityp_ID unique field.
 	 *
-	 * @return int ID if item type exists otherwise NULL/false
+	 * @return int ID if post type exists otherwise NULL/false
 	 */
 	function dbexists()
 	{
@@ -420,7 +420,7 @@ class ItemType extends DataObject
 
 		if( parent::dbdelete() )
 		{
-			// Delete all custom fields of this item type
+			// Delete all custom fields of this post type
 			$DB->query( 'DELETE FROM T_items__type_custom_field
 				WHERE itcf_ityp_ID = '.$item_ID );
 		}
@@ -490,9 +490,9 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Check if this item type is special( reserved in system )
+	 * Check if this post type is special( reserved in system )
 	 *
-	 * @param integer Use this param ID of item type when object is not created
+	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
 	 */
 	function is_special( $ID = NULL )
@@ -509,9 +509,9 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Check if this item type is reserved
+	 * Check if this post type is reserved
 	 *
-	 * @param integer Use this param ID of item type when object is not created
+	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
 	 */
 	function is_reserved( $ID = NULL )
@@ -528,7 +528,7 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Returns array, which determinate what item types are defaults of the blogs
+	 * Returns array, which determinate what post types are defaults of the blogs
 	 *
 	 * @return array ( key => Blog ID, value => ItemType ID )
 	 */
@@ -540,7 +540,7 @@ class ItemType extends DataObject
 		$CollectionSettings = new CollectionSettings();
 		$item_types['default'] = $CollectionSettings->get_default( 'default_post_type' );
 
-		// Get default item type of each blog
+		// Get default post type of each blog
 		$SQL = new SQL();
 		$SQL->SELECT( 'cset_coll_ID, cset_value' );
 		$SQL->FROM( 'T_coll_settings' );
@@ -563,7 +563,7 @@ class ItemType extends DataObject
 		if( ! isset( $this->custom_fields ) )
 		{ // Initialize an array only first time
 			if( empty( $this->ID ) )
-			{ // Set an empty array for new creating item type
+			{ // Set an empty array for new creating post type
 				$this->custom_fields = array();
 			}
 			else

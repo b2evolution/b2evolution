@@ -63,7 +63,7 @@ class coll_media_index_Widget extends ComponentWidget
 			),
 			'item_visibility' => array(
 				'label' => T_('Item visibility'),
-				'note' => T_('What item statuses should be included in the list?'),
+				'note' => T_('What post statuses should be included in the list?'),
 				'type' => 'radio',
 				'field_lines' => true,
 				'options' => array(
@@ -72,7 +72,7 @@ class coll_media_index_Widget extends ComponentWidget
 				'defaultvalue' => 'all',
 			),
 			'item_type' => array(
-				'label' => T_('Item type'),
+				'label' => T_('Post type'),
 				'note' => T_('What kind of items do you want to list?'),
 				'type' => 'select',
 				'options' => $item_type_options,

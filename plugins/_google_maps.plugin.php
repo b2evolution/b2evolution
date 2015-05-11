@@ -179,7 +179,7 @@ class google_maps_plugin extends Plugin
 		{
 			$url = $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;blog='.$Blog->ID.'&amp;ityp_ID='.$Item->get_ItemType()->ID.'#itemtype_features';
 
-			echo sprintf( T_('You must turn on the <b>"Use coordinates"</b> setting in Item Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
+			echo sprintf( T_('You must turn on the <b>"Use coordinates"</b> setting in Post Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates.'), 'href="'.$url.'"' );
 			$params['Form']->end_fieldset();
 			return;
 		}

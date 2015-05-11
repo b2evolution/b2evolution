@@ -97,7 +97,7 @@ class coll_post_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type'] = '#';	// Use default item types
+		$params['item_type'] = '#';	// Use default post types
 
 		parent::init_display( $params );
 	}

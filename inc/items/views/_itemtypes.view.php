@@ -29,32 +29,32 @@ global $default_ids;
 $default_ids = ItemType::get_default_ids();
 
 /**
- * Callback to build possible actions depending on item type id
+ * Callback to build possible actions depending on post type id
  *
  */
 function get_actions_for_itemtype( $id )
 {
 	global $default_ids;
-	$action = action_icon( T_('Duplicate this item type...'), 'copy',
+	$action = action_icon( T_('Duplicate this Post Type...'), 'copy',
 										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
 
 	if( ! ItemType::is_reserved( $id ) )
-	{ // Edit all item types except of not reserved item type
-		$action = action_icon( T_('Edit this item type...'), 'edit',
+	{ // Edit all post types except of not reserved post type
+		$action = action_icon( T_('Edit this Post Type...'), 'edit',
 										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
 							.$action;
 	}
 
 	if( ! ItemType::is_special( $id ) && ! in_array( $id, $default_ids ) )
-	{ // Delete only the not reserved and not default item types
-		$action .= action_icon( T_('Delete this item type!'), 'delete',
+	{ // Delete only the not reserved and not default post types
+		$action .= action_icon( T_('Delete this Post Type!'), 'delete',
 									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
 	}
 	return $action;
 }
 
 /**
- * Callback to make item type name depending on item type id
+ * Callback to make post type name depending on post type id
  *
  */
 function get_name_for_itemtype( $id, $name )
@@ -102,7 +102,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 						);
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
-				regenerate_url( 'action', 'action=new' ), T_('New item type').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4  );
 }
 
 // Display results:

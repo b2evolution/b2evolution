@@ -33,7 +33,7 @@ if( get_param( 'slug_filter' ) )
 		OR LOWER(post_title) LIKE "%'.$like.'%")' );
 }
 if( $filter_type = get_param( 'slug_type' ) )
-{ // add filter for item type
+{ // add filter for post type
 	$SQL->WHERE_and( 'slug_type = "'.$DB->escape( get_param('slug_ftype') ).'"' );
 }
 if( $filter_item_ID = get_param( 'slug_item_ID' ) )

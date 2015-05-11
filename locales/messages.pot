@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-05-08 01:47+0200\n"
+"POT-Creation-Date: 2015-05-11 18:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,13 +177,13 @@ msgstr ""
 #: ../../../skins_email/account_reported.txt.php:34
 #: ../../../skins_email/comment_new.html.php:67
 #: ../../../skins_email/comment_new.txt.php:78
-#: ../../../skins_fallback_v5/_contact_msg.form.php:73
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:59
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:244
+#: ../../../skins_fallback_v5/_contact_msg.form.php:72
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:58
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:243
 #: ../../../skins_fallback_v5/_register.disp.php:177
-#: ../../../skins_fallback_v6/_contact_msg.form.php:73
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:59
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:252
+#: ../../../skins_fallback_v6/_contact_msg.form.php:72
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:58
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:251
 #: ../../../skins_fallback_v6/_register.disp.php:177
 msgid "Email"
 msgstr ""
@@ -199,8 +199,8 @@ msgstr ""
 #: ../../../skins/pureforums/_item_comment_form.inc.php:302
 #: ../../../skins/touch/_item_comment_form.inc.php:237
 #: ../../../skins_email/comment_new.txt.php:66
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:249
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:257
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:248
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:256
 msgid "Website"
 msgstr ""
 
@@ -324,7 +324,7 @@ msgstr ""
 #: ../../../inc/slugs/views/_slug.form.php:40
 #: ../../../skins/ark_skin/access_denied.main.php:144
 #: ../../../skins/ark_skin/access_requires_login.main.php:155
-#: ../../../skins/ark_skin/index.main.php:336 ../skins/ark_skin/single.main.php:300
+#: ../../../skins/ark_skin/single.main.php:300
 #: ../../../skins/asevo/_body_footer.inc.php:40
 #: ../../../skins/blackorange_skin/access_denied.main.php:144
 #: ../../../skins/blackorange_skin/access_requires_login.main.php:152
@@ -332,10 +332,11 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:148
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:155
 #: ../../../skins/bootstrap_blog_skin/index.main.php:424
-#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:40
+#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:37
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:332
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:174
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:175
-#: ../../../skins/bootstrap_main_skin/index.main.php:373
+#: ../../../skins/bootstrap_main_skin/index.main.php:375
 #: ../../../skins/bootstrap_manual_skin/_body_footer.inc.php:64
 #: ../../../skins/colourise/_body_footer.inc.php:40
 #: ../../../skins/custom/access_denied.main.php:156
@@ -353,20 +354,21 @@ msgstr ""
 #: ../../../skins/forums/access_requires_login.main.php:160
 #: ../../../skins/forums/index.main.php:296
 #: ../../../skins/horizon_gallery_skin/_body_footer.inc.php:40
+#: ../../../skins/horizon_gallery_skin/index.main.php:332
 #: ../../../skins/horizon_main_skin/access_denied.main.php:174
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:176
 #: ../../../skins/horizon_main_skin/index.main.php:419
 #: ../../../skins/horizon_skin/access_denied.main.php:156
 #: ../../../skins/horizon_skin/access_requires_login.main.php:161
-#: ../../../skins/horizon_skin/index.main.php:444
+#: ../../../skins/horizon_skin/index.main.php:441
 #: ../../../skins/horizon_skin/single.main.php:417
 #: ../../../skins/manual/_body_footer.inc.php:57
 #: ../../../skins/material_main_skin/access_denied.main.php:174
 #: ../../../skins/material_main_skin/access_requires_login.main.php:176
-#: ../../../skins/material_main_skin/index.main.php:456
+#: ../../../skins/material_main_skin/index.main.php:439
 #: ../../../skins/material_skin/access_denied.main.php:156
 #: ../../../skins/material_skin/access_requires_login.main.php:161
-#: ../../../skins/material_skin/index.main.php:432
+#: ../../../skins/material_skin/index.main.php:434
 #: ../../../skins/photoalbums/_body_footer.inc.php:40
 #: ../../../skins/photoblog/_body_footer.inc.php:33
 #: ../../../skins/pixelgreen/access_denied.main.php:146
@@ -377,14 +379,14 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:276
 #: ../../../skins/reporter_skin/access_denied.main.php:150
 #: ../../../skins/reporter_skin/access_requires_login.main.php:157
-#: ../../../skins/reporter_skin/front.main.php:428
+#: ../../../skins/reporter_skin/front.main.php:436
 #: ../../../skins/reporter_skin/index.main.php:429
-#: ../../../skins/reporter_skin/page.main.php:257
+#: ../../../skins/reporter_skin/page.main.php:260
 #: ../../../skins/reporter_skin/posts.main.php:400
-#: ../../../skins/reporter_skin/single.main.php:266
-#: ../../../skins/starter_skin/access_denied.main.php:145
-#: ../../../skins/starter_skin/access_requires_login.main.php:153
-#: ../../../skins/starter_skin/index.main.php:434
+#: ../../../skins/reporter_skin/single.main.php:268
+#: ../../../skins/starter_skin/access_denied.main.php:148
+#: ../../../skins/starter_skin/access_requires_login.main.php:155
+#: ../../../skins/starter_skin/index.main.php:424
 #: ../../../skins/touch/_body_footer.inc.php:39
 msgid "Help"
 msgstr ""
@@ -439,9 +441,9 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:145
 #: ../../../skins/basic/_item_feedback.inc.php:75
 #: ../../../skins/material_main_skin/_user.disp.php:345
-#: ../../../skins/mystique/_item_feedback.inc.php:151
-#: ../../../skins_fallback_v5/_user.disp.php:371
-#: ../../../skins_fallback_v6/_user.disp.php:371
+#: ../../../skins/material_skin/_user.disp.php:370
+#: ../../../skins_fallback_v5/_user.disp.php:370
+#: ../../../skins_fallback_v6/_user.disp.php:370
 msgid "Comments"
 msgstr ""
 
@@ -477,19 +479,19 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:2632
 #: ../../../inc/messaging/model/_messaging.funcs.php:1812
 #: ../../../inc/skins/model/_skin.class.php:882
-#: ../../../skins/ark_skin/_skin.class.php:256 ../skins/asevo/index.main.php:161
+#: ../../../skins/ark_skin/_skin.class.php:262 ../skins/asevo/index.main.php:161
 #: ../../../skins/basic/index.main.php:260
 #: ../../../skins/blackorange_skin/_skin.class.php:256
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:272
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:293
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:419
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:386
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:287
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:399
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:300
 #: ../../../skins/custom/_skin.class.php:256 ../skins/flat_skin/_skin.class.php:256
 #: ../../../skins/forums/_posts.disp.php:62 ../skins/forums/_posts.disp.php:201
 #: ../../../skins/horizon_main_skin/_skin.class.php:382
 #: ../../../skins/horizon_skin/_skin.class.php:256
 #: ../../../skins/manual/posts.main.php:260 ../skins/manual/posts.main.php:285
-#: ../../../skins/material_main_skin/_skin.class.php:483
+#: ../../../skins/material_main_skin/_skin.class.php:388
 #: ../../../skins/material_skin/_skin.class.php:256
 #: ../../../skins/photoblog/index.main.php:106 ../skins/photoblog/index.main.php:124
 #: ../../../skins/pureforums/_item_block.inc.php:250
@@ -498,11 +500,11 @@ msgstr ""
 #: ../../../skins/pureforums/_search.disp.php:52
 #: ../../../skins/pureforums/_skin.class.php:492
 #: ../../../skins/reporter_skin/_skin.class.php:256
-#: ../../../skins/starter_skin/_skin.class.php:260
+#: ../../../skins/starter_skin/_skin.class.php:293
 #: ../../../skins_adm/_adminUI_general.class.php:1011
 #: ../../../skins_adm/_adminUI_general.class.php:1091
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:385
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:685
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:400
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:700
 #: ../../../skins_adm/chicago/_adminUI.class.php:286
 #: ../../../skins_email/account_changed.html.php:32
 #: ../../../skins_email/account_changed.txt.php:34
@@ -513,19 +515,19 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:2633
 #: ../../../inc/messaging/model/_messaging.funcs.php:1813
 #: ../../../inc/skins/model/_skin.class.php:883
-#: ../../../skins/ark_skin/_skin.class.php:257 ../skins/asevo/index.main.php:162
+#: ../../../skins/ark_skin/_skin.class.php:263 ../skins/asevo/index.main.php:162
 #: ../../../skins/basic/index.main.php:261
 #: ../../../skins/blackorange_skin/_skin.class.php:257
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:273
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:294
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:420
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:387
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:288
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:400
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:301
 #: ../../../skins/custom/_skin.class.php:257 ../skins/flat_skin/_skin.class.php:257
 #: ../../../skins/forums/_posts.disp.php:63 ../skins/forums/_posts.disp.php:202
 #: ../../../skins/horizon_main_skin/_skin.class.php:383
 #: ../../../skins/horizon_skin/_skin.class.php:257
 #: ../../../skins/manual/posts.main.php:261 ../skins/manual/posts.main.php:286
-#: ../../../skins/material_main_skin/_skin.class.php:484
+#: ../../../skins/material_main_skin/_skin.class.php:389
 #: ../../../skins/material_skin/_skin.class.php:257
 #: ../../../skins/photoblog/index.main.php:107 ../skins/photoblog/index.main.php:120
 #: ../../../skins/pureforums/_item_block.inc.php:251
@@ -534,11 +536,11 @@ msgstr ""
 #: ../../../skins/pureforums/_search.disp.php:53
 #: ../../../skins/pureforums/_skin.class.php:493
 #: ../../../skins/reporter_skin/_skin.class.php:257
-#: ../../../skins/starter_skin/_skin.class.php:261
+#: ../../../skins/starter_skin/_skin.class.php:294
 #: ../../../skins_adm/_adminUI_general.class.php:1012
 #: ../../../skins_adm/_adminUI_general.class.php:1092
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:386
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:686
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:401
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:701
 #: ../../../skins_adm/chicago/_adminUI.class.php:287
 msgid "Next"
 msgstr ""
@@ -637,18 +639,18 @@ msgstr ""
 #: ../../../skins/blackorange_skin/index.main.php:325
 #: ../../../skins/bootstrap_blog_skin/index.main.php:275
 #: ../../../skins/bootstrap_main_skin/index.main.php:276
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:564
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:577
 #: ../../../skins/custom/index.main.php:298 ../skins/custom/single.main.php:297
 #: ../../../skins/flat_skin/index.main.php:300
 #: ../../../skins/horizon_main_skin/index.main.php:291
-#: ../../../skins/horizon_skin/index.main.php:311
+#: ../../../skins/horizon_skin/index.main.php:308
 #: ../../../skins/horizon_skin/single.main.php:317
-#: ../../../skins/material_main_skin/index.main.php:313
-#: ../../../skins/material_skin/index.main.php:296
+#: ../../../skins/material_main_skin/index.main.php:300
+#: ../../../skins/material_skin/index.main.php:298
 #: ../../../skins/reporter_skin/front.main.php:300
 #: ../../../skins/reporter_skin/index.main.php:299
 #: ../../../skins/reporter_skin/posts.main.php:271
-#: ../../../skins/starter_skin/index.main.php:303
+#: ../../../skins/starter_skin/index.main.php:275
 msgid "Register"
 msgstr ""
 
@@ -1013,8 +1015,8 @@ msgstr ""
 #: ../../../inc/widgets/views/_widget.form.php:69 ../install/debug.php:357
 #: ../../../skins/forums/_edit_comment.disp.php:183
 #: ../../../skins/pureforums/_edit_comment.disp.php:184
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:143
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:143
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:142
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:142
 msgid "Save Changes!"
 msgstr ""
 
@@ -1610,8 +1612,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:365
 #: ../../../skins/pureforums/_item_comment_form.inc.php:411
 #: ../../../skins/touch/_item_comment_form.inc.php:353
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:366
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:374
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:365
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:373
 msgid "Preview"
 msgstr ""
 
@@ -1909,7 +1911,6 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.class.php:237
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:183
 #: ../../../install/_functions_create.php:1501 ../install/index.php:630
-#: ../../../skins/mystique/index.main.php:98 ../skins/mystique/index.main.php:113
 #: ../../../skins_fallback_v5/_register.disp.php:58
 #: ../../../skins_fallback_v6/_register.disp.php:58
 msgid "Home"
@@ -1998,7 +1999,7 @@ msgstr ""
 #: ../../../inc/dashboard/dashboard.ctrl.php:425
 #: ../../../inc/dashboard/dashboard.ctrl.php:524 ../inc/items/items.ctrl.php:373
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:142
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:187
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:200
 #: ../../../skins/manual/posts.main.php:30 ../skins_fallback_v5/_sitemap.disp.php:71
 #: ../../../skins_fallback_v6/_sitemap.disp.php:71
 msgid "Posts"
@@ -2019,12 +2020,8 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:270
 #: ../../../skins/asevo/_item_block.inc.php:73 ../skins/basic/index.main.php:166
 #: ../../../skins/dating_mood/_item_block.inc.php:66
-#: ../../../skins/mystique/_item_block.inc.php:147
-#: ../../../skins/mystique/_skin.class.php:605
-#: ../../../skins/mystique/a_skin.class.php:573
-#: ../../../skins/mystique/mess_skin.class.php:573
 #: ../../../skins/pixelgreen/_item_block.inc.php:64
-#: ../../../skins/touch/_item_block.inc.php:83 ../skins/touch/single.main.php:165
+#: ../../../skins/touch/_item_block.inc.php:83 ../skins/touch/single.main.php:137
 #: ../../../skins_fallback_v5/_item_block.inc.php:46
 #: ../../../skins_fallback_v5/_sitemap.disp.php:58
 #: ../../../skins_fallback_v6/_sitemap.disp.php:58
@@ -2097,7 +2094,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_group_perm.form.php:158
 #: ../../../inc/collections/views/_coll_user_perm.form.php:161
 #: ../../../inc/items/item_types.ctrl.php:276
-msgid "Item Types"
+msgid "Post Types"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:1127
@@ -2106,7 +2103,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_user_perm.form.php:147
 #: ../../../inc/items/item_statuses.ctrl.php:41
 #: ../../../inc/items/item_statuses.ctrl.php:45
-msgid "Item Statuses"
+msgid "Post Statuses"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:1133
@@ -2324,8 +2321,9 @@ msgstr ""
 #: ../../../inc/_core/__core.init.php:1575 ../inc/users/organizations.ctrl.php:210
 #: ../../../inc/users/views/_organization.view.php:29
 #: ../../../skins/material_main_skin/_user.disp.php:271
-#: ../../../skins_fallback_v5/_user.disp.php:297
-#: ../../../skins_fallback_v6/_user.disp.php:297
+#: ../../../skins/material_skin/_user.disp.php:296
+#: ../../../skins_fallback_v5/_user.disp.php:296
+#: ../../../skins_fallback_v6/_user.disp.php:296
 msgid "Organizations"
 msgstr ""
 
@@ -2633,7 +2631,7 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.class.php:294
 #: ../../../inc/collections/model/_blog.class.php:295
 #: ../../../inc/collections/model/_blog.funcs.php:405
-#: ../../../inc/cron/_cron.funcs.php:182 ../install/_functions_create.php:2284
+#: ../../../inc/cron/_cron.funcs.php:182 ../install/_functions_create.php:2288
 #: ../../../install/index.php:635
 msgid "Manual"
 msgstr ""
@@ -2761,8 +2759,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:241
 #: ../../../skins/pureforums/_item_comment_form.inc.php:295
 #: ../../../skins/touch/_item_comment_form.inc.php:230
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:242
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:250
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:241
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:249
 msgid "Name"
 msgstr ""
 
@@ -2982,8 +2980,7 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:197
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:77
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:251
-#: ../../../skins/forums/_search.disp.php:31 ../skins/mystique/index.main.php:258
-#: ../../../skins/pureforums/_search.disp.php:32
+#: ../../../skins/forums/_search.disp.php:31 ../skins/pureforums/_search.disp.php:32
 msgid "Search"
 msgstr ""
 
@@ -2998,18 +2995,18 @@ msgstr ""
 #: ../../../skins/blackorange_skin/index.main.php:371
 #: ../../../skins/bootstrap_blog_skin/index.main.php:294
 #: ../../../skins/bootstrap_main_skin/index.main.php:297
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:588
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:601
 #: ../../../skins/custom/index.main.php:337 ../skins/custom/single.main.php:336
 #: ../../../skins/flat_skin/index.main.php:346
 #: ../../../skins/horizon_main_skin/index.main.php:339
-#: ../../../skins/horizon_skin/index.main.php:354
+#: ../../../skins/horizon_skin/index.main.php:351
 #: ../../../skins/horizon_skin/single.main.php:363
-#: ../../../skins/material_main_skin/index.main.php:361
-#: ../../../skins/material_skin/index.main.php:342
-#: ../../../skins/reporter_skin/front.main.php:339
+#: ../../../skins/material_main_skin/index.main.php:348
+#: ../../../skins/material_skin/index.main.php:344
+#: ../../../skins/reporter_skin/front.main.php:346
 #: ../../../skins/reporter_skin/index.main.php:338
 #: ../../../skins/reporter_skin/posts.main.php:310
-#: ../../../skins/starter_skin/index.main.php:346
+#: ../../../skins/starter_skin/index.main.php:294
 msgid "Sending a message"
 msgstr ""
 
@@ -3023,18 +3020,18 @@ msgstr ""
 #: ../../../skins/blackorange_skin/index.main.php:333
 #: ../../../skins/bootstrap_blog_skin/index.main.php:282
 #: ../../../skins/bootstrap_main_skin/index.main.php:283
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:571
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:584
 #: ../../../skins/custom/index.main.php:306 ../skins/custom/single.main.php:305
 #: ../../../skins/flat_skin/index.main.php:308
 #: ../../../skins/horizon_main_skin/index.main.php:299
-#: ../../../skins/horizon_skin/index.main.php:319
+#: ../../../skins/horizon_skin/index.main.php:316
 #: ../../../skins/horizon_skin/single.main.php:325
-#: ../../../skins/material_main_skin/index.main.php:321
-#: ../../../skins/material_skin/index.main.php:304
+#: ../../../skins/material_main_skin/index.main.php:308
+#: ../../../skins/material_skin/index.main.php:306
 #: ../../../skins/reporter_skin/front.main.php:308
 #: ../../../skins/reporter_skin/index.main.php:307
 #: ../../../skins/reporter_skin/posts.main.php:279
-#: ../../../skins/starter_skin/index.main.php:311
+#: ../../../skins/starter_skin/index.main.php:282
 #: ../../../skins_adm/login/_validate_form.main.php:25
 msgid "Account activation"
 msgstr ""
@@ -4345,10 +4342,10 @@ msgstr ""
 #: ../../../skins_email/comment_new.txt.php:73 ../skins_email/comment_new.txt.php:77
 #: ../../../skins_email/post_new.html.php:36 ../skins_email/post_new.txt.php:35
 #: ../../../skins_email/post_new.txt.php:39
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:54
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:58
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:54
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:58
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:53
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:57
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:53
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:57
 msgid "Author"
 msgstr ""
 
@@ -5437,7 +5434,7 @@ msgstr ""
 #: ../../../inc/users/model/_user.funcs.php:3387
 #: ../../../inc/widgets/views/_widget_list_available.view.php:54
 #: ../../../install/_functions_create.php:1694
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:818
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:833
 #: ../../../skins_fallback_v5/_closeaccount.disp.php:42
 msgid "Other"
 msgstr ""
@@ -5453,11 +5450,11 @@ msgid "Manage skins"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:803
-msgid "Item Types Management"
+msgid "Post Types Management"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:808
-msgid "Item Statuses Management"
+msgid "Post Statuses Management"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:881
@@ -6735,7 +6732,7 @@ msgid "same as above"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:178
-#: ../../../inc/items/items.ctrl.php:1804 ../inc/sessions/views/_goal.form.php:62
+#: ../../../inc/items/items.ctrl.php:1803 ../inc/sessions/views/_goal.form.php:62
 msgid "Notes"
 msgstr ""
 
@@ -6954,7 +6951,6 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_comments.form.php:132
 #: ../../../skins/basic/_item_feedback.inc.php:86
-#: ../../../skins/mystique/_item_feedback.inc.php:145
 msgid "Trackbacks"
 msgstr ""
 
@@ -6963,9 +6959,9 @@ msgid "Autocomplete usernames in back-office"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_comments.form.php:136
-#: ../../../skins/ark_skin/_skin.class.php:115 ../skins/asevo/_skin.class.php:104
+#: ../../../skins/ark_skin/_skin.class.php:121 ../skins/asevo/_skin.class.php:104
 #: ../../../skins/blackorange_skin/_skin.class.php:115
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:127
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:133
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:144
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:167
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:116
@@ -6977,14 +6973,14 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:169
 #: ../../../skins/horizon_skin/_skin.class.php:115
 #: ../../../skins/manual/_skin.class.php:134
-#: ../../../skins/material_main_skin/_skin.class.php:270
+#: ../../../skins/material_main_skin/_skin.class.php:175
 #: ../../../skins/material_skin/_skin.class.php:115
 #: ../../../skins/photoalbums/_skin.class.php:144
 #: ../../../skins/photoblog/_skin.class.php:144
 #: ../../../skins/pixelgreen/_skin.class.php:104
 #: ../../../skins/pureforums/_skin.class.php:120
 #: ../../../skins/reporter_skin/_skin.class.php:115
-#: ../../../skins/starter_skin/_skin.class.php:115
+#: ../../../skins/starter_skin/_skin.class.php:133
 #: ../../../skins/touch/_skin.class.php:110
 msgid "Check to enable auto-completion of usernames entered after a \"@\" sign in the comment forms"
 msgstr ""
@@ -7884,11 +7880,6 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:212
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:261
 #: ../../../plugins/_archives.plugin.php:302 ../skins/basic/index.main.php:267
-#: ../../../skins/mystique/_skin.class.php:153 ../skins/mystique/_skin.class.php:601
-#: ../../../skins/mystique/a_skin.class.php:152
-#: ../../../skins/mystique/a_skin.class.php:569
-#: ../../../skins/mystique/mess_skin.class.php:152
-#: ../../../skins/mystique/mess_skin.class.php:569
 msgid "Archives"
 msgstr ""
 
@@ -8625,8 +8616,8 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:71
 #: ../../../skins/horizon_main_skin/_skin.class.php:95
 #: ../../../skins/manual/_skin.class.php:50 ../skins/manual/_skin.class.php:62
-#: ../../../skins/material_main_skin/_skin.class.php:172
-#: ../../../skins/material_main_skin/_skin.class.php:196
+#: ../../../skins/material_main_skin/_skin.class.php:77
+#: ../../../skins/material_main_skin/_skin.class.php:101
 #: ../../../skins/photoalbums/_skin.class.php:66
 #: ../../../skins/photoblog/_skin.class.php:66
 msgid "E-g: #ff0000 for red"
@@ -9144,7 +9135,6 @@ msgid "Publish this comment!"
 msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:2344
-#: ../../../skins/mystique/_item_comment.inc.php:83
 msgid "Send email to comment author"
 msgstr ""
 
@@ -9287,8 +9277,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:27
 #: ../../../skins/pureforums/_item_comment_form.inc.php:28
 #: ../../../skins/touch/_item_comment_form.inc.php:27
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:28
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:29
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:27
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:28
 msgid "Leave a comment"
 msgstr ""
 
@@ -9327,8 +9317,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:28
 #: ../../../skins/pureforums/_item_comment_form.inc.php:29
 #: ../../../skins/touch/_item_comment_form.inc.php:28
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:29
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:30
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:28
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:29
 msgid "Comment text"
 msgstr ""
 
@@ -9357,8 +9347,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:216
 #: ../../../skins/pureforums/_item_comment_form.inc.php:270
 #: ../../../skins/touch/_item_comment_form.inc.php:204
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:217
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:225
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:216
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:224
 msgid "You are currently replying to a specific comment"
 msgstr ""
 
@@ -9403,8 +9393,8 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:92
 #: ../../../skins/forums/_edit_comment.disp.php:152
 #: ../../../skins/pureforums/_edit_comment.disp.php:152
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:116
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:116
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:115
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:115
 msgid "Visibility"
 msgstr ""
 
@@ -9494,8 +9484,8 @@ msgstr ""
 #: ../../../inc/comments/views/_comment.form.php:76
 #: ../../../skins/forums/_edit_comment.disp.php:71
 #: ../../../skins/pureforums/_edit_comment.disp.php:71
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:45
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:45
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:44
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:44
 msgid "In response to"
 msgstr ""
 
@@ -9506,24 +9496,24 @@ msgstr ""
 #: ../../../inc/comments/views/_comment.form.php:104
 #: ../../../skins/forums/_edit_comment.disp.php:75
 #: ../../../skins/pureforums/_edit_comment.disp.php:75
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:49
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:49
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:48
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:48
 msgid "In reply to comment ID"
 msgstr ""
 
 #: ../../../inc/comments/views/_comment.form.php:109
 #: ../../../skins/forums/_edit_comment.disp.php:75
 #: ../../../skins/pureforums/_edit_comment.disp.php:75
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:49
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:49
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:48
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:48
 msgid "(leave blank for normal comments)"
 msgstr ""
 
 #: ../../../inc/comments/views/_comment.form.php:130
 #: ../../../skins/forums/_edit_comment.disp.php:86
 #: ../../../skins/pureforums/_edit_comment.disp.php:86
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:60
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:60
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:59
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:59
 msgid "Website URL"
 msgstr ""
 
@@ -9535,8 +9525,8 @@ msgstr ""
 #: ../../../inc/comments/views/_comment.form.php:210
 #: ../../../skins/forums/_edit_comment.disp.php:131
 #: ../../../skins/pureforums/_edit_comment.disp.php:131
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:90
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:90
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:89
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:89
 msgid "Comment date"
 msgstr ""
 
@@ -9545,8 +9535,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:337
 #: ../../../skins/pureforums/_item_comment_form.inc.php:393
 #: ../../../skins/touch/_item_comment_form.inc.php:330
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:338
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:346
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:337
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:345
 msgid "Allow message form"
 msgstr ""
 
@@ -9560,8 +9550,8 @@ msgstr ""
 #: ../../../skins/pureforums/_edit_comment.disp.php:137
 #: ../../../skins_email/comment_new.html.php:74
 #: ../../../skins_email/comment_new.txt.php:85
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:101
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:101
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:100
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:100
 msgid "Rating"
 msgstr ""
 
@@ -9595,10 +9585,10 @@ msgstr ""
 #: ../../../skins/pureforums/_item_comment_form.inc.php:338
 #: ../../../skins/touch/_item_comment_form.inc.php:341
 #: ../../../skins_fallback_v5/_edit.disp.php:269
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:123
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:356
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:123
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:364
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:122
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:355
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:122
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:363
 msgid "Text Renderers"
 msgstr ""
 
@@ -10912,8 +10902,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:230
 #: ../../../skins/pureforums/_item_comment_form.inc.php:284
 #: ../../../skins/touch/_item_comment_form.inc.php:218
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:231
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:239
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:230
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:238
 msgid "User"
 msgstr ""
 
@@ -11462,8 +11452,8 @@ msgstr ""
 #: ../../../inc/tools/views/_email_return_details.view.php:34
 #: ../../../skins/forums/_comments.disp.php:44
 #: ../../../skins/forums/_item_block.inc.php:87
-#: ../../../skins_fallback_v5/_contact_msg.form.php:78
-#: ../../../skins_fallback_v6/_contact_msg.form.php:78
+#: ../../../skins_fallback_v5/_contact_msg.form.php:77
+#: ../../../skins_fallback_v6/_contact_msg.form.php:77
 msgid "Message"
 msgstr ""
 
@@ -11913,8 +11903,8 @@ msgstr ""
 #: ../../../skins/forums/_item_comment_form.inc.php:384
 #: ../../../skins/material_skin/_item_comment_form.inc.php:345
 #: ../../../skins/pureforums/_item_comment_form.inc.php:401
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:346
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:354
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:345
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:353
 msgid "Options"
 msgstr ""
 
@@ -12754,59 +12744,59 @@ msgid "%d related items"
 msgstr ""
 
 #: ../../../inc/items/item_statuses.ctrl.php:59
-msgid "Cannot delete item status"
+msgid "Cannot delete Post Status"
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:108
 #, php-format
-msgid "Item types with ID from %d to %d are reserved. Please use another ID."
+msgid "Post types with ID from %d to %d are reserved. Please use another ID."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:131
 #, php-format
-msgid "This item type already exists. Do you want to <a %s>edit the existing item type</a>?"
+msgid "This post type already exists. Do you want to <a %s>edit the existing post type</a>?"
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:137
-msgid "New item type created."
+msgid "New Post Type created."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:185
 #, php-format
-msgid "Item types with IDs = ( %d ) are reserved. You can not edit this item type."
+msgid "Post types with IDs = ( %d ) are reserved. You can not edit this post type."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:193
-msgid "Item type updated."
+msgid "Post type updated."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:220
 #, php-format
-msgid "Item types with ID from %d to %d are reserved. You can not delete this item type."
+msgid "Post types with ID from %d to %d are reserved. You can not delete this post type."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:228
-msgid "This item type is default of all blogs. You can not delete this item type."
+msgid "This Post Type is the default for all collections. You can not delete this Post Type."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:241
 #, php-format
-msgid "This item type is default of the blogs: %s. You can not delete this item type."
+msgid "This Post Type is default for the collections: %s. You can not delete this Post Type."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:250
 #, php-format
-msgid "Item type &laquo;%s&raquo; deleted."
+msgid "Post type &laquo;%s&raquo; deleted."
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:261
 #, php-format
-msgid "Cannot delete item type &laquo;%s&raquo;"
+msgid "Cannot delete Post Type &laquo;%s&raquo;"
 msgstr ""
 
 #: ../../../inc/items/item_types.ctrl.php:301
 #, php-format
-msgid "Delete item type &laquo;%s&raquo;?"
+msgid "Delete Post Type &laquo;%s&raquo;?"
 msgstr ""
 
 #: ../../../inc/items/items.ctrl.php:178
@@ -13160,7 +13150,7 @@ msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:1623
 #: ../../../skins/material_skin/_item_content.inc.php:35
-#: ../../../skins_fallback_v5/_item_content.inc.php:35
+#: ../../../skins_fallback_v5/_item_content.inc.php:40
 #: ../../../skins_fallback_v6/_item_content.inc.php:40
 msgid "more"
 msgstr ""
@@ -13202,7 +13192,7 @@ msgstr ""
 #: ../../../skins/dating_mood/index.main.php:152
 #: ../../../skins/dating_mood/index.main.php:182
 #: ../../../skins/material_skin/_item_content.inc.php:82
-#: ../../../skins_fallback_v5/_item_content.inc.php:83
+#: ../../../skins_fallback_v5/_item_content.inc.php:89
 #: ../../../skins_fallback_v6/_item_content.inc.php:94
 msgid "Pages:"
 msgstr ""
@@ -13218,11 +13208,11 @@ msgstr ""
 #: ../../../skins_email/comment_new.html.php:92
 #: ../../../skins_email/comment_new.txt.php:101 ../skins_email/post_new.html.php:58
 #: ../../../skins_email/post_new.txt.php:63 ../skins_fallback_v5/_edit.disp.php:359
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:132
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:138
-#: ../../../skins_fallback_v5/_item_content.inc.php:76
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:132
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:138
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:131
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
+#: ../../../skins_fallback_v5/_item_content.inc.php:82
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:131
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
 #: ../../../skins_fallback_v6/_item_content.inc.php:87
 msgid "Attachments"
 msgstr ""
@@ -13379,19 +13369,12 @@ msgstr ""
 #: ../../../skins/manual/_item_block.inc.php:105
 #: ../../../skins/material_main_skin/_item_block.inc.php:121
 #: ../../../skins/material_skin/_item_block.inc.php:129
-#: ../../../skins/mystique/_item_block.inc.php:137
-#: ../../../skins/mystique/_skin.class.php:160 ../skins/mystique/_skin.class.php:603
-#: ../../../skins/mystique/a_skin.class.php:159
-#: ../../../skins/mystique/a_skin.class.php:571
-#: ../../../skins/mystique/mess_skin.class.php:159
-#: ../../../skins/mystique/mess_skin.class.php:571
 #: ../../../skins/photoblog/_item_block.inc.php:161
 #: ../../../skins/pixelgreen/_item_block.inc.php:73
 #: ../../../skins/pureforums/_edit.disp.php:376
 #: ../../../skins/pureforums/_item_block.inc.php:161
 #: ../../../skins/reporter_skin/_item_block.inc.php:124
-#: ../../../skins/starter_skin/_item_block.inc.php:122
-#: ../../../skins/touch/_item_block.inc.php:96 ../skins/touch/single.main.php:177
+#: ../../../skins/touch/_item_block.inc.php:96 ../skins/touch/single.main.php:149
 #: ../../../skins_fallback_v5/_edit.disp.php:279
 #: ../../../skins_fallback_v5/_item_block.inc.php:89
 #: ../../../skins_fallback_v6/_item_block.inc.php:125
@@ -13479,7 +13462,7 @@ msgid "Updated post"
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:7305
-msgid "Do you want to save your changes before changing the item type?"
+msgid "Do you want to save your changes before changing the Post Type?"
 msgstr ""
 
 #: ../../../inc/items/model/_item.funcs.php:480
@@ -13631,7 +13614,7 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:2875
 #: ../../../skins/basic/_item_content.inc.php:75
 #: ../../../skins/material_skin/_item_content.inc.php:321
-#: ../../../skins_fallback_v5/_item_content.inc.php:331
+#: ../../../skins_fallback_v5/_item_content.inc.php:339
 #: ../../../skins_fallback_v6/_item_content.inc.php:350
 msgid "Location"
 msgstr ""
@@ -14039,7 +14022,7 @@ msgid "Make posts"
 msgstr ""
 
 #: ../../../inc/items/views/_item_edit_type.form.php:31
-msgid "Change item type"
+msgid "Change Post Type"
 msgstr ""
 
 #: ../../../inc/items/views/_item_edit_type.form.php:41
@@ -14147,7 +14130,7 @@ msgid "(Separate by space)"
 msgstr ""
 
 #: ../../../inc/items/views/_item_expert.form.php:456
-#: ../../../install/_functions_create.php:1976
+#: ../../../install/_functions_create.php:1978
 msgid "Featured post"
 msgstr ""
 
@@ -14368,10 +14351,9 @@ msgstr ""
 #: ../../../skins/material_main_skin/_item_block.inc.php:86
 #: ../../../skins/pixelgreen/_item_block.inc.php:46
 #: ../../../skins/reporter_skin/_item_block.inc.php:85
-#: ../../../skins/starter_skin/_item_block.inc.php:85
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:54
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:70
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:80
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:56
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:72
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:82
 #: ../../../skins_fallback_v6/_item_block.inc.php:88
 msgid "by"
 msgstr ""
@@ -14444,8 +14426,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:29
 #: ../../../skins/pureforums/_item_comment_form.inc.php:30
 #: ../../../skins/touch/_item_comment_form.inc.php:29
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:30
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:31
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:29
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:30
 msgid "Send comment"
 msgstr ""
 
@@ -14551,7 +14533,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:35
 #: ../../../inc/items/views/_itemtypes.view.php:50
-msgid "Delete this item type!"
+msgid "Delete this Post Type!"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:40
@@ -14563,14 +14545,14 @@ msgid "New post type"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:45
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:81
-#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:75
-msgid "Item type"
+#: ../../../inc/items/views/_itemtypes.view.php:105
+msgid "New Post Type"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:45
-#: ../../../inc/items/views/_itemtypes.view.php:105
-msgid "New item type"
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:81
+#: ../../../inc/widgets/widgets/_coll_media_index.widget.php:75
+msgid "Post type"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:66
@@ -14746,11 +14728,11 @@ msgid "Item/Post/Page types"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtypes.view.php:38
-msgid "Duplicate this item type..."
+msgid "Duplicate this Post Type..."
 msgstr ""
 
 #: ../../../inc/items/views/_itemtypes.view.php:43
-msgid "Edit this item type..."
+msgid "Edit this Post Type..."
 msgstr ""
 
 #: ../../../inc/links/links.ctrl.php:83
@@ -14876,10 +14858,10 @@ msgid "Below comment"
 msgstr ""
 
 #: ../../../inc/links/model/_linkcomment.class.php:163
+#: ../../../skins/material_main_skin/_item_comment.inc.php:87
 #: ../../../skins/material_skin/_item_comment.inc.php:87
-#: ../../../skins/mystique/_item_comment.inc.php:65
 #: ../../../skins_fallback_v5/_item_comment.inc.php:87
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:55
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:57
 #: ../../../skins_fallback_v6/_item_comment.inc.php:87
 msgid "Comment"
 msgstr ""
@@ -15005,8 +14987,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:315
 #: ../../../skins/pureforums/_item_comment_form.inc.php:371
 #: ../../../skins/touch/_item_comment_form.inc.php:308
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:316
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:324
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:315
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:323
 msgid "Attach files"
 msgstr ""
 
@@ -16611,8 +16593,8 @@ msgstr ""
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
 #: ../../../skins/forums/_edit.disp.php:215 ../skins/pureforums/_edit.disp.php:216
-#: ../../../skins_fallback_v5/_contact_msg.form.php:76
-#: ../../../skins_fallback_v6/_contact_msg.form.php:76
+#: ../../../skins_fallback_v5/_contact_msg.form.php:75
+#: ../../../skins_fallback_v6/_contact_msg.form.php:75
 msgid "Subject"
 msgstr ""
 
@@ -16798,8 +16780,8 @@ msgstr ""
 
 #: ../../../inc/messaging/views/_message_list.view.php:313
 #: ../../../inc/messaging/views/_thread.form.php:141
-#: ../../../skins_fallback_v5/_contact_msg.form.php:87
-#: ../../../skins_fallback_v6/_contact_msg.form.php:87
+#: ../../../skins_fallback_v5/_contact_msg.form.php:86
+#: ../../../skins_fallback_v6/_contact_msg.form.php:86
 msgid "Send message"
 msgstr ""
 
@@ -16858,8 +16840,8 @@ msgstr ""
 #: ../../../inc/messaging/views/_msg_settings.form.php:78
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:127
 #: ../../../inc/sessions/views/_stats_search_keywords.view.php:178
-#: ../../../skins_fallback_v5/_contact_msg.form.php:72
-#: ../../../skins_fallback_v6/_contact_msg.form.php:72
+#: ../../../skins_fallback_v5/_contact_msg.form.php:71
+#: ../../../skins_fallback_v6/_contact_msg.form.php:71
 msgid "From"
 msgstr ""
 
@@ -19333,7 +19315,7 @@ msgid "The requested chapter was not found"
 msgstr ""
 
 #: ../../../inc/skins/_skin.funcs.php:558 ../inc/skins/_skin.funcs.php:578
-#: ../../../skins_email/login.main.php:25 ../skins_fallback_v5/login.main.php:25
+#: ../../../skins_fallback_v5/login.main.php:25
 msgid "You are already logged in."
 msgstr ""
 
@@ -19465,17 +19447,17 @@ msgstr ""
 
 #: ../../../inc/skins/model/_skin.class.php:886
 #: ../../../inc/skins/model/_skin.class.php:887
-#: ../../../skins/ark_skin/_skin.class.php:260 ../skins/ark_skin/_skin.class.php:261
+#: ../../../skins/ark_skin/_skin.class.php:266 ../skins/ark_skin/_skin.class.php:267
 #: ../../../skins/blackorange_skin/_skin.class.php:260
 #: ../../../skins/blackorange_skin/_skin.class.php:261
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:276
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:277
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:297
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:298
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:423
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:424
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:390
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:391
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:291
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:292
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:403
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:404
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:304
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:305
 #: ../../../skins/custom/_skin.class.php:260 ../skins/custom/_skin.class.php:261
 #: ../../../skins/flat_skin/_skin.class.php:260
 #: ../../../skins/flat_skin/_skin.class.php:261
@@ -19483,22 +19465,22 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:387
 #: ../../../skins/horizon_skin/_skin.class.php:260
 #: ../../../skins/horizon_skin/_skin.class.php:261
-#: ../../../skins/material_main_skin/_skin.class.php:487
-#: ../../../skins/material_main_skin/_skin.class.php:488
+#: ../../../skins/material_main_skin/_skin.class.php:392
+#: ../../../skins/material_main_skin/_skin.class.php:393
 #: ../../../skins/material_skin/_skin.class.php:260
 #: ../../../skins/material_skin/_skin.class.php:261
 #: ../../../skins/pureforums/_skin.class.php:496
 #: ../../../skins/pureforums/_skin.class.php:497
 #: ../../../skins/reporter_skin/_skin.class.php:260
 #: ../../../skins/reporter_skin/_skin.class.php:261
-#: ../../../skins/starter_skin/_skin.class.php:264
-#: ../../../skins/starter_skin/_skin.class.php:265
+#: ../../../skins/starter_skin/_skin.class.php:297
+#: ../../../skins/starter_skin/_skin.class.php:298
 #: ../../../skins_adm/_adminUI_general.class.php:1015
 #: ../../../skins_adm/_adminUI_general.class.php:1016
 #: ../../../skins_adm/_adminUI_general.class.php:1095
 #: ../../../skins_adm/_adminUI_general.class.php:1096
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:389
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:390
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:404
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:405
 #: ../../../skins_adm/chicago/_adminUI.class.php:290
 #: ../../../skins_adm/chicago/_adminUI.class.php:291
 msgid "..."
@@ -21251,8 +21233,8 @@ msgstr ""
 
 #: ../../../inc/tools/views/_email_sent.view.php:143
 #: ../../../inc/tools/views/_email_sent_details.view.php:42
-#: ../../../skins_fallback_v5/_contact_msg.form.php:68
-#: ../../../skins_fallback_v6/_contact_msg.form.php:68
+#: ../../../skins_fallback_v5/_contact_msg.form.php:67
+#: ../../../skins_fallback_v6/_contact_msg.form.php:67
 msgid "To"
 msgstr ""
 
@@ -22609,8 +22591,9 @@ msgstr ""
 #: ../../../inc/users/views/_user_report.form.php:62
 #: ../../../inc/users/views/_user_report.form.php:85
 #: ../../../skins/material_main_skin/_user.disp.php:230
-#: ../../../skins_fallback_v5/_user.disp.php:244
-#: ../../../skins_fallback_v6/_user.disp.php:244
+#: ../../../skins/material_skin/_user.disp.php:243
+#: ../../../skins_fallback_v5/_user.disp.php:243
+#: ../../../skins_fallback_v6/_user.disp.php:243
 msgid "Report User"
 msgstr ""
 
@@ -23121,7 +23104,7 @@ msgstr ""
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:333
 #: ../../../skins/ark_skin/access_denied.main.php:137
 #: ../../../skins/ark_skin/access_requires_login.main.php:148
-#: ../../../skins/ark_skin/index.main.php:329 ../skins/ark_skin/single.main.php:293
+#: ../../../skins/ark_skin/single.main.php:293
 #: ../../../skins/asevo/_body_footer.inc.php:33
 #: ../../../skins/basic/access_denied.main.php:125
 #: ../../../skins/basic/access_requires_login.main.php:132
@@ -23132,10 +23115,11 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:141
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:148
 #: ../../../skins/bootstrap_blog_skin/index.main.php:417
-#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:33
+#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:30
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:325
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:167
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:168
-#: ../../../skins/bootstrap_main_skin/index.main.php:366
+#: ../../../skins/bootstrap_main_skin/index.main.php:368
 #: ../../../skins/bootstrap_manual_skin/_body_footer.inc.php:57
 #: ../../../skins/colourise/_body_footer.inc.php:33
 #: ../../../skins/custom/access_denied.main.php:149
@@ -23153,20 +23137,21 @@ msgstr ""
 #: ../../../skins/forums/access_requires_login.main.php:153
 #: ../../../skins/forums/index.main.php:289
 #: ../../../skins/horizon_gallery_skin/_body_footer.inc.php:33
+#: ../../../skins/horizon_gallery_skin/index.main.php:325
 #: ../../../skins/horizon_main_skin/access_denied.main.php:167
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
 #: ../../../skins/horizon_main_skin/index.main.php:412
 #: ../../../skins/horizon_skin/access_denied.main.php:149
 #: ../../../skins/horizon_skin/access_requires_login.main.php:154
-#: ../../../skins/horizon_skin/index.main.php:437
+#: ../../../skins/horizon_skin/index.main.php:434
 #: ../../../skins/horizon_skin/single.main.php:410
 #: ../../../skins/manual/_body_footer.inc.php:50
 #: ../../../skins/material_main_skin/access_denied.main.php:167
 #: ../../../skins/material_main_skin/access_requires_login.main.php:169
-#: ../../../skins/material_main_skin/index.main.php:449
+#: ../../../skins/material_main_skin/index.main.php:432
 #: ../../../skins/material_skin/access_denied.main.php:149
 #: ../../../skins/material_skin/access_requires_login.main.php:154
-#: ../../../skins/material_skin/index.main.php:425
+#: ../../../skins/material_skin/index.main.php:427
 #: ../../../skins/photoalbums/_body_footer.inc.php:33
 #: ../../../skins/photoblog/_body_footer.inc.php:26
 #: ../../../skins/pixelgreen/access_denied.main.php:139
@@ -23177,14 +23162,14 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:269
 #: ../../../skins/reporter_skin/access_denied.main.php:143
 #: ../../../skins/reporter_skin/access_requires_login.main.php:150
-#: ../../../skins/reporter_skin/front.main.php:421
+#: ../../../skins/reporter_skin/front.main.php:429
 #: ../../../skins/reporter_skin/index.main.php:422
-#: ../../../skins/reporter_skin/page.main.php:250
+#: ../../../skins/reporter_skin/page.main.php:253
 #: ../../../skins/reporter_skin/posts.main.php:393
-#: ../../../skins/reporter_skin/single.main.php:259
-#: ../../../skins/starter_skin/access_denied.main.php:138
-#: ../../../skins/starter_skin/access_requires_login.main.php:146
-#: ../../../skins/starter_skin/index.main.php:427
+#: ../../../skins/reporter_skin/single.main.php:261
+#: ../../../skins/starter_skin/access_denied.main.php:141
+#: ../../../skins/starter_skin/access_requires_login.main.php:148
+#: ../../../skins/starter_skin/index.main.php:417
 #: ../../../skins/touch/_body_footer.inc.php:32
 #: ../../../skins_fallback_v5/_body_footer.inc.php:23
 msgid "Contact"
@@ -23698,9 +23683,9 @@ msgid "Display gender in back-office"
 msgstr ""
 
 #: ../../../inc/users/views/_display.form.php:77
-#: ../../../skins/ark_skin/_skin.class.php:103 ../skins/asevo/_skin.class.php:92
+#: ../../../skins/ark_skin/_skin.class.php:109 ../skins/asevo/_skin.class.php:92
 #: ../../../skins/blackorange_skin/_skin.class.php:103
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:115
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:121
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:132
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:155
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:104
@@ -23712,14 +23697,14 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:157
 #: ../../../skins/horizon_skin/_skin.class.php:103
 #: ../../../skins/manual/_skin.class.php:122
-#: ../../../skins/material_main_skin/_skin.class.php:258
+#: ../../../skins/material_main_skin/_skin.class.php:163
 #: ../../../skins/material_skin/_skin.class.php:103
 #: ../../../skins/photoalbums/_skin.class.php:132
 #: ../../../skins/photoblog/_skin.class.php:132
 #: ../../../skins/pixelgreen/_skin.class.php:92
 #: ../../../skins/pureforums/_skin.class.php:108
 #: ../../../skins/reporter_skin/_skin.class.php:103
-#: ../../../skins/starter_skin/_skin.class.php:103 ../skins/touch/_skin.class.php:98
+#: ../../../skins/starter_skin/_skin.class.php:121 ../skins/touch/_skin.class.php:98
 msgid "Use colored usernames to differentiate men & women."
 msgstr ""
 
@@ -23729,9 +23714,9 @@ msgstr ""
 
 #: ../../../inc/users/views/_display.form.php:85
 #: ../../../inc/users/views/_display.form.php:126
-#: ../../../skins/ark_skin/_skin.class.php:109 ../skins/asevo/_skin.class.php:98
+#: ../../../skins/ark_skin/_skin.class.php:115 ../skins/asevo/_skin.class.php:98
 #: ../../../skins/blackorange_skin/_skin.class.php:109
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:121
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:127
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:138
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:161
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:110
@@ -23743,22 +23728,22 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:163
 #: ../../../skins/horizon_skin/_skin.class.php:109
 #: ../../../skins/manual/_skin.class.php:128
-#: ../../../skins/material_main_skin/_skin.class.php:264
+#: ../../../skins/material_main_skin/_skin.class.php:169
 #: ../../../skins/material_skin/_skin.class.php:109
 #: ../../../skins/photoalbums/_skin.class.php:138
 #: ../../../skins/photoblog/_skin.class.php:138
 #: ../../../skins/pixelgreen/_skin.class.php:98
 #: ../../../skins/pureforums/_skin.class.php:114
 #: ../../../skins/reporter_skin/_skin.class.php:109
-#: ../../../skins/starter_skin/_skin.class.php:109
+#: ../../../skins/starter_skin/_skin.class.php:127
 #: ../../../skins/touch/_skin.class.php:104
 msgid "Check to enable bubble tips on usernames"
 msgstr ""
 
 #: ../../../inc/users/views/_display.form.php:85
-#: ../../../skins/ark_skin/_skin.class.php:108 ../skins/asevo/_skin.class.php:97
+#: ../../../skins/ark_skin/_skin.class.php:114 ../skins/asevo/_skin.class.php:97
 #: ../../../skins/blackorange_skin/_skin.class.php:108
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:120
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:126
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:137
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:160
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:109
@@ -23770,14 +23755,14 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:162
 #: ../../../skins/horizon_skin/_skin.class.php:108
 #: ../../../skins/manual/_skin.class.php:127
-#: ../../../skins/material_main_skin/_skin.class.php:263
+#: ../../../skins/material_main_skin/_skin.class.php:168
 #: ../../../skins/material_skin/_skin.class.php:108
 #: ../../../skins/photoalbums/_skin.class.php:137
 #: ../../../skins/photoblog/_skin.class.php:137
 #: ../../../skins/pixelgreen/_skin.class.php:97
 #: ../../../skins/pureforums/_skin.class.php:113
 #: ../../../skins/reporter_skin/_skin.class.php:108
-#: ../../../skins/starter_skin/_skin.class.php:108
+#: ../../../skins/starter_skin/_skin.class.php:126
 #: ../../../skins/touch/_skin.class.php:103
 msgid "Username bubble tips"
 msgstr ""
@@ -24602,43 +24587,49 @@ msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:274
 #: ../../../skins/material_main_skin/_user.disp.php:341
-#: ../../../skins_fallback_v5/_user.disp.php:367
-#: ../../../skins_fallback_v6/_user.disp.php:367
+#: ../../../skins/material_skin/_user.disp.php:366
+#: ../../../skins_fallback_v5/_user.disp.php:366
+#: ../../../skins_fallback_v6/_user.disp.php:366
 msgid "Reputation"
 msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:276
 #: ../../../skins/material_main_skin/_user.disp.php:343
-#: ../../../skins_fallback_v5/_user.disp.php:369
-#: ../../../skins_fallback_v6/_user.disp.php:369
+#: ../../../skins/material_skin/_user.disp.php:368
+#: ../../../skins_fallback_v5/_user.disp.php:368
+#: ../../../skins_fallback_v6/_user.disp.php:368
 msgid "Number of posts"
 msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:280 ../install/index.php:633
 #: ../../../skins/material_main_skin/_user.disp.php:347
-#: ../../../skins_fallback_v5/_user.disp.php:373
-#: ../../../skins_fallback_v6/_user.disp.php:373
+#: ../../../skins/material_skin/_user.disp.php:372
+#: ../../../skins_fallback_v5/_user.disp.php:372
+#: ../../../skins_fallback_v6/_user.disp.php:372
 msgid "Photos"
 msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:282
 #: ../../../skins/material_main_skin/_user.disp.php:349
-#: ../../../skins_fallback_v5/_user.disp.php:375
-#: ../../../skins_fallback_v6/_user.disp.php:375
+#: ../../../skins/material_skin/_user.disp.php:374
+#: ../../../skins_fallback_v5/_user.disp.php:374
+#: ../../../skins_fallback_v6/_user.disp.php:374
 msgid "Audio"
 msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:284
 #: ../../../skins/material_main_skin/_user.disp.php:351
-#: ../../../skins_fallback_v5/_user.disp.php:377
-#: ../../../skins_fallback_v6/_user.disp.php:377
+#: ../../../skins/material_skin/_user.disp.php:376
+#: ../../../skins_fallback_v5/_user.disp.php:376
+#: ../../../skins_fallback_v6/_user.disp.php:376
 msgid "Other files"
 msgstr ""
 
 #: ../../../inc/users/views/_user_admin.form.php:286
 #: ../../../skins/material_main_skin/_user.disp.php:353
-#: ../../../skins_fallback_v5/_user.disp.php:379
-#: ../../../skins_fallback_v6/_user.disp.php:379
+#: ../../../skins/material_skin/_user.disp.php:378
+#: ../../../skins_fallback_v5/_user.disp.php:378
+#: ../../../skins_fallback_v6/_user.disp.php:378
 msgid "Spam fighter score"
 msgstr ""
 
@@ -25483,9 +25474,9 @@ msgstr ""
 
 #: ../../../inc/widgets/_widgets.funcs.php:142
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:32
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:208
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:212
 #: ../../../skins/horizon_gallery_skin/index.main.php:32
-#: ../../../skins/horizon_gallery_skin/index.main.php:192
+#: ../../../skins/horizon_gallery_skin/index.main.php:210
 #: ../../../skins/photoalbums/index.main.php:32
 #: ../../../skins/photoalbums/index.main.php:189
 #: ../../../skins/photoblog/index.main.php:27 ../skins/photoblog/index.main.php:141
@@ -26231,7 +26222,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:72
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:66
-msgid "What item statuses should be included in the list?"
+msgid "What post statuses should be included in the list?"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:76
@@ -26399,16 +26390,14 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:89
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:63
-#: ../../../skins/ark_skin/_skin.class.php:49
+#: ../../../skins/ark_skin/_skin.class.php:55
 #: ../../../skins/blackorange_skin/_skin.class.php:49
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:61
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:67
 #: ../../../skins/custom/_skin.class.php:49 ../skins/flat_skin/_skin.class.php:49
 #: ../../../skins/horizon_skin/_skin.class.php:49
 #: ../../../skins/material_skin/_skin.class.php:49
-#: ../../../skins/mystique/_skin.class.php:75 ../skins/mystique/a_skin.class.php:74
-#: ../../../skins/mystique/mess_skin.class.php:74
 #: ../../../skins/reporter_skin/_skin.class.php:49
-#: ../../../skins/starter_skin/_skin.class.php:49
+#: ../../../skins/starter_skin/_skin.class.php:67
 msgid "Layout"
 msgstr ""
 
@@ -26460,9 +26449,6 @@ msgid "Simplified Item list for listing posts."
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_related_post_list.widget.php:48
-#: ../../../skins/mystique/_skin.class.php:174
-#: ../../../skins/mystique/a_skin.class.php:173
-#: ../../../skins/mystique/mess_skin.class.php:173
 msgid "Related posts"
 msgstr ""
 
@@ -26595,8 +26581,6 @@ msgid "Display posts tagged with &laquo;%s&raquo;"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_tagline.widget.php:42
-#: ../../../skins/mystique/_skin.class.php:65 ../skins/mystique/a_skin.class.php:64
-#: ../../../skins/mystique/mess_skin.class.php:64
 msgid "Blog tagline"
 msgstr ""
 
@@ -26615,8 +26599,6 @@ msgid "check to add the collection tagline after the title."
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_title.widget.php:63
-#: ../../../skins/mystique/_skin.class.php:58 ../skins/mystique/a_skin.class.php:57
-#: ../../../skins/mystique/mess_skin.class.php:57
 msgid "Blog title"
 msgstr ""
 
@@ -26846,7 +26828,7 @@ msgstr ""
 #: ../../../skins/blackorange_skin/index.main.php:90
 #: ../../../skins/blackorange_skin/index.main.php:117
 #: ../../../skins/bootstrap_blog_skin/index.main.php:92
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:98
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:102
 #: ../../../skins/bootstrap_manual_skin/_body_header.inc.php:70
 #: ../../../skins/colourise/_body_header.inc.php:63
 #: ../../../skins/custom/index.main.php:91 ../skins/custom/single.main.php:91
@@ -26856,15 +26838,15 @@ msgstr ""
 #: ../../../skins/evopress/posts.main.php:48 ../skins/evopress/search.main.php:46
 #: ../../../skins/evopress/single.main.php:54 ../skins/flat_skin/index.main.php:91
 #: ../../../skins/forums/index.main.php:131
-#: ../../../skins/horizon_gallery_skin/index.main.php:85
-#: ../../../skins/horizon_skin/index.main.php:99
+#: ../../../skins/horizon_gallery_skin/index.main.php:98
+#: ../../../skins/horizon_skin/index.main.php:95
 #: ../../../skins/horizon_skin/single.main.php:107
 #: ../../../skins/manual/_body_header.inc.php:88
 #: ../../../skins/material_skin/index.main.php:92
-#: ../../../skins/mystique/index.main.php:102 ../skins/photoalbums/index.main.php:83
-#: ../../../skins/photoblog/index.main.php:66 ../skins/pixelgreen/index.main.php:77
+#: ../../../skins/photoalbums/index.main.php:83 ../skins/photoblog/index.main.php:66
+#: ../../../skins/pixelgreen/index.main.php:77
 #: ../../../skins/pureforums/index.main.php:139
-#: ../../../skins/reporter_skin/front.main.php:93
+#: ../../../skins/reporter_skin/front.main.php:91
 #: ../../../skins/reporter_skin/index.main.php:92
 #: ../../../skins/reporter_skin/page.main.php:78
 #: ../../../skins/reporter_skin/posts.main.php:91
@@ -27273,6 +27255,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:121
 #: ../../../skins/material_main_skin/_user.disp.php:42
+#: ../../../skins/material_skin/_user.disp.php:42
 #: ../../../skins_fallback_v5/_user.disp.php:42
 #: ../../../skins_fallback_v6/_user.disp.php:42
 msgid "Edit my profile"
@@ -27535,7 +27518,7 @@ msgstr ""
 msgid "Photo Albums"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1698 ../install/_functions_create.php:2155
+#: ../../../install/_functions_create.php:1698 ../install/_functions_create.php:2157
 #: ../../../install/index.php:634
 msgid "Forums"
 msgstr ""
@@ -27661,6 +27644,8 @@ msgstr ""
 msgid ""
 "<p>This is page 1 of a multipage post.</p>\n"
 "\n"
+"<blockquote><p>This is a Block Quote.</p></blockquote>\n"
+"\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr ""
 
@@ -27668,58 +27653,58 @@ msgstr ""
 msgid "This is a multipage post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1855 ../install/_functions_create.php:1859
-#: ../../../install/_functions_create.php:1863 ../install/_functions_create.php:2191
-#: ../../../install/_functions_create.php:2195 ../install/_functions_create.php:2199
-#: ../../../install/_functions_create.php:2567 ../install/_functions_create.php:2571
-#: ../../../install/_functions_create.php:2575
+#: ../../../install/_functions_create.php:1857 ../install/_functions_create.php:1861
+#: ../../../install/_functions_create.php:1865 ../install/_functions_create.php:2195
+#: ../../../install/_functions_create.php:2199 ../install/_functions_create.php:2203
+#: ../../../install/_functions_create.php:2573 ../install/_functions_create.php:2577
+#: ../../../install/_functions_create.php:2581
 #, php-format
 msgid "<p>This is page %d.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1865 ../install/_functions_create.php:2201
-#: ../../../install/_functions_create.php:2577
+#: ../../../install/_functions_create.php:1867 ../install/_functions_create.php:2205
+#: ../../../install/_functions_create.php:2583
 msgid "<p>It is the last page.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1870
+#: ../../../install/_functions_create.php:1872
 msgid "<p>This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1870
+#: ../../../install/_functions_create.php:1872
 msgid "Extended post with no teaser"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1873 ../install/_functions_create.php:1883
+#: ../../../install/_functions_create.php:1875 ../install/_functions_create.php:1885
 msgid "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1880
+#: ../../../install/_functions_create.php:1882
 msgid "<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1880
+#: ../../../install/_functions_create.php:1882
 msgid "Extended post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1895
+#: ../../../install/_functions_create.php:1897
 msgid ""
 "<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1895
+#: ../../../install/_functions_create.php:1897
 msgid "Image post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1909 ../install/_functions_create.php:2226
-#: ../../../install/_functions_create.php:2605
+#: ../../../install/_functions_create.php:1911 ../install/_functions_create.php:2230
+#: ../../../install/_functions_create.php:2611
 msgid "Welcome to your b2evolution-powered website!"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1910 ../install/_functions_create.php:2227
-#: ../../../install/_functions_create.php:2606
+#: ../../../install/_functions_create.php:1912 ../install/_functions_create.php:2231
+#: ../../../install/_functions_create.php:2612
 msgid ""
 "<p>To get you started, the installer has automatically created several sample collections and populated them with some sample contents. Of course, this starter structure is all yours to edit. Until you do that, though, here's what you will find on this site:</p>\n"
 "\n"
@@ -27735,43 +27720,43 @@ msgid ""
 "<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1943
+#: ../../../install/_functions_create.php:1945
 msgid "b2evo skins repository"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1948
+#: ../../../install/_functions_create.php:1950
 msgid "About Blog B"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1948 ../install/index.php:632
+#: ../../../install/_functions_create.php:1950 ../install/index.php:632
 msgid "Blog B"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1954
+#: ../../../install/_functions_create.php:1956
 msgid "Main Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1954
+#: ../../../install/_functions_create.php:1956
 msgid "This is the main intro post. It appears on the homepage only."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1960
+#: ../../../install/_functions_create.php:1962
 msgid "This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1960
+#: ../../../install/_functions_create.php:1962
 msgid "b2evolution tips category &ndash; Sub Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1966
+#: ../../../install/_functions_create.php:1968
 msgid "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1966
+#: ../../../install/_functions_create.php:1968
 msgid "Widgets tag &ndash; Sub Intro post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1976
+#: ../../../install/_functions_create.php:1978
 msgid ""
 "<p>This is a demo of a featured post.</p>\n"
 "\n"
@@ -27780,7 +27765,7 @@ msgid ""
 "<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1988
+#: ../../../install/_functions_create.php:1990
 #, php-format
 msgid ""
 "<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>\n"
@@ -27788,11 +27773,11 @@ msgid ""
 "<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1988
+#: ../../../install/_functions_create.php:1990
 msgid "Apache optimization..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:1999
+#: ../../../install/_functions_create.php:2001
 msgid ""
 "<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>\n"
 "\n"
@@ -27809,11 +27794,11 @@ msgid ""
 "<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:1999
+#: ../../../install/_functions_create.php:2001
 msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2019
+#: ../../../install/_functions_create.php:2021
 msgid ""
 "<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>\n"
 "\n"
@@ -27822,11 +27807,11 @@ msgid ""
 "<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2019
+#: ../../../install/_functions_create.php:2021
 msgid "About widgets..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2031
+#: ../../../install/_functions_create.php:2033
 #, php-format
 msgid ""
 "<p>By default, b2evolution blogs are displayed using an evoskin.</p>\n"
@@ -27842,19 +27827,19 @@ msgid ""
 "<p>And, of course, read the <a href=\"%s\" target=\"_blank\">manual on skins</a>!</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2031
+#: ../../../install/_functions_create.php:2033
 msgid "About skins..."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2060
+#: ../../../install/_functions_create.php:2062
 msgid "Sunset"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2069
+#: ../../../install/_functions_create.php:2071
 msgid "Bus Stop Ahead"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2110
+#: ../../../install/_functions_create.php:2112
 msgid ""
 "Heading\n"
 "=======\n"
@@ -27894,55 +27879,57 @@ msgid ""
 "The rain---not the reign---in Spain."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2155
+#: ../../../install/_functions_create.php:2157
 msgid "About Forums"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2161
+#: ../../../install/_functions_create.php:2163
 msgid ""
 "<p>This is the first topic.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2161
+#: ../../../install/_functions_create.php:2163
 msgid "First Topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2168
+#: ../../../install/_functions_create.php:2170
 msgid ""
 "<p>This is the second topic.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2168
+#: ../../../install/_functions_create.php:2170
 msgid "Second topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2175 ../install/_functions_create.php:2550
+#: ../../../install/_functions_create.php:2177 ../install/_functions_create.php:2554
 msgid ""
 "<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2175 ../install/_functions_create.php:2550
+#: ../../../install/_functions_create.php:2177 ../install/_functions_create.php:2554
 msgid "Image topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2185 ../install/_functions_create.php:2561
+#: ../../../install/_functions_create.php:2187 ../install/_functions_create.php:2565
 msgid ""
 "<p>This is page 1 of a multipage topic.</p>\n"
+"\n"
+"<blockquote><p>This is a Block Quote.</p></blockquote>\n"
 "\n"
 "<p>You can see the other pages by clicking on the links below the text.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2185 ../install/_functions_create.php:2561
+#: ../../../install/_functions_create.php:2187 ../install/_functions_create.php:2565
 msgid "This is a multipage topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2206 ../install/_functions_create.php:2583
+#: ../../../install/_functions_create.php:2210 ../install/_functions_create.php:2589
 msgid ""
 "<p>This is an extended topic with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>\n"
 "\n"
@@ -27951,11 +27938,11 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2206 ../install/_functions_create.php:2583
+#: ../../../install/_functions_create.php:2210 ../install/_functions_create.php:2589
 msgid "Extended topic with no teaser"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2217 ../install/_functions_create.php:2595
+#: ../../../install/_functions_create.php:2221 ../install/_functions_create.php:2601
 msgid ""
 "<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>\n"
 "\n"
@@ -27964,15 +27951,15 @@ msgid ""
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2217 ../install/_functions_create.php:2595
+#: ../../../install/_functions_create.php:2221 ../install/_functions_create.php:2601
 msgid "Extended topic"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2246 ../install/_functions_create.php:2642
+#: ../../../install/_functions_create.php:2250 ../install/_functions_create.php:2648
 msgid "Markdown examples"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2261
+#: ../../../install/_functions_create.php:2265
 msgid ""
 "This is the main introduction for this demo online manual. It is a post using the type \"Intro-Front\". It will only appear on the front page of the manual.\n"
 "\n"
@@ -27981,83 +27968,83 @@ msgid ""
 "Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2261
+#: ../../../install/_functions_create.php:2265
 msgid "Welcome here!"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2271 ../install/_functions_create.php:2277
+#: ../../../install/_functions_create.php:2275 ../install/_functions_create.php:2281
 msgid "Chapter Intro"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2271 ../install/_functions_create.php:2277
+#: ../../../install/_functions_create.php:2275 ../install/_functions_create.php:2281
 msgid "This is an introduction for this chapter. It is a post using the \"intro-cat\" type."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2278
+#: ../../../install/_functions_create.php:2282
 msgid "Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2284
+#: ../../../install/_functions_create.php:2288
 msgid "About this manual"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2290
+#: ../../../install/_functions_create.php:2294
 msgid ""
 "<p>This is the first page.</p>\n"
 "\n"
 "<p>It appears in a single category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2290
+#: ../../../install/_functions_create.php:2294
 msgid "First Page"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2298
+#: ../../../install/_functions_create.php:2302
 msgid ""
 "<p>This is the second page.</p>\n"
 "\n"
 "<p>It appears in multiple categories.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2298
+#: ../../../install/_functions_create.php:2302
 msgid "Second Page"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2306
+#: ../../../install/_functions_create.php:2310
 msgid "Wiki Tables"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2626
+#: ../../../install/_functions_create.php:2632
 msgid ""
 "<p>This is the sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2626
+#: ../../../install/_functions_create.php:2632
 msgid "Sports post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2634
+#: ../../../install/_functions_create.php:2640
 msgid ""
 "<p>This is the second sports post.</p>\n"
 "\n"
 "<p>It appears in sports category.</p>"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2634
+#: ../../../install/_functions_create.php:2640
 msgid "Second sports post"
 msgstr ""
 
-#: ../../../install/_functions_create.php:2672
+#: ../../../install/_functions_create.php:2678
 msgid "Hi, this is my comment."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2837
+#: ../../../install/_functions_create.php:2843
 msgid "Hi!<br />This is a sample comment that has been approved by default!<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard."
 msgstr ""
 
-#: ../../../install/_functions_create.php:2841
+#: ../../../install/_functions_create.php:2847
 msgid "Hi!<br />This is a sample comment that has not been approved by default.<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard."
 msgstr ""
 
@@ -29233,7 +29220,7 @@ msgstr ""
 
 #: ../../../plugins/_google_maps.plugin.php:182
 #, php-format
-msgid "You must turn on the <b>\"Use coordinates\"</b> setting in Item Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates."
+msgid "You must turn on the <b>\"Use coordinates\"</b> setting in Post Type settings <a %s>Features</a> tab so the Google Maps plugin can save its coordinates."
 msgstr ""
 
 #: ../../../plugins/_google_maps.plugin.php:285
@@ -30443,6 +30430,7 @@ msgstr ""
 
 #: ../../../skins/_atom/comments.main.php:87 ../skins/_rdf/comments.main.php:97
 #: ../../../skins/_rss/comments.main.php:81 ../skins/forums/_item_comment.inc.php:68
+#: ../../../skins/material_main_skin/_item_comment.inc.php:138
 #: ../../../skins/material_skin/_item_comment.inc.php:138
 #: ../../../skins/pureforums/_item_comment.inc.php:70
 #: ../../../skins_fallback_v5/_item_comment.inc.php:66
@@ -30467,7 +30455,6 @@ msgstr ""
 #: ../../../skins/material_main_skin/_item_block.inc.php:49
 #: ../../../skins/material_skin/_item_block.inc.php:48
 #: ../../../skins/reporter_skin/_item_block.inc.php:48
-#: ../../../skins/starter_skin/_item_block.inc.php:48
 #: ../../../skins_fallback_v6/_item_block.inc.php:51
 msgid "Edit Intro"
 msgstr ""
@@ -30479,7 +30466,6 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_item_block.inc.php:79
 #: ../../../skins/horizon_skin/_item_block.inc.php:78
 #: ../../../skins/material_main_skin/_item_block.inc.php:79
-#: ../../../skins/starter_skin/_item_block.inc.php:78
 #: ../../../skins_fallback_v6/_item_block.inc.php:81
 msgid "posted on "
 msgstr ""
@@ -30491,49 +30477,54 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_item_block.inc.php:93
 #: ../../../skins/horizon_skin/_item_block.inc.php:92
 #: ../../../skins/material_main_skin/_item_block.inc.php:93
-#: ../../../skins/mystique/_item_block.inc.php:105
 #: ../../../skins/reporter_skin/_item_block.inc.php:92
-#: ../../../skins/starter_skin/_item_block.inc.php:92
 #: ../../../skins_fallback_v6/_item_block.inc.php:95
 msgid "in"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:53
+#: ../../../skins/ark_skin/_skin.class.php:49
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:62
+#: ../../../skins/horizon_main_skin/_skin.class.php:64
+#: ../../../skins/material_main_skin/_skin.class.php:70
+msgid "Front page background image"
+msgstr ""
+
+#: ../../../skins/ark_skin/_skin.class.php:59
 #: ../../../skins/blackorange_skin/_skin.class.php:53
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:65
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:71
 #: ../../../skins/custom/_skin.class.php:53 ../skins/flat_skin/_skin.class.php:53
 #: ../../../skins/horizon_skin/_skin.class.php:53
 #: ../../../skins/material_skin/_skin.class.php:53
 #: ../../../skins/reporter_skin/_skin.class.php:53
-#: ../../../skins/starter_skin/_skin.class.php:53
+#: ../../../skins/starter_skin/_skin.class.php:71
 msgid "Single column"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:54
+#: ../../../skins/ark_skin/_skin.class.php:60
 #: ../../../skins/blackorange_skin/_skin.class.php:54
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:66
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:72
 #: ../../../skins/custom/_skin.class.php:54 ../skins/flat_skin/_skin.class.php:54
 #: ../../../skins/horizon_skin/_skin.class.php:54
 #: ../../../skins/material_skin/_skin.class.php:54
 #: ../../../skins/reporter_skin/_skin.class.php:54
-#: ../../../skins/starter_skin/_skin.class.php:54
+#: ../../../skins/starter_skin/_skin.class.php:72
 msgid "Left Sidebar"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:55
+#: ../../../skins/ark_skin/_skin.class.php:61
 #: ../../../skins/blackorange_skin/_skin.class.php:55
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:67
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:73
 #: ../../../skins/custom/_skin.class.php:55 ../skins/flat_skin/_skin.class.php:55
 #: ../../../skins/horizon_skin/_skin.class.php:55
 #: ../../../skins/material_skin/_skin.class.php:55
 #: ../../../skins/reporter_skin/_skin.class.php:55
-#: ../../../skins/starter_skin/_skin.class.php:55
+#: ../../../skins/starter_skin/_skin.class.php:73
 msgid "Right Sidebar"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:60 ../skins/asevo/_skin.class.php:49
+#: ../../../skins/ark_skin/_skin.class.php:66 ../skins/asevo/_skin.class.php:49
 #: ../../../skins/blackorange_skin/_skin.class.php:60
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:72
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:78
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:89
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:111
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:61
@@ -30544,20 +30535,20 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_skin.class.php:89
 #: ../../../skins/horizon_main_skin/_skin.class.php:113
 #: ../../../skins/horizon_skin/_skin.class.php:60 ../skins/manual/_skin.class.php:79
-#: ../../../skins/material_main_skin/_skin.class.php:214
+#: ../../../skins/material_main_skin/_skin.class.php:119
 #: ../../../skins/material_skin/_skin.class.php:60
 #: ../../../skins/photoalbums/_skin.class.php:89
 #: ../../../skins/photoblog/_skin.class.php:89
 #: ../../../skins/pixelgreen/_skin.class.php:49
 #: ../../../skins/pureforums/_skin.class.php:65
 #: ../../../skins/reporter_skin/_skin.class.php:60
-#: ../../../skins/starter_skin/_skin.class.php:60 ../skins/touch/_skin.class.php:55
+#: ../../../skins/starter_skin/_skin.class.php:78 ../skins/touch/_skin.class.php:55
 msgid "Colorbox Image Zoom"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:61 ../skins/asevo/_skin.class.php:50
+#: ../../../skins/ark_skin/_skin.class.php:67 ../skins/asevo/_skin.class.php:50
 #: ../../../skins/blackorange_skin/_skin.class.php:61
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:73
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:79
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:90
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:112
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:62
@@ -30568,20 +30559,20 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_skin.class.php:90
 #: ../../../skins/horizon_main_skin/_skin.class.php:114
 #: ../../../skins/horizon_skin/_skin.class.php:61 ../skins/manual/_skin.class.php:80
-#: ../../../skins/material_main_skin/_skin.class.php:215
+#: ../../../skins/material_main_skin/_skin.class.php:120
 #: ../../../skins/material_skin/_skin.class.php:61
 #: ../../../skins/photoalbums/_skin.class.php:90
 #: ../../../skins/photoblog/_skin.class.php:90
 #: ../../../skins/pixelgreen/_skin.class.php:50
 #: ../../../skins/pureforums/_skin.class.php:66
 #: ../../../skins/reporter_skin/_skin.class.php:61
-#: ../../../skins/starter_skin/_skin.class.php:61 ../skins/touch/_skin.class.php:56
+#: ../../../skins/starter_skin/_skin.class.php:79 ../skins/touch/_skin.class.php:56
 msgid "Check to enable javascript zooming on images (using the colorbox script)"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:66 ../skins/asevo/_skin.class.php:55
+#: ../../../skins/ark_skin/_skin.class.php:72 ../skins/asevo/_skin.class.php:55
 #: ../../../skins/blackorange_skin/_skin.class.php:66
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:78
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:84
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:95
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:117
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:67
@@ -30592,26 +30583,26 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_skin.class.php:95
 #: ../../../skins/horizon_main_skin/_skin.class.php:119
 #: ../../../skins/horizon_skin/_skin.class.php:66 ../skins/manual/_skin.class.php:85
-#: ../../../skins/material_main_skin/_skin.class.php:220
+#: ../../../skins/material_main_skin/_skin.class.php:125
 #: ../../../skins/material_skin/_skin.class.php:66
 #: ../../../skins/photoalbums/_skin.class.php:95
 #: ../../../skins/photoblog/_skin.class.php:95
 #: ../../../skins/pixelgreen/_skin.class.php:55
 #: ../../../skins/pureforums/_skin.class.php:71
 #: ../../../skins/reporter_skin/_skin.class.php:66
-#: ../../../skins/starter_skin/_skin.class.php:66 ../skins/touch/_skin.class.php:61
+#: ../../../skins/starter_skin/_skin.class.php:84 ../skins/touch/_skin.class.php:61
 msgid "Voting on Post Images"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:67 ../skins/ark_skin/_skin.class.php:79
-#: ../../../skins/ark_skin/_skin.class.php:91 ../skins/asevo/_skin.class.php:56
+#: ../../../skins/ark_skin/_skin.class.php:73 ../skins/ark_skin/_skin.class.php:85
+#: ../../../skins/ark_skin/_skin.class.php:97 ../skins/asevo/_skin.class.php:56
 #: ../../../skins/asevo/_skin.class.php:68 ../skins/asevo/_skin.class.php:80
 #: ../../../skins/blackorange_skin/_skin.class.php:67
 #: ../../../skins/blackorange_skin/_skin.class.php:79
 #: ../../../skins/blackorange_skin/_skin.class.php:91
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:79
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:91
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:103
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:85
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:97
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:109
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:96
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:108
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:120
@@ -30643,9 +30634,9 @@ msgstr ""
 #: ../../../skins/horizon_skin/_skin.class.php:79
 #: ../../../skins/horizon_skin/_skin.class.php:91 ../skins/manual/_skin.class.php:86
 #: ../../../skins/manual/_skin.class.php:98 ../skins/manual/_skin.class.php:110
-#: ../../../skins/material_main_skin/_skin.class.php:221
-#: ../../../skins/material_main_skin/_skin.class.php:233
-#: ../../../skins/material_main_skin/_skin.class.php:245
+#: ../../../skins/material_main_skin/_skin.class.php:126
+#: ../../../skins/material_main_skin/_skin.class.php:138
+#: ../../../skins/material_main_skin/_skin.class.php:150
 #: ../../../skins/material_skin/_skin.class.php:67
 #: ../../../skins/material_skin/_skin.class.php:79
 #: ../../../skins/material_skin/_skin.class.php:91
@@ -30664,22 +30655,22 @@ msgstr ""
 #: ../../../skins/reporter_skin/_skin.class.php:67
 #: ../../../skins/reporter_skin/_skin.class.php:79
 #: ../../../skins/reporter_skin/_skin.class.php:91
-#: ../../../skins/starter_skin/_skin.class.php:67
-#: ../../../skins/starter_skin/_skin.class.php:79
-#: ../../../skins/starter_skin/_skin.class.php:91 ../skins/touch/_skin.class.php:62
+#: ../../../skins/starter_skin/_skin.class.php:85
+#: ../../../skins/starter_skin/_skin.class.php:97
+#: ../../../skins/starter_skin/_skin.class.php:109 ../skins/touch/_skin.class.php:62
 #: ../../../skins/touch/_skin.class.php:74 ../skins/touch/_skin.class.php:86
 msgid "Check this to enable AJAX voting buttons in the colorbox zoom view"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:72 ../skins/ark_skin/_skin.class.php:84
-#: ../../../skins/ark_skin/_skin.class.php:96 ../skins/asevo/_skin.class.php:61
+#: ../../../skins/ark_skin/_skin.class.php:78 ../skins/ark_skin/_skin.class.php:90
+#: ../../../skins/ark_skin/_skin.class.php:102 ../skins/asevo/_skin.class.php:61
 #: ../../../skins/asevo/_skin.class.php:73 ../skins/asevo/_skin.class.php:85
 #: ../../../skins/blackorange_skin/_skin.class.php:72
 #: ../../../skins/blackorange_skin/_skin.class.php:84
 #: ../../../skins/blackorange_skin/_skin.class.php:96
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:84
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:96
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:108
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:90
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:102
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:114
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:101
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:113
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:125
@@ -30711,9 +30702,9 @@ msgstr ""
 #: ../../../skins/horizon_skin/_skin.class.php:84
 #: ../../../skins/horizon_skin/_skin.class.php:96 ../skins/manual/_skin.class.php:91
 #: ../../../skins/manual/_skin.class.php:103 ../skins/manual/_skin.class.php:115
-#: ../../../skins/material_main_skin/_skin.class.php:226
-#: ../../../skins/material_main_skin/_skin.class.php:238
-#: ../../../skins/material_main_skin/_skin.class.php:250
+#: ../../../skins/material_main_skin/_skin.class.php:131
+#: ../../../skins/material_main_skin/_skin.class.php:143
+#: ../../../skins/material_main_skin/_skin.class.php:155
 #: ../../../skins/material_skin/_skin.class.php:72
 #: ../../../skins/material_skin/_skin.class.php:84
 #: ../../../skins/material_skin/_skin.class.php:96
@@ -30732,22 +30723,22 @@ msgstr ""
 #: ../../../skins/reporter_skin/_skin.class.php:72
 #: ../../../skins/reporter_skin/_skin.class.php:84
 #: ../../../skins/reporter_skin/_skin.class.php:96
-#: ../../../skins/starter_skin/_skin.class.php:72
-#: ../../../skins/starter_skin/_skin.class.php:84
-#: ../../../skins/starter_skin/_skin.class.php:96 ../skins/touch/_skin.class.php:67
+#: ../../../skins/starter_skin/_skin.class.php:90
+#: ../../../skins/starter_skin/_skin.class.php:102
+#: ../../../skins/starter_skin/_skin.class.php:114 ../skins/touch/_skin.class.php:67
 #: ../../../skins/touch/_skin.class.php:79 ../skins/touch/_skin.class.php:91
 msgid "Display Votes"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:73 ../skins/ark_skin/_skin.class.php:85
-#: ../../../skins/ark_skin/_skin.class.php:97 ../skins/asevo/_skin.class.php:62
+#: ../../../skins/ark_skin/_skin.class.php:79 ../skins/ark_skin/_skin.class.php:91
+#: ../../../skins/ark_skin/_skin.class.php:103 ../skins/asevo/_skin.class.php:62
 #: ../../../skins/asevo/_skin.class.php:74 ../skins/asevo/_skin.class.php:86
 #: ../../../skins/blackorange_skin/_skin.class.php:73
 #: ../../../skins/blackorange_skin/_skin.class.php:85
 #: ../../../skins/blackorange_skin/_skin.class.php:97
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:85
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:97
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:109
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:91
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:103
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:115
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:102
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:114
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:126
@@ -30779,9 +30770,9 @@ msgstr ""
 #: ../../../skins/horizon_skin/_skin.class.php:85
 #: ../../../skins/horizon_skin/_skin.class.php:97 ../skins/manual/_skin.class.php:92
 #: ../../../skins/manual/_skin.class.php:104 ../skins/manual/_skin.class.php:116
-#: ../../../skins/material_main_skin/_skin.class.php:227
-#: ../../../skins/material_main_skin/_skin.class.php:239
-#: ../../../skins/material_main_skin/_skin.class.php:251
+#: ../../../skins/material_main_skin/_skin.class.php:132
+#: ../../../skins/material_main_skin/_skin.class.php:144
+#: ../../../skins/material_main_skin/_skin.class.php:156
 #: ../../../skins/material_skin/_skin.class.php:73
 #: ../../../skins/material_skin/_skin.class.php:85
 #: ../../../skins/material_skin/_skin.class.php:97
@@ -30800,16 +30791,16 @@ msgstr ""
 #: ../../../skins/reporter_skin/_skin.class.php:73
 #: ../../../skins/reporter_skin/_skin.class.php:85
 #: ../../../skins/reporter_skin/_skin.class.php:97
-#: ../../../skins/starter_skin/_skin.class.php:73
-#: ../../../skins/starter_skin/_skin.class.php:85
-#: ../../../skins/starter_skin/_skin.class.php:97 ../skins/touch/_skin.class.php:68
+#: ../../../skins/starter_skin/_skin.class.php:91
+#: ../../../skins/starter_skin/_skin.class.php:103
+#: ../../../skins/starter_skin/_skin.class.php:115 ../skins/touch/_skin.class.php:68
 #: ../../../skins/touch/_skin.class.php:80 ../skins/touch/_skin.class.php:92
 msgid "Check to display number of likes and dislikes"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:78 ../skins/asevo/_skin.class.php:67
+#: ../../../skins/ark_skin/_skin.class.php:84 ../skins/asevo/_skin.class.php:67
 #: ../../../skins/blackorange_skin/_skin.class.php:78
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:90
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:96
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:107
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:129
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:79
@@ -30820,20 +30811,20 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_skin.class.php:107
 #: ../../../skins/horizon_main_skin/_skin.class.php:131
 #: ../../../skins/horizon_skin/_skin.class.php:78 ../skins/manual/_skin.class.php:97
-#: ../../../skins/material_main_skin/_skin.class.php:232
+#: ../../../skins/material_main_skin/_skin.class.php:137
 #: ../../../skins/material_skin/_skin.class.php:78
 #: ../../../skins/photoalbums/_skin.class.php:107
 #: ../../../skins/photoblog/_skin.class.php:107
 #: ../../../skins/pixelgreen/_skin.class.php:67
 #: ../../../skins/pureforums/_skin.class.php:83
 #: ../../../skins/reporter_skin/_skin.class.php:78
-#: ../../../skins/starter_skin/_skin.class.php:78 ../skins/touch/_skin.class.php:73
+#: ../../../skins/starter_skin/_skin.class.php:96 ../skins/touch/_skin.class.php:73
 msgid "Voting on Comment Images"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:90 ../skins/asevo/_skin.class.php:79
+#: ../../../skins/ark_skin/_skin.class.php:96 ../skins/asevo/_skin.class.php:79
 #: ../../../skins/blackorange_skin/_skin.class.php:90
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:102
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:108
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:119
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:141
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:91
@@ -30845,20 +30836,20 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:143
 #: ../../../skins/horizon_skin/_skin.class.php:90
 #: ../../../skins/manual/_skin.class.php:109
-#: ../../../skins/material_main_skin/_skin.class.php:244
+#: ../../../skins/material_main_skin/_skin.class.php:149
 #: ../../../skins/material_skin/_skin.class.php:90
 #: ../../../skins/photoalbums/_skin.class.php:119
 #: ../../../skins/photoblog/_skin.class.php:119
 #: ../../../skins/pixelgreen/_skin.class.php:79
 #: ../../../skins/pureforums/_skin.class.php:95
 #: ../../../skins/reporter_skin/_skin.class.php:90
-#: ../../../skins/starter_skin/_skin.class.php:90 ../skins/touch/_skin.class.php:85
+#: ../../../skins/starter_skin/_skin.class.php:108 ../skins/touch/_skin.class.php:85
 msgid "Voting on User Images"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:102 ../skins/asevo/_skin.class.php:91
+#: ../../../skins/ark_skin/_skin.class.php:108 ../skins/asevo/_skin.class.php:91
 #: ../../../skins/blackorange_skin/_skin.class.php:102
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:114
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:120
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:131
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:154
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:103
@@ -30870,20 +30861,20 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:156
 #: ../../../skins/horizon_skin/_skin.class.php:102
 #: ../../../skins/manual/_skin.class.php:121
-#: ../../../skins/material_main_skin/_skin.class.php:257
+#: ../../../skins/material_main_skin/_skin.class.php:162
 #: ../../../skins/material_skin/_skin.class.php:102
 #: ../../../skins/photoalbums/_skin.class.php:131
 #: ../../../skins/photoblog/_skin.class.php:131
 #: ../../../skins/pixelgreen/_skin.class.php:91
 #: ../../../skins/pureforums/_skin.class.php:107
 #: ../../../skins/reporter_skin/_skin.class.php:102
-#: ../../../skins/starter_skin/_skin.class.php:102 ../skins/touch/_skin.class.php:97
+#: ../../../skins/starter_skin/_skin.class.php:120 ../skins/touch/_skin.class.php:97
 msgid "Display gender"
 msgstr ""
 
-#: ../../../skins/ark_skin/_skin.class.php:114 ../skins/asevo/_skin.class.php:103
+#: ../../../skins/ark_skin/_skin.class.php:120 ../skins/asevo/_skin.class.php:103
 #: ../../../skins/blackorange_skin/_skin.class.php:114
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:126
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:132
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:143
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:166
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:115
@@ -30895,14 +30886,14 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:168
 #: ../../../skins/horizon_skin/_skin.class.php:114
 #: ../../../skins/manual/_skin.class.php:133
-#: ../../../skins/material_main_skin/_skin.class.php:269
+#: ../../../skins/material_main_skin/_skin.class.php:174
 #: ../../../skins/material_skin/_skin.class.php:114
 #: ../../../skins/photoalbums/_skin.class.php:143
 #: ../../../skins/photoblog/_skin.class.php:143
 #: ../../../skins/pixelgreen/_skin.class.php:103
 #: ../../../skins/pureforums/_skin.class.php:119
 #: ../../../skins/reporter_skin/_skin.class.php:114
-#: ../../../skins/starter_skin/_skin.class.php:114
+#: ../../../skins/starter_skin/_skin.class.php:132
 #: ../../../skins/touch/_skin.class.php:109
 msgid "Autocomplete usernames"
 msgstr ""
@@ -30921,7 +30912,7 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/index.main.php:53
 #: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:46
 #: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:46
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:79
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:55
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:68
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:69
 #: ../../../skins/bootstrap_main_skin/index.main.php:76
@@ -30943,22 +30934,21 @@ msgstr ""
 #: ../../../skins/forums/index.main.php:91
 #: ../../../skins/horizon_gallery_skin/access_denied.main.php:46
 #: ../../../skins/horizon_gallery_skin/access_requires_login.main.php:46
-#: ../../../skins/horizon_gallery_skin/index.main.php:58
+#: ../../../skins/horizon_gallery_skin/index.main.php:56
 #: ../../../skins/horizon_main_skin/access_denied.main.php:68
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:69
 #: ../../../skins/horizon_main_skin/index.main.php:64
 #: ../../../skins/horizon_skin/access_denied.main.php:56
 #: ../../../skins/horizon_skin/access_requires_login.main.php:60
-#: ../../../skins/horizon_skin/index.main.php:53
+#: ../../../skins/horizon_skin/index.main.php:52
 #: ../../../skins/horizon_skin/single.main.php:64
 #: ../../../skins/manual/_body_header.inc.php:38
 #: ../../../skins/material_main_skin/access_denied.main.php:68
 #: ../../../skins/material_main_skin/access_requires_login.main.php:69
-#: ../../../skins/material_main_skin/index.main.php:86
+#: ../../../skins/material_main_skin/index.main.php:78
 #: ../../../skins/material_skin/access_denied.main.php:56
 #: ../../../skins/material_skin/access_requires_login.main.php:60
 #: ../../../skins/material_skin/index.main.php:69
-#: ../../../skins/mystique/index.main.php:50
 #: ../../../skins/photoalbums/access_denied.main.php:46
 #: ../../../skins/photoalbums/access_requires_login.main.php:46
 #: ../../../skins/photoalbums/index.main.php:52
@@ -30973,7 +30963,7 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:96
 #: ../../../skins/reporter_skin/access_denied.main.php:56
 #: ../../../skins/reporter_skin/access_requires_login.main.php:56
-#: ../../../skins/reporter_skin/front.main.php:54
+#: ../../../skins/reporter_skin/front.main.php:52
 #: ../../../skins/reporter_skin/index.main.php:53
 #: ../../../skins/reporter_skin/posts.main.php:52
 #: ../../../skins/starter_skin/access_denied.main.php:51
@@ -30994,7 +30984,7 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:69
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:70
 #: ../../../skins/bootstrap_blog_skin/index.main.php:72
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:54
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:73
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:86
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:87
 #: ../../../skins/bootstrap_main_skin/index.main.php:95
@@ -31014,17 +31004,18 @@ msgstr ""
 #: ../../../skins/forums/access_denied.main.php:76
 #: ../../../skins/forums/access_requires_login.main.php:76
 #: ../../../skins/forums/index.main.php:109
+#: ../../../skins/horizon_gallery_skin/index.main.php:75
 #: ../../../skins/horizon_main_skin/access_denied.main.php:86
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
 #: ../../../skins/horizon_main_skin/index.main.php:83
 #: ../../../skins/horizon_skin/access_denied.main.php:74
 #: ../../../skins/horizon_skin/access_requires_login.main.php:78
-#: ../../../skins/horizon_skin/index.main.php:73
+#: ../../../skins/horizon_skin/index.main.php:71
 #: ../../../skins/horizon_skin/single.main.php:83
 #: ../../../skins/manual/_body_header.inc.php:56
 #: ../../../skins/material_main_skin/access_denied.main.php:86
 #: ../../../skins/material_main_skin/access_requires_login.main.php:87
-#: ../../../skins/material_main_skin/index.main.php:105
+#: ../../../skins/material_main_skin/index.main.php:97
 #: ../../../skins/material_skin/access_denied.main.php:74
 #: ../../../skins/material_skin/access_requires_login.main.php:78
 #: ../../../skins/material_skin/index.main.php:53
@@ -31036,7 +31027,7 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:123
 #: ../../../skins/reporter_skin/access_denied.main.php:74
 #: ../../../skins/reporter_skin/access_requires_login.main.php:74
-#: ../../../skins/reporter_skin/front.main.php:73
+#: ../../../skins/reporter_skin/front.main.php:71
 #: ../../../skins/reporter_skin/index.main.php:72
 #: ../../../skins/reporter_skin/posts.main.php:71
 #: ../../../skins/starter_skin/access_denied.main.php:69
@@ -31047,16 +31038,17 @@ msgstr ""
 
 #: ../../../skins/ark_skin/access_denied.main.php:116
 #: ../../../skins/ark_skin/access_requires_login.main.php:127
-#: ../../../skins/ark_skin/index.main.php:301 ../skins/ark_skin/single.main.php:265
+#: ../../../skins/ark_skin/single.main.php:265
 #: ../../../skins/blackorange_skin/access_denied.main.php:116
 #: ../../../skins/blackorange_skin/access_requires_login.main.php:124
 #: ../../../skins/blackorange_skin/index.main.php:430
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:118
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:125
 #: ../../../skins/bootstrap_blog_skin/index.main.php:394
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:304
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:146
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:147
-#: ../../../skins/bootstrap_main_skin/index.main.php:345
+#: ../../../skins/bootstrap_main_skin/index.main.php:347
 #: ../../../skins/bootstrap_manual_skin/_body_footer.inc.php:36
 #: ../../../skins/custom/access_denied.main.php:128
 #: ../../../skins/custom/access_requires_login.main.php:133
@@ -31071,23 +31063,21 @@ msgstr ""
 #: ../../../skins/forums/access_requires_login.main.php:132
 #: ../../../skins/forums/index.main.php:268
 #: ../../../skins/horizon_gallery_skin/_body_footer.inc.php:23
+#: ../../../skins/horizon_gallery_skin/index.main.php:304
 #: ../../../skins/horizon_main_skin/access_denied.main.php:146
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:148
 #: ../../../skins/horizon_main_skin/index.main.php:391
 #: ../../../skins/horizon_skin/access_denied.main.php:128
 #: ../../../skins/horizon_skin/access_requires_login.main.php:133
-#: ../../../skins/horizon_skin/index.main.php:416
+#: ../../../skins/horizon_skin/index.main.php:413
 #: ../../../skins/horizon_skin/single.main.php:389
 #: ../../../skins/manual/_body_footer.inc.php:29
 #: ../../../skins/material_main_skin/access_denied.main.php:146
 #: ../../../skins/material_main_skin/access_requires_login.main.php:148
-#: ../../../skins/material_main_skin/index.main.php:428
+#: ../../../skins/material_main_skin/index.main.php:411
 #: ../../../skins/material_skin/access_denied.main.php:128
 #: ../../../skins/material_skin/access_requires_login.main.php:133
-#: ../../../skins/material_skin/index.main.php:404
-#: ../../../skins/mystique/_skin.class.php:718
-#: ../../../skins/mystique/a_skin.class.php:686
-#: ../../../skins/mystique/mess_skin.class.php:686
+#: ../../../skins/material_skin/index.main.php:406
 #: ../../../skins/photoalbums/_body_footer.inc.php:23
 #: ../../../skins/pixelgreen/access_denied.main.php:115
 #: ../../../skins/pixelgreen/access_requires_login.main.php:123
@@ -31097,20 +31087,20 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:248
 #: ../../../skins/reporter_skin/access_denied.main.php:122
 #: ../../../skins/reporter_skin/access_requires_login.main.php:129
-#: ../../../skins/reporter_skin/front.main.php:400
+#: ../../../skins/reporter_skin/front.main.php:408
 #: ../../../skins/reporter_skin/index.main.php:400
-#: ../../../skins/reporter_skin/page.main.php:229
+#: ../../../skins/reporter_skin/page.main.php:232
 #: ../../../skins/reporter_skin/posts.main.php:371
-#: ../../../skins/reporter_skin/single.main.php:237
-#: ../../../skins/starter_skin/access_denied.main.php:117
+#: ../../../skins/reporter_skin/single.main.php:239
+#: ../../../skins/starter_skin/access_denied.main.php:118
 #: ../../../skins/starter_skin/access_requires_login.main.php:125
-#: ../../../skins/starter_skin/index.main.php:406
+#: ../../../skins/starter_skin/index.main.php:394
 msgid "Footer"
 msgstr ""
 
 #: ../../../skins/ark_skin/access_denied.main.php:138
 #: ../../../skins/ark_skin/access_requires_login.main.php:149
-#: ../../../skins/ark_skin/index.main.php:330 ../skins/ark_skin/single.main.php:294
+#: ../../../skins/ark_skin/single.main.php:294
 #: ../../../skins/asevo/_body_footer.inc.php:34
 #: ../../../skins/basic/access_denied.main.php:126
 #: ../../../skins/basic/access_requires_login.main.php:133
@@ -31121,10 +31111,11 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:142
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:149
 #: ../../../skins/bootstrap_blog_skin/index.main.php:418
-#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:34
+#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:31
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:326
 #: ../../../skins/bootstrap_main_skin/access_denied.main.php:168
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:169
-#: ../../../skins/bootstrap_main_skin/index.main.php:367
+#: ../../../skins/bootstrap_main_skin/index.main.php:369
 #: ../../../skins/bootstrap_manual_skin/_body_footer.inc.php:58
 #: ../../../skins/colourise/_body_footer.inc.php:34
 #: ../../../skins/custom/access_denied.main.php:150
@@ -31142,20 +31133,21 @@ msgstr ""
 #: ../../../skins/forums/access_requires_login.main.php:154
 #: ../../../skins/forums/index.main.php:290
 #: ../../../skins/horizon_gallery_skin/_body_footer.inc.php:34
+#: ../../../skins/horizon_gallery_skin/index.main.php:326
 #: ../../../skins/horizon_main_skin/access_denied.main.php:168
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:170
 #: ../../../skins/horizon_main_skin/index.main.php:413
 #: ../../../skins/horizon_skin/access_denied.main.php:150
 #: ../../../skins/horizon_skin/access_requires_login.main.php:155
-#: ../../../skins/horizon_skin/index.main.php:438
+#: ../../../skins/horizon_skin/index.main.php:435
 #: ../../../skins/horizon_skin/single.main.php:411
 #: ../../../skins/manual/_body_footer.inc.php:51
 #: ../../../skins/material_main_skin/access_denied.main.php:168
 #: ../../../skins/material_main_skin/access_requires_login.main.php:170
-#: ../../../skins/material_main_skin/index.main.php:450
+#: ../../../skins/material_main_skin/index.main.php:433
 #: ../../../skins/material_skin/access_denied.main.php:150
 #: ../../../skins/material_skin/access_requires_login.main.php:155
-#: ../../../skins/material_skin/index.main.php:426
+#: ../../../skins/material_skin/index.main.php:428
 #: ../../../skins/photoalbums/_body_footer.inc.php:34
 #: ../../../skins/photoblog/_body_footer.inc.php:27
 #: ../../../skins/pixelgreen/access_denied.main.php:140
@@ -31166,14 +31158,14 @@ msgstr ""
 #: ../../../skins/pureforums/index.main.php:270
 #: ../../../skins/reporter_skin/access_denied.main.php:144
 #: ../../../skins/reporter_skin/access_requires_login.main.php:151
-#: ../../../skins/reporter_skin/front.main.php:422
+#: ../../../skins/reporter_skin/front.main.php:430
 #: ../../../skins/reporter_skin/index.main.php:423
-#: ../../../skins/reporter_skin/page.main.php:251
+#: ../../../skins/reporter_skin/page.main.php:254
 #: ../../../skins/reporter_skin/posts.main.php:394
-#: ../../../skins/reporter_skin/single.main.php:260
-#: ../../../skins/starter_skin/access_denied.main.php:139
-#: ../../../skins/starter_skin/access_requires_login.main.php:147
-#: ../../../skins/starter_skin/index.main.php:428
+#: ../../../skins/reporter_skin/single.main.php:262
+#: ../../../skins/starter_skin/access_denied.main.php:142
+#: ../../../skins/starter_skin/access_requires_login.main.php:149
+#: ../../../skins/starter_skin/index.main.php:418
 #: ../../../skins/touch/_body_footer.inc.php:33
 #: ../../../skins_fallback_v5/_body_footer.inc.php:24
 msgid "Send a message to the owner of this blog..."
@@ -31186,7 +31178,7 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/index.main.php:262
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:117
 #: ../../../skins/bootstrap_main_skin/index.main.php:263
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:551
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:564
 #: ../../../skins/custom/access_requires_login.main.php:108
 #: ../../../skins/custom/index.main.php:284 ../skins/custom/single.main.php:283
 #: ../../../skins/flat_skin/access_requires_login.main.php:99
@@ -31194,24 +31186,23 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
 #: ../../../skins/horizon_main_skin/index.main.php:277
 #: ../../../skins/horizon_skin/access_requires_login.main.php:108
-#: ../../../skins/horizon_skin/index.main.php:297
+#: ../../../skins/horizon_skin/index.main.php:294
 #: ../../../skins/horizon_skin/single.main.php:303
 #: ../../../skins/material_main_skin/access_requires_login.main.php:117
-#: ../../../skins/material_main_skin/index.main.php:299
+#: ../../../skins/material_main_skin/index.main.php:286
 #: ../../../skins/material_skin/access_requires_login.main.php:108
-#: ../../../skins/material_skin/index.main.php:282
+#: ../../../skins/material_skin/index.main.php:284
 #: ../../../skins/reporter_skin/access_requires_login.main.php:104
 #: ../../../skins/reporter_skin/front.main.php:286
 #: ../../../skins/reporter_skin/index.main.php:285
 #: ../../../skins/reporter_skin/posts.main.php:257
 #: ../../../skins/starter_skin/access_requires_login.main.php:100
-#: ../../../skins/starter_skin/index.main.php:289
+#: ../../../skins/starter_skin/index.main.php:262
 #: ../../../skins_adm/login/_login_form.main.php:38
 msgid "Log in to your account"
 msgstr ""
 
-#: ../../../skins/ark_skin/index.main.php:257 ../skins/ark_skin/single.main.php:222
-#: ../../../skins/asevo/index.main.php:188
+#: ../../../skins/ark_skin/single.main.php:222 ../skins/asevo/index.main.php:188
 #: ../../../skins/blackorange_skin/index.main.php:388
 #: ../../../skins/bootstrap_blog_skin/index.main.php:313
 #: ../../../skins/bootstrap_manual_skin/_left_navigation_bar.inc.php:27
@@ -31219,15 +31210,14 @@ msgstr ""
 #: ../../../skins/dating_mood/index.main.php:212
 #: ../../../skins/evocamp/_sidebar_left.inc.php:21
 #: ../../../skins/evopress/_sidebar.inc.php:22 ../skins/flat_skin/index.main.php:364
-#: ../../../skins/forums/index.main.php:234 ../skins/horizon_skin/index.main.php:372
+#: ../../../skins/forums/index.main.php:234 ../skins/horizon_skin/index.main.php:369
 #: ../../../skins/manual/_left_navigation_bar.inc.php:25
-#: ../../../skins/material_skin/index.main.php:359
-#: ../../../skins/mystique/index.main.php:279
+#: ../../../skins/material_skin/index.main.php:361
 #: ../../../skins/pixelgreen/_sidebar.inc.php:20
-#: ../../../skins/reporter_skin/front.main.php:357
+#: ../../../skins/reporter_skin/front.main.php:364
 #: ../../../skins/reporter_skin/index.main.php:356
 #: ../../../skins/reporter_skin/posts.main.php:328
-#: ../../../skins/starter_skin/index.main.php:364
+#: ../../../skins/starter_skin/index.main.php:313
 msgid "Sidebar"
 msgstr ""
 
@@ -31256,8 +31246,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:248
 #: ../../../skins/pureforums/_item_comment_form.inc.php:302
 #: ../../../skins/touch/_item_comment_form.inc.php:237
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:249
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:257
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:248
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:256
 msgid "Your URL will be displayed."
 msgstr ""
 
@@ -31274,8 +31264,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:323
 #: ../../../skins/pureforums/_item_comment_form.inc.php:379
 #: ../../../skins/touch/_item_comment_form.inc.php:316
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:324
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:332
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:323
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:331
 msgid "Remember me"
 msgstr ""
 
@@ -31306,7 +31296,7 @@ msgstr ""
 #: ../../../skins/bootstrap_blog_skin/index.main.php:350
 #: ../../../skins/bootstrap_manual_skin/_left_navigation_bar.inc.php:63
 #: ../../../skins/evocamp/_sidebar_right.inc.php:23
-#: ../../../skins/mystique/index.main.php:220
+#: ../../../skins/starter_skin/index.main.php:350
 msgid "Sidebar 2"
 msgstr ""
 
@@ -31339,8 +31329,8 @@ msgstr ""
 
 #: ../../../skins/bootstrap_gallery_skin/_item_comment.inc.php:58
 #: ../../../skins/horizon_gallery_skin/_item_comment.inc.php:58
+#: ../../../skins/material_main_skin/_item_comment.inc.php:80
 #: ../../../skins/material_skin/_item_comment.inc.php:80
-#: ../../../skins/mystique/_item_comment.inc.php:60
 #: ../../../skins/photoalbums/_item_comment.inc.php:58
 #: ../../../skins_fallback_v5/_item_comment.inc.php:80
 #: ../../../skins_fallback_v6/_item_comment.inc.php:80
@@ -31362,7 +31352,7 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_skin.class.php:78
 #: ../../../skins/horizon_main_skin/_skin.class.php:83
 #: ../../../skins/manual/_skin.class.php:74
-#: ../../../skins/material_main_skin/_skin.class.php:184
+#: ../../../skins/material_main_skin/_skin.class.php:89
 #: ../../../skins/photoalbums/_skin.class.php:54
 #: ../../../skins/photoalbums/_skin.class.php:78
 #: ../../../skins/photoblog/_skin.class.php:54 ../skins/photoblog/_skin.class.php:78
@@ -31409,8 +31399,8 @@ msgstr ""
 #: ../../../skins/horizon_main_skin/_skin.class.php:77
 #: ../../../skins/horizon_main_skin/_skin.class.php:89
 #: ../../../skins/manual/_skin.class.php:56 ../skins/manual/_skin.class.php:68
-#: ../../../skins/material_main_skin/_skin.class.php:178
-#: ../../../skins/material_main_skin/_skin.class.php:190
+#: ../../../skins/material_main_skin/_skin.class.php:83
+#: ../../../skins/material_main_skin/_skin.class.php:95
 #: ../../../skins/photoalbums/_skin.class.php:72
 #: ../../../skins/photoblog/_skin.class.php:72
 msgid "E-g: #00ff00 for green"
@@ -31467,10 +31457,10 @@ msgstr ""
 
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:33
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:35
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:211
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:215
 #: ../../../skins/horizon_gallery_skin/index.main.php:33
 #: ../../../skins/horizon_gallery_skin/index.main.php:35
-#: ../../../skins/horizon_gallery_skin/index.main.php:195
+#: ../../../skins/horizon_gallery_skin/index.main.php:213
 #: ../../../skins/photoalbums/index.main.php:33
 #: ../../../skins/photoalbums/index.main.php:35
 #: ../../../skins/photoalbums/index.main.php:192
@@ -31481,80 +31471,73 @@ msgid "Galleries"
 msgstr ""
 
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:34
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:210
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:214
 #: ../../../skins/horizon_gallery_skin/index.main.php:34
-#: ../../../skins/horizon_gallery_skin/index.main.php:194
+#: ../../../skins/horizon_gallery_skin/index.main.php:212
 #: ../../../skins/photoalbums/index.main.php:34
 #: ../../../skins/photoalbums/index.main.php:191
 #: ../../../skins/photoblog/index.main.php:29 ../skins/photoblog/index.main.php:143
 msgid "Gallery"
 msgstr ""
 
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:126
-#: ../../../skins/horizon_gallery_skin/index.main.php:115
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:130
+#: ../../../skins/horizon_gallery_skin/index.main.php:156
 #: ../../../skins/photoalbums/index.main.php:112
 msgid "All Albums"
 msgstr ""
 
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:134
-#: ../../../skins/horizon_gallery_skin/index.main.php:126
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:138
+#: ../../../skins/horizon_gallery_skin/index.main.php:136
 #: ../../../skins/photoalbums/index.main.php:123
 #: ../../../skins/photoblog/_item_block.inc.php:93
 msgid "Edit title/description..."
 msgstr ""
 
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:173
-#: ../../../skins/horizon_gallery_skin/index.main.php:160
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:177
 #: ../../../skins/photoalbums/index.main.php:157
 #, php-format
 msgid "%s photos"
 msgstr ""
 
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:62
-#: ../../../skins/horizon_main_skin/_skin.class.php:64
-#: ../../../skins/material_main_skin/_skin.class.php:165
-msgid "Front page background image"
-msgstr ""
-
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:68
 #: ../../../skins/horizon_main_skin/_skin.class.php:70
-#: ../../../skins/material_main_skin/_skin.class.php:171
+#: ../../../skins/material_main_skin/_skin.class.php:76
 msgid "Front page title color"
 msgstr ""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:74
 #: ../../../skins/horizon_main_skin/_skin.class.php:76
-#: ../../../skins/material_main_skin/_skin.class.php:177
+#: ../../../skins/material_main_skin/_skin.class.php:82
 msgid "Front page text color"
 msgstr ""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:80
 #: ../../../skins/horizon_main_skin/_skin.class.php:82
-#: ../../../skins/material_main_skin/_skin.class.php:183
+#: ../../../skins/material_main_skin/_skin.class.php:88
 msgid "Front page link color"
 msgstr ""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:86
 #: ../../../skins/horizon_main_skin/_skin.class.php:88
-#: ../../../skins/material_main_skin/_skin.class.php:189
+#: ../../../skins/material_main_skin/_skin.class.php:94
 msgid "Front page inverse icon color"
 msgstr ""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:92
 #: ../../../skins/horizon_main_skin/_skin.class.php:94
-#: ../../../skins/material_main_skin/_skin.class.php:195
+#: ../../../skins/material_main_skin/_skin.class.php:100
 msgid "Front page main area background color"
 msgstr ""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:98
 #: ../../../skins/horizon_main_skin/_skin.class.php:100
-#: ../../../skins/material_main_skin/_skin.class.php:201
+#: ../../../skins/material_main_skin/_skin.class.php:106
 msgid "Front page main area background opacity"
 msgstr ""
 
-#: ../../../skins/bootstrap_main_skin/index.main.php:328
+#: ../../../skins/bootstrap_main_skin/index.main.php:329
 #: ../../../skins/horizon_main_skin/index.main.php:370
-#: ../../../skins/material_main_skin/index.main.php:394
+#: ../../../skins/material_main_skin/index.main.php:379
 msgid "Front Page Secondary Area"
 msgstr ""
 
@@ -31791,8 +31774,8 @@ msgstr ""
 
 #: ../../../skins/forums/_edit_comment.disp.php:176
 #: ../../../skins/pureforums/_edit_comment.disp.php:176
-#: ../../../skins_fallback_v5/_edit_comment.disp.php:138
-#: ../../../skins_fallback_v6/_edit_comment.disp.php:138
+#: ../../../skins_fallback_v5/_edit_comment.disp.php:137
+#: ../../../skins_fallback_v6/_edit_comment.disp.php:137
 msgid "You do not have permission to edit file attachments for this comment"
 msgstr ""
 
@@ -32001,8 +31984,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:243
 #: ../../../skins/pureforums/_item_comment_form.inc.php:297
 #: ../../../skins/touch/_item_comment_form.inc.php:232
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:244
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:252
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:243
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:251
 msgid "Your email address will <strong>not</strong> be revealed on this site."
 msgstr ""
 
@@ -32010,8 +31993,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:257
 #: ../../../skins/pureforums/_item_comment_form.inc.php:308
 #: ../../../skins/touch/_item_comment_form.inc.php:243
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:258
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:266
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:257
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:265
 msgid "Your vote"
 msgstr ""
 
@@ -32019,8 +32002,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:308
 #: ../../../skins/pureforums/_item_comment_form.inc.php:364
 #: ../../../skins/touch/_item_comment_form.inc.php:301
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:309
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:317
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:316
 msgid "Attached files"
 msgstr ""
 
@@ -32028,8 +32011,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:324
 #: ../../../skins/pureforums/_item_comment_form.inc.php:380
 #: ../../../skins/touch/_item_comment_form.inc.php:317
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:325
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:333
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:324
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:332
 msgid "For my next comment on this site"
 msgstr ""
 
@@ -32037,8 +32020,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:338
 #: ../../../skins/pureforums/_item_comment_form.inc.php:394
 #: ../../../skins/touch/_item_comment_form.inc.php:331
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:339
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:347
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:338
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:346
 msgid "Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!"
 msgstr ""
 
@@ -32046,8 +32029,8 @@ msgstr ""
 #: ../../../skins/material_skin/_item_comment_form.inc.php:365
 #: ../../../skins/pureforums/_item_comment_form.inc.php:411
 #: ../../../skins/touch/_item_comment_form.inc.php:353
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:366
-#: ../../../skins_fallback_v6/_item_comment_form.inc.php:374
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:365
+#: ../../../skins_fallback_v6/_item_comment_form.inc.php:373
 msgid "Preview/Add file"
 msgstr ""
 
@@ -32192,7 +32175,7 @@ msgstr ""
 #: ../../../skins/horizon_gallery_skin/_front.disp.php:24
 #: ../../../skins/photoalbums/_front.disp.php:24 ../skins/touch/_front.disp.php:23
 #: ../../../skins_fallback_v5/_front.disp.php:29
-#: ../../../skins_fallback_v6/_front.disp.php:31
+#: ../../../skins_fallback_v6/_front.disp.php:34
 msgid "Front Page Main Area"
 msgstr ""
 
@@ -32200,74 +32183,12 @@ msgstr ""
 msgid "Pages in this chapter:"
 msgstr ""
 
-#: ../../../skins/material_main_skin/_skin.class.php:73
-msgid "Recommended widget set"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_skin.class.php:74
-msgid "Alternative widget set"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_skin.class.php:75
-msgid "Full widget set"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:43
-#: ../../../skins_fallback_v5/_user.disp.php:43
-#: ../../../skins_fallback_v6/_user.disp.php:43
-msgid "Edit in Back-Office"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:139
-#: ../../../skins_fallback_v5/_user.disp.php:144
-#: ../../../skins_fallback_v6/_user.disp.php:144
-#, php-format
-msgid "%s years old"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:188
-#: ../../../skins_fallback_v5/_user.disp.php:193
-#: ../../../skins_fallback_v6/_user.disp.php:193
-msgid "Send Message"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:200
-#: ../../../skins_fallback_v5/_user.disp.php:205
-#: ../../../skins_fallback_v6/_user.disp.php:205
-msgid "Add to Contacts"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:204
-#: ../../../skins_fallback_v5/_user.disp.php:213
-#: ../../../skins_fallback_v6/_user.disp.php:213
-msgid "Edit Contact"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:211
-#: ../../../skins_fallback_v5/_user.disp.php:221
-#: ../../../skins_fallback_v6/_user.disp.php:221
-msgid "Block Contact"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:217
-#: ../../../skins_fallback_v5/_user.disp.php:227
-#: ../../../skins_fallback_v6/_user.disp.php:227
-msgid "Unblock Contact"
-msgstr ""
-
-#: ../../../skins/material_main_skin/_user.disp.php:234
-#: ../../../skins_fallback_v5/_user.disp.php:248
-#: ../../../skins_fallback_v6/_user.disp.php:248
-msgid "Edit Reported User"
-msgstr ""
-
+#: ../../../skins/material_main_skin/_item_comment.inc.php:86
+#: ../../../skins/material_main_skin/_item_comment.inc.php:112
+#: ../../../skins/material_main_skin/_item_comment.inc.php:123
 #: ../../../skins/material_skin/_item_comment.inc.php:86
 #: ../../../skins/material_skin/_item_comment.inc.php:112
 #: ../../../skins/material_skin/_item_comment.inc.php:123
-#: ../../../skins/mystique/_item_comment.inc.php:46
-#: ../../../skins/mystique/_item_comment.inc.php:50
-#: ../../../skins/mystique/_item_comment.inc.php:54
-#: ../../../skins/mystique/_item_comment.inc.php:65
 #: ../../../skins_fallback_v5/_item_comment.inc.php:86
 #: ../../../skins_fallback_v5/_item_comment.inc.php:112
 #: ../../../skins_fallback_v5/_item_comment.inc.php:123
@@ -32277,596 +32198,196 @@ msgstr ""
 msgid "from:"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_comment.inc.php:113
 #: ../../../skins/material_skin/_item_comment.inc.php:113
-#: ../../../skins/mystique/_item_comment.inc.php:46
 #: ../../../skins_fallback_v5/_item_comment.inc.php:113
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:71
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:73
 #: ../../../skins_fallback_v6/_item_comment.inc.php:113
 msgid "Trackback"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_comment.inc.php:124
 #: ../../../skins/material_skin/_item_comment.inc.php:124
-#: ../../../skins/mystique/_item_comment.inc.php:50
 #: ../../../skins_fallback_v5/_item_comment.inc.php:124
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:81
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:83
 #: ../../../skins_fallback_v6/_item_comment.inc.php:124
 msgid "Pingback"
 msgstr ""
 
-#: ../../../skins/material_skin/_item_content.inc.php:63
-#: ../../../skins_fallback_v5/_item_content.inc.php:64
-#: ../../../skins_fallback_v6/_item_content.inc.php:74
-msgid "Link:"
-msgstr ""
-
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:66
 #: ../../../skins/material_skin/_item_feedback.inc.php:66
 #: ../../../skins/touch/_item_feedback.inc.php:52
 #: ../../../skins_email/comment_new.html.php:169
 #: ../../../skins_email/comment_new.txt.php:162
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:66
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:65
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:66
 msgid "This is your post. You are receiving notifications when anyone comments on your posts."
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:67
 #: ../../../skins/material_skin/_item_feedback.inc.php:67
 #: ../../../skins/touch/_item_feedback.inc.php:333
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:67
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:66
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:67
 msgid "You will be notified by email when someone comments here."
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:68
 #: ../../../skins/material_skin/_item_feedback.inc.php:68
 #: ../../../skins/touch/_item_feedback.inc.php:338
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:68
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:67
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:68
 msgid "Notify me by email when someone comments here."
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:178
 #: ../../../skins/material_skin/_item_feedback.inc.php:178
-#: ../../../skins/mystique/_item_feedback.inc.php:234
 #: ../../../skins/touch/_item_feedback.inc.php:140
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:178
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:177
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:178
 msgid "Trackback address for this post"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:186
 #: ../../../skins/material_skin/_item_feedback.inc.php:186
 #: ../../../skins/touch/_item_feedback.inc.php:148
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:186
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:185
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:186
 msgid "Trackback URL (right click and copy shortcut/link location)"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:195
 #: ../../../skins/material_skin/_item_feedback.inc.php:195
-#: ../../../skins/mystique/_item_feedback.inc.php:191
 #: ../../../skins/touch/_item_feedback.inc.php:157
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:195
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:194
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:195
 msgid "Feedback awaiting moderation"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:203
 #: ../../../skins/material_skin/_item_feedback.inc.php:203
-#: ../../../skins/mystique/_item_feedback.inc.php:199
 #: ../../../skins/touch/_item_feedback.inc.php:165
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:203
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:202
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:203
 msgid "No feedback yet"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:353
 #: ../../../skins/material_skin/_item_feedback.inc.php:353
-#: ../../../skins/mystique/_item_feedback.inc.php:214
 #: ../../../skins/touch/_item_feedback.inc.php:275
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:353
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:352
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:353
 #, php-format
 msgid "This post has 1 feedback awaiting moderation... %s"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:354
 #: ../../../skins/material_skin/_item_feedback.inc.php:354
-#: ../../../skins/mystique/_item_feedback.inc.php:215
 #: ../../../skins/touch/_item_feedback.inc.php:276
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:354
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:353
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:354
 #, php-format
 msgid "This post has %d feedbacks awaiting moderation... %s"
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:397
 #: ../../../skins/material_skin/_item_feedback.inc.php:397
 #: ../../../skins/touch/_item_feedback.inc.php:317
 #: ../../../skins_email/comment_new.html.php:153
 #: ../../../skins_email/comment_new.txt.php:146
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:397
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:396
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:397
 msgid "You are receiving notifications when anyone comments on any post."
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:398
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:412
 #: ../../../skins/material_skin/_item_feedback.inc.php:398
 #: ../../../skins/material_skin/_item_feedback.inc.php:412
 #: ../../../skins/touch/_item_feedback.inc.php:318
 #: ../../../skins/touch/_item_feedback.inc.php:326
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:398
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:412
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:397
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:411
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:398
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:412
 msgid "Click here to manage your subscriptions."
 msgstr ""
 
+#: ../../../skins/material_main_skin/_item_feedback.inc.php:420
 #: ../../../skins/material_skin/_item_feedback.inc.php:420
 #: ../../../skins/touch/_item_feedback.inc.php:334
-#: ../../../skins_fallback_v5/_item_feedback.inc.php:420
+#: ../../../skins_fallback_v5/_item_feedback.inc.php:419
 #: ../../../skins_fallback_v6/_item_feedback.inc.php:420
 msgid "Click here to unsubscribe."
 msgstr ""
 
-#: ../../../skins/mystique/_item_block.inc.php:99
-msgid "Posted by"
+#: ../../../skins/material_main_skin/_user.disp.php:43
+#: ../../../skins/material_skin/_user.disp.php:43
+#: ../../../skins_fallback_v5/_user.disp.php:43
+#: ../../../skins_fallback_v6/_user.disp.php:43
+msgid "Edit in Back-Office"
 msgstr ""
 
-#: ../../../skins/mystique/_item_block.inc.php:118
-msgid "No comments"
-msgstr ""
-
-#: ../../../skins/mystique/_item_block.inc.php:122
-msgid "comment"
-msgstr ""
-
-#: ../../../skins/mystique/_item_block.inc.php:122
-msgid "comments"
-msgstr ""
-
-#: ../../../skins/mystique/_item_block.inc.php:161
-msgid "Print article"
-msgstr ""
-
-#: ../../../skins/mystique/_item_block.inc.php:164
+#: ../../../skins/material_main_skin/_user.disp.php:139
+#: ../../../skins/material_skin/_user.disp.php:143
+#: ../../../skins_fallback_v5/_user.disp.php:143
+#: ../../../skins_fallback_v6/_user.disp.php:143
 #, php-format
-msgid "This %1$s was posted by %2$s on %3$s at %4$s. Follow any responses to this post through %5$s."
+msgid "%s years old"
 msgstr ""
 
-#: ../../../skins/mystique/_item_block.inc.php:165
-msgid "entry"
+#: ../../../skins/material_main_skin/_user.disp.php:188
+#: ../../../skins/material_skin/_user.disp.php:192
+#: ../../../skins_fallback_v5/_user.disp.php:192
+#: ../../../skins_fallback_v6/_user.disp.php:192
+msgid "Send Message"
 msgstr ""
 
-#: ../../../skins/mystique/_item_block.inc.php:166
-msgid "Posts by"
+#: ../../../skins/material_main_skin/_user.disp.php:200
+#: ../../../skins/material_skin/_user.disp.php:204
+#: ../../../skins_fallback_v5/_user.disp.php:204
+#: ../../../skins_fallback_v6/_user.disp.php:204
+msgid "Add to Contacts"
 msgstr ""
 
-#: ../../../skins/mystique/_item_block.inc.php:182
-msgid "Post bottom"
+#: ../../../skins/material_main_skin/_user.disp.php:204
+#: ../../../skins/material_skin/_user.disp.php:212
+#: ../../../skins_fallback_v5/_user.disp.php:212
+#: ../../../skins_fallback_v6/_user.disp.php:212
+msgid "Edit Contact"
 msgstr ""
 
-#: ../../../skins/mystique/_item_comment.inc.php:54
-msgid "Linkback"
+#: ../../../skins/material_main_skin/_user.disp.php:211
+#: ../../../skins/material_skin/_user.disp.php:220
+#: ../../../skins_fallback_v5/_user.disp.php:220
+#: ../../../skins_fallback_v6/_user.disp.php:220
+msgid "Block Contact"
 msgstr ""
 
-#: ../../../skins/mystique/_item_feedback.inc.php:75
-msgid "Attending this event"
+#: ../../../skins/material_main_skin/_user.disp.php:217
+#: ../../../skins/material_skin/_user.disp.php:226
+#: ../../../skins_fallback_v5/_user.disp.php:226
+#: ../../../skins_fallback_v6/_user.disp.php:226
+msgid "Unblock Contact"
 msgstr ""
 
-#: ../../../skins/mystique/_item_feedback.inc.php:104
-msgid "Related Links"
+#: ../../../skins/material_main_skin/_user.disp.php:234
+#: ../../../skins/material_skin/_user.disp.php:247
+#: ../../../skins_fallback_v5/_user.disp.php:247
+#: ../../../skins_fallback_v6/_user.disp.php:247
+msgid "Edit Reported User"
 msgstr ""
 
-#: ../../../skins/mystique/_item_feedback.inc.php:108
-msgid "Related Posts"
+#: ../../../skins/material_skin/_item_content.inc.php:63
+#: ../../../skins_fallback_v5/_item_content.inc.php:69
+#: ../../../skins_fallback_v6/_item_content.inc.php:74
+msgid "Link:"
 msgstr ""
 
-#: ../../../skins/mystique/_skin.class.php:59 ../skins/mystique/a_skin.class.php:58
-#: ../../../skins/mystique/mess_skin.class.php:58
-msgid "Enter image URL to display a logo"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:78 ../skins/mystique/a_skin.class.php:77
-#: ../../../skins/mystique/mess_skin.class.php:77
-msgid "Skin color"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:82 ../skins/mystique/a_skin.class.php:81
-#: ../../../skins/mystique/mess_skin.class.php:81
-msgid "Green"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:83 ../skins/mystique/a_skin.class.php:82
-#: ../../../skins/mystique/mess_skin.class.php:82
-msgid "Blue"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:84 ../skins/mystique/a_skin.class.php:83
-#: ../../../skins/mystique/mess_skin.class.php:83
-msgid "Red"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:85 ../skins/mystique/a_skin.class.php:84
-#: ../../../skins/mystique/mess_skin.class.php:84
-msgid "Grey"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:90 ../skins/mystique/a_skin.class.php:89
-#: ../../../skins/mystique/mess_skin.class.php:89
-msgid "Skin width"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:94 ../skins/mystique/a_skin.class.php:93
-#: ../../../skins/mystique/mess_skin.class.php:93
-msgid "Fixed"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:95 ../skins/mystique/a_skin.class.php:94
-#: ../../../skins/mystique/mess_skin.class.php:94
-msgid "Fluid"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:100 ../skins/mystique/a_skin.class.php:99
-#: ../../../skins/mystique/mess_skin.class.php:99
-msgid "Skin layout"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:104
-#: ../../../skins/mystique/a_skin.class.php:103
-#: ../../../skins/mystique/mess_skin.class.php:103
-msgid "1 column"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:105
-#: ../../../skins/mystique/a_skin.class.php:104
-#: ../../../skins/mystique/mess_skin.class.php:104
-msgid "2 columns: Sidebar to the right"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:106
-#: ../../../skins/mystique/a_skin.class.php:105
-#: ../../../skins/mystique/mess_skin.class.php:105
-msgid "2 columns: Sidebar to the left"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:107
-#: ../../../skins/mystique/a_skin.class.php:106
-#: ../../../skins/mystique/mess_skin.class.php:106
-msgid "3 columns"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:108
-#: ../../../skins/mystique/a_skin.class.php:107
-#: ../../../skins/mystique/mess_skin.class.php:107
-msgid "3 columns: Sidebars to the right"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:109
-#: ../../../skins/mystique/a_skin.class.php:108
-#: ../../../skins/mystique/mess_skin.class.php:108
-msgid "3 columns: Sidebars to the left"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:114
-#: ../../../skins/mystique/a_skin.class.php:113
-#: ../../../skins/mystique/mess_skin.class.php:113
-msgid "Skin font"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:130
-#: ../../../skins/mystique/a_skin.class.php:129
-#: ../../../skins/mystique/mess_skin.class.php:129
-msgid "Tabbed widget settings"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:133
-#: ../../../skins/mystique/a_skin.class.php:132
-#: ../../../skins/mystique/mess_skin.class.php:132
-msgid "Tabbed widget"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:134
-#: ../../../skins/mystique/a_skin.class.php:133
-#: ../../../skins/mystique/mess_skin.class.php:133
-msgid "Display javascript tabbed widget on the sidebar"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:139 ../skins/mystique/_skin.class.php:597
-#: ../../../skins/mystique/a_skin.class.php:138
-#: ../../../skins/mystique/a_skin.class.php:565
-#: ../../../skins/mystique/mess_skin.class.php:138
-#: ../../../skins/mystique/mess_skin.class.php:565
-msgid "Recent comments"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:140
-#: ../../../skins/mystique/a_skin.class.php:139
-#: ../../../skins/mystique/mess_skin.class.php:139
-msgid "The number of recent comments"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:146 ../skins/mystique/_skin.class.php:599
-#: ../../../skins/mystique/a_skin.class.php:145
-#: ../../../skins/mystique/a_skin.class.php:567
-#: ../../../skins/mystique/mess_skin.class.php:145
-#: ../../../skins/mystique/mess_skin.class.php:567
-msgid "Popular posts"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:147
-#: ../../../skins/mystique/a_skin.class.php:146
-#: ../../../skins/mystique/mess_skin.class.php:146
-msgid "The number of popular posts"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:154
-#: ../../../skins/mystique/a_skin.class.php:153
-#: ../../../skins/mystique/mess_skin.class.php:153
-msgid "The number of months in archive"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:161
-#: ../../../skins/mystique/a_skin.class.php:160
-#: ../../../skins/mystique/mess_skin.class.php:160
-msgid "The number of tags"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:171
-#: ../../../skins/mystique/a_skin.class.php:170
-#: ../../../skins/mystique/mess_skin.class.php:170
-msgid "Misc settings"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:175
-#: ../../../skins/mystique/a_skin.class.php:174
-#: ../../../skins/mystique/mess_skin.class.php:174
-msgid "The number of related articles in single post mode"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:181
-#: ../../../skins/mystique/a_skin.class.php:180
-#: ../../../skins/mystique/mess_skin.class.php:180
-msgid "Twitter widget"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:182
-#: ../../../skins/mystique/a_skin.class.php:181
-#: ../../../skins/mystique/mess_skin.class.php:181
-msgid "The number of items in \"My latest tweets\" widget. Select 0 to disable."
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:192
-#: ../../../skins/mystique/a_skin.class.php:219
-#: ../../../skins/mystique/mess_skin.class.php:219
-msgid "Enable/disable features"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:195
-msgid "FancyBox Helper"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:196
-msgid "See <a href=\""
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:201
-#: ../../../skins/mystique/a_skin.class.php:222
-#: ../../../skins/mystique/mess_skin.class.php:222
-msgid "Post metadata"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:202
-#: ../../../skins/mystique/a_skin.class.php:223
-#: ../../../skins/mystique/mess_skin.class.php:223
-msgid "Display post metadata block in single post mode"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:207
-#: ../../../skins/mystique/a_skin.class.php:228
-#: ../../../skins/mystique/mess_skin.class.php:228
-msgid "Author avatar (list)"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:208
-#: ../../../skins/mystique/a_skin.class.php:229
-#: ../../../skins/mystique/mess_skin.class.php:229
-msgid "Display author avatar next to post title in <u>post list mode</u>"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:213
-#: ../../../skins/mystique/a_skin.class.php:234
-#: ../../../skins/mystique/mess_skin.class.php:234
-msgid "Author avatar (single)"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:214
-#: ../../../skins/mystique/a_skin.class.php:235
-#: ../../../skins/mystique/mess_skin.class.php:235
-msgid "Display author avatar next to post title in <u>single post mode</u>"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:219
-#: ../../../skins/mystique/a_skin.class.php:240
-#: ../../../skins/mystique/mess_skin.class.php:240
-msgid "Display thumbshots"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:220
-#: ../../../skins/mystique/a_skin.class.php:241
-#: ../../../skins/mystique/mess_skin.class.php:241
-msgid "Display website previews on external post links."
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:226
-#: ../../../skins/mystique/a_skin.class.php:247
-#: ../../../skins/mystique/mess_skin.class.php:247
-msgid "Display footer credits"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:227
-#: ../../../skins/mystique/a_skin.class.php:248
-#: ../../../skins/mystique/mess_skin.class.php:248
-msgid "You get this skin for free. We do appreciate you giving us credit. <b>Thank you for your support!</b>"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:236
-#: ../../../skins/mystique/a_skin.class.php:257
-#: ../../../skins/mystique/mess_skin.class.php:257
-msgid "Social buttons"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:239
-#: ../../../skins/mystique/a_skin.class.php:260
-#: ../../../skins/mystique/mess_skin.class.php:260
-msgid "Facebook"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:240 ../skins/mystique/_skin.class.php:247
-#: ../../../skins/mystique/_skin.class.php:253 ../skins/mystique/_skin.class.php:259
-#: ../../../skins/mystique/_skin.class.php:265 ../skins/mystique/_skin.class.php:272
-#: ../../../skins/mystique/a_skin.class.php:261
-#: ../../../skins/mystique/a_skin.class.php:268
-#: ../../../skins/mystique/a_skin.class.php:274
-#: ../../../skins/mystique/a_skin.class.php:280
-#: ../../../skins/mystique/a_skin.class.php:286
-#: ../../../skins/mystique/a_skin.class.php:293
-#: ../../../skins/mystique/mess_skin.class.php:261
-#: ../../../skins/mystique/mess_skin.class.php:268
-#: ../../../skins/mystique/mess_skin.class.php:274
-#: ../../../skins/mystique/mess_skin.class.php:280
-#: ../../../skins/mystique/mess_skin.class.php:286
-#: ../../../skins/mystique/mess_skin.class.php:293
-msgid "Username. Leave empty to hide the button"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:246
-#: ../../../skins/mystique/a_skin.class.php:267
-#: ../../../skins/mystique/mess_skin.class.php:267
-msgid "Flickr"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:252
-#: ../../../skins/mystique/a_skin.class.php:273
-#: ../../../skins/mystique/mess_skin.class.php:273
-msgid "Myspace"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:258
-#: ../../../skins/mystique/a_skin.class.php:279
-#: ../../../skins/mystique/mess_skin.class.php:279
-msgid "LinkedIn"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:264
-#: ../../../skins/mystique/a_skin.class.php:285
-#: ../../../skins/mystique/mess_skin.class.php:285
-msgid "Twitter"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:271
-#: ../../../skins/mystique/a_skin.class.php:292
-#: ../../../skins/mystique/mess_skin.class.php:292
-msgid "Youtube"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:282
-#: ../../../skins/mystique/a_skin.class.php:303
-#: ../../../skins/mystique/mess_skin.class.php:303
-msgid "Updates"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:455
-msgid "My latest tweets"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:483
-msgid "Follow me on Twitter!"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:775
-#: ../../../skins/mystique/a_skin.class.php:743
-#: ../../../skins/mystique/mess_skin.class.php:743
-msgid "Share this post!"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:887
-msgid "No related Links yet"
-msgstr ""
-
-#: ../../../skins/mystique/_skin.class.php:888
-#: ../../../skins/mystique/a_skin.class.php:804
-#: ../../../skins/mystique/mess_skin.class.php:804
-msgid "No related posts yet"
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:187
-#: ../../../skins/mystique/mess_skin.class.php:187
-msgid "Twitter consumer key"
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:188
-#: ../../../skins/mystique/mess_skin.class.php:188
-msgid "Your Twitter App Consumer Key."
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:194
-#: ../../../skins/mystique/mess_skin.class.php:194
-msgid "Twitter consumer secret"
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:195
-#: ../../../skins/mystique/mess_skin.class.php:195
-msgid "Your Twitter App Consumer Secret."
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:201
-#: ../../../skins/mystique/mess_skin.class.php:201
-msgid "Twitter user token"
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:202
-#: ../../../skins/mystique/mess_skin.class.php:202
-msgid "Your Twitter App Access Token."
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:208
-#: ../../../skins/mystique/mess_skin.class.php:208
-msgid "Twitter Token Secret"
-msgstr ""
-
-#: ../../../skins/mystique/a_skin.class.php:209
-#: ../../../skins/mystique/mess_skin.class.php:209
-msgid "Your Twitter App Access Token Secret."
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:64
-msgid "View RSS Feed"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:68
-msgid "Follow me on Twitter"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:72
-msgid "Find me on Flickr"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:76
-msgid "Find me on Facebook"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:80
-msgid "Find me on MySpace"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:84
-msgid "Follow me on LinkedIn"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:88
-msgid "Follow me on Youtube"
-msgstr ""
-
-#: ../../../skins/mystique/index.main.php:313
-msgid "After posts"
-msgstr ""
-
-#: ../../../skins/mystique/locales/pt_BR/pt-BR.locale.php:13
-msgid "Portuguese (PT)"
-msgstr ""
-
-#: ../../../skins/mystique/locales/ru_RU/ru-RU.locale.php:13
-msgid "Russian (RU) utf8"
+#: ../../../skins/material_skin/_user.disp.php:208
+#: ../../../skins_fallback_v5/_user.disp.php:208
+#: ../../../skins_fallback_v6/_user.disp.php:208
+msgid "Edit Blocked Contact"
 msgstr ""
 
 #: ../../../skins/pureforums/_front.disp.php:84
@@ -32957,11 +32478,6 @@ msgstr ""
 msgid "Skip to comments"
 msgstr ""
 
-#. TRANS: Widget container name
-#: ../../../skins/touch/single.main.php:131
-msgid "Item Single"
-msgstr ""
-
 #: ../../../skins_adm/_access_denied.main.php:15
 #: ../../../skins_adm/_access_denied.main.php:19
 msgid "Back-office access denied"
@@ -32988,7 +32504,7 @@ msgid "Select blog"
 msgstr ""
 
 #: ../../../skins_adm/_adminUI_general.class.php:1523
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:216
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:231
 #: ../../../skins_adm/chicago/_adminUI.class.php:148
 msgid "WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome."
 msgstr ""
@@ -33585,10 +33101,6 @@ msgid ""
 "for this e-mail address anymore:"
 msgstr ""
 
-#: ../../../skins_email/login.main.php:19 ../skins_fallback_v5/login.main.php:19
-msgid "You are logged in but your account is not activated. You will find instructions about activating your account below:"
-msgstr ""
-
 #: ../../../skins_email/newsletter.html.php:27 ../skins_email/newsletter.txt.php:27
 msgid "If you don't want to receive this newsletter anymore, click here:"
 msgstr ""
@@ -33753,23 +33265,23 @@ msgstr ""
 msgid "I changed my mind, don't close my account."
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:72
-#: ../../../skins_fallback_v6/_contact_msg.form.php:72
+#: ../../../skins_fallback_v5/_contact_msg.form.php:71
+#: ../../../skins_fallback_v6/_contact_msg.form.php:71
 msgid "Your name."
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:73
-#: ../../../skins_fallback_v6/_contact_msg.form.php:73
+#: ../../../skins_fallback_v5/_contact_msg.form.php:72
+#: ../../../skins_fallback_v6/_contact_msg.form.php:72
 msgid "Your email address. (Will <strong>not</strong> be displayed on this site.)"
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:76
-#: ../../../skins_fallback_v6/_contact_msg.form.php:76
+#: ../../../skins_fallback_v5/_contact_msg.form.php:75
+#: ../../../skins_fallback_v6/_contact_msg.form.php:75
 msgid "Subject of your message."
 msgstr ""
 
-#: ../../../skins_fallback_v5/_contact_msg.form.php:78
-#: ../../../skins_fallback_v6/_contact_msg.form.php:78
+#: ../../../skins_fallback_v5/_contact_msg.form.php:77
+#: ../../../skins_fallback_v6/_contact_msg.form.php:77
 msgid "Plain text only."
 msgstr ""
 
@@ -33827,7 +33339,7 @@ msgstr ""
 msgid "What to do if the owner doesn't respond"
 msgstr ""
 
-#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:48
+#: ../../../skins_fallback_v5/_item_comment_wp.inc.php:50
 msgid "PREVIEW Comment by"
 msgstr ""
 
@@ -33941,11 +33453,6 @@ msgstr ""
 msgid "Common links"
 msgstr ""
 
-#: ../../../skins_fallback_v5/_user.disp.php:209
-#: ../../../skins_fallback_v6/_user.disp.php:209
-msgid "Edit Blocked Contact"
-msgstr ""
-
 #: ../../../skins_fallback_v5/_usercomments.disp.php:20
 #, php-format
 msgid "Comments posted by %s"
@@ -33979,6 +33486,10 @@ msgstr ""
 
 #: ../../../skins_fallback_v5/contacts.main.php:92
 msgid "Contact was unblocked."
+msgstr ""
+
+#: ../../../skins_fallback_v5/login.main.php:19
+msgid "You are logged in but your account is not activated. You will find instructions about activating your account below:"
 msgstr ""
 
 #: ../../../skins_fallback_v5/messages.main.php:20

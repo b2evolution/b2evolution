@@ -6312,7 +6312,7 @@ vjs.PlaybackRateMenuButton.prototype.updateLabel = function(){
 };
 
 /**
- * The specific menu item type for selecting a playback rate
+ * The specific menu post type for selecting a playback rate
  *
  * @constructor
  */
@@ -9005,7 +9005,7 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
 
 
 /**
- * The specific menu item type for selecting a language within a text track kind
+ * The specific menu post type for selecting a language within a text track kind
  *
  * @constructor
  */

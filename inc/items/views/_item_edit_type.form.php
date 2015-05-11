@@ -21,14 +21,14 @@ $SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_items__type' );
 if( ! empty( $posttypes_reserved_IDs ) )
-{ // Exclude the reserved item types
+{ // Exclude the reserved post types
 	$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $posttypes_reserved_IDs ).' )' );
 }
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'editityp_' );
 
-$Results->title = T_('Change item type');
+$Results->title = T_('Change Post Type');
 
 if( $edited_Item->ID > 0 )
 {
@@ -42,7 +42,7 @@ $Results->global_icon( T_('Do NOT change the type'), 'close', $close_url );
 
 
 /**
- * Callback to make item type name depending on item type id
+ * Callback to make post type name depending on post type id
  */
 function get_name_for_itemtype( $ityp_ID, $name )
 {

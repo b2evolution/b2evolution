@@ -2384,7 +2384,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 	if( $old_db_version < 9930 )
 	{	// 3.1 continued
-		task_begin( 'Updating item types...' );
+		task_begin( 'Updating Post Types...' );
 		$DB->query( "
 			REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
 			VALUES ( 3000, 'Sidebar link' )" );
@@ -5539,7 +5539,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Adding new post types...' );
 		$DB->begin();
 		$new_item_types = array(
-				/* 'blog type' => array( 'min item type ID', 'title for new type' ) */
+				/* 'blog type' => array( 'min post type ID', 'title for new type' ) */
 				'manual' => array( 'type_ID' => 100, 'title' => 'Manual Page' ),
 				'forum'  => array( 'type_ID' => 200, 'title' => 'Forum Topic' ),
 			);
@@ -5548,7 +5548,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{
 			$item_type_ID = $new_item_types[ $blog_type ]['type_ID'];
 			while( $item_type_ID !== NULL )
-			{ // Find first free item type ID starting with 100
+			{ // Find first free post type ID starting with 100
 				$free_item_type_ID = $item_type_ID;
 				$item_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_ID = '.$DB->quote( $item_type_ID ) );
 				if( $item_type_ID === NULL )
@@ -5562,7 +5562,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		if( count( $item_types_insert_data ) )
 		{
-			// Insert new item types
+			// Insert new post types
 			$DB->query( 'INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html )
 						VALUES '.implode( ', ', $item_types_insert_data ) );
 			// Update types of all post with "Post" type to new created (only for blogs with type 'forum' and 'manual')
@@ -5599,7 +5599,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		) ENGINE = innodb' );
 
 		global $posttypes_perms;
-		// Create item types for each blog that has at aleast one custom field
+		// Create post types for each blog that has at aleast one custom field
 		$SQL = new SQL();
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_coll_settings' );
@@ -5650,7 +5650,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				}
 			}
 			if( count( $custom_fields ) )
-			{ // Create item type for each blog with custom fields
+			{ // Create post type for each blog with custom fields
 				$BlogCache = & get_BlogCache();
 				$itypes_insert_data = array();
 				$item_type_max_ID = $DB->get_var( 'SELECT MAX( ityp_ID ) FROM T_items__type' ) + 1;
@@ -5672,11 +5672,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						.$DB->quote( $cf_Blog->get_setting( 'location_city' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_city' ) ).', '
 						.$DB->quote( $cf_Blog->get_setting( 'show_location_coordinates' ) ? 'optional' : 'never' ).', '
 						.$DB->quote( intval( $cf_Blog->get_setting( 'disable_comments_bypost' ) ) ).' )';
-					// Update default item type
+					// Update default post type
 					$blog_setting_item_types[ $cf_Blog->ID ] = $item_type_max_ID;
 					$blog_categories = $DB->get_col( 'SELECT cat_ID FROM T_categories WHERE cat_blog_ID = '.$cf_Blog->ID );
 					if( count( $blog_categories ) )
-					{ // Set new item type for each post
+					{ // Set new post type for each post
 						$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$item_type_max_ID.'
 							WHERE post_ityp_ID = 1
 							  AND post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
@@ -5697,7 +5697,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							$page_type_max_ID = 0;
 							if( count( $pages_IDs ) > 0 )
 							{ // We have the Pages that have the defined custom fields
-								// Increase item type ID for new special item type for pages
+								// Increase post type ID for new special post type for pages
 								$page_type_max_ID = $item_type_max_ID + 1;
 								$itypes_insert_data[] = '( '.$page_type_max_ID.', '
 									.$DB->quote( 'page_'.$cf_Blog->get( 'shortname' ) ).', '
@@ -5726,7 +5726,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 										WHERE iset_item_ID IN ( '.implode( ', ', $pages_IDs ).' )
 											AND iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
 								}
-								// Set new item type for each page
+								// Set new post type for each page
 								$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$page_type_max_ID.'
 									WHERE post_ID IN ( '.implode( ', ', $pages_IDs ).' )' );
 							}
@@ -5747,10 +5747,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 								SET iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$itcf_ID ).'
 							WHERE iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
 					}
-					// Increase item type ID for next
+					// Increase post type ID for next
 					$item_type_max_ID += $page_type_max_ID > 0 ? 2 : 1;
 				}
-				// Insert item types
+				// Insert post types
 				$DB->query( 'INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_use_title, ityp_allow_html, ityp_use_country, ityp_use_region, ityp_use_sub_region, ityp_use_city, ityp_use_coordinates, ityp_allow_disabling_comments )
 					VALUES '.implode( ', ', $itypes_insert_data ) );
 				// Delete old blog settings from DB (custom fields)
@@ -5760,17 +5760,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 		}
 
-		// Update default item types
+		// Update default post types
 		$blogs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		$sql_update_blog_settings = array();
 		foreach( $blogs as $blog_ID )
 		{
 			if( isset( $blog_setting_item_types[ $blog_ID ] ) )
-			{ // Set it from custom item type
+			{ // Set it from custom post type
 				$current_item_type = $blog_setting_item_types[ $blog_ID ];
 			}
 			else
-			{ // Set it from first non reserved item type
+			{ // Set it from first non reserved post type
 				if( ! isset( $first_item_type ) )
 				{
 					$reserved_types = array();

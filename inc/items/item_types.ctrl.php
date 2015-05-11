@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the controller for item types management.
+ * This file implements the controller for post types management.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -48,7 +48,7 @@ if( param( 'ityp_ID', 'integer', '', true) )
 {// Load itemtype from cache:
 	$ItemtypeCache = & get_ItemTypeCache();
 	if( ($edited_Itemtype = & $ItemtypeCache->get_by_ID( $ityp_ID, false )) === false )
-	{	// We could not find the item type to edit:
+	{	// We could not find the post type to edit:
 		unset( $edited_Itemtype );
 		forget_param( 'ityp_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), 'Itemtype' ), 'error' );
@@ -70,9 +70,9 @@ switch( $action )
 		else
 		{	// Duplicate object in order no to mess with the cache:
 			$edited_Itemtype = duplicate( $edited_Itemtype ); // PHP4/5 abstraction
-			// Load all custom fields of the copied item type
+			// Load all custom fields of the copied post type
 			$edited_Itemtype->get_custom_fields();
-			// Reset ID of new item type
+			// Reset ID of new post type
 			$edited_Itemtype->ID = 0;
 		}
 		break;
@@ -88,7 +88,7 @@ switch( $action )
 	case 'create': // Record new Itemtype
 	case 'create_new': // Record Itemtype and create new
 	case 'create_copy': // Record Itemtype and create similar
-		// Insert new item type...:
+		// Insert new post type...:
 		
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
@@ -103,9 +103,9 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			if( $edited_Itemtype->is_special() )
-			{ // is special item type
+			{ // is special post type
 				param_error( 'ityp_ID',
-					sprintf( T_('Item types with ID from %d to %d are reserved. Please use another ID.' ), $special_range[0], $special_range[1] ) );
+					sprintf( T_('Post types with ID from %d to %d are reserved. Please use another ID.' ), $special_range[0], $special_range[1] ) );
 				// Set to 0 in order to display an edit input box for name field
 				$edited_Itemtype->ID = 0;
 				// Set name from request
@@ -128,13 +128,13 @@ switch( $action )
 				{	// We have a duplicate entry:
 
 					param_error( 'ityp_ID',
-						sprintf( T_('This item type already exists. Do you want to <a %s>edit the existing item type</a>?'),
+						sprintf( T_('This post type already exists. Do you want to <a %s>edit the existing post type</a>?'),
 							'href="?ctrl=itemtypes&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;action=edit&amp;ityp_ID='.$q.'"' ) );
 				}
 				else
 				{
 					$edited_Itemtype->dbinsert();
-					$Messages->add( T_('New item type created.'), 'success' );
+					$Messages->add( T_('New Post Type created.'), 'success' );
 				}
 				$DB->commit();
 
@@ -164,7 +164,7 @@ switch( $action )
 		break;
 
 	case 'update':
-		// Edit item type form...:
+		// Edit post type form...:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
@@ -180,9 +180,9 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			if( $edited_Itemtype->is_reserved() )
-			{ // is reserved item type
+			{ // is reserved post type
 				param_error( 'ityp_ID',
-					sprintf( T_('Item types with IDs = ( %d ) are reserved. You can not edit this item type.' ), implode( ', ', $posttypes_reserved_IDs ) ) );
+					sprintf( T_('Post types with IDs = ( %d ) are reserved. You can not edit this post type.' ), implode( ', ', $posttypes_reserved_IDs ) ) );
 			}
 			else
 			{ // ID is good
@@ -190,7 +190,7 @@ switch( $action )
 				$DB->begin();
 
 				$edited_Itemtype->dbupdate();
-				$Messages->add( T_('Item type updated.'), 'success' );
+				$Messages->add( T_('Post type updated.'), 'success' );
 
 				$DB->commit();
 
@@ -201,7 +201,7 @@ switch( $action )
 		break;
 
 	case 'delete':
-		// Delete item type:
+		// Delete post type:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
@@ -215,17 +215,17 @@ switch( $action )
 		$default_ids = ItemType::get_default_ids();
 
 		if( $edited_Itemtype->is_special() )
-		{ // is special item type
+		{ // is special post type
 			param_error( 'ityp_ID',
-				sprintf( T_('Item types with ID from %d to %d are reserved. You can not delete this item type.' ), $special_range[0], $special_range[1] ) );
+				sprintf( T_('Post types with ID from %d to %d are reserved. You can not delete this post type.' ), $special_range[0], $special_range[1] ) );
 			// To don't display a confirmation question
 			$action = 'edit';
 		}
 		elseif( ( $item_type_blog_ID = array_search( $edited_Itemtype->ID, $default_ids ) ) !== false )
-		{ // is default item type of the blog
+		{ // is default post type of the blog
 			if( $item_type_blog_ID == 'default' )
 			{
-				$Messages->add( T_('This item type is default of all blogs. You can not delete this item type.' ) );
+				$Messages->add( T_('This Post Type is the default for all collections. You can not delete this Post Type.' ) );
 			}
 			else
 			{
@@ -238,7 +238,7 @@ switch( $action )
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}
 				}
-				$Messages->add( sprintf( T_('This item type is default of the blogs: %s. You can not delete this item type.' ), implode( ', ', $blog_names ) ) );
+				$Messages->add( sprintf( T_('This Post Type is default for the collections: %s. You can not delete this Post Type.' ), implode( ', ', $blog_names ) ) );
 			}
 			// To don't display a confirmation question
 			$action = 'edit';
@@ -247,7 +247,7 @@ switch( $action )
 		{ // ID is good
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
-				$msg = sprintf( T_('Item type &laquo;%s&raquo; deleted.'), $edited_Itemtype->dget('name') );
+				$msg = sprintf( T_('Post type &laquo;%s&raquo; deleted.'), $edited_Itemtype->dget('name') );
 				$edited_Itemtype->dbdelete( true );
 				unset( $edited_Itemtype );
 				forget_param( 'ityp_ID' );
@@ -258,7 +258,7 @@ switch( $action )
 			}
 			else
 			{	// not confirmed, Check for restrictions:
-				if( ! $edited_Itemtype->check_delete( sprintf( T_('Cannot delete item type &laquo;%s&raquo;'), $edited_Itemtype->dget('name') ) ) )
+				if( ! $edited_Itemtype->check_delete( sprintf( T_('Cannot delete Post Type &laquo;%s&raquo;'), $edited_Itemtype->dget('name') ) ) )
 				{	// There are restrictions:
 					$action = 'view';
 				}
@@ -273,7 +273,7 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'itemt
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Item Types'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
+$AdminUI->breadcrumbpath_add( T_('Post Types'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
 
 $AdminUI->set_page_manual_link( 'managing-item-types' );
 
@@ -298,7 +298,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Itemtype->confirm_delete(
-				sprintf( T_('Delete item type &laquo;%s&raquo;?'),  $edited_Itemtype->dget('name') ),
+				sprintf( T_('Delete Post Type &laquo;%s&raquo;?'),  $edited_Itemtype->dget('name') ),
 				'itemtype', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -312,10 +312,10 @@ switch( $action )
 
 
 	default:
-		// No specific request, list all item types:
+		// No specific request, list all post types:
 		// Cleanup context:
 		forget_param( 'ityp_ID' );
-		// Display item types list:
+		// Display post types list:
 		$AdminUI->disp_view( 'items/views/_itemtypes.view.php' );
 		break;
 
