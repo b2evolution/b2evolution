@@ -51,6 +51,8 @@ global $Plugins;
 
 global $locale_from_get, $disp_handler;
 
+global $Session;
+
 load_class( '_core/ui/_menu.class.php', 'Menu' );
 
 /**
