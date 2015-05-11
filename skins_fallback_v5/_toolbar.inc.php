@@ -49,7 +49,7 @@ global $Hit;
 
 global $Plugins;
 
-global $locale_from_get;
+global $locale_from_get, $disp_handler;
 
 load_class( '_core/ui/_menu.class.php', 'Menu' );
 
@@ -98,6 +98,16 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 	</div>
 	<div class="clear"></div>
 </div>
+
+<?php
+	if( $Session->get( 'display_includes_'.$Blog->ID ) )
+	{ // Wrap the include with a visible div:
+		echo '<div class="dev-blocks dev-blocks--include dev-blocks--belowtoolbar">';
+		echo '<div class="dev-blocks-name"><b>MAIN template:</b> '.rel_path_to_base($disp_handler).'</div>';
+		echo '</div>';
+	}
+?>
+
 
 <?php
 if( ! $locale_from_get )

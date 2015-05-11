@@ -1878,6 +1878,9 @@ function skin_body_attrs( $params = array() )
 
 	global $PageCache, $Blog, $disp, $disp_detail, $Item, $current_User;
 
+	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
+	global $Session;
+
 	$classes = array();
 
 	if( ! empty( $params['class'] ) )
@@ -1928,6 +1931,16 @@ function skin_body_attrs( $params = array() )
 
 	// User Group class:
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
+
+	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
+	if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+	{
+		$classes[] = 'dev_show_includes';
+	}
+	if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+	{
+		$classes[] = 'dev_show_containers';
+	}
 
 	if( ! empty( $classes ) )
 	{ // Print attr "class"

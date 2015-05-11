@@ -765,39 +765,25 @@ if( !empty( $skin ) )
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 				{	// The skin has a customized page handler for this display:
 					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skins' );
-					require $disp_handler;
 				}
 				elseif( $disp_handler = skin_fallback_path( $disp_handlers[$disp] ) )
 				{	// Skins have a general page handler for this display:
 					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (for CSS include -- added in v 4.1)', 'skins' );
-					require $disp_handler;
-				}
-				elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
-				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
-					require $disp_handler;
-				}
-				elseif( $disp_handlers[$disp] == 'comments.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'latestcom.tpl.php' ) )
-				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
-					require $disp_handler;
-				}
-				elseif( $disp_handlers[$disp] == 'feedback_popup.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'feedback_popup.tpl.php' ) )
-				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
-					require $disp_handler;
 				}
 				else
 				{	// Use the default handler from the skins dir:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default handler)', 'skins' );
-					require $ads_current_skin_path.'index.main.php';
+					$disp_handler = $ads_current_skin_path.'index.main.php';
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default handler)', 'skins' );
 				}
 			}
 			else
 			{	// Use the default handler from the skins dir:
-				$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default index handler)', 'skins' );
-				require $ads_current_skin_path.'index.main.php';
+				$disp_handler = $ads_current_skin_path.'index.main.php';
+				$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default index handler)', 'skins' );
 			}
+
+			// CALL THE MAIN TEMPLTE NOW:
+			require $disp_handler;
 		}
 
 		// Save collected cached data if needed:

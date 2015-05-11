@@ -496,6 +496,7 @@ div.dev-blocks div.dev-blocks {
   margin: 2px;
 }
 div.dev-blocks-name {
+  font-family: "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
   font-size: 7pt;
@@ -545,6 +546,9 @@ div.dev-blocks--widget--notincache {
 div.dev-blocks--widget--notincache > .dev-blocks-name {
   color: #f8bb00;
   background-color: #fff0e0;
+}
+div.dev-blocks--belowtoolbar {
+  margin: 27px 0 -27px 0;
 }
 a[rel~=nofollow]:hover {
   background: #f8e0e0;
