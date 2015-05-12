@@ -569,6 +569,17 @@ function _mw_get_cat_IDs( $contentstruct, $Blog, $empty_struct_is_ok = false )
 }
 
 
+function add_to_categories_data( $Chapter )
+{
+	global $categories_data, $categoryIdName;
+
+	$categories_data[] = new xmlrpcval( array(
+			$categoryIdName => new xmlrpcval( $Chapter->ID ),
+			'categoryName' => new xmlrpcval( $Chapter->name )
+		), 'struct' );
+}
+
+
 /**
  * Helper for {@link b2_getcategories()} and {@link mt_getPostCategories()}, because they differ
  * only in the "categoryId" case ("categoryId" (b2) vs "categoryID" (MT))
@@ -582,7 +593,7 @@ function _mw_get_cat_IDs( $contentstruct, $Blog, $empty_struct_is_ok = false )
  */
 function _b2_or_mt_get_categories( $type, $m )
 {
-	global $DB, $Settings;
+	global $DB;
 
 	/**
 	 * @var User
@@ -601,46 +612,22 @@ function _b2_or_mt_get_categories( $type, $m )
 		return xmlrpcs_resperror();
 	}
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'cat_ID, cat_name, cat_order' );
-	$SQL->FROM( 'T_categories' );
-	$SQL->WHERE( $Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID') );
-
-	if( $Settings->get('chapter_ordering') == 'manual' )
-	{	// Manual order
-		$SQL->ORDER_BY( 'cat_order' );
-	}
-	else
-	{	// Alphabetic order
-		$SQL->ORDER_BY( 'cat_name' );
-	}
-
-	$rows = $DB->get_results( $SQL->get() );
-	if( $DB->error )
-	{	// DB error
-		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
-	}
-	logIO( 'Categories: '.count($rows) );
-
+	global $categories_data, $categoryIdName;
+	$categories_data = array();
 	$categoryIdName = ( $type == 'b2' ? 'categoryID' : 'categoryId' );
+	$aggregate_coll_IDs = $Blog->get_aggregate_coll_IDs();
+	$callbacks = array( 'line' => 'add_to_categories_data' );
 
 	$ChapterCache = & get_ChapterCache();
-	$data = array();
-	foreach( $rows as $row )
-	{
-		$Chapter = & $ChapterCache->get_by_ID( $row->cat_ID, false, false );
-		if( ! $Chapter )
-		{
-			continue;
-		}
-		$data[] = new xmlrpcval( array(
-				$categoryIdName => new xmlrpcval( $Chapter->ID ),
-				'categoryName' => new xmlrpcval( $Chapter->name )
-			), 'struct' );
-	}
+	$ChapterCache->recurse( $callbacks, $aggregate_coll_IDs, NULL, 0, 0, array( 'sorted' => true ) );
 
+	logIO( 'Categories: '.count($ChapterCache->cache) );
 	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval($data, 'array') );
+
+	$result = new xmlrpcresp( new xmlrpcval($categories_data, 'array') );
+	unset( $categories_data );
+
+	return $result;
 }
 
 
@@ -659,7 +646,7 @@ function _b2_or_mt_get_categories( $type, $m )
  */
 function _wp_mw_getcategories( $m, $params = array() )
 {
-	global $DB, $Settings;
+	global $DB;
 
 	// CHECK LOGIN:
 	/**
@@ -688,14 +675,8 @@ function _wp_mw_getcategories( $m, $params = array() )
 	{	// Category name starts with 'search'
 		$SQL->WHERE_and( 'cat_name LIKE "'.$DB->like_escape( $params['search'] ).'%"' );
 	}
-	if( $Settings->get('chapter_ordering') == 'manual' )
-	{	// Manual order
-		$SQL->ORDER_BY( 'cat_order' );
-	}
-	else
-	{	// Alphabetic order
-		$SQL->ORDER_BY( 'cat_name' );
-	}
+	// TODO: asimo>fp How should we order categories from multiple blogs?
+	$SQL->ORDER_BY( 'cat_name' );
 
 	$rows = $DB->get_results( $SQL->get() );
 	if( $DB->error )

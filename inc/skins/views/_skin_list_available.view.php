@@ -65,7 +65,7 @@ $skin_folders = get_filenames( $skins_path, $filename_params );
 $Form = new Form( $admin_url, '', 'post', 'blockspan' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'install' );
-$Form->hidden( 'tab', $tab );
+if( isset($tab) ) $Form->hidden( 'tab', $tab ); // fp> do we need this?
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->add_crumb( 'skin' );
 
@@ -77,37 +77,74 @@ $skins_exist = false;
 // Go through all skin folders:
 foreach( $skin_folders as $skin_folder )
 {
-	if( ! strlen( $skin_folder ) || $skin_folder[0] == '.' || $skin_folder == 'CVS' )
-	{
+	if( !strlen( $skin_folder ) || $skin_folder[0] == '.' || $skin_folder == 'CVS' )
+	{	// Skip system folders:
 		continue;
 	}
 	if( $SkinCache->get_by_folder( $skin_folder, false ) )
-	{ // Already installed...
-		continue;
-	}
-	if( ! ( $folder_Skin = & $SkinCache->new_obj( NULL, $skin_folder ) ) )
-	{ // Try to get Skin by folder name
-		continue;
-	}
-	if( ! empty( $skin_type ) && $folder_Skin->type != $skin_type )
-	{ // Filter skin by selected type
+	{ // Skip already installed:
 		continue;
 	}
 
-	$redirect_to_after_install = $redirect_to;
-	$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' );
-	if( ! empty( $kind ) && $skin_compatible )
-	{ // If we are installing skin for new creating blog
-		$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
+	// What xxx_Skin class name do we expect from this skin? 
+	// (remove optional "_skin" and always append "_Skin"):
+	$skin_class_name = preg_replace( '/_skin$/', '', $skin_folder ).'_Skin';	
+
+	// Check if we already have such a skin
+	if( class_exists($skin_class_name) )
+	{	// This class already exists!
+		$disp_params = array(
+				'function'        => 'broken',	
+				'msg'             => T_('DUPLICATE SKIN NAME'),
+			);
+	}
+	elseif( ! @$skin_class_file_contents = file_get_contents( $skins_path.$skin_folder.'/_skin.class.php' ) )
+	{ 	// Could not load the contents of the skin file:
+		$disp_params = array(
+				'function'        => 'broken',	
+				'msg'             => T_('_skin.class.php NOT FOUND!'),
+			);
+	}
+	elseif( strpos( $skin_class_file_contents, 'class '.$skin_class_name.' extends Skin' ) === false )
+	{
+		$disp_params = array(
+				'function'        => 'broken',	
+				'msg'             => T_('MALFORMED _skin.class.php'),
+			);
+
+	}
+	elseif( ! $folder_Skin = & $SkinCache->new_obj( NULL, $skin_folder ) )
+	{ // We could not load the Skin class:
+		$disp_params = array(
+				'function'        => 'broken',	
+				'msg'             => T_('_skin.class.php could not be loaded!'),
+			);
+	}
+	else
+	{	// Skin class seems fine...
+
+		if( ! empty( $skin_type ) && $folder_Skin->type != $skin_type )
+		{ // Filter skin by selected type:
+			continue;
+		}
+
+		$redirect_to_after_install = $redirect_to;
+		$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' );
+		if( ! empty( $kind ) && $skin_compatible )
+		{ // If we are installing skin for a new collection we're currently creating:
+			$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
+		}
+
+		$disp_params = array(
+			'function'        => 'install',
+			'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode( $skin_folder ).'&amp;redirect_to='.rawurlencode( $redirect_to_after_install ).'&amp;'.url_crumb( 'skin' ),
+			'skin_compatible' => $skin_compatible,
+		);
 	}
 
 	// Display skinshot:
-	$disp_params = array(
-		'function'        => 'install',
-		'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode( $skin_folder ).'&amp;redirect_to='.rawurlencode( $redirect_to_after_install ).'&amp;'.url_crumb( 'skin' ),
-		'skin_compatible' => $skin_compatible,
-	);
 	Skin::disp_skinshot( $skin_folder, $skin_folder, $disp_params );
+	
 	$skins_exist = true;
 }
 

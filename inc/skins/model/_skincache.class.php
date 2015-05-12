@@ -123,9 +123,9 @@ class SkinCache extends DataObjectCache
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'('.$type.')</strong> into cache', 'dataobjects' );
 		$sql = 'SELECT *
-							FROM T_skins__skin
-						 WHERE skin_type = '.$DB->quote($type).'
-						 ORDER BY skin_name';
+					 FROM T_skins__skin
+				   WHERE skin_type = '.$DB->quote($type).'
+				   ORDER BY skin_name';
 
 		foreach( $DB->get_results( $sql, OBJECT, 'Loading Skins('.$type.') into cache' ) as $row )
 		{

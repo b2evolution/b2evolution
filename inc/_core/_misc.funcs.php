@@ -6764,97 +6764,6 @@ function button_class( $type = 'button', $jQuery_selector = false )
 
 
 /**
- * Get chapters by blog ID and parent ID
- *
- * @todo Why is this not a method of $ChapterCache ?
- *
- * @param integer Blog ID
- * @param integer Chapter parent ID
- */
-function get_chapters( $blog_ID, $parent_ID = 0 )
-{
-	// TODO: why do we need this in addition to $ChapterCache ?
-	global $blog_chapters_cache;
-
-	if( ! isset( $blog_chapters_cache ) )
-	{ // Init only first time
-		$blog_chapters_cache = array();
-	}
-
-	if( ! empty( $blog_ID ) && ! isset( $blog_chapters_cache[ $blog_ID ] ) )
-	{ // Get the all chapters for current blog
-		$blog_chapters_cache[ $blog_ID ] = array();
-
-		$ChapterCache = & get_ChapterCache();
-		$ChapterCache->load_subset( $blog_ID );
-
-		if( isset( $ChapterCache->subset_cache[ $blog_ID ] ) )
-		{
-			$chapters = $ChapterCache->subset_cache[ $blog_ID ];
-
-			foreach( $chapters as $chapter_ID => $Chapter )
-			{ // Init children
-				if( $Chapter->get( 'parent_ID' ) == 0 )
-				{
-					$Chapter->children = get_chapter_children( $blog_ID, $Chapter->ID );
-					$blog_chapters_cache[ $blog_ID ][ $Chapter->ID ] = $Chapter;
-				}
-			}
-		}
-	}
-
-	if( $parent_ID > 0 )
-	{ // Get the chapters by parent
-		$ChapterCache = & get_ChapterCache();
-		if( $Chapter = & $ChapterCache->get_by_ID( $parent_ID, false ) )
-		{
-			return $Chapter->children;
-		}
-		else
-		{ // Invalid ID of parent category
-			return array();
-		}
-	}
-
-	if( ! isset( $blog_chapters_cache[ $blog_ID ] ) )
-	{ // Init only first time for the blog
-		$blog_chapters_cache[ $blog_ID ] = array();
-	}
-
-	return $blog_chapters_cache[ $blog_ID ];
-}
-
-
-/**
- * Get the children of current chapter recursively
- *
- * @param integer Blog ID
- * @param integer Parent ID
- * @return array Chapter children
- */
-function get_chapter_children( $blog_ID, $parent_ID = 0 )
-{
-	$ChapterCache = & get_ChapterCache();
-
-	$chapter_children = array();
-	if( isset( $ChapterCache->subset_cache[ $blog_ID ] ) )
-	{
-		$chapters = $ChapterCache->subset_cache[ $blog_ID ];
-		foreach( $chapters as $Chapter )
-		{
-			if( $parent_ID == $Chapter->get( 'parent_ID' ) )
-			{
-				$Chapter->children = get_chapter_children( $blog_ID, $Chapter->ID );
-				$chapter_children[ $Chapter->ID ] = $Chapter;
-			}
-		}
-	}
-
-	return $chapter_children;
-}
-
-
-/**
  * Initialize JavaScript to build and open window
  */
 function echo_modalwindow_js()
@@ -7124,6 +7033,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 <?php
 } // end of echo_modalwindow_js_bootstrap
 
+
 /**
  * Handle fatal error in order to display info message when debug is OFF
  */
@@ -7138,6 +7048,11 @@ function evo_error_handler()
 	{ // Save only last fatal error
 		$evo_last_handled_error = $error;
 	}
+
+	// fp> WTF?!? and what about warnings? 
+	// fp> And where do we die()? why is there not a debug_die() here?
+	// There should be ONE MILLION COMMENTS in this function to explain what we do!
+
 }
 
 

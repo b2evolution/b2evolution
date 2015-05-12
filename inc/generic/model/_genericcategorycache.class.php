@@ -123,14 +123,19 @@ class GenericCategoryCache extends GenericCache
 	 * After executing this, each Chapter will have an array pointing to its direct children
 	 *
 	 * @param integer|NULL NULL for all subsets
+	 * @param boolean Set true to sort root categories or leave it on false otherwise
 	 */
-	function reveal_children( $subset_ID = NULL )
+	function reveal_children( $subset_ID = NULL, $sort_root_cats = false )
 	{
 		global $Debuglog;
 		global $Timer;
 
 		if( $this->revealed_all_children )
 		{	// All children have already been revealed: (can happen even if we require a subset *now*)
+			if( $sort_root_cats )
+			{
+				$this->sort_root_cats( $subset_ID );
+			}
 			return;
 		}
 
@@ -159,6 +164,11 @@ class GenericCategoryCache extends GenericCache
 				}
 			}
 
+			if( $sort_root_cats )
+			{ // Sort root categories as it was requested
+				$this->sort_root_cats( NULL );
+			}
+
 			$this->revealed_all_children = true;
 		}
 		else
@@ -170,11 +180,12 @@ class GenericCategoryCache extends GenericCache
 				// Make sure everything has been loaded:
 				$this->load_all();
 
-				echo 'DEBUG - PARTIAL IMPLEMENTATION - REVEALING ALL SUBSETS in a row. Is this needed?';
+				// Commented out, because it is needed in case of cross posting through blogs
+				// echo 'DEBUG - PARTIAL IMPLEMENTATION - REVEALING ALL SUBSETS in a row. Is this needed?';
 
 				foreach( $this->subset_cache as $subset_ID => $dummy )
 				{
-					$this->reveal_children( $subset_ID );
+					$this->reveal_children( $subset_ID, $sort_root_cats );
 				}
 
 				$this->revealed_all_children = true;
@@ -185,6 +196,10 @@ class GenericCategoryCache extends GenericCache
 
 				if( !empty( $this->revealed_subsets[$subset_ID] ) )
 				{	// Children have already been revealed:
+					if( $sort_root_cats )
+					{
+						$this->sort_root_cats( $subset_ID );
+					}
 					return;
 				}
 
@@ -222,6 +237,11 @@ class GenericCategoryCache extends GenericCache
 							$this->root_cats[] = & $GenericCategory; // $this->cache[$cat_ID];
 							$this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}][] = & $GenericCategory; // $this->cache[$cat_ID];
 						}
+					}
+
+					if( $sort_root_cats )
+					{ // Sort subset root categories as it was requested
+						$this->sort_root_cats( $subset_ID );
 					}
 
 					$Timer->pause('reveal_children', false );
@@ -306,6 +326,47 @@ class GenericCategoryCache extends GenericCache
 
 
 	/**
+	 * Sort root categories or root categories in a subset if they are not sorted yet
+	 *
+	 * @param integer subset_ID, leave it on null to sort in all subsets
+	 */
+	function sort_root_cats( $subset_ID = NULL )
+	{
+		if( $subset_ID == NULL && empty($this->subset_property) )
+		{
+			if( !$this->sorted_flags['root_cats'] )
+			{ // Root cats were not sorted yet
+				usort( $this->root_cats, array( 'Chapter','compare_chapters' ) );
+				$this->sorted_flags['root_cats'] = true;
+			}
+			return;
+		}
+
+		if( $subset_ID == NULL )
+		{
+			foreach( array_keys( $this->subset_root_cats ) as $key )
+			{
+				if( $this->sorted_flags[$key] )
+				{ // This subset was already sorted
+					continue;
+				}
+
+				usort( $this->subset_root_cats[$key], array( 'Chapter','compare_chapters' ) );
+				$this->sorted_flags[$key] = true;
+			}
+			return;
+		}
+
+		// fp>attila : check this - there were undefined variables
+		if( !empty($key) && empty($this->sorted_flags[$subset_ID]) )
+		{ // This subset was not sorted yet
+			usort( $this->subset_root_cats[$subset_ID], array( 'Chapter','compare_chapters' ) );
+			$this->sorted_flags[$key] = true;
+		}
+	}
+
+
+	/**
 	 * Return recursive display of loaded categories
 	 *
 	 * @param array callback funtions (to format the display)
@@ -335,7 +396,7 @@ class GenericCategoryCache extends GenericCache
 		$display_posts = ! empty( $callbacks['posts'] );
 
 		// Make sure children have been (loaded and) revealed for specific subset:
-		$this->reveal_children( $subset_ID );
+		$this->reveal_children( $subset_ID, $sorted );
 
 		if( $display_posts && !$params['posts_are_loaded'] && ( $params['expand_all'] || !empty( $params['chapter_path'] ) ) )
 		{ // Posts needs to be loaded
@@ -348,21 +409,10 @@ class GenericCategoryCache extends GenericCache
 		{	// Get all parent categories:
 			if( is_null( $subset_ID ) )
 			{
-				if( $sorted && ( ! isset( $sorted_flags['root_cats'] ) ) )
-				{ // Sort root categories
-					usort( $this->root_cats, array( 'Chapter','compare_chapters' ) );
-					$sorted_flags['root_cats'] = true;
-				}
 				$cat_array = $this->root_cats;
 			}
 			elseif( isset( $this->subset_root_cats[$subset_ID] ) )
 			{ // We have root cats for the requested subset:
-				$subset_key = 'subset_root_cats_'.$subset_ID;
-				if( $sorted && ( ! isset( $sorted_flags[$subset_key] ) ) )
-				{ // Sort subset root categories
-					usort( $this->subset_root_cats[$subset_ID], array( 'Chapter','compare_chapters' ) );
-					$sorted_flags[$subset_key] = true;
-				}
 				$cat_array = $this->subset_root_cats[$subset_ID];
 			}
 			else
@@ -404,7 +454,7 @@ class GenericCategoryCache extends GenericCache
 			{ // object callback:
 				$r_before .= $callbacks['before_level'][0]->{$callbacks['before_level'][1]}( $level ); // <ul>
 			}
-			else
+			elseif( isset( $callbacks['before_level'] ) )
 			{
 				$r_before .= $callbacks['before_level']( $level ); // <ul>
 			}
@@ -415,7 +465,7 @@ class GenericCategoryCache extends GenericCache
 			{ // object callback:
 				$r .= $callbacks['after_level'][0]->{$callbacks['after_level'][1]}( $level ); // </ul>
 			}
-			else
+			elseif( isset( $callbacks['after_level'] ) )
 			{
 				$r .= $callbacks['after_level']( $level ); // </ul>
 			}
@@ -455,7 +505,8 @@ class GenericCategoryCache extends GenericCache
 			$cat_index = 0;
 			$item_index = 0;
 			$subcats_to_display = array();
-			$has_more_children = isset( $Chapter->children[$cat_index] );
+			$chapter_children_ids = array_keys( $Chapter->children );
+			$has_more_children = isset( $chapter_children_ids[$cat_index] );
 			$has_more_items = isset( $cat_items[$item_index] );
 			$cat_order = $Chapter->get_subcat_ordering();
 			// Set post params for post display
@@ -469,7 +520,7 @@ class GenericCategoryCache extends GenericCache
 
 			while( $has_more_children || $has_more_items )
 			{
-				$current_sub_Chapter = $has_more_children ? $Chapter->children[$cat_index] : NULL;
+				$current_sub_Chapter = $has_more_children ? $Chapter->children[$chapter_children_ids[$cat_index]] : NULL;
 				$current_Item = $has_more_items ? $cat_items[$item_index] : NULL;
 				if( $current_Item != NULL && ( $current_sub_Chapter == NULL || ( $this->compare_item_with_chapter( $current_Item, $current_sub_Chapter, $cat_order ) <= 0 ) ) )
 				{
@@ -508,7 +559,7 @@ class GenericCategoryCache extends GenericCache
 				elseif( $current_sub_Chapter != NULL )
 				{
 					$subcats_to_display[] = $current_sub_Chapter;
-					$has_more_children = isset( $Chapter->children[++$cat_index] );
+					$has_more_children = isset( $chapter_children_ids[++$cat_index] );
 				}
 			}
 
@@ -541,11 +592,13 @@ class GenericCategoryCache extends GenericCache
 		}
 		elseif( is_array( $callbacks['no_children'] ) )
 		{ // object callback:
-			$r .= $callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $cat, $level ); // </li>
+			// TODO: fp>attila: REMOVE the @ which is a TEMPORARY UGLY PATCH
+			$r .= @$callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $cat, $level ); // </li>
 		}
 		elseif( isset( $callbacks['no_children'] ) )
 		{
-			$r .= $callbacks['no_children']( $cat, $level ); // </li>
+			// TODO: fp>attila: REMOVE the @ which is a TEMPORARY UGLY PATCH
+			$r .= @$callbacks['no_children']( $cat, $level ); // </li>
 		}
 
 		return $r;

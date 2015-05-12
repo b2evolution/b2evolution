@@ -181,7 +181,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $disp;
+		global $Messages, $disp, $debug;
 
 		require_js( '#jquery#', 'blog' );
 

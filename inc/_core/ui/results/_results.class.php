@@ -1538,6 +1538,7 @@ class Results extends Table
 					return '';
 				}
 
+				$this->order = '';
 				foreach( $this->cols as $col )
 				{
 					if( isset( $col['order'] ) || isset( $col['order_objects_callback'] ) || isset( $col['order_rows_callback'] ) )

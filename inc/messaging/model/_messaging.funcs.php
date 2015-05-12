@@ -1074,6 +1074,7 @@ function update_contacts_groups_user( $user_ID, $groups, $blocked = NULL )
 
 	$insert_sql = 'REPLACE INTO T_messaging__contact_groupusers ( cgu_user_ID, cgu_cgr_ID ) VALUES ';
 
+	$records = array();
 	foreach( $groups as $group )
 	{
 		if( $group == 'new' || intval( $group ) < 0 )

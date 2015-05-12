@@ -108,7 +108,7 @@ class coll_logo_Widget extends ComponentWidget
 		// Collection logo:
 		echo $this->disp_params['block_start'];
 
-		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
+		$title = '<a href="'.$Blog->get( 'url' ).'">'
 							.'<img src="'.$Blog->get_media_url().$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
 							.'</a>';
 		$this->disp_title( $title );

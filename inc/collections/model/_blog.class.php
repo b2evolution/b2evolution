@@ -2879,6 +2879,31 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get aggregate coll IDs
+	 *
+	 * @return integer|NULL|array
+	 *  - current blog ID if no aggreation
+	 *  - NULL if aggreagation of all blogs
+	 *  - array of aggreagated blog IDs
+	 */
+	function get_aggregate_coll_IDs()
+	{
+		$aggregate_coll_IDs = $this->get_setting( 'aggregate_coll_IDs' );
+
+		if( empty( $aggregate_coll_IDs ) || $aggregate_coll_IDs == '-' )
+		{ // No aggregation, return only the current blog:
+			return $this->ID;
+		}
+		elseif( $aggregate_coll_IDs == '*' )
+		{ // Aggregation of all blogs
+			return NULL;
+		}
+
+		return explode( ',', $aggregate_coll_IDs );
+	}
+
+
+	/**
 	 * Get SQL expression to match the list of aggregates collection IDs.
 	 *
 	 * This resolves as follows:

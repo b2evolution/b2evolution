@@ -264,6 +264,7 @@ class ChapterCache extends GenericCategoryCache
 
 	/**
 	 * Get chapters in the given subset
+	 * Note: This is not ordered and it returns all of chpaters and subchapters
 	 *
 	 * @param integer subset ID
 	 * @return array of Chapters
@@ -276,6 +277,47 @@ class ChapterCache extends GenericCategoryCache
 		}
 
 		return $this->subset_cache[$subset_ID];
+	}
+
+
+	/**
+	 * Get chapters by collection ID and parent ID
+	 *
+	 * @param integer collection ID
+	 * @param integer parent chapter ID
+	 * @param boolean set to true to sort the result, leave it on false otherwise
+	 *
+	 * @return array set of chapters
+	 */
+	function get_chapters( $coll_ID, $parent_ID = 0, $sorted = false )
+	{
+		$this->reveal_children( $coll_ID, $sorted );
+
+		if( $parent_ID == 0 )
+		{
+			return $this->subset_root_cats[$coll_ID];
+		}
+
+		$parent_Chapter = & $this->get_by_ID( $parent_ID );
+		if( $sorted )
+		{ // Sort chapter
+			$parent_Chapter->sort_children();
+		}
+
+		return $parent_Chapter->children;
+	}
+
+
+	/**
+	 * Check if there are categories in the given subset
+	 *
+	 * @param integer subset ID
+	 * @return boolean true if subset has chapters, false otherwise
+	 */
+	function has_chapters_in_subset( $subset_ID )
+	{
+		$this->load_subset( $subset_ID );
+		return ! empty( $this->subset_cache[$subset_ID] );
 	}
 
 

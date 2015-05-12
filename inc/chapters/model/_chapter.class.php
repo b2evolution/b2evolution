@@ -124,8 +124,9 @@ class Chapter extends GenericCategory
 		}
 
 		if( $a_Chapter->parent_ID != $b_Chapter->parent_ID )
-		{
-			debug_die('Category objects with different parents received to compare.');
+		{ // Sort based on the ordering between different blogs
+			// TODO: asimo>fp How should we order chapers from different blogs?
+			return ( $a_Chapter->blog_ID > $b_Chapter->blog_ID ) ? 1 : ( ( $a_Chapter->blog_ID < $b_Chapter->blog_ID ) ? -1 : 0 );
 		}
 
 		if( empty( $a_Chapter->parent_ID ) )

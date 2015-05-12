@@ -313,68 +313,30 @@ class pureforums_Skin extends Skin
 			return $skin_chapters_cache;
 		}
 
+		$ChapterCache = & get_ChapterCache();
+		$ChapterCache->reveal_children( $Blog->ID, true );
+
 		$skin_chapters_cache = array();
 		if( $parent_ID > 0 )
-		{	// Get children of selected chapter
-			global $DB, $Settings;
-
-			$skin_chapters_cache = array();
-
-			$SQL = new SQL();
-			$SQL->SELECT( 'cat_ID' );
-			$SQL->FROM( 'T_categories' );
-			$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $parent_ID ) );
-			if( $Settings->get( 'chapter_ordering' ) == 'manual' )
-			{	// Manual order
-				$SQL->ORDER_BY( 'cat_meta, cat_order' );
-			}
-			else
-			{	// Alphabetic order
-				$SQL->ORDER_BY( 'cat_meta, cat_name' );
-			}
-
+		{ // Get children of selected chapter
 			$ChapterCache = & get_ChapterCache();
-
-			$categories = $DB->get_results( $SQL->get() );
-			foreach( $categories as $c => $category )
-			{
-				$skin_chapters_cache[$c] = $ChapterCache->get_by_ID( $category->cat_ID );
-				// Get children
-				$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $category->cat_ID ) );
-				$children = $DB->get_results( $SQL->get() );
-				foreach( $children as $child_Chapter )
-				{
-					$skin_chapters_cache[$c]->children[$child_Chapter->cat_ID] = $ChapterCache->get_by_ID( $child_Chapter->cat_ID );
+			$parent_Chapter = $ChapterCache->get_by_ID( $parent_ID );
+			$parent_Chapter->sort_children();
+			foreach( $parent_Chapter->children as $Chapter )
+			{ // Iterate through childrens or the given parent Chapter
+				$skin_chapters_cache[$Chapter->ID] = $ChapterCache->get_by_ID( $Chapter->ID );
+				$Chapter->sort_children();
+				foreach( $Chapter->children as $sub_Chapter )
+				{ // Set Chapter childrens
+					$skin_chapters_cache[$Chapter->ID]->children[$sub_Chapter->cat_ID] = $sub_Chapter;
 				}
 			}
 		}
 		else
-		{	// Get the all chapters for current blog
-			$ChapterCache = & get_ChapterCache();
-			$ChapterCache->load_subset( $Blog->ID );
-
-			if( isset( $ChapterCache->subset_cache[ $Blog->ID ] ) )
+		{ // Get the current blog root chapters
+			foreach( $ChapterCache->subset_root_cats[ $Blog->ID] as $Chapter )
 			{
-				$skin_chapters_cache = $ChapterCache->subset_cache[ $Blog->ID ];
-
-				foreach( $skin_chapters_cache as $c => $Chapter )
-				{ // Init children
-					foreach( $skin_chapters_cache as $child_Chapter )
-					{ // Again go through all chapters to find a children for current chapter
-						if( $Chapter->ID == $child_Chapter->get( 'parent_ID' ) )
-						{ // Add to array of children
-							$skin_chapters_cache[$c]->children[$child_Chapter->ID] = $child_Chapter;
-						}
-					}
-				}
-
-				foreach( $skin_chapters_cache as $c => $Chapter )
-				{ // Unset the child chapters
-					if( $Chapter->get( 'parent_ID' ) )
-					{
-						unset( $skin_chapters_cache[$c] );
-					}
-				}
+				$skin_chapters_cache[$Chapter->ID] = $Chapter;
 			}
 		}
 

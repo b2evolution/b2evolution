@@ -98,20 +98,9 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
  */
 function get_the_category_by_ID( $cat_ID, $die = true )
 {
-	global $cache_categories;
-	if( empty($cache_categories[$cat_ID]) )
-	{
-		cat_load_cache( 'none' );
-	}
-	if( !isset( $cache_categories[$cat_ID] ) )
-	{
-		if( $die )
-		{
-			debug_die( sprintf( T_('Requested category %s does not exist!'),  $cat_ID ) );
-		}
-		else return false;
-	}
-	return $cache_categories[$cat_ID];
+	// TODO: asimo> Old content was changed, but still the whole function should be removed.
+	$ChapterCache = & get_ChapterCache();
+	return $ChapterCache->get_by_ID( $cat_ID, $die );
 }
 
 
@@ -140,80 +129,6 @@ function get_caturl( $cat_ID )
 	$Chapter = $ChapterCache->get_by_ID($cat_ID);
 
 	return $Chapter->get_permanent_url();
-}
-
-
-/**
- * Load cache for category definitions.
- *
- * Warning: this loads all categories for ALL blogs
- */
-function cat_load_cache()
-{
-	global $DB, $cache_categories;
-	global $Settings;
-	global $Timer;
-
-	if( isset($cache_categories))
-	{
-		return;
-	}
-
-	$Timer->resume( 'cat_load_cache' );
-
-	// echo "loading CAT cache";
-	if( $Settings->get('chapter_ordering') == 'manual' )
-	{	// Manual order
-		$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
-		$sql_order = ' ORDER BY temp_order';
-	}
-	else
-	{	// Alphabetic order
-		$select_temp_order = '';
-		$sql_order = ' ORDER BY cat_name';
-	}
-	$sql = 'SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID'.$select_temp_order.'
-					FROM T_categories'
-					.$sql_order;
-
-
-	foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
-	{
-		$this_cat['cat_name'] = $myrow['cat_name'];
-		$this_cat['cat_blog_ID'] = $myrow['cat_blog_ID'];
-		$this_cat['cat_parent_ID'] = $myrow['cat_parent_ID'];
-		$this_cat['cat_postcount'] = 0;					// Will be increased later
-		$this_cat['cat_children'] = array();
-		$cache_categories[$myrow['cat_ID']] = $this_cat;
-		// echo 'just cached:',$myrow['cat_ID'],':',$cache_categories[$myrow['cat_ID']]['cat_name'], ' parent:',$cache_categories[$myrow['cat_ID']]['cat_parent_ID'],'<br />';
-	}
-
-	// echo 'Number of cats=', count($cache_categories);
-
-	// Reveal children:
-	if( ! empty( $cache_categories ) )
-	{
-		foreach( $cache_categories as $icat_ID => $i_cat )
-		{
-			// echo '<br>handling cat ', $icat_ID, ' ', $i_cat['cat_name'];
-			$cat_parent_ID = $i_cat['cat_parent_ID'];
-			if( $cat_parent_ID )
-			{
-				if( isset( $cache_categories[$cat_parent_ID] ) )
-				{ // If the parent exists!
-					$cache_categories[$cat_parent_ID]['cat_children'][] = $icat_ID;
-				}
-				else
-				{
-					echo( "Category #$icat_ID is orphan of non existant parent #$cat_parent_ID!<br />" );
-				}
-			}
-		}
-	}
-
-	// echo 'Number of cats=', count($cache_categories);
-
-	$Timer->pause( 'cat_load_cache' );
 }
 
 
@@ -315,99 +230,6 @@ function postcats_get_byID( $post_ID )
 
 
 /**
- * Taking a recursive walk in the category park...
- *
- * @param array PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
- * @param integer
- * @param integer
- * @param string|array Callback for first category
- * @param string|array Callback before each category
- * @param string|array Callback after each category
- * @param string|array Callback after last category
- * @param integer Caller nesting level, just to keep track of how far we go :)
- * @return string
- */
-function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level = 0, $root_call = true )
-{
-	static $total_count = 0;
-
-	$r = '';
-
-	// echo 'Number of cats=', count($ccats);
-	if( empty( $ccats ) )
-	{ // this can happen if there are no cats at all!
-		return '';
-	}
-
-	if( $root_call )
-	{ // Init:
-		$total_count = 0;
-	}
-
-	$child_count = 0;
-	foreach( $ccats as $icat_ID => $i_cat )
-	{
-		if( empty( $icat_ID )
-			|| ! ( /* TODO: check ($blog_ID == 0) || */ ($i_cat['cat_blog_ID'] == $blog_ID))
-			|| ! ($i_cat['cat_parent_ID'] == $parent_ID) )
-		{ // this cat is not in the blog and or is not a child of the parent
-			continue;
-		}
-
-		// this cat is in the blog and is a child of the parent...
-		$total_count++;
-
-
-		// "before first":
-		if( $child_count++ == 0 )
-		{ // this is the first child
-			if( is_array( $callback_before_first ) )
-			{ // object callback:
-				$r .= $callback_before_first[0]->{$callback_before_first[1]}( $parent_ID, $level, $total_count, 1 );
-			}
-			else
-				$r .= $callback_before_first( $parent_ID, $level, $total_count, 1 );
-		}
-
-		// "before each":
-		if( is_array( $callback_before_each ) )
-		{ // object callback:
-			$r2 = $callback_before_each[0]->{$callback_before_each[1]}( $icat_ID, $level, $total_count, $child_count );
-		}
-		else
-			$r2 = $callback_before_each( $icat_ID, $level, $total_count, $child_count );
-		if( $r2 === true )
-		{	// callback function has requested that we stop recursing for this branch
-			continue;
-		}
-		$r .= $r2;
-
-		// Recursion:
-		$r .= cat_children( $ccats, $blog_ID, $icat_ID, $callback_before_first, $callback_before_each, $callback_after_each, $callback_after_last, $level+1, false );
-
-		// "after each":
-		if( is_array( $callback_after_each ) )
-		{ // object callback:
-			$r .= $callback_after_each[0]->{$callback_after_each[1]}( $icat_ID, $level, $total_count, $child_count );
-		}
-		else
-		{
-			$r .= $callback_after_each( $icat_ID, $level, $total_count, $child_count );
-		}
-	}
-	if( $child_count )
-	{ // There have been children
-		if( is_array( $callback_after_last ) )
-			$r .= $callback_after_last[0]->{$callback_after_last[1]}( $parent_ID, $level, $total_count, $child_count );
-		else
-			$r .= $callback_after_last( $parent_ID, $level, $total_count, $child_count );
-	}
-
-	return $r;
-}
-
-
-/**
  * Does a given blog have categories?
  *
  * @param integer Blog ID
@@ -415,19 +237,8 @@ function cat_children( $ccats, $blog_ID, $parent_ID, $callback_before_first, $ca
  */
 function blog_has_cats( $blog_ID )
 {
-	global $cache_categories;
-
-	cat_load_cache( 'none' );
-
-	foreach( $cache_categories as $icat_ID => $i_cat )
-	{
-		if( $icat_ID && $i_cat['cat_blog_ID'] == $blog_ID )
-		{ // this cat is in the blog
-			return true;
-		}
-	}
-
-	return false;
+	$ChapterCache = & get_ChapterCache();
+	return $ChapterCache->has_chapters_in_subset( $blog_ID );
 }
 
 
@@ -442,8 +253,6 @@ function blog_has_cats( $blog_ID )
  */
 function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restrict_to_blog = 0  )
 {
-	global $cache_categories;
-
 	// echo '$cat='.$cat;
 	// pre_dump( $catsel );
 	// echo '$restrict_to_blog'.$restrict_to_blog;
@@ -474,14 +283,27 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 			// Getting required sub-categories:
 			// and add everything to cat array
 			// ----------------- START RECURSIVE CAT LIST ----------------
-			cat_load_cache();	// make sure the caches are loaded
+			$ChapterCache = & get_ChapterCache();
+			if( $restrict_to_blog > 0 )
+			{ // Load all Chapters from the given blog
+				$ChapterCache->reveal_children( $restrict_to_blog, true );
+			}
+			else
+			{ // Load all chapters
+				$ChapterCache->reveal_children( NULL, true );
+			}
+
 			foreach( $req_cat_array as $cat_ID )
 			{ // run recursively through the cats
+				$current_Chapter = $ChapterCache->get_by_ID( $cat_ID, false );
+				if( empty( $current_Chapter ) )
+				{ // The requested Chapter doesn't exists in the given context
+					continue;
+				}
 				if( ! in_array( $cat_ID, $cat_array ) )
 				{ // Not already in list
 					$cat_array[] = $cat_ID;
-					cat_children( $cache_categories, $restrict_to_blog, $cat_ID, 'cat_req_dummy', 'cat_req',
-												'cat_req_dummy', 'cat_req_dummy', 1 );
+					$ChapterCache->iterate_through_category_children( $current_Chapter, array( 'line' => 'cat_req' ), true, array( 'sorted' => true ) );
 				}
 			}
 			// ----------------- END RECURSIVE CAT LIST ----------------
@@ -505,18 +327,13 @@ function compile_cat_array( $cat, $catsel, & $cat_array, & $cat_modifier, $restr
 /**
  * Callback used in compile_cat_array()
  */
-function cat_req( $parent_cat_ID, $level )
+function cat_req( $Chapter, $level )
 {
 	global $cat_array;
-	// echo "[$parent_cat_ID] ";
-	if( ! in_array( $parent_cat_ID, $cat_array ) )
+
+	if( ! in_array( $Chapter->ID, $cat_array ) )
 	{ // Not already visited
-		$cat_array[] = $parent_cat_ID;
-	}
-	else
-	{
-		// echo "STOP! ALREADY VISITED THIS ONE!";
-		return -1;		// STOP going through that branch
+		$cat_array[] = $Chapter->ID;
 	}
 }
 
@@ -534,14 +351,6 @@ function get_allow_cross_posting()
 {
 	global $Settings;
 	return $Settings->get( 'cross_posting' ) + ( 2 *  $Settings->get( 'cross_posting_blogs' ) );
-}
-
-
-/**
- * Callback used in compile_cat_array()
- */
-function cat_req_dummy()
-{
 }
 
 

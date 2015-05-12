@@ -102,7 +102,7 @@ class coll_longdesc_Widget extends ComponentWidget
 		if( strpos( $this->disp_params['title'], '$title$' ) !== false )
 		{ // Replace mask $title$ with real blog name with link to blog home page as it does widget coll_title
 			$this->disp_params['title'] = str_replace( '$title$',
-				'<a href="'.$Blog->get( 'url', 'raw' ).'">'.$Blog->dget( 'name', 'htmlbody' ).'</a>', $this->disp_params['title'] );
+				'<a href="'.$Blog->get( 'url' ).'">'.$Blog->dget( 'name', 'htmlbody' ).'</a>', $this->disp_params['title'] );
 		}
 
 		// Display title if requested

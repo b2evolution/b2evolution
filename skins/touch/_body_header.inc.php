@@ -113,8 +113,8 @@ global $dummy_fields;
 
 <div id="headerbar">
 	<div id="headerbar-title">
-		<a href="<?php echo $Blog->get( 'url', 'raw' ); ?>"><img id="logo-icon" src="<?php echo $Skin->get_url(); ?>img/icon-pool/Default.png" alt="<?php echo $Blog->dget( 'name', 'text' ); ?>"></a>
-		<a href="<?php echo $Blog->get( 'url', 'raw' ); ?>"><?php echo $Blog->dget( 'name', 'htmlbody' ); ?></a>
+		<a href="<?php echo $Blog->get( 'url' ); ?>"><img id="logo-icon" src="<?php echo $Skin->get_url(); ?>img/icon-pool/Default.png" alt="<?php echo $Blog->dget( 'name', 'text' ); ?>"></a>
+		<a href="<?php echo $Blog->get( 'url' ); ?>"><?php echo $Blog->dget( 'name', 'htmlbody' ); ?></a>
 	</div>
 	<div id="headerbar-menu">
 		<?php

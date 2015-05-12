@@ -432,7 +432,8 @@ class coll_category_list_Widget extends ComponentWidget
 			}
 		}
 
-		$parent_cat_is_visible = $this->parent_cat_is_visible;
+		// TODO: fp>attila: chek this: (was undefined)
+		$parent_cat_is_visible = isset($this->parent_cat_is_visible) ? $this->parent_cat_is_visible : false;
 		$start_level = intval( $this->disp_params['start_level'] );
 		if( $start_level > 1 &&
 		    ( $start_level > $level + 1 ||

@@ -1315,7 +1315,7 @@ function init_list_mode()
 			// require colorbox js
 			require_js_helper( 'colorbox' );
 
-			$AdminUI->breadcrumbpath_add( T_('All'), $admin_url.'?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
 
 		case 'manual':

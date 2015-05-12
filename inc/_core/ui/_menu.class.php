@@ -332,7 +332,6 @@ class Menu extends Widget
 
 				$anchor .= '>'.(isset($loop_details['text']) ? format_to_output( $loop_details['text'], 'htmlbody' ) : '?');
 				$anchor_end = '</a>';
-				$anchor_end_with_sub = $templateForLevel['arrow_level_'.( $level + 1 )].'</a>';
 
 				if( $loop_key == $selected )
 				{ // Highlight selected entry
@@ -349,7 +348,7 @@ class Menu extends Widget
 							    ( isset( $templateForLevel['_props']['recurse_level'] ) &&
 							      $templateForLevel['_props']['recurse_level'] > $level + 1 ) ) )
 						{ // Display submenus if this level is not limited by param 'recurse_level'
-							$r .= $anchor_end_with_sub;
+							$r .= $templateForLevel['arrow_level_'.( $level + 1 )].'</a>';
 							$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
 						}
 						else
@@ -384,7 +383,7 @@ class Menu extends Widget
 							&& $this->get_menu_entries($recursePath) )
 					{
 						$r .= isset($templateForLevel['beforeEachWithSub']) ? $templateForLevel['beforeEachWithSub'] : $templateForLevel['beforeEachSel'];
-						$r .= $anchor.$anchor_end_with_sub;
+						$r .= $anchor.$templateForLevel['arrow_level_'.( $level + 1 )].'</a>';
 						// recurse:
 						$r .= $this->get_html_menu( $recursePath, $template, $level+1 );
 						$r .= isset($templateForLevel['afterEachWithSub']) ? $templateForLevel['afterEachWithSub'] : $templateForLevel['afterEachSel'];

@@ -529,6 +529,7 @@ class Skin extends DataObject
 			$select_a_end = '';
 		}
 
+		// Display skinshot:
 		echo '<div class="'.$disp_params[ 'skinshot_class' ].'">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
@@ -560,12 +561,27 @@ class Skin extends DataObject
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
 		echo '</div>';
+
+		//
 		echo '<div class="legend">';
-		if( isset( $disp_params[ 'function' ] ) && isset( $disp_params[ 'function_url' ] ) )
+		if( isset( $disp_params[ 'function' ] ) )
 		{
 			echo '<div class="actions">';
 			switch( $disp_params[ 'function' ] )
 			{
+				case 'broken':
+					echo '<span class="text-danger">';
+					if( !empty($disp_params[ 'msg' ]) )
+					{
+						echo $disp_params[ 'msg' ];
+					}
+					else
+					{
+						echo T_('Broken.');
+					}
+					echo '</span>';
+					break;
+
 				case 'install':
 					// Display a link to install the skin
 					if( $disp_params[ 'skin_compatible' ] )
@@ -595,9 +611,9 @@ class Skin extends DataObject
 			echo '</div>';
 		}
 		echo '<strong>'
-				.( empty( $skin_name_before ) ? '' : $skin_name_before )
+				.( empty( $skin_name_before ) ? '<label>' : $skin_name_before )
 					.$skin_name
-				.( empty( $skin_name_after ) ? '' : $skin_name_after )
+				.( empty( $skin_name_after ) ? '</label>' : $skin_name_after )
 			.'</strong>';
 		echo '</div>';
 		echo '</div>';

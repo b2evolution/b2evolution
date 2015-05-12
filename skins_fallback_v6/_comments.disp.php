@@ -19,6 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $params = array_merge( array(
 		'comment_template'        => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'author_link_text'        => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'link_to'                 => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'display_comment_avatar'  => true,
 		'comment_avatar_position' => 'before_title', // 'before_title', 'before_text'
 		'comment_start'           => '<div class="evo_comment panel panel-default">',
@@ -85,7 +86,6 @@ while( $Comment = & $CommentList->get_next() )
 					'author_link_text'      => $params['author_link_text'],
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
-					'comment_number'        => $comment_number,
 					'image_size'            => $params['comment_image_size'],
 				) );
 			// Note: You can customize the default item comment by copying the generic

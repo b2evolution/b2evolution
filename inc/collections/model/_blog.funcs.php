@@ -303,7 +303,7 @@ function valid_blog_requested()
 function get_working_blog()
 {
 	global $blog, $current_User, $UserSettings;
-	
+
 	if( ! is_logged_in() )
 	{ // User must be logged in to view the blogs
 		return false;
@@ -550,7 +550,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we want to give priority to ?blog=123..
 	if( $use_blog_param_first == true )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );			
+		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -578,7 +578,7 @@ function init_requested_blog( $use_blog_param_first = true )
 		}
 		else
 		{
-			$Debuglog->add( 'No match.', 'detectblog' );			
+			$Debuglog->add( 'No match.', 'detectblog' );
 		}
 	}
 
@@ -603,7 +603,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	// If we did NOT give priority to ?blog=123, check for param now:
 	if( $use_blog_param_first == false )
 	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );			
+		$Debuglog->add( 'Checking for epxlicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -1683,6 +1683,7 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 	if( $current_User->check_perm( 'blog_properties', 'false', false, $blog_ID ) )
 	{ // Link to update blog setting
 		return '<a href="'.$admin_url.'?ctrl=coll_settings'
+			.'&amp;tab=general'
 			.'&amp;action='.$action
 			.'&amp;setting='.$setting_name
 			.'&amp;blog='.$blog_ID

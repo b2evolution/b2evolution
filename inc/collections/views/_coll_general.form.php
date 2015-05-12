@@ -71,9 +71,9 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
-	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
+	$Form->text( 'blog_name', $edited_Blog->dget( 'name', 'formvalue' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
 
-	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
+	$Form->text( 'blog_shortname', $edited_Blog->dget( 'shortname', 'formvalue' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings

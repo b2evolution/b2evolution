@@ -100,7 +100,7 @@ class coll_title_Widget extends ComponentWidget
 		// Collection title:
 		echo $this->disp_params['block_start'];
 
-		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
+		$title = '<a href="'.$Blog->get( 'url' ).'">'
 							.$Blog->dget( 'name', 'htmlbody' )
 							.'</a>';
 		if( $this->disp_params['add_tagline'] )

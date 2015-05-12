@@ -5959,13 +5959,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY ufdf_code varchar(20) COLLATE ascii_general_ci UNIQUE NOT NULL' );
 		task_end();
 
+		set_upgrade_checkpoint( '11400' );
+	}
+
+	if( $old_db_version < 11410 )
+	{ // part 18.k trunk aka 13th part of "i7"
+
+		task_begin( 'Upgrading skin names... ' );
+		$DB->query( 'UPDATE T_skins__skin 
+							 SET skin_folder = CASE
+									WHEN skin_folder = "bootstrap"        THEN "bootstrap_blog_skin"
+									WHEN skin_folder = "bootstrap_main"   THEN "bootstrap_main_skin"
+									WHEN skin_folder = "bootstrap_manual" THEN "bootstrap_manual_skin"
+									ELSE skin_folder
+			END' );
+		task_end();
+
 		/*
 		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
 		 *
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11400' );
+		// set_upgrade_checkpoint( '11410' );
 	}
 
 	/*

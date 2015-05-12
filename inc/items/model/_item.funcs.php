@@ -1057,9 +1057,8 @@ function get_newcategory_link()
  */
 function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
-	global $cache_categories, $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
-	global $cat_sel_total_count, $dispatcher;
-	global $rsc_url;
+	global $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $dispatcher, $rsc_url;
 
 	if( get_post_cat_setting( $blog ) < 1 )
 	{ // No categories for $blog
@@ -1090,18 +1089,22 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	$Form->begin_fieldset( $fieldset_title, array( 'class'=>'extracats', 'id' => 'itemform_categories', 'fold' => $params['fold'] ) );
 
-	$cat_sel_total_count = 0;
 	$r ='';
-
 	$cat_select_form_fields = $form_fields;
-
-	cat_load_cache(); // make sure the caches are loaded
+	$ChapterCache = & get_ChapterCache();
 
 	$r .= '<table cellspacing="0" class="catselect table table-striped table-bordered table-hover table-condensed">';
 	if( get_post_cat_setting($blog) == 3 )
 	{ // Main + Extra cats option is set, display header
 		$r .= cat_select_header( $params );
 	}
+
+	$callbacks = array(
+		'before_first' => 'cat_select_before_first',
+		'before_each'  => 'cat_select_before_each',
+		'after_each'   => 'cat_select_after_each',
+		'after_last'   => 'cat_select_after_last'
+	);
 
 	if( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) )
@@ -1110,6 +1113,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 		 * @var BlogCache
 		 */
 		$BlogCache = & get_BlogCache();
+		$ChapterCache->reveal_children( NULL, true );
+		$cat_display_params = array( 'total_count' => 0 );
 
 		/**
 		 * @var Blog
@@ -1123,23 +1128,29 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 				continue;
 
 			$r .= '<tr class="group" id="catselect_blog'.$l_Blog->ID.'"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
-			$cat_sel_total_count++; // the header uses 1 line
 
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
-			$r .= cat_children( $cache_categories, $l_Blog->ID, NULL, 'cat_select_before_first',
-										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-			if( $blog == $l_Blog->ID )
+			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
 			{
-				$r .= cat_select_new();
+				$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+			}
+			if( $blog == $current_blog_ID )
+			{
+				$r .= cat_select_new( $cat_display_params );
 			}
 		}
 	}
 	else
 	{ // BLOG Cross posting is disabled. Current blog only:
 		$current_blog_ID = $blog;
-		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
-									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-		$r .= cat_select_new();
+		$ChapterCache->reveal_children( $current_blog_ID, true );
+
+		foreach( $ChapterCache->subset_root_cats[$blog] as $root_Chapter )
+		{
+			$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+		}
+
+		$r .= cat_select_new( $cat_display_params );
 	}
 
 	$r .= '</table>';
@@ -1181,6 +1192,90 @@ function cat_select_header( $params = array() )
 	return $r;
 }
 
+
+/**
+ * Get content of a category display recursively with all of its subcats in a cat selection control
+ *
+ * @param object Chapter
+ * @param array callbacks to display a line of category
+ * @param array display params
+ * @return string content to display
+ */
+function cat_select_display( $Chapter, $callbacks, & $params = array() )
+{
+	$params = array_merge( array(
+			'level'  => 1,
+			'sorted' => true,
+			'total_count' => 0,
+		), $params );
+
+	$callbacks = array_merge( array(
+			'before_first' => NULL,
+			'before_each'  => NULL,
+			'after_each'   => NULL,
+			'after_last'   => NULL
+		), $callbacks );
+
+	$params['total_count'] = $params['total_count'] + 1;
+	$parent_Chapter = & $Chapter->get_parent_Chapter();
+
+	if( is_array( $callbacks['before_each'] ) )
+	{ // object callback:
+		$r .= $callbacks['before_each'][0]->{$callbacks['before_each'][1]}( $Chapter->ID, $params['level'], $params['total_count'] );
+	}
+	else
+	{
+		$r .= $callbacks['before_each']( $Chapter->ID, $params['level'], $params['total_count'] );
+	}
+
+	if( is_array( $callbacks['after_each'] ) )
+	{ // object callback:
+		$r .= $callbacks['after_each'][0]->{$callbacks['after_each'][1]}( $Chapter->ID, $params['level'], $params['total_count'] );
+	}
+	else
+	{
+		$r .= $callbacks['after_each']( $Chapter->ID, $params['level'], $params['total_count'] );
+	}
+
+	if( empty( $Chapter->children ) )
+	{
+		return $r;
+	}
+
+	if( $params['sorted'] )
+	{
+		$Chapter->sort_children();
+	}
+
+	if( is_array( $callbacks['before_first'] ) )
+	{ // object callback:
+		$r .= $callbacks['before_first'][0]->{$callbacks['before_first'][1]}( $Chapter->parent_ID, $params['level'], $params['total_count'], 1 );
+	}
+	else
+	{
+		$r .= $callbacks['before_first']( $Chapter->parent_ID, $params['level'], $params['total_count'], 1 );
+	}
+
+	$params['level'] = $params['level'] + 1;
+	foreach( $Chapter->children as $child_Chapter )
+	{
+		$r .= cat_select_display( $child_Chapter, $callbacks, $params );
+	}
+	$params['level'] = $params['level'] - 1;
+
+	if( is_array( $callbacks['after_last'] ) )
+	{ // object callback:
+		$r .= $callbacks['after_last'][0]->{$callbacks['after_last'][1]}( $Chapter->parent_ID, $params['level'], $params['total_count'], 1 );
+	}
+	else
+	{
+		$r .= $callbacks['after_last']( $Chapter->parent_ID, $params['level'], $params['total_count'], 1 );
+	}
+
+	return $r;
+}
+
+
 /**
  * callback to start sublist
  */
@@ -1196,7 +1291,6 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $post_extracats, $edited_Item, $current_User;
 	global $creating, $cat_select_level, $cat_select_form_fields;
-	global $cat_sel_total_count;
 
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
@@ -1205,8 +1299,6 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
 		return;
 	}
-
-	$cat_sel_total_count++;
 
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
@@ -1315,9 +1407,11 @@ function cat_select_after_last( $parent_cat_ID, $level )
 
 /**
  * new category line for catselect table
+ *
+ * @param array category display params, contains e.g. the total displayed rows
  * @return string new row code
  */
-function cat_select_new()
+function cat_select_new( & $cat_display_params )
 {
 	global $blog, $current_User;
 
@@ -1337,9 +1431,8 @@ function cat_select_new()
 		$category_name = '';
 	}
 
-	global $cat_sel_total_count;
-	$cat_sel_total_count++;
-	$r = "\n".'<tr class="'.( $cat_sel_total_count%2 ? 'odd' : 'even' ).'">';
+	$cat_display_params['total_count'] = $cat_display_params['total_count']  + 1;
+	$r = "\n".'<tr class="'.( $cat_display_params['total_count'] % 2 ? 'odd' : 'even' ).'">';
 
 	if( get_post_cat_setting( $blog ) != 2 )
 	{

@@ -191,7 +191,6 @@ param( 'import_mode', 'string', 'normal' );
 
 	// load caches
 	blog_load_cache();
-	cat_load_cache( 'none' );
 
 	$i_user = -1;
 
@@ -955,17 +954,6 @@ param( 'import_mode', 'string', 'normal' );
 								$cat_id = cat_create( $checkcat[2], 'NULL', $checkcat[1] );
 							}
 							$catsmapped[ $catname ] = array( 'catid', $cat_id ); // use ID from now on.
-
-							if( !isset($cache_categories[ $cat_id ] ) )
-							{ // stupid workaround because of a bug where cache_categories does not get updated and we want to use get_catname later
-								$cache_categories[ $cat_id ] = array(
-									'cat_name' => $checkcat[2],
-									'cat_blog_ID' => $checkcat[1],
-									'cat_parent_ID' => NULL,
-									'cat_postcount' => 0,
-									'cat_children' => 0
-								);
-							}
 							$post_catids[] = $cat_id;
 							$message .= '<li style="color:orange">category '.$checkcat[2].' [ID '.$cat_id.'] created</li>';
 							break;
@@ -1245,14 +1233,19 @@ function get_catname($cat_ID)
 
 function fieldset_cats()
 {
-	global $cache_blogs, $cache_categories;
+	global $cache_blogs;
+
+	// ----------------- START RECURSIVE CAT LIST ----------------
+	$ChapterCache = & get_ChapterCache();
+	// Load all chapters recursively at once
+	$ChapterCache->reveal_children( NULL, true );
 
 	?>
 	<fieldset title="default categories set" style="background-color:#fafafa; border:1px solid #ccc; padding: 1em; display:inline; float:right; white-space:nowrap;">
 		<legend>Default categories set (only needed if you want to map categories to this)</legend>
 		<p class="extracatnote">
 		<?php
-			if( count( $cache_categories ) )
+			if( count( $ChapterCache->cache ) )
 			{
 				echo T_('Select main category in target blog and optionally check additional categories').':';
 			}
@@ -1268,22 +1261,21 @@ function fieldset_cats()
 		$default_main_cat = 0;
 		$blog = 1;
 
-		// ----------------- START RECURSIVE CAT LIST ----------------
-		cat_load_cache();	// make sure the caches are loaded
-		function import_cat_select_before_first( $parent_cat_ID, $level )
+		function import_cat_select_before_first( $level )
 		{	// callback to start sublist
-			echo "\n<ul>\n";
+			return "\n<ul>\n";
 		}
 
-		function import_cat_select_before_each( $cat_ID, $level )
+		function import_cat_select_before_each( $Chapter, $level )
 		{	// callback to display sublist element
 			global $current_blog_ID, $blog, $cat, $postdata, $default_main_cat, $action, $tabindex;
-			echo '<li>';
+
+			$r = '<li>';
 
 			if( get_allow_cross_posting() >= 1 )
 			{ // We allow cross posting, display checkbox:
-				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
-				echo ' />';
+				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.T_('Select as an additionnal category').'" value="'.$Chapter->ID.'"';
+				$r .= ' />';
 			}
 
 			// Radio for main cat:
@@ -1291,25 +1283,31 @@ function fieldset_cats()
 			{
 				if( ($default_main_cat == 0) && ($action == 'post') )
 				{	// Assign default cat for new post
-					$default_main_cat = $cat_ID;
+					$default_main_cat = $Chapter->ID;
 				}
-				echo ' <input type="radio" name="post_category" class="checkbox" title="', T_('Select as MAIN category'), '" value="',$cat_ID,'"';
-				if( ($cat_ID == $postdata["Category"]) || ($cat_ID == $default_main_cat))
-					echo ' checked="checked"';
-				echo ' />';
+				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.T_('Select as MAIN category').'" value="'.$Chapter->ID.'"';
+				if( ($Chapter->ID == $postdata["Category"]) || ($Chapter->ID == $default_main_cat))
+					$r .= ' checked="checked"';
+				$r .= ' />';
 			}
-			echo ' '.htmlspecialchars(get_catname($cat_ID));
+			$r .= ' '.htmlspecialchars(get_catname($Chapter->ID));
+
+			// End of element
+			$r .= "</li>\n";
+
+			return $r;
 		}
 
-		function import_cat_select_after_each( $cat_ID, $level )
-		{	// callback after each sublist element
-			echo "</li>\n";
-		}
-
-		function import_cat_select_after_last( $parent_cat_ID, $level )
+		function import_cat_select_after_last( $level )
 		{	// callback to end sublist
-			echo "</ul>\n";
+			return "</ul>\n";
 		}
+
+		$callbacks = array(
+			'line'         => 'import_cat_select_before_each',
+			'before_level' => 'import_cat_select_before_first',
+			'after_level'  => 'import_cat_select_after_last'
+		);
 
 		// go through all blogs with cats:
 		foreach( $cache_blogs as $i_blog )
@@ -1318,8 +1316,7 @@ function fieldset_cats()
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
 			#if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 			echo "<h4>".$i_blog->blog_name."</h4>\n";
-			cat_children( $cache_categories, $current_blog_ID, NULL, 'import_cat_select_before_first',
-										'import_cat_select_before_each', 'import_cat_select_after_each', 'import_cat_select_after_last', 1 );
+			echo $ChapterCache->recurse( $callbacks, $current_blog_ID, NULL, 0, 0, array( 'sorted' => true) );
 		}
 		// ----------------- END RECURSIVE CAT LIST ----------------
 		?>
@@ -1333,29 +1330,30 @@ function fieldset_cats()
 */
 function cats_optionslist( $forcat )
 {
-	global $cache_categories, $cache_blogs, $cache_optionslist;
+	global $cache_blogs, $cache_optionslist, $cat_name_id_associations;
+
+	if( !isset( $cat_name_id_associations ) )
+	{ // Create a map fro the category name-id associations to populate during optionlist initialization
+		$cat_name_id_associations = array();
+	}
 
 	if( !isset($cache_optionslist) )
 	{
+		$ChapterCache = & get_ChapterCache();
+		$ChapterCache->reveal_children( NULL, true );
+		$callbacks = array( 'line' => 'proces_cat_line' );
+
 		$cache_optionslist = '';
 		foreach( $cache_blogs as $i_blog )
 		{
 			$cache_optionslist .= '<option value="#NEW#'.$i_blog->blog_ID.'">[-- create in blog '.$i_blog->blog_shortname.' --]:</option>';
-			cat_children2( $cache_categories, $i_blog->blog_ID, NULL, 1 );
+			$cache_optionslist .= $ChapterCache->recurse( $callbacks, $i_blog->blog_ID, NULL, 0, 0, array( 'sorted' => true) );
 		}
 	}
 
-	$cat_id = false;
-	foreach( $cache_categories as $key => $value )
-	{
-		if( $value['cat_name'] == $forcat )
-		{
-			$cat_id = $key;
-			break;
-		}
-	}
+	$cat_id = isset( $cat_name_id_associations[$forcat] ) ? $cat_name_id_associations[$forcat] : false;
 
-	if( is_int($cat_id) )
+	if( $cat_id )
 	{
 		echo str_replace( '<option value="'.$cat_id.'">', '<option value="'.$cat_id.'" selected="selected">', $cache_optionslist );
 	}
@@ -1365,40 +1363,23 @@ function cats_optionslist( $forcat )
 	}
 }
 
-function cat_children2(
-	$ccats, 	// PHP requires this stupid cloning of the cache_categories array in order to be able to perform foreach on it
-	$blog_ID,
-	$parent_ID,
-	$level = 0 )	// Caller nesting level, just to keep track of how far we go :)
+
+function proces_cat_line( $Chapter, $level )
 {
-	global $cache_optionslist;
+	global $cat_name_id_associations;
 
-	// echo 'Number of cats=', count($ccats);
-	if( ! empty( $ccats ) ) // this can happen if there are no cats at all!
-	{
-		$child_count = 0;
-		foreach( $ccats as $icat_ID => $i_cat )
-		{
-			// fp> TODO: check what ($blog_ID == 0) is for .. ?
-			if( $icat_ID
-				&& ( ($blog_ID == 0) || ($i_cat['cat_blog_ID'] == $blog_ID))
-				&& ($i_cat['cat_parent_ID'] == $parent_ID) )
-			{ // this cat is in the blog and is a child of the parent
-				$child_count++;
+	// Set name-ID association to be able to select them easily in the select list
+	$cat_name_id_associations[$Chapter->get( 'name' )] = $Chapter->ID;
 
-				$cache_optionslist .= '<option value="'.$icat_ID.'">';
+	$r .= '<option value="'.$Chapter->ID.'">';
 
-				for( $i = 0; $i < $level; $i++ )
-				{
-					$cache_optionslist .= '-';
-				}
-
-				$cache_optionslist .= '&gt; '.format_to_output( $ccats[ $icat_ID ]['cat_name'], 'entityencoded' ).'</option>';
-
-				cat_children2( $ccats, $blog_ID, $icat_ID, $level+1 );
-			}
-		}
+	for( $i = 0; $i <= $level; $i++ )
+	{ // Add one '-' for each level
+		$r .= '-';
 	}
+
+	$r .= '&gt; '.format_to_output( $Chapter->get( 'name' ), 'entityencoded' ).'</option>';
+	return $r;
 }
 
 
