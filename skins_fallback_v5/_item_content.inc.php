@@ -57,7 +57,7 @@ $params = array_merge( array(
 		'excerpt_image_size'       => 'fit-80x80',
 		'excerpt_image_limit'      => 1,
 		'excerpt_image_link_to'    => 'single',
-		'include_cover_images'     => true,
+		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
 
 		'before_gallery'           => '<div class="bGallery">',
 		'after_gallery'            => '</div>',

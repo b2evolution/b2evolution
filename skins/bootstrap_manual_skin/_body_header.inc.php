@@ -17,7 +17,7 @@ global $Settings, $disp, $cat;
 ?>
 
 <div class="container">
-	<div id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
+	<header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 			<div class="evo_container evo_container__page_top">
 			<?php
@@ -53,14 +53,14 @@ global $Settings, $disp, $cat;
 			?>
 			</div>
 		</div>
-	</div>
+	</header>
 
 	<?php
 	global $hide_widget_container_menu;
 	if( empty( $hide_widget_container_menu ) )
 	{ // Display this widget container only when it is not disabled
 	?>
-	<div class="row">
+	<nav class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs evo_container evo_container__menu">
 			<?php
@@ -85,7 +85,7 @@ global $Settings, $disp, $cat;
 			?>
 			</ul>
 		</div>
-	</div>
+	</nav>
 	<?php } ?>
 
 	<div class="row">
@@ -108,14 +108,18 @@ global $Settings, $disp, $cat;
 						// CODE for the widget:
 						'widget' => 'breadcrumb_path',
 						// Optional display params
-						'block_start'      => '<ol class="breadcrumb">',
-						'block_end'        => '</ol>',
+						'block_start'      => '<nav><ol class="breadcrumb">',
+						'block_end'        => '</ol></nav>',
 						'separator'        => '',
 						'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 						'item_active_mask' => '<li class="active">$title$</li>',
 					) );
 			}
+			?>
 
+			<main><!-- This is were a link like "Jump to main content" would land -->
+
+			<?php
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h1 class="page_title">',
@@ -139,3 +143,4 @@ global $Settings, $disp, $cat;
 					'users_text'        => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
+			?>

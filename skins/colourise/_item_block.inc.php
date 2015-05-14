@@ -22,7 +22,6 @@ $params = array_merge( array(
 		'content_mode'    => 'auto',		// 'auto' will auto select depending on $disp-detail
 		'item_class'      => 'post',
 		'image_size'      => 'fit-400x320'
-
 	), $params );
 
 echo '<div id="styled_content_block">'; // Beginning of posts display

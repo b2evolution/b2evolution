@@ -66,10 +66,17 @@ skin_include( '_body_header.inc.php' );
 		display_if_empty();
 
 		echo '<div id="styled_content_block">';
+
+		$item_class_params = array(
+				'item_class'        => 'post',
+				'item_type_class'   => 'post_ptyp',
+				'item_status_class' => 'post',
+			);
+
 		while( $Item = & mainlist_get_item() )
-		{	// For each blog post, do everything below up to the closing curly brace "}"
+		{ // For each blog post, do everything below up to the closing curly brace "}"
 		?>
-		<div id="<?php $Item->anchor_id() ?>" class="post post<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+		<div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $item_class_params ) ?>" lang="<?php $Item->lang() ?>">
 
 			<?php
 				if( $Item->status != 'published' )

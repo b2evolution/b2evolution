@@ -28,7 +28,7 @@ if( !empty( $Item ) )
 			'feature_block'     => true,
 			'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
 			'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-			'item_class'        => 'jumbotron evo_post',
+			'item_class'        => 'jumbotron evo_content_block evo_post',
 			'disp_comment_form' => false,
 			'item_link_type'    => 'none',
 		) );

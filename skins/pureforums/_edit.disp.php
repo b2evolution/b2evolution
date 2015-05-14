@@ -57,7 +57,7 @@ $disp_params = array_merge( array(
 			'fieldset_end'   => '</td></tr>',
 			'fieldstart'     => '<tr>',
 			'fieldend'       => '</tr>',
-			'labelstart'     => '<td class="form_label"><strong>',
+			'labelstart'     => '<td class="form_label" valign="top"><strong>',
 			'labelend'       => '</strong></td>',
 			'inputstart'     => '<td class="form_input">',
 			'inputend'       => '</td>',

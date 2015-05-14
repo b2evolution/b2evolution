@@ -26,6 +26,7 @@ if( $Item = & mainlist_get_item() )
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+			'item_class'   => 'evo_post evo_content_block',
 		), $Skin->get_template( 'disp_params' ) ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 	echo '</div>'; // End of posts display

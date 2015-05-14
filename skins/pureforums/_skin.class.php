@@ -471,14 +471,19 @@ class pureforums_Skin extends Skin
 			case 'Form':
 				// Default Form settings:
 				return array(
+					'layout'            => 'fieldset',
+					'title_fmt'         => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+					'no_title_fmt'      => '<span style="float:right">$global_icons$</span>'."\n",
 					'formstart'         => '<table class="bForums" width="100%" cellspacing="1" cellpadding="2" border="0">',
 					'formend'           => '</table>',
 					'fieldset_begin'    => '<tr><th colspan="3" $fieldset_attribs$>$fieldset_title$</th></tr>',
 					'fieldset_end'      => '',
 					'fieldstart'        => '<tr $ID$>',
 					'fieldend'          => '</tr>',
+					'labelclass'        => '',
 					'labelstart'        => '<td class="row1 left">',
 					'labelend'          => '</td>',
+					'labelempty'        => '<td class="row1 left"></td>',
 					'inputstart'        => '<td class="row2 left">',
 					'inputend'          => '</td>',
 					'infostart'         => '<td class="row2 left" colspan="2">',
@@ -491,6 +496,7 @@ class pureforums_Skin extends Skin
 					'inline_inputend'   => '',
 					'customstart'       => '<tr><td colspan="2" class="custom_content">',
 					'customend'         => '</td></tr>',
+					'note_format'       => ' <span class="notes">%s</span>',
 				);
 
 			default:

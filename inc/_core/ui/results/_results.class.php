@@ -1662,7 +1662,7 @@ class Results extends Table
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
 
 		$content = str_replace( array( '{CUR_IDX}', '{TOTAL_ROWS}', '{ROW_IDX_TYPE}' ),
-			array( $this->current_idx, $this->total_rows, $this->get_row_order_type() ),
+			array( $this->current_idx, $this->total_rows, "'".$this->get_row_order_type()."'" ),
 			$content );
 
 		return $content;

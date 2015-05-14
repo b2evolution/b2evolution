@@ -525,6 +525,8 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'bootstrap_manual_skin' );
 
 	skin_install( 'asevo' );
+	skin_install( 'bootstrap_forums_skin' );
+	skin_install( 'bootstrap_gallery_skin' );
 	skin_install( 'dating_mood' );
 	skin_install( 'evopress' );
 	skin_install( 'forums' );

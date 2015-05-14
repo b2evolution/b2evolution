@@ -53,44 +53,44 @@ if( $is_pictured_page )
 
 <div class="container body">
 
-	<div class="row">
+	<header class="row">
 		<div class="col-md-12">
 
-<div class="evo_container evo_container__page_top">
-	<?php
-		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '<div class="widget $wi_class$">',
-				'block_end'           => '</div>',
-				'block_display_title' => false,
-				'list_start'          => '<ul>',
-				'list_end'            => '</ul>',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
-			) );
-		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-	?>
-</div>
+			<div class="evo_container evo_container__page_top">
+				<?php
+					// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+					// Display container and contents:
+					skin_container( NT_('Page Top'), array(
+							// The following params will be used as defaults for widgets included in this container:
+							'block_start'         => '<div class="widget $wi_class$">',
+							'block_end'           => '</div>',
+							'block_display_title' => false,
+							'list_start'          => '<ul>',
+							'list_end'            => '</ul>',
+							'item_start'          => '<li>',
+							'item_end'            => '</li>',
+						) );
+					// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+				?>
+			</div>
 
-<div class="evo_container evo_container__header">
-	<?php
-		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="widget $wi_class$">',
-				'block_end'         => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end'   => '</h1>',
-			) );
-		// ----------------------------- END OF "Header" CONTAINER -----------------------------
-	?>
-</div>
+			<div class="evo_container evo_container__header">
+				<?php
+					// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+					// Display container and contents:
+					skin_container( NT_('Header'), array(
+							// The following params will be used as defaults for widgets included in this container:
+							'block_start'       => '<div class="widget $wi_class$">',
+							'block_end'         => '</div>',
+							'block_title_start' => '<h1>',
+							'block_title_end'   => '</h1>',
+						) );
+					// ----------------------------- END OF "Header" CONTAINER -----------------------------
+				?>
+			</div>
 
 		</div>
-	</div>
+	</header>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
@@ -132,7 +132,7 @@ if( $is_pictured_page )
 </div>
 
 <!-- =================================== START OF FOOTER =================================== -->
-<div class="evo_container evo_container__footer">
+<footer class="evo_container evo_container__footer">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12 center">
@@ -198,7 +198,7 @@ if( $is_pictured_page )
 			</div>
 		</div>
 	</div>
-</div>
+</footer>
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

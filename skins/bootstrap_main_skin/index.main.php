@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8971 2015-05-13 18:01:20Z fplanque $
+ * @version $Id: index.main.php 8992 2015-05-14 15:51:50Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -62,7 +62,7 @@ if( $is_pictured_page )
 if( $disp != 'front' )
 { // Don't display header on disp=front
 ?>
-	<div class="row">
+	<header class="row">
 		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 			<div class="evo_container evo_container__page_top">
 	<?php
@@ -98,7 +98,7 @@ if( $disp != 'front' )
 	?>
 			</div>
 		</div>
-	</div>
+	</header>
 <?php
 }
 ?>
@@ -136,6 +136,8 @@ if( $disp != 'front' )
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
 
+			<main><!-- This is were a link like "Jump to main content" would land -->
+
 	<?php
 		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 		request_title( array(
@@ -143,7 +145,8 @@ if( $disp != 'front' )
 				'title_after'       => '</h2>',
 				'title_none'        => '',
 				'glue'              => ' - ',
-				'title_single_disp' => true,
+				'title_single_disp' => false,
+				'title_page_disp'   => false,
 				'format'            => 'htmlbody',
 				'register_text'     => '',
 				'login_text'        => '',
@@ -229,12 +232,12 @@ if( $disp != 'front' )
 				'author_link_text' => 'preferredname',
 				// Profile tabs to switch between user edit forms
 				'profile_tabs' => array(
-					'block_start'         => '<ul class="nav nav-tabs profile_tabs">',
+					'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
 					'item_start'          => '<li>',
 					'item_end'            => '</li>',
 					'item_selected_start' => '<li class="active">',
 					'item_selected_end'   => '</li>',
-					'block_end'           => '</ul>',
+					'block_end'           => '</ul></nav>',
 				),
 				// Pagination
 				'pagination' => array(
@@ -294,7 +297,10 @@ if( $disp != 'front' )
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
 		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
+	?>
+			</main>
 
+	<?php
 		if( $disp == 'front' )
 		{ // End of wrapper for front page area, in order to have the $Messages outside this block
 			echo '</div>';// END OF <div class="front_main_content">

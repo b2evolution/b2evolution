@@ -1,0 +1,428 @@
+.border-radius (@radius: 4px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	-ms-border-radius: @radius;
+	-o-border-radius: @radius;
+	border-radius: @radius;
+}
+
+// Header
+.evo_container__page_top {
+	margin-top: 20px;
+	.ufld_icon_links {
+		text-align: right;
+	}
+}
+
+// Footer
+.evo_container__footer {
+	text-align: right;
+	color: #A1A9B7;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+// Breadcrumbs
+ol.breadcrumb {
+	margin-left: 0;
+	float: left;
+}
+
+// Status icons
+.fa.icon {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #306595;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
+// Forums table list
+.forums_list {
+	.panel-heading {
+		&:not(:first-child) {
+			border-top: 1px solid #ddd;
+			.border-radius(0);
+		}
+		h2 {
+			margin-top: 0;
+		}
+	}
+	&.panel>a+.table {
+		border-top:1px solid #ddd;
+	}
+	.table tbody {
+		td {
+			vertical-align: middle;
+		}
+		.valign-top, .valign-top td {
+			vertical-align: top;
+		}
+	}
+	.meta_category a {
+		color: #535C66;
+		font-size: 14px;
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+	.ft_status {
+		width: 26px;
+	}
+	.ft_status_topic {
+		width: 19px;
+	}
+	.ft_title > a.forumlink {
+		font-size: 21px;
+	}
+	.ft_title a.topictitle {
+		color: #535C66;
+		font-size: 16px;
+	}
+	.ft_title a.topictitle.unread {
+		font-weight: bold;
+	}
+	.ft_title a.topictitle:hover {
+		color: #31363C;
+	}
+	.ft_desc, .ft_count {
+		color: #8B96A1;
+	}
+	.ft_count {
+		width: 100px;
+	}
+	.ft_date {
+		width: 220px;
+		white-space: nowrap;
+		padding-right: 20px;
+		line-height: 16px;
+	}
+	.ft_author_avatar {
+		float: left;
+		margin-right: 10px;
+		display: block;
+		img {
+			.border-radius(3px);
+		}
+	}
+	.ft_comment_response {
+		td {
+			background: #F6F6F6;
+		}
+		h3 {
+			margin: 0;
+		}
+	}
+}
+
+// Comment form
+.comment_form {
+	h3 {
+		margin: 0;
+	}
+	.panel {
+		margin: 0;
+		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		.panel-body {
+			padding: 0;
+		}
+	}
+}
+.evo_form {
+	border: none;
+	padding: 0;
+	overflow: visible;
+	.form-actions {
+		margin-bottom: 0;
+	}
+	div.form-group, div.custom_content {
+		padding: 0 20px;
+	}
+	fieldset {
+		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
+	}
+}
+.form-group[id^="ffield_uploadfile"] .controls {
+	padding-top: 5px;
+	input {
+		line-height: 10px;
+	}
+}
+#comment_date_field .panel {
+	border: none;
+	box-shadow: none;
+	margin-bottom: 0;
+	.panel-body {
+		padding: 0;
+		.control-label {
+			font-weight: bold;
+		}
+		.controls .form-group {
+			display: inline-block;
+			padding-left: 15px;
+			margin-bottom: 0;
+		}
+	}
+}
+
+// Fix buttons for comment actions
+.btn-group>.btn.first-child {
+	border-top-left-radius: 3px !important;
+	border-bottom-left-radius: 3px !important;
+}
+
+// Legend table & list
+table.legend {
+	text-align: center;
+	margin: 20px auto;
+	td {
+		padding: 0 20px 0 5px;
+		vertical-align: middle;
+	}
+}
+ul.legend {
+	list-style: none;
+	border: none;
+	text-align: center;
+	padding: 0;
+	&.bForums.bPosts {
+		margin: 10px 0;
+	}
+	li {
+		list-style: none;
+		display: inline-block;
+		white-space: nowrap;
+		vertical-align: middle;
+		margin: 5px;
+		span {
+			vertical-align: middle;
+		}
+		a {
+			text-decoration: none;
+			vertical-align: middle;
+			display: inline-block;
+		}
+	}
+	span.note {
+		float: none;
+	}
+}
+
+// Post navigation
+.post_nav.pager {
+	float: right;
+	margin: 0;
+}
+
+// Login/Register forms:
+.skin-form {
+	.panel-body {
+		.panel {
+			border: none;
+			box-shadow: none;
+		}
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.fieldset {
+		margin: 0;
+		div.input {
+			margin: 0;
+		}
+	}
+	.control-buttons, div.input {
+		padding: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+.evo_panel__login, .evo_panel__lostpass, .evo_panel__register, .evo_panel__activation {
+	min-width: 290px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding: 20px 30px 0;
+	}
+}
+.evo_panel__login {
+	max-width: 400px;
+}
+.evo_panel__lostpass {
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
+}
+.evo_panel__activation {
+	max-width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.evo_panel__register {
+	max-width: 580px;
+	.control-buttons{
+		text-align: left;
+	}
+	&.register-disabled {
+		width: 350px;
+	}
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
+	}
+}
+.evo_form__login_links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+.evo_form__login {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	}
+	.control-buttons {
+		margin-left: 0;
+	}
+	input.form-control[type=text], input.form-control[type=password] {
+		width: 100%;
+	}
+	.btn {
+		margin-top: 5px;
+	}
+	.form-actions {
+		padding: 0;
+		margin: 0 0 20px;
+		background: none;
+		border: none;
+	}
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
+	}
+}
+.standard_login_link {
+	text-align: center;
+	margin: 3em 0 1ex 0;
+}
+.form_footer_notes {
+	margin-top: 0;
+}
+
+// Single topic view
+.single_topic {
+	.star_rating {
+		display: inline-block;
+		margin: 0 10px;
+	}
+	// Profile pictures
+	.ft_avatar {
+		width: 80px;
+		> a {
+			position: relative;
+			&:before {
+				box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2) inset;
+				content: "";
+				display: block;
+				height: 100%;
+				position: absolute;
+				width: 100%;
+			}
+		}
+		> a, > span, a > img {
+			display: inline-block;
+		}
+	}
+}
+body.round_avatars .single_topic #styled_content_block .ft_avatar {
+	> a:before, > a, > span, a > img {
+		.border-radius(50%);
+	}
+}
+
+// Statuses of posts/comments display in table view
+#styled_content_block span[class*='status_'] {
+	top: -8px;
+	left: 8px;
+}
+
+// Voting panels
+.vote_spam {
+	float: left;
+	.action_icon {
+		margin: 0;
+	}
+}
+a.btn+.vote_spam {
+	margin-left: 5px;
+}
+.vote_helpful {
+	float: left;
+	display: block;
+	margin-right: 10px;
+}
+
+// Form elements on item edit page
+label.control-label[for=post_title] {
+	width: auto;
+}
+.item_tags {
+	td.label {
+		background: none;
+		color: #000;
+		text-shadow: none;
+		padding: 0 5px 0 0;
+		font-size: 100%;
+		label, span {
+			margin-top: 10px;
+		}
+	}
+	td.input {
+		width: 90%;
+		label {
+			display: none;
+		}
+	}
+	.controls {
+		margin-left: 0;
+	}
+}
+
+// Profile page
+.profile_avatar {
+	float: right;
+	padding: 10px;
+	margin-left: 10px;
+}
+
+// Search form
+.widget_core_coll_search_form {
+	float: right;
+	width: 200px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}

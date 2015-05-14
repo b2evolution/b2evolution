@@ -2652,7 +2652,7 @@ class Item extends ItemLight
 				'gallery_image_limit'        => 1000,
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',

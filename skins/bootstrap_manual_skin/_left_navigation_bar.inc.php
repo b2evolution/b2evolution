@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Settings, $Session;
 ?>
 <!-- =================================== START OF SIDEBAR =================================== -->
-<div class="col-md-3 pull-left">
+<aside class="col-md-3 pull-left">
 	<div id="evo_container__sidebar">
 		<div class="evo_container evo_container__sidebar">
 	<?php
@@ -104,7 +104,7 @@ global $Settings, $Session;
 	?>
 		</div>
 	</div>
-</div>
+</aside>
 <script type="text/javascript">
 var has_touch_event;
 window.addEventListener( 'touchstart', function set_has_touch_event ()

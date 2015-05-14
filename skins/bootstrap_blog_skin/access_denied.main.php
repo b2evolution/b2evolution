@@ -35,44 +35,46 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 <div class="container">
-	<div class="row">
+
+
+	<header class="row">
 		<div class="col-md-12">
 
-<div class="evo_container evo_container__page_top">
-	<?php
-		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '<div class="evo_widget $wi_class$">',
-				'block_end'           => '</div>',
-				'block_display_title' => false,
-				'list_start'          => '<ul>',
-				'list_end'            => '</ul>',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
-			) );
-		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-	?>
-</div>
+			<div class="evo_container evo_container__page_top">
+				<?php
+					// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+					// Display container and contents:
+					skin_container( NT_('Page Top'), array(
+							// The following params will be used as defaults for widgets included in this container:
+							'block_start'         => '<div class="evo_widget $wi_class$">',
+							'block_end'           => '</div>',
+							'block_display_title' => false,
+							'list_start'          => '<ul>',
+							'list_end'            => '</ul>',
+							'item_start'          => '<li>',
+							'item_end'            => '</li>',
+						) );
+					// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+				?>
+			</div>
 
-<div class="evo_container evo_container__header">
-	<?php
-		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="evo_widget $wi_class$">',
-				'block_end'         => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end'   => '</h1>',
-			) );
-		// ----------------------------- END OF "Header" CONTAINER -----------------------------
-	?>
-</div>
+			<div class="evo_container evo_container__header">
+				<?php
+					// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+					// Display container and contents:
+					skin_container( NT_('Header'), array(
+							// The following params will be used as defaults for widgets included in this container:
+							'block_start'       => '<div class="evo_widget $wi_class$">',
+							'block_end'         => '</div>',
+							'block_title_start' => '<h1>',
+							'block_title_end'   => '</h1>',
+						) );
+					// ----------------------------- END OF "Header" CONTAINER -----------------------------
+				?>
+			</div>
 
 		</div>
-	</div>
+	</header>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
 	<div class="row">
@@ -104,74 +106,75 @@ siteskin_include( '_site_body_header.inc.php' );
 	</div>
 
 <!-- =================================== START OF FOOTER =================================== -->
-	<div class="row">
+	<footer class="row">
 		<div class="col-md-12 center">
 			<div class="evo_container evo_container__footer">
-	<?php
-		// Display container and contents:
-		skin_container( NT_("Footer"), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="evo_widget $wi_class$">',
-				'block_end'         => '</div>',
-			) );
-		// Note: Double quotes have been used around "Footer" only for test purposes.
-	?>
-	<p>
-		<?php
-			// Display footer text (text can be edited in Blog Settings):
-			$Blog->footer_text( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
-				) );
+			<?php
+				// Display container and contents:
+				skin_container( NT_("Footer"), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start'       => '<div class="evo_widget $wi_class$">',
+						'block_end'         => '</div>',
+					) );
+				// Note: Double quotes have been used around "Footer" only for test purposes.
+			?>
+			<p>
+				<?php
+					// Display footer text (text can be edited in Blog Settings):
+					$Blog->footer_text( array(
+							'before'      => '',
+							'after'       => ' &bull; ',
+						) );
 
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
-		?>
+				// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+				?>
 
-		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
-				) );
-			// Display a link to help page:
-			$Blog->help_link( array(
-					'before'      => ' ',
-					'after'       => ' ',
-					'text'        => T_('Help'),
-				) );
-		?>
+				<?php
+					// Display a link to contact the owner of this blog (if owner accepts messages):
+					$Blog->contact_link( array(
+							'before'      => '',
+							'after'       => ' &bull; ',
+							'text'   => T_('Contact'),
+							'title'  => T_('Send a message to the owner of this blog...'),
+						) );
+					// Display a link to help page:
+					$Blog->help_link( array(
+							'before'      => ' ',
+							'after'       => ' ',
+							'text'        => T_('Help'),
+						) );
+				?>
 
-		<?php
-			// Display additional credits:
-			// If you can add your own credits without removing the defaults, you'll be very cool :))
-			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			credits( array(
-					'list_start'  => '&bull;',
-					'list_end'    => ' ',
-					'separator'   => '&bull;',
-					'item_start'  => ' ',
-					'item_end'    => ' ',
-				) );
-		?>
-	</p>
+				<?php
+					// Display additional credits:
+					// If you can add your own credits without removing the defaults, you'll be very cool :))
+					// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+					credits( array(
+							'list_start'  => '&bull;',
+							'list_end'    => ' ',
+							'separator'   => '&bull;',
+							'item_start'  => ' ',
+							'item_end'    => ' ',
+						) );
+				?>
+			</p>
 
-	<?php
-		// Please help us promote b2evolution and leave this logo on your blog:
-		powered_by( array(
-				'block_start' => '<div class="powered_by">',
-				'block_end'   => '</div>',
-				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-				'img_width'   => 120,
-				'img_height'  => 32,
-			) );
-	?>
+			<?php
+				// Please help us promote b2evolution and leave this logo on your blog:
+				powered_by( array(
+						'block_start' => '<div class="powered_by">',
+						'block_end'   => '</div>',
+						// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+						'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+						'img_width'   => 120,
+						'img_height'  => 32,
+					) );
+			?>
 
 			</div>
 		</div>
-	</div>
+	</footer>
+
 </div>
 
 <?php

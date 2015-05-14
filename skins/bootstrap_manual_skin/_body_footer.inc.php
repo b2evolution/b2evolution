@@ -15,6 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 ?>
 
+		</main>
+
 		</div><?php /** END OF <div class="col-md-9 pull-right|col-md-12"> **/?>
 		<?php
 			if( $Skin->is_left_navigation_visible() )

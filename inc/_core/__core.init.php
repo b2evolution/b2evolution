@@ -885,7 +885,7 @@ class _core_Module extends Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $baseurl, $home_url, $admin_url, $debug, $dev_menu, $seo_page_type, $robots_index;
+		global $baseurl, $home_url, $admin_url, $debug, $debug_jslog, $dev_menu, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;

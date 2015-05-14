@@ -39,7 +39,7 @@ $CommentList->display_if_empty( array(
 if( $CommentList->result_num_rows > 0 )
 {
 ?>
-<table id="styled_content_block" class="forums_table topics_table single_topic" cellspacing="0" cellpadding="0">
+<table id="styled_content_block" class="forums_table topics_table single_topic evo_content_block" cellspacing="0" cellpadding="0">
 <?php
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:

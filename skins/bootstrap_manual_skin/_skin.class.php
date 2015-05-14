@@ -535,12 +535,12 @@ class bootstrap_manual_Skin extends Skin
 					'author_link_text' => 'preferredname',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
-						'block_start'         => '<ul class="nav nav-tabs profile_tabs">',
+						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
 						'item_start'          => '<li>',
 						'item_end'            => '</li>',
 						'item_selected_start' => '<li class="active">',
 						'item_selected_end'   => '</li>',
-						'block_end'           => '</ul>',
+						'block_end'           => '</ul></nav>',
 					),
 					// Pagination
 					'pagination' => array(

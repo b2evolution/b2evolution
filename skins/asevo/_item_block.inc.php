@@ -19,7 +19,7 @@ global $Item;
 $params = array_merge( array(
 		'feature_block'    => false,
 		'content_mode'     => 'auto',		// 'auto' will auto select depending on $disp-detail
-		'item_class'       => 'evo_post',
+		'item_class'       => 'evo_post evo_content_block',
 		'image_size'	     => 'fit-400x320',
 		'author_link_text' => 'preferredname',
 	), $params );

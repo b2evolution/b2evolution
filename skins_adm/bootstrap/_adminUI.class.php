@@ -614,7 +614,7 @@ class AdminUI extends AdminUI_general
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="panel panel-default" id="styled_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default evo_content_block" id="styled_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 					'global_icons_class' => 'btn btn-default btn-sm',
 				);
