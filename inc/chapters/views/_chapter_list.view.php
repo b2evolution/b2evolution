@@ -205,10 +205,10 @@ function cat_after_level( $level )
 
 
 $callbacks = array(
-	'line' 			 	 => 'cat_line',
+	'line'         => 'cat_line',
 	'no_children'  => 'cat_no_children',
 	'before_level' => 'cat_before_level',
-	'after_level'	 => 'cat_after_level'
+	'after_level'  => 'cat_after_level'
 );
 
 //____________________________________ Display generic categories _____________________________________

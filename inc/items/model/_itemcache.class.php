@@ -73,8 +73,8 @@ class ItemCache extends DataObjectCache
 			$this->load_by_categories( array( $cat_ID ), $Chapter->blog_ID );
 		}
 
-		if( ! $this->items_by_cat_map[$cat_ID]['sorted'] )
-		{
+		if( ! ( isset( $this->items_by_cat_map[$cat_ID]['sorted'] ) && $this->items_by_cat_map[$cat_ID]['sorted'] ) )
+		{ // Not sorted yet
 			$compare_method = $Chapter->get_subcat_ordering() == 'alpha' ? 'compare_items_by_title' : 'compare_items_by_order';
 			usort( $this->items_by_cat_map[$cat_ID]['items'], array( 'Item', $compare_method ) );
 			$this->items_by_cat_map[$cat_ID]['sorted'] = true;
@@ -120,6 +120,8 @@ class ItemCache extends DataObjectCache
 			if( ! isset( $this->items_by_cat_map[$cat_ID] ) )
 			{ // This category is not loaded
 				$not_loaded_cat_ids[] = $cat_ID;
+				// Initialize items_by_cat_map for this cat_ID
+				$this->items_by_cat_map[$cat_ID] = array( 'items' => array(), 'sorted' => false );
 			}
 		}
 
@@ -146,7 +148,7 @@ class ItemCache extends DataObjectCache
 
 		// Set filters what to select
 		$ItemQuery->SELECT( $this->dbtablename.'.*' );
-		$ItemQuery->where_chapter2( $Blog, $not_loaded_cat_ids );
+		$ItemQuery->where_chapter2( $Blog, $not_loaded_cat_ids, "" );
 		$ItemQuery->where_visibility( $visibility_statuses );
 		$ItemQuery->where_datestart( NULL, NULL, NULL, NULL, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 		$ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
@@ -160,9 +162,6 @@ class ItemCache extends DataObjectCache
 			if( empty( $this->cache[ $row['post_ID'] ] ) )
 			{ // The Item was not loaded because it does not correspond to the defined filters
 				continue;
-			}
-			if( ! isset( $this->items_by_cat_map[$row['cat_ID']] ) ) {
-				$this->items_by_cat_map[$row['cat_ID']] = array( 'items' => array(), 'sorted' => false );
 			}
 
 			// Add to the map

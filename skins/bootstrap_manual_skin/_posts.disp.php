@@ -6,7 +6,7 @@
  * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -88,13 +88,13 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	if( ! empty( $intro_Item ) )
 	{ // We have a featured/intro post to display:
 		$Item = $intro_Item;
-		echo '<div id="styled_content_block">'; // Beginning of posts display
+		echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array_merge( array(
 				'feature_block'     => true,
 				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
 				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'        => 'jumbotron evo_post',
+				'item_class'        => 'jumbotron evo_post evo_content_block',
 				'disp_comments'     => false,
 				'disp_comment_form' => false,
 				'disp_notification' => false,
@@ -139,7 +139,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		global $c, $ReqURI;
 		$c = 1; // Display comments
 
-		echo '<div id="styled_content_block">'; // Beginning of posts display
+		echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
 				'before_section_title' => '<h3 class="comments_list_title">',

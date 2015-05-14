@@ -33,13 +33,13 @@ $params = array_merge( array(
 		'disp_pingbacks'        => true,
 		'disp_section_title'    => true,
 		'disp_rating_summary'   => true,
-		'before_section_title'  => '<h3>',
+		'before_section_title'  => '<div class="clearfix"></div><h3>',
 		'after_section_title'   => '</h3>',
 		'comments_title_text'   => '',
 		'comment_list_start'    => "\n\n",
 		'comment_list_end'      => "\n\n",
-		'comment_start'         => '<div class="evo_comment panel panel-default">',
-		'comment_end'           => '</div>',
+		'comment_start'         => '<article class="evo_comment panel panel-default">',
+		'comment_end'           => '</article>',
 		'comment_post_display'	=> false,	// Do we want ot display the title of the post we're referring to?
 		'comment_post_before'   => '<h3 class="evo_comment_post_title">',
 		'comment_post_after'    => '</h3>',
@@ -51,8 +51,8 @@ $params = array_merge( array(
 		'comment_rating_after'  => '</div>',
 		'comment_text_before'   => '<div class="evo_comment_text">',
 		'comment_text_after'    => '</div>',
-		'comment_info_before'   => '<div class="evo_comment_footer clear text-muted"><small>',
-		'comment_info_after'    => '</small></div></div>',
+		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
+		'comment_info_after'    => '</small></footer></div>',
 		'preview_start'         => '<div class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
 		'preview_end'           => '</div>',
 		'comment_error_start'   => '<div class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
@@ -61,12 +61,13 @@ $params = array_merge( array(
 		'comment_image_size'    => 'fit-400x320',
 		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'               => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+		// Comment notification functions:
 		'disp_notification'     => true,
-		'notification_before'   => '<div class="evo_post_comment_notification">',
+		'notification_before'   => '<nav class="evo_post_comment_notification">',
 		'notification_text'     => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
 		'notification_text2'    => T_( 'You will be notified by email when someone comments here.' ),
 		'notification_text3'    => T_( 'Notify me by email when someone comments here.' ),
-		'notification_after'    => '</div>',
+		'notification_after'    => '</nav>',
 		'feed_title'            => '#',
 		'disp_nav_top'          => true,
 		'disp_nav_bottom'       => true,
@@ -119,7 +120,7 @@ if( $Item->can_see_comments( true ) )
 		return false;
 	}
 
-	echo '<a id="feedbacks"></a>';
+	echo '<section id="feedbacks">';
 
 	$type_list = array();
 	$disp_title = array();
@@ -354,6 +355,8 @@ if( $Item->can_see_comments( true ) )
 				T_('This post has %d feedbacks awaiting moderation... %s') );
 		// _______________________________________________________________
 	}
+
+	echo '</section>';
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
@@ -382,29 +385,30 @@ if( $params['disp_comment_form'] )
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
-	global $UserSettings;
-
-	$not_subscribed = true;
-	$creator_User = $Item->get_creator_User();
-
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
-	{
-		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
-					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
-		if( $DB->get_var( $sql ) > 0 )
-		{
-			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
-			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
-			$not_subscribed = false;
-		}
-	}
-
 	if( $params['disp_notification'] )
-	{	// Display notification link
+	{	// Display notification link:
+
 		echo $params['notification_before'];
 
+		global $DB, $htsrv_url;
+		global $UserSettings;
+
 		$notification_icon = get_icon( 'notification' );
+
+		$not_subscribed = true;
+		$creator_User = $Item->get_creator_User();
+
+		if( $Blog->get_setting( 'allow_subscriptions' ) )
+		{
+			$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
+						WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+			if( $DB->get_var( $sql ) > 0 )
+			{
+				echo '<p>'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+				echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span>Ò</p>';
+				$not_subscribed = false;
+			}
+		}
 
 		if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
 		{
@@ -433,7 +437,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<div class="evo_post_feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );
+	$Item->feedback_feed_link( '_rss2', '<nav class="evo_post_feedback_feed_msg"><p>', '</p></nav>', $params['feed_title'] );
 }
 
 ?>

@@ -24,7 +24,6 @@ $params = array_merge( array(
 		'item_class'        => 'evo_post',
 		'item_type_class'   => 'evo_post__ptyp_',
 		'item_status_class' => 'evo_post__',
-		'item_disp_class'   => NULL,
 		'image_class'       => 'img-responsive',
 		'image_size'        => 'fit-1280x720',
 		'disp_comment_form' => true,

@@ -3,7 +3,7 @@
  * This is the HTML header include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * This is meant to be included in a page template.
  * Note: This is also included in the popup: do not include site navigation!

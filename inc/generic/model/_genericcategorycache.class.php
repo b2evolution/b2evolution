@@ -357,11 +357,10 @@ class GenericCategoryCache extends GenericCache
 			return;
 		}
 
-		// fp>attila : check this - there were undefined variables
-		if( !empty($key) && empty($this->sorted_flags[$subset_ID]) )
+		if( empty($this->sorted_flags[$subset_ID]) )
 		{ // This subset was not sorted yet
 			usort( $this->subset_root_cats[$subset_ID], array( 'Chapter','compare_chapters' ) );
-			$this->sorted_flags[$key] = true;
+			$this->sorted_flags[$subset_ID] = true;
 		}
 	}
 
@@ -489,6 +488,12 @@ class GenericCategoryCache extends GenericCache
 		$r = "";
 		$cat_items = array();
 		$has_sub_cats = ! empty( $Chapter->children );
+		$params = array_merge( array(
+				'sorted'    => false,
+				'level'     => 0,
+				'max_level' => 0,
+				'subset_ID' => $Chapter->blog_ID
+			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
 		{
@@ -590,15 +595,14 @@ class GenericCategoryCache extends GenericCache
 				$r .= $params['list_subs_end'];
 			}
 		}
-		elseif( is_array( $callbacks['no_children'] ) )
-		{ // object callback:
-			// TODO: fp>attila: REMOVE the @ which is a TEMPORARY UGLY PATCH
-			$r .= @$callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $cat, $level ); // </li>
-		}
 		elseif( isset( $callbacks['no_children'] ) )
-		{
-			// TODO: fp>attila: REMOVE the @ which is a TEMPORARY UGLY PATCH
-			$r .= @$callbacks['no_children']( $cat, $level ); // </li>
+		{ // Display message when no children
+			if( is_array( $callbacks['no_children'] ) )
+			{ // object callback:
+				$r .= $callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $Chapter, $params['level'] + 1 ); // </li>
+			} else {
+				$r .= $callbacks['no_children']( $Chapter, $params['level'] + 1 ); // </li>
+			}
 		}
 
 		return $r;

@@ -1,12 +1,11 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
- * @version $Id: plugins.js 8846 2015-04-30 15:01:55Z yura $
+ * @version $Id: plugins.js 8962 2015-05-13 13:32:15Z fplanque $
  */
 
 /** Init bubbletip for help icon of plugins **/
-// fp>yura: is this backoffice only?
-// yura>fp: No, this is also used to display a bubbletip over help plugin icon e.g. on the edit post/comment pages.
+// Note: This is not just backoffice, this is also used to display a bubbletip over help plugin icon e.g. on the edit post/comment pages.
 
 var plugin_number = 1;
 jQuery( document ).on( 'mouseover', 'a.help_plugin_icon', function()

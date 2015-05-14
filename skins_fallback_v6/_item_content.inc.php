@@ -26,10 +26,10 @@ $params = array_merge( array(
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
 
 		// Wrap images and text:
-		'content_start_excerpt'    => '<div class="evo_post__excerpt">',		// In case of compact display
-		'content_end_excerpt'      => '</div>',
-		'content_start_full'       => '<div class="evo_post__full">',			// In case of full display
-		'content_end_full'         => '</div>',
+		'content_start_excerpt'    => '<section class="evo_post__excerpt">',		// In case of compact display
+		'content_end_excerpt'      => '</section>',
+		'content_start_full'       => '<section class="evo_post__full">',			// In case of full display
+		'content_end_full'         => '</section>',
 
 		// In case we display a compact version of the post:
 		'excerpt_before_text'      => '<div class="evo_post__excerpt_text">',

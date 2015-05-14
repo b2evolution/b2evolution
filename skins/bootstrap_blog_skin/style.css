@@ -365,15 +365,15 @@ div.action_messages,
 div.log_container {
   margin: 0;
 }
-.post_title {
+.evo_post_title {
   display: table;
 }
-.post_title h2 {
+.evo_post_title h2 {
   display: table-cell;
   margin: 0;
   padding: 20px 0 10px;
 }
-.post_title .btn-group {
+.evo_post_title .btn-group {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;

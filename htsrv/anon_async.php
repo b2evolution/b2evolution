@@ -1184,7 +1184,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! is_logged_in() || $current_User->ID == $User->ID || ! $current_User->check_status( 'can_report_user' ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user' ) )
 		{ // Only if current user can reports
 			break;
 		}
@@ -1223,7 +1223,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! is_logged_in() || $current_User->ID == $User->ID ||
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) ||
 		    ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
 				! $current_User->check_status( 'can_edit_contacts' ) )
 		{ // Only if current user can reports

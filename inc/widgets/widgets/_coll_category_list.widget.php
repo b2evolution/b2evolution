@@ -403,15 +403,14 @@ class coll_category_list_Widget extends ComponentWidget
 		// ID of the current selected category
 		$first_selected_cat_ID = isset( $cat_array[0] ) ? $cat_array[0] : 0;
 
-		//if( $this->disp_params['mark_parents'] && ! isset( $this->current_parents ) )
-		if( ! isset( $this->current_parents ) )
+		if( ! isset( $this->disp_params['current_parents'] ) )
 		{ // Try to find the parent categories in order to select it because of widget setting is enabled
-			$this->current_all_cats = array(); // All children of the root parent of the selcted category
-			$this->current_parents = array(); // All parents of the selected category
-			$this->current_selected_level = 0; // Level of the selected category
+			$this->disp_params['current_all_cats'] = array(); // All children of the root parent of the selcted category
+			$this->disp_params['current_parents'] = array(); // All parents of the selected category
+			$this->disp_params['current_selected_level'] = 0; // Level of the selected category
 			if( $first_selected_cat_ID > 0 )
 			{
-				$this->current_selected_level++;
+				$this->disp_params['current_selected_level'] = $this->disp_params['current_selected_level'] + 1;
 				$ChapterCache = & get_ChapterCache();
 				$parent_Chapter = & $ChapterCache->get_by_ID( $first_selected_cat_ID, false, false );
 
@@ -420,35 +419,34 @@ class coll_category_list_Widget extends ComponentWidget
 					$root_parent_ID = $parent_Chapter->ID;
 					if( $parent_Chapter = & $parent_Chapter->get_parent_Chapter() )
 					{
-						$this->current_parents[] = $parent_Chapter->ID;
-						$this->current_all_cats[] = $parent_Chapter->ID;
-						$this->current_selected_level++;
+						$this->disp_params['current_parents'][] = $parent_Chapter->ID;
+						$this->disp_params['current_all_cats'][] = $parent_Chapter->ID;
+						$this->disp_params['current_selected_level'] = $this->disp_params['current_selected_level'] + 1;
 					}
 				}
 
 				// Load all categories of the current selected path (these categories should be visible on page)
-				$this->current_all_cats = $cat_array;
-				$this->load_category_children( $root_parent_ID, $this->current_all_cats, $this->current_parents );
+				$this->disp_params['current_all_cats'] = $cat_array;
+				$this->load_category_children( $root_parent_ID, $this->disp_params['current_all_cats'], $this->disp_params['current_parents'] );
 			}
 		}
 
-		// TODO: fp>attila: chek this: (was undefined)
-		$parent_cat_is_visible = isset($this->parent_cat_is_visible) ? $this->parent_cat_is_visible : false;
+		$parent_cat_is_visible = isset($this->disp_params['parent_cat_is_visible']) ? $this->disp_params['parent_cat_is_visible'] : false;
 		$start_level = intval( $this->disp_params['start_level'] );
 		if( $start_level > 1 &&
 		    ( $start_level > $level + 1 ||
-		      ( ! in_array( $Chapter->ID, $this->current_all_cats ) && ! $this->parent_cat_is_visible ) ||
-		      ( $this->current_selected_level < $level && ! $this->parent_cat_is_visible )
+		      ( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
+		      ( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
 		    ) )
 		{ // Don't show this item because of level restriction
-			$this->parent_cat_is_visible = false;
-			//return '<span style="font-size:10px">hidden: ('.$level.'|'.$this->current_selected_level.')</span>';
+			$this->disp_params['parent_cat_is_visible'] = false;
+			//return '<span style="font-size:10px">hidden: ('.$level.'|'.$this->disp_params['current_selected_level'].')</span>';
 			return '';
 		}
-		elseif( ! isset( $this->current_cat_level ) )
+		elseif( ! isset( $this->disp_params['current_cat_level'] ) )
 		{ // Save level of the current selected category
-			$this->current_cat_level = $level;
-			$this->parent_cat_is_visible = true;
+			$this->disp_params['current_cat_level'] = $level;
+			$this->disp_params['parent_cat_is_visible'] = true;
 		}
 
 		if( // First category that should be selected:
@@ -456,7 +454,7 @@ class coll_category_list_Widget extends ComponentWidget
 		    // OR Select only children of the current category(don't select parent category):
 		    ( $this->disp_params['mark_children'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $cat_array ) ) ||
 		    // OR Select only parents of the current category(don't select current category):
-		    ( $this->disp_params['mark_parents'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $this->current_parents ) ) )
+		    ( $this->disp_params['mark_parents'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $this->disp_params['current_parents'] ) ) )
 		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
 		}
@@ -474,12 +472,6 @@ class coll_category_list_Widget extends ComponentWidget
 			$start_tag = $this->add_cat_class_attr( $start_tag, 'meta' );
 		}
 
-		/*$r = $start_tag.'<span style="font-size:10px">visible: (level='.$level
-			.'|visible_level='.$this->visible_level
-			.'|cats='.implode( ',', $this->current_all_cats )
-			.'|cond='.intval( $start_level > $level + 1 ).','
-							 .intval( ! in_array( $Chapter->ID, $this->current_all_cats ) ).','
-							 .intval( $this->current_selected_level < $level && ! $parent_cat_is_visible ).')</span>';*/
 		$r = $start_tag;
 
 		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
@@ -540,8 +532,8 @@ class coll_category_list_Widget extends ComponentWidget
 		$start_level = intval( $this->disp_params['start_level'] );
 		if( $start_level > 1 &&
 		    ( $start_level > $level + 1 ||
-		      ( ! in_array( $Chapter->ID, $this->current_all_cats ) && ! $this->parent_cat_is_visible ) ||
-		      ( $this->current_selected_level < $level && ! $this->parent_cat_is_visible )
+		      ( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
+		      ( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
 		    ) )
 		{ // Don't show this item because of level restriction
 			return;
@@ -561,7 +553,7 @@ class coll_category_list_Widget extends ComponentWidget
 	function cat_before_level( $level )
 	{
 		$start_level = intval( $this->disp_params['start_level'] );
-		if( $start_level > 1 && $this->current_cat_level >= $level )
+		if( $start_level > 1 && $this->disp_params['current_cat_level'] >= $level )
 		{ // Don't show a start of group because of level restriction
 			return;
 		}
@@ -582,7 +574,7 @@ class coll_category_list_Widget extends ComponentWidget
 	function cat_after_level( $level )
 	{
 		$start_level = intval( $this->disp_params['start_level'] );
-		if( $start_level > 1 && $this->current_cat_level >= $level )
+		if( $start_level > 1 && $this->disp_params['current_cat_level'] >= $level )
 		{ // Don't show a start of group because of level restriction
 			return;
 		}

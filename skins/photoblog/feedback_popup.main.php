@@ -3,7 +3,7 @@
  * This is the comments-popup page template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * It is used to display the blog when no specific page template is available.
  *
@@ -19,9 +19,7 @@ skin_init( $disp );	// disp will normally be "feedback-popup" here
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php' );
-// Note: You can customize the default HTML header by copying the
-// _html_header.inc.php file into the current skin folder.
+skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
 ?>
 

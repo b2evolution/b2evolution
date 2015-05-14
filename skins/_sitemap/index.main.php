@@ -3,7 +3,7 @@
  * This template generates a sitemap feed for the requested blog's latest posts
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * @package evoskins
  * @subpackage rss

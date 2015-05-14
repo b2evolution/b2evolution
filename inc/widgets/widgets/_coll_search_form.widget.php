@@ -109,11 +109,11 @@ class coll_search_form_Widget extends ComponentWidget
 
 
 	/**
-	 * Display the widget!
+	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function display( $params )
+	function init_display( $params )
 	{
 		$params = array_merge( array(
 				'search_input_before'  => '',
@@ -122,6 +122,17 @@ class coll_search_form_Widget extends ComponentWidget
 				'search_submit_after'  => '',
 			), $params );
 
+		parent::init_display( $params );
+	}
+
+
+	/**
+	 * Display the widget!
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function display( $params )
+	{
 		$this->init_display( $params );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );

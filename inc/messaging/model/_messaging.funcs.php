@@ -1225,22 +1225,7 @@ function get_contacts_groups_by_user_ID( $user_ID )
  */
 function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = true )
 {
-	global $current_User;
-
 	$groups = get_contacts_groups_array();
-	$selected_default_group_name = $default_groups[-1]; // Close Friends
-	foreach( $groups as $group_ID => $group_name )
-	{
-		if( $selected_default_group_name == $group_name )
-		{ // To know group ID of selected default group
-			$selected_default_group_ID = $group_ID;
-		}
-	}
-
-	if( isset( $selected_default_group_ID ) && $selected_group_ID == -1 )
-	{ // If default group already exists in DB we should use this group ID
-		$selected_group_ID = $selected_default_group_ID;
-	}
 
 	$options = '';
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the item block
+ * This is the template that displays the item block: title, author, content (sub-template), tags, comments (sub-template)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template (or other templates)
@@ -17,53 +17,76 @@ global $Item, $Skin;
 
 // Default params:
 $params = array_merge( array(
-		'disp_title'        => true,
-		'feature_block'     => false,
-		'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-		'item_class'        => 'evo_post',
-		'item_type_class'   => 'evo_post__ptyp_',
-		'item_status_class' => 'evo_post__',
-		'item_disp_class'   => NULL,
-		'image_class'       => 'img-responsive',
-		'image_size'        => 'fit-1280x720',
-		'author_link_text'  => 'preferredname',
+		'feature_block'              => false,			// fp>yura: what is this for??
+		// Classes for the <article> tag:
+		'item_class'                 => 'evo_post evo_content_block',
+		'item_type_class'            => 'evo_post__ptyp_',
+		'item_status_class'          => 'evo_post__',
+		// Controlling the title:
+		'disp_title'                 => true,
+		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+			'item_title_before'          => '<h2>',	
+			'item_title_after'           => '</h2>',
+			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+			'item_title_single_after'    => '</h1>',
+		'item_title_line_after'      => '</div>',
+		// Controlling the content:
+		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
+		'image_class'                => 'img-responsive',
+		'image_size'                 => 'fit-1280x720',
+		'author_link_text'           => 'preferredname',
 	), $params );
 
-echo '<div id="styled_content_block">'; // Beginning of post display
+echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get rid of this ID, use class .evo_content_block instead
 ?>
 
-<div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
+<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
+	<header>
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 
-		if( $params['disp_title'] && $disp != 'single' && $disp != 'page' )
-		{ // Don't display this on disp=single because there is already title header in h2
+		// ------- Title -------
+		if( $params['disp_title'] )
+		{
+			echo $params['item_title_line_before'];
 
-			$title_before = '<h2>';
-			$title_after = '</h2>';
-			if( $Item->is_intro() )
-			{ // Display a link to edit the post only for intro post, because for all other posts it is displayed below under title
-				$title_before = '<div class="post_title"><h2>';
-				$title_after = '</h2>'.$Item->get_edit_link( array(
-						'before' => '<div class="'.button_class( 'group' ).'">',
-						'after'  => '</div>',
-						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-						'class'  => button_class( 'text' ),
-					) ).'</div>';
+			if( $disp == 'single' || $disp == 'page' )
+			{
+				$title_before = $params['item_title_single_before'];
+				$title_after = $params['item_title_single_after'];
+			}
+			else
+			{
+				$title_before = $params['item_title_before'];
+				$title_after = $params['item_title_after'];
 			}
 
+			// POST TITLE:
 			$Item->title( array(
 					'before'    => $title_before,
 					'after'     => $title_after,
-					'link_type' => 'permalink'
+					'link_type' => '#'
 				) );
+
+			// EDIT LINK:
+			if( $Item->is_intro() )
+			{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
+				$Item->edit_link( array(
+							'before' => '<div class="'.button_class( 'group' ).'">',
+							'after'  => '</div>',
+							'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+							'class'  => button_class( 'text' ),
+						) );
+			}
+
+			echo $params['item_title_line_after'];
 		}
 	?>
 
 	<?php
 	if( ! $Item->is_intro() )
-	{ // Don't display these data for intro posts
+	{ // Don't display the following for intro posts
 	?>
 	<div class="small text-muted">
 	<?php
@@ -110,25 +133,29 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 	}
 	?>
+	</header>
 
 	<?php
+	// this will create a <section>
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
 		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
+	// this will end a </section>
 	?>
 
-	<?php
+	<footer>
+		<?php
 		// List all tags attached to this post:
 		$Item->tags( array(
-				'before'    => '<div class="small">'.T_('Tags').': ',
-				'after'     => '</div>',
+				'before'    => '<nav class="small">'.T_('Tags').': ',
+				'after'     => '</nav>',
 				'separator' => ', ',
 			) );
-	?>
+		?>
 
-	<div class="small">
+		<nav class="small">
 		<?php
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
@@ -152,14 +179,14 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 							'link_title' => '#',
 						) );
 		?>
-	</div>
+		</nav>
+	</footer>
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
 				'before_section_title' => '<div class="clearfix"></div><h3>',
 				'after_section_title'  => '</h3>',
-				'author_link_text' => $params['author_link_text'],
 			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -169,5 +196,6 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
-</div>
+</article>
+
 <?php echo '</div>'; // End of post display ?>

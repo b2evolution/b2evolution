@@ -3,7 +3,7 @@
  * This file is the template that displays an access denied for non-members
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * @package evoskins
  * @subpackage pixelgreen
@@ -24,9 +24,7 @@ skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php' );
-// Note: You can customize the default HTML header by copying the generic
-// /skins/_html_header.inc.php file into the current skin folder.
+skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
 
 

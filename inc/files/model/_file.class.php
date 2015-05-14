@@ -324,7 +324,10 @@ class File extends DataObject
 					$this->hash  = $row->file_hash;
 				}
 				$this->path_hash = $row->file_path_hash;
-				$this->can_be_main_profile = $row->file_can_be_main_profile;
+				if( isset( $row->file_can_be_main_profile ) )
+				{
+					$this->can_be_main_profile = $row->file_can_be_main_profile;
+				}
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();

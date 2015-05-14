@@ -190,7 +190,7 @@ class coll_current_filters_Widget extends ComponentWidget
 		{ // Display the filters
 			echo $filters;
 
-			if( $this->disp_params['display_button_reset'] )
+			if( $params['display_button_reset'] )
 			{ // Button to reset all filters
 				echo '<p>'.action_icon( T_('Reset all filters'), 'reset_filters',
 					regenerate_url( 'catsel,cat,'

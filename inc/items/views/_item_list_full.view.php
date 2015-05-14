@@ -47,7 +47,7 @@ $postIDarray = $ItemList->get_page_ID_array();
 $block_item_Widget = new Widget( 'block_item' );
 
 // This block is used to keep correct css style for the post status banners
-echo '<div id="styled_content_block">';
+echo '<div id="styled_content_block" class="evo_content_block">';
 
 if( $action == 'view' )
 { // We are displaying a single post:

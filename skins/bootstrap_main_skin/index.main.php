@@ -6,7 +6,7 @@
  * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -14,7 +14,7 @@
  * @package evoskins
  * @subpackage bootstrap_main
  *
-	 * @version $Id: index.main.php 8907 2015-05-08 18:16:32Z fplanque $
+	 * @version $Id: index.main.php 8971 2015-05-13 18:01:20Z fplanque $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -29,17 +29,12 @@ skin_init( $disp );
 
 
 // Check if current page has a big picture as background
-$is_pictured_page = in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied' ) );
+$is_pictured_page = in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'html_tag' => '<!DOCTYPE html>'."\r\n"
-	             .'<html lang="'.locale_lang( false ).'">',
-	'viewport_tag' => '#responsive#',
 	'body_class' => ( $is_pictured_page ? 'pictured' : '' ),
 ) );
-// Note: You can customize the default HTML header by copying the generic
-// /skins/_html_header.inc.php file into the current skin folder.
 // -------------------------------- END OF HEADER --------------------------------
 
 
@@ -112,7 +107,7 @@ if( $disp != 'front' )
 		<div class="col-md-12<?php echo $disp == 'front' ? ' front_main_area' : ''; ?>">
 
 	<?php
-	if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo' ) ) )
+	if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
 	{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 		messages( array(

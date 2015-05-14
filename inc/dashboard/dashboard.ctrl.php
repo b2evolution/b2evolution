@@ -162,7 +162,7 @@ if( $blog )
 			' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
 			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
-		echo '<div id="styled_content_block">';
+		echo '<div id="styled_content_block" class="evo_content_block">';
 		echo '<div id="comments_block" class="dashboard_comments_block">';
 
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -196,7 +196,7 @@ if( $blog )
 	ob_clean();
 	if( ! empty( $posts_awaiting_moderation_content ) )
 	{
-		echo '<div id="styled_content_block" class="items_container">';
+		echo '<div id="styled_content_block" class="items_container evo_content_block">';
 		echo $posts_awaiting_moderation_content;
 		echo '</div>';
 	}
@@ -228,7 +228,7 @@ if( $blog )
 			$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4 );
 		}
 
-		echo '<div id="styled_content_block" class="items_container">';
+		echo '<div id="styled_content_block" class="items_container evo_content_block">';
 
 		$block_item_Widget->title = T_('Recently edited');
 		$block_item_Widget->disp_template_replaced( 'block_start' );

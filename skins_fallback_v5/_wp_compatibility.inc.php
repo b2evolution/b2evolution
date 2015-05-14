@@ -7,7 +7,7 @@
  * This should not be used in redistributed skins as this will NOT provide FULL b2evo functionality.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * @package evoskins
  * @deprecated This will be removed from a future version.

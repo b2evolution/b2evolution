@@ -271,8 +271,8 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function get_chapters_by_subset( $subset_ID )
 	{
-		if( ! $this->loaded_subsets[$subset_ID] )
-		{
+		if( ! isset( $this->loaded_subsets[$subset_ID] ) )
+		{ // Load subset
 			$this->load_subset( $subset_ID );
 		}
 

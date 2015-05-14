@@ -41,6 +41,7 @@ $params = array_merge( array(
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'comment_mode'         => '', // Can be 'quote' from GET request
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );

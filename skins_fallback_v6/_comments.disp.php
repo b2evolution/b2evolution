@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the links to the latest comments for a blog
+ * This is the template that displays the links to the latest comments for a blog (disp=comments)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
@@ -22,8 +22,8 @@ $params = array_merge( array(
 		'link_to'                 => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'display_comment_avatar'  => true,
 		'comment_avatar_position' => 'before_title', // 'before_title', 'before_text'
-		'comment_start'           => '<div class="evo_comment panel panel-default">',
-		'comment_end'             => '</div>',
+		'comment_start'           => '<article class="evo_comment evo_content_block panel panel-default">',
+		'comment_end'             => '</article>',
 		'comment_post_display'    => true,	// We want to display the title of the post we're referring to
 		'comment_post_before'     => '<div class="panel-heading"><h4 class="evo_comment_title panel-title pull-left">',
 		'comment_post_after'      => '</h4>',
@@ -35,8 +35,8 @@ $params = array_merge( array(
 		'comment_rating_after'    => '</div>',
 		'comment_text_before'     => '<div class="evo_comment_text">',
 		'comment_text_after'      => '</div>',
-		'comment_info_before'     => '<div class="evo_comment_info clear text-muted"><small>',
-		'comment_info_after'      => '</small></div></div>',
+		'comment_info_before'     => '<footer class="evo_comment_info clear text-muted"><small>',
+		'comment_info_after'      => '</small></footer></div>',
 		'comment_image_size'      => 'fit-400x320',
 	), $params );
 
@@ -49,9 +49,6 @@ $CommentList->set_filters( array(
 		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order' => 'DESC',
 		'comments' => 50,
-		// fp> I don't think it's necessary to add a restriction here. (use case?)
-		// 'timestamp_min' => $Blog->get_timestamp_min(),
-		// 'timestamp_max' => $Blog->get_timestamp_max(),
 	) );
 
 // Get ready for display (runs the query):

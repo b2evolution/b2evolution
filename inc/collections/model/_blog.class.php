@@ -1806,6 +1806,11 @@ class Blog extends DataObject
 	{
 		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
+		if( gettype( $params ) != 'array' )
+		{
+			debug_die('wrong $params');
+		}
+
 		$params = array_merge( array(
 				'glue' => '&amp;',
 			), $params );
@@ -1870,6 +1875,7 @@ class Blog extends DataObject
 			case 'registerurl':
 			case 'lostpasswordurl':
 			case 'activateinfourl':
+			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
@@ -3140,7 +3146,7 @@ class Blog extends DataObject
 			return true;
 		}
 
-		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform' ) ) )
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login' ) ) )
 		{ // Don't restrict these pages
 			return true;
 		}
@@ -3149,12 +3155,13 @@ class Blog extends DataObject
 		 * $allow_access == 'users' || 'members'
 		 */
 		$has_access = true;
+		$redirect_blog_page = 'loginurl';
 		if( ! is_logged_in() )
 		{ // Only logged in users have an access to this blog
 			$error_message = NT_('You need to log in before you can access this collection.');
 			$template = 'access_requires_login.main.php';
 			$has_access = false;
-			$disp = 'access_requires_login';
+			$redirect_blog_page = 'access_requires_loginurl';
 			// Don't use site skin if template doesn't exist, User will be redirect to standard login form instead
 			$use_site_skin = false;
 		}
@@ -3207,7 +3214,7 @@ class Blog extends DataObject
 
 			if( ! is_logged_in() )
 			{ // Redirect to login form
-				header_redirect( get_login_url( 'no access to blog' ), 302 );
+				header_redirect( get_login_url( 'no access to blog', NULL, false, NULL, $redirect_blog_page ), 302 );
 				// will have exited
 			}
 		}

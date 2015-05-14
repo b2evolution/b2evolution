@@ -42,6 +42,7 @@ $params = array_merge( array(
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'comment_mode'         => '', // Can be 'quote' from GET request
 	), $params );
 
 /* Yura: Dirty temp hack, because now function param() brakes html tags by validate function param_check_general_array() -> check_html_sanity() -> balance_tags() */

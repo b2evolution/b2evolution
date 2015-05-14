@@ -182,9 +182,10 @@ function get_user_colored_login_link( $login, $params = array() )
  * @param string URL to redirect
  * @param boolean TRUE to use normal login form(ignore in-skin login form)
  * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @param string Blog page param, @see Blog->get()
  * @return string URL
  */
-function get_login_url( $source, $redirect_to = NULL, $force_normal_login = false, $blog_ID = NULL )
+function get_login_url( $source, $redirect_to = NULL, $force_normal_login = false, $blog_ID = NULL, $blog_page = 'loginurl' )
 {
 	global $secure_htsrv_url;
 
@@ -208,9 +209,9 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( ! empty( $redirect ) )
 		{
-			$redirect = url_rel_to_same_host( $redirect, $Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
+			$redirect = url_rel_to_same_host( $redirect, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
 		}
-		$url = $Blog->get( 'loginurl', array( 'glue' => '&' ) );
+		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
 	}
 	else
 	{ // Use normal/standard login form (without blog skin)

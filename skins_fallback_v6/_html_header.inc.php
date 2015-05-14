@@ -1,6 +1,8 @@
 <?php
 /**
- * This is the HTML footer include template.
+ * This is the HTML header include template.
+ *
+ * 
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
@@ -9,17 +11,16 @@
  * Note: This is also included in the popup: do not include site navigation!
  *
  * @package evoskins
- * @subpackage bootstrap_main
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+// NEW default params for v6:
+$params = array_merge( array(
+	'html_tag' => '<!DOCTYPE html>'."\r\n"
+	             .'<html lang="'.locale_lang( false ).'">',
+	'viewport_tag' => '#responsive#',
+	'auto_pilot'    => 'seo_title',
+), $params );
 
-	modules_call_method( 'SkinEndHtmlBody' );
-
-	// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
-	$Plugins->trigger_event('SkinEndHtmlBody');
-
-	$Blog->disp_setting( 'footer_includes', 'raw' );
-?>
-</body>
-</html>
+// Fallback to API v5:
+require dirname(__FILE__).'/../skins_fallback_v5/_html_header.inc.php';

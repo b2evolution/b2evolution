@@ -45,6 +45,7 @@ $params = array_merge( array(
 		'form_comment_redirect_to' => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
 		'comment_image_size'   => 'fit-400x320',
 		'comment_attach_info'  => '<br />'.get_upload_restriction(),
+		'comment_mode'         => '', // Can be 'quote' from GET request
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );

@@ -53,6 +53,7 @@ $params = array_merge( array(
 						'block_after'     => '',
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
+		'comment_mode'         => '', // Can be 'quote' from GET request
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );

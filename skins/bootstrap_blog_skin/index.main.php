@@ -6,7 +6,7 @@
  * It will also rely on default includes for specific dispays (like the comment form).
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
- * {@link http://b2evolution.net/man/skin-structure}
+ * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * The main page template is used to display the blog when no specific page template is available
  * to handle the request (based on $disp).
@@ -27,13 +27,7 @@ skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php', array(
-	'html_tag' => '<!DOCTYPE html>'."\r\n"
-	             .'<html lang="'.locale_lang( false ).'">',
-	'viewport_tag' => '#responsive#',
-) );
-// Note: You can customize the default HTML header by copying the generic
-// /skins/_html_header.inc.php file into the current skin folder.
+skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
 
 
@@ -47,66 +41,66 @@ siteskin_include( '_site_body_header.inc.php' );
 	<div class="row">
 		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 			<div class="evo_container evo_container__page_top">
-	<?php
-		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '<div class="evo_widget $wi_class$">',
-				'block_end'           => '</div>',
-				'block_display_title' => false,
-				'list_start'          => '<ul>',
-				'list_end'            => '</ul>',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
-			) );
-		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-	?>
+			<?php
+				// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				skin_container( NT_('Page Top'), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<div class="evo_widget $wi_class$">',
+						'block_end'           => '</div>',
+						'block_display_title' => false,
+						'list_start'          => '<ul>',
+						'list_end'            => '</ul>',
+						'item_start'          => '<li>',
+						'item_end'            => '</li>',
+					) );
+				// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+			?>
 			</div>
 		</div>
 		<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 			<div class="evo_container evo_container__header">
-	<?php
-		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="evo_widget $wi_class$">',
-				'block_end'         => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end'   => '</h1>',
-			) );
-		// ----------------------------- END OF "Header" CONTAINER -----------------------------
-	?>
+			<?php
+				// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				skin_container( NT_('Header'), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start'       => '<div class="evo_widget $wi_class$">',
+						'block_end'         => '</div>',
+						'block_title_start' => '<h1>',
+						'block_title_end'   => '</h1>',
+					) );
+				// ----------------------------- END OF "Header" CONTAINER -----------------------------
+			?>
 			</div>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="col-md-12">
+		<nav class="col-md-12">
 			<ul class="nav nav-tabs evo_container evo_container__menu">
-	<?php
-		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		// Note: this container is designed to be a single <ul> list
-		skin_container( NT_('Menu'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '',
-				'block_end'           => '',
-				'block_display_title' => false,
-				'list_start'          => '',
-				'list_end'            => '',
-				'item_start'          => '<li class="evo_widget $wi_class$">',
-				'item_end'            => '</li>',
-				'item_selected_start' => '<li class="active evo_widget $wi_class$">',
-				'item_selected_end'   => '</li>',
-				'item_title_before'   => '',
-				'item_title_after'    => '',
-			) );
-		// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-	?>
+			<?php
+				// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				// Note: this container is designed to be a single <ul> list
+				skin_container( NT_('Menu'), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '',
+						'block_end'           => '',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '<li class="evo_widget $wi_class$">',
+						'item_end'            => '</li>',
+						'item_selected_start' => '<li class="active evo_widget $wi_class$">',
+						'item_selected_end'   => '</li>',
+						'item_title_before'   => '',
+						'item_title_after'    => '',
+					) );
+				// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+			?>
 			</ul>
-		</div>
+		</nav>
 	</div>
 
 <!-- =================================== START OF MAIN AREA =================================== -->
@@ -129,12 +123,12 @@ siteskin_include( '_site_body_header.inc.php' );
 	<?php
 		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 		item_prevnext_links( array(
-				'block_start' => '<ul class="pager">',
-				'prev_start'  => '<li class="previous">',
-				'prev_end'    => '</li>',
-				'next_start'  => '<li class="next">',
-				'next_end'    => '</li>',
-				'block_end'   => '</ul>',
+				'block_start' => '<nav><ul class="pager">',
+					'prev_start'  => '<li class="previous">',
+					'prev_end'    => '</li>',
+					'next_start'  => '<li class="next">',
+					'next_end'    => '</li>',
+				'block_end'   => '</ul></nav>',
 			) );
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 	?>
@@ -146,7 +140,8 @@ siteskin_include( '_site_body_header.inc.php' );
 				'title_after'       => '</h2>',
 				'title_none'        => '',
 				'glue'              => ' - ',
-				'title_single_disp' => true,
+				'title_single_disp' => false,
+				'title_page_disp'   => false,
 				'format'            => 'htmlbody',
 				'register_text'     => '',
 				'login_text'        => '',
@@ -465,7 +460,5 @@ siteskin_include( '_site_body_footer.inc.php' );
 
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
-// Note: You can customize the default HTML footer by copying the
-// _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>
