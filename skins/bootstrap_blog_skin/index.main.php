@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main/default page template for the "bootstrap" skin.
+ * This is the main/default page template for the "bootstrap_blog" skin.
  *
  * This skin only uses one single template which includes most of its features.
  * It will also rely on default includes for specific dispays (like the comment form).
@@ -12,7 +12,7 @@
  * to handle the request (based on $disp).
  *
  * @package evoskins
- * @subpackage bootstrap
+ * @subpackage bootstrap_blog
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -42,6 +42,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <header class="row">
+
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<div class="evo_container evo_container__page_top">
 		<?php
@@ -60,7 +61,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
 		</div>
-	</div>
+	</div><!-- .col -->
+
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<div class="evo_container evo_container__header">
 		<?php
@@ -76,11 +78,13 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 		</div>
-	</div>
-</header>
+	</div><!-- .col -->
+
+</header><!-- .row -->
 
 
 <nav class="row">
+
 	<div class="col-md-12">
 		<ul class="nav nav-tabs evo_container evo_container__menu">
 		<?php
@@ -104,15 +108,19 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
 		</ul>
-	</div>
-</nav>
+	</div><!-- .col -->
+
+</nav><!-- .row -->
 
 
 <div class="row">
 
-	<!-- ================================= START OF MAIN AREA ================================== -->
 	<div class="<?php echo ( $Skin->get_setting( 'layout' ) == 'single_column' ? 'col-md-12' : 'col-md-9' ); 
 			echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-right' : '' ); ?>">
+
+		<main><!-- This is were a link like "Jump to main content" would land -->
+
+		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
 		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
@@ -138,8 +146,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 		?>
-
-		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<?php
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
@@ -192,7 +198,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 		?>
 
-
 		<?php
 			// --------------------------------- START OF POSTS -------------------------------------
 			// Display message if no post:
@@ -224,7 +229,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 		}
 		?>
-
 
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
@@ -302,15 +306,15 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</main>
 
-	</div>
+	</div><!-- .col -->
 
 
-	<!-- =================================== START OF SIDEBAR =================================== -->
 	<?php
 	if( $Skin->get_setting( 'layout' ) != 'single_column' )
 	{
 	?>
 	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+		<!-- =================================== START OF SIDEBAR =================================== -->
 		<div class="evo_container evo_container__sidebar">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -348,6 +352,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
 		</div>
+
 		<div class="evo_container evo_container__sidebar2">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -385,15 +390,17 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
 		</div>
-	</aside>
+	</aside><!-- .col -->
 	<?php } ?>
 
-</div>
+</div><!-- .row -->
 
 
 <footer class="row">
+
 	<!-- =================================== START OF FOOTER =================================== -->
 	<div class="col-md-12 center">
+
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
@@ -404,13 +411,14 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
+		</div>
 
 		<p>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
-						'before'      => '',
-						'after'       => ' &bull; ',
+						'before' => '',
+						'after'  => ' &bull; ',
 					) );
 
 			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
@@ -419,8 +427,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			<?php
 				// Display a link to contact the owner of this blog (if owner accepts messages):
 				$Blog->contact_link( array(
-						'before'      => '',
-						'after'       => ' &bull; ',
+						'before' => '',
+						'after'  => ' &bull; ',
 						'text'   => T_('Contact'),
 						'title'  => T_('Send a message to the owner of this blog...'),
 					) );
@@ -457,12 +465,12 @@ siteskin_include( '_site_body_header.inc.php' );
 					'img_height'  => 32,
 				) );
 		?>
-		</div>
-	</div>
-</footer>
+	</div><!-- .col -->
+	
+</footer><!-- .row -->
 
 
-</div>
+</div><!-- .container -->
 
 
 <?php

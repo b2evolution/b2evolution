@@ -18,6 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_forums_Skin extends Skin
 {
 	/**
+	 * Do we want to use style.min.css instead of style.css ?
+	 */
+	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
+
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -45,21 +50,6 @@ class bootstrap_forums_Skin extends Skin
 	function get_api_version()
 	{
 		return 6;
-	}
-
-
-	/**
-	 * Get the container codes of the skin main containers
-	 *
-	 * @return array
-	 */
-	function get_declared_containers()
-	{
-		return array_merge( parent::get_declared_containers(), array(
-				'index.main.php' => array( 'header', 'footer', 'menu', 'menu_top', 'page_top' ),
-				'_item_block.inc.php' => array( 'item_single' ),
-				'_front.disp.php' => array()
-			) );
 	}
 
 
@@ -202,7 +192,9 @@ class bootstrap_forums_Skin extends Skin
 		}
 		
 		// Make sure standard CSS is called ahead of custom CSS generated below:
-		if( $debug )
+		if( $this->use_min_css == false 
+			|| $debug 
+			|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 		{	// Use readable CSS:
 			require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
@@ -210,8 +202,7 @@ class bootstrap_forums_Skin extends Skin
 		{	// Use minified CSS:
 			require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
-
-
+	
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
 		{
@@ -714,6 +705,7 @@ class bootstrap_forums_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
+
 }
 
 ?>

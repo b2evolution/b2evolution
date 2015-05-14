@@ -55,8 +55,10 @@ register_shutdown_function( 'shutdown' );
 /**
  * Handle fatal error in order to display info message when debug is OFF
  */
-set_error_handler( 'evo_error_handler' );
-
+// set_error_handler( 'evo_error_handler' );
+// fp> I disabled the above because it kills display of warnings like the following
+// fp> see function evo_error_handler() for more comments
+// echo $fddfdjshfjkdfsd;
 
 // NOTE: it might be faster (though more bandwidth intensive) to spit cached pages (CachePageContent event) than to look into blocking the request (SessionLoaded event).
 $Plugins->trigger_event( 'SessionLoaded' );

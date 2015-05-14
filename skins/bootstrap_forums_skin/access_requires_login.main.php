@@ -25,6 +25,7 @@ global $Skin;
 // Do inits depending on current $disp:
 skin_init( $disp );
 
+
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
@@ -38,59 +39,50 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <div class="container">
-	<header class="row">
-		<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-			<div class="evo_container evo_container__page_top">
-	<?php
-		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Page Top'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'         => '<div class="widget $wi_class$">',
-				'block_end'           => '</div>',
-				'block_display_title' => false,
-				'list_start'          => '<ul>',
-				'list_end'            => '</ul>',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
-			) );
-		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-	?>
-			</div>
+
+
+<header class="row">
+	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+		<div class="evo_container evo_container__page_top">
+		<?php
+			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Page Top'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'         => '<div class="evo_widget $wi_class$">',
+					'block_end'           => '</div>',
+					'block_display_title' => false,
+					'list_start'          => '<ul>',
+					'list_end'            => '</ul>',
+					'item_start'          => '<li>',
+					'item_end'            => '</li>',
+				) );
+			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+		?>
 		</div>
-		<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-			<div class="evo_container evo_container__header">
-	<?php
-		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		skin_container( NT_('Header'), array(
-				// The following params will be used as defaults for widgets included in this container:
-				'block_start'       => '<div class="widget $wi_class$">',
-				'block_end'         => '</div>',
-				'block_title_start' => '<h1>',
-				'block_title_end'   => '</h1>',
-			) );
-		// ----------------------------- END OF "Header" CONTAINER -----------------------------
-	?>
-			</div>
+	</div>
+	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+		<div class="evo_container evo_container__header">
+		<?php
+			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Header'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
+					'block_title_start' => '<h1>',
+					'block_title_end'   => '</h1>',
+				) );
+			// ----------------------------- END OF "Header" CONTAINER -----------------------------
+		?>
 		</div>
-	</header>
+	</div>
+</header>
 
 	<div class="row">
 		<div class="col-md-12">
 
 <!-- =================================== START OF MAIN AREA =================================== -->
-
-	<?php
-		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-		request_title( array(
-				'title_before'      => '<h2 class="page_title">',
-				'title_after'       => '</h2>',
-				'format'            => 'htmlbody',
-			) );
-		// ----------------------------- END OF REQUEST TITLE ----------------------------
-	?>
-
 
 	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------

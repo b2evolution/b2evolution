@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage bootstrap
+ * @subpackage bootstrap_blog
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = 'check';  // true|false|'check' Set this to true for better optimization
-	// Note: we leave this on "check" so it's easier for beginners to kjust delete the .min.css file
+	// Note: we leave this on "check" in the bootstrap_blog_skin so it's easier for beginners to just delete the .min.css file
 
 	/**
 	 * Get default name for the skin.
