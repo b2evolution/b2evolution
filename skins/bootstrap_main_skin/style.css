@@ -10,17 +10,17 @@
 div.widget_core_coll_tagline {
   margin-bottom: 30px;
 }
-.evo_container__footer {
+.secondary_area {
   background-color: #FFF;
   width: 100%;
 }
-.evo_container__footer p {
+.secondary_area p {
   margin-top: 10px;
 }
-body.pictured .evo_container__footer {
+body.pictured .secondary_area {
   color: #666;
 }
-body.pictured .evo_container__footer a:not([class^=ufld_]) {
+body.pictured .secondary_area a:not([class^=ufld_]) {
   color: #666;
 }
 html {
@@ -519,9 +519,9 @@ body.pictured .front_main_content .ufld_icon_links a .fa {
 .widget_core_org_members p.user_field {
   margin-bottom: 40px;
 }
-body.pictured .evo_container__footer .widget_core_org_members a.user_link {
+body.pictured .secondary_area .widget_core_org_members a.user_link {
   color: #000;
 }
-body.pictured .evo_container__footer .widget_core_org_members a.user_link:hover {
+body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #23527c;
 }

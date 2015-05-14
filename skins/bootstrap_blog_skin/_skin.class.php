@@ -74,6 +74,7 @@ class bootstrap_blog_Skin extends Skin
 						),
 					'type' => 'select',
 				),
+				// Colorbox
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
@@ -116,6 +117,7 @@ class bootstrap_blog_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				// Other settings
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -183,7 +185,7 @@ class bootstrap_blog_Skin extends Skin
 		{	// Use minified CSS:
 			require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
-	
+
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
 		{

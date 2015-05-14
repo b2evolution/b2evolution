@@ -95,7 +95,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		?>
 
-		<?php
+	<?php
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h2 class="page_title">',

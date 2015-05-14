@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is the template that displays an access denied for non-members
+ * This file is the template that displays "access denied" for non-members.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
@@ -42,6 +42,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <header class="row">
+
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<div class="evo_container evo_container__page_top">
 		<?php
@@ -60,7 +61,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
 		</div>
-	</div>
+	</div><!-- .col -->
+
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<div class="evo_container evo_container__header">
 		<?php
@@ -76,93 +78,123 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 		</div>
-	</div>
-</header>
+	</div><!-- .col -->
 
-	<div class="row">
-		<div class="col-md-12">
+</header><!-- .row -->
 
-<!-- =================================== START OF MAIN AREA =================================== -->
 
-	<?php
-		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-		messages( array(
-				'block_start' => '<div class="action_messages">',
-				'block_end'   => '</div>',
-			) );
-		// --------------------------------- END OF MESSAGES ---------------------------------
-	?>
+<div class="row">
+	<div class="col-md-12">
+		<main><!-- This is were a link like "Jump to main content" would land -->
 
-	<?php
-		// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-		request_title( array(
-				'title_before'      => '<h2 class="page_title">',
-				'title_after'       => '</h2>',
-				'format'            => 'htmlbody',
-			) );
-		// ----------------------------- END OF REQUEST TITLE ----------------------------
-	?>
-
-			<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>
-
-		</div>
-	</div>
-
-<!-- =================================== START OF FOOTER =================================== -->
-
-	<div class="row">
-		<div class="col-md-12">
-			<div class="evo_container evo_container__footer">
-	<?php
-		// Display container and contents:
-		skin_container( NT_("Footer"), array(
-				// The following params will be used as defaults for widgets included in this container:
-			) );
-		// Note: Double quotes have been used around "Footer" only for test purposes.
-	?>
-	<p class="baseline">
-		<?php
-			// Display footer text (text can be edited in Blog Settings):
-			$Blog->footer_text( array(
-					'before' => '',
-					'after'  => ' &bull; ',
-				) );
-
-		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
-		?>
+		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-			// Display a link to contact the owner of this blog (if owner accepts messages):
-			$Blog->contact_link( array(
-					'before' => '',
-					'after'  => ' &bull; ',
-					'text'   => T_('Contact'),
-					'title'  => T_('Send a message to the owner of this blog...'),
+			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+			messages( array(
+					'block_start' => '<div class="action_messages">',
+					'block_end'   => '</div>',
 				) );
-			// Display a link to help page:
-			$Blog->help_link( array(
-					'before' => ' ',
-					'after'  => ' &bull; ',
-					'text'   => T_('Help'),
-				) );
+			// --------------------------------- END OF MESSAGES ---------------------------------
+		?>
 
-			// Display additional credits:
-			// If you can add your own credits without removing the defaults, you'll be very cool :))
-			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-			credits( array(
-					'list_start' => '',
-					'list_end'   => ' ',
-					'separator'  => '&bull;',
-					'item_start' => ' ',
-					'item_end'   => ' ',
+	<?php
+			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
+			request_title( array(
+					'title_before'      => '<h2 class="page_title">',
+					'title_after'       => '</h2>',
+					'title_none'        => '',
+					'glue'              => ' - ',
+				) );
+			// ----------------------------- END OF REQUEST TITLE ----------------------------
+		?>
+
+		<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>
+
+		</main>
+
+	</div><!-- .col -->
+
+</div><!-- .row -->
+
+
+<footer class="row">
+
+	<!-- =================================== START OF FOOTER =================================== -->
+	<div class="col-md-12 center">
+
+		<div class="evo_container evo_container__footer">
+		<?php
+			// Display container and contents:
+			skin_container( NT_("Footer"), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'       => '<div class="evo_widget $wi_class$">',
+					'block_end'         => '</div>',
+				) );
+			// Note: Double quotes have been used around "Footer" only for test purposes.
+		?>
+		</div>
+
+		<p>
+			<?php
+				// Display footer text (text can be edited in Blog Settings):
+				$Blog->footer_text( array(
+						'before' => '',
+						'after'  => ' &bull; ',
+					) );
+
+			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+			?>
+
+			<?php
+				// Display a link to contact the owner of this blog (if owner accepts messages):
+				$Blog->contact_link( array(
+						'before' => '',
+						'after'  => ' &bull; ',
+						'text'   => T_('Contact'),
+						'title'  => T_('Send a message to the owner of this blog...'),
+					) );
+				// Display a link to help page:
+				$Blog->help_link( array(
+						'before'      => ' ',
+						'after'       => ' ',
+						'text'        => T_('Help'),
+					) );
+			?>
+
+			<?php
+				// Display additional credits:
+				// If you can add your own credits without removing the defaults, you'll be very cool :))
+				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+				credits( array(
+						'list_start'  => '&bull;',
+						'list_end'    => ' ',
+						'separator'   => '&bull;',
+						'item_start'  => ' ',
+						'item_end'    => ' ',
+					) );
+			?>
+		</p>
+
+		<?php
+			// Please help us promote b2evolution and leave this logo on your blog:
+			powered_by( array(
+					'block_start' => '<div class="powered_by">',
+					'block_end'   => '</div>',
+					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+					'img_width'   => 120,
+					'img_height'  => 32,
 				) );
 		?>
-	</p>
-			</div>
-		</div>
-	</div>
+	</div><!-- .col -->
+	
+</footer><!-- .row -->
 
-</div>
+
+</div><!-- .container -->
+
+
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
 // If site footers are enabled, they will be included here:
@@ -172,7 +204,5 @@ siteskin_include( '_site_body_footer.inc.php' );
 
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
-// Note: You can customize the default HTML footer by copying the
-// _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

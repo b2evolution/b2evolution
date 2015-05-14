@@ -18,6 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_main_Skin extends Skin
 {
 	/**
+	 * Do we want to use style.min.css instead of style.css ?
+	 */
+	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
+
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -207,7 +212,9 @@ class bootstrap_main_Skin extends Skin
 		}
 		
 		// Make sure standard CSS is called ahead of custom CSS generated below:
-		if( $debug )
+		if( $this->use_min_css == false 
+			|| $debug 
+			|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 		{	// Use readable CSS:
 			require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
