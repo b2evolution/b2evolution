@@ -14,7 +14,7 @@
 /* top elements */
 * { padding: 0; margin: 0; }
 
-div#skin_wrapper div.sitewide_header {
+div#skin_wrapper .sitewide_header {
 	margin-bottom: 0;
 }
 

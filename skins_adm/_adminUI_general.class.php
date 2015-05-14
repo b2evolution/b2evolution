@@ -1122,6 +1122,7 @@ class AdminUI_general extends Menu
 					'labelempty' => '',
 					'inputstart' => '',
 					'infostart' => '',
+					'infoend' => '',
 					'inputend' => "\n",
 					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
 					'buttonsstart' => '',
@@ -1150,6 +1151,7 @@ class AdminUI_general extends Menu
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
 					'inputstart' => '<div class="input">',
 					'infostart' => '<div class="info">',
+					'infoend' => "</div>\n",
 					'inputend' => "</div>\n",
 					'fieldend' => "</fieldset>\n\n",
 					'buttonsstart' => '<fieldset><div class="input">',

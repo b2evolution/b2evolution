@@ -11,7 +11,7 @@ body {
 	background-color: #666;
 }
 
-div#skin_wrapper div.sitewide_header {
+div#skin_wrapper .sitewide_header {
 	border-bottom: none;
 	margin-bottom: 0;
 }

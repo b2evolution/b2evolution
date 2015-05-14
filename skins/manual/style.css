@@ -6,7 +6,7 @@ body {
 	font: 84% Arial, Helvetica, sans-serif;
 }
 
-div#skin_wrapper div.sitewide_header {
+div#skin_wrapper .sitewide_header {
 	margin-bottom: 0;
 	position: fixed;
 	top: 0;
@@ -14,7 +14,7 @@ div#skin_wrapper div.sitewide_header {
 	z-index: 10000;
 	-webkit-font-smoothing: subpixel-antialiased;
 }
-div#skin_wrapper.skin_wrapper_loggedin div.sitewide_header {
+div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 	top: 27px;
 }
 

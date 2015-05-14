@@ -7,8 +7,8 @@ body {
 	padding: 0;
 } 
  
-div.sitewide_header,
-div.sitewide_footer {
+.sitewide_header,
+.sitewide_footer {
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
 	line-height: normal;
 	color: #ccc;
@@ -19,23 +19,23 @@ div.sitewide_footer {
 /* Devices with max width <= 1024px (iPhone,iPad):
    Don't fix a position of the sitewide header */
 @media only screen and (max-device-width: 1024px) {
-	div#skin_wrapper div.sitewide_header {
+	div#skin_wrapper .sitewide_header {
 		position: inherit;
 		width: 100%;
 	}
 }
-div.sitewide_header p,
-div.sitewide_footer p {
+.sitewide_header p,
+.sitewide_footer p {
 	margin: 0;
 	padding: 0;
 }
-div.sitewide_header a,
-div.sitewide_footer a {
+.sitewide_header a,
+.sitewide_footer a {
 	color: #ccc;
 	border: none;
 }
 
-div.sitewide_header{
+.sitewide_header{
 	font-size: 16px;
 	font-weight: 300;
 	text-align: left;	
@@ -65,12 +65,12 @@ a.swhead_sitename.swhead_logo {
 a.swhead_sitename.swhead_logo img {
 	max-height: 43px;
 }
-div.sitewide_header a.swhead_sitename {
+.sitewide_header a.swhead_sitename {
 	color: #FFF;
 	font-weight: 400;
 }
-div.sitewide_header a.swhead_item_selected,
-div.sitewide_header a.swhead_item:hover {
+.sitewide_header a.swhead_item_selected,
+.sitewide_header a.swhead_item:hover {
 	text-decoration: none;
 	text-shadow: 0px 0 3px #FFF;
 	color: #FFF;
@@ -80,30 +80,30 @@ div.sitewide_header a.swhead_item:hover {
 	background: -ms-linear-gradient(top, #696c72, #333334);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 }
-div.sitewide_header .floatright a.swhead_item_selected,
-div.sitewide_header .floatright a.swhead_item:hover {
+.sitewide_header .floatright a.swhead_item_selected,
+.sitewide_header .floatright a.swhead_item:hover {
 	text-decoration: underline;
 	background: none;
 	text-shadow: none;
 	filter: none;
 }
-div.sitewide_header a.swhead_item.swhead_item_white {
+.sitewide_header a.swhead_item.swhead_item_white {
 	background: #FFF;
 	border-radius: 3px;
 	margin: 4px 15px 4px 0;
 	padding: 8px 9px;
 	color: #000;
 }
-div.sitewide_header a.swhead_item.swhead_item_white.swhead_item_selected,
-div.sitewide_header a.swhead_item.swhead_item_white:hover {
+.sitewide_header a.swhead_item.swhead_item_white.swhead_item_selected,
+.sitewide_header a.swhead_item.swhead_item_white:hover {
 	background: #FFF;
 }
-div.sitewide_header a.swhead_item.user {
+.sitewide_header a.swhead_item.user {
 	position: relative;
 	padding-left: 49px;
 	font-weight: normal;
 }
-div.sitewide_header a.swhead_item.user img {
+.sitewide_header a.swhead_item.user img {
 	position: absolute;
 	top: 0;
 	left: 12px;
@@ -111,14 +111,14 @@ div.sitewide_header a.swhead_item.user img {
 	margin: auto;
 }
 
-div.sitewide_header a.swhead_sitename:hover {
+.sitewide_header a.swhead_sitename:hover {
 	text-decoration: none;
 	text-shadow: 0px 0 3px #FFF;
 	color: #FFF;
 }
 
 
-div.sitewide_footer{
+.sitewide_footer{
 	font-size: 11px;
 	text-align: center;	
 	border-top: 1px solid #444;
@@ -126,9 +126,9 @@ div.sitewide_footer{
 	padding: 4px;
 	background-color: #888;
 }
-div.sitewide_footer p{
+.sitewide_footer p{
 	text-align: center;
 }
-div.sitewide_footer a {
+.sitewide_footer a {
 	text-decoration: underline;
 }

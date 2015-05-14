@@ -318,6 +318,7 @@ class AdminUI extends AdminUI_general
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
 					'inputstart' => '<div class="input">',
 					'infostart' => '<div class="info">',
+					'infoend' => "</div>\n",
 					'inputend' => "</div>\n",
 					'fieldend' => "</fieldset>\n\n",
 					'buttonsstart' => '<fieldset><div class="input">',
@@ -347,6 +348,7 @@ class AdminUI extends AdminUI_general
 					'labelempty' => '<div class="label"></div>', // so that IE6 aligns DIV.input correcctly
 					'inputstart' => '<div class="input">',
 					'infostart' => '<div class="info">',
+					'infoend' => "</div>\n",
 					'inputend' => "</div>\n",
 					'fieldend' => "</fieldset>\n\n",
 					'buttonsstart' => '<fieldset><div class="input">',

@@ -12,7 +12,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $baseurl, $Settings;
 ?>
 
-<div class="sitewide_header">
+<nav class="sitewide_header">
 
 <?php
 if( $Settings->get( 'notification_logo' ) != '' )
@@ -171,4 +171,4 @@ else
 	?>
 	</div>
 	<div class="clear"></div>
-</div>
+</nav>

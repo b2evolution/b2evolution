@@ -1106,6 +1106,9 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 		'after_last'   => 'cat_select_after_last'
 	);
 
+	// Init cat display param
+	$cat_display_params = array( 'total_count' => 0 );
+
 	if( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -1114,7 +1117,6 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 		 */
 		$BlogCache = & get_BlogCache();
 		$ChapterCache->reveal_children( NULL, true );
-		$cat_display_params = array( 'total_count' => 0 );
 
 		/**
 		 * @var Blog
@@ -1218,6 +1220,8 @@ function cat_select_display( $Chapter, $callbacks, & $params = array() )
 
 	$params['total_count'] = $params['total_count'] + 1;
 	$parent_Chapter = & $Chapter->get_parent_Chapter();
+
+	$r = '';
 
 	if( is_array( $callbacks['before_each'] ) )
 	{ // object callback:
