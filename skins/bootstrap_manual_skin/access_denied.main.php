@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is the template that displays an access denied for non-members
+ * This file is the template that displays "access denied" for non-members.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
@@ -33,6 +33,7 @@ skin_init( $disp );
 skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
 
+
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
@@ -61,9 +62,8 @@ skin_include( '_body_footer.inc.php' );
 siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------------- END OF SITE FOOTER --------------------------------
 
+
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
-// Note: You can customize the default HTML footer by copying the
-// _html_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
 ?>

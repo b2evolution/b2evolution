@@ -17,94 +17,99 @@ global $Settings, $Session;
 ?>
 <!-- =================================== START OF SIDEBAR =================================== -->
 <aside class="col-md-3 pull-left">
-	<div id="evo_container__sidebar">
-		<div class="evo_container evo_container__sidebar">
-	<?php
-		// <div data-spy="affix" data-offset-top="165" class="affix_block">
-		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		// Note: this container is designed to be a single <ul> list
-		skin_container( NT_('Sidebar'), array(
-				// The following (optional) params will be used as defaults for widgets included in this container:
-				// This will enclose each widget in a block:
-				'block_start' => '<div class="panel panel-default widget $wi_class$">',
-				'block_end'   => '</div>',
-				// This will enclose the title of each widget:
-				'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-				'block_title_end'   => '</h4></div>',
-				// This will enclose the body of each widget:
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end'   => '</div>',
-				// This will enclose (foot)notes:
-				'notes_start' => '<div class="small text-muted">',
-				'notes_end'   => '</div>',
-				// Widget 'Search form':
-				'search_class'         => 'compact_search_form',
-				'search_input_before'  => '<div class="input-group">',
-				'search_input_after'   => '',
-				'search_submit_before' => '<span class="input-group-btn">',
-				'search_submit_after'  => '</span></div>',
-				// Widget 'Content Hierarchy':
-				'item_before_opened'   => get_icon( 'collapse' ),
-				'item_before_closed'   => get_icon( 'expand' ),
-				'item_before_post'     => get_icon( 'post' ),
-				'expand_all'           => false,
-				'sorted'               => true
-			) );
-		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
-	?>
-		</div>
-		<div class="evo_container evo_container__sidebar2">
-	<?php
-		// <div data-spy="affix" data-offset-top="165" class="affix_block">
-		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
-		// Display container and contents:
-		// Note: this container is designed to be a single <ul> list
-		skin_container( NT_('Sidebar 2'), array(
-				// The following (optional) params will be used as defaults for widgets included in this container:
-				// This will enclose each widget in a block:
-				'block_start' => '<div class="panel panel-default widget $wi_class$">',
-				'block_end'   => '</div>',
-				// This will enclose the title of each widget:
-				'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-				'block_title_end'   => '</h4></div>',
-				// This will enclose the body of each widget:
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end'   => '</div>',
-				// This will enclose (foot)notes:
-				'notes_start' => '<div class="small text-muted">',
-				'notes_end'   => '</div>',
-				// Widget 'Search form':
-				'search_class'         => 'compact_search_form',
-				'search_input_before'  => '<div class="input-group">',
-				'search_input_after'   => '',
-				'search_submit_before' => '<span class="input-group-btn">',
-				'search_submit_after'  => '</span></div>',
-				// Widget 'Content Hierarchy':
-				'item_before_opened'   => get_icon( 'collapse' ),
-				'item_before_closed'   => get_icon( 'expand' ),
-				'item_before_post'     => get_icon( 'post' ),
-				'expand_all'           => false,
-				'sorted'               => true
-			) );
-		// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
-	?>
 
-	<?php
-		// Please help us promote b2evolution and leave this logo on your blog:
-		powered_by( array(
-				'block_start' => '<div class="powered_by">',
-				'block_end'   => '</div>',
-				// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-				'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-				'img_width'   => 120,
-				'img_height'  => 32,
-			) );
-		//</div>
-	?>
+	<div id="evo_container__sidebar">
+
+		<div class="evo_container evo_container__sidebar">
+		<?php
+			// <div data-spy="affix" data-offset-top="165" class="affix_block">
+			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			// Note: this container is designed to be a single <ul> list
+			skin_container( NT_('Sidebar'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="panel panel-default widget $wi_class$">',
+					'block_end'   => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+					'block_title_end'   => '</h4></div>',
+					// This will enclose the body of each widget:
+					'block_body_start' => '<div class="panel-body">',
+					'block_body_end'   => '</div>',
+					// This will enclose (foot)notes:
+					'notes_start' => '<div class="small text-muted">',
+					'notes_end'   => '</div>',
+					// Widget 'Search form':
+					'search_class'         => 'compact_search_form',
+					'search_input_before'  => '<div class="input-group">',
+					'search_input_after'   => '',
+					'search_submit_before' => '<span class="input-group-btn">',
+					'search_submit_after'  => '</span></div>',
+					// Widget 'Content Hierarchy':
+					'item_before_opened'   => get_icon( 'collapse' ),
+					'item_before_closed'   => get_icon( 'expand' ),
+					'item_before_post'     => get_icon( 'post' ),
+					'expand_all'           => false,
+					'sorted'               => true
+				) );
+			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
+		?>
 		</div>
-	</div>
-</aside>
+
+		<div class="evo_container evo_container__sidebar2">
+		<?php
+			// <div data-spy="affix" data-offset-top="165" class="affix_block">
+			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			// Note: this container is designed to be a single <ul> list
+			skin_container( NT_('Sidebar 2'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="panel panel-default widget $wi_class$">',
+					'block_end'   => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+					'block_title_end'   => '</h4></div>',
+					// This will enclose the body of each widget:
+					'block_body_start' => '<div class="panel-body">',
+					'block_body_end'   => '</div>',
+					// This will enclose (foot)notes:
+					'notes_start' => '<div class="small text-muted">',
+					'notes_end'   => '</div>',
+					// Widget 'Search form':
+					'search_class'         => 'compact_search_form',
+					'search_input_before'  => '<div class="input-group">',
+					'search_input_after'   => '',
+					'search_submit_before' => '<span class="input-group-btn">',
+					'search_submit_after'  => '</span></div>',
+					// Widget 'Content Hierarchy':
+					'item_before_opened'   => get_icon( 'collapse' ),
+					'item_before_closed'   => get_icon( 'expand' ),
+					'item_before_post'     => get_icon( 'post' ),
+					'expand_all'           => false,
+					'sorted'               => true
+				) );
+			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
+		?>
+		</div>
+
+		<?php
+			// Please help us promote b2evolution and leave this logo on your blog:
+			powered_by( array(
+					'block_start' => '<div class="powered_by">',
+					'block_end'   => '</div>',
+					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+					'img_width'   => 120,
+					'img_height'  => 32,
+				) );
+		?>
+
+	</div><!-- DO WE NEED THIS DIV? -->
+
+</aside><!-- .col -->
+
 <script type="text/javascript">
 var has_touch_event;
 window.addEventListener( 'touchstart', function set_has_touch_event ()

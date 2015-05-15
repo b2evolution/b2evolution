@@ -420,8 +420,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'before' => '',
 						'after'  => ' &bull; ',
 					) );
-
-			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
 			?>
 
 			<?php
