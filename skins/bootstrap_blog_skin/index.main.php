@@ -176,8 +176,9 @@ siteskin_include( '_site_body_header.inc.php' );
 			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'   => 'featured_post',
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------

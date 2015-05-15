@@ -6,9 +6,10 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage photoalbums
+ * @subpackage bootstrap_gallery
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
 /**
  * Specific code for this skin.
  *
@@ -29,6 +30,8 @@ class bootstrap_gallery_Skin extends Skin
 	{
 		return 'Bootstrap Gallery';
 	}
+
+
 	/**
 	 * Get default type for the skin.
 	 */
@@ -36,6 +39,8 @@ class bootstrap_gallery_Skin extends Skin
 	{
 		return 'normal';
 	}
+
+
 	/**
 	 * What evoSkins API does has this skin been designed with?
 	 *
@@ -46,6 +51,8 @@ class bootstrap_gallery_Skin extends Skin
 	{
 		return 6;
 	}
+
+
 	/**
 	 * Get definitions for editable params
 	 *
@@ -81,6 +88,7 @@ class bootstrap_gallery_Skin extends Skin
 					'defaultvalue' => '#333',
 					'type' => 'color',
 				),
+				// Colorbox
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
@@ -123,6 +131,7 @@ class bootstrap_gallery_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				// Other settings
 				'gender_colored' => array(
 					'label' => T_('Display gender'),
 					'note' => T_('Use colored usernames to differentiate men & women.'),
@@ -169,9 +178,11 @@ class bootstrap_gallery_Skin extends Skin
 					'type' => 'select',
 				),
 			), parent::get_param_definitions( $params ) );
+
 		return $r;
 	}
-	
+
+
 	/**
 	 * Get ready for displaying the skin.
 	 *
@@ -179,17 +190,17 @@ class bootstrap_gallery_Skin extends Skin
 	 */
 	function display_init()
 	{
-		
 		global $Messages, $debug;
+
 		require_js( '#jquery#', 'blog' );
-		
+
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 		init_fontawesome_icons( 'fontawesome-glyphicons' );
-		
+
 		require_js( '#bootstrap#', 'blog' );
 		require_css( '#bootstrap_css#', 'blog' );
 		//require_css( '#bootstrap_theme_css#', 'blog' );
-		
+
 		if( $debug )
 		{	// Use readable CSS:
 			// rsc/less/bootstrap-basic_styles.less
@@ -214,17 +225,17 @@ class bootstrap_gallery_Skin extends Skin
 		else
 		{	// Use minified CSS:
 			require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
-		}		
-		
+		}
+
 		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 		if( $this->get_setting( 'colorbox' ) )
 		{
 			require_js_helper( 'colorbox', 'blog' );
 		}
-		
+
 		// JS to init tooltip (E.g. on comment form for allowed file extensions)
 		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
-		
+
 		// Set bootstrap classes for messages
 		$Messages->set_params( array(
 				'class_success'  => 'alert alert-dismissible alert-success fade in',
@@ -236,6 +247,7 @@ class bootstrap_gallery_Skin extends Skin
 		
 		// call parent:
 		parent::display_init();
+
 		// Add custom CSS:
 		$custom_css = '';
 		// Custom menu styles:
