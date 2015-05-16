@@ -30,6 +30,13 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Do we want to use style.min.css instead of style.css ?
+	 */
+	var $use_min_css = false;  // true|false|'check' Set this to true for better optimization
+	// Note: we set this to false by default for backwards compatibility with third party skins.
+	// But for best performance, you should set it to true.
+
+	/**
 	 * Lazy filled.
 	 * @var array
 	 */
@@ -745,28 +752,126 @@ class Skin extends DataObject
 	/**
 	 * Get ready for displaying the skin.
 	 *
-	 * This may register some CSS or JS...
+	 * This method may register some CSS or JS. 
+	 * The default implementation can register a few common things that you may request in the $features param.
+	 *
+	 * If this doesn't do what you need you may add functions like the following to your skin's display_init():
+	 * require_js() , require_css() , add_js_headline()
+	 *
+	 * @param array of possible features you want to include. If empty, will default to {'b2evo_base', 'style', 'colorbox'} for backwards compatibility.
 	 */
-	function display_init()
+	function display_init( $features = array() )
 	{
-		// Add CSS:
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+		global $debug, $Messages;
 
-		// Make sure standard CSS is called ahead of custom CSS generated below:
-		require_css( 'style.css', true );
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting( 'colorbox' ) )
-		{	// This can be enabled by a setting in skins where it may be relevant
-			require_js_helper( 'colorbox', 'blog' );
+		if( empty($features) )
+		{	// Fall back to v5 default set of features:
+			$features = array( 'b2evo_base_css', 'style_css', 'colorbox' );
 		}
 
-		// override this in specific skins...
+		foreach( $features as $feature )
+		{
+			switch( $feature ) 
+			{
+				case 'jquery':
+					// Include jQuery:
+					require_js( '#jquery#', 'blog' );
+					break;
+
+				case 'font_awesome':
+					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					break;
+
+				case 'bootstrap':
+					// Include Bootstrap:
+					require_js( '#bootstrap#', 'blog' );
+					require_css( '#bootstrap_css#', 'blog' );
+					break;
+
+				case 'bootstrap_theme_css':
+					// Include the Bootstrap Theme CSS:
+					require_css( '#bootstrap_theme_css#', 'blog' );
+					break;
+
+				case 'bootstrap_evo_css':
+					// Include the bootstrap-b2evo_base CSS (NEW / v6 style) - Use this when you use Bootstrap:
+					if( $debug )
+					{	// Use readable CSS:
+						// rsc/less/bootstrap-basic_styles.less
+						// rsc/less/bootstrap-basic.less
+						// rsc/less/bootstrap-blog_base.less
+						// rsc/less/bootstrap-item_base.less
+						// rsc/less/bootstrap-evoskins.less
+						require_css( 'bootstrap-b2evo_base.bundle.css', 'blog' );  // CSS concatenation of the above
+					}
+					else
+					{	// Use minified CSS:
+						require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+					}
+					break;
+
+				case 'bootstrap_init_tooltips':
+					// JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions):
+					add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+					break;
+
+				case 'bootstrap_messages':
+					// Initialize $Messages Class to use Bootstrap styles:
+					$Messages->set_params( array(
+							'class_success'  => 'alert alert-dismissible alert-success fade in',
+							'class_warning'  => 'alert alert-dismissible alert-warning fade in',
+							'class_error'    => 'alert alert-dismissible alert-danger fade in',
+							'class_note'     => 'alert alert-dismissible alert-info fade in',
+							'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
+						) );
+					break;
+
+				case 'b2evo_base_css':
+					// Include the b2evo_base CSS (OLD / v5 style) - Use this when you DON'T use Bootstrap:
+					if( $debug )
+					{	// Use readable CSS:
+						// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
+						// require_css( 'basic.css', 'blog' ); // Basic styles
+						// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
+						// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
+						// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
+						require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation + Minifaction of the above
+					}
+					else
+					{	// Use minified CSS:
+						require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+					}
+					break;
+				
+				case 'style_css':
+					// Include the default skin style.css:
+					// You should make sure this is called ahead of any custom generated CSS.
+					if( $this->use_min_css == false 
+						|| $debug 
+						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
+					{	// Use readable CSS:
+						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+					}
+					else
+					{	// Use minified CSS:
+						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+					}
+					break;
+
+				case 'colorbox':
+					// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
+					if( $this->get_setting( 'colorbox' ) )
+					{	// This can be enabled by a setting in skins where it may be relevant
+						require_js_helper( 'colorbox', 'blog' );
+					}
+					break;
+
+
+				default:
+					debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
+			}
+		}
 	}
 
 

@@ -229,7 +229,7 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'register' || $disp == 'lostpassword' )
+		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' )
 		{	// We do NOT want caching for in-skin login, register and lostpassord pages
 			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
 			return false;

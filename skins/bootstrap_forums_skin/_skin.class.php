@@ -168,58 +168,19 @@ class bootstrap_forums_Skin extends Skin
 	{
 		global $disp, $Messages, $debug;
 
-		require_js( '#jquery#', 'blog' );
-
-		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-		init_fontawesome_icons( 'fontawesome-glyphicons' );
-
-		require_js( '#bootstrap#', 'blog' );
-		require_css( '#bootstrap_css#', 'blog' );
-		//require_css( '#bootstrap_theme_css#', 'blog' );
-
-		if( $debug )
-		{	// Use readable CSS:
-			// rsc/less/bootstrap-basic_styles.less
-			// rsc/less/bootstrap-basic.less
-			// rsc/less/bootstrap-blog_base.less
-			// rsc/less/bootstrap-item_base.less
-			// rsc/less/bootstrap-evoskins.less
-			require_css( 'bootstrap-b2evo_base.bundle.css', 'blog' );  // CSS concatenation of the above
-		}
-		else
-		{	// Use minified CSS:
-			require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
-		}
-		
-		// Make sure standard CSS is called ahead of custom CSS generated below:
-		if( $this->use_min_css == false 
-			|| $debug 
-			|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
-		{	// Use readable CSS:
-			require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
-		}
-		else
-		{	// Use minified CSS:
-			require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
-		}
-	
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting( 'colorbox' ) )
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
-
-		// JS to init tooltip (E.g. on comment form for allowed file extensions)
-		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
-
-		// Set bootstrap classes for messages
-		$Messages->set_params( array(
-				'class_success'  => 'alert alert-dismissible alert-success fade in',
-				'class_warning'  => 'alert alert-dismissible alert-warning fade in',
-				'class_error'    => 'alert alert-dismissible alert-danger fade in',
-				'class_note'     => 'alert alert-dismissible alert-info fade in',
-				'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
+		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
+		parent::display_init( array(
+				'jquery', 							// Load jQuery
+				'font_awesome', 					// Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
+				'bootstrap', 						// Load Bootstrap (without 'bootstrap_theme_css')
+				'bootstrap_evo_css', 			// Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'bootstrap_messages',			// Initialize $Messages Class to use Bootstrap styles
+				'style_css', 						// Load the style.css file of the current skin
+				'colorbox',							// Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
+				'bootstrap_init_tooltips', 	// Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 			) );
+
+		// Skin specific initializations:
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote

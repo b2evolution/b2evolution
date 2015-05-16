@@ -147,20 +147,16 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <?php
 if( $disp == 'front' || $disp == 'posts' )
-{
-	// ------------------------- "Menu Top" CONTAINER EMBEDDED HERE --------------------------
-	// Display container and contents:
-	// Note: this container is designed to be a single <ul> list
-	skin_container( NT_('Menu Top'), array(
-			// The following params will be used as defaults for widgets included in this container:
-			'block_title_start'   => '',
-			'block_title_end'     => '',
-			'list_start'          => '',
-			'list_end'            => '',
-			'item_start'          => '',
-			'item_end'            => '',
+{ // Widget 'Search form':
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'coll_search_form',
+			// Optional display params
+			'block_title_start' => '',
+			'block_title_end'   => '',
+			'title'             => T_('Search this forum:'),
+			'button'            => T_('Search')
 		) );
-	// ----------------------------- END OF "Menu Top" CONTAINER -----------------------------
 }
 ?>
 

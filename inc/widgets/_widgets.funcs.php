@@ -152,27 +152,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 
 	/* Page Top */
-	if( in_array( $blog_id, array( $blog_home_ID, $blog_a_ID, $blog_manual_ID ) ) )
-	{
-		add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
-	}
-
-	/* Menu Top */
-	$menu_top_params = NULL;
-	if( $kind == 'forum' )
-	{	// Set special params for forums blogs
-		$menu_top_params = array(
-				'title' => T_('Search this forum:'),
-				'button' => T_('Search')
-			);
-	}
-	elseif( $kind == 'manual' )
-	{	// Set special params for manual blogs
-		$menu_top_params = array(
-				'title' => T_('Search this manual:'),
-			);
-	}
-	add_basic_widget( $blog_id, 'Menu Top', 'coll_search_form', 'core', 1, $menu_top_params );
+	add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
 
 	/* Sidebar */
 	if( $kind == 'manual' )

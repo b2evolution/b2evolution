@@ -3154,42 +3154,30 @@ class Blog extends DataObject
 		/**
 		 * $allow_access == 'users' || 'members'
 		 */
-		$has_access = true;
-		$redirect_blog_page = 'loginurl';
 		if( ! is_logged_in() )
 		{ // Only logged in users have an access to this blog
-			$error_message = NT_('You need to log in before you can access this collection.');
-			$template = 'access_requires_login.main.php';
-			$has_access = false;
-			$redirect_blog_page = 'access_requires_loginurl';
-			// Don't use site skin if template doesn't exist, User will be redirect to standard login form instead
-			$use_site_skin = false;
+			$Messages->add( T_( 'You need to log in before you can access this collection.' ), 'error' );
+
+			// Redirect to login form on "access_requires_login.main.php"
+			header_redirect( get_login_url( 'no access to blog', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
+			// will have exited
 		}
 		elseif( $allow_access == 'members' )
 		{ // Check if current user is member of this blog
 			global $current_User;
-			$error_message = NT_('You are not a member of this collection, therefore you are not allowed to access it.');
-			$template = 'access_denied.main.php';
-			$has_access = $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID );
-			if( ! $has_access )
+
+			if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
 			{ // Force disp to restrict access for current user
 				$disp = 'access_denied';
-			}
-			// If skin template files don't exist - the template "/skins_site/access_denied.main.php" will be used
-			$use_site_skin = true;
-		}
 
-		if( ! $has_access )
-		{ // Current user has no access to current page
-			$Messages->add( T_( $error_message ), 'error' );
+				$Messages->add( T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ), 'error' );
 
-			if( ( ! is_logged_in() && $this->get_setting( 'in_skin_login' ) && ! get_setting_Blog( 'login_blog_ID' ) ) ||
-			    ( is_logged_in() && isset( $template ) ) )
-			{ // If blog has in-skin login form we should not display it
-			  // Use 'access_requires_login.main.php' or 'access_denied.main.php' instead
 				$blog_skin_ID = $this->get_skin_ID();
 				if( ! empty( $blog_skin_ID ) )
 				{
+					// Use 'access_denied.main.php' instead of real template when current User is not a member of this blog
+					$template = 'access_denied.main.php';
+
 					$SkinCache = & get_SkinCache();
 					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 					$ads_current_skin_path = $skins_path.$Skin->folder.'/';
@@ -3204,18 +3192,12 @@ class Blog extends DataObject
 						require $global_template_name;
 						exit;
 					}
-					elseif( $use_site_skin )
+					else
 					{ // Display a template from site skins
 						siteskin_include( $template );
 						exit;
 					}
 				}
-			}
-
-			if( ! is_logged_in() )
-			{ // Redirect to login form
-				header_redirect( get_login_url( 'no access to blog', NULL, false, NULL, $redirect_blog_page ), 302 );
-				// will have exited
 			}
 		}
 

@@ -13,14 +13,14 @@ div.widget_core_coll_tagline {
 }
 
 // Footer
-.evo_container__footer {
+.secondary_area {
 	background-color: #FFF;
 	width: 100%;
 	p {
 		margin-top: 10px;
 	}
 }
-body.pictured .evo_container__footer {
+body.pictured .secondary_area {
 	color: #666;
 	a:not([class^=ufld_]) {
 		color: #666;
@@ -301,8 +301,11 @@ label.control-label[for=post_title] {
 		background: none;
 		color: #000;
 		text-shadow: none;
-		padding: 0;
+		padding: 0 5px 0 0;
 		font-size: 100%;
+		label, span {
+			margin-top: 10px;
+		}
 	}
 	td.input {
 		width: 90%;
@@ -592,7 +595,7 @@ body.pictured .front_main_content .ufld_icon_links a {
 		margin-bottom: 40px;
 	}
 }
-body.pictured .evo_container__footer .widget_core_org_members {
+body.pictured .secondary_area .widget_core_org_members {
 	a.user_link {
 		color: #000;
 		&:hover {

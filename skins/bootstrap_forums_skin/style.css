@@ -392,7 +392,9 @@ label.control-label[for=post_title] {
 }
 .widget_core_coll_search_form {
   float: right;
-  width: 200px;
+  width: 40%;
+  min-width: 250px;
+  margin-bottom: 20px;
 }
 .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;

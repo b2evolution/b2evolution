@@ -198,27 +198,19 @@ siteskin_include( '_site_body_header.inc.php' );
 
 		<?php
 		if( in_array( $disp, array( 'front', 'single', 'page' ) ) || ( $disp == 'posts' && ! empty( $cat ) ) )
-		{
-			// ------------------------- "Menu Top" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu Top'), array(
-					// The following params will be used as defaults for widgets included in this container:
-					'block_start' => '<div class="widget $wi_class$">',
-					'block_end' => '</div>',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '',
-					'item_end'            => '',
-					// Widget 'Search form':
+		{ // Widget 'Search form':
+			skin_widget( array(
+					// CODE for the widget:
+					'widget' => 'coll_search_form',
+					// Optional display params
+					'block_display_title'  => false,
 					'search_class'         => 'compact_search_form',
 					'search_input_before'  => '<div class="input-group">',
 					'search_input_after'   => '',
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
+					'button'               => T_('Search')
 				) );
-			// ----------------------------- END OF "Menu Top" CONTAINER -----------------------------
 		}
 		?>
 

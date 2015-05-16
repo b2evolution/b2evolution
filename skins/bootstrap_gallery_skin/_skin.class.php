@@ -244,9 +244,6 @@ class bootstrap_gallery_Skin extends Skin
 				'class_note'     => 'alert alert-dismissible alert-info fade in',
 				'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
 			) );
-		
-		// call parent:
-		parent::display_init();
 
 		// Add custom CSS:
 		$custom_css = '';

@@ -69,7 +69,7 @@ $profileForm->switch_template_parts( $params['skin_form_params'] );
 
 $profileForm->switch_layout( 'fixed', false );
 
-$profileForm->begin_form( 'evo_from evo_form_user' );
+$profileForm->begin_form( 'evo_form evo_form_user' );
 
 // ---- START OF LEFT COLUMN ---- //
 echo '<div class="profile_column_left">';

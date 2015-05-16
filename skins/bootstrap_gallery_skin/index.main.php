@@ -1,14 +1,18 @@
 <?php
 /**
- * This is the main/default page template.
+ * This is the main/default page template for the "bootstrap_gallery" skin.
  *
- * For a quick explanation of b2evo 2.0 skins, please start here:
+ * This skin only uses one single template which includes most of its features.
+ * It will also rely on default includes for specific displays (like the comment form).
+ *
+ * For a quick explanation of b2evo 6.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
  *
- * It is used to display the blog when no specific page template is available to handle the request.
+ * The main page template is used to display the blog when no specific page template is available
+ * to handle the request (based on $disp).
  *
  * @package evoskins
- * @subpackage bootstrap_gallery
+ * @subpackage bootstrap
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -17,21 +21,13 @@ if( version_compare( $app_version, '6.4' ) < 0 )
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
-
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-// TODO: move to Skin::display_init
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
+
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php', array(
-		'arcdir_text'     => T_('Index'),
-		'catdir_text'     => T_('Galleries'),
-		'category_text'   => T_('Gallery').': ',
-		'categories_text' => T_('Galleries').': ',
-	) );
+skin_include( '_html_header.inc.php', array() );
 // -------------------------------- END OF HEADER --------------------------------
 
 
@@ -43,7 +39,6 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <div class="container">
-
 
 <header class="row">
 
@@ -64,6 +59,16 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
+
+		<?php
+			skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'member_count',
+				// Optional display params
+				'before' => '(',
+				'after'  => ')',
+			) );
+		?>
 		</div>
 	</div><!-- .col -->
 
@@ -82,18 +87,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 		</div>
-
-		<?php
-			/* TODO: fp> hum this should not be hacked in to here -- maybe put it into "Page Top" ?
-			skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'member_count',
-				// Optional display params
-				'before' => '(',
-				'after'  => ')',
-			) );
-			*/
-		?>
 
 	</div><!-- .col -->
 
@@ -137,7 +130,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 	<nav class="nav_album">
 
-		<a href="<?php $Blog->disp( 'url', 'raw' ) ?>" title="<?php echo format_to_output( T_('All Albums'), 'htmlattr' ); ?>" class="all_albums btn btn-primary">All Albums</a>
+		<a href="<?php $Blog->disp( 'url', 'raw' ) ?>" title="<?php echo format_to_output( T_('All Albums'), 'htmlattr' ); ?>" class="all_albums">All Albums</a>
 
 		<span class="nav_album_title">
 			<?php
@@ -154,9 +147,10 @@ siteskin_include( '_site_body_header.inc.php' );
 				if( $Skin->enabled_status_banner( $Item->status ) )
 				{ // Status banner
 					$single_Item->status( array(
-							'before' => '<div class="post_status">',
+							'before' => '<div class="post_status">',							
+							'class' => 'badge',
 							'after'  => '</div>',
-							'format' => 'styled'
+							'format' => 'styled',
 						) );
 				}
 				$single_Item->edit_link( array( // Link to backoffice for editing
@@ -198,10 +192,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">	
 
-	<div class="bPosts<?php echo in_array( $disp, array( 'catdir', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' col-lg-12' : '' ?>">
-		<?php
-			// TODO: fp>milos: Please get rid of the "bPosts" class (also we have disp specifc classes on <body>)
-		?>
+	<div class="<?php echo in_array( $disp, array( 'catdir', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' col-lg-12' : '' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 

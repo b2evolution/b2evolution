@@ -65,8 +65,8 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_display_title' => false,
 				'list_start'          => '',
 				'list_end'            => '',
-				'item_start'          => '<li>',
-				'item_end'            => '</li>',
+				'item_start'          => '',
+				'item_end'            => '',
 			) );
 		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		$page_top_skin_container = ob_get_clean();
@@ -76,7 +76,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 	<div class="header_top">
 		<div class="layout_width switched_width"<?php echo ( !empty( $cookie_skin_width_value ) ) ? ' style="max-width:'.$cookie_skin_width_value.'"' : ''; ?>>
-			<ul><?php echo $page_top_skin_container; ?></ul>
+			<?php echo $page_top_skin_container; ?>
 		</div>
 	</div>
 	<?php } ?>

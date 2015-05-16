@@ -23,12 +23,9 @@ if( version_compare( $app_version, '6.4' ) < 0 )
 skin_init( $disp );
 
 
-// Check if current page has a big picture as background
-$is_pictured_page = true;
-
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'body_class' => ( $is_pictured_page ? 'pictured' : '' ),
+	'body_class' => 'pictured',
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -38,22 +35,19 @@ skin_include( '_html_header.inc.php', array(
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
-if( $is_pictured_page )
-{ // Display a picture from skin setting as background image
-	global $media_path, $media_url;
-	$bg_image = $Skin->get_setting( 'front_bg_image' );
-	echo '<div id="bg_picture">';
-	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-	{ // If it exists in media folder
-		echo '<img src="'.$media_url.$bg_image.'" />';
-	}
-	echo '</div>';
+// Display a picture from skin setting as background image
+global $media_path, $media_url;
+$bg_image = $Skin->get_setting( 'front_bg_image' );
+echo '<div id="bg_picture">';
+if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+{ // If it exists in media folder
+	echo '<img src="'.$media_url.$bg_image.'" />';
 }
+echo '</div>';
 ?>
 
 
-<div class="container">
-
+<div class="container main_page_wrapper">
 
 <header class="row">
 
@@ -130,6 +124,7 @@ if( $is_pictured_page )
 			// copying the matching php file into your skin directory.
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
+
 		</main>
 
 	</div><!-- .col -->
@@ -143,24 +138,22 @@ if( $is_pictured_page )
 <section class="secondary_area"><!-- white background -->
 <div class="container">
 
-<footer class="row">
+	<div class="row">
 
-	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
-
-		<div class="evo_container evo_container__footer">
-		<?php
-			// Display container and contents:
-			skin_container( NT_("Footer"), array(
-					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
-				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
-
-		<p>
+		<footer class="col-md-12 center">
+	
+			<div class="evo_container evo_container__footer">
+			<?php
+				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				skin_container( NT_('Footer'), array(
+						// The following params will be used as defaults for widgets included in this container:
+					) );
+				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
+			?>
+			</div>
+	
+			<p>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -181,9 +174,9 @@ if( $is_pictured_page )
 					) );
 				// Display a link to help page:
 				$Blog->help_link( array(
-						'before'      => ' ',
-						'after'       => ' ',
-						'text'        => T_('Help'),
+						'before' => ' ',
+						'after'  => ' ',
+						'text'   => T_('Help'),
 					) );
 			?>
 
@@ -192,29 +185,30 @@ if( $is_pictured_page )
 				// If you can add your own credits without removing the defaults, you'll be very cool :))
 				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 				credits( array(
-						'list_start'  => '&bull;',
-						'list_end'    => ' ',
-						'separator'   => '&bull;',
-						'item_start'  => ' ',
-						'item_end'    => ' ',
+						'list_start' => '&bull;',
+						'list_end'   => ' ',
+						'separator'  => '&bull;',
+						'item_start' => ' ',
+						'item_end'   => ' ',
 					) );
 			?>
-		</p>
+			</p>
 
-		<?php
-			// Please help us promote b2evolution and leave this logo on your blog:
-			powered_by( array(
-					'block_start' => '<div class="powered_by">',
-					'block_end'   => '</div>',
-					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-					'img_width'   => 120,
-					'img_height'  => 32,
-				) );
-		?>
-	</div><!-- .col -->
-	
-</footer><!-- .row -->
+			<?php
+				// Please help us promote b2evolution and leave this logo on your blog:
+				powered_by( array(
+						'block_start' => '<div class="powered_by">',
+						'block_end'   => '</div>',
+						// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+						'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+						'img_width'   => 120,
+						'img_height'  => 32,
+					) );
+			?>
+
+		</footer><!-- .col -->
+
+	</div><!-- .row -->
 
 
 </div><!-- .container -->

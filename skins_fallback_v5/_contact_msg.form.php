@@ -46,7 +46,7 @@ else
 	$email_author_address = $unsaved_message_params[ 'sender_address' ];
 }
 
-echo str_replace( '$form_title$', $params['msgform_form_title'], $params['skin_form_before'] ),
+echo str_replace( '$form_title$', $params['msgform_form_title'], $params['skin_form_before'] );
 
 $Form = new Form( $submit_url );
 

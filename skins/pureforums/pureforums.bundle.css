@@ -67,6 +67,7 @@
   padding: 11px;
 }
 .header .widget_core_coll_search_form form .search_field {
+  outline: none;
   background-color: #EAECF1;
   background-image: -webkit-linear-gradient(white, #d5d9e3);
   background-image: -moz-linear-gradient(white, #d5d9e3);
@@ -158,6 +159,14 @@ body.tablet_device div.pageHeader.site_skins {
 
 .header_top ul li.selected a {
   box-shadow: 0 1px 7px rgba(255, 255, 255, 0.2) inset;
+}
+
+.header_top .ufld_icon_links {
+  text-align: right;
+}
+.header_top .ufld_icon_links a {
+  display: inline-block;
+  width: 40px;
 }
 
 @media (max-width: 1200px) {

@@ -519,13 +519,12 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'photoalbums' );
 
 	// Note: Skin #5 will we used by Forums
-	skin_install( 'pureforums' );
+	skin_install( 'bootstrap_forums_skin' );
 
 	// Note: Skin #6 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
 	skin_install( 'asevo' );
-	skin_install( 'bootstrap_forums_skin' );
 	skin_install( 'bootstrap_gallery_skin' );
 	skin_install( 'dating_mood' );
 	skin_install( 'evopress' );
@@ -533,6 +532,7 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( 'manual' );
 	skin_install( 'photoblog' );
 	skin_install( 'pixelgreen' );
+	skin_install( 'pureforums' );
 	if( $install_mobile_skins )
 	{
 		skin_install( 'touch' );

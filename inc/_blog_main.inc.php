@@ -757,6 +757,7 @@ if( !empty( $skin ) )
 					'useritems'      => 'useritems.main.php',
 					'usercomments'   => 'usercomments.main.php',
 					'download'       => 'download.main.php',
+					'access_requires_login' => 'access_requires_login.main.php',
 					// All others will default to index.main.php
 				);
 

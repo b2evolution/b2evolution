@@ -157,6 +157,9 @@ class pureforums_Skin extends Skin
 	{
 		global $disp;
 
+		// Load Font Awesome:
+		require_css( 'http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css' );
+
 		// Add CSS:
 		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
 		// require_css( 'basic.css', 'blog' ); // Basic styles

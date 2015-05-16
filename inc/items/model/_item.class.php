@@ -4392,6 +4392,7 @@ class Item extends ItemLight
 				'before' => '',
 				'after'  => '',
 				'format' => 'htmlbody', // Output format, see {@link format_to_output()}
+				'class'  => '',
 			), $params );
 
 		$r = $params['before'];
@@ -4403,7 +4404,7 @@ class Item extends ItemLight
 				break;
 
 			case 'styled':
-				$r .= get_styled_status( $this->status, $this->get('t_status') );
+				$r .= get_styled_status( $this->status, $this->get('t_status'), $params['class'] );
 				break;
 
 			default:
@@ -4433,9 +4434,10 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => '',
-				'after'       => '',
-				'format'      => 'htmlbody', // Output format, see {@link format_to_output()}
+				'before' => '',
+				'after'  => '',
+				'format' => 'htmlbody', // Output format, see {@link format_to_output()}
+				'class'  => '',
 			), $params );
 
 		echo $this->get_status( $params );

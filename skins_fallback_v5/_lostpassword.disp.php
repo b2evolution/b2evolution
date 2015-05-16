@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $dummy_fields;
+global $blog, $dummy_fields, $source;
 
 // Default params:
 $params = array_merge( array(

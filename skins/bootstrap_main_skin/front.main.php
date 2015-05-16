@@ -1,15 +1,9 @@
 <?php
 /**
- * This is the main/default page template for the "bootstrap_main" skin.
- *
- * This skin only uses one single template which includes most of its features.
- * It will also rely on default includes for specific dispays (like the comment form).
+ * This is the template that displays the front page of a collection (when front page enabled)
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
- *
- * The main page template is used to display the blog when no specific page template is available
- * to handle the request (based on $disp).
  *
  * @package evoskins
  * @subpackage bootstrap_main
@@ -26,12 +20,9 @@ if( version_compare( $app_version, '6.4' ) < 0 )
 skin_init( $disp );
 
 
-// Check if current page has a big picture as background
-$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
-
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'body_class' => ( $is_pictured_page ? 'pictured' : '' ),
+	'body_class' => 'pictured',
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -41,67 +32,24 @@ skin_include( '_html_header.inc.php', array(
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
-if( $is_pictured_page )
-{ // Display a picture from skin setting as background image
-	global $media_path, $media_url;
-	$bg_image = $Skin->get_setting( 'front_bg_image' );
-	echo '<div id="bg_picture">';
-	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-	{ // If it exists in media folder
-		echo '<img src="'.$media_url.$bg_image.'" />';
-	}
-	echo '</div>';
+// Display a picture from skin setting as background image
+global $media_path, $media_url;
+$bg_image = $Skin->get_setting( 'front_bg_image' );
+echo '<div id="bg_picture">';
+if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+{ // If it exists in media folder
+	echo '<img src="'.$media_url.$bg_image.'" />';
 }
+echo '</div>';
 ?>
 
 
 <div class="container main_page_wrapper">
 
-<header class="row">
-
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-		<div class="evo_container evo_container__page_top">
-		<?php
-			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
-					// The following params will be used as defaults for widgets included in this container:
-					'block_start'         => '<div class="evo_widget $wi_class$">',
-					'block_end'           => '</div>',
-					'block_display_title' => false,
-					'list_start'          => '<ul>',
-					'list_end'            => '</ul>',
-					'item_start'          => '<li>',
-					'item_end'            => '</li>',
-				) );
-			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		?>
-		</div>
-	</div><!-- .col -->
-
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-		<div class="evo_container evo_container__header">
-		<?php
-			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			skin_container( NT_('Header'), array(
-					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
-					'block_title_start' => '<h1>',
-					'block_title_end'   => '</h1>',
-				) );
-			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		?>
-		</div>
-	</div><!-- .col -->
-
-</header><!-- .row -->
-
 
 <div class="row">
 
-	<div class="col-md-12">
+	<div class="col-md-12 front_main_area">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -117,6 +65,9 @@ if( $is_pictured_page )
 				) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
+
+		// Start of wrapper for front page area, in order to have the $Messages outside this block
+		echo '<div class="front_main_content">';
 		?>
 
 		<?php
@@ -166,52 +117,6 @@ if( $is_pictured_page )
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
-		}
-		?>
-
-		<?php
-		if( $disp != 'download' && $disp != 'search' )
-		{
-			// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-			mainlist_page_links( array(
-					'block_start' => '<div class="center"><ul class="pagination">',
-					'block_end' => '</ul></div>',
-					'page_current_template' => '<span><b>$page_num$</b></span>',
-					'page_item_before' => '<li>',
-					'page_item_after' => '</li>',
-				) );
-			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-		?>
-
-		<?php
-			// --------------------------------- START OF POSTS -------------------------------------
-			// Display message if no post:
-			display_if_empty();
-
-			while( $Item = & mainlist_get_item() )
-			{ // For each blog post, do everything below up to the closing curly brace "}"
-
-				// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-				skin_include( '_item_block.inc.php', array(
-						'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					) );
-				// ----------------------------END ITEM BLOCK  ----------------------------
-
-			} // ---------------------------------- END OF POSTS ------------------------------------
-		?>
-
-		<?php
-			// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-			mainlist_page_links( array(
-					'block_start' => '<div class="center"><ul class="pagination">',
-					'block_end' => '</ul></div>',
-					'page_current_template' => '<span><b>$page_num$</b></span>',
-					'page_item_before' => '<li>',
-					'page_item_after' => '</li>',
-					'prev_text' => '&lt;&lt;',
-					'next_text' => '&gt;&gt;',
-				) );
-			// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 		}
 		?>
 
@@ -291,6 +196,11 @@ if( $is_pictured_page )
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
 
+		<?php
+			// End of wrapper for front page area, in order to have the $Messages outside this block
+			echo '</div>';// END OF <div class="front_main_content">
+		?>
+
 		</main>
 
 	</div><!-- .col -->
@@ -305,6 +215,23 @@ if( $is_pictured_page )
 <div class="container">
 
 	<div class="row">
+
+		<div class="col-md-12">
+			<div class="evo_container evo_container__front_page_secondary">
+			<?php
+				// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				skin_container( NT_('Front Page Secondary Area'), array(
+						// The following params will be used as defaults for widgets included in this container:
+						'block_start'       => '<div class="widget $wi_class$">',
+						'block_end'         => '</div>',
+						'block_title_start' => '<h2 class="page-header">',
+						'block_title_end'   => '</h2>',
+					) );
+				// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
+			?>
+			</div>
+		</div><!-- .col -->
 
 		<footer class="col-md-12 center">
 

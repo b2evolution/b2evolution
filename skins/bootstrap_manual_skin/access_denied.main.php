@@ -44,13 +44,15 @@ skin_include( '_body_header.inc.php' );
 // Note: You can customize the default BODY header by copying the generic
 // /skins/_body_header.inc.php file into the current skin folder.
 // -------------------------------- END OF BODY HEADER ---------------------------
-?>
 
 
-<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>
+// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+skin_include( '_access_denied.disp.php' );
+// Note: you can customize any of the sub templates included here by
+// copying the matching php file into your skin directory.
+// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 
 
-<?php
 // -------------------------- BODY FOOTER INCLUDED HERE --------------------------
 skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the generic

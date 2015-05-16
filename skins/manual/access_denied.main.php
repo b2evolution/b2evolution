@@ -68,7 +68,13 @@ skin_include( '_body_header.inc.php' );
 		// ----------------------------- END OF REQUEST TITLE ----------------------------
 	?>
 
-	<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>
+	<?php
+		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
+		skin_include( '_access_denied.disp.php' );
+		// Note: you can customize any of the sub templates included here by
+		// copying the matching php file into your skin directory.
+		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
+	?>
 
 </div>
 <?php

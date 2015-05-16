@@ -1400,13 +1400,14 @@ function get_colored_status( $Comment )
  *
  * @param string Status value
  * @param string Status title
+ * @param string Status class
  * @return string Styled template for status
  */
-function get_styled_status( $status_value, $status_title )
+function get_styled_status( $status_value, $status_title, $status_class = '' )
 {
 	return '<div class="floatright">'
 		.'<span class="note status_'.$status_value.'">'
-		.'<span>'.format_to_output( $status_title ).'</span>'
+		.'<span'.( empty( $status_class ) ? '' : ' class="'.$status_class.'"' ).'>'.format_to_output( $status_title ).'</span>'
 		.'</span>'
 		.'</div>';
 }

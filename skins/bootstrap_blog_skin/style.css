@@ -135,8 +135,12 @@ label.control-label[for=post_title] {
   background: none;
   color: #000;
   text-shadow: none;
-  padding: 0;
+  padding: 0 5px 0 0;
   font-size: 100%;
+}
+.item_tags td.label label,
+.item_tags td.label span {
+  margin-top: 10px;
 }
 .item_tags td.input {
   width: 90%;

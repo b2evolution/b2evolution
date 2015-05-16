@@ -29,7 +29,7 @@ $params = array_merge( array(
 ?>
 
 <!--<div id="<?php // $Item->anchor_id() ?>" class="<?php //$Item->div_classes( $params ) ?>" lang="<?php //fbPostContent$Item->lang() ?>">-->
-	<div class="col-lg-12 single_post no-border">
+	<div class="col-lg-12 single_post">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
