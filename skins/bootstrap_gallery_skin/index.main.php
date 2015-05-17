@@ -1,36 +1,34 @@
 <?php
 /**
- * This is the main/default page template for the "bootstrap_gallery" skin.
+ * This is the main/default page template.
  *
- * This skin only uses one single template which includes most of its features.
- * It will also rely on default includes for specific displays (like the comment form).
- *
- * For a quick explanation of b2evo 6.0 skins, please start here:
+ * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
  *
- * The main page template is used to display the blog when no specific page template is available
- * to handle the request (based on $disp).
+ * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage bootstrap
+ * @subpackage bootstrap_gallery
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
 if( version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
-
+global $Skin;
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-
-
+// TODO: move to Skin::display_init
+require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php', array() );
+skin_include( '_html_header.inc.php', array(
+		'arcdir_text'     => T_('Index'),
+		'catdir_text'     => T_('Galleries'),
+		'category_text'   => T_('Gallery').': ',
+		'categories_text' => T_('Galleries').': ',
+	) );
 // -------------------------------- END OF HEADER --------------------------------
-
-
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
