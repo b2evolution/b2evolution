@@ -17,25 +17,27 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+		'comment_template'        => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'author_link_text'        => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'link_to'                 => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'display_comment_avatar'  => true,
 		'comment_avatar_position' => 'before_title', // 'before_title', 'before_text'
-		'comment_start'        => '<div class="bComment">',
-		'comment_end'          => '</div>',
-		'comment_post_display' => true,	// We want to display the title of the post we're referring to
-		'comment_post_before'  => '<h3 class="bTitle">',
-		'comment_post_after'   => '</h3>',
-		'comment_title_before' => '<div class="bCommentTitle">',
-		'comment_title_after'  => '</div>',
-		'comment_rating_before'=> '<div class="comment_rating">',
-		'comment_rating_after' => '</div>',
-		'comment_text_before'  => '<div class="bCommentText">',
-		'comment_text_after'   => '</div>',
-		'comment_info_before'  => '<div class="bCommentSmallPrint">',
-		'comment_info_after'   => '</div>',
-		'comment_image_size'   => 'fit-400x320',
+		'comment_start'           => '<div class="bComment">',
+		'comment_end'             => '</div>',
+		'comment_post_display'    => true,	// We want to display the title of the post we're referring to
+		'comment_post_before'     => '<h3 class="bTitle">',
+		'comment_post_after'      => '</h3>',
+		'comment_title_before'    => '<div class="bCommentTitle">',
+		'comment_title_after'     => '</div>',
+		'comment_avatar_before'   => '<div class="evo_comment_avatar">',	// New in v6
+		'comment_avatar_after'    => '</div>',
+		'comment_rating_before'   => '<div class="comment_rating">',
+		'comment_rating_after'    => '</div>',
+		'comment_text_before'     => '<div class="bCommentText">',
+		'comment_text_after'      => '</div>',
+		'comment_info_before'     => '<div class="bCommentSmallPrint">',
+		'comment_info_after'      => '</div>',
+		'comment_image_size'      => 'fit-400x320',
 	), $params );
 
 
