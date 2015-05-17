@@ -432,7 +432,7 @@ text-align: center;
 	display: inline-block;
   vertical-align: middle;
 	}
-	/*.bPost img, .posts_list .bPost b {
+	.bPost img, .posts_list .bPost b {
 		transition: all 0.15s ease-in-out;
 		-webkit-transition: all 0.15s ease-in-out;
 		-moz-transition: all 0.15s ease-in-out;
@@ -440,8 +440,7 @@ text-align: center;
 		-ms-transition: all 0.15s ease-in-out;
 		// On hovering images helps to remove jagged edges
 		outline: 1px solid transparent;
-		1px solid white;
-	}*/
+	}
 	.bPost:hover img, .posts_list .bPost:hover b {
 	transform:rotate(-3deg);
 		-ms-transform:rotate(-3deg); /* IE 9 */
@@ -452,9 +451,6 @@ text-align: center;
 		-moz-border-radius: 20px;
 		-webkit-border-radius: 20px;
 		-khtml-border-radius: 20px;
-		/*-webkit-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-		-moz-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-		box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);*/
 		margin-bottom: 5px;
 	}
 	margin-top: 0px;
@@ -495,10 +491,7 @@ div.evo_image_index div {
 		-webkit-transition: all 0.15s ease-in-out;
 		-moz-transition: all 0.15s ease-in-out;
 		-o-transition: all 0.15s ease-in-out;
-		-ms-transition: all 0.15s ease-in-out;		
-		/*-webkit-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-		-moz-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-		box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);*/
+		-ms-transition: all 0.15s ease-in-out;
 	}
 	&:hover img {
 		transform:scale(1.06);
@@ -642,9 +635,6 @@ form.evo_form fieldset div.label, fieldset .input, fieldset .info {
 	-moz-transition: all 0.15s ease-in-out;
 	-o-transition: all 0.15s ease-in-out;
 	-ms-transition: all 0.15s ease-in-out;
-	/*-webkit-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-	-moz-box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);
-	box-shadow: 0px 0px 7px 3px rgba(0,0,0,0.42);*/
 }
 .post_images div:hover img {
 	transform:scale(1.06);
@@ -660,15 +650,14 @@ form.evo_form fieldset div.label, fieldset .input, fieldset .info {
 	.float-right {
 		float: none !important;
 	}
-	.col-lg-12.single_post {
-		border: none;
-		margin-bottom: 0px;
-	}
-	.posts_list {
-		border-top: 1px solid #ddd;
-	}
 	.post_images {
 		padding-bottom: 10px;
+	}
+}
+@media screen and (max-width: 991px) { 
+	.single-image {
+		margin-left: 0px;
+		margin-right: 0px;
 	}
 }
 @media screen and (max-width: 767px) {
@@ -683,6 +672,10 @@ form.evo_form fieldset div.label, fieldset .input, fieldset .info {
 	.bDetails, .col-lg-12 {
 		padding-left: 0px;
 		padding-right: 0px;
+	}	
+	.single-image {
+		margin-left: 42px;
+		margin-right: 42px;
 	}
 }
 @media screen and (max-width: 500px) {
@@ -731,9 +724,6 @@ form.evo_form fieldset div.label, fieldset .input, fieldset .info {
 }
 .label {
 	font-size: 14px !important;
-}
-.ufld_icon_links {
-	text-align: right !important;
 }
 
 /* XL Bootstrap Grid Layot */
