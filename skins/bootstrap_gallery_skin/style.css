@@ -597,9 +597,6 @@ fieldset .info {
   -webkit-transform: scale(1.06);
   /* Safari and Chrome */
 }
-.widget_core_coll_tagline {
-  color: #333;
-}
 @media screen and (max-width: 1199px) {
   .float-right {
     float: none !important;

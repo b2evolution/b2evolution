@@ -65,6 +65,12 @@ class bootstrap_gallery_Skin extends Skin
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
+				'page_text_color' => array(
+					'label' => T_('Page text color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#333',
+					'type' => 'color',
+				),
 				'menu_text_color' => array(
 					'label' => T_('Menu text color'),
 					'note' => T_('E-g: #ff6600 for orange'),
@@ -75,12 +81,6 @@ class bootstrap_gallery_Skin extends Skin
 					'label' => T_('Page background color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#fff',
-					'type' => 'color',
-				),
-				'page_text_color' => array(
-					'label' => T_('Page text color'),
-					'note' => T_('E-g: #00ff00 for green'),
-					'defaultvalue' => '#333',
 					'type' => 'color',
 				),
 				'post_text_color' => array(
@@ -209,22 +209,26 @@ class bootstrap_gallery_Skin extends Skin
 
 		// Add custom CSS:
 		$custom_css = '';
-		// Custom menu styles:
-		$custom_styles = array();
-		if( $bg_color = $this->get_setting( 'menu_bg_color' ) )
-		{ // Background color:
-			$custom_styles[] = 'background-color: '.$bg_color;
-		}
+		// ===== Custom page styles: =====
+		$custom_styles = array();	
+		
+		// Menu text color
 		if( $text_color = $this->get_setting( 'menu_text_color' ) )
-		{ // Text color:
+		{
 			$custom_styles[] = 'color: '.$text_color;
 		}
-		// Custom page styles:
-		$custom_styles = array();
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	ul.nav.nav-tabs li a { '.implode( ';', $custom_styles )." }\n";
+		}		
+		
+		// Page background color
 		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
-		{ // Background color:
+		{
 			$custom_styles[] = 'background-color: '.$bg_color;
 		}
+		
+		// Text color
 		if( $text_color = $this->get_setting( 'page_text_color' ) )
 		{ // Text color:
 			$custom_styles[] = 'color: '.$text_color;
@@ -233,12 +237,17 @@ class bootstrap_gallery_Skin extends Skin
 		{
 			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
 		}
+		
 		// Custom post area styles:
-		$custom_styles = array();
-		if( $bg_color = $this->get_setting( 'post_bg_color' ) )
-		{ // Background color:
-			$custom_styles[] = 'background-color: '.$bg_color;
+		if( $text_color = $this->get_setting( 'post_text_color' ) )
+		{ // Text color:
+			$custom_styles[] = 'color: '.$text_color;
 		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	section.evo_post__full { '.implode( ';', $custom_styles )." }\n";
+		}				
+		
 		if( $text_color = $this->get_setting( 'post_text_color' ) )
 		{ // Text color:
 			$custom_styles[] = 'color: '.$text_color;
