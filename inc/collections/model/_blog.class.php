@@ -1812,7 +1812,8 @@ class Blog extends DataObject
 		}
 
 		$params = array_merge( array(
-				'glue' => '&amp;',
+				'glue'       => '&amp;',
+				'url_suffix' => '', // additional url params are appended at the end
 			), $params );
 
 		switch( $parname )
@@ -1864,8 +1865,30 @@ class Blog extends DataObject
 				$disp_param = 'msgform';
 				break;
 
+			case 'profileurl':
+				$disp_param = 'profile';
+				break;
+
+			case 'avatarurl':
+				$disp_param = 'avatar';
+				break;
+
+			case 'pwdchangeurl':
+				$disp_param = 'pwdchange';
+				break;
+
+			case 'userprefsurl':
+				$disp_param = 'userprefs';
+				break;
+
+			case 'subsurl':
+				$disp_param = 'subs';
+				$params['url_suffix'] .= '#subs';
+				break;
+
 			case 'userurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=user' );
+				$disp_param = 'user';
+				break;
 
 			case 'usersurl':
 				$disp_param = 'users';
@@ -1885,9 +1908,6 @@ class Blog extends DataObject
 				{ // Use login/register urls of this blog
 					return url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
-
-			case 'subsurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=subs#subs' );
 
 			case 'threadsurl':
 				$disp_param = 'threads';
@@ -1989,7 +2009,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -1999,12 +2019,17 @@ class Blog extends DataObject
 
 			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
 			{ // Get home page of this blog because front page displays current disp
-				return $this_Blog->gen_blogurl( 'default' );
+				$url = $this_Blog->gen_blogurl( 'default' );
 			}
 			else
 			{ // Add disp param to blog's url when current disp is not a front page
-				return url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
+				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
+			if( ! empty( $params['url_suffix'] ) )
+			{ // Append url suffix
+				$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
+			}
+			return $url;
 		}
 	}
 

@@ -87,8 +87,8 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 
-	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, T_('Collection for messaging'), array(
-		'note' => T_('This collection will be used for all messaging functions.').$create_new_blog_link,
+	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, T_('Collection for profiles/messaging'), array(
+		'note' => T_('This collection will be used for all messaging, profile viewing and profile editing functions.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 

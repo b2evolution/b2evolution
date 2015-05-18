@@ -283,7 +283,7 @@ switch( $action )
 			$Blog = $BlogCache->get_by_ID( $blog );
 			if( $Blog )
 			{
-				$changepwd_url = url_add_param( $Blog->gen_blogurl(), 'disp=pwdchange&reqID='.$reqID );
+				$changepwd_url = $Blog->get( 'userurl', array( 'url_suffix' => 'disp=pwdchange&reqID='.$reqID, 'glue' => '&' ) );
 			}
 		}
 

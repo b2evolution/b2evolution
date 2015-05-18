@@ -1146,12 +1146,10 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	{ // Use base url when current blog is not defined yet
 		global $baseurl;
 		$blog_url = $baseurl;
-		$blog_exists = false;
 	}
 	else
 	{ // Use home page of the current blog
 		$blog_url = $current_Blog->gen_blogurl();
-		$blog_exists = true;
 	}
 
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
@@ -1159,7 +1157,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
 		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
 		{ // Use blog url when user has no access to backoffice 
-			if( ! $blog_exists )
+			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
 				$BlogCache = & get_BlogCache();
 				$BlogCache->clear();
@@ -1168,7 +1166,6 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 				$BlogCache->load_by_sql( $blog_cache_SQL );
 				if( count( $BlogCache->cache ) > 0 )
 				{
-					$blog_exists = true;
 					if( $current_Blog = & $BlogCache->get_next() )
 					{
 						$blog_url = $current_Blog->gen_blogurl();
@@ -1176,13 +1173,20 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 				}
 			}
 
-			if( $blog_exists )
+			if( ! empty( $current_Blog ) )
 			{ // We should use blog url when at least one blog exist 
 				if( $is_admin_tab )
 				{ // Deny all admin tabs for such users
 					$user_tab = 'user';
 				}
-				return url_add_param( $blog_url, 'disp='.$user_tab );
+				if( in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+				{
+					return $current_Blog->get( $user_tab.'url' );
+				}
+				else
+				{
+					return url_add_param( $blog_url, 'disp='.$user_tab );
+				}
 			}
 			else
 			{ // No blogs exist in system
@@ -1196,7 +1200,14 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
 	}
 
-	return url_add_param( $blog_url, 'disp='.$user_tab );
+	if( ! empty( $current_Blog ) && in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+	{
+		return $current_Blog->get( $user_tab.'url' );
+	}
+	else
+	{
+		return url_add_param( $blog_url, 'disp='.$user_tab );
+	}
 }
 
 

@@ -683,7 +683,7 @@ class AdminUI_general extends Menu
 	 * @param string
 	 * @param array params to be used in the view (optional)
 	 */
-	function disp_view( $view_name, $view_params = array() )
+	function disp_view( $view_name, $params = array() )
 	{
 		global $inc_path;
 

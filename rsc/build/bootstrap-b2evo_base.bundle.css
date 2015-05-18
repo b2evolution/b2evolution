@@ -619,6 +619,7 @@ a.selected {
   -khtml-border-radius: 4px;
   border-radius: 4px;
   text-align: center;
+  box-sizing: content-box;
 }
 .avatar_rounded:hover {
   text-decoration: none;
@@ -703,6 +704,13 @@ div.avatartag.main > img:first-child {
     max-height: 245px;
   }
 }
+form div.avatartag {
+  float: left;
+  margin: 0 0.5em 0.5em 0;
+}
+form div.avatartag a {
+  outline: none;
+}
 #image_crop_block {
   display: table;
 }
@@ -749,8 +757,7 @@ div.avatartag.main > img:first-child {
   margin-right: 10px;
 }
 @media only screen and (max-width: 800px) {
-  #fieldset_wrapper_image_crop fieldset,
-  #overlay_page .evo_form {
+  #fieldset_wrapper_image_crop fieldset {
     padding: 0 !important;
   }
   #target_cropped_image {
@@ -1334,13 +1341,6 @@ ul.jslog_error {
   right: auto;
   left: auto;
 }
-#overlay_page .evo_form {
-  padding: 0 10px;
-}
-#overlay_page .evo_form legend {
-  width: 100%;
-  text-align: left;
-}
 #overlay_page.overlay_page_active_transparent .fieldset {
   margin: 0;
 }
@@ -1485,61 +1485,6 @@ a.comment_reply_current:hover {
 }
 .comment_notification span {
   vertical-align: middle;
-}
-/* 18/80% forms: comments and profile */
-.evo_form fieldset {
-  border: none;
-  margin: 1em 0 0 0;
-  padding: 0ex;
-}
-.evo_form fieldset label {
-  font-weight: bold;
-}
-.evo_form fieldset div.label {
-  float: left;
-  width: 100px;
-  text-align: right;
-  font-weight: bold;
-}
-.evo_form fieldset.field_wide div.label,
-.evo_form fieldset.field_inline div.label {
-  float: none;
-  text-align: left;
-  width: auto;
-  margin-bottom: 5px;
-}
-.evo_form fieldset.field_inline div.label {
-  float: left;
-}
-.evo_form fieldset div.input {
-  margin: 0 0 0 108px;
-}
-.evo_form fieldset.field_wide div.input {
-  margin-left: 20px;
-}
-.evo_form fieldset.field_inline div.input {
-  float: left;
-  margin-left: 5px;
-  line-height: 20px;
-}
-.evo_form fieldset.input {
-  margin: 0;
-}
-.evo_form fieldset div.info {
-  margin: 0 0 0 108px;
-}
-.evo_form fieldset.info_full div.info {
-  margin-left: 5px;
-}
-.evo_form fieldset div.label select {
-  width: 91%;
-}
-.evo_form div.avatartag {
-  float: left;
-  margin: 0 0.5em 0.5em 0;
-}
-.evo_form div.avatartag a {
-  outline: none;
 }
 textarea.form_textarea_input {
   width: 100%;
@@ -1852,45 +1797,21 @@ div.item_location {
 .evo_private_messages_list h2 {
   margin: 0;
 }
-.evo_private_messages_list > h2 {
-  border: 1px solid #BBB;
-  border-bottom: none;
-  background-color: #D4D4D4;
-  padding: 0 7px;
-}
-.evo_private_messages_list .evo_form {
-  border: 1px solid #BBB;
-  background-color: #DDDDDD;
-  margin: 0;
-  padding-top: 5px;
-}
-.evo_private_messages_list table.bForums {
-  border: none;
-}
-.evo_private_messages_list table.bForums td {
-  background: none;
-  vertical-align: top;
-}
-.evo_private_messages_list div.messages_list_actions {
+.evo_private_messages_list .messages_list_actions {
   text-align: center;
-  border-left: 1px solid #BBB;
-  border-right: 1px solid #BBB;
   padding: 10px 0;
 }
-.evo_private_messages_list div.messages_list_actions p {
+.evo_private_messages_list .messages_list_actions p {
   margin: 0;
   padding: 0;
   text-align: center;
 }
-.evo_private_messages_list div.messages_list_actions a {
+.evo_private_messages_list .messages_list_actions a {
   margin-bottom: 1ex;
   display: inline-block;
 }
-.evo_private_messages_list div.messages_list_actions a:last-child {
+.evo_private_messages_list .messages_list_actions a:last-child {
   margin-bottom: 0;
-}
-.evo_private_messages_list div.results {
-  margin-top: 0;
 }
 .evo_private_messages_list span.error {
   border: 1px solid #BBB;
@@ -2111,10 +2032,7 @@ body.disp_user #skin_wrapper > .container {
   border: none;
   padding: 0;
 }
-.evo_form .other_profile_pictures div.avatartag {
-  float: none;
-}
-.evo_form .profile_column_right legend.panel-heading {
+.profile_column_right legend.panel-heading {
   padding: 10px 15px;
 }
 @media (max-width: 767px) {

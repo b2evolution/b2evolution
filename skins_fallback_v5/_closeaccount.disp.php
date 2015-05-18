@@ -73,7 +73,7 @@ else
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Close my account now'), 'SaveButton' ) ) );
 
-	$Form->info( '', '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=user' ).'">'.T_( 'I changed my mind, don\'t close my account.' ).'</a>' );
+	$Form->info( '', '<a href="'.$Blog->get( 'userurl' ).'">'.T_( 'I changed my mind, don\'t close my account.' ).'</a>' );
 
 	$Form->end_form();
 

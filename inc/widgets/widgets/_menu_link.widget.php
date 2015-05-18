@@ -473,7 +473,7 @@ class menu_link_Widget extends ComponentWidget
 				{	// Don't show this link for not logged in users
 					return false;
 				}
-				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=user' );
+				$url = $current_Blog->get( 'userurl' );
 				$text = T_('My profile');
 				// Is this the current display?  (Edit my Profile)
 				global $user_ID, $current_User;

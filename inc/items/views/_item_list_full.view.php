@@ -519,7 +519,7 @@ while( $Item = & $ItemList->get_item() )
 
 			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
 
-			$Form->begin_form( 'evo_form '.( $comment_type == 'meta' ? ' meta_comment_form' : '' ) );
+			$Form->begin_form( 'bComment evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
 
 			if( $comment_type == 'meta' )
 			{

@@ -28,7 +28,7 @@ $params = array_merge( array(
 	
 ?>
 
-<!--<div id="<?php // $Item->anchor_id() ?>" class="<?php //$Item->div_classes( $params ) ?>" lang="<?php //fbPostContent$Item->lang() ?>">-->
+<!--<div id="<?php // $Item->anchor_id() ?>" class="<?php //$Item->div_classes( $params ) ?>" lang="<?php //fevo_post_content$Item->lang() ?>">-->
 	<div class="col-lg-12 single_post">
 
 	<?php
@@ -51,9 +51,9 @@ $params = array_merge( array(
 		echo '</div>';
 	?>
 
-<div class="bPostContent col-xl-3 col-lg-4 col-md-6 col-sm-6">
+<div class="evo_post_content col-xl-3 col-lg-4 col-md-6 col-sm-6">
 
-	<div class="bDetails">
+	<div class="evo_details">
 
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
@@ -67,7 +67,7 @@ $params = array_merge( array(
 		<?php
 			// URL link, if the post has one:
 			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
+					'before'        => '<div class="small evo_print">'.T_('Link').': ',
 					'after'         => '</div>',
 					'text_template' => '$url$',
 					'url_template'  => '$url$',

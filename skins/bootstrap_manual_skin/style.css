@@ -51,11 +51,7 @@ ul.profile_tabs {
   padding: 10px;
   margin-left: 10px;
 }
-.evo_form {
-  border-color: #DDD;
-  padding: 1em;
-}
-.evo_form .controls textarea.form-control {
+.form-horizontal .controls textarea.form-control {
   width: 100%;
 }
 input.search_field {
@@ -114,9 +110,6 @@ label.control-label[for=post_title] {
 .item_tags .controls {
   margin-left: 0;
 }
-.evo_private_messages_list .evo_form {
-  background: none;
-}
 textarea.message_text {
   width: 95%;
 }
@@ -132,22 +125,15 @@ textarea.message_text {
 .comment_form .panel .panel-body {
   padding: 0;
 }
-.evo_form {
-  border: none;
-  padding: 0;
-  overflow: visible;
+.form-horizontal .form-group,
+.form-horizontal .custom_content {
+  margin-left: 0;
+  margin-right: 0;
 }
-.evo_form .form-actions {
-  margin-bottom: 0;
-}
-.evo_form div.form-group,
-.evo_form div.custom_content {
-  padding: 0 20px;
-}
-.evo_form fieldset {
+.form-horizontal fieldset {
   margin-top: 0;
 }
-.evo_form input[type=file] {
+.form-horizontal input[type=file] {
   display: inline;
 }
 #comment_date_field input {
@@ -201,9 +187,6 @@ textarea.message_text {
 .evo_post {
   margin-bottom: 2em;
 }
-form#user_checkchanges.evo_form {
-  border: none;
-}
 div.bSideItem {
   background: #F7F5FA;
   border-radius: 5px;
@@ -250,7 +233,8 @@ div.bSideItem h4 {
 .evo_panel__lostpass .panel-body,
 .evo_panel__register .panel-body,
 .evo_panel__activation .panel-body {
-  padding: 20px 30px 0;
+  padding-top: 20px;
+  padding-bottom: 0;
 }
 .evo_panel__login {
   max-width: 400px;
@@ -301,12 +285,6 @@ div.bSideItem h4 {
 }
 .evo_form__login .btn {
   margin-top: 5px;
-}
-.evo_form__login .form-actions {
-  padding: 0;
-  margin: 0 0 20px;
-  background: none;
-  border: none;
 }
 #login_form .control-buttons {
   text-align: left;

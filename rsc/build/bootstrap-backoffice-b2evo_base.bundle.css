@@ -619,6 +619,7 @@ a.selected {
   -khtml-border-radius: 4px;
   border-radius: 4px;
   text-align: center;
+  box-sizing: content-box;
 }
 .avatar_rounded:hover {
   text-decoration: none;
@@ -703,6 +704,13 @@ div.avatartag.main > img:first-child {
     max-height: 245px;
   }
 }
+form div.avatartag {
+  float: left;
+  margin: 0 0.5em 0.5em 0;
+}
+form div.avatartag a {
+  outline: none;
+}
 #image_crop_block {
   display: table;
 }
@@ -749,8 +757,7 @@ div.avatartag.main > img:first-child {
   margin-right: 10px;
 }
 @media only screen and (max-width: 800px) {
-  #fieldset_wrapper_image_crop fieldset,
-  #overlay_page .evo_form {
+  #fieldset_wrapper_image_crop fieldset {
     padding: 0 !important;
   }
   #target_cropped_image {
@@ -1333,13 +1340,6 @@ ul.jslog_error {
   bottom: auto;
   right: auto;
   left: auto;
-}
-#overlay_page .evo_form {
-  padding: 0 10px;
-}
-#overlay_page .evo_form legend {
-  width: 100%;
-  text-align: left;
 }
 #overlay_page.overlay_page_active_transparent .fieldset {
   margin: 0;

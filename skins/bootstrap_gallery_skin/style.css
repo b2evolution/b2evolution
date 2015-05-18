@@ -88,11 +88,8 @@ ul.profile_tabs {
   padding: 10px;
   margin-left: 10px;
 }
-form.evo_form .controls textarea.form-control {
+.form-horizontal .controls textarea.form-control {
   width: 100%;
-}
-form.evo_form textarea {
-  resize: vertical;
 }
 input.search_field {
   margin-bottom: 0;
@@ -164,25 +161,18 @@ textarea.message_text {
 .comment_form .panel .panel-body {
   padding: 0;
 }
-form.bComment {
-  border: none;
-  padding: 0;
-  overflow: visible;
-}
-form.bComment .form-actions {
-  margin-bottom: 0;
-}
-form.bComment legend {
+.form-horizontal legend {
   padding: 0 10px;
 }
-form.bComment div.form-group,
-form.bComment div.custom_content {
-  padding: 0 20px;
+.form-horizontal .form-group,
+.form-horizontal .custom_content {
+  margin-left: 0;
+  margin-right: 0;
 }
-form.bComment fieldset {
+.form-horizontal fieldset {
   margin-top: 0;
 }
-form.bComment input[type=file] {
+.form-horizontal input[type=file] {
   display: inline;
 }
 #comment_date_field input {
@@ -346,12 +336,6 @@ div.bSideItem h4 {
 }
 .form-login .btn {
   margin-top: 5px;
-}
-.form-login .form-actions {
-  padding: 0;
-  margin: 0 0 20px;
-  background: none;
-  border: none;
 }
 #login_form .control-buttons {
   text-align: left;
@@ -528,25 +512,25 @@ div.evo_image_index div:hover {
 .nav_album .btn-primary {
   margin: 5px 3px;
 }
-form.evo_form fieldset .info {
+.evo_form__comment fieldset .info {
   margin: 10px 0px 17px 0px;
 }
-form.evo_form fieldset {
+.evo_form__comment fieldset {
   margin: 5px 0px !important;
 }
-form.evo_form fieldset {
+.evo_form__comment fieldset {
   margin: 0px;
 }
-form.evo_form fieldset div.label {
+.evo_form__comment fieldset div.label {
   float: none !important;
   padding-left: 0px;
   text-align: center;
 }
-form.evo_form fieldset div.label .btn {
+.evo_form__comment fieldset div.label .btn {
   margin: 5px;
   display: inline-block;
 }
-form.evo_form fieldset div.label,
+.evo_form__comment fieldset div.label,
 fieldset .input,
 fieldset .info {
   float: none;
@@ -671,6 +655,10 @@ fieldset .info {
 }
 .label {
   font-size: 14px !important;
+}
+.powered_by a img {
+  background-color: #ffffff;
+  border-radius: 4px;
 }
 /* XL Bootstrap Grid Layot */
 .visible-xl-block,

@@ -3971,7 +3971,7 @@ class User extends DataObject
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
-					$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$this->ID, '&' );
+					$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&', 'url_suffix' => 'user_ID='.$this->ID ) );
 				}
 				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align, '', $tag_size ).'</a>';
 			}
@@ -4452,7 +4452,7 @@ class User extends DataObject
 						{ // set where to redirect in front office, another way it would go to profile_update.php
 							$BlogCache = & get_BlogCache();
 							$Blog = $BlogCache->get_by_ID( $blog, false );
-							$redirect_to = rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=userprefs' ) );
+							$redirect_to = rawurlencode( $Blog->get( 'userprefsurl' ) );
 						}
 						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to, '&amp;' ).'"';
 						$Messages->add( sprintf( T_('An email has been sent to your email address (%s). Please click on the link therein to activate your account. <a %s>More info &raquo;</a>' ), $this->dget('email'), $activate_info_link ), 'success' );

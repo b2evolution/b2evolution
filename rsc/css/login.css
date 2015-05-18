@@ -68,13 +68,6 @@ span.help-inline {
 	font-size: 84%;
 }
 
-.form-horizontal .form-actions {
-	background: none;
-	border: none;
-	text-align: center;
-	padding: 0;
-	margin-bottom: 0;
-}
 .control-label .label_field_required {
 	display: none;
 }

@@ -520,15 +520,15 @@ function url_same_protocol( $url, $other_url = NULL )
  */
 function url_add_param( $url, $param, $glue = '&amp;' )
 {
-	if( empty($param) )
+	if( empty( $param ) )
 	{
 		return $url;
 	}
 
-	if( ($anchor_pos = strpos($url, '#')) !== false )
+	if( ( $anchor_pos = strpos( $url, '#' ) ) !== false )
 	{ // There's an "#anchor" in the URL
-		$anchor = substr($url, $anchor_pos);
-		$url = substr($url, 0, $anchor_pos);
+		$anchor = substr( $url, $anchor_pos );
+		$url = substr( $url, 0, $anchor_pos );
 	}
 	else
 	{ // URL without "#anchor"
@@ -536,21 +536,21 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 	}
 
 	// Handle array use case
-	if( is_array($param) )
+	if( is_array( $param ) )
 	{ // list of key => value pairs
 		$param_list = array();
 		foreach( $param as $k => $v )
 		{
-			$param_list[] = get_param_urlencoded($k, $v, $glue);
+			$param_list[] = get_param_urlencoded( $k, $v, $glue );
 		}
-		$param = implode($glue, $param_list);
+		$param = implode( $glue, $param_list );
 	}
 
-	if( strpos($url, '?') !== false )
+	if( strpos( $url, '?' ) !== false )
 	{ // There are already params in the URL
 		$r = $url;
-		if( substr($url, -1) != '?' )
-		{ // the "?" is not the last char
+		if( substr( $url, -1 ) != '?' && substr( $param, 0, 1 ) != '#' )
+		{ // the "?" is not the last char AND "#" is not first char of param
 			$r .= $glue;
 		}
 		return $r.$param.$anchor;

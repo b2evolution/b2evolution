@@ -109,14 +109,9 @@ ul.profile_tabs {
 	margin-left: 10px;
 }
 
-// Set border color of form the same as profile tabs
-form.evo_form {
-	.controls textarea.form-control {
-		width: 100%;
-	}
-	textarea {
-		resize: vertical;
-	}
+// Use full width for all textarea
+.form-horizontal .controls textarea.form-control {
+	width: 100%;
 }
 
 // A search button
@@ -206,18 +201,13 @@ textarea.message_text {
 		}
 	}
 }
-form.bComment {
-	border: none;
-	padding: 0;
-	overflow: visible;
-	.form-actions {
-		margin-bottom: 0;
-	}
+.form-horizontal {
 	legend {
 		padding: 0 10px;
 	}
-	div.form-group, div.custom_content {
-		padding: 0 20px;
+	.form-group, .custom_content {
+		margin-left: 0;
+		margin-right: 0;
 	}
 	fieldset {
 		margin-top: 0;
@@ -390,12 +380,6 @@ div.bSideItem {
 	}
 	.btn {
 		margin-top: 5px;
-	}
-	.form-actions {
-		padding: 0;
-		margin: 0 0 20px;
-		background: none;
-		border: none;
 	}
 }
 #login_form {
@@ -571,7 +555,7 @@ div.evo_image_index div {
 		margin: 5px 3px;
 	}
 }
-form.evo_form {
+.evo_form__comment {
 	fieldset .info {
 		margin: 10px 0px 17px 0px;
 	}
@@ -591,7 +575,7 @@ form.evo_form {
 		}
 	}
 }
-form.evo_form fieldset div.label, fieldset .input, fieldset .info {
+.evo_form__comment fieldset div.label, fieldset .input, fieldset .info {
 	float: none;
 	color: #333;
 	width: auto;
@@ -721,6 +705,15 @@ form.evo_form fieldset div.label, fieldset .input, fieldset .info {
 }
 .label {
 	font-size: 14px !important;
+}
+// Bottom b2evo image background issue fix
+.powered_by {
+	a {
+		img {
+			background-color: rgba(255,255,255,1);
+			border-radius: 4px;
+		}
+	}
 }
 
 /* XL Bootstrap Grid Layot */

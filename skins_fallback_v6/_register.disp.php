@@ -34,6 +34,7 @@ $params = array_merge( array(
 		'register_form_footer'      => true,
 		'register_form_params'      => NULL,
 		'register_disp_home_button' => false, // Display button to go home when registration is disabled
+		'display_form_messages'     => false,
 		// If registration is disabled
 		'register_disabled_page_before' => '',
 		'register_disabled_page_after'  => '',
@@ -111,7 +112,10 @@ if( ! is_null( $params['register_form_params'] ) )
 
 $Form->add_crumb( 'regform' );
 $Form->hidden( 'inskin', true );
-$Form->hidden( 'blog', $Blog->ID );
+if( isset( $Blog ) )
+{ // for in-skin form
+	$Form->hidden( 'blog', $Blog->ID );
+}
 
 // disp register form
 $Form->begin_form( $params['form_class_register'] );

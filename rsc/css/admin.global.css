@@ -971,11 +971,11 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	text-decoration: none;
 }
 
-div.block_item .evo_form.meta_comment_form {
+form.bComment.evo_form__comment_meta {
 	background-color: #f7f4ff;
 	border: 2px solid #5133ab;
 }
-.meta_comment_form .form_info {
+.evo_form__comment_meta .form_info {
 	display: block;
 	text-align: center;
 	padding: 10px;

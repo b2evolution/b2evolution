@@ -205,10 +205,6 @@ div.bPost {
 #comments_container.full_comment_list {
   border: none;
 }
-#comments_container.full_comment_list .evo_form {
-  margin-left: 0;
-  margin-right: 0;
-}
 #comments_container.full_comment_list .bCommentAvatar {
   border: 0;
   -webkit-border-radius: 50%;
@@ -238,7 +234,7 @@ div.bPost {
   background: #F5F5F5;
   border: none;
 }
-.bFeedback .evo_form {
+.bFeedback .form-horizontal {
   margin: 0;
   padding: 1ex;
   border: 1px solid #ddd;
@@ -248,11 +244,11 @@ div.bPost {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-.bFeedback .evo_form.meta_comment_form {
+.bFeedback .form-horizontal.evo_form__comment_meta {
   border: 2px solid #5133ab;
   background-color: #f7f4ff;
 }
-.bFeedback .evo_form .form_info {
+.bFeedback .form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;

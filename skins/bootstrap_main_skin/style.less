@@ -242,13 +242,9 @@ ul.profile_tabs {
 	margin-left: 10px;
 }
 
-// Set border color of form the same as profile tabs
-.evo_form {
-	border-color: #DDD;
-	padding: 1em;
-	.controls textarea.form-control {
-		width: 100%;
-	}
+// Use full width for all textarea
+.form-horizontal .controls textarea.form-control {
+	width: 100%;
 }
 
 // A search button
@@ -319,9 +315,6 @@ label.control-label[for=post_title] {
 }
 
 // A form to create a new message/thread
-.evo_private_messages_list .evo_form {
-	background: none;
-}
 textarea.message_text {
 	width: 95%;
 }
@@ -341,18 +334,10 @@ textarea.message_text {
 		}
 	}
 }
-.evo_form {
-	border: none;
-	padding: 0;
-	overflow: visible;
-	.form-actions {
-		margin-bottom: 0;
-	}
-	div.form-group, div.custom_content {
-		padding: 0 20px;
-	}
-	fieldset {
-		margin-top: 0;
+.form-horizontal {
+	.form-group, .custom_content {
+		margin-left: 0;
+		margin-right: 0;
 	}
 	input[type=file] {
 		display: inline;
@@ -419,9 +404,6 @@ textarea.message_text {
 		}
 	}
 }
-form#user_checkchanges.evo_form {
-	border: none;
-}
 
 div.bSideItem {
 	background: #F7F5FA;
@@ -464,7 +446,8 @@ div.bSideItem {
 		margin: 5px 0;
 	}
 	.panel-body {
-		padding: 20px 30px 0;
+		padding-top: 20px;
+		padding-bottom: 0;
 	}
 }
 .evo_panel__login {
@@ -517,12 +500,6 @@ div.bSideItem {
 	}
 	.btn {
 		margin-top: 5px;
-	}
-	.form-actions {
-		padding: 0;
-		margin: 0 0 20px;
-		background: none;
-		border: none;
 	}
 }
 #login_form {

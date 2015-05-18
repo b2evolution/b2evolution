@@ -29,6 +29,7 @@ $params = array_merge( array(
 		'activate_page_after'  => '',
 		'activate_form_params' => NULL,
 		'use_form_wrapper'     => true,
+		'display_form_messages'=> false,
 	), $params );
 
 $display_params = array(

@@ -41,24 +41,28 @@ if( !isset( $params ) )
 	$params = array();
 }
 $params = array_merge( array(
-	'form_class_msg' => 'fform',
-	'form_action' => NULL,
-	'form_name' => 'messages_checkchanges',
-	'form_layout' => 'compact',
-	'redirect_to' => regenerate_url( 'action', '', '', '&' ),
-	'cols' => 80,
-	'skin_form_params' => array(),
-	'display_navigation' => false,
-	'display_title' => false,
-	'messages_list_start' => '',
-	'messages_list_end' => '',
-	'messages_list_title' => $edited_Thread->title,
+	'form_class_msg'            => 'fform',
+	'form_action'               => NULL,
+	'form_name'                 => 'messages_checkchanges',
+	'form_layout'               => 'compact',
+	'redirect_to'               => regenerate_url( 'action', '', '', '&' ),
+	'cols'                      => 80,
+	'skin_form_params'          => array(),
+	'display_navigation'        => false,
+	'display_title'             => false,
+	'messages_list_start'       => '',
+	'messages_list_end'         => '',
+	'messages_list_title'       => $edited_Thread->title,
+	'messages_list_title_start' => '<div class="panel-heading"><h2>',
+	'messages_list_title_end'   => '</h2></div>',
+	'messages_list_form_start'  => '<div class="panel panel-default">',
+	'messages_list_form_end'    => '</div>',
 	), $params );
 
 echo $params['messages_list_start'];
 
 if( $params['display_navigation'] )
-{	// Display navigation
+{ // Display navigation
 	echo '<div class="messages_navigation">'
 		.'<div class="floatleft">'
 			.'<a href="'.get_dispctrl_url( 'threads' ).'">&laquo; '.T_('Back to list').'</a>'
@@ -68,9 +72,10 @@ if( $params['display_navigation'] )
 	.'</div>';
 }
 
+echo $params['messages_list_form_start'];
 if( $params['display_title'] )
-{	// Display title
-	echo '<h2>'.$edited_Thread->title.'</h2>';
+{ // Display title
+	echo $params['messages_list_title_start'].$edited_Thread->title.$params['messages_list_title_end'];
 }
 
 // load Thread recipients
@@ -314,6 +319,8 @@ if( $is_recipient )
 			) );
 	}
 }
+
+echo $params['messages_list_form_end'];
 
 // Display Leave or Close conversation action if they are available
 if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )

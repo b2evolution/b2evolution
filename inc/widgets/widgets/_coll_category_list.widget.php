@@ -203,7 +203,6 @@ class coll_category_list_Widget extends ComponentWidget
 
 		$callbacks = array(
 			'line'         => array( $this, 'cat_line' ),
-			'no_children'  => array( $this, 'cat_no_children' ),
 			'before_level' => array( $this, 'cat_before_level' ),
 			'after_level'  => array( $this, 'cat_after_level' )
 		);
@@ -435,8 +434,10 @@ class coll_category_list_Widget extends ComponentWidget
 		$start_level = intval( $this->disp_params['start_level'] );
 		if( $start_level > 1 &&
 		    ( $start_level > $level + 1 ||
-		      ( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
-		      ( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
+		    	( $first_selected_cat_ID > 0 && (
+		    		( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
+					( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
+				) )
 		    ) )
 		{ // Don't show this item because of level restriction
 			$this->disp_params['parent_cat_is_visible'] = false;
@@ -513,34 +514,13 @@ class coll_category_list_Widget extends ComponentWidget
 			$r .= '</label>';
 		}
 
-		// Do not end line here because we need to include children first!
-		// $r .= $this->disp_params['item_end'];
+		// End the line even if it has children, since this is the end of one single item
+		// To close the whole group of categories with all of it's children see @cat_before_level and @cat_after_level
+		// Note: If this solution will not work, and we can't add the 'item_end' here, then create new after_line callback,
+		// which then must be called from a the ChapterCache recurse method
+		$r .= $this->disp_params['item_end'];
 
 		return $r;
-	}
-
-
-	/**
-	 * Callback: Generate category line when it has no children
-	 *
-	 * @param Chapter generic category we want to display
-	 * @param int level of the category in the recursive tree
-	 * @return string HTML
-	 */
-	function cat_no_children( $Chapter, $level )
-	{
-		$start_level = intval( $this->disp_params['start_level'] );
-		if( $start_level > 1 &&
-		    ( $start_level > $level + 1 ||
-		      ( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
-		      ( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
-		    ) )
-		{ // Don't show this item because of level restriction
-			return;
-		}
-
-		// End current line:
-		return $this->disp_params['item_end'];
 	}
 
 

@@ -64,20 +64,20 @@ switch( $action )
 
 		$user_ID = param( 'user_ID', 'integer', 0 );
 		if( $user_ID > 0 )
-		{	// Add user to contacts
+		{ // Add user to contacts
 			if( create_contacts_user( $user_ID ) )
-			{	// Add user to the group
+			{ // Add user to the group
 				$group_ID = param( 'group_ID', 'string', '' );
 				if( $result = create_contacts_group_users( $group_ID, $user_ID, 'group_ID_combo' ) )
-				{	// User has been added to the group
+				{ // User has been added to the group
 					$Messages->add( sprintf( T_('User has been added to the &laquo;%s&raquo; group.'), $result['group_name'] ), 'success' );
 				}
 				else
-				{	// User has been added ONLY to the contacts list
+				{ // User has been added ONLY to the contacts list
 					$Messages->add( 'User has been added to your contacts.', 'success' );
 				}
 			}
-			header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$user_ID, '&' ) );
+			header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
 		}
 		break;
 
@@ -101,16 +101,16 @@ switch( $action )
 		$user_ID = param( 'user_ID', 'integer', 0 );
 		$group_ID = param( 'group_ID', 'integer', 0 );
 		if( $user_ID > 0 && $group_ID > 0 )
-		{	// Remove user from selected group
+		{ // Remove user from selected group
 			if( remove_contacts_group_user( $group_ID, $user_ID ) )
-			{	// User has been removed from the group
+			{ // User has been removed from the group
 				if( $view == 'contacts' )
-				{	// Redirect to the contacts list
+				{ // Redirect to the contacts list
 					header_redirect( $Blog->get( 'contactsurl', array( 'glue' => '&' ) ) );
 				}
 				else
-				{	// Redirect to the user profile page
-					header_redirect( url_add_param( $Blog->gen_blogurl(), 'disp=user&user_ID='.$user_ID, '&' ) );
+				{ // Redirect to the user profile page
+					header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
 				}
 			}
 		}

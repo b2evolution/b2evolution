@@ -82,7 +82,7 @@ if( ! empty( $recipient_User ) )
 		$edit_preferences_url = NULL;
 		if( !empty( $Blog ) )
 		{ // go to blog
-			$edit_preferences_url = url_add_param( str_replace( '&amp;', '&', $Blog->gen_blogurl() ), 'disp=userprefs', '&' );
+			$edit_preferences_url = $Blog->get( 'userprefsurl', array( 'glue' => '&' ) );
 		}
 		elseif( $recipient_User->check_perm( 'admin', 'restricted' ) )
 		{ // go to admin

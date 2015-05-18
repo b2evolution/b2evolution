@@ -500,7 +500,7 @@ switch( $action )
 		}
 
 		$userfields = $DB->get_results( '
-			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 				FROM T_users__fielddefs
 				LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID
 			WHERE ufdf_ID = "'.$field_ID.'"' );

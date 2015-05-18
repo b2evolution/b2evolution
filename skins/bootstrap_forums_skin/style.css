@@ -124,22 +124,15 @@ ol.breadcrumb {
 .comment_form .panel .panel-body {
   padding: 0;
 }
-.evo_form {
-  border: none;
-  padding: 0;
-  overflow: visible;
+.form-horizontal .form-group,
+.form-horizontal .custom_content {
+  margin-left: 0;
+  margin-right: 0;
 }
-.evo_form .form-actions {
-  margin-bottom: 0;
-}
-.evo_form div.form-group,
-.evo_form div.custom_content {
-  padding: 0 20px;
-}
-.evo_form fieldset {
+.form-horizontal fieldset {
   margin-top: 0;
 }
-.evo_form input[type=file] {
+.form-horizontal input[type=file] {
   display: inline;
 }
 .form-group[id^="ffield_uploadfile"] .controls {
@@ -243,7 +236,8 @@ ul.legend span.note {
 .evo_panel__lostpass .panel-body,
 .evo_panel__register .panel-body,
 .evo_panel__activation .panel-body {
-  padding: 20px 30px 0;
+  padding-top: 20px;
+  padding-bottom: 0;
 }
 .evo_panel__login {
   max-width: 400px;
@@ -294,12 +288,6 @@ ul.legend span.note {
 }
 .evo_form__login .btn {
   margin-top: 5px;
-}
-.evo_form__login .form-actions {
-  padding: 0;
-  margin: 0 0 20px;
-  background: none;
-  border: none;
 }
 #login_form .control-buttons {
   text-align: left;

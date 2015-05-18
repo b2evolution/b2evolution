@@ -334,7 +334,7 @@ function get_messages_link_to( $thread_ID = NULL )
 		if( $link_to_Blog )
 		{
 			$message_link = url_add_param( $link_to_Blog->gen_blogurl(), 'disp='.$link_tail );
-			$prefs_link =  url_add_param( $link_to_Blog->gen_blogurl(), 'disp=userprefs' );
+			$prefs_link = $link_to_Blog->get( 'userprefsurl' );
 			return array( $message_link, $prefs_link );
 		}
 	}

@@ -260,7 +260,7 @@ function validateCommentForm(form)
 
 	$Form->switch_template_parts( $params['form_params'] );
 
-	$Form->begin_form( 'evo_form', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
+	$Form->begin_form( 'evo_form evo_form__comment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin

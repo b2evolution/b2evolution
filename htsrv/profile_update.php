@@ -285,20 +285,20 @@ if( empty( $Blog ) )
 }
 
 if( param_errors_detected() || $action == 'refresh_regional' )
-{	// unable to update, store unsaved user into session
+{ // unable to update, store unsaved user into session
 	$Session->set( 'core.unsaved_User', $current_User );
 }
 elseif( ! param_errors_detected() )
-{	// update was successful on user profile
+{ // update was successful on user profile
 	switch( $action )
 	{
 		case 'update':
 			if( $current_User->has_avatar() )
-			{	// Redirect to display user page
-				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=user', '&' );
+			{ // Redirect to display user page
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
 			}
 			else
-			{	// Redirect to upload avatar
+			{ // Redirect to upload avatar
 				$redirect_to = get_user_avatar_url();
 			}
 			break;

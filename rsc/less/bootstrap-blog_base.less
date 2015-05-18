@@ -149,66 +149,7 @@ a.comment_reply_current:hover {
 	vertical-align: middle;
 }
 
-
-/* 18/80% forms: comments and profile */
-.evo_form {
-	fieldset { // one form line
-		border: none;
-		margin: 1em 0 0 0;
-		padding: 0ex;
-		label {
-			font-weight: bold;
-		}
-		div.label { // label of form line
-			float: left;
-			width: 100px;
-			text-align: right;
-			font-weight: bold;
-		}
-		&.field_wide div.label,
-		&.field_inline div.label {
-			float: none;
-			text-align: left;
-			width: auto;
-			margin-bottom: 5px;
-		}
-		&.field_inline div.label {
-			float: left;
-		}
-		div.input { // input zone of form line
-			margin: 0 0 0 108px;
-		}
-		&.field_wide div.input {
-			margin-left: 20px;
-		}
-		&.field_inline div.input {
-			float: left;
-			margin-left: 5px;
-			line-height: 20px;
-		}
-		&.input {
-			margin: 0;
-		}
-		div.info { // info zone of form line
-			margin: 0 0 0 108px;
-		}
-		&.info_full div.info {
-			margin-left: 5px;
-		}
-		div.label select {
-			width: 91%;
-		}
-	}
-	div.avatartag {
-		float: left;
-		margin: 0 0.5em 0.5em 0;
-		a {
-			outline: none;
-		}
-	}
-}
-
-// bComment TextArea
+// TextArea element
 textarea.form_textarea_input {
 	width: 100%;
 }
@@ -542,58 +483,36 @@ div.item_location {
 }
 
 // Messages list & form
-.evo_private_messages_list .messages_navigation {
-	padding: 5px;
-}
-.evo_private_messages_list h2 {
-	margin: 0;
-}
-.evo_private_messages_list > h2 {
-	border: 1px solid #BBB;
-	border-bottom: none;
-	background-color: #D4D4D4;
-	padding: 0 7px;
-}
-.evo_private_messages_list .evo_form {
-	border: 1px solid #BBB;
-	background-color: #DDDDDD;
-	margin: 0;
-	padding-top: 5px;
-}
-.evo_private_messages_list table.bForums {
-	border: none;
-}
-.evo_private_messages_list table.bForums td {
-	background: none;
-	vertical-align: top;
-}
-.evo_private_messages_list div.messages_list_actions {
-	text-align: center;
-	border-left: 1px solid #BBB;
-	border-right: 1px solid #BBB;
-	padding: 10px 0;
-}
-.evo_private_messages_list div.messages_list_actions p {
-	margin: 0;
-	padding: 0;
-	text-align: center;
-}
-.evo_private_messages_list div.messages_list_actions a {
-	margin-bottom: 1ex;
-	display: inline-block;
-}
-.evo_private_messages_list div.messages_list_actions a:last-child {
-	margin-bottom: 0;
-}
-.evo_private_messages_list div.results {
-	margin-top: 0;
-}
-.evo_private_messages_list span.error {
-	border: 1px solid #BBB;
-	border-bottom: none;
-	padding: 10px;
-	text-align: center;
-	display: block;
+.evo_private_messages_list {
+	.messages_navigation {
+		padding: 5px;
+	}
+	h2 {
+		margin: 0;
+	}
+	.messages_list_actions {
+		text-align: center;
+		padding: 10px 0;
+		p {
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+		a {
+			margin-bottom: 1ex;
+			display: inline-block;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	span.error {
+		border: 1px solid #BBB;
+		border-bottom: none;
+		padding: 10px;
+		text-align: center;
+		display: block;
+	}
 }
 
 // Not published comments display
@@ -817,13 +736,8 @@ body.disp_user #skin_wrapper > .container {
 		padding: 0;
 	}
 }
-.evo_form {
-	.other_profile_pictures div.avatartag {
-		float: none;
-	}
-	.profile_column_right legend.panel-heading {
-		padding: 10px 15px;
-	}
+.profile_column_right legend.panel-heading {
+	padding: 10px 15px;
 }
 @media (max-width: 767px) {
 	.profile_column_left {
