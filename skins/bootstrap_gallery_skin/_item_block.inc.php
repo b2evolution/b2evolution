@@ -9,7 +9,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
- * @package evoskins
+ * @package boostrap
  * @subpackage photoalbums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -19,8 +19,9 @@ global $Item;
 // Default params:
 $params = array_merge( array(
 		'feature_block'          => false,
-		'item_class'             => 'bPost',
-		'item_status_class'      => 'bPost',
+		'item_class'             => 'evo_post evo_content_block',
+		'item_type_class'        => 'evo_post__ptyp_',
+		'item_status_class'      => 'evo_post__',
 		'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 		'image_size'             => '', // Do not display images in content block - Image is handled separately
 		'url_link_text_template' => '', // link will be displayed (except player if podcast)
@@ -29,7 +30,7 @@ $params = array_merge( array(
 ?>
 
 <!--<div id="<?php // $Item->anchor_id() ?>" class="<?php //$Item->div_classes( $params ) ?>" lang="<?php //fevo_post_content$Item->lang() ?>">-->
-	<div class="col-lg-12 single_post">
+	<div class="row single_post">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)

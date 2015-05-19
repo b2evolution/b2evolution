@@ -126,7 +126,9 @@ siteskin_include( '_site_body_header.inc.php' );
 		if( $single_Item = & mainlist_get_item() )
 		{ // Get Item here, because it can be not defined yet, e.g. in Preview mode
 	?>
-	<nav class="nav_album">
+	<div class="row">
+		<div class="col-lg-12">
+		<nav class="nav_album">
 
 		<a href="<?php $Blog->disp( 'url', 'raw' ) ?>" title="<?php echo format_to_output( T_('All Albums'), 'htmlattr' ); ?>" class="all_albums">All Albums</a>
 
@@ -182,7 +184,9 @@ siteskin_include( '_site_body_header.inc.php' );
 	
 		<div class="clear"></div>
 		
-	</nav><!-- .nav_album -->
+		</nav><!-- /.nav_album -->
+		</div>
+	</div><!-- ./row -->
 	<?php
 		}
 	} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
@@ -190,12 +194,13 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">	
 
-	<div class="<?php echo in_array( $disp, array( 'catdir', 'posts', 'single', 'page', 'mediaidx' ) ) ? ' col-lg-12' : '' ?>">
+	<div class="<?php echo in_array( $disp, array( 'catdir', 'posts', 'single', 'page', 'mediaidx' ) ) ? '' : '' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
+		<div class="col-lg-12">
 		<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 		messages( array(
@@ -203,23 +208,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
-		?>
-		
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h2>',
-					'title_after'       => '</h2>',
-					'title_none'        => '',
-					'glue'              => ' - ',
-					'title_single_disp' => false,
-					'format'            => 'htmlbody',
-					'arcdir_text' => T_('Index'),
-					'catdir_text' => '',
-					'category_text' => T_('Gallery').': ',
-					'categories_text' => T_('Galleries').': ',
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
 
 		<?php
@@ -263,6 +251,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		} // ---------------------------------- END OF A POST ------------------------------------
 		?>
 
+		</div>
 
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
@@ -272,10 +261,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
 					'author_link_text'     => 'preferredname',
 					// Login
-					'login_page_before'    => '<div class="login_block"><div class="bDetails">',
+					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
 					'login_page_after'     => '</div></div>',
 					// Register
-					'register_page_before' => '<div class="login_block"><div class="bDetails">',
+					'register_page_before' => '<div class="login_block"><div class="evo_details">',
 					'register_page_after'  => '</div></div>',
 					'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
 				) );

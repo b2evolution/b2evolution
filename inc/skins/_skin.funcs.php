@@ -1814,7 +1814,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$SkinCache = & get_SkinCache();
 		$edited_Skin = $SkinCache->get_by_ID( $skin_ID );
 
-		echo '<div class="skin_settings">';
+		echo '<div class="skin_settings well">';
 		$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
 		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
 
@@ -1838,7 +1838,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$Form->info( T_('Containers'), $container_ul );
 
 		echo '</div>';
-		echo '<div class="floatleft">';
+		echo '<div class="floatleft skin_settings_form">';
 
 		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) );
 

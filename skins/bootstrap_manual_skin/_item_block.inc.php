@@ -101,7 +101,7 @@ if( $disp == 'single' )
 	}
 	$Item->title( array(
 			'link_type'  => $params['item_link_type'],
-			'before'     => '<div class="post_title"><h1>',
+			'before'     => '<div class="evo_post_title"><h1>',
 			'after'      => '</h1><div class="'.button_class( 'group' ).'">'.$action_links.'</div></div>',
 			'nav_target' => false,
 		) );

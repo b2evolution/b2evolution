@@ -304,7 +304,7 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		$update_redirect_url = $admin_rul.'?ctrl=dashboard';
+		$update_redirect_url = $admin_url.'?ctrl=dashboard';
 
 		$setting = param( 'setting', 'string', '' );
 		switch( $setting )

@@ -701,6 +701,33 @@ switch( $action )
 		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
 		break;
 
+	case 'cat_order_edit':
+		// Update order of a chapter from list screen by clicking on the order column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'catorder' );
+
+		$blog = param( 'blogid', 'integer' );
+		$cat_order = param( 'new_cat_order', 'string' );
+		$cat_ID = param( 'cat_ID', 'integer' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
+
+		if( $cat_order === '-' || $cat_order === '' || intval( $cat_order ) == '' )
+		{ // Set NULL for these values
+			$cat_order = NULL;
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+		{ // Update cat order if it exists in DB
+			$Chapter->set( 'order', ( $cat_order === '' ? NULL : $cat_order ), true );
+			$Chapter->dbupdate();
+			echo '<a href="#">'.( $cat_order === NULL ? '-' : $cat_order ).'</a>';
+		}
+		break;
+
 	case 'get_goals':
 		// Get option list with goals by selected category
 		$blog = param( 'blogid', 'integer' );

@@ -65,6 +65,12 @@ class bootstrap_gallery_Skin extends Skin
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
+				'page_text_size' => array(
+					'label' => T_('Page text size'),
+					'note' => T_('Default value is 14 pixels.'),
+					'defaultvalue' => '14px',
+					'type' => 'text',
+				),
 				'page_text_color' => array(
 					'label' => T_('Page text color'),
 					'note' => T_('E-g: #00ff00 for green'),
@@ -210,8 +216,19 @@ class bootstrap_gallery_Skin extends Skin
 		// Add custom CSS:
 		$custom_css = '';
 		// ===== Custom page styles: =====
-		$custom_styles = array();	
+		$custom_styles = array();			
 		
+		// Text size <=== THIS IS A WORK IN PROGRESS
+		if( $text_size = $this->get_setting( 'page_text_size' ) )
+		{
+			$custom_styles[] = 'font-size: '.$text_size;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+		}
+		
+		$custom_styles = array();
 		// Text color
 		if( $text_color = $this->get_setting( 'page_text_color' ) )
 		{

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 8852 2015-05-01 09:48:58Z yura $
+ * @version $Id: blog_widgets.js 9079 2015-05-19 12:53:40Z yura $
  */
 
 
@@ -96,7 +96,7 @@ jQuery(document).ready( function()
 	});
 
 	// grab the widget ID out of the "delete" url and add as ID to parent row:
-	jQuery( '.widget_row td:nth-child(5)' ).each( function()
+	jQuery( '.widget_row td:nth-child(6)' ).each( function()
 	{
 		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
 		widget_id = widget_id.match(/wi_ID=([0-9]+)/)[1] // extract ID
@@ -154,7 +154,27 @@ jQuery(document).ready( function()
 	current_widgets = getWidgetOrder(); // save current widget order
 
 	doFade( ".fadeout-ffff00" );// highlight any changed widgets
-});
+
+	// Actions for buttons to select several widgets to activate/deactivate them by one action
+	jQuery( '#widget_button_check_all' ).click( function()
+	{
+		jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]' ).prop( 'checked', true );
+	} );
+	jQuery( '#widget_button_uncheck_all' ).click( function()
+	{
+		jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]' ).prop( 'checked', false );
+	} );
+	jQuery( '#widget_button_check_active' ).click( function()
+	{
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', true );
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', false );
+	} );
+	jQuery( '#widget_button_check_inactive' ).click( function()
+	{
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', false );
+		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', true );
+	} );
+} );
 
 
 /**
@@ -563,7 +583,11 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	}
 
 	// Add state indicator:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+'</span>' ) );
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+
+			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\', \''+crumb_url+'\' );">'+
+				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
+			'</a>'+
+		'</span>' ) );
 
 	// Add action icons:
 	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\', \''+crumb_url+'\' );">'
@@ -571,6 +595,11 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
 				+delete_icon_tag+'</a></span>' );
 	jQuery( newWidget ).prepend( actionIcons ); // add widget action icons
+
+	// Add checkbox:
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox'+( wi_enabled ? ' widget_checkbox_enabled' : '' )+'">'+
+			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' )+'" />'+
+		'</span>' ) );
 
 	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
 
@@ -585,7 +614,6 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
  */
 function toggleWidget( wi_ID )
 {
-	 //console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
 	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
 	return false;
 }
@@ -598,9 +626,17 @@ function toggleWidget( wi_ID )
  */
 function doToggle( wi_ID, wi_enabled )
 {
-	//console.log( 'Setting state of widget #' + wi_ID + ' to ' + ( wi_enabled ? 'enabled' : 'disabled' ) );
-
-	jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( wi_enabled ? enabled_icon_tag : disabled_icon_tag );
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+crumb_url+'\' );">'+
+				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
+			'</a>' );
+	if( wi_enabled )
+	{
+		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).addClass( 'widget_checkbox_enabled' );
+	}
+	else
+	{
+		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).removeClass( 'widget_checkbox_enabled' );
+	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
 }
 

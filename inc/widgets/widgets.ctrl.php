@@ -56,7 +56,7 @@ else
 	$tab = '';
 }
 
-param( 'action', 'string', 'list' );
+$action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
@@ -75,6 +75,8 @@ switch( $action )
  	case 'nil':
  	case 'list':
  	case 'reload':
+ 	case 'activate':
+	case 'deactivate':
 		// Do nothing
 		break;
 
@@ -159,9 +161,9 @@ $container_list = $Skin->get_containers();
  */
 switch( $action )
 {
- 	case 'nil':
- 	case 'new':
- 	case 'edit':
+	case 'nil':
+	case 'new':
+	case 'edit':
 		// Do nothing
 		break;
 
@@ -364,6 +366,35 @@ switch( $action )
 			// EXITS:
 			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
 		}
+		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		break;
+
+	case 'activate':
+	case 'deactivate':
+		// Enable or disable the widgets:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+
+		$widgets = param( 'widgets', 'array:integer' );
+
+		if( count( $widgets ) )
+		{ // Enable/Disable the selected widgets
+			$DB->query( 'UPDATE T_widget
+				  SET wi_enabled = '.$DB->quote( $action == 'activate' ? '1' : '0' ).'
+				WHERE wi_ID IN ( '.$DB->quote( $widgets ).' )
+				  AND wi_coll_ID = '.$DB->quote( $Blog->ID ) );
+		}
+
+		if( $action == 'activate' )
+		{
+			$Messages->add( T_( 'Widgets have been enabled.' ), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_( 'Widgets have been disabled.' ), 'success' );
+		}
+
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
 

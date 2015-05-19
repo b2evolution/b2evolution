@@ -452,6 +452,11 @@ switch( $action )
 		break;
 }
 
+if( $action == 'list' )
+{ // Load JS to edit chapter order inline
+	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+}
+
 /**
  * Display page header, menus & messages:
  */

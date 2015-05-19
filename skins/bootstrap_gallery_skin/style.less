@@ -268,6 +268,23 @@ textarea.message_text {
 	}
 }
 
+
+// Disp=single form
+.evo_form__comment {
+	.form-group {
+		label, div {
+			float: left;
+			width: 100%;
+			clear: both;
+			text-align: left;
+		}
+		.control-buttons {
+			margin-left: 0% !important;
+		}
+	}
+}
+
+
 .bPost {
 	margin-bottom: 2em;
 	.bTitle {
@@ -451,7 +468,7 @@ text-align: center;
 	text-align: center;
 	margin: 25px 44px;
 }
-.bPostContent {
+.evo_post_content {
 	padding-top: 15px;	
 }
 .single-image {
@@ -555,14 +572,14 @@ div.evo_image_index div {
 		margin: 5px 3px;
 	}
 }
-.evo_form__comment {
+.evo_post_content .evo_details .evo_form__comment {
 	fieldset .info {
-		margin: 10px 0px 17px 0px;
+		margin: 0px 0px 22px 0px;
 	}
 	fieldset {
 		margin: 5px 0px !important;
 	}
-	 fieldset {
+	fieldset {
 		margin: 0px;
 		div.label {
 			float: none !important;
@@ -575,22 +592,16 @@ div.evo_image_index div {
 		}
 	}
 }
-.evo_form__comment fieldset div.label, fieldset .input, fieldset .info {
-	float: none;
-	color: #333;
-	width: auto;
-	text-align: left;
-	margin-left: 0px !important;
-}
 .radio, .checkbox {
 	display: inline-block;
 }
 .evo_comment {
 	margin: 0 0 20px 0;
 	padding: 0px;
-	.bCommentAvatar {
+	img {
 		border-radius: 50%;
-		border: none;
+		float: left;
+		margin: 4px 10px 10px 0;
 	}
 }
 .input {
@@ -650,7 +661,7 @@ div.evo_image_index div {
 		position: relative !important;
 		text-align: right;
 	}
-	.bDetails, .col-lg-12 {
+	.evo_details, .col-lg-12 {
 		padding-left: 0px;
 		padding-right: 0px;
 	}	

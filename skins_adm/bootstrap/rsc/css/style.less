@@ -1120,21 +1120,31 @@ div.level3 nav .nav>li>a {
 .skin_settings {
 	float: left;
 	width: 30%;
+	margin-right: 20px;
 	.control-label {
 		width: 40%;
 	}
 	.controls-info {
 		width: 60%;
 	}
-}
-// Skin info
-.skin_settings {
+	// Skin info
 	div.controls.col-xs-10 {
 		width: auto;
 	}
 	ul {
 		list-style: disc;
 		margin-left: 20px;
+	}
+}
+.skin_settings_form {
+	width: 60%;
+	float: left;
+	margin-left: 15px;
+}
+@media (max-width: 992px) {
+	.skin_settings, .skin_settings_form {
+		float: none;
+		width: 100%;
 	}
 }
 // Skin selector form

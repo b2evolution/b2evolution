@@ -223,6 +223,16 @@ textarea.message_text {
   padding-left: 15px;
   margin-bottom: 0;
 }
+.evo_form__comment .form-group label,
+.evo_form__comment .form-group div {
+  float: left;
+  width: 100%;
+  clear: both;
+  text-align: left;
+}
+.evo_form__comment .form-group .control-buttons {
+  margin-left: 0% !important;
+}
 .bPost {
   margin-bottom: 2em;
 }
@@ -405,7 +415,7 @@ body {
   text-align: center;
   margin: 25px 44px;
 }
-.bPostContent {
+.evo_post_content {
   padding-top: 15px;
 }
 .single-image {
@@ -512,32 +522,23 @@ div.evo_image_index div:hover {
 .nav_album .btn-primary {
   margin: 5px 3px;
 }
-.evo_form__comment fieldset .info {
-  margin: 10px 0px 17px 0px;
+.evo_post_content .evo_details .evo_form__comment fieldset .info {
+  margin: 0px 0px 22px 0px;
 }
-.evo_form__comment fieldset {
+.evo_post_content .evo_details .evo_form__comment fieldset {
   margin: 5px 0px !important;
 }
-.evo_form__comment fieldset {
+.evo_post_content .evo_details .evo_form__comment fieldset {
   margin: 0px;
 }
-.evo_form__comment fieldset div.label {
+.evo_post_content .evo_details .evo_form__comment fieldset div.label {
   float: none !important;
   padding-left: 0px;
   text-align: center;
 }
-.evo_form__comment fieldset div.label .btn {
+.evo_post_content .evo_details .evo_form__comment fieldset div.label .btn {
   margin: 5px;
   display: inline-block;
-}
-.evo_form__comment fieldset div.label,
-fieldset .input,
-fieldset .info {
-  float: none;
-  color: #333;
-  width: auto;
-  text-align: left;
-  margin-left: 0px !important;
 }
 .radio,
 .checkbox {
@@ -547,9 +548,10 @@ fieldset .info {
   margin: 0 0 20px 0;
   padding: 0px;
 }
-.evo_comment .bCommentAvatar {
+.evo_comment img {
   border-radius: 50%;
-  border: none;
+  float: left;
+  margin: 4px 10px 10px 0;
 }
 .input #uploadfile_A1 {
   width: 90%;
@@ -604,7 +606,7 @@ fieldset .info {
     position: relative !important;
     text-align: right;
   }
-  .bDetails,
+  .evo_details,
   .col-lg-12 {
     padding-left: 0px;
     padding-right: 0px;

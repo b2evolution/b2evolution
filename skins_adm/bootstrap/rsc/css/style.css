@@ -1080,6 +1080,7 @@ div.level3 nav .nav > li > a {
 .skin_settings {
   float: left;
   width: 30%;
+  margin-right: 20px;
 }
 .skin_settings .control-label {
   width: 40%;
@@ -1093,6 +1094,18 @@ div.level3 nav .nav > li > a {
 .skin_settings ul {
   list-style: disc;
   margin-left: 20px;
+}
+.skin_settings_form {
+  width: 60%;
+  float: left;
+  margin-left: 15px;
+}
+@media (max-width: 992px) {
+  .skin_settings,
+  .skin_settings_form {
+    float: none;
+    width: 100%;
+  }
 }
 .skin_selector_filters {
   border-bottom: 1px solid #ddd;

@@ -39,7 +39,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Image / Blog logo');
+		return T_('Logo / Image');
 	}
 
 
@@ -80,12 +80,42 @@ class coll_logo_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'image_source' => array(
+					'label' => T_('Image source'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'skin', T_('Skin folder') ),
+							array( 'coll', T_('Collection File Root') ),
+							array( 'shared', T_('Shared File Root') ) ),
+					'defaultvalue' => 'coll',
+				),
 				'logo_file' => array(
 					'label' => T_('Image filename'),
-					'note' => T_('The image/logo file must be uploaded to the root of the Blog\'s media dir'),
+					'note' => T_('The image/logo file must be uploaded to the root of the selected image source'),
 					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-][a-z0-9_.\-]*$~i',
 																		'error'=>T_('Invalid filename.') ),
+				),
+				'width' => array(
+					'label' => T_('Image width'),
+					'note' => T_('pixels'),
+					'type' => 'integer',
+					'defaultvalue' => 200,
+					'allow_empty' => true,
+				),
+				'height' => array(
+					'label' => T_('Image height'),
+					'note' => T_('pixels'),
+					'type' => 'integer',
+					'defaultvalue' => '',
+					'allow_empty' => true,
+				),
+				'check_file' => array(
+					'label' => T_('Check file'),
+					'note' => T_('Check if file exists. If not, no IMG tag will be created.'),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -103,13 +133,49 @@ class coll_logo_Widget extends ComponentWidget
 	{
 		global $Blog;
 
+		switch( $this->disp_params['image_source'] )
+		{
+			case 'skin':
+				global $skins_url, $skins_path;
+				$image_url = $skins_url;
+				$image_path = $skins_path;
+				break;
+
+			case 'shared':
+				global $media_url, $media_path;
+				$image_url = $media_url.'shared/';
+				$image_path = $media_path.'shared/';
+				break;
+
+			case 'coll':
+			default:
+				$image_url = $Blog->get_media_url();
+				$image_path = $Blog->get_media_dir();
+				break;
+		}
+
+		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		{ // Logo file doesn't exist, Exit here because of widget setting requires this
+			return true;
+		}
+
 		$this->init_display( $params );
 
 		// Collection logo:
 		echo $this->disp_params['block_start'];
 
+		$image_attrs = '';
+		if( ! empty( $this->disp_params['width'] ) )
+		{ // Image width
+			$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
+		}
+		if( ! empty( $this->disp_params['height'] ) )
+		{ // Image height
+			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
+		}
+
 		$title = '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$Blog->get_media_url().$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'" />'
+							.'<img src="'.$image_url.$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'"'.$image_attrs.' />'
 							.'</a>';
 		$this->disp_title( $title );
 

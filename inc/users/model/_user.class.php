@@ -4160,6 +4160,7 @@ class User extends DataObject
 		{
 			$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
 		}
+		$SQL->ORDER_BY( 'ufdf_order' );
 
 		return $DB->get_results( $SQL->get() );
 	}

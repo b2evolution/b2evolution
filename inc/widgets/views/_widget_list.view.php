@@ -13,16 +13,18 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog;
+global $Blog, $admin_url;
 
 global $container_Widget_array;
 
 global $container_list;
 
-if(	$current_User->check_perm( 'options', 'edit', false ) )
+if( $current_User->check_perm( 'options', 'edit', false ) )
 {
-	echo '<div class="floatright small">'.action_icon( TS_('Reload containers!'), 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4 ).'</div>';
+	echo '<div class="pull-right" style="margin-bottom:10px">';
+	echo action_icon( TS_('Reload containers!'), 'reload',
+	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+	echo '</div>';
 }
 
 // Load widgets for current collection:
@@ -49,6 +51,10 @@ function display_container( $container, $legend_suffix = '' )
 			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
 
 	$Table->cols = array(
+			array(
+				'th' => '', // checkbox
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap' ),
 			array(
 				'th' => /* TRANS: shortcut for enabled */ T_( 'En' ),
 				'th_class' => 'shrinkwrap',
@@ -99,7 +105,7 @@ function display_container( $container, $legend_suffix = '' )
 	if( empty($Widget_array) )
 	{	// TODO: cleanup
 		$Table->display_line_start( true );
-		$Table->display_col_start( array( 'colspan' => 5 ) );
+		$Table->display_col_start( array( 'colspan' => 6 ) );
 		echo '<span class="new_widget">'.T_('There is no widget in this container yet.').'</span>';
 		$Table->display_col_end();
 		$Table->display_line_end();
@@ -126,16 +132,20 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
+			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
+			$Table->display_col_end();
+
+			$Table->display_col_start();
 			if ( $enabled )
 			{
 				// Indicator for the JS UI:
 				echo '<span class="widget_is_enabled">';
-				echo get_icon( 'enabled', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) );
+				echo action_icon( T_( 'The widget is enabled.' ), 'enabled', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 				echo '</span>';
 			}
 			else
 			{
-				echo get_icon( 'disabled', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) );
+				echo action_icon( T_( 'The widget is disabled.' ), 'disabled', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			$Table->display_col_end();
 
@@ -196,6 +206,12 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->display_list_end();
 }
 
+$Form = new Form( $admin_url.'?ctrl=widgets&blog='.$Blog->ID );
+
+$Form->add_crumb( 'widget' );
+
+$Form->begin_form();
+
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
@@ -215,6 +231,24 @@ foreach( $container_Widget_array as $container=>$dummy )
 }
 
 echo '</fieldset>'."\n";
+
+echo '<span class="btn-group">';
+$Form->button( array( 'type' => 'button', 'value' => T_('Check All'), 'id' => 'widget_button_check_all' ) );
+$Form->button( array( 'type' => 'button', 'value' => T_('Uncheck All'), 'id' => 'widget_button_uncheck_all' ) );
+echo '</span>';
+
+echo '<span class="btn-group">';
+$Form->button( array( 'type' => 'button', 'value' => T_('Check Active'), 'id' => 'widget_button_check_active' ) );
+$Form->button( array( 'type' => 'button', 'value' => T_('Check Inactive'), 'id' => 'widget_button_check_inactive' ) );
+echo '</span>';
+
+echo ' '.T_('With checked do:');
+echo '<span class="btn-group">';
+$Form->button( array( 'type' => 'submit', 'value' => T_('Activate'), 'name' => 'actionArray[activate]' ) );
+$Form->button( array( 'type' => 'submit', 'value' => T_('De-activate'), 'name' => 'actionArray[deactivate]' ) );
+echo '</span>';
+
+$Form->end_form();
 
 echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 

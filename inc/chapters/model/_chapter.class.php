@@ -203,10 +203,11 @@ class Chapter extends GenericCategory
 		param( 'cat_description', 'string' );
 		$this->set_from_Request( 'description' );
 
-		// Manual ordering
-		if( param( 'cat_order', 'integer', NULL ) )
-		{
-			$this->set_from_Request( 'order' );
+		$cat_Blog = & $this->get_Blog();
+		if( $cat_Blog && $cat_Blog->get_setting('category_ordering') == 'manual' )
+		{ // Manual ordering
+			param( 'cat_order', 'integer', NULL );
+			$this->set_from_Request( 'order', 'cat_order', true );
 		}
 
 		// Sort sub-categories

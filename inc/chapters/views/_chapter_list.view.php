@@ -100,8 +100,16 @@ function cat_line( $Chapter, $level )
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	// Order
-	$order_value = ( $Chapter->get_parent_subcat_ordering() == 'manual' ) ? $Chapter->dget('order') : T_('Alphabetic');
-	$r .= '<td class="center">'.$order_value.'</td>';
+	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
+	{ // Manual ordering
+		$r .= '<td class="center cat_order_edit" rel="'.$Chapter->ID.'">'
+						.'<a href="#">'.( $Chapter->get( 'order' ) === NULL ? '-' : $Chapter->dget( 'order' ) ).'</a>'
+					.'</td>';
+	}
+	else
+	{ // Alphabetic ordering
+		$r .= '<td class="center">'.T_('Alphabetic').'</td>';
+	}
 
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display these columns:
@@ -330,4 +338,13 @@ if( ! $Settings->get('allow_moving_chapters') )
 //Flush fadeout
 $Session->delete( 'fadeout_array');
 
+
+// Print JS to edit order of the chapters inline
+echo_editable_column_js( array(
+	'column_selector' => '.cat_order_edit',
+	'ajax_url'        => get_secure_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
+	'new_field_name'  => 'new_cat_order',
+	'ID_value'        => 'jQuery( this ).attr( "rel" )',
+	'ID_name'         => 'cat_ID',
+	'field_type'      => 'text' ) );
 ?>
