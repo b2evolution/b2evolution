@@ -8,7 +8,7 @@
  * This is meant to be included in a page template.
  *
  * @package evoskins
- * @subpackage photoalbums
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

@@ -9,8 +9,8 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
- * @package boostrap
- * @subpackage photoalbums
+ * @package evoskins
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,9 +19,9 @@ global $Item;
 // Default params:
 $params = array_merge( array(
 		'feature_block'          => false,
-		'item_class'             => 'evo_post evo_content_block',
-		'item_type_class'        => 'evo_post__ptyp_',
-		'item_status_class'      => 'evo_post__',
+		'item_class'        	 => 'evo_post',
+		'item_type_class'   	 => 'evo_post__ptyp_',
+		'item_status_class' 	 => 'evo_post__',
 		'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 		'image_size'             => '', // Do not display images in content block - Image is handled separately
 		'url_link_text_template' => '', // link will be displayed (except player if podcast)

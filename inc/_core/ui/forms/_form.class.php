@@ -239,8 +239,9 @@ class Form extends Widget
 					'formstart'      => '<div>',// required before (no_)title_fmt for validation
 					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+					'no_title_no_actions_fmt' => "\n",
 					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
-															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+												.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end'   => '</fieldset>'."\n",
 					'fieldstart'     => '<fieldset$ID$>'."\n",
 					'labelclass'     => '',
@@ -288,6 +289,7 @@ class Form extends Widget
 					$this->formstart      = $template['formstart'];
 					$this->title_fmt      = $template['title_fmt'];
 					$this->no_title_fmt   = $template['no_title_fmt'];
+					$this->no_title_no_icons_fmt = isset( $template['no_title_no_icons_fmt'] ) ? $template['no_title_no_icons_fmt'] : '';
 					$this->fieldset_begin = $template['fieldset_begin'];
 					$this->fieldset_end   = $template['fieldset_end'];
 					$this->fieldstart     = $template['fieldstart'];
@@ -398,6 +400,7 @@ class Form extends Widget
 																	.'<span class="right_icons">$global_icons$</span>'
 																	.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
+					$this->no_title_no_icons_fmt = "\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -445,6 +448,7 @@ class Form extends Widget
 					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->no_title_no_icons_fmt = "\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -491,6 +495,7 @@ class Form extends Widget
 					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
+					$this->no_title_no_icons_fmt = "\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -538,6 +543,7 @@ class Form extends Widget
 					$this->formstart      = '';
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
+					$this->no_title_no_icons_fmt = "\n";
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -585,6 +591,7 @@ class Form extends Widget
 					$this->formstart      = '';
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
+					$this->no_title_no_icons_fmt = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -632,6 +639,7 @@ class Form extends Widget
 					$this->formclass      = '';
 					$this->formstart      = '';
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
+					$this->no_title_fmt   = '';          //           "
 					$this->no_title_fmt   = '';          //           "
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
@@ -686,6 +694,7 @@ class Form extends Widget
 	 *    formstart
 	 *    title_fmt
 	 *    no_title_fmt
+	 *    no_title_no_icons_fmt
 	 *    fieldset_begin
 	 *    fieldset_end
 	 *    fieldstart
@@ -1870,21 +1879,32 @@ class Form extends Widget
 
 		if( empty( $form_title ) )
 		{
-			$r .= $this->replace_vars( $this->no_title_fmt );
+			if( empty($this->global_icons) )
+			{	// No title, no icons:
+				$r .= $this->replace_vars( $this->no_title_no_icons_fmt );
+			}
+			else
+			{ // No title, but there are icons:
+				$r .= $this->replace_vars( $this->no_title_fmt );
+			}
 		}
 		else
-		{
+		{	// Title and icons:
 			$this->title = $form_title;
 
 			$r .= $this->replace_vars( $this->title_fmt );
 		}
 
-		// Initialization of javascript vars used to create parent_child select lists
-		// TODO: does this make sense to add it to every form??
-		$r .= '<script type="text/javascript">
-							var nb_dynamicSelects = 0;
-							var tab_dynamicSelects = Array();
+
+		if( $this->form_type == 'form' )	// DO not do this for div's
+		{	// Initialization of javascript vars used to create parent_child select lists
+			// fp>yura: TODO: does this make sense to add it to every form??
+			$r .= '<script type="text/javascript">
+								var nb_dynamicSelects = 0;
+								var tab_dynamicSelects = Array();
 						</script>';
+		}
+
 
 		global $UserSettings;
 		if( isset( $UserSettings ) && $UserSettings->get( 'control_form_abortions' )
@@ -1974,37 +1994,37 @@ class Form extends Widget
 		$r .= '<div class="inline">'.implode( '', $this->hiddens ).'</div>';
 
 		if( $this->form_type == 'div' )
-		{ // Use <div> tag instead of <form>
+		{ // Use <div> tag instead of <form>:
 			$r .= "\n</div>\n\n";
 		}
 		else
-		{ // Standard form
+		{ // Standard form:
 			$r .= "\n</form>\n\n";
-		}
 
-		// When the page loads, Initialize all the parent child select lists + other javascripts
-		$r .= '
-			<script type="text/javascript">
-				//<![CDATA[
-				if( typeof init_dynamicSelect == "function" )
-				{
-					jQuery( document ).bind( "ready", init_dynamicSelect );
+			// When the page loads, Initialize all the parent child select lists + other javascripts
+			$r .= '
+				<script type="text/javascript">
+					//<![CDATA[
+					if( typeof init_dynamicSelect == "function" )
+					{
+						jQuery( document ).bind( "ready", init_dynamicSelect );
+						';
+						if( $this->check_all )
+						{ // Init check_all event on check_all links
+							$r .= 'jQuery( document ).bind( "ready", init_check_all );';
+						}
+						$r .= '
+					}
 					';
-					if( $this->check_all )
-					{ // Init check_all event on check_all links
-						$r .= 'jQuery( document ).bind( "ready", init_check_all );';
+
+					if( $this->append_javascript )
+					{ // Append Javascript that we have added
+						$r .= implode( "\n", $this->append_javascript );
 					}
 					$r .= '
-				}
-				';
-
-				if( $this->append_javascript )
-				{ // Append Javascript that we have added
-					$r .= implode( "\n", $this->append_javascript );
-				}
-				$r .= '
-				//]]>
-			</script>';
+					//]]>
+				</script>';
+		}
 
 		// Reset (in case we re-use begin_form! NOTE: DO NOT REUSE begin_form, it's against the spec.)
 		$this->hiddens = array();

@@ -277,7 +277,7 @@ div.bPost {
 	fieldset {
 		margin-bottom: 20px;
 	}
-	.controls.col-xs-10 {
+	.controls.col-sm-10 {
 		width: 100%;
 		input[type=text] {
 			width: 100%;
@@ -1119,16 +1119,21 @@ div.level3 nav .nav>li>a {
 // Skin settings
 .skin_settings {
 	float: left;
-	width: 30%;
+	width: 280px;
 	margin-right: 20px;
-	.control-label {
-		width: 40%;
-	}
-	.controls-info {
-		width: 60%;
+	.skin_setting_row {
+		margin-bottom: 15px;
+		> label {
+			padding: 7px 15px 0 0;
+			margin: 0;
+			min-width: 40%;
+		}
+		> span {
+			padding-top: 7px;
+		}
 	}
 	// Skin info
-	div.controls.col-xs-10 {
+	div.controls.col-sm-10 {
 		width: auto;
 	}
 	ul {
@@ -1137,14 +1142,26 @@ div.level3 nav .nav>li>a {
 	}
 }
 .skin_settings_form {
-	width: 60%;
 	float: left;
 	margin-left: 15px;
+	.col-sm-2 {
+		width: 30%;
+	}
+	.col-sm-10 {
+		width: 70%;
+	}
 }
 @media (max-width: 992px) {
-	.skin_settings, .skin_settings_form {
+	.skin_settings_form {
 		float: none;
 		width: 100%;
+	}
+}
+@media (max-width: 767px) {
+	.skin_settings_form {
+		.col-sm-2, .col-sm-10 {
+			width: 100%;
+		}
 	}
 }
 // Skin selector form
@@ -1192,6 +1209,23 @@ div.level3 nav .nav>li>a {
 	margin: -15px 0 0 -15px;
 	.skinshot {
 		margin: 15px 0 0 15px;
+	}
+}
+.skinshot_new {
+	text-align: center;
+	font-size: 20px;
+	background: none;
+	border: 3px dashed #CCC;
+	width: 267px;
+	height: 248px;
+	&:hover {
+		background: #F5F5F5;
+		text-decoration: none;
+	}
+	.fa {
+		display: block;
+		font-size: 100px;
+		margin: 20px 0 10px;
 	}
 }
 

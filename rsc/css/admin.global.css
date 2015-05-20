@@ -327,7 +327,7 @@ table.grouped tr.PluginsSubGroup td.firstcol {
 /*
  * Skin selection:
  */
-div.skinshot {
+.skinshot {
 	float: left;
 	background-color: #ccc;
 	margin: 1ex;

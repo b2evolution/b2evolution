@@ -4059,6 +4059,8 @@ function echo_user_report_window()
 	global $Blog;
 ?>
 <script type="text/javascript">
+	//<![CDATA[
+	// User report window
 <?php
 // Initialize JavaScript to build and open window
 echo_modalwindow_js();
@@ -4094,6 +4096,7 @@ function user_report( user_ID, user_tab )
 	} );
 	return false;
 }
+	//]]>
 </script>
 <?php
 }
@@ -4107,6 +4110,8 @@ function echo_user_contact_groups_window()
 	global $Blog;
 ?>
 <script type="text/javascript">
+	//<![CDATA[
+	// User Contact Groups
 <?php
 // Initialize JavaScript to build and open window
 echo_modalwindow_js();
@@ -4137,6 +4142,7 @@ function user_contact_groups( user_ID )
 	} );
 	return false;
 }
+	//]]>
 </script>
 <?php
 }

@@ -55,7 +55,7 @@ $Form->begin_form( 'fform' );
 					regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$params[ 'skin_ID' ].'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb('skin') ),
 					' '.T_('Reset params'), 3, 4, array(
 						'class'   => 'action_icon btn btn-default btn-sm',
-						'onclick' => 'return confirm( \''.TS_( 'Are you sure want to reset skin params to defaults?' ).'\' )',
+						'onclick' => 'return confirm( \''.TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' ).'\' )',
 				) );
 		}
 		$fieldset_title_links .= '</span>';

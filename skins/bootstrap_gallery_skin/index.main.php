@@ -8,7 +8,7 @@
  * It is used to display the blog when no specific page template is available to handle the request.
  *
  * @package evoskins
- * @subpackage bootstrap_gallery
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 if( version_compare( $app_version, '6.4' ) < 0 )
@@ -208,6 +208,24 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_end'   => '</div>',
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
+		?>
+		
+		<?php
+		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+		request_title( array(
+				'title_before'      => '<h2>',
+				'title_after'       => '</h2>',
+				'title_none'        => '',
+				'glue'              => ' - ',
+				'title_single_disp' => false,
+				'format'            => 'htmlbody',
+				'arcdir_text'       => T_('Index'),
+				'catdir_text'       => '',
+				'category_text'     => T_('Gallery').': ',
+				'categories_text'   => T_('Galleries').': ',
+				'user_text'         => '',
+			) );
+		// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?>
 
 		<?php

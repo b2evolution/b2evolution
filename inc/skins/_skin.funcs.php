@@ -1818,15 +1818,27 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
 		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
 
-		$Form->info( T_('Skin name'), $edited_Skin->name );
+		// Skin name
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin name').':</label>';
+			echo '<span>'.$edited_Skin->name.'</span>';
+		echo '</div>';
 
-		if( isset($edited_Skin->version) )
-		{
-				$Form->info( T_('Skin version'), $edited_Skin->version );
+		if( isset( $edited_Skin->version ) )
+		{ // Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.$edited_Skin->version.'</span>';
+			echo '</div>';
 		}
 
-		$Form->info( T_('Skin type'), $edited_Skin->type );
+		// Skin type
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin type').':</label>';
+			echo '<span>'.$edited_Skin->type.'</span>';
+		echo '</div>';
 
+		// Containers
 		if( $skin_containers = $edited_Skin->get_containers() )
 		{
 			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
@@ -1835,7 +1847,10 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		{
 			$container_ul = '-';
 		}
-		$Form->info( T_('Containers'), $container_ul );
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Containers').':</label>';
+			echo '<span>'.$container_ul.'</span>';
+		echo '</div>';
 
 		echo '</div>';
 		echo '<div class="floatleft skin_settings_form">';
@@ -1850,6 +1865,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		{
 			load_funcs( 'plugins/_plugin.funcs.php' );
 
+			echo '<div class="clear"></div>';
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
 			{

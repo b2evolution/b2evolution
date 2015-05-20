@@ -143,9 +143,6 @@ label.control-label[for=evo_post_title] {
 .item_tags .controls {
   margin-left: 0;
 }
-.messages_list form.bComment {
-  background: none;
-}
 textarea.message_text {
   width: 95%;
 }
@@ -225,29 +222,38 @@ textarea.message_text {
 }
 .evo_form__comment .form-group label,
 .evo_form__comment .form-group div {
+  text-align: center;
+}
+.evo_form__comment .form-group .controls #uploadfile_A1 {
+  display: inline-block;
+  width: 92%;
   float: left;
-  width: 100%;
-  clear: both;
+}
+.evo_form__comment .form-group .controls .help-inline {
+  display: inline-block;
+  width: auto;
+  float: left;
+  margin-left: 2%;
+}
+.evo_form__comment .form-group .controls .form-control-static {
   text-align: left;
 }
-.evo_form__comment .form-group .control-buttons {
-  margin-left: 0% !important;
+.evo_form__comment .form-group .control-buttons .btn {
+  margin-top: 20px;
+  margin-bottom: -15px;
 }
-.bPost {
+.evo_post {
   margin-bottom: 2em;
 }
-.bPost .bTitle {
+.evo_post .bTitle {
   margin: 0;
 }
-.bPost .small.text-muted {
+.evo_post .small.text-muted {
   margin: 4px 0 10px;
 }
-.bPost .small.text-muted a,
-.bPost .small.text-muted a .glyphicon {
+.evo_post .small.text-muted a,
+.evo_post .small.text-muted a .glyphicon {
   color: inherit;
-}
-form#user_checkchanges.bComment {
-  border: none;
 }
 div.bSideItem {
   background: #F7F5FA;
@@ -373,12 +379,12 @@ body {
   text-align: center;
   margin-top: 0px;
 }
-.posts_list .bPost {
+.posts_list .evo_post {
   display: inline-block;
   vertical-align: middle;
 }
-.posts_list .bPost img,
-.posts_list .posts_list .bPost b {
+.posts_list .evo_post img,
+.posts_list .posts_list .evo_post b {
   transition: all 0.15s ease-in-out;
   -webkit-transition: all 0.15s ease-in-out;
   -moz-transition: all 0.15s ease-in-out;
@@ -386,16 +392,16 @@ body {
   -ms-transition: all 0.15s ease-in-out;
   outline: 1px solid transparent;
 }
-.posts_list .bPost:hover img,
-.posts_list .posts_list .bPost:hover b {
+.posts_list .evo_post:hover img,
+.posts_list .posts_list .evo_post:hover b {
   transform: rotate(-3deg);
   -ms-transform: rotate(-3deg);
   /* IE 9 */
   -webkit-transform: rotate(-3deg);
   /* Safari and Chrome */
 }
-.posts_list .bPost img,
-.posts_list .posts_list .bPost b {
+.posts_list .evo_post img,
+.posts_list .posts_list .evo_post b {
   border-radius: 20px;
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
@@ -409,7 +415,7 @@ body {
 .col-lg-12 h2 {
   text-align: center;
 }
-.bPost {
+.evo_post {
   display: inline-block;
   vertical-align: top;
   text-align: center;
@@ -548,7 +554,7 @@ div.evo_image_index div:hover {
   margin: 0 0 20px 0;
   padding: 0px;
 }
-.evo_comment img {
+.evo_comment img.bCommentAvatar {
   border-radius: 50%;
   float: left;
   margin: 4px 10px 10px 0;
@@ -614,6 +620,9 @@ div.evo_image_index div:hover {
   .single-image {
     margin-left: 42px;
     margin-right: 42px;
+  }
+  .evo_details {
+    padding: 0px 15px;
   }
 }
 @media screen and (max-width: 500px) {

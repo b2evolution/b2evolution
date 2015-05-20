@@ -12,10 +12,20 @@
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage photoalbums
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
 global $Blog;
+
+// Default params:
+$params = array_merge( array(
+		'item_class'        => 'evo_post evo_content_block',
+		'item_type_class'   => 'evo_post__ptyp_',
+		'item_status_class' => 'evo_post__',
+	), $params );
+
 // --------------------------------- START OF POSTS -------------------------------------
 // Display message if no post:
 $params_no_content = array(

@@ -40,6 +40,7 @@ $display_errors_on_production = true;
 
 $script_start_time = time();
 $localtimenow = $script_start_time; // used e.g. for post_datemodified (sample posts)
+$servertimenow = $script_start_time; // used e.g. for itpr_datemodified, cmpr_datemodified, mspr_datemodified (sample data)
 
 if( ! $config_is_done )
 {	// Base config is not done yet, try to guess some values needed for correct display:
@@ -1059,7 +1060,7 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Conversion in progress') );
 
-		db_upgrade_to_utf8( true );
+		db_upgrade_to_utf8();
 
 		// Stop the animation of the progress bar
 		stop_install_progress_bar();

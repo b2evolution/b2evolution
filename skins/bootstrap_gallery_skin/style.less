@@ -179,9 +179,6 @@ label.control-label[for=evo_post_title] {
 }
 
 // A form to create a new message/thread
-.messages_list form.bComment {
-	background: none;
-}
 textarea.message_text {
 	width: 95%;
 }
@@ -273,19 +270,35 @@ textarea.message_text {
 .evo_form__comment {
 	.form-group {
 		label, div {
-			float: left;
-			width: 100%;
-			clear: both;
-			text-align: left;
+			text-align: center;
+		}
+		.controls {
+			#uploadfile_A1 {
+				display: inline-block;
+				width: 92%;
+				float: left;
+			}
+			.help-inline{
+				display: inline-block;
+				width: auto;
+				float: left;
+				margin-left: 2%;
+			}
+			.form-control-static {
+				text-align: left;
+			}
 		}
 		.control-buttons {
-			margin-left: 0% !important;
+			.btn {
+				margin-top: 20px;
+				margin-bottom: -15px;
+			}
 		}
 	}
 }
 
 
-.bPost {
+.evo_post {
 	margin-bottom: 2em;
 	.bTitle {
 		margin: 0;
@@ -296,9 +309,6 @@ textarea.message_text {
 			color: inherit;
 		}
 	}
-}
-form#user_checkchanges.bComment{
-	border: none;
 }
 
 div.bSideItem {
@@ -429,11 +439,11 @@ html, body {
 }
 .posts_list {
 text-align: center;
-	.bPost {
+	.evo_post {
 	display: inline-block;
   vertical-align: middle;
 	}
-	.bPost img, .posts_list .bPost b {
+	.evo_post img, .posts_list .evo_post b {
 		transition: all 0.15s ease-in-out;
 		-webkit-transition: all 0.15s ease-in-out;
 		-moz-transition: all 0.15s ease-in-out;
@@ -442,12 +452,12 @@ text-align: center;
 		// On hovering images helps to remove jagged edges
 		outline: 1px solid transparent;
 	}
-	.bPost:hover img, .posts_list .bPost:hover b {
+	.evo_post:hover img, .posts_list .evo_post:hover b {
 	transform:rotate(-3deg);
 		-ms-transform:rotate(-3deg); /* IE 9 */
 		-webkit-transform:rotate(-3deg); /* Safari and Chrome */
 	}
-	.bPost img, .posts_list .bPost b {
+	.evo_post img, .posts_list .evo_post b {
 		border-radius: 20px;
 		-moz-border-radius: 20px;
 		-webkit-border-radius: 20px;
@@ -462,7 +472,7 @@ text-align: center;
 .posts_list, .col-lg-12 h2 {
 	text-align: center;
 }
-.bPost {
+.evo_post {
 	display: inline-block;
 	vertical-align: top;
 	text-align: center;
@@ -598,7 +608,7 @@ div.evo_image_index div {
 .evo_comment {
 	margin: 0 0 20px 0;
 	padding: 0px;
-	img {
+	img.bCommentAvatar {
 		border-radius: 50%;
 		float: left;
 		margin: 4px 10px 10px 0;
@@ -668,6 +678,9 @@ div.evo_image_index div {
 	.single-image {
 		margin-left: 42px;
 		margin-right: 42px;
+	}
+	.evo_details {
+	padding: 0px 15px;
 	}
 }
 @media screen and (max-width: 500px) {

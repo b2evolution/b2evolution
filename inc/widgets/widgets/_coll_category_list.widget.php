@@ -434,10 +434,8 @@ class coll_category_list_Widget extends ComponentWidget
 		$start_level = intval( $this->disp_params['start_level'] );
 		if( $start_level > 1 &&
 		    ( $start_level > $level + 1 ||
-		    	( $first_selected_cat_ID > 0 && (
-		    		( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
-					( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
-				) )
+		      ( ! in_array( $Chapter->ID, $this->disp_params['current_all_cats'] ) && ! $this->disp_params['parent_cat_is_visible'] ) ||
+		      ( $this->disp_params['current_selected_level'] < $level && ! $this->disp_params['parent_cat_is_visible'] )
 		    ) )
 		{ // Don't show this item because of level restriction
 			$this->disp_params['parent_cat_is_visible'] = false;

@@ -5,8 +5,8 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @package skins
- * @subpackage bootstrap_gallery
+ * @package evoskins
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -277,9 +277,9 @@ class bootstrap_gallery_Skin extends Skin
 		if( isset( $thumbnail_sizes[ $posts_thumb_size ] ) )
 		{
 			// Make the width of image block as fixed to don't expand it by long post title text
-			$custom_css .= '	.posts_list .bPost { max-width:'.$thumbnail_sizes[ $posts_thumb_size ][1]."px }\n";
+			$custom_css .= '	.posts_list .evo_post { max-width:'.$thumbnail_sizes[ $posts_thumb_size ][1]."px }\n";
 			// Set width & height for block with text "No pictures yet"
-			$custom_css .= '	.posts_list .bPost b { width:'.( $thumbnail_sizes[ $posts_thumb_size ][1] - 20 ).'px;'
+			$custom_css .= '	.posts_list .evo_post b { width:'.( $thumbnail_sizes[ $posts_thumb_size ][1] - 20 ).'px;'
 				.'height:'.( $thumbnail_sizes[ $posts_thumb_size ][2] - 20 ).'px'." }\n";
 		}
 		$single_thumb_size = $this->get_setting( 'single_thumb_size' );
@@ -288,7 +288,7 @@ class bootstrap_gallery_Skin extends Skin
 			// Make the width of image block as fixed to don't expand it by long post title text
 			$custom_css .= '	.post_images .image_block .image_legend { width:'.$thumbnail_sizes[ $single_thumb_size ][1].'px; max-width:'.$thumbnail_sizes[ $single_thumb_size ][1]."px }\n";
 			// Set width & height for block with text "No pictures yet"
-			/*$custom_css .= '	.posts_list .bPost b { width:'.( $thumbnail_sizes[ $single_thumb_size ][1] - 20 ).'px;'
+			/*$custom_css .= '	.posts_list .evo_post b { width:'.( $thumbnail_sizes[ $single_thumb_size ][1] - 20 ).'px;'
 				.'height:'.( $thumbnail_sizes[ $single_thumb_size ][2] - 20 ).'px'." }\n";*/
 		}
 		if( !empty( $custom_css ) )
@@ -469,28 +469,28 @@ class bootstrap_gallery_Skin extends Skin
 
 			case 'compact_form':
 			case 'Form':
-				// Default Form settings:
+				// $disp=single contact form:
 				return array(
 					'layout'         => 'fieldset',
-					'formclass'      => 'form-horizontal',
+					'formclass'      => '',
 					'formstart'      => '',
 					'formend'        => '',
 					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+					'fieldset_begin' => '<div class="clear"></div><div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-3',
+					'labelclass'     => 'control-label',
 					'labelstart'     => '',
 					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-3"></label>',
-					'inputstart'     => '<div class="controls col-sm-9">',
+					'labelempty'     => '<label class="control-label"></label>',
+					'inputstart'     => '<div class="controls">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
+					'infostart'      => '<div class="controls"><div class="form-control-static">',
 					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
 					'buttonsend'     => "</div></div>\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",

@@ -6,7 +6,7 @@
  * {@link http://b2evolution.net/man/skin-development-primer}
  *
  * @package evoskins
- * @subpackage bootstrap_gallery
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

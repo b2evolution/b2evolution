@@ -48,6 +48,7 @@ $params = array_merge( array(
 user_prevnext_links();
 // ------------------------- END OF PREV/NEXT USER LINKS -------------------------
 
+
 // ---- START OF PROFILE CONTENT ---- //
 echo '<div class="profile_content">';
 
@@ -387,7 +388,8 @@ echo '</div>';
 echo '<div class="clear"></div>';
 
 // ---- END OF PROFILE CONTENT ---- //
-echo '</div>';
+echo '</div>'; // .profile_content
+
 
 $profileForm->end_form();
 

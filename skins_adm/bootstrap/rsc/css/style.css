@@ -257,10 +257,10 @@ div.bPost {
 #comment_filter_form fieldset {
   margin-bottom: 20px;
 }
-#comment_filter_form .controls.col-xs-10 {
+#comment_filter_form .controls.col-sm-10 {
   width: 100%;
 }
-#comment_filter_form .controls.col-xs-10 input[type=text] {
+#comment_filter_form .controls.col-sm-10 input[type=text] {
   width: 100%;
 }
 #comment_filter_form .rating input[name=cmnt_fullview_rating_limit] {
@@ -1079,16 +1079,21 @@ div.level3 nav .nav > li > a {
 }
 .skin_settings {
   float: left;
-  width: 30%;
+  width: 280px;
   margin-right: 20px;
 }
-.skin_settings .control-label {
-  width: 40%;
+.skin_settings .skin_setting_row {
+  margin-bottom: 15px;
 }
-.skin_settings .controls-info {
-  width: 60%;
+.skin_settings .skin_setting_row > label {
+  padding: 7px 15px 0 0;
+  margin: 0;
+  min-width: 40%;
 }
-.skin_settings div.controls.col-xs-10 {
+.skin_settings .skin_setting_row > span {
+  padding-top: 7px;
+}
+.skin_settings div.controls.col-sm-10 {
   width: auto;
 }
 .skin_settings ul {
@@ -1096,14 +1101,24 @@ div.level3 nav .nav > li > a {
   margin-left: 20px;
 }
 .skin_settings_form {
-  width: 60%;
   float: left;
   margin-left: 15px;
 }
+.skin_settings_form .col-sm-2 {
+  width: 30%;
+}
+.skin_settings_form .col-sm-10 {
+  width: 70%;
+}
 @media (max-width: 992px) {
-  .skin_settings,
   .skin_settings_form {
     float: none;
+    width: 100%;
+  }
+}
+@media (max-width: 767px) {
+  .skin_settings_form .col-sm-2,
+  .skin_settings_form .col-sm-10 {
     width: 100%;
   }
 }
@@ -1160,6 +1175,23 @@ div.level3 nav .nav > li > a {
 }
 .skin_selector_block .skinshot {
   margin: 15px 0 0 15px;
+}
+.skinshot_new {
+  text-align: center;
+  font-size: 20px;
+  background: none;
+  border: 3px dashed #CCC;
+  width: 267px;
+  height: 248px;
+}
+.skinshot_new:hover {
+  background: #F5F5F5;
+  text-decoration: none;
+}
+.skinshot_new .fa {
+  display: block;
+  font-size: 100px;
+  margin: 20px 0 10px;
 }
 form#thread_checkchanges ul.token-input-list-facebook {
   width: 97%;

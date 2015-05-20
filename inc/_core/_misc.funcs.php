@@ -65,6 +65,34 @@ function modules_call_method( $method_name, $params = NULL )
 
 
 /**
+ * Loads the b2evo database scheme.
+ *
+ * This gets updated through {@link db_delta()} which generates the queries needed to get
+ * to this scheme.
+ *
+ * Please see {@link db_delta()} for things to take care of.
+ */
+function load_db_schema()
+{
+	global $schema_queries;
+	global $modules, $inc_path;
+	global $db_storage_charset, $DB;
+
+	if( empty( $db_storage_charset ) )
+	{ // If no specific charset has been requested for datstorage, use the one of the current connection (optimize for speed - no conversions)
+		$db_storage_charset = $DB->connection_charset;
+	}
+
+	// Load modules:
+	foreach( $modules as $module )
+	{
+		echo 'Loading module: '.$module.'/model/_'.$module.'.install.php<br />';
+		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
+	}
+}
+
+
+/**
  * @deprecated kept only for plugin backward compatibility (core is being modified to call getters directly)
  * To be removed, maybe in b2evo v5.
  *
@@ -3803,6 +3831,7 @@ function emailskin_style( $class, $set_attr_name = true )
 		{
 			if( strpos( $classes, ',' ) !== false )
 			{ // This style is used for several classes
+				unset( $emailskins_styles[ $classes ] );
 				$classes = explode( ',', $classes );
 				foreach( $classes as $class_name )
 				{
@@ -3816,7 +3845,6 @@ function emailskin_style( $class, $set_attr_name = true )
 						$emailskins_styles[ $class_name ] = $styles;
 					}
 				}
-				unset( $emailskins_styles[ $classes ] );
 			}
 		}
 	}

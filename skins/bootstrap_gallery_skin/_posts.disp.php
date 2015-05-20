@@ -12,7 +12,7 @@
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage photoalbums
+ * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,7 +25,7 @@ $params_no_content = array(
 					'after'       => '</div>' );
 if( ! is_logged_in() )
 { // fp> the following is kind of a hack. It's not really correct.
-	$url = get_login_url( 'no public ocntent' );
+	$url = get_login_url( 'no public content' );
 	$params_no_content['msg_empty'] = '<p>'.T_('This site has no public contents.').'</p><p><a href="'.$url.'">'.T_('Log in now!').'</a></p>';
 }
 $list_is_empty = display_if_empty( $params_no_content );

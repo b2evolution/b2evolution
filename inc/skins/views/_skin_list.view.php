@@ -84,7 +84,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        .get_icon( 'delete', 'noimg' ).'\' )~',
 						);
 
-  $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action,blog', 'action=new'), T_('Install new'), 3, 4  );
+  $Results->global_icon( T_('Install new skin...'), 'new', regenerate_url( 'action,blog', 'action=new'), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 

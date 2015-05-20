@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $admin_url, $dispatcher;
+global $admin_url;
 
 $skin_type = param( 'skin_type', 'string', 'normal' );
 
@@ -49,8 +49,8 @@ switch( $skin_type )
 $current_skin_ID = $edited_Blog->get_setting( $skin_type.'_skin_ID', true );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
-{	// We have permission to modify:
-	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $dispatcher.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new'), 3, 4 );
+{ // We have permission to modify:
+	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
@@ -94,6 +94,14 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		);
 		// Display skinshot:
 		Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
+	}
+
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{ // A link to install new skin:
+		echo '<a href="'.$admin_url.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
+				.get_icon( 'new' )
+				.T_('Install New').' &raquo;'
+			.'</a>';
 	}
 
 	echo '<div class="clear"></div>';

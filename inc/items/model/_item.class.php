@@ -1528,9 +1528,9 @@ class Item extends ItemLight
 
 			if( $use_cache )
 			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
-				$DB->query( "
-					REPLACE INTO T_items__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
-					 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($r).' )', 'Cache prerendered item content' );
+				global $servertimenow;
+				$DB->query( 'REPLACE INTO T_items__prerendering ( itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered, itpr_datemodified )
+					VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( implode( '.', $post_renderers ) ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered item content' );
 			}
 		}
 

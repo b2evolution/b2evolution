@@ -1,8 +1,7 @@
 ; This is the definitions file for the autolinks plugin.
 ;
 ; Do NOT MODIFY this file. You may lose your edits when upgrading.
-;
-; To create your own definitions, duplicate this file by SAVING it AS defintions.local.txt .
+; In order to create your own definitions, duplicate this file by SAVING it AS defintions.local.txt .
 ;
 ; Values are separated by ;
 ; Field 1 = word to autolink
@@ -11,7 +10,6 @@
 ; Field 4 = url
 
 ; Team members and their b2evo blogs
-sam2kb;;;b2evo.sonorth.com/
 fplanque;;;fplanque.com/
 
 ; A couple of English definitions
@@ -30,6 +28,7 @@ b2evo;;;b2evolution.net/
 b2evolution;;;b2evolution.net/
 ccms;;;b2evolution.net/
 engine;multiblog;;b2evolution.net/
+evocms;;;b2evolution.net/
 evoskin;;;skins.b2evolution.net/
 evoskins;;;skins.b2evolution.net/
 platform;multiblog;;b2evolution.net/
@@ -42,7 +41,6 @@ hypertexte;;;webreference.fr/defintions/www/hypertexte
 ; Twitter handles:
 @b2evolution;;;twitter.com/b2evolution
 @francoisplanque;;;twitter.com/francoisplanque
-@sam2kb;;;twitter.com/sam2kb
 @evofactory;;;twitter.com/evofactory
 ; Aliases
 @b2evo;;;twitter.com/b2evolution

@@ -798,9 +798,9 @@ class Message extends DataObject
 
 			if( $use_cache )
 			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
-				$DB->query( "
-					REPLACE INTO T_messaging__prerendering (mspr_msg_ID, mspr_format, mspr_renderers, mspr_content_prerendered)
-					 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote( $message_renderers ).', '.$DB->quote($r).' )', 'Cache prerendered message content' );
+				global $servertimenow;
+				$DB->query( 'REPLACE INTO T_messaging__prerendering ( mspr_msg_ID, mspr_format, mspr_renderers, mspr_content_prerendered, mspr_datemodified )
+					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $message_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered message content' );
 			}
 		}
 

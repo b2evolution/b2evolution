@@ -1114,7 +1114,7 @@ th.checkright {
 /*
  * Skin selection:
  */
-div.skinshot,
+.skinshot,
 div.coll_settings_skinshot {
 	background-color: #E0E9F0;
 }
@@ -1126,6 +1126,24 @@ div.skinshot div.current {
 }
 div.skinshot_noshot {
 	color: #555;
+}
+.skinshot_new {
+	margin: 7px;
+	text-align: center;
+	font-size: 20px;
+	background: none;
+	border: 3px dashed #CCC;
+	width: 250px;
+	height: 209px;
+}
+.skinshot_new:hover {
+	background: #E0E9F0;
+	text-decoration: none;
+}
+.skinshot_new .fa {
+	display: block;
+	font-size: 100px;
+	margin: 20px 0 10px;
 }
 
 

@@ -522,16 +522,19 @@ class Skin extends DataObject
 
 		if( isset( $disp_params[ 'select_url' ] ) )
 		{
+			$skin_url = $disp_params[ 'select_url' ];
 			$select_a_begin = '<a href="'.$disp_params[ 'select_url' ].'" title="'.T_('Select this skin!').'">';
 			$select_a_end = '</a>';
 		}
 		elseif( isset( $disp_params[ 'function_url' ] ) )
 		{
+			$skin_url = $disp_params[ 'function_url' ];
 			$select_a_begin = '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
 			$select_a_end = '</a>';
 		}
 		else
 		{
+			$skin_url = '';
 			$select_a_begin = '';
 			$select_a_end = '';
 		}
@@ -593,8 +596,11 @@ class Skin extends DataObject
 					// Display a link to install the skin
 					if( $disp_params[ 'skin_compatible' ] )
 					{ // If skin is compatible for current selected type
-						echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
-						echo T_('Install NOW!').'</a>';
+						if( ! empty( $skin_url ) )
+						{
+							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
+							echo T_('Install NOW!').'</a>';
+						}
 						if( empty( $kind ) )
 						{ // Don't display the checkob on new collection creating form
 							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
@@ -603,16 +609,22 @@ class Skin extends DataObject
 					}
 					else
 					{ // Inform about skin type is wrong for current case
-						echo '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'" class="red">';
-						echo T_('Wrong Type!').'</a> ';
+						if( ! empty( $skin_url ) )
+						{
+							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'" class="red">';
+							echo T_('Wrong Type!').'</a> ';
+						}
 						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
 					}
 					break;
 
 				case 'select':
 					// Display a link to preview the skin
-					echo '<a href="'.$disp_params[ 'function_url' ].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-					echo T_('Preview').'</a>';
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+						echo T_('Preview').'</a>';
+					}
 					break;
 			}
 			echo '</div>';
@@ -1030,6 +1042,7 @@ class Skin extends DataObject
 					'formstart' => '',
 					'title_fmt' => '$title$'."\n", // TODO: icons
 					'no_title_fmt' => '',          //           "
+					'no_title_no_icons_fmt' => '',          //           "
 					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
 					'fieldset_end' => '</fieldset>'."\n",

@@ -2560,9 +2560,9 @@ class Comment extends DataObject
 
 			if( $use_cache )
 			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
-				$DB->query( "
-					REPLACE INTO T_comments__prerendering (cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered)
-					 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote( $comment_renderers ).', '.$DB->quote($r).' )', 'Cache prerendered comment content' );
+				global $servertimenow;
+				$DB->query( 'REPLACE INTO T_comments__prerendering ( cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered, cmpr_datemodified )
+					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $comment_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered comment content' );
 			}
 		}
 

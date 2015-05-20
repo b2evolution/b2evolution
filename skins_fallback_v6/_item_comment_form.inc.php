@@ -337,7 +337,7 @@ function validateCommentForm(form)
 	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
 			'note' => $note,
 			'cols' => 38,
-			'class' => 'bComment autocomplete_usernames'
+			'class' => 'autocomplete_usernames'
 		) );
 	$Form->inputstart = $form_inputstart;
 

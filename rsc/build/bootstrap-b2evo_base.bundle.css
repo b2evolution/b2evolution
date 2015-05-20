@@ -1509,8 +1509,6 @@ textarea.form_textarea_input {
   text-align: center;
 }
 div.widget_core_coll_avatar {
-  margin-top: 1em;
-  margin-bottom: 1em;
   text-align: center;
 }
 div.compact_search_form {
@@ -1987,10 +1985,9 @@ input.btn-lg {
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
 }
-body.disp_user #skin_wrapper > .container {
-  width: 100%;
+.profile_content {
   max-width: 960px;
-  padding: 0 10px;
+  margin: auto;
 }
 .main_profile_picture {
   -webkit-border-radius: 4px;
@@ -2015,7 +2012,7 @@ body.disp_user #skin_wrapper > .container {
   max-width: 300px;
 }
 .profile_column_right {
-  margin: 20px 0 0 320px;
+  margin-left: 320px;
 }
 .profile_column_right #fieldset_user_fields {
   overflow: hidden;

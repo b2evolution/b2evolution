@@ -5918,43 +5918,53 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Upgrade table user field definitions... ' );
 		$DB->query( 'ALTER TABLE T_users__fielddefs
 			ADD ufdf_code varchar(20) COLLATE ascii_general_ci NULL' );
-		$DB->query( 'UPDATE T_users__fielddefs SET
-			ufdf_code = CASE
-				WHEN ufdf_name = "Micro bio"     THEN "microbio"
-				WHEN ufdf_name = "I like"        THEN "ilike"
-				WHEN ufdf_name = "I don\'t like" THEN "idontlike"
-				WHEN ufdf_name = "MSN/Live IM"   THEN "msnliveim"
-				WHEN ufdf_name = "Yahoo IM"      THEN "yahooim"
-				WHEN ufdf_name = "AOL AIM"       THEN "aolaim"
-				WHEN ufdf_name = "ICQ ID"        THEN "icqid"
-				WHEN ufdf_name = "Skype"         THEN "skype"
-				WHEN ufdf_name = "Main phone"    THEN "mainphone"
-				WHEN ufdf_name = "Cell phone"    THEN "cellphone"
-				WHEN ufdf_name = "Office phone"  THEN "officephone"
-				WHEN ufdf_name = "Home phone"    THEN "homephone"
-				WHEN ufdf_name = "Office FAX"    THEN "officefax"
-				WHEN ufdf_name = "Home FAX"      THEN "homefax"
-				WHEN ufdf_name = "Twitter"       THEN "twitter"
-				WHEN ufdf_name = "Facebook"      THEN "facebook"
-				WHEN ufdf_name = "Google Plus"   THEN "googleplus"
-				WHEN ufdf_name = "Linkedin"      THEN "linkedin"
-				WHEN ufdf_name = "GitHub"        THEN "github"
-				WHEN ufdf_name = "Website"       THEN "website"
-				WHEN ufdf_name = "Blog"          THEN "blog"
-				WHEN ufdf_name = "Myspace"       THEN "myspace"
-				WHEN ufdf_name = "Flickr"        THEN "flickr"
-				WHEN ufdf_name = "YouTube"       THEN "youtube"
-				WHEN ufdf_name = "Digg"          THEN "digg"
-				WHEN ufdf_name = "StumbleUpon"   THEN "stumbleupon"
-				WHEN ufdf_name = "Pinterest"     THEN "pinterest"
-				WHEN ufdf_name = "Role"          THEN "role"
-				WHEN ufdf_name = "Organization"  THEN "organization"
-				WHEN ufdf_name = "Division"      THEN "division"
-				WHEN ufdf_name = "VAT ID"        THEN "vatid"
-				WHEN ufdf_name = "Main address"  THEN "mainaddress"
-				WHEN ufdf_name = "Home address"  THEN "homeaddress"
-				ELSE CONCAT( "code_", ufdf_ID )
-			END' );
+		$update_user_fields = array(
+				'Micro bio'     => 'microbio',
+				'I like'        => 'ilike',
+				'I don\'t like' => 'idontlike',
+				'MSN/Live IM'   => 'msnliveim',
+				'Yahoo IM'      => 'yahooim',
+				'AOL AIM'       => 'aolaim',
+				'ICQ ID'        => 'icqid',
+				'Skype'         => 'skype',
+				'Main phone'    => 'mainphone',
+				'Cell phone'    => 'cellphone',
+				'Office phone'  => 'officephone',
+				'Home phone'    => 'homephone',
+				'Office FAX'    => 'officefax',
+				'Home FAX'      => 'homefax',
+				'Twitter'       => 'twitter',
+				'Facebook'      => 'facebook',
+				'Google Plus'   => 'googleplus',
+				'Linkedin'      => 'linkedin',
+				'GitHub'        => 'github',
+				'Website'       => 'website',
+				'Blog'          => 'blog',
+				'Myspace'       => 'myspace',
+				'Flickr'        => 'flickr',
+				'YouTube'       => 'youtube',
+				'Digg'          => 'digg',
+				'StumbleUpon'   => 'stumbleupon',
+				'Pinterest'     => 'pinterest',
+				'Role'          => 'role',
+				'Organization'  => 'organization',
+				'Division'      => 'division',
+				'VAT ID'        => 'vatid',
+				'Main address'  => 'mainaddress',
+				'Home address'  => 'homeaddress',
+			);
+		foreach( $update_user_fields as $update_user_field_name => $update_user_field_code )
+		{
+			$DB->query( 'UPDATE T_users__fielddefs
+				  SET ufdf_code = '.$DB->quote( $update_user_field_code ).'
+				WHERE ufdf_name = '.$DB->quote( $update_user_field_name ).'
+				LIMIT 1' ); // limit by 1 in order to update only first record to avoid the duplicate codes
+		}
+		// Update codes for all other unknown fields
+		$DB->query( 'UPDATE T_users__fielddefs
+				SET ufdf_code = CONCAT( "code_", ufdf_ID )
+			WHERE ufdf_code IS NULL' );
+		// Make code field unique
 		$DB->query( 'ALTER TABLE T_users__fielddefs
 			MODIFY ufdf_code varchar(20) COLLATE ascii_general_ci UNIQUE NOT NULL' );
 		task_end();
