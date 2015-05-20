@@ -21,6 +21,7 @@
 .widget_core_user_login #login_form .controls {
   padding: 0;
   width: 100%;
+  text-align: left;
 }
 .widget_core_user_login #login_form .form_text_input.form-control {
   width: 100%;
@@ -222,18 +223,19 @@ textarea.message_text {
 }
 .evo_form__comment .form-group label,
 .evo_form__comment .form-group div {
-  text-align: center;
+  text-align: left;
 }
 .evo_form__comment .form-group .controls #uploadfile_A1 {
   display: inline-block;
-  width: 92%;
+  width: 80%;
   float: left;
+  margin-right: 2%;
 }
 .evo_form__comment .form-group .controls .help-inline {
-  display: inline-block;
-  width: auto;
-  float: left;
-  margin-left: 2%;
+  height: auto;
+  text-align: left;
+  font-size: 84%;
+  color: #999;
 }
 .evo_form__comment .form-group .controls .form-control-static {
   text-align: left;
@@ -623,6 +625,9 @@ div.evo_image_index div:hover {
   }
   .evo_details {
     padding: 0px 15px;
+  }
+  #uploadfile_A1 {
+    width: 50% !important;
   }
 }
 @media screen and (max-width: 500px) {

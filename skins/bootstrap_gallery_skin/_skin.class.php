@@ -472,7 +472,7 @@ class bootstrap_gallery_Skin extends Skin
 				// $disp=single contact form:
 				return array(
 					'layout'         => 'fieldset',
-					'formclass'      => '',
+					'formclass'      => 'form-horizontal',
 					'formstart'      => '',
 					'formend'        => '',
 					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",

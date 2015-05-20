@@ -29,8 +29,9 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
 <head>
-	<title><?php echo $this->get_html_title(); ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
+	<title><?php echo $this->get_html_title(); ?></title>
 	<?php
 	global $robots_index, $robots_follow;
 	$robots_index = false;

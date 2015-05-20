@@ -29,6 +29,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
 	<title><?php echo $this->get_html_title(); ?></title>
 	<?php
 	global $robots_index, $robots_follow;

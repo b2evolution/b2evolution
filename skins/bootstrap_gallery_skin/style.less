@@ -26,6 +26,7 @@
 		.controls {
 			padding: 0;
 			width: 100%;
+			text-align: left;
 		}
 		.form_text_input.form-control {
 			width: 100%;
@@ -270,19 +271,20 @@ textarea.message_text {
 .evo_form__comment {
 	.form-group {
 		label, div {
-			text-align: center;
+			text-align: left;
 		}
 		.controls {
 			#uploadfile_A1 {
 				display: inline-block;
-				width: 92%;
+				width: 80%;
 				float: left;
+				margin-right: 2%;
 			}
-			.help-inline{
-				display: inline-block;
-				width: auto;
-				float: left;
-				margin-left: 2%;
+			.help-inline {
+				height: auto;
+				text-align: left;
+				font-size: 84%;
+				color: #999;
 			}
 			.form-control-static {
 				text-align: left;
@@ -681,6 +683,9 @@ div.evo_image_index div {
 	}
 	.evo_details {
 	padding: 0px 15px;
+	}
+	#uploadfile_A1 {
+		width: 50% !important;
 	}
 }
 @media screen and (max-width: 500px) {

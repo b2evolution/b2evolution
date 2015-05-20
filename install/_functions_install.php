@@ -1366,7 +1366,7 @@ jQuery( document ).ready( function()
 		switch( jQuery( 'input[type=radio][name=action]:checked' ).val() )
 		{
 			case 'newdb':
-				var btn_title = '<?php echo TS_('Next &raquo;'); ?>';
+				var btn_title = '<?php echo TS_('Next').' &raquo'; ?>';
 				var btn_class = 'btn-success';
 				break;
 
@@ -1381,7 +1381,7 @@ jQuery( document ).ready( function()
 				break;
 
 			case 'start':
-				var btn_title = '<?php echo TS_('Change config &raquo;'); ?>';
+				var btn_title = '<?php echo TS_('Change config').' &raquo'; ?>';
 				var btn_class = 'btn-primary';
 				break;
 
