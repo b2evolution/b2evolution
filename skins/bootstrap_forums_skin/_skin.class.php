@@ -62,6 +62,26 @@ class bootstrap_forums_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				// === MILOS
+				'page_link_color' => array(
+					'label' => T_('Page link color'),
+					'note' => T_('E-g: #00ff00 for green'),
+					'defaultvalue' => '#337ab7',
+					'type' => 'color',
+				),
+				'current_tab_text_color' => array(
+					'label' => T_('Current tab text color'),
+					'note' => T_('E-g: #ff6600 for orange'),
+					'defaultvalue' => '#333',
+					'type' => 'color',
+				),
+				'page_bg_color' => array(
+					'label' => T_('Page background color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#fff',
+					'type' => 'color',
+				),				
+				// === ../MILOS
 				'avatar_style' => array(
 					'label' => T_('Style of profile pictures'),
 					'note' => '',
@@ -182,6 +202,55 @@ class bootstrap_forums_Skin extends Skin
 
 		// Skin specific initializations:
 
+		// === MILOS 
+		
+		// Add custom CSS:
+		$custom_css = '';
+		// ===== Custom page styles: =====
+		
+		$custom_styles = array();
+		// Link color
+		if( $text_color = $this->get_setting( 'page_link_color' ) )
+		{
+			$custom_styles[] = 'color: '.$text_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	a { '.implode( ';', $custom_styles )." }\n";
+		}
+		
+		$custom_styles = array();
+		// Current tab text color
+		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
+		{
+			$custom_styles[] = 'color: '.$text_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	ul.nav.nav-tabs li a.selected { '.implode( ';', $custom_styles )." }\n";
+		}
+		
+		$custom_styles = array();
+		// Page background color
+		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
+		{
+			$custom_styles[] = 'background-color: '.$bg_color;
+		}
+		if( ! empty( $custom_styles ) )
+		{
+			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+		}		
+		
+		if( !empty( $custom_css ) )
+		{
+			$custom_css = '<style type="text/css">
+	<!--
+'.$custom_css.'	-->
+	</style>';
+			add_headline( $custom_css );
+		}
+		// ===../MILOS
+		
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
 			require_js( '#jqueryUI#', 'blog' );

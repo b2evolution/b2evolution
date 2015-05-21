@@ -22,6 +22,15 @@
 	font-weight: bold;
 	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
+// Powered By image background
+.powered_by {
+	a {
+		img {
+			background-color: rgba(255,255,255,1);
+			border-radius: 4px;
+		}
+	}
+}
 
 // Breadcrumbs
 ol.breadcrumb {
@@ -416,5 +425,99 @@ label.control-label[for=post_title] {
 	margin-bottom: 20px;
 	div.compact_search_form input.search_field {
 		width: 100%;
+	}
+}
+
+// Low resolution layout *** MILOS ***
+// Responsive styles
+@media screen and (max-width: 767px) {
+	table, thead, tbody, th, tr, td {
+		display: block;
+		&:hover {
+			background-color: transparent !important;
+		}
+	}
+	.meta_category {
+		border-bottom: none !important;
+	}
+	.forums_list .table-hover {
+		border-top: none !important;
+	}
+	.post_button {
+		margin-bottom: 5px;
+	}
+	// $disp=front
+	.table-hover {
+		tr {
+			border-top: 1px solid #ddd;
+			.ft_status_topic {
+				border: none;
+			}
+		}
+		tbody tr:nth-child(even) {
+			background-color: rgba(0,0,0,0.02) !important;
+			.ft_author_info {
+				background-color: #fff;
+			}
+		}
+		.ft_status {
+			width: 100%;
+			border-top: none !important;
+		}
+		.ft_title {
+			border: none;
+		}
+		tbody tr {
+			.ft_author_info {
+				margin-top: 10px;
+				padding: 10px 5px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				background-color: rgba(0,0,0,0.02);
+			}
+		}
+		.ft_count {
+			display: inline;
+			border: none;
+		}
+		.ft_date {
+			border: none;
+			.icon_latest_reply:hover {
+				text-decoration: none !important;
+			}
+		}
+	}	
+	.legend {
+		tbody tr {
+			th {
+				text-align: center;
+				padding-top: 15px;
+			}
+			td {
+				padding: 0px 5px;
+			}
+		}
+	}	
+	// $disp=single
+	.single_topic {
+		.ft_avatar {
+			border: none;
+		}
+		.evo_content_block {
+			.vs_published {
+				.ft_post_info {
+					border: none;
+					&:first-child {
+						border-top: 1px solid #ddd;
+					}
+				}
+			}
+			.floatright {
+				float: none !important;
+			}
+			.valign-top .floatright {
+				float: right !important;
+			}
+		}
 	}
 }

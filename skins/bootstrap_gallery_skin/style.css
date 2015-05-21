@@ -227,8 +227,6 @@ textarea.message_text {
 }
 .evo_form__comment .form-group .controls #uploadfile_A1 {
   display: inline-block;
-  width: 80%;
-  float: left;
   margin-right: 2%;
 }
 .evo_form__comment .form-group .controls .help-inline {
@@ -236,6 +234,7 @@ textarea.message_text {
   text-align: left;
   font-size: 84%;
   color: #999;
+  display: inline-block;
 }
 .evo_form__comment .form-group .controls .form-control-static {
   text-align: left;
@@ -561,9 +560,6 @@ div.evo_image_index div:hover {
   float: left;
   margin: 4px 10px 10px 0;
 }
-.input #uploadfile_A1 {
-  width: 90%;
-}
 .evo_post_title {
   display: table;
 }
@@ -625,9 +621,6 @@ div.evo_image_index div:hover {
   }
   .evo_details {
     padding: 0px 15px;
-  }
-  #uploadfile_A1 {
-    width: 50% !important;
   }
 }
 @media screen and (max-width: 500px) {

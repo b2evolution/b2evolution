@@ -133,13 +133,12 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function get_chapter_path( $blog_ID, $chapter_ID )
 	{
-		$ChapterCache = & get_ChapterCache();
-		$ChapterCache->load_subset( $blog_ID );
+		$this->load_subset( $blog_ID );
 
 		$chapter_path = array( $chapter_ID );
-		if( isset( $ChapterCache->subset_cache[ $blog_ID ] ) )
+		if( isset( $this->subset_cache[ $blog_ID ] ) )
 		{
-			$chapters = $ChapterCache->subset_cache[ $blog_ID ];
+			$chapters = $this->subset_cache[ $blog_ID ];
 			if( isset( $chapters[ $chapter_ID ] ) )
 			{
 				$Chapter = $chapters[ $chapter_ID ];

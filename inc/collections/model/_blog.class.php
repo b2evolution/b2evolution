@@ -220,6 +220,48 @@ class Blog extends DataObject
 
 
 	/**
+	 * Compare two Blog based on the common blog order setting
+	 *
+	 * @param Blog A
+	 * @param Blog B
+	 * @return number -1 if A < B, 1 if A > B, 0 if A == B
+	 */
+	static function compare_blogs( $a_Blog, $b_Blog )
+	{
+		global $Settings;
+
+		if( $a_Blog->ID == $b_Blog->ID )
+		{
+			return 0;
+		}
+
+		$order_by = $Settings->get('blogs_order_by');
+		$order_dir = $Settings->get('blogs_order_dir');
+
+		if( $order_by == 'RAND' )
+		{ // In case of Random order we consider every blog as equal
+			return 0;
+		}
+
+		$blog_a_value = $a_Blog->get( $order_by );
+		$blog_b_value = $b_Blog->get( $order_by );
+		if( $blog_a_value == $blog_b_value )
+		{ // The compare fields are equal sort based on the ID
+			$blog_a_value = $a_Blog->ID;
+			$blog_b_value = $b_Blog->ID;
+		}
+		$result = is_numeric( $blog_a_value ) ? ( $blog_a_value < $blog_b_value ? -1 : 1 ) : strcmp( $blog_a_value, $blog_b_value );
+
+		if( $order_dir == 'DESC' )
+		{ // Change the order direction
+			$result = $result * (-1);
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Initialize blog setting by kind
 	 *
 	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual'

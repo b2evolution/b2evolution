@@ -85,26 +85,26 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 
 	if( $plug_status == 'enabled' )
 	{
-		return get_icon('enabled', 'imgtag', array('title'=>T_('The plugin is enabled.')) );
+		return get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The plugin is enabled.') ) );
 	}
 	elseif( $plug_status == 'broken' )
 	{
-		return get_icon('warning', 'imgtag', array(
+		return get_icon( 'warning', 'imgtag', array(
 			'title' => T_('The plugin is broken.')
 				.// Display load error from Plugins::register() (if any):
-				( isset( $admin_Plugins->plugin_errors[$plug_ID] )
-					&& ! empty($admin_Plugins->plugin_errors[$plug_ID]['register'])
-					? ' '.$admin_Plugins->plugin_errors[$plug_ID]['register']
+				( isset( $admin_Plugins->plugin_errors[ $plug_ID ] )
+					&& ! empty( $admin_Plugins->plugin_errors[ $plug_ID ]['register'] )
+					? ' '.$admin_Plugins->plugin_errors[ $plug_ID ]['register']
 					: '' )
 			) );
 	}
-	elseif( $plug_status == 'install' )
+	elseif( $plug_status == 'needs_config' )
 	{
-		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is not installed completely.')) );
+		return get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('The plugin is not installed completely.') ) );
 	}
 	else
 	{
-		return get_icon('disabled', 'imgtag', array('title'=>T_('The plugin is disabled.')) );
+		return get_icon( 'disabled', 'imgtag', array( 'title' => T_('The plugin is disabled.') ) );
 	}
 }
 $Results->cols[] = array(

@@ -123,10 +123,38 @@ class Chapter extends GenericCategory
 			debug_die('Invalid category objects received to compare.');
 		}
 
-		if( $a_Chapter->parent_ID != $b_Chapter->parent_ID )
+		if( $a_Chapter->ID == $b_Chapter->ID )
+		{ // The two chapters are the same
+			return 0;
+		}
+
+		if( $a_Chapter->blog_ID != $b_Chapter->blog_ID )
 		{ // Sort based on the ordering between different blogs
-			// TODO: asimo>fp How should we order chapers from different blogs?
-			return ( $a_Chapter->blog_ID > $b_Chapter->blog_ID ) ? 1 : ( ( $a_Chapter->blog_ID < $b_Chapter->blog_ID ) ? -1 : 0 );
+			$a_Chapter->load_Blog();
+			$b_Chapter->load_Blog();
+			return Blog::compare_blogs($a_Chapter->Blog, $b_Chapter->Blog);
+		}
+
+		$ChapterCache= & get_ChapterCache();
+		if( $a_Chapter->parent_ID != $b_Chapter->parent_ID )
+		{ // Two chapters from the same blog, but different parrents
+			// Compare those parents of these chapters which have a common parent Chapter or they are both root Chapters.
+			$path_to_root_a = array_reverse( $ChapterCache->get_chapter_path( $a_Chapter->blog_ID, $a_Chapter->ID ) );
+			$path_to_root_b = array_reverse( $ChapterCache->get_chapter_path( $b_Chapter->blog_ID, $b_Chapter->ID ) );
+			$index = 0;
+			while( isset( $path_to_root_a[$index] ) && isset( $path_to_root_b[$index] ) )
+			{
+				if( $path_to_root_a[$index] != $path_to_root_b[$index] )
+				{ // The first different parent on the same level was found, compare parent objects
+					$parent_a_Chapter = $ChapterCache->get_by_ID( $path_to_root_a[$index] );
+					$parent_b_Chapter = $ChapterCache->get_by_ID( $path_to_root_b[$index] );
+					return self::compare_chapters( $parent_a_Chapter, $parent_b_Chapter );
+				}
+				$index++;
+			}
+
+			// One of the chapters is a parent of the other, the parent is considered greater than the other
+			return isset( $path_to_root_a[$index] ) ? -1 : 1;
 		}
 
 		if( empty( $a_Chapter->parent_ID ) )
@@ -136,7 +164,6 @@ class Chapter extends GenericCategory
 		}
 		else
 		{
-			$ChapterCache= & get_ChapterCache();
 			$parent_Chapter = $ChapterCache->get_by_ID( $a_Chapter->parent_ID );
 			$cat_order = $parent_Chapter->get_subcat_ordering();
 		}
@@ -144,28 +171,35 @@ class Chapter extends GenericCategory
 		switch( $cat_order )
 		{
 			case 'alpha':
-				return strcmp( $a_Chapter->name, $b_Chapter->name );
+				$result = strcmp( $a_Chapter->name, $b_Chapter->name );
+				break;
 
 			case 'manual':
 				if( $a_Chapter->order === NULL )
-				{
-					if( $b_Chapter->order !== NULL )
-					{ // a is NULL b is a number, NULL values are greater than any number
-						return 1;
-					}
-					return 0;
+				{ // NULL values are greater than any number
+					$result = ( $b_Chapter->order !== NULL ) ? 1 : 0;
+					break;
 				}
 
 				if( $b_Chapter->order === NULL )
 				{ // NULL values are greater than any number, so a is lower than b
-					return -1;
+					$result = -1;
+					break;
 				}
 
-				return ( $a_Chapter->order > $b_Chapter->order ) ? 1 : ( ( $a_Chapter->order < $b_Chapter->order ) ? -1 : 0 );
+				$result = ( $a_Chapter->order > $b_Chapter->order ) ? 1 : ( ( $a_Chapter->order < $b_Chapter->order ) ? -1 : 0 );
+				break;
 
 			default:
 				debug_die("Invalid category ordering value!");
 		}
+
+		if( $result == 0 )
+		{ // In case if the order fields are equal order by ID
+			$result = $a_Chapter->ID > $b_Chapter->ID ? 1 : -1;
+		}
+
+		return $result;
 	}
 
 

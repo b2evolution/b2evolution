@@ -72,10 +72,10 @@ if( $display_mode == 'js' )
  */
 switch( $action )
 {
- 	case 'nil':
- 	case 'list':
- 	case 'reload':
- 	case 'activate':
+	case 'nil':
+	case 'list':
+	case 'reload':
+	case 'activate':
 	case 'deactivate':
 		// Do nothing
 		break;
@@ -104,6 +104,7 @@ switch( $action )
 
 	case 'edit':
 	case 'update':
+	case 'update_edit':
 	case 'delete':
 	case 'move_up':
 	case 'move_down':
@@ -113,7 +114,7 @@ switch( $action )
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
 		// Take blog from here!
 		// echo $edited_ComponentWidget->coll_ID;
- 		set_working_blog( $edited_ComponentWidget->coll_ID );
+		set_working_blog( $edited_ComponentWidget->coll_ID );
 		$BlogCache = & get_BlogCache();
 		/**
 		* @var Blog
@@ -242,6 +243,7 @@ switch( $action )
 
 
 	case 'update':
+	case 'update_edit':
 		// Update Settings
 
 		// Check that this action request is not a CSRF hacked request:
@@ -257,7 +259,13 @@ switch( $action )
 			{
 				case 'js' : // js reply
 					$edited_ComponentWidget->init_display( array() );
-					send_javascript_message(array( 'widgetSettingsCallback' => array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_desc_for_list() ), 'closeWidgetSettings' => array() ), true );
+					$methods = array();
+					$methods['widgetSettingsCallback'] = array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_desc_for_list() );
+					if( $action == 'update' )
+					{ // Close window after update, and don't close it when user wants continue editing after updating
+						$methods['closeWidgetSettings'] = array();
+					}
+					send_javascript_message( $methods, true );
 					break;
 			}
 			$action = 'list';
@@ -380,19 +388,22 @@ switch( $action )
 
 		if( count( $widgets ) )
 		{ // Enable/Disable the selected widgets
-			$DB->query( 'UPDATE T_widget
+			$updated_widgets = $DB->query( 'UPDATE T_widget
 				  SET wi_enabled = '.$DB->quote( $action == 'activate' ? '1' : '0' ).'
 				WHERE wi_ID IN ( '.$DB->quote( $widgets ).' )
 				  AND wi_coll_ID = '.$DB->quote( $Blog->ID ) );
 		}
 
-		if( $action == 'activate' )
-		{
-			$Messages->add( T_( 'Widgets have been enabled.' ), 'success' );
-		}
-		else
-		{
-			$Messages->add( T_( 'Widgets have been disabled.' ), 'success' );
+		if( ! empty( $updated_widgets ) )
+		{ // Display a result message only when at least one widget has been updated
+			if( $action == 'activate' )
+			{
+				$Messages->add( sprintf( T_( '%d widgets have been enabled.' ), $updated_widgets ), 'success' );
+			}
+			else
+			{
+				$Messages->add( sprintf( T_( '%d widgets have been disabled.' ), $updated_widgets ), 'success' );
+			}
 		}
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
@@ -567,6 +578,7 @@ switch( $action )
 
 	case 'edit':
 	case 'update':	// on error
+	case 'update_edit':
 		switch( $display_mode )
 		{
 			case 'js' : // js request

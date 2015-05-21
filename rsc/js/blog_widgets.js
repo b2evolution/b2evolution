@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 9079 2015-05-19 12:53:40Z yura $
+ * @version $Id: blog_widgets.js 9134 2015-05-21 12:50:39Z yura $
  */
 
 
@@ -404,7 +404,7 @@ function editWidget( widget )
 function widgetSettings( the_html )
 {
 	// add placeholder for widgets settings form:
-	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings"></div>' );
+	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="panel panel-default"></div>' );
 	// var evobar_height = jQuery( '#evo_toolbar' ).height();
 	// jQuery( '#screen_mask' ).css({ top: evobar_height });
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);

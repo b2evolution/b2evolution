@@ -11,6 +11,10 @@
   font-weight: bold;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
+.powered_by a img {
+  background-color: #ffffff;
+  border-radius: 4px;
+}
 ol.breadcrumb {
   margin-left: 0;
   float: left;
@@ -386,4 +390,89 @@ label.control-label[for=post_title] {
 }
 .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
+}
+@media screen and (max-width: 767px) {
+  table,
+  thead,
+  tbody,
+  th,
+  tr,
+  td {
+    display: block;
+  }
+  table:hover,
+  thead:hover,
+  tbody:hover,
+  th:hover,
+  tr:hover,
+  td:hover {
+    background-color: transparent !important;
+  }
+  .meta_category {
+    border-bottom: none !important;
+  }
+  .forums_list .table-hover {
+    border-top: none !important;
+  }
+  .post_button {
+    margin-bottom: 5px;
+  }
+  .table-hover tr {
+    border-top: 1px solid #ddd;
+  }
+  .table-hover tr .ft_status_topic {
+    border: none;
+  }
+  .table-hover tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+  }
+  .table-hover tbody tr:nth-child(even) .ft_author_info {
+    background-color: #fff;
+  }
+  .table-hover .ft_status {
+    width: 100%;
+    border-top: none !important;
+  }
+  .table-hover .ft_title {
+    border: none;
+  }
+  .table-hover tbody tr .ft_author_info {
+    margin-top: 10px;
+    padding: 10px 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  .table-hover .ft_count {
+    display: inline;
+    border: none;
+  }
+  .table-hover .ft_date {
+    border: none;
+  }
+  .table-hover .ft_date .icon_latest_reply:hover {
+    text-decoration: none !important;
+  }
+  .legend tbody tr th {
+    text-align: center;
+    padding-top: 15px;
+  }
+  .legend tbody tr td {
+    padding: 0px 5px;
+  }
+  .single_topic .ft_avatar {
+    border: none;
+  }
+  .single_topic .evo_content_block .vs_published .ft_post_info {
+    border: none;
+  }
+  .single_topic .evo_content_block .vs_published .ft_post_info:first-child {
+    border-top: 1px solid #ddd;
+  }
+  .single_topic .evo_content_block .floatright {
+    float: none !important;
+  }
+  .single_topic .evo_content_block .valign-top .floatright {
+    float: right !important;
+  }
 }

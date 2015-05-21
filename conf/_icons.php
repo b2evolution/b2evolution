@@ -338,7 +338,8 @@ function get_icon_info($name)
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 176 ),
 			'glyph' => 'exclamation-sign',
-			'fa' => 'exclamation-circle'
+			'fa' => 'exclamation-circle',
+			'color' => '#d9534f',
 		);
 		case 'warning_yellow': return array(
 			'alt'  => T_('Warning'),
@@ -537,7 +538,7 @@ function get_icon_info($name)
 			'size' => array( 9, 9 ),
 			'xy' => array( 80, 192 ),
 			'fa' => 'circle',
-			'color' => '#0F0'
+			'color' => '#5cb85c'
 		);
 		case 'bullet_yellow': return array(
 			'alt'  => '&bull;',

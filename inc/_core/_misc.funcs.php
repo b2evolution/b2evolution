@@ -5414,7 +5414,7 @@ function get_coll_sort_options()
 		'name'         => T_('Name'),
 		'shortname'    => T_('Short name'),
 		'tagline'      => T_('Tagline'),
-		'description'  => T_('Description'),
+		'shortdesc'    => T_('Description'),
 		'urlname'      => T_('URL "filename"'),
 		'RAND'         => T_('Random order!'),
 	);

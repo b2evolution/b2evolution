@@ -66,6 +66,9 @@ $Form->end_fieldset();
 //       catch any params/settings maybe? Although this could be done in the
 //       same hook in most cases probably. (dh)
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array(
+		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ),
+		array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
+	) );
 
 ?>

@@ -92,6 +92,7 @@ class GenericCategoryCache extends GenericCache
 		$this->subset_root_cats = array();
 		$this->revealed_all_children = false;
 		$this->revealed_subsets = array();
+		$this->sorted_flags = array();
 		parent::clear();
  	}
 
