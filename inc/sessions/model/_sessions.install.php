@@ -54,10 +54,10 @@ $schema_queries['T_basedomains'] = array(
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 $schema_queries['T_track__keyphrase'] = array(
-		'Creating table for Hit-Logs',
+		'Creating table for Hit-Logs keyphrases',
 		"CREATE TABLE T_track__keyphrase (
 			keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			keyp_phrase  VARCHAR( 255 ) NOT NULL,
+			keyp_phrase  VARCHAR( 255 ) COLLATE utf8_bin NOT NULL,
 			keyp_count_refered_searches INT UNSIGNED DEFAULT 0,
 			keyp_count_internal_searches INT UNSIGNED DEFAULT 0,
 			PRIMARY KEY        ( keyp_ID ),

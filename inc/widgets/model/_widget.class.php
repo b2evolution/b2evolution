@@ -137,7 +137,14 @@ class ComponentWidget extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array( 'for_editing' => true, 'for_updating' => true  ) ) as $parname => $parmeta )
 		{
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
+			$parvalue = NULL;
+			if( $parname == 'allow_blockcache'
+					&& isset( $parmeta['disabled'] )
+					&& ( $parmeta['disabled'] == 'disabled' ) )
+			{ // Force checkbox "Allow caching" to unchecked when it is disabled from widget
+				$parvalue = 0;
+			}
+			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget', NULL, $parvalue );
 		}
 	}
 
@@ -226,15 +233,21 @@ class ComponentWidget extends DataObject
 	 */
 	function get_help_url()
 	{
+		locale_temp_switch( 'en-US' );
+
 		if( $widget_Plugin = & $this->get_Plugin() )
 		{ // Get url of the plugin widget
-			return $widget_Plugin->get_help_url( '$widget_url' );
+			$help_url = $widget_Plugin->get_help_url( '$widget_url' );
 		}
 		else
 		{ // Get url of the standard widget
 			$widget_manual_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $this->get_name() ).'-widget' );
-			return get_manual_url( $widget_manual_slug );
+			$help_url = get_manual_url( $widget_manual_slug );
 		}
+
+		locale_restore_previous();
+
+		return $help_url;
 	}
 
 
@@ -537,12 +550,27 @@ class ComponentWidget extends DataObject
 		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
 		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
 
+		// Check if current widget is disabled for caching
+		$default_widget_params = $this->get_param_definitions( array() );
+		if( ! empty( $default_widget_params )
+		    && isset( $default_widget_params['allow_blockcache'] )
+		    && isset( $default_widget_params['allow_blockcache']['disabled'] )
+		    && ( $default_widget_params['allow_blockcache']['disabled'] == 'disabled' ) )
+		{ // Widget cache is disabled
+			$widget_cache_disabled = true;
+		}
+		else
+		{ // Widget cache is allowed
+			$widget_cache_disabled = false;
+		}
+
 		if( ! $Blog->get_setting('cache_enabled_widgets')
-			|| ! $this->disp_params['allow_blockcache'] )
-		{	// NO CACHING - We do NOT want caching for this collection or for this specific widget:
+		    || ! $this->disp_params['allow_blockcache']
+		    || $widget_cache_disabled )
+		{ // NO CACHING - We do NOT want caching for this collection or for this specific widget:
 
 			if( $display_containers )
-			{	// DEBUG:
+			{ // DEBUG:
 				echo '<div class="dev-blocks dev-blocks--widget"><div class="dev-blocks-name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">'
 							.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
@@ -552,12 +580,12 @@ class ComponentWidget extends DataObject
 			$this->display( $params );
 
 			if( $display_containers )
-			{	// DEBUG:
+			{ // DEBUG:
 				echo "</div>\n";
 			}
 		}
 		else
-		{	// Instantiate BlockCache:
+		{ // Instantiate BlockCache:
 			$Timer->resume( 'BlockCache' );
 			// Extend cache keys:
 			$keys += $this->get_cache_keys();
@@ -572,7 +600,7 @@ class ComponentWidget extends DataObject
 			{ // cache hit, let's display:
 
 				if( $display_containers )
-				{	// DEBUG:
+				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
 								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
 								.'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
@@ -581,16 +609,16 @@ class ComponentWidget extends DataObject
 				echo $content;
 
 				if( $display_containers )
-				{	// DEBUG:
+				{ // DEBUG:
 					echo "</div>\n";
 				}
 
 			}
 			else
-			{	// Cache miss, we have to generate:
+			{ // Cache miss, we have to generate:
 
 				if( $display_containers )
-				{	// DEBUG:
+				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">'
 								.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
 								.'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
@@ -604,7 +632,7 @@ class ComponentWidget extends DataObject
 				$this->BlockCache->end_collect();
 
 				if( $display_containers )
-				{	// DEBUG:
+				{ // DEBUG:
 					echo "</div>\n";
 				}
 

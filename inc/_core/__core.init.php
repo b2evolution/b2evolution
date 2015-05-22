@@ -1223,7 +1223,7 @@ class _core_Module extends Module
 					);
 			}
 
-			if( ($dev_menu || $debug) && !is_admin_page() )
+			if( ( $dev_menu || $debug ) && ! is_admin_page() && ! empty( $Blog ) )
 			{ // Display a menu to turn on/off the debug containers
 				global $ReqURI, $Session;
 

@@ -265,6 +265,10 @@ switch( $action )
 					{ // Close window after update, and don't close it when user wants continue editing after updating
 						$methods['closeWidgetSettings'] = array();
 					}
+					else
+					{ // Scroll to messages after update
+						$methods['showMessagesWidgetSettings'] = array();
+					}
 					send_javascript_message( $methods, true );
 					break;
 			}

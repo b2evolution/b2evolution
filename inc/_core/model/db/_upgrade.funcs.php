@@ -1675,18 +1675,18 @@ function get_columns_with_charset_definition( $query )
 
 
 /**
- * Convert table character set to utf8
+ * Convert table character set to utf8 and fix ascii fields
  * Those columns where the charset or the collation is explicitly defined will be skipped ( those won't be converted )
  *
  * @param sytring table
  */
-function convert_table_to_utf8( $table )
+function convert_table_to_utf8_ascii( $table )
 {
 	global $DB, $schema_queries;
 
 	// Get the table alias
 	$table_index = array_search( $table, $DB->dbreplaces );
-	if( $table_index === NULL )
+	if( $table_index === NULL || $table_index === false )
 	{ // The table doesn't exists in the configuration
 		return;
 	}
@@ -1740,14 +1740,19 @@ function convert_table_to_utf8( $table )
 	{ // Update the table default character set, but not convert the fields to utf8, since they were already converted
 		$DB->query( 'ALTER TABLE `'.$table.'`
 			DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci' );
+
+		// Fix/Normalize all fields with defined charsets/collations (ascii_bin, ascii_general_ci, utf8_bin)
+		$DB->query( 'ALTER TABLE `'.$table.'`
+			MODIFY '.implode( ',
+			MODIFY ', $columns_with_charset ) );
 	}
 }
 
 
 /**
- * Upgrade DB to UTF-8
+ * Upgrade DB to UTF-8 and fix ASCII fields
  */
-function db_upgrade_to_utf8()
+function db_upgrade_to_utf8_ascii()
 {
 	global $db_config, $tableprefix, $DB;
 
@@ -1762,7 +1767,7 @@ function db_upgrade_to_utf8()
 	{ // Convert all tables charset to utf8
 		echo sprintf( T_('Converting %s...'), $table );
 		evo_flush();
-		convert_table_to_utf8( $table );
+		convert_table_to_utf8_ascii( $table );
 		echo " OK<br />\n";
 	}
 

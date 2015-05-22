@@ -52,8 +52,15 @@ $Form->begin_fieldset( T_('Params') );
 	// Loop through all widget params:
 	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
+		$l_value = NULL;
+		if( $l_name == 'allow_blockcache'
+		    && isset( $l_meta['disabled'] )
+		    && ( $l_meta['disabled'] == 'disabled' ) )
+		{ // Force checkbox "Allow caching" to unchecked when it is disabled from widget
+			$l_value = 0;
+		}
 		// Display field:
-		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget );
+		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget, NULL, $l_value );
 	}
 
 $Form->end_fieldset();

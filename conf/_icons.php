@@ -373,6 +373,14 @@ function get_icon_info($name)
 			'fa' => 'home'
 		);
 
+		case 'puzzle': return array(
+			'rollover' => true,
+			'alt'  => T_('New'),
+			'size' => array( 16, 15 ),
+			'xy' => array( 0, 64 ),
+			'glyph' => 'plus',
+			'fa' => 'puzzle-piece'
+		);
 		case 'new': return array(
 			'rollover' => true,
 			'alt'  => T_('New'),

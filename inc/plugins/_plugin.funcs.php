@@ -648,16 +648,18 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  * @param Plugin|Widget
  * @param string Type of Settings (either 'Settings' or 'UserSettings').
  * @param mixed Target (User object for 'UserSettings')
+ * @param mixed NULL to use value from request, OR set value what you want to force
  */
-function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL )
+function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
 {
 	if( isset($parmeta['layout']) )
 	{ // a layout "setting"
 		return;
 	}
 
-	if( ! empty($parmeta['disabled']) || ! empty($parmeta['no_edit']) )
-	{ // the setting is disabled
+	if( ( ! empty( $parmeta['disabled'] ) || ! empty( $parmeta['no_edit'] ) )
+	    && $set_value === NULL )
+	{ // the setting is disabled, but allow to update the value when it is forced by $set_value
 		return;
 	}
 
@@ -695,9 +697,14 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		}
 	}
 
-	// Get the value:
-	$l_value = param( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_param_type, $l_param_default );
-	// pre_dump( $parname, $l_value );
+	if( $set_value === NULL )
+	{ // Get the value from request:
+		$l_value = param( 'edit_plugin_'.$Obj->ID.'_set_'.$parname, $l_param_type, $l_param_default );
+	}
+	else
+	{ // Force value
+		$l_value = $set_value;
+	}
 
 	if( isset($parmeta['type']) && $parmeta['type'] == 'array' )
 	{ // make keys (__key__) in arrays unique and remove them

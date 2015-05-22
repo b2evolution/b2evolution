@@ -5991,7 +5991,309 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * This part will be included in trunk and i7 branches
 		 */
 
-		// set_upgrade_checkpoint( '11410' );
+		set_upgrade_checkpoint( '11410' );
+	}
+
+	if( $old_db_version < 11420 )
+	{ // part 18.l trunk aka 14th part of "i7"
+
+		// This upgrade block restores all field collations that may have been broekn by the back-office DB convert tool
+		// to 'ascii_bin' and 'ascii_general_ci'
+
+		task_begin( 'Updating hit log keyphrases table...' );
+		$DB->query( 'ALTER TABLE T_track__keyphrase
+			MODIFY keyp_phrase  VARCHAR( 255 ) COLLATE utf8_bin NOT NULL' );
+		task_end();
+
+		task_begin( 'Check and normalize the ASCII charsets/collations... <br />' );
+		task_begin( '- Converting skins table...' );
+		$DB->query( "ALTER TABLE T_skins__skin
+			MODIFY skin_type enum('normal','feed','sitemap','mobile','tablet') COLLATE ascii_general_ci NOT NULL default 'normal'" );
+		task_end();
+		task_begin( '- Converting blogs table...' );
+		$DB->query( "ALTER TABLE T_blogs
+			MODIFY blog_access_type    VARCHAR(10) COLLATE ascii_general_ci NOT NULL DEFAULT 'extrapath',
+			MODIFY blog_urlname        VARCHAR(255) COLLATE ascii_general_ci NOT NULL DEFAULT 'urlname',
+			MODIFY blog_in_bloglist    ENUM( 'public', 'logged', 'member', 'never' ) COLLATE ascii_general_ci DEFAULT 'public' NOT NULL,
+			MODIFY blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_general_ci DEFAULT 'default' NOT NULL,
+			MODIFY blog_type           ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL" );
+		task_end();
+		task_begin( '- Converting blog settings table...' );
+		$DB->query( 'ALTER TABLE T_coll_settings
+			MODIFY cset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+		task_begin( '- Converting widgets table...' );
+		$DB->query( "ALTER TABLE {$tableprefix}widget
+			MODIFY wi_type ENUM( 'core', 'plugin' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'core',
+			MODIFY wi_code VARCHAR(32) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting categories table...' );
+		$DB->query( "ALTER TABLE T_categories
+			MODIFY cat_urlname varchar(255) COLLATE ascii_general_ci NOT NULL,
+			MODIFY cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL" );
+		task_end();
+		task_begin( '- Converting posts table...' );
+		$DB->query( "ALTER TABLE T_items__item
+			MODIFY post_status               enum('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL default 'published',
+			MODIFY post_urltitle             VARCHAR(210) COLLATE ascii_general_ci NOT NULL,
+			MODIFY post_notifications_status ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
+			MODIFY post_comment_status       ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
+			MODIFY post_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting comments table...' );
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_type         enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
+			MODIFY comment_status       ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'published' NOT NULL,
+			MODIFY comment_author_email varchar(255) COLLATE ascii_general_ci NULL,
+			MODIFY comment_author_IP    varchar(45) COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY comment_renderers    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			MODIFY comment_secret       CHAR(32) COLLATE ascii_general_ci NULL default NULL,
+			MODIFY comment_notif_status ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?'" );
+		task_end();
+		task_begin( '- Converting post prerendered contents table...' );
+		$DB->query( "ALTER TABLE T_items__prerendering
+			MODIFY itpr_format    ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			MODIFY itpr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting comment prerendered contents table...' );
+		$DB->query( "ALTER TABLE T_comments__prerendering
+			MODIFY cmpr_format    ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			MODIFY cmpr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting post versions table...' );
+		$DB->query( "ALTER TABLE T_items__version
+			MODIFY iver_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL" );
+		task_end();
+		task_begin( '- Converting post types table...' );
+		$DB->query( "ALTER TABLE T_items__type
+			MODIFY ityp_use_title              ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
+			MODIFY ityp_use_url                ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_text               ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_excerpt            ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_title_tag          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_meta_desc          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_meta_keywds        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_tags               ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			MODIFY ityp_use_country            ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			MODIFY ityp_use_region             ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			MODIFY ityp_use_sub_region         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			MODIFY ityp_use_city               ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			MODIFY ityp_use_coordinates        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
+			MODIFY ityp_use_comment_expiration ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional'" );
+		task_end();
+		task_begin( '- Converting post types custom fields table...' );
+		$DB->query( "ALTER TABLE T_items__type_custom_field
+			MODIFY itcf_name VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			MODIFY itcf_type ENUM( 'double', 'varchar' ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting post settings table...' );
+		$DB->query( "ALTER TABLE T_items__item_settings
+			MODIFY iset_name varchar( 50 ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting user permissions table...' );
+		$DB->query( "ALTER TABLE T_coll_user_perms
+			MODIFY bloguser_perm_poststatuses set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloguser_perm_edit         ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			MODIFY bloguser_perm_cmtstatuses  set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloguser_perm_edit_cmt     ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
+		task_end();
+		task_begin( '- Converting group permissions table...' );
+		$DB->query( "ALTER TABLE T_coll_group_perms
+			MODIFY bloggroup_perm_poststatuses set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloggroup_perm_edit         ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			MODIFY bloggroup_perm_cmtstatuses  set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY bloggroup_perm_edit_cmt     ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
+		task_end();
+		task_begin( '- Converting links table...' );
+		$DB->query( "ALTER TABLE T_links
+			MODIFY link_position varchar(10) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting files table...' );
+		$DB->query( "ALTER TABLE T_files
+			MODIFY file_type      enum('image', 'audio', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
+			MODIFY file_root_type enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute'" );
+		task_end();
+		task_begin( '- Converting file types table...' );
+		$DB->query( "ALTER TABLE T_filetypes
+			MODIFY ftyp_extensions varchar(30) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ftyp_viewtype   varchar(10) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ftyp_allowed    enum('any','registered','admin') COLLATE ascii_general_ci NOT NULL default 'admin'" );
+		task_end();
+		task_begin( '- Converting messages table...' );
+		$DB->query( "ALTER TABLE T_messaging__message
+			MODIFY msg_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting message prerendering contents table...' );
+		$DB->query( "ALTER TABLE T_messaging__prerendering
+			MODIFY mspr_format    ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			MODIFY mspr_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting sessions table...' );
+		$DB->query( "ALTER TABLE T_sessions
+			MODIFY sess_key       CHAR(32) COLLATE ascii_general_ci NULL,
+			MODIFY sess_ipaddress VARCHAR(45) COLLATE ascii_general_ci NOT NULL DEFAULT '',
+			MODIFY sess_device    VARCHAR(8) COLLATE ascii_general_ci NOT NULL DEFAULT ''" );
+		task_end();
+		task_begin( '- Converting domains table...' );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			MODIFY dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown'" );
+		task_end();
+		task_begin( '- Converting logs table...' );
+		$DB->query( "ALTER TABLE T_hitlog
+			MODIFY hit_ctrl         VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY hit_type         ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			MODIFY hit_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
+			MODIFY hit_remote_addr  VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY hit_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
+		task_end();
+		task_begin( '- Converting goal categories table...' );
+		$DB->query( "ALTER TABLE T_track__goalcat
+			MODIFY gcat_color  char(7) COLLATE ascii_general_ci default NULL" );
+		task_end();
+		task_begin( '- Converting groups table...' );
+		$DB->query( "ALTER TABLE T_groups
+			MODIFY grp_perm_blogs                  enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
+			MODIFY grp_perm_xhtmlvalidation        VARCHAR(10) COLLATE ascii_general_ci NOT NULL default 'always',
+			MODIFY grp_perm_xhtmlvalidation_xmlrpc VARCHAR(10) COLLATE ascii_general_ci NOT NULL default 'always',
+			MODIFY grp_perm_stats                  enum('none','user','view','edit') COLLATE ascii_general_ci NOT NULL default 'none'" );
+		task_end();
+		task_begin( '- Converting group settings table...' );
+		$DB->query( "ALTER TABLE T_groups__groupsettings
+			MODIFY gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting settings table...' );
+		$DB->query( "ALTER TABLE T_settings
+			MODIFY set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting cache table...' );
+		$DB->query( "ALTER TABLE T_global__cache
+			MODIFY cach_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting users table...' );
+		$DB->query( "ALTER TABLE T_users
+			MODIFY user_email           varchar(255) COLLATE ascii_general_ci NOT NULL,
+			MODIFY user_status          enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			MODIFY user_unsubscribe_key CHAR(32) COLLATE ascii_general_ci NOT NULL default '' COMMENT 'A specific key, it is used when a user wants to unsubscribe from a post comments without signing in',
+			MODIFY user_gender          char(1) COLLATE ascii_general_ci NULL" );
+		task_end();
+		task_begin( '- Converting user fields table...' );
+		$DB->query( "ALTER TABLE T_users__fielddefs
+			MODIFY ufdf_type       char(8) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ufdf_required   enum('hidden','optional','recommended','require') COLLATE ascii_general_ci NOT NULL default 'optional',
+			MODIFY ufdf_duplicated enum('forbidden','allowed','list') COLLATE ascii_general_ci NOT NULL default 'allowed',
+			MODIFY ufdf_icon_name  varchar(100) COLLATE ascii_general_ci NULL,
+			MODIFY ufdf_code       varchar(20) COLLATE ascii_general_ci UNIQUE NOT NULL" );
+		task_end();
+		task_begin( '- Converting user reports table...' );
+		$DB->query( "ALTER TABLE T_users__reports
+			MODIFY urep_status enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci" );
+		task_end();
+		task_begin( '- Converting user invitation codes table...' );
+		$DB->query( "ALTER TABLE T_users__invitation_code
+			MODIFY ivc_code varchar(32) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting locales table...' );
+		$DB->query( "ALTER TABLE T_locales
+			MODIFY loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			MODIFY loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
+			MODIFY loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i'" );
+		task_end();
+		task_begin( '- Converting antispam table...' );
+		$DB->query( "ALTER TABLE {$tableprefix}antispam
+			MODIFY aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported'" );
+		task_end();
+		task_begin( '- Converting IP ranges table...' );
+		$DB->query( "ALTER TABLE T_antispam__iprange
+			MODIFY aipr_status enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL" );
+		task_end();
+		task_begin( '- Converting user settings table...' );
+		$DB->query( "ALTER TABLE T_users__usersettings
+			MODIFY uset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting plugins table...' );
+		$DB->query( "ALTER TABLE T_plugins
+			MODIFY plug_classname VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
+			MODIFY plug_code      VARCHAR(32) COLLATE ascii_general_ci NULL,
+			MODIFY plug_version   VARCHAR(42) COLLATE ascii_general_ci NOT NULL default '0',
+			MODIFY plug_status    ENUM( 'enabled', 'disabled', 'needs_config', 'broken' ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting plugin settings table...' );
+		$DB->query( "ALTER TABLE T_pluginsettings
+			MODIFY pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting plugin user settings table...' );
+		$DB->query( "ALTER TABLE T_pluginusersettings
+			MODIFY puset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting plugin events table...' );
+		$DB->query( "ALTER TABLE T_pluginevents
+			MODIFY pevt_event VARCHAR(40) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting cron tasks table...' );
+		$DB->query( "ALTER TABLE T_cron__task
+			MODIFY ctsk_key varchar(50) COLLATE ascii_general_ci not null" );
+		task_end();
+		task_begin( '- Converting cron logs table...' );
+		$DB->query( "ALTER TABLE T_cron__log
+			MODIFY clog_status enum('started','finished','error','timeout') COLLATE ascii_general_ci not null default 'started'" );
+		task_end();
+		task_begin( '- Converting countries table...' );
+		$DB->query( "ALTER TABLE T_regional__country
+			MODIFY ctry_code   char(2) COLLATE ascii_general_ci NOT NULL,
+			MODIFY ctry_status enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL" );
+		task_end();
+		task_begin( '- Converting regions table...' );
+		$DB->query( "ALTER TABLE T_regional__region
+			MODIFY rgn_code char(6) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting subregions table...' );
+		$DB->query( "ALTER TABLE T_regional__subregion
+			MODIFY subrg_code char(6) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting cities table...' );
+		$DB->query( "ALTER TABLE T_regional__city
+			MODIFY city_postcode char(12) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting currencies table...' );
+		$DB->query( "ALTER TABLE T_regional__currency
+			MODIFY curr_code char(3) COLLATE ascii_general_ci NOT NULL" );
+		task_end();
+		task_begin( '- Converting slugs table...' );
+		$DB->query( "ALTER TABLE T_slug
+			MODIFY slug_title varchar(255) COLLATE ascii_bin NOT NULL,
+			MODIFY slug_type	char(6) COLLATE ascii_bin NOT NULL DEFAULT 'item'" );
+		task_end();
+		task_begin( '- Converting email logs table...' );
+		$DB->query( "ALTER TABLE T_email__log
+			MODIFY emlog_to     VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emlog_result ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok'" );
+		task_end();
+		task_begin( '- Converting email returns table...' );
+		$DB->query( "ALTER TABLE T_email__returns
+			MODIFY emret_address   VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emret_errtype   CHAR(1) COLLATE ascii_general_ci NOT NULL DEFAULT 'U'" );
+		task_end();
+		task_begin( '- Converting email addresses table...' );
+		$DB->query( "ALTER TABLE T_email__address
+			MODIFY emadr_address VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			MODIFY emadr_status  ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown'" );
+		task_end();
+		task_begin( '- Converting system log table...' );
+		$DB->query( "ALTER TABLE T_syslog
+			MODIFY slg_type   ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
+			MODIFY slg_origin ENUM('core', 'plugin') COLLATE ascii_general_ci,
+			MODIFY slg_object ENUM('comment', 'item', 'user', 'file') COLLATE ascii_general_ci" );
+		task_end();
+		task_end();
+
+		/*
+		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
+		 *
+		 * This part will be included in trunk and i7 branches
+		 */
+
+		// set_upgrade_checkpoint( '11420' );
 	}
 
 	/*

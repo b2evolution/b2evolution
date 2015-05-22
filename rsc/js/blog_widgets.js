@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 9134 2015-05-21 12:50:39Z yura $
+ * @version $Id: blog_widgets.js 9162 2015-05-22 13:29:23Z yura $
  */
 
 
@@ -435,6 +435,14 @@ function closeWidgetSettings()
 	jQuery( '#server_messages' ).insertBefore( '.available_widgets' );
 	jQuery( '#widget_settings' ).remove();
 	jQuery( '#screen_mask' ).remove();
+	return false;
+}
+
+function showMessagesWidgetSettings()
+{
+	jQuery( '#widget_settings' ).animate( {
+			scrollTop: jQuery( '#widget_settings' ).scrollTop() +  + jQuery( '#server_messages' ).position().top - 20
+		}, 100 );
 	return false;
 }
 

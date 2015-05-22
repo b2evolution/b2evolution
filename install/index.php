@@ -1060,7 +1060,7 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Conversion in progress') );
 
-		db_upgrade_to_utf8();
+		db_upgrade_to_utf8_ascii();
 
 		// Stop the animation of the progress bar
 		stop_install_progress_bar();

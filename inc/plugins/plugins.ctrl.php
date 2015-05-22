@@ -306,6 +306,7 @@ switch( $action )
 		}
 		else
 		{ // delta queries have to be confirmed in payload
+			$action = 'install_db_schema';
 			$next_action = 'install_db_schema';
 			break;
 		}
