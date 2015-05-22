@@ -174,11 +174,8 @@ class user_links_Widget extends ComponentWidget
 
 		if( empty( $this->disp_params['login'] ) )
 		{ // No defined user in widget settings
-			if( ! empty( $Item ) )
-			{ // Use an author of the current $Item
-				$widget_User = & $Item->get_creator_User();
-			}
-			elseif( ! empty( $Blog ) )
+			// Note: There is no 'in-item' context in i7
+			if( ! empty( $Blog ) )
 			{ // Use an owner of the current $Blog
 				$widget_User = & $Blog->get_owner_User();
 			}

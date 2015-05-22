@@ -1800,6 +1800,7 @@ function & mainlist_get_item()
 		$Item = NULL;
 	}
 
+	// Make this available globally:
 	$GLOBALS['Item'] = & $Item;
 
 	return $Item;

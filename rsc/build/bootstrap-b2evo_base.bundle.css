@@ -895,6 +895,9 @@ div#evo_toolbar .actions_right {
   height: 1px;
   margin: 10px 4px;
 }
+.evobar-menu li u {
+  text-decoration: none;
+}
 .evobar-menu a {
   display: inline-block;
   position: relative;
@@ -929,7 +932,8 @@ div#evo_toolbar .actions_right {
   float: right;
 }
 @media (max-width: 800px) {
-  .evobar-menu li.rwdhide {
+  .evobar-menu li.rwdhide,
+  .evobar-menu li u {
     display: none;
   }
 }

@@ -920,12 +920,12 @@ class _core_Module extends Module
 					);
 			}
 			$entries['front'] = array(
-					'text' => T_('Home'),
+					'text' => /* TRANS: evobar menu link. <u>...</u> marks the part to hide on small screens */ T_('Front<u>-office</u>'),
 					'href' => $baseurl,
-					'title' => T_('Go to the home page (Front-office)'),
+					'title' => T_('Go to the site home page (Front-office)'),
 				);
 			$entries['dashboard'] = array(
-					'text' => T_('Admin'),
+					'text' => /* TRANS: evobar menu link. <u>...</u> marks the part to hide on small screens */ T_('Back<u>-office</u>'),
 					'href' => $admin_url,
 					'title' => T_('Go to the site dashboard (Back-office)'),
 				);

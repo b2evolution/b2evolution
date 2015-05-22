@@ -1949,13 +1949,16 @@ function skin_body_attrs( $params = array() )
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
-	if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+	if ( ! empty($Blog) )
 	{
-		$classes[] = 'dev_show_includes';
-	}
-	if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
-	{
-		$classes[] = 'dev_show_containers';
+		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		{
+			$classes[] = 'dev_show_includes';
+		}
+		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		{
+			$classes[] = 'dev_show_containers';
+		}
 	}
 
 	if( ! empty( $classes ) )

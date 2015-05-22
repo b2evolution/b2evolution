@@ -396,6 +396,9 @@ div#evo_toolbar {
 				margin: 10px 4px;
 			}
 		}
+		u {	// This is used to hide a part of the text on small screens
+			text-decoration: none;
+		}
 	}
 	a {
 		display: inline-block;
@@ -441,7 +444,8 @@ div#evo_toolbar {
 }
 // Hide several menu entries on small screens
 @media (max-width: 800px) {
-	.evobar-menu li.rwdhide {
+	.evobar-menu li.rwdhide,
+	.evobar-menu li u {
 		display: none;
 	}
 }

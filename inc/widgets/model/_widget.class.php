@@ -387,7 +387,7 @@ class ComponentWidget extends DataObject
 	 * Prepare display params
 	 *
 	 * @todo Document default params and default values.
-	 *       This might link to a wiki page, too.
+	 * @todo fp> do NOT call this when just listing widget names in the back-office. It's overkill!
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
@@ -501,7 +501,8 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 		global $rsc_url;
 
-		$this->init_display( $params ); // just in case it hasn't been done before
+		// prepare for display:
+		$this->init_display( $params ); 
 
 		switch( $this->type )
 		{
