@@ -61,8 +61,10 @@ skin_widget( array(
 
 <a name="top"></a>
 <a name="p<?php echo $Item->ID; ?>"></a>
-<div class="panel panel-default forums_list single_topic">
+<div class="forums_list single_topic">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
+	
+	<section class="panel panel-default">
 	<div class="panel-heading">
 		<?php
 		// Page title
@@ -104,42 +106,45 @@ skin_widget( array(
 		}
 		?>
 	</div>
-<table id="styled_content_block" class="table evo_content_block">
-	<tr class="ft_post_info">
-		<td><?php
-			$Item->author( array(
-				'link_text' => 'login',
-			) );
-		?></td>
-		<td><?php
-			if( $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Item->issue_time( array(
-						'before'      => '',
-						'after'       => ' &nbsp; &nbsp; ',
-						'time_format' => 'D M j, Y H:i',
+	</section>
+	
+	<section id="styled_content_block" class="table evo_content_block">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
+				<?php
+					$Item->author( array(
+						'link_text' => 'login',
 					) );
-			}
-		?>
-			<a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
-		</td>
-	</tr>
-	<tr class="valign-top">
-		<td class="ft_avatar"><?php
-			$Item->author( array(
-				'link_text'  => 'only_avatar',
-				'thumb_size' => 'crop-top-80x80',
-			) );
-		?></td>
-		<td>
-			<?php
-			$post_header_class = 'bPostDate';
-			if( $Skin->enabled_status_banner( $Item->status ) )
-			{
-				$Item->status( array( 'format' => 'styled' ) );
-				$legend_statuses[] = $Item->status;
-			}
-			?>
+				?>
+				<?php
+					if( $Skin->get_setting( 'display_post_date' ) )
+					{ // We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => '',
+								'after'       => ' &nbsp; &nbsp; ',
+								'time_format' => 'D M j, Y H:i',
+							) );
+					}
+				?></h4>	
+		</div>
+		
+		<div class="panel-body">
+			<div class="ft_avatar col-md-1 col-sm-2"><?php
+				$Item->author( array(
+					'link_text'  => 'only_avatar',
+					'thumb_size' => 'crop-top-80x80',
+				) );
+			?></div>
+			<div class="post_main col-md-11 col-sm-10 col-xs-12">
+				<?php
+				$post_header_class = 'bPostDate';
+				if( $Skin->enabled_status_banner( $Item->status ) )
+				{
+					$Item->status( array( 'format' => 'styled' ) );
+					$legend_statuses[] = $Item->status;
+				}
+				?>
 <?php
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 	skin_include( '_item_content.inc.php', $params );
@@ -147,11 +152,11 @@ skin_widget( array(
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
 ?>
-		</td>
-	</tr>
-	<tr>
-		<td><a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="postlink"><?php echo T_('Back to top'); ?></a></td>
-		<td>
+			</div>		
+		</div><!-- ../panel-body -->
+		
+		<div class="panel-footer">
+		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="postlink"><?php echo T_('Back to top'); ?></a>
 		<?php
 			echo '<div class="floatleft">';
 
@@ -196,58 +201,20 @@ skin_widget( array(
 			echo '</span>';
 			echo '</div>';
 		?>
-		</td>
-	</tr>
-<?php
-if( !$Item->can_see_comments( true ) || $preview )
-{	// If comments are disabled for this post we should close the <table> tag that was opened above for post content
-	// Otherwise this tag will be closed below by 'comment_list_end'
-	echo '</table></div>';
-}
-?>
-
+		
+		</div><!-- ../panel-footer -->
+	</div><!-- ../panel panel-default -->
+	</section><!-- ../table evo_content_block -->
+</div><!-- ../forums_list single_topic -->
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array_merge( array(
-				'preview_block_start'  => '<div id="comment_preview" class="panel panel-warning forums_list single_topic"><table id="styled_content_block" class="table evo_content_block">',
-				'preview_block_end'    => '</table></div>',
-				'notification_text'    => T_( 'This is your topic. You are receiving notifications when anyone posts a reply on your topics.' ),
-				'notification_text2'   => T_( 'You will be notified by email when someone posts a reply here.' ),
-				'notification_text3'   => T_( 'Notify me by email when someone posts a reply here.' ),
-				'before_section_title' => '<h3>',
-				'after_section_title'  => '</h3>',
-				'comment_list_end'     => '</table></div>',
-				'disp_rating_summary'  => false,
-				'disp_section_title'   => false,
-				'form_comment_text'    => T_('Message body'),
-				'form_submit_text'     => T_('Submit'),
-				'form_title_text'      => T_('Post a reply'),
-				'comments_disabled_text_member'     => T_( 'You must be a member of this blog to post a reply.' ),
-				'comments_disabled_text_registered' => T_( 'You must be logged in to post a reply.' ),
-				'comments_disabled_text_validated'  => T_( 'You must activate your account before you can post a reply.' ),
-				'feed_title'                        => get_icon( 'feed' ).' '.T_('RSS feed for replies to this topic'),
-				'before_comment_error' => '<p class="center" style="font-size:150%"><b>',
-				'comment_closed_text'  => T_('This topic is closed.'),
-				'after_comment_error'  => '</b></p>',
-				// Params for ajax comment form on quote action
-				'comment_mode'         => param( 'mode', 'string', '' ),
-				'comment_qc'           => param( 'qc', 'integer', 0 ),
-				'comment_qp'           => param( 'qp', 'integer', 0 ),
-				$dummy_fields[ 'content' ] => param( $dummy_fields[ 'content' ], 'html' ),
-				// Comments list navigation:
-				'disp_nav_top'      => false,
-				'nav_bottom_inside' => true,
-				'nav_block_start'   => '<tr class="panel bottom"><td colspan="2">'.$post_buttons.'<div class="navigation">',
-				'nav_block_end'     => '</div></td></tr>',
-				'nav_prev_text'     => T_('Previous'),
-				'nav_next_text'     => T_('Next'),
-				'nav_prev_class'    => 'prev',
-				'nav_next_class'    => 'next',
-			), $params ) );
+		skin_include( '_item_feedback.inc.php', array ( 
+			'disp_section_title'    => false,
+		) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 

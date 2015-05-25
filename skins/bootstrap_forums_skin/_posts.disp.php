@@ -61,22 +61,22 @@ if( count( $chapters ) > 0 )
 ?>
 	<div class="panel panel-default forums_list">
 <?php
-	$table_is_started = false;
+	$section_is_started = false;
 	foreach( $chapters as $Chapter )
 	{ // Loop through categories:
 		if( $Chapter->meta )
 		{ // Meta category
 			$chapters_children = $Chapter->children;
-			if( $table_is_started )
+			if( $section_is_started )
 			{ // Close previous opened table
 ?>
 			</tbody>
 		</table>
 <?php
-				$table_is_started = false;
+				$section_is_started = false;
 			}
 ?>
-		<div class="panel-heading meta_category"><a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a></div>
+		<header class="panel-heading meta_category"><a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a></header>
 <?php
 		}
 		else
@@ -84,12 +84,11 @@ if( count( $chapters ) > 0 )
 			$chapters_children = array( $Chapter );
 		}
 
-		if( ! $table_is_started )
+		if( ! $section_is_started )
 		{
-			$table_is_started = true;
+			$section_is_started = true;
 ?>
-		<table class="table table-hover">
-			<tbody>
+		<section class="table table-hover">
 <?php
 		}
 
@@ -105,10 +104,12 @@ if( count( $chapters ) > 0 )
 				$chapter_icon = 'fa-folder big';
 				$chapter_icon_title = T_('No new posts');
 			}
+
 ?>
-		<tr>
-			<td class="ft_status"><i class="icon fa <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></i></td>
-			<td class="ft_title">
+	<article class="container group_row">		
+			
+			<div class="ft_status col-lg-1 col-md-1 col-sm-1 col-xs-2"><i class="icon fa <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></i></div>
+			<div class="ft_title col-lg-7 col-md-6 col-sm-6 col-xs-6">			
 				<a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a>
 				<?php
 				if( $Chapter->dget( 'description' ) != '' )
@@ -121,7 +122,7 @@ if( count( $chapters ) > 0 )
 					echo T_('Subforums').': ';
 					$cc = 0;
 					foreach( $Chapter->children as $child_Chapter )
-					{	// Display subforum
+					{ // Display subforum
 						echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
 						echo $cc < count( $Chapter->children ) - 1 ? ', ' : '';
 						$cc++;
@@ -129,19 +130,19 @@ if( count( $chapters ) > 0 )
 					echo '</div>';
 				}
 				?>
-			</td>
-			<td class="ft_count"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></td>
-			<td class="ft_count"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></td>
-			<td class="ft_date"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></td>
-		</tr>
+			</div>
+			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-1"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
+			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-1"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
+			<div class="ft_date_shrinked col-xs-3"><?php echo $Chapter->get_last_touched_date( 'm/j/y H:i' ); ?></div>
+		</article>
 <?php
 		}
 	} // End of categories loop.
-	if( $table_is_started )
+	if( $section_is_started )
 	{
 ?>
-			</tbody>
-		</table>
+		</section>
 <?php
 	}
 ?>
@@ -186,8 +187,7 @@ if( isset( $MainList ) && ( empty( $cat ) ||
 		?>
 	</div>
 
-	<table class="table table-hover">
-		<tbody>
+	<section class="table table-hover">
 <?php
 
 if( ! empty( $cat ) )
@@ -216,14 +216,13 @@ if( $MainList->result_num_rows > 0 )
 elseif( isset( $current_Chapter ) )
 { // Display a message about no posts in this category
 ?>
-<tr>
-	<td colspan="5"><?php echo T_('There is no topic in this forum yet.'); ?></td>
-</tr>
+<div class="ft_no_post">
+	<?php echo T_('There is no topic in this forum yet.'); ?>
+</div>
 <?php
 }
 ?>
-		</tbody>
-	</table>
+	</section>
 
 	<div class="panel-body">
 	<?php

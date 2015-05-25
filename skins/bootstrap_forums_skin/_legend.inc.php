@@ -58,17 +58,17 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 foreach( $legends as $l => $legend )
 {	// Print out all legends
 ?>
-<table class="legend" border="0" cellpadding="0" cellspacing="0">
-	<tr>
+<div class="legend">
 	<?php
 	foreach( $legend as $s => $status )
 	{	// Display legend icon with description
 	?>
-		<th><i class="icon fa <?php echo $status['icon']; ?>" title="<?php echo $status['title']; ?>"></i></th>
-		<td><?php echo $status['title']; ?></td>
+		<div class="legend-item">
+			<i class="icon fa <?php echo $status['icon']; ?>" title="<?php echo $status['title']; ?>"></i>
+			<?php echo $status['title']; ?>
+		</div>
 	<?php } ?>
-	</tr>
-</table>
+</div>
 <?php } ?>
 
 <?php
@@ -78,7 +78,7 @@ if( !empty( $legend_statuses ) && is_logged_in() )
 	$statuses = get_visibility_statuses( '', array( 'deprecated', 'redirected', 'trash' ) );
 	$statuses_titles = get_visibility_statuses( 'legend-titles' );
 ?>
-<ul class="bPosts bForums legend">
+<ul class="evo_posts evo_forums legend">
 	<?php
 	foreach( $statuses_titles as $status => $title )
 	{

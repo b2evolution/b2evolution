@@ -51,9 +51,9 @@ elseif( $comments_number > 25 )
 	$status_icon = 'fa-star';
 }
 ?>
-		<tr>
-			<td class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i></td>
-			<td class="ft_title"><?php
+		<article class="container group_row posts">			
+			<div class="ft_status_topic col-lg-1 col-md-1 col-sm-1"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i></div>
+			<div class="ft_title col-lg-8 col-md-7 col-sm-11 col-xs-10"><?php
 				echo $status_title;
 				$Item->load_Blog();
 				if( $Item->Blog->get_setting( 'track_unread_content' ) )
@@ -85,8 +85,8 @@ elseif( $comments_number > 25 )
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
-			?></td>
-			<td class="ft_count"><?php
+			?></div>
+			<div class="ft_count col-lg-1 col-md-1 col-sm-3"><?php
 				if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 				{ // The comments are disabled
 					echo T_('n.a.');
@@ -95,8 +95,8 @@ elseif( $comments_number > 25 )
 				{
 					printf( T_('%s replies'), '<b>'.$comments_number.'</b>' );
 				}
-			?></td>
-			<td class="ft_date"><?php
+			?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-4"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
 					$latest_Comment->author2( array(
@@ -135,5 +135,25 @@ elseif( $comments_number > 25 )
 						) );
 					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
-			?></td>
-		</tr>
+			?></div>
+			
+			<div class="ft_date_shrinked"><?php
+				if( $latest_Comment = & $Item->get_latest_Comment() )
+				{ // Display info about last comment
+					$latest_Comment->date('m/j/y H:i');
+					$latest_Comment->author2( array(
+							'link_text'   => 'login'
+						) );
+
+					echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+				}
+				else
+				{ // No comments, Display info of post
+					echo $Item->get_mod_date( 'm/j/y H:i' );
+					echo $Item->author( array(
+							'link_text' => 'login',
+						) );
+					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+				}
+			?></div>			
+		</article>

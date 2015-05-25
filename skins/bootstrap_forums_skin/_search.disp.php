@@ -16,15 +16,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-echo '<table class="forums_table topics_table" cellspacing="0" cellpadding="0">';
+echo '<div class="forums_table_search panel panel-default">';
 
 // --------------------------------- START OF COMMON LINKS --------------------------------
 skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'coll_search_form',
 		// Optional display params
-		'block_start' => '<tr class="ft_search"><td>',
-		'block_end' => '</td></tr>',
+		'block_start' => '<div class="panel-heading">',
+		'block_end' => '</div></div>',
 		'block_display_title' => false,
 		'disp_search_options' => 0,
 		'search_class' => 'extended_search_form',
@@ -39,13 +39,13 @@ search_result_block( array(
 		'title_prefix_comment'  => T_('Reply: '),
 		'title_prefix_category' => T_('Forum: '),
 		'title_prefix_tag'      => T_('Tag: '),
-		'block_start' => '',
-		'block_end'   => '',
-		'row_start'   => '<tr><td>',
-		'row_end'     => '</td></tr>',
+		'block_start' => '<div class="panel panel-default">',
+		'block_end'   => '</div>',
+		'row_start'   => '<div class="panel-body">',
+		'row_end'     => '</div>',
 		'pagination'  => array(
-				'block_start' => '<tr class="panel white"><td><div class="navigation">',
-				'block_end' => '</div></td></tr>',
+				'block_start' => '<div class="evo_search_navigation center">',
+				'block_end' => '</div>',
 				'page_current_template' => '<strong class="current_page">$page_num$</strong>',
 				'page_item_before'      => '',
 				'page_item_after'       => '',
@@ -56,5 +56,5 @@ search_result_block( array(
 			)
 	) );
 
-echo '</table>';
+echo '</div>';
 ?>

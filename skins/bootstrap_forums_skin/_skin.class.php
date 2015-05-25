@@ -63,7 +63,7 @@ class bootstrap_forums_Skin extends Skin
 	{
 		$r = array_merge( array(
 				// === MILOS
-				'page_link_color' => array(
+				/*'page_link_color' => array(
 					'label' => T_('Page link color'),
 					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#337ab7',
@@ -80,7 +80,7 @@ class bootstrap_forums_Skin extends Skin
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#fff',
 					'type' => 'color',
-				),				
+				),*/	
 				// === ../MILOS
 				'avatar_style' => array(
 					'label' => T_('Style of profile pictures'),
@@ -208,7 +208,7 @@ class bootstrap_forums_Skin extends Skin
 		$custom_css = '';
 		// ===== Custom page styles: =====
 		
-		$custom_styles = array();
+		/*$custom_styles = array();
 		// Link color
 		if( $text_color = $this->get_setting( 'page_link_color' ) )
 		{
@@ -239,7 +239,7 @@ class bootstrap_forums_Skin extends Skin
 		if( ! empty( $custom_styles ) )
 		{
 			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
-		}		
+		}*/
 		
 		if( !empty( $custom_css ) )
 		{
