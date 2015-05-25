@@ -240,7 +240,7 @@ switch( $action )
 		break;
 
 	case 'utf8upgrade':
-		$title = T_('Convert your DB to UTF-8');
+		$title = T_('Convert/Normalize your DB to UTF-8/ASCII');
 		break;
 
 	case 'start':
@@ -736,7 +736,7 @@ switch( $action )
 			<div class="radio">
 				<label>
 					<input type="radio" name="action" id="utf8upgrade" value="utf8upgrade"<?php echo ( $require_charset_update ) ? ' checked="checked"' : '' ?>/>
-					<?php echo T_('<strong>Convert your DB to UTF-8</strong>: all the b2evolution tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset.')?>
+					<?php echo T_('<strong>Convert/Normalize your DB to UTF-8/ASCII</strong>: The content tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset. Some system tables will also be converted to plain ASCII for better performance.')?>
 				</label>
 			</div>
 			<?php
