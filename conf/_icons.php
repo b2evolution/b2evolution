@@ -520,6 +520,13 @@ function get_icon_info($name)
 			'fa' => 'circle-o',
 			'color' => '#000'
 		);
+		case 'bullet_empty_grey': return array(
+			'alt'  => '&nbsp;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 112, 176 ),
+			'fa' => 'circle-o',
+			'color' => '#999'
+		);
 		case 'bullet_blue': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -635,6 +642,13 @@ function get_icon_info($name)
 			'xy' => array( 32, 128 ),
 			'glyph' => 'question-sign',
 			'fa' => 'question-circle'
+		);
+		case 'question': return array(
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 128 ),
+			'glyph' => 'question-sign',
+			'fa' => 'question-circle',
+			'color' => '#F90'
 		);
 		case 'manual': return array(
 			'rollover' => true,
