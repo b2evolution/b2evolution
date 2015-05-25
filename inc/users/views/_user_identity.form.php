@@ -193,12 +193,12 @@ if( $action != 'view' )
 
 		if( $edited_User->has_avatar() || count( $user_avatars ) )
 		{ // If user uploaded at least one profile picture
-			$change_picture_title = T_('Change').' &raquo';
+			$change_picture_title = T_('Change').' &raquo;';
 			$change_picture_icon = 'edit';
 		}
 		else
 		{ // If user has no profile picture yet
-			$change_picture_title = T_('Upload now').' &raquo';
+			$change_picture_title = T_('Upload now').' &raquo;';
 			$change_picture_icon = 'move_up_green';
 		}
 
