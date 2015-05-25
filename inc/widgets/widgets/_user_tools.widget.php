@@ -210,6 +210,18 @@ class user_tools_Widget extends ComponentWidget
 		return $r;
 	}
 
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'user-tools-widget' );
+	}
+
+
 	/**
 	 * Get name of widget
 	 */

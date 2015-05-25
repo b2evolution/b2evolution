@@ -35,11 +35,22 @@ class coll_longdesc_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'long-description-of-collection-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		return T_('Long Description of this Blog');
+		return T_('Long Description of this Collection');
 	}
 
 

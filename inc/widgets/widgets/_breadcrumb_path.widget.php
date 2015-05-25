@@ -63,6 +63,17 @@ class breadcrumb_path_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'breadcrumb-path-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

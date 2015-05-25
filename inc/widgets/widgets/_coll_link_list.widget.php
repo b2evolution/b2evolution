@@ -63,6 +63,17 @@ class coll_link_list_Widget extends coll_item_list_Widget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'simple-sidebar-links-list-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

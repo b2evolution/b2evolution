@@ -115,6 +115,17 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'featured-intro-post-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

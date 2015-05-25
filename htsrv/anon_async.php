@@ -1124,7 +1124,7 @@ switch( $action )
 			$tags = $DB->get_results( '
 				SELECT tag_name AS id, tag_name AS title
 				  FROM T_items__tag
-				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').'
+				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
 				 ORDER BY tag_name', ARRAY_A );
 
 			// Check if current term is not an existing tag

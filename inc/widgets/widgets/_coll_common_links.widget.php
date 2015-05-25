@@ -39,6 +39,17 @@ class coll_common_links_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'common-navigation-links-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

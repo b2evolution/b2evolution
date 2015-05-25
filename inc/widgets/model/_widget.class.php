@@ -229,23 +229,18 @@ class ComponentWidget extends DataObject
 	/**
 	 * Get help URL
 	 *
-	 * @return string URL
+	 * @return string|NULL URL, NULL - when core widget doesn't define the url yet
 	 */
 	function get_help_url()
 	{
-		locale_temp_switch( 'en-US' );
-
 		if( $widget_Plugin = & $this->get_Plugin() )
 		{ // Get url of the plugin widget
 			$help_url = $widget_Plugin->get_help_url( '$widget_url' );
 		}
 		else
-		{ // Get url of the standard widget
-			$widget_manual_slug = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $this->get_name() ).'-widget' );
-			$help_url = get_manual_url( $widget_manual_slug );
+		{ // Core widget must defines this URL
+			$help_url = NULL;
 		}
-
-		locale_restore_previous();
 
 		return $help_url;
 	}
@@ -260,6 +255,13 @@ class ComponentWidget extends DataObject
 	 */
 	function get_help_link( $icon = 'help', $use_tooltip = true )
 	{
+		$widget_url = $this->get_help_url();
+
+		if( empty( $widget_url ) )
+		{ // Return empty string when widget URL is not defined
+			return '';
+		}
+
 		$link_attrs = array( 'target' => '_blank' );
 
 		if( $use_tooltip )
@@ -268,7 +270,7 @@ class ComponentWidget extends DataObject
 			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
-		return action_icon( '', $icon, $this->get_help_url(), NULL, NULL, NULL, $link_attrs );
+		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );
 	}
 
 

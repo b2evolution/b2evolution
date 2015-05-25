@@ -35,6 +35,17 @@ class profile_menu_link_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'my-profile-menu-link-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

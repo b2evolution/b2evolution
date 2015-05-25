@@ -35,11 +35,22 @@ class colls_list_public_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'public-collections-list-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		return T_('Public blog list');
+		return T_('Public collections list');
 	}
 
 

@@ -34,9 +34,9 @@ class coll_comment_list_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -85,6 +85,17 @@ class coll_comment_list_Widget extends ComponentWidget
 		), parent::get_param_definitions( $params )	);
 
 		return $r;
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'comment-list-widget' );
 	}
 
 

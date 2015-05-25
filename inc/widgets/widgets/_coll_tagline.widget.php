@@ -35,11 +35,22 @@ class coll_tagline_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'collection-tagline-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		return T_('Blog tagline');
+		return T_('Collection tagline');
 	}
 
 

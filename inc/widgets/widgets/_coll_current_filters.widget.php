@@ -36,6 +36,17 @@ class coll_current_filters_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'current-filters-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

@@ -35,6 +35,17 @@ class coll_search_form_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'search-form-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()

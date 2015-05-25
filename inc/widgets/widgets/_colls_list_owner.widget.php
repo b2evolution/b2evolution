@@ -35,11 +35,22 @@ class colls_list_owner_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'same-owner-collections-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		return T_('Same owner\'s blog list');
+		return T_('Same owner\'s collections list');
 	}
 
 

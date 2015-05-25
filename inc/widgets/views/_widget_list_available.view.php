@@ -44,36 +44,40 @@ foreach( $Plugin_array as $k => $Plugin )
 		$Plugin_array_grouped[ $plugin_group ][] = $Plugin;
 	}
 }
-
-if( isset( $Plugin_array_grouped['other'] ) )
-{ // Move "other" group at the end
-	$plugins_other_group = $Plugin_array_grouped['other'];
-	unset( $Plugin_array_grouped['other'] );
-	$Plugin_array_grouped['other'] = $plugins_other_group;
-	unset( $plugins_other_group );
-}
 unset( $Plugin_array );
 
+$widget_groups = array (
+	'multipurpose' => T_('Multi-Purpose Widgets'),
+	'menu_item'    => T_('Menu Item Widgets'),
+	'navigation'   => T_('Navigation Widgets'),
+	'content'      => T_('Content Listing Widgets'),
+	'collection'   => T_('Collection Support Widgets'),
+	'site'         => T_('Site Support Widgets'),
+	'user'         => T_('User Support Widgets'),
+	'other'        => T_('Other'),
+);
 
-// NOTE: Text "*multipurpose*" is used to move the plugins in the widget groups by Plugin->subgroup
 $core_componentwidget_defs = array(
-		'*multipurpose*'.T_('Multi-Purpose Widgets'),
+	'multipurpose' => array(
 			'coll_logo',
 			'coll_avatar',
 			'free_html',
 			'user_links',
-		'*menu*'.T_('Menu Item Widgets'),
+		),
+	'menu_item' => array(
 			'menu_link',
 			'msg_menu_link',
 			'profile_menu_link',
-		'*navigation*'.T_('Navigation Widgets'),
+		),
+	'navigation' => array(
 			'coll_search_form',
 			'coll_category_list',
 			'content_hierarchy',
 			'coll_tag_cloud',
 			'breadcrumb_path',
 			'coll_common_links',
-		'*content*'.T_('Content Listing Widgets'),
+		),
+	'content' => array(
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_link_list',         // Simple Sidebar Links list
@@ -83,84 +87,67 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro',    // Featured/Intro Post 
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
-		'*collection*'.T_('Collection Support Widgets'),
+		),
+	'collection' => array(
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
 			'coll_current_filters',
 			'coll_xml_feeds',
-		'*site*'.T_('Site Support Widgets'),
+		),
+	'site' => array(
 			'colls_list_public',
 			'colls_list_owner',
 			'user_avatars',
-		'*user*'.T_('User Support Widgets'),
+		),
+	'user' => array(
 			'user_login',
 			'user_register',
 			'user_tools',
-		'*other*'.T_('Other'),
+		),
+	'other' => array(
 			'org_members',
 			'online_users',
 			'member_count',
 			'mobile_skin_switcher',
-	);
-$i = 0;
-$prev_group_code = '';
-foreach( $core_componentwidget_defs as $code )
+		),
+);
+
+
+foreach( $widget_groups as $widget_group_code => $widget_group_title )
 {
-	$i++;
-	if( $code[0] == '*' )
-	{ // group
-		preg_match( '/\^*([a-z0-9\-_]+)\*(.+)$/i', $code, $code_match );
-		if( isset( $group_code ) && $group_code != $code_match[1] )
-		{ // New group is starting
-			$prev_group_code = $group_code;
-		}
-		$group_code = $code_match[1];
-		$group_name = $code_match[2];
+	// Group title:
+	echo '<h3>'.$widget_group_title.':</h3>';
 
-		// Plugin widgets:
-		if( $prev_group_code != '' && isset( $Plugin_array_grouped[ $prev_group_code ] ) )
-		{ // Print out all plugins of previous group at the end of group after all system widget
-			foreach( $Plugin_array_grouped[ $prev_group_code ] as $ID => $Plugin )
-			{
-				echo '<li>';
-				echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-				echo get_icon( 'puzzle' ).' <strong>'.$Plugin->name.'</strong>';
-				echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
-				echo '</li>';
-			}
-			unset( $Plugin_array_grouped[ $prev_group_code ] );
-		}
-
-		if( $i > 1 )
-		{ // End of previous group
-			echo '</ul>';
-		}
-
-		// Group title:
-		echo '<h3>'.$group_name.':</h3><ul class="widget_list">';
+	if( ! isset( $core_componentwidget_defs[ $widget_group_code ] ) )
+	{ // No widgets for this group
+		continue;
 	}
-	else
+
+	echo '<ul class="widget_list">';
+
+	// Core widgets:
+	if( isset( $core_componentwidget_defs[ $widget_group_code ] ) )
 	{
-		$classname = $code.'_Widget';
-		load_class( 'widgets/widgets/_'.$code.'.widget.php', $classname);
+		foreach( $core_componentwidget_defs[ $widget_group_code ] as $widget_code )
+		{
+			$classname = $widget_code.'_Widget';
+			load_class( 'widgets/widgets/_'.$widget_code.'.widget.php', $classname);
 
-		$ComponentWidget = new $classname( NULL, 'core', $code );
+			$ComponentWidget = new $classname( NULL, 'core', $widget_code );
 
-		// System widget:
-		echo '<li>';
-		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
-		echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
-		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
-		echo '</li>';
+			echo '<li>';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
+			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
+			echo '</li>';
+		}
 	}
-}
 
-if( ! empty( $Plugin_array_grouped ) )
-{ // Put all ungrouped plugins to the last group "Other"
-	foreach( $Plugin_array_grouped as $plugin_group => $Plugin_array )
+	// Plugin widgets:
+	if( isset( $Plugin_array_grouped[ $widget_group_code ] ) )
 	{
-		foreach( $Plugin_array as $ID => $Plugin )
+		foreach( $Plugin_array_grouped[ $widget_group_code ] as $Plugin )
 		{
 			echo '<li>';
 			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
@@ -169,7 +156,7 @@ if( ! empty( $Plugin_array_grouped ) )
 			echo '</li>';
 		}
 	}
-}
 
-echo '</ul>';
+	echo '</ul>';
+}
 ?>
