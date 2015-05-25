@@ -324,9 +324,9 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__tag' => array(
 		'Creating table for Tags',
 		"CREATE TABLE T_items__tag (
-			tag_ID   int(11) unsigned not null AUTO_INCREMENT,
-			tag_name varbinary(50) not null,
-			primary key (tag_ID),
+			tag_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tag_name VARCHAR(50) COLLATE utf8_bin NOT NULL,
+			PRIMARY KEY (tag_ID),
 			UNIQUE tag_name( tag_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -376,7 +376,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_ismember             tinyint NOT NULL default 0,
 			bloguser_can_be_assignee      tinyint NOT NULL default 0,
 			bloguser_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
-			bloguser_perm_edit            ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			bloguser_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
 			bloguser_perm_delpost         tinyint NOT NULL default 0,
 			bloguser_perm_edit_ts         tinyint NOT NULL default 0,
 			bloguser_perm_delcmts         tinyint NOT NULL default 0,
@@ -406,7 +406,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_ismember             tinyint NOT NULL default 0,
 			bloggroup_can_be_assignee      tinyint NOT NULL default 0,
 			bloggroup_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
-			bloggroup_perm_edit            ENUM('no','own','lt','le','all','redirected') COLLATE ascii_general_ci NOT NULL default 'no',
+			bloggroup_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
 			bloggroup_perm_delpost         tinyint NOT NULL default 0,
 			bloggroup_perm_edit_ts         tinyint NOT NULL default 0,
 			bloggroup_perm_delcmts         tinyint NOT NULL default 0,

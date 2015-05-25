@@ -2300,7 +2300,6 @@ class Item extends ItemLight
 		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
 		foreach( $this->tags as $t => $tag )
 		{
-			$tag = evo_strtolower( $tag );
 			if( substr( $tag, 0, 1 ) == '-' )
 			{ // Prevent chars '-' in first position
 				$tag = preg_replace( '/^-+/', '', $tag );
@@ -5523,18 +5522,18 @@ class Item extends ItemLight
 											WHERE itag_itm_ID = '.$this->ID, 'delete previous tags' );
 			}
 
-			if( !empty($this->tags) )
+			if( ! empty( $this->tags ) )
 			{
 				// Find the tags that are already in the DB
-				$query = 'SELECT LOWER( tag_name )
+				$query = 'SELECT tag_name
 										FROM T_items__tag
-									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
+									 WHERE tag_name IN ('.$DB->quote( $this->tags ).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
-				$new_tags = array_diff( array_map('utf8_strtolower', $this->tags), $existing_tags );
+				$new_tags = array_diff( $this->tags, $existing_tags );
 
 				if( !empty( $new_tags ) )
-				{	// insert new tags:
+				{ // insert new tags:
 					$query = "INSERT INTO T_items__tag( tag_name ) VALUES ";
 					foreach( $new_tags as $tag )
 					{
@@ -5548,7 +5547,7 @@ class Item extends ItemLight
 				$query = 'INSERT INTO T_items__itemtag( itag_itm_ID, itag_tag_ID )
 								  SELECT '.$this->ID.', tag_ID
 									  FROM T_items__tag
-									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
+									 WHERE tag_name IN ('.$DB->quote( $this->tags ).')';
 				$DB->query( $query, 'Make tag associations!' );
 			}
 
