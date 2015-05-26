@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Slug
  */
-global $Sug, $current_User;
+global $Sug, $current_User, $admin_url;
 
 $SQL = new SQL();
 
@@ -25,22 +25,26 @@ $SQL->SELECT( '*, post_title AS target_title' ); // select target_title for sort
 $SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 
 // filters
+$list_is_filtered = false;
 if( get_param( 'slug_filter' ) )
 { // add slug_title filter
-	$like = $DB->escape( strtolower(get_param( 'slug_filter' )) );
+	$like = $DB->escape( strtolower( get_param( 'slug_filter' ) ) );
 	$SQL->WHERE_and( '(
 		LOWER(slug_title) LIKE "%'.$like.'%"
 		OR LOWER(post_title) LIKE "%'.$like.'%")' );
+	$list_is_filtered = true;
 }
 if( $filter_type = get_param( 'slug_type' ) )
 { // add filter for post type
-	$SQL->WHERE_and( 'slug_type = "'.$DB->escape( get_param('slug_ftype') ).'"' );
+	$SQL->WHERE_and( 'slug_type = "'.$DB->escape( get_param( 'slug_ftype' ) ).'"' );
+	$list_is_filtered = true;
 }
 if( $filter_item_ID = get_param( 'slug_item_ID' ) )
 { // add filter for item ID
 	if( is_number( $filter_item_ID ) )
 	{
-		$SQL->WHERE_and( 'slug_itm_ID = '.$DB->quote($filter_item_ID) );
+		$SQL->WHERE_and( 'slug_itm_ID = '.$DB->quote( $filter_item_ID ) );
+		$list_is_filtered = true;
 	}
 }
 
@@ -49,6 +53,11 @@ $Results = new Results( $SQL->get(), 'slug_', 'A' );
 
 $Results->title = T_('Slugs').' ('.$Results->get_total_rows().')' . get_manual_link('slugs-list');
 $Results->Cache = get_SlugCache();
+
+if( $list_is_filtered )
+{ // List is filtered, offer option to reset filters:
+	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=slugs', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+}
 
 /**
  * Callback to add filters on top of the result set
