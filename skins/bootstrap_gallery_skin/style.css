@@ -375,6 +375,20 @@ html,
 body {
   width: auto !important;
   overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+#skin_wrapper {
+  min-height: 100%;
+  position: relative;
+}
+footer.sitewide_footer {
+  width: 100%;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 .posts_list {
   text-align: center;
@@ -494,7 +508,7 @@ div.evo_image_index div:hover {
 }
 .nav_album .nav_album_title {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 .nav_album .nav_album_title a {
   font-size: 20px;
@@ -604,7 +618,7 @@ div.evo_image_index div:hover {
 @media screen and (max-width: 767px) {
   .nav_album_title {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: 12px;
     margin-right: 5px;
     float: right !important;
     position: relative !important;
@@ -640,7 +654,7 @@ div.evo_image_index div:hover {
     margin: 0px 0px 40px 0px;
   }
   .nav_album .nav_album_title {
-    margin-top: 12px;
+    margin-top: 6px;
   }
   .nav_album .nav_album_title a {
     font-size: 16px;

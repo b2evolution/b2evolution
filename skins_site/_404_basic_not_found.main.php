@@ -9,7 +9,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 header_http_response('404 Not Found');
-header('Content-Type: text/html; charset=iso-8859-1'); // no translation
+header('Content-Type: text/html; charset=utf-8'); // no translation
 
 $page_title = '404 Not Found';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
