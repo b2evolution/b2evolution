@@ -1,3 +1,8 @@
+html,
+body {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
 .evo_container__page_top {
   margin-top: 20px;
 }
@@ -95,9 +100,15 @@ ol.breadcrumb {
 .forums_list .posts {
   text-align: left;
 }
+.forums_list .posts .ft_title {
+  padding-left: 8px;
+}
 .forums_list .posts .ft_title .ft_author_info {
-  padding-top: 10px;
+  padding-top: 2px;
   font-size: 90%;
+}
+.forums_list .posts .ft_title .fa {
+  margin-left: 0px;
 }
 .forums_list .ft_status__ft_title {
   text-align: left;
@@ -121,14 +132,10 @@ ol.breadcrumb {
   font-size: 21px;
 }
 .forums_list .ft_title a.topictitle {
-  color: #535C66;
   font-size: 16px;
 }
 .forums_list .ft_title a.topictitle.unread {
   font-weight: bold;
-}
-.forums_list .ft_title a.topictitle:hover {
-  color: #31363C;
 }
 .forums_list .ft_desc,
 .forums_list .ft_count {
@@ -140,7 +147,8 @@ ol.breadcrumb {
   white-space: nowrap;
   line-height: 16px;
 }
-.forums_list .ft_date_shrinked {
+.forums_list .ft_date_shrinked,
+.forums_list .ft_date_shrinked_more {
   display: none;
 }
 .forums_list .ft_author_avatar {
@@ -181,6 +189,9 @@ ol.breadcrumb {
   font-size: 16px;
   margin: 0px;
   display: inline;
+}
+.forums_list.single_topic .panel-heading .ft_author_info.shrinked {
+  display: none;
 }
 .evo_comment_title a.permalink {
   color: #337ab7;
@@ -519,13 +530,22 @@ label.control-label[for=post_title] {
   margin: 0px 3px;
 }
 @media screen and (max-width: 991px) {
+  .posts .ft_status_topic {
+    vertical-align: top;
+    margin-top: 5px;
+  }
+  .posts .ft_title .floatright {
+    float: none;
+    display: inline-block;
+    margin-left: 8px;
+  }
   .posts .ft_count,
   .posts .ft_date {
-    padding-top: 20px;
+    padding-top: 8px;
   }
   .posts .ft_count {
     width: 100px;
-    margin-left: 30px;
+    margin-left: 20px;
   }
 }
 @media screen and (max-width: 767px) {
@@ -535,13 +555,17 @@ label.control-label[for=post_title] {
   .ft_date_shrinked {
     display: inline-block !important;
     float: none;
+    margin-top: 2px;
+  }
+  .posts .ft_title {
+    width: 91%;
   }
   .posts .ft_count {
     padding-top: 0px;
     margin-top: -4px;
   }
-  .posts .ft_date_shrinked {
-    padding-top: 20px;
+  .posts .ft_date_shrinked a {
+    margin-left: 4px;
   }
   .legend-item {
     margin-bottom: 5px;
@@ -573,12 +597,15 @@ label.control-label[for=post_title] {
     background-color: #f5f5f5;
   }
   .group_row .ft_count {
-    display: block !important;
-    vertical-align: middle;
-    float: none;
-    padding-left: 50px;
-    width: 200px;
+    display: inline-block !important;
+    float: left;
+    padding-left: 0px;
+    width: auto;
     text-align: left;
+    margin-left: 35px;
+  }
+  .group_row .ft_count.second_of_class {
+    margin-left: 0px;
   }
   .group_row .ft_status,
   .group_row .ft_title {
@@ -589,48 +616,94 @@ label.control-label[for=post_title] {
   }
   .group_row .ft_title {
     width: 80%;
-  }
-  .group_row .ft_count:before {
-    clear: both;
-    content: '';
-    display: block;
+    padding-left: 0px;
   }
   .group_row .ft_date_shrinked {
-    display: block !important;
+    display: block;
     float: right;
-    margin-top: -20px;
-    width: 200px !important;
+    width: 130px !important;
     text-align: right;
   }
   .posts .small {
     display: none;
   }
+  .posts .ft_title {
+    width: 90%;
+  }
   .posts .ft_author_info {
     padding-top: 0px !important;
   }
   .posts .ft_count {
-    padding-left: 20px;
-    width: 100px;
-    margin-top: 15px;
+    width: auto;
     display: inline;
+    text-align: left;
+    margin-left: 43px;
   }
   .posts .ft_date_shrinked {
     display: inline !important;
     float: none;
     margin-top: 0px;
-    width: 200px !important;
+    width: 200px;
     text-align: left;
-    padding-left: 50px;
   }
 }
 @media screen and (max-width: 400px) {
   .widget_core_coll_title h1 a,
-  .nav li a,
-  .ft_title a {
-    font-size: 85%;
+  .forums_list.single_topic section.panel .panel-heading h2 a {
+    font-size: 92%;
+  }
+  .nav li a {
+    font-size: 92%;
+    padding: 10px 5px;
   }
   .page_title,
   .panel-heading h2 {
-    font-size: 150%;
+    font-size: 170%;
+  }
+  .group_row .ft_title a {
+    font-size: 92%;
+  }
+  .ft_date_shrinked {
+    display: none !important;
+  }
+  .ft_date_shrinked_more {
+    display: block !important;
+    float: right;
+    text-align: right;
+    padding-right: 15px;
+    margin-top: 2px;
+  }
+  .forums_list single_topic .ft_author_info {
+    display: none;
+  }
+  .forums_list single_topic .ft_author_info.shrinked {
+    display: block !important;
+  }
+  .posts .ft_status_topic {
+    vertical-align: top;
+    margin-top: 8px;
+  }
+  .posts .ft_title {
+    width: 80%;
+  }
+  .posts .ft_count {
+    margin-top: 0px;
+  }
+  .posts .ft_date_shrinked a span,
+  .posts .ft_date_shrinked a.login {
+    display: none !important;
+  }
+  /* Disp Single */
+  .forums_list.single_topic section.panel .panel-body .pager {
+    display: none;
+  }
+  .ft_author_info {
+    display: none !important;
+  }
+  .ft_author_info.shrinked {
+    display: block !important;
+  }
+  .evo_content_block .panel-heading {
+    height: 40px;
   }
 }

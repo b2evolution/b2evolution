@@ -78,6 +78,11 @@ skin_widget( array(
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
+				// Author info - shrinked:
+				echo '<div class="ft_author_info shrinked">'.T_('Started by');
+				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
+				echo '</div>';
 		?>
 	</div>
 	<div class="panel-body"><?php
@@ -123,7 +128,7 @@ skin_widget( array(
 						$Item->issue_time( array(
 								'before'      => '',
 								'after'       => ' &nbsp; &nbsp; ',
-								'time_format' => 'D M j, Y H:i',
+								'time_format' => 'M j, Y H:i',
 							) );
 					}
 				?></h4>	
