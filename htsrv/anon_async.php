@@ -1126,11 +1126,20 @@ switch( $action )
 				  FROM T_items__tag
 				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
 				 ORDER BY tag_name', ARRAY_A );
+			/* Yura: Here I added "COLLATE utf8_general_ci" because:
+			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+			 * It also allows to find "ee" when we type in "éè".
+			 * BUT it does NOT allow to find "éè" when we type in "ee".
+			 */
 
 			// Check if current term is not an existing tag
 			foreach( $tags as $tag )
 			{
-				if( $tag['title'] == $term )
+				/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+				 * When we enter new tag 'testA' and the tag 'testa' already exists
+				 * then we suggest only 'testa' instead of 'testA'.
+				 */
+				if( utf8_strtolower( $tag['title'] ) == utf8_strtolower( $term ) )
 				{ // Current term is an existing tag
 					$term_is_new_tag = false;
 				}
