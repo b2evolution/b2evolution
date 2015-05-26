@@ -85,6 +85,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'items'        => 'items/items.ctrl.php',
 		'itemstatuses' => 'items/item_statuses.ctrl.php',
 		'itemtypes'    => 'items/item_types.ctrl.php',
+		'itemtags'     => 'items/item_tags.ctrl.php',
 		'links'        => 'links/links.ctrl.php',
 		'mtimport'     => 'tools/mtimport.ctrl.php',
 		'skins'        => 'skins/skins.ctrl.php',
@@ -238,6 +239,24 @@ function & get_ItemTypeCache()
 	}
 
 	return $ItemTypeCache;
+}
+
+/**
+ * Get the ItemTagCache
+ *
+ * @return ItemTagCache
+ */
+function & get_ItemTagCache()
+{
+	global $ItemTagCache;
+
+	if( ! isset( $ItemTagCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'items/model/_itemtag.class.php', 'ItemTag' );
+		$ItemTagCache = new DataObjectCache( 'ItemTag', false, 'T_items__tag', 'tag_', 'tag_ID', 'tag_name' );
+	}
+
+	return $ItemTagCache;
 }
 
 /**
@@ -633,6 +652,13 @@ class collections_Module extends Module
 				$site_menu['entries']['slugs'] = array(
 					'text' => T_('Slugs'),
 					'href' => $admin_url.'?ctrl=slugs'
+				);
+			}
+			if( $current_User->check_perm( 'options', 'view' ) )
+			{ // User has an access to view settings
+				$site_menu['entries']['tags'] = array(
+					'text' => T_('Tags'),
+					'href' => $admin_url.'?ctrl=itemtags'
 				);
 			}
 		}

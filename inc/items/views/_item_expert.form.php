@@ -362,10 +362,15 @@ $Form->begin_form( '', '', $params );
 		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 
+		$link_to_tags_manager = '';
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{ // Display a link to manage tags only when current use has the rights
+			$link_to_tags_manager = ' &ndash; <a href="'.$admin_url.'?ctrl=itemtags&amp;tag_item_ID='.$edited_Item->ID.'">'.T_('Go to tags manager').'</a>';
+		}
 		// Checkbox to suggest tags
 		$suggest_checkbox = '<label>'
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
-				.T_('Auto-suggest tags as you type (based on existing tag)')
+				.T_('Auto-suggest tags as you type (based on existing tag)').$link_to_tags_manager
 			.'</label>';
 		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
