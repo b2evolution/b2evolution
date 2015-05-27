@@ -215,19 +215,10 @@ $Form->begin_form();
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-// Display containers for current skin:
-foreach( $container_list as $container )
-{
-	display_container( $container );
-}
-
-// Display containers not in current skin:
+// Display ALL containers (fp> I removed the things that thought it knew which containers are part of the current skin because cearly, in i7, nobody knows)
 foreach( $container_Widget_array as $container=>$dummy )
 {
-	if( !in_array( $container, $container_list ) )
-	{
-		display_container( $container, ' '.T_('[NOT INCLUDED IN SELECTED SKIN!]') );
-	}
+	display_container( $container );
 }
 
 echo '</fieldset>'."\n";
