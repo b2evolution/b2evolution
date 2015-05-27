@@ -627,7 +627,8 @@ function get_icon_info($name)
 			'size' => array( 14, 14 ),
 			'xy' => array( 112, 96 ),
 			'glyph' => 'resize-full',
-			'fa' => 'unlink'
+			'fa' => 'unlink',
+			'color' => '#F00',
 		);
 
 		case 'parent_childto_arrow': return array(

@@ -198,6 +198,18 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
+		// Delete old tag from the items if they already have new tag
+		// in order to avoid conflicts in the update sql query below
+		$new_tag_item_IDs = $DB->get_col( 'SELECT itag_itm_ID
+			 FROM T_items__itemtag
+			WHERE itag_tag_ID = '.$DB->quote( $edited_ItemTag->ID ) );
+		if( ! empty( $new_tag_item_IDs ) )
+		{
+			$DB->query( 'DELETE FROM T_items__itemtag
+				WHERE itag_itm_ID IN ( '.$DB->quote( $new_tag_item_IDs ).' )
+				  AND itag_tag_ID = '.$DB->quote( $old_tag_ID ) );
+		}
+
 		// Replace all previous tags with new existing tags
 		$DB->query( 'UPDATE T_items__itemtag
 			  SET itag_tag_ID = '.$DB->quote( $edited_ItemTag->ID ).'
@@ -207,7 +219,7 @@ switch( $action )
 		$DB->query( 'DELETE FROM T_items__tag
 			WHERE tag_ID = '.$DB->quote( $old_ItemTag->ID ) );
 
-		$Messages->add( sprintf( T_('The previously named "%s" tag has been merged with the existing "%s" tag'),
+		$Messages->add( sprintf( T_('The previously named "%s" tag has been merged with the existing "%s" tag.'),
 				'<b>'.$old_ItemTag->dget( 'name' ).'</b>',
 				'<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ), 'success' );
 

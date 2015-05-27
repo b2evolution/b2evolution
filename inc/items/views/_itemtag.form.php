@@ -94,9 +94,9 @@ if( $edited_ItemTag->ID > 0 )
 			'td'    => '<a href="@get_permanent_url()@">$post_title$</a>',
 		);
 
-	function tagitem_edit_actions( $Item, $tag_ID )
+	function tagitem_edit_actions( $Item )
 	{
-		global $current_User;
+		global $current_User, $edited_ItemTag;
 
 		// Display the edit icon if current user has the rights:
 		$r = $Item->get_edit_link( array(
@@ -108,7 +108,13 @@ if( $edited_ItemTag->ID > 0 )
 
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Display the unlink icon if current user has the rights:
-			$r .= action_icon( T_('Unlink this tag from post!'), 'unlink', regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$tag_ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;'.url_crumb( 'tag' ) ) );
+			$r .= action_icon( T_('Unlink this tag from post!'), 'unlink',
+				regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$edited_ItemTag->ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;'.url_crumb( 'tag' ) ),
+				NULL, NULL, NULL,
+				array( 'onclick' => 'return confirm(\''.format_to_output( sprintf( TS_('Are you sure you want to remove the tag "%s" from "%s"?'),
+						$edited_ItemTag->dget( 'name' ),
+						$Item->dget( 'title' ) ).'\');', 'htmlattr' )
+					) );
 		}
 
 		return $r;
@@ -117,7 +123,7 @@ if( $edited_ItemTag->ID > 0 )
 			'th'       => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td'       => '%tagitem_edit_actions( {Obj}, '.$edited_ItemTag->ID.' )%',
+			'td'       => '%tagitem_edit_actions( {Obj} )%',
 		);
 
 	$Results->display();
