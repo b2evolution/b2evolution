@@ -100,14 +100,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Block title'),
 					'defaultvalue' => T_('Tag cloud'),
+					'size' => 20,
 					'maxlength' => 100,
 				),
 			'blog_ids' => array(
 					'type' => 'text',
-					'label' => T_('Include collections'),
-					'note' => T_('A comma-separated list of Collection IDs.'),
+					'label' => T_('Source collections'),
+					'note' => T_('Comma-separated list of collection IDs. Leave empty for current collection.'),
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*)?$/',
-																		'error'   => T_('Invalid list of Collection IDs.') ),
+													  'error' => T_('Invalid list of Collection IDs.') ),
+				),
+			'destination_coll_ID' => array(
+					'type' => 'integer',
+					'label' => T_('Destination collection'),
+					'allow_empty' => true,
+					'size' => 2,
+					'note' => T_('Collection ID. Leave empty for automatic selection.'),
 				),
 			'max_tags' => array(
 					'type' => 'integer',
@@ -119,8 +127,10 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Tag separator'),
 					'defaultvalue' => ' ',
+					'size' => 2,
 					'maxlength' => 100,
 				),
+			// fp> TODO: make an inline group of fields here:
 			'tag_min_size' => array(
 					'type' => 'integer',
 					'label' => T_('Min size'),
@@ -140,6 +150,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'defaultvalue' => 'ASC',
 					'note' => T_('How to sort the tag cloud.'),
 				),
+			/* fp> TODO: I don't see anything to validate input/prevent SQL injection here!
 			'filter_list' => array(
 					'type' => 'textarea',
 					'label' => T_('Filter tags'),
@@ -147,6 +158,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'size' => 40,
 					'rows' => 2,
 				),
+				*/
 			), parent::get_param_definitions( $params )	);
 
 		// add limit default 100
@@ -166,9 +178,11 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		global $blog;
 
+		$BlogCache = & get_BlogCache();
+
+		// Source collections:
 		// Get a list of quoted blog IDs
 		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], true);
-
 		if( empty($blog) && empty($blog_ids) )
 		{	// Nothing to display
 			return;
@@ -178,14 +192,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$blog_ids = $blog;
 		}
 
-		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], $this->disp_params['filter_list'], true );
+		// Destination:
+		if( $destination_coll_ID = $this->disp_params['destination_coll_ID'] )
+		{	// Get destination Colelction, but allow error, in that case we'll get NULL
+			$destination_Blog = $BlogCache->get_by_ID( $destination_coll_ID, false );
+		}
+		else
+		{ // Auto destination:
+			$destination_Blog = NULL;
+		}
+
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false );
 
 		if( empty($results) )
 		{	// No tags!
 			return;
 		}
-
-		$BlogCache = & get_BlogCache();
 
 		$max_count = $results[0]->tag_count;
 		$min_count = $results[count($results)-1]->tag_count;
@@ -194,11 +216,11 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$min_size = $this->disp_params['tag_min_size'];
 		$size_span = $max_size - $min_size;
 
-		if ($this->disp_params['tag_ordering'] == 'ASC')
+		if($this->disp_params['tag_ordering'] == 'ASC')
 		{
 			usort($results, array($this, 'tag_cloud_cmp'));
 		}
-		else if ($this->disp_params['tag_ordering'] == 'RAND')
+		elseif($this->disp_params['tag_ordering'] == 'RAND')
 		{
 			shuffle( $results );
 		}
@@ -210,6 +232,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 
 		echo $this->disp_params['tag_cloud_start'];
+
 		$count = 0;
 		foreach( $results as $row )
 		{
@@ -217,16 +240,26 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			{
 				echo $this->disp_params['tag_separator'];
 			}
+
 			// If there's a space in the tag name, quote it:
 			$tag_name_disp = strpos($row->tag_name, ' ')
 				? '&laquo;'.format_to_output($row->tag_name, 'htmlbody').'&raquo;'
 				: format_to_output($row->tag_name, 'htmlbody');
-			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 
-			$l_Blog = $BlogCache->get_by_id( $row->cat_blog_ID );
+			$font_size = floor( $row->tag_count * $size_span / $count_span + $min_size );
+
+			if( !is_null($destination_Blog) )
+			{
+				$l_Blog = $destination_Blog;
+			}
+			else
+			{	// Automatic destination decision. Note: this may not be be best decision.
+				$l_Blog = $BlogCache->get_by_ID( $row->cat_blog_ID );
+			}
+
 			echo $l_Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
-				'style' => 'font-size:'.$size.'pt;',
-				'title' => sprintf( T_('Display posts tagged with &laquo;%s&raquo;'), $row->tag_name ) ) );
+				'style' => 'font-size:'.$font_size.'pt;',
+				'title' => sprintf( T_('Display posts tagged with "%s"'), $row->tag_name ) ) );
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -243,29 +276,5 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	{
 		return strcasecmp($a->tag_name, $b->tag_name);
 	}
-
-
-	/**
-	 * May be overriden by some widgets, depending on what THEY depend on..
-	 *
-	 * @todo dh> this needs a custom implementation I believe.
-	 *           It could depend on tag_ID_any (once tags have an ID)
-	 *           or just the list of blogs (cont_coll_ID_*)?
-	 * fp> I don't understand what you mean.
-	 * dh> That the widget should get cached, and needs a custom implementation
-	 *     of this method (get_cache_keys).
-	 *     Cache contents should get invalidated when any tags get changed.
-	 *
-	 * @return array of keys this widget depends on
-	 *
-	function get_cache_keys()
-	{
-		return array(
-				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
-				'item_ID' => 'any',							// doc???
-			);
-	}
-	*/
 }
-
 ?>

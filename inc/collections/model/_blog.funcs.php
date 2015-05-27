@@ -850,37 +850,26 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 
 	if( is_array( $blog_ids ) )
 	{ // Get quoted ID list
-		$where_cats = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
+		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
 	{ // Get list of relevant blogs
 		$Blog = & $BlogCache->get_by_ID( $blog_ids );
-		$where_cats = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
-
-	// fp> verrry dirty and params; TODO: clean up
-	// dh> oddly, this appears to not get cached by the query cache. Have experimented a bit, but not found the reason.
-	//     It worked locally somehow, but not live.
-	//     This takes up to ~50% (but more likely 15%) off the total SQL time. With the query being cached, it would be far better.
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
-	$tags_SQL->SELECT( 'LOWER( tag_name ) AS tag_name, post_datestart, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+
+	$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 
-	if( $where_cats != '1' )
-	{ // we have to join the cats
-		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
-		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	}
-	else
-	{ // Join categories table because we need the field cat_blog_ID everytime
-		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-	}
-
-	$tags_SQL->WHERE( $where_cats );
+	$tags_SQL->WHERE( $where_cat_clause );
 	$tags_SQL->WHERE_and( 'post_status = "published"' );
 	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
@@ -895,6 +884,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	$tags_SQL->GROUP_BY( 'tag_name' );
+
 	$tags_SQL->ORDER_BY( 'tag_count DESC' );
 
 	if( ! empty( $limit ) )
