@@ -6215,6 +6215,47 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part 18.m trunk aka 15th part of "i7"
 
 		task_begin( 'Upgrading tags table...' );
+		// Get all tags that contain not ascii chars, because some mysql versions cannot convert them correctly to utf8_bin
+		$not_ascii_tags = $DB->get_results( 'SELECT *
+			 FROM T_items__tag
+			WHERE tag_name NOT REGEXP "^[A-Za-z0-9_\-\s]+$"' );
+		foreach( $not_ascii_tags as $not_ascii_tag )
+		{ // Replace each not ascii char with "_" in tag name in order to avoid error on below table upgrading
+			$ascii_tag_name = preg_replace( '/[^A-Za-z0-9_\-\s]/', '_', $not_ascii_tag->tag_name );
+			$ascii_tag_name = str_replace( '__', '_', $ascii_tag_name );
+
+			if( $ascii_tag_name == $not_ascii_tag->tag_name )
+			{ // Skip this tag name because it doesn't contain not ascii chars really
+				continue;
+			}
+
+			// Check tag name for uniqueness
+			$c = 1;
+			$new_tag_name = $ascii_tag_name;
+			while( $DB->get_var( 'SELECT tag_ID
+				 FROM T_items__tag
+				WHERE tag_name = '.$DB->quote( $new_tag_name ) ) )
+			{
+				$new_tag_name = $ascii_tag_name.$c;
+				$c++;
+			}
+
+			// Update tag name to new value without not ascii chars
+			$DB->query( 'UPDATE T_items__tag
+				  SET tag_name = '.$DB->quote( $new_tag_name ).'
+				WHERE tag_ID = '.$not_ascii_tag->tag_ID );
+		}
+		// Remove the empty tags
+		$empty_tag_IDs = $DB->get_col( 'SELECT tag_ID FROM T_items__tag
+			WHERE tag_name = ""' );
+		if( ! empty( $empty_tag_IDs ) )
+		{
+			$DB->query( 'DELETE FROM T_items__tag
+				WHERE tag_ID IN ( '.$DB->quote( $empty_tag_IDs ).' ) ' );
+			$DB->query( 'DELETE FROM T_items__itemtag
+				WHERE itag_tag_ID IN ( '.$DB->quote( $empty_tag_IDs ).' ) ' );
+		}
+		// Upgrade field "tag_name" from varbinary to varchar utf8_bin
 		$DB->query( 'ALTER TABLE T_items__tag
 			MODIFY tag_name VARCHAR(50) COLLATE utf8_bin NOT NULL' ); // Allow multiple special char variations for each tag
 		task_end();
