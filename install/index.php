@@ -122,6 +122,8 @@ switch( $action )
 	case 'cafelogupgrade':
 	case 'deletedb':
 	case 'menu':
+	case 'menu-install':
+	case 'menu-options':
 	case 'localeinfo':
 	case 'utf8upgrade':
 		$try_db_connect = true;
@@ -219,6 +221,11 @@ if( ! locale_activate( $default_locale ) )
 
 init_charsets( $current_charset );
 
+if( $action == 'menu-install' && ! ( $old_db_version = get_db_version() ) )
+{ // Force to step 3 (Select install options) if DB is not installed yet
+	$action = 'menu-options';
+}
+
 switch( $action )
 {
 	case 'evoupgrade':
@@ -250,6 +257,8 @@ switch( $action )
 	case 'conf':
 		$config_is_done = 0;
 	case 'menu':
+	case 'menu-install':
+	case 'menu-options':
 	case 'localeinfo':
 	case 'default':
 		$title = '';
@@ -549,7 +558,7 @@ switch( $action )
 	case 'menu':
 		/*
 		 * -----------------------------------------------------------------------------------
-		 * Menu
+		 * Menu (STEP 1)
 		 * -----------------------------------------------------------------------------------
 		 */
 		track_step( 'installer-menu' );
@@ -594,7 +603,7 @@ switch( $action )
 
 			<div class="radio">
 				<label>
-					<input type="radio" name="action" id="newdb" value="newdb"
+					<input type="radio" name="action" id="newdb" value="menu-install"
 					<?php
 						// fp> change the above to 'newdbsettings' for an additional settings screen.
 						if( is_null($old_db_version) )
@@ -604,101 +613,6 @@ switch( $action )
 					?>/>
 					<?php echo T_('<strong>New Install</strong>: Install the b2evolution database tables. Optionally add some default contents.')?>
 				</label>
-			</div>
-			
-			<div style="margin-left:2em">
-				<?php
-				if( $test_install_all_features && $allow_evodb_reset )
-				{ // Option to quick delete before new installation
-				?>
-				<div class="checkbox">
-					<label>
-						<input type="checkbox" name="delete_contents" id="delete_contents" value="1" checked="checked" />
-						<?php echo T_('Delete pre-existing b2evolution tables &amp; cache files.')?>
-					</label>
-				</div>
-				<?php } ?>
-				<div class="checkbox">
-					<label>
-						<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-						<?php echo T_('Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.')?>
-					</label>
-					<br />
-					<?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?>
-					<?php
-						// Display the collections to select which install
-						$collections = array(
-								'home'   => T_('Home'),
-								'a'      => T_('Blog A'),
-								'b'      => T_('Blog B'),
-								'photos' => T_('Photos'),
-								'forums' => T_('Forums'),
-								'manual' => T_('Manual'),
-							);
-
-						// Allow all modules to set what collections should be installed
-						$module_collections = modules_call_method( 'get_demo_collections' );
-						if( ! empty( $module_collections ) )
-						{
-							foreach( $module_collections as $module_key => $module_colls )
-							{
-								foreach( $module_colls as $module_coll_key => $module_coll_title )
-								{
-									$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
-								}
-							}
-						}
-
-						foreach( $collections as $coll_index => $coll_title )
-						{ // Display the checkboxes to select what demo collection to install
-					?>
-					<div class="checkbox" style="margin-left:2em">
-						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-							<?php echo $coll_title; ?>
-						</label>
-					</div>
-					<?php } ?>
-				</div>
-				<div class="checkbox">
-					<?php
-						// Pre-check if current installation is local
-						$is_local = php_sapi_name() != 'cli' && // NOT php CLI mode
-							( $basehost == 'localhost' ||
-								( isset( $_SERVER['SERVER_ADDR'] ) && (
-									$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
-									$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
-								) ||
-								( isset( $_SERVER['REMOTE_ADDR'] ) && (
-									$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
-									$_SERVER['REMOTE_ADDR'] == '::1' )
-								) ||
-								( isset( $_SERVER['HTTP_HOST'] ) && (
-									$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
-									$_SERVER['HTTP_HOST'] == '::1' )
-								) ||
-								( isset( $_SERVER['SERVER_NAME'] ) && (
-									$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
-									$_SERVER['SERVER_NAME'] == '::1' )
-								)
-							);
-					?>
-					<label>
-						<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo $is_local ? ' checked="checked"' : ''; ?> />
-						<?php echo T_('This is a local / test / intranet installation.')?>
-					</label>
-				</div>
-				<?php
-					if( $test_install_all_features )
-					{ // Checkbox to install all features
-				?>
-				<div class="checkbox">
-					<label>
-						<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-						<?php echo T_('Also install all test features.')?>
-					</label>
-				</div>
-				<?php } ?>
 			</div>
 
 			<div class="radio">
@@ -758,6 +672,150 @@ switch( $action )
 		echo_install_button_js();
 		break;
 
+	case 'menu-install':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * Menu Install (STEP 2)
+		 * -----------------------------------------------------------------------------------
+		 */
+		track_step( 'installer-menu' );
+		?>
+
+		<form action="index.php" method="get">
+			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<input type="hidden" name="confirmed" value="0" />
+			<input type="hidden" name="installer_version" value="10" />
+
+			<h2><?php echo T_('b2evolution is already installed') ?></h2>
+
+		<?php
+		if( $test_install_all_features && $allow_evodb_reset )
+		{ // We can allow to continue installation with deleting DB
+		?>
+			<input type="hidden" name="action" value="menu-options" />
+			<p><?php echo T_('Would you like to DELETE ALL before RE-INSTALL?'); ?></p>
+
+			<p class="text-danger"><?php echo T_('ATTENTION: all your b2evolution data will be lost and reset to its original state.'); ?></p>
+
+			<p>
+				<button id="delete_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & Continue')?> &raquo;</button>
+				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+			</p>
+		<?php
+		}
+		else
+		{ // Don't allow to continue installation because the DB deleting is disabled in config
+		?>
+			<input type="hidden" name="action" value="menu" />
+			<p><?php echo T_('We cannot install because there is already a b2evolution installation in the current database. You may delete it first or maybe upgrade it to the latest version.'); ?></p>
+
+			<p>
+				<button id="cancel_button" type="submit" class="btn btn-primary btn-lg">&laquo; <?php echo T_('Back to Menu')?></button>
+			</p>
+		<?php } ?>
+		</form>
+
+		<?php
+		break;
+
+	case 'menu-options':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * Menu Install Options (STEP 3)
+		 * -----------------------------------------------------------------------------------
+		 */
+		track_step( 'installer-menu' );
+		?>
+
+		<form action="index.php" method="get">
+			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<input type="hidden" name="confirmed" value="0" />
+			<input type="hidden" name="installer_version" value="10" />
+			<input type="hidden" name="action" value="newdb" />
+
+			<h2><?php echo T_('b2evolution installation options') ?></h2>
+
+			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
+
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
+					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?><br /><br />
+					<?php echo T_('Which demo collections would you like to install?') ?>
+				</label>
+				<?php
+					// Display the collections to select which install
+					$collections = array(
+							'home'   => T_('Home'),
+							'a'      => T_('Blog A'),
+							'b'      => T_('Blog B'),
+							'photos' => T_('Photos'),
+							'forums' => T_('Forums'),
+							'manual' => T_('Manual'),
+						);
+
+					// Allow all modules to set what collections should be installed
+					$module_collections = modules_call_method( 'get_demo_collections' );
+					if( ! empty( $module_collections ) )
+					{
+						foreach( $module_collections as $module_key => $module_colls )
+						{
+							foreach( $module_colls as $module_coll_key => $module_coll_title )
+							{
+								$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
+							}
+						}
+					}
+
+					foreach( $collections as $coll_index => $coll_title )
+					{ // Display the checkboxes to select what demo collection to install
+				?>
+				<div class="checkbox" style="margin-left:2em">
+					<label>
+						<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
+						<?php echo $coll_title; ?>
+					</label>
+				</div>
+				<?php } ?>
+			</div>
+			<?php
+				if( $test_install_all_features )
+				{ // Checkbox to install all features
+			?>
+			<div class="checkbox" style="margin-top:15px">
+				<label>
+					<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+					<?php echo T_('Also install all test features.')?>
+				</label>
+			</div>
+			<?php } ?>
+			<div class="checkbox" style="margin:15px 0 15px">
+				<label>
+					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
+					<?php echo T_('This is a local / test / intranet installation.')?>
+				</label>
+			</div>
+
+			<p>
+			<?php
+			if( $test_install_all_features && $allow_evodb_reset && $old_db_version = get_db_version() )
+			{ // We can allow to delete DB before installation
+			?>
+				<input type="hidden" name="delete_contents" value="1" />
+				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button>
+			<?php
+			}
+			else
+			{ // Allow only install new DB without deleting previous DB
+			?>
+			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button>
+			<?php } ?>
+			</p>
+		</form>
+
+		<?php
+		break;
+
 	case 'localeinfo':
 		// Info about getting additional locales.
 		display_locale_selector();
@@ -802,10 +860,12 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
+		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+
 		$config_test_install_all_features = $test_install_all_features;
 		if( $test_install_all_features )
 		{ // Allow to use $test_install_all_features from request only when it is enabled in config
-			$test_install_all_features = param( 'install_all_features', 'boolean', false );
+			$test_install_all_features = param( 'install_all_features', 'boolean', ( $create_sample_contents == 'all' ? intval( $config_test_install_all_features ) : false ) );
 		}
 		else
 		{
