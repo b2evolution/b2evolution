@@ -66,35 +66,37 @@ if( count( $chapters ) > 0 )
 				$chapter_icon_title = T_('No new posts');
 			}
 ?>
-		<article class="container group_row">			
-			<div class="ft_status col-lg-1 col-md-1 col-sm-1 col-xs-2"><i class="icon fa <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></i></div>
-			<div class="ft_title col-lg-7 col-md-6 col-sm-6 col-xs-6">			
-				<a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a>
-				<?php
-				if( $Chapter->dget( 'description' ) != '' )
-				{
-					echo '<br /><span class="ft_desc">'.$Chapter->dget( 'description' ).'</span>';
-				}
-				if( count( $Chapter->children ) > 0 )
-				{ // Subforums exist
-					echo '<div class="subcats">';
-					echo T_('Subforums').': ';
-					$cc = 0;
-					foreach( $Chapter->children as $child_Chapter )
-					{ // Display subforum
-						echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
-						echo $cc < count( $Chapter->children ) - 1 ? ', ' : '';
-						$cc++;
+		<article class="container group_row">
+			<div class="ft_status__ft_title col-lg-8 col-md-7 col-sm-7 col-xs-6">
+				<div class="ft_status"><i class="icon fa <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></i></div>
+				<div class="ft_title ellipsis">
+					<a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a>
+					<?php
+					if( $Chapter->dget( 'description' ) != '' )
+					{
+						echo '<br /><span class="ft_desc">'.$Chapter->dget( 'description' ).'</span>';
 					}
-					echo '</div>';
-				}
-				?>
+					if( count( $Chapter->children ) > 0 )
+					{ // Subforums exist
+						echo '<div class="subcats">';
+						echo T_('Subforums').': ';
+						$cc = 0;
+						foreach( $Chapter->children as $child_Chapter )
+						{ // Display subforum
+							echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
+							echo $cc < count( $Chapter->children ) - 1 ? ', ' : '';
+							$cc++;
+						}
+						echo '</div>';
+					}
+					?>
+				</div>
 			</div>
-			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-1"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
-			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-1"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
+			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
+			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
 			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
 			<!-- Apply this on XS size -->
-			<div class="ft_date_shrinked col-xs-3"><?php echo $Chapter->get_last_touched_date( 'm/j/y H:i' ); ?></div>
+			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y H:i' ); ?></div>
 			<!-- Apply this on XXS size -->
 			<div class="ft_date_shrinked_more"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
 		</article>

@@ -45,15 +45,7 @@ ol.breadcrumb {
   font-size: 16px;
 }
 .forums_list {
-  /* MILOS> REDUNDANT STYLES
-	.table tbody {
-		td {
-			vertical-align: middle;
-		}
-		.valign-top, .valign-top td {
-			vertical-align: top;
-		}
-	}*/
+  /* This is the row layout on disp=posts */
 }
 .forums_list .panel-heading:not(:first-child) {
   border-top: 1px solid #ddd;
@@ -81,7 +73,7 @@ ol.breadcrumb {
   padding: 8px 0px;
   display: inline-block;
   vertical-align: middle;
-  text-align: center;
+  text-align: left;
 }
 .forums_list .group_row:nth-last-child(1) {
   border-bottom: none;
@@ -89,44 +81,52 @@ ol.breadcrumb {
 .forums_list .group_row:hover {
   background-color: #f5f5f5;
 }
-.forums_list .group_row .ft_status,
-.forums_list .group_row .ft_title,
-.forums_list .group_row .ft_count,
-.forums_list .group_row .ft_date {
-  display: inline-block;
-  vertical-align: middle;
-  float: none;
-}
 .forums_list .posts {
   text-align: left;
 }
 .forums_list .posts .ft_title {
-  padding-left: 8px;
+  padding-left: 35px;
 }
 .forums_list .posts .ft_title .ft_author_info {
   padding-top: 2px;
   font-size: 90%;
+  color: #8b96a1;
+}
+.forums_list .posts .ft_title .ft_author_info.shrinked {
+  display: none;
 }
 .forums_list .posts .ft_title .fa {
-  margin-left: 0px;
+  margin: 5px 5px 0px 0px;
 }
-.forums_list .ft_status__ft_title {
+.forums_list .posts .ft_title .small {
+  font-size: 90%;
+}
+.forums_list .posts .ft_date {
+  margin-top: 14px;
+}
+.forums_list .posts .ft_count {
+  margin-top: 20px;
+}
+.forums_list .ftb_status__ft_title {
   text-align: left;
 }
 .forums_list .ft_status {
   width: 30px;
   padding: 0px;
+  margin: 12px 15px 0px 0px;
+  float: left;
 }
 .forums_list .ft_status_topic {
   width: 30px;
   padding: 0px;
-  text-align: right;
-  display: inline-block;
-  vertical-align: middle;
-  float: none;
+  margin-top: 5px;
+  float: left;
 }
-.forums_list .ft_title {
-  text-align: left;
+.forums_list .ft_count {
+  margin-top: 15px;
+}
+.forums_list .ft_date {
+  margin-top: 17px;
 }
 .forums_list .ft_title > a.forumlink {
   font-size: 21px;
@@ -252,6 +252,11 @@ ol.breadcrumb {
 .btn-group > .btn.first-child {
   border-top-left-radius: 3px !important;
   border-bottom-left-radius: 3px !important;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .legend {
   text-align: center;
@@ -529,23 +534,26 @@ label.control-label[for=post_title] {
 .evo_search_navigation a {
   margin: 0px 3px;
 }
+@media screen and (max-width: 1199px) {
+  .table-hover .group_row .ft_count {
+    margin-top: 5px;
+  }
+  .table-hover .group_row.posts .ft_count {
+    margin-top: 10px;
+  }
+}
 @media screen and (max-width: 991px) {
-  .posts .ft_status_topic {
+  .table-hover .group_row.posts .ft_status_topic {
     vertical-align: top;
     margin-top: 5px;
   }
-  .posts .ft_title .floatright {
+  .table-hover .group_row.posts .ft_title .floatright {
     float: none;
     display: inline-block;
     margin-left: 8px;
   }
-  .posts .ft_count,
-  .posts .ft_date {
-    padding-top: 8px;
-  }
-  .posts .ft_count {
-    width: 100px;
-    margin-left: 20px;
+  .table-hover .group_row.posts .ft_count {
+    margin-top: 5px;
   }
 }
 @media screen and (max-width: 767px) {
@@ -554,15 +562,19 @@ label.control-label[for=post_title] {
   }
   .ft_date_shrinked {
     display: inline-block !important;
-    float: none;
-    margin-top: 2px;
+    margin-top: 5px;
+    text-align: center;
   }
-  .posts .ft_title {
-    width: 91%;
+  .table-hover .group_row .ft_count {
+    margin-top: 15px;
   }
   .posts .ft_count {
-    padding-top: 0px;
-    margin-top: -4px;
+    margin: 0px;
+    text-align: left;
+  }
+  .posts .ft_date_shrinked {
+    text-align: left;
+    padding-left: 0px;
   }
   .posts .ft_date_shrinked a {
     margin-left: 4px;
@@ -582,7 +594,7 @@ label.control-label[for=post_title] {
   .widget_core_coll_search_form {
     width: 100%;
   }
-  .group_row {
+  .table-hover .group_row {
     width: 100%;
     border-bottom: 1px solid #ddd;
     padding: 8px 0px;
@@ -590,61 +602,41 @@ label.control-label[for=post_title] {
     vertical-align: middle;
     text-align: left !important;
   }
-  .group_row:nth-last-child(1) {
+  .table-hover .group_row:nth-last-child(1) {
     border-bottom: none;
   }
-  .group_row:nth-child(even) {
+  .table-hover .group_row:nth-child(even) {
     background-color: #f5f5f5;
   }
-  .group_row .ft_count {
-    display: inline-block !important;
+  .table-hover .group_row .ft_status__ft_title {
+    width: 100%;
+  }
+  .table-hover .group_row .ft_status {
+    margin-right: 11px;
     float: left;
-    padding-left: 0px;
-    width: auto;
+  }
+  .table-hover .group_row .ft_count {
     text-align: left;
-    margin-left: 35px;
+    margin-top: 2px !important;
+    width: 100px !important;
+    padding-right: 5px;
   }
-  .group_row .ft_count.second_of_class {
-    margin-left: 0px;
-  }
-  .group_row .ft_status,
-  .group_row .ft_title {
-    float: left;
-  }
-  .group_row .ft_status {
-    margin-left: 3px;
-  }
-  .group_row .ft_title {
-    width: 80%;
+  .table-hover .group_row .ft_count.second_of_class {
     padding-left: 0px;
   }
-  .group_row .ft_date_shrinked {
-    display: block;
-    float: right;
-    width: 130px !important;
+  .table-hover .group_row .ft_date_shrinked {
+    width: 130px;
     text-align: right;
+    float: right;
   }
-  .posts .small {
+  .table-hover .group_row.posts .small {
     display: none;
   }
-  .posts .ft_title {
-    width: 90%;
-  }
-  .posts .ft_author_info {
-    padding-top: 0px !important;
-  }
-  .posts .ft_count {
-    width: auto;
-    display: inline;
-    text-align: left;
-    margin-left: 43px;
-  }
-  .posts .ft_date_shrinked {
-    display: inline !important;
+  .table-hover .group_row.posts .ft_date_shrinked.item_list {
     float: none;
-    margin-top: 0px;
-    width: 200px;
     text-align: left;
+    width: 70%;
+    margin-top: 2px;
   }
 }
 @media screen and (max-width: 400px) {
@@ -679,31 +671,25 @@ label.control-label[for=post_title] {
   .forums_list single_topic .ft_author_info.shrinked {
     display: block !important;
   }
+  /* Disp posts */
   .posts .ft_status_topic {
     vertical-align: top;
     margin-top: 8px;
   }
-  .posts .ft_title {
-    width: 80%;
-  }
   .posts .ft_count {
     margin-top: 0px;
   }
-  .posts .ft_date_shrinked a span,
-  .posts .ft_date_shrinked a.login {
+  .posts .ft_author_info {
     display: none !important;
+  }
+  .posts .ft_author_info.shrinked {
+    display: inline;
   }
   /* Disp Single */
   .forums_list.single_topic section.panel .panel-body .pager {
     display: none;
   }
-  .ft_author_info {
-    display: none !important;
-  }
   .ft_author_info.shrinked {
     display: block !important;
-  }
-  .evo_content_block .panel-heading {
-    height: 40px;
   }
 }
