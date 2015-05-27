@@ -172,7 +172,14 @@ switch( $Comment->get( 'type' ) )
 		break;
 }
 echo $params['comment_title_after'];
-
+if( $Skin->enabled_status_banner( $Item->status ) )
+	{
+		$Item->status( array(
+				'format' => 'styled',
+				'class'  => 'badge',
+		 ) );
+		$legend_statuses[] = $Item->status;
+	}
 // Avatar:
 echo $params['comment_avatar_before'];
 $Comment->avatar();
@@ -191,18 +198,26 @@ echo $params['comment_text_after'];
 
 // Info:
 echo $params['comment_info_before'];
-
-$commented_Item = & $Comment->get_Item();
-$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
-$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
-
-$Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
-$Comment->reply_link(); /* Link for replying to the Comment */
-$Comment->vote_helpful( '', '', '&amp;', true, true );
-
+	$commented_Item = & $Comment->get_Item();
+	$Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 echo $params['comment_info_after'];
 
-echo $params['comment_end'];
+/* ======================== START OF COMMENT FOOTER ======================== */
+?>
+<div class="panel-footer small clearfix">
+	<?php
+	$Comment->reply_link(); /* Link for replying to the Comment */
+	$Comment->vote_helpful( '', '', '&amp;', true, true );
+	?>
+	<div class="floatright">
+		<?php
+		$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
+		$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+		?>
+	</div>
+</div>
+
+<?php echo $params['comment_end'];
 
 $comment_template_counter++;
 ?>

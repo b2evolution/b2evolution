@@ -62,7 +62,8 @@ ol.breadcrumb {
 }
 
 // Forums table list
-.forums_list {
+.forums_list {	
+	box-shadow: none;
 	.panel-heading {
 		&:not(:first-child) {
 			border-top: 1px solid #ddd;
@@ -173,10 +174,6 @@ ol.breadcrumb {
 		}
 	}
 	.ft_comment_response {
-		/* MILOS> REDUNDANT STYLES
-		td {
-			background: #F6F6F6;
-		}*/
 		h3 {
 			margin: 0;
 		}
@@ -280,6 +277,14 @@ ol.breadcrumb {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+// Overflow class
+.clearfix:after {
+	content:" ";
+	display: block;
+	height: 0;
+	clear: both;
 }
 
 // Legend table & list
@@ -461,8 +466,6 @@ ul.legend {
 				padding: 0px;
 				text-align: center;
 			}
-			.post_main {
-			}
 		}
 	}
 	// Profile pictures
@@ -492,7 +495,7 @@ body.round_avatars .single_topic #styled_content_block .ft_avatar {
 // Statuses of posts/comments display in table view
 #styled_content_block span[class*='status_'] {
 	top: -15px;
-	left: 30px;
+	left: 15px;
 }
 
 // Voting panels
@@ -515,28 +518,6 @@ a.btn+.vote_spam {
 label.control-label[for=post_title] {
 	width: auto;
 }
-/* MILOS > REDUNDANT STYLES
-.item_tags {
-	td.label {
-		background: none;
-		color: #000;
-		text-shadow: none;
-		padding: 0 5px 0 0;
-		font-size: 100%;
-		label, span {
-			margin-top: 10px;
-		}
-	}
-	td.input {
-		width: 90%;
-		label {
-			display: none;
-		}
-	}
-	.controls {
-		margin-left: 0;
-	}
-}*/
 
 // Profile page
 .profile_avatar {
@@ -650,6 +631,9 @@ label.control-label[for=post_title] {
 			margin-top: 5px;
 		}
 	}
+	.evo_comment .panel-body .floatright {
+		display: none;
+	}
 }
 @media screen and (max-width: 600px) {
 	.widget_core_coll_search_form {
@@ -699,6 +683,11 @@ label.control-label[for=post_title] {
 			text-align: left;
 			width: 70%;
 			margin-top: 2px;
+		}
+	}
+	.evo_content_block {		
+		.panel-body .floatright {
+			display: none;
 		}
 	}
 }
