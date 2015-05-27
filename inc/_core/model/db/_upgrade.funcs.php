@@ -1756,7 +1756,7 @@ function db_upgrade_to_utf8_ascii()
 {
 	global $db_config, $tableprefix, $DB;
 
-	echo '<h2 class="page-title">'.T_('Upgrading all tables in b2evolution MySQL database to UTF-8...').'</h2>';
+	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
 	evo_flush();
 
 	// Load db schema to be able to check the original charset definition
@@ -1765,7 +1765,7 @@ function db_upgrade_to_utf8_ascii()
 	$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
 	foreach( $db_tables as $table )
 	{ // Convert all tables charset to utf8
-		echo sprintf( T_('Converting %s...'), $table );
+		echo sprintf( T_('Normalizing %s...'), $table );
 		evo_flush();
 		convert_table_to_utf8_ascii( $table );
 		echo " OK<br />\n";

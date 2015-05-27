@@ -257,7 +257,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_ItemTag->confirm_delete(
-				sprintf( T_('Delete post tag "%s"?'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ),
+				sprintf( T_('Delete tag "%s"?'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ),
 				'tag', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

@@ -85,7 +85,7 @@ class ItemTag extends DataObject
 		{ // Other tag already exists with the same name:
 			if( empty( $this->ID ) )
 			{ // Suggest to edit existing tag for new creating tag
-				param_error( 'tag_name', sprintf( T_('This post tag already exists. Do you want to <a %s>edit the existing post tag</a>?'),
+				param_error( 'tag_name', sprintf( T_('This tag already exists. Do you want to <a %s>edit the existing tag</a>?'),
 					'href="?ctrl=itemtags&amp;action=edit&amp;tag_ID='.$existing_tag_ID.'"' ) );
 			}
 			else
