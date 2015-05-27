@@ -175,15 +175,13 @@ function install_newdb()
 		return;
 	}
 
-	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
-
 	/**
 	 * 1 - If current installation is local, test or intranet
 	 *     Used to turn off gravatar and all ping plugins
 	 *
 	 * @var integer
 	 */
-	$local_installation = param( 'local_installation', 'integer', 0 );
+	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
 
 	echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
 	evo_flush();
@@ -1365,7 +1363,7 @@ jQuery( document ).ready( function()
 	{
 		switch( jQuery( 'input[type=radio][name=action]:checked' ).val() )
 		{
-			case 'newdb':
+			case 'menu-install':
 				var btn_title = '<?php echo TS_('Next').' &raquo;'; ?>';
 				var btn_class = 'btn-success';
 				break;
@@ -1408,5 +1406,36 @@ jQuery( document ).ready( function()
 } );
 </script>
 <?php
+}
+
+
+/**
+ * Check if current installation is local
+ * 
+ * @return boolean
+ */
+function check_local_installation()
+{
+	global $basehost;
+
+	return php_sapi_name() != 'cli' && // NOT php CLI mode
+		( $basehost == 'localhost' ||
+			( isset( $_SERVER['SERVER_ADDR'] ) && (
+				$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
+				$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
+			) ||
+			( isset( $_SERVER['REMOTE_ADDR'] ) && (
+				$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
+				$_SERVER['REMOTE_ADDR'] == '::1' )
+			) ||
+			( isset( $_SERVER['HTTP_HOST'] ) && (
+				$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
+				$_SERVER['HTTP_HOST'] == '::1' )
+			) ||
+			( isset( $_SERVER['SERVER_NAME'] ) && (
+				$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
+				$_SERVER['SERVER_NAME'] == '::1' )
+			)
+		);
 }
 ?>
