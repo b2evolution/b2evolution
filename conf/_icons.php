@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * @param string icon name/key
  * @return array array( 'file' (relative to $rsc_path/$rsc_url), 'alt', 'size', 'class', 'rollover' )
  */
-function get_icon_info($name)
+function get_icon_info( $name )
 {
 	/*
 	 * dh> Idea:
@@ -25,7 +25,7 @@ function get_icon_info($name)
 	}
 	*/
 
-	switch($name)
+	switch( $name )
 	{
 		case 'pixel': return array(
 			'alt'  => '',
@@ -517,14 +517,14 @@ function get_icon_info($name)
 			'alt'  => '&nbsp;',
 			'size' => array( 9, 9 ),
 			'xy' => array( 112, 176 ),
-			'fa' => 'circle-o',
+			'fa' => 'circle-thin',
 			'color' => '#000'
 		);
 		case 'bullet_empty_grey': return array(
 			'alt'  => '&nbsp;',
 			'size' => array( 9, 9 ),
 			'xy' => array( 112, 176 ),
-			'fa' => 'circle-o',
+			'fa' => 'circle-thin',
 			'color' => '#999'
 		);
 		case 'bullet_blue': return array(
@@ -573,7 +573,7 @@ function get_icon_info($name)
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
 			'xy' => array( 0, 192 ),
-			'fa' => 'circle-o',
+			'fa' => 'circle-thin',
 			'color' => '#CCC'
 		);
 		case 'bullet_magenta': return array(
@@ -589,14 +589,14 @@ function get_icon_info($name)
 			'legend' => T_('Activate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 96 ),
-			'fa' => 'retweet'
+			'fa' => 'toggle-on'
 		);
 		case 'deactivate': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 80, 96 ),
-			'fa' => 'retweet'
+			'fa' => 'toggle-off'
 		);
 		case 'enabled': return array(
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
@@ -611,7 +611,7 @@ function get_icon_info($name)
 			'legend' => T_('Deactivated'),
 			'size' => array( 9, 9 ),
 			'xy' => array( 112, 176 ),
-			'fa' => 'circle-o',
+			'fa' => 'circle-thin',
 			'color' => '#000'
 		);
 
@@ -1130,6 +1130,28 @@ function get_icon_info($name)
 			'xy' => array( 0, 32 ),
 			'fa' => 'flash',
 			'color' => '#ff9900'
+		);
+
+		case 'cache_enabled': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 128, 32 ),
+			'fa' => 'cube',
+			'color' => '#F90'
+		);
+		case 'cache_disabled': return array(
+			'alt'  => '',
+			'size' => array( 10, 16 ),
+			'xy' => array( 0, 32 ),
+			'fa' => 'bolt',
+			'color' => '#000'
+		);
+		case 'cache_disallowed': return array(
+			'alt'  => '',
+			'size' => array( 10, 16 ),
+			'xy' => array( 0, 32 ),
+			'fa' => 'bolt',
+			'color' => '#CCC'
 		);
 	}
 }
