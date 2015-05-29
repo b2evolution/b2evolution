@@ -97,10 +97,10 @@ ol.breadcrumb {
 		}
 	}
 	/* This is the row layout on disp=posts */
-	.posts {
+	.posts_panel {
 		text-align: left;
 		.ft_title {
-			padding-left: 35px;
+			padding-left: 5px;
 			.ft_author_info {
 				padding-top: 2px;
 				font-size: 90%;
@@ -118,6 +118,10 @@ ol.breadcrumb {
 		}
 		.ft_date {
 			margin-top: 14px;
+			text-align: left;
+			img {
+				border-radius: 50%;
+			}
 		}
 		.ft_count {
 			margin-top: 20px;
@@ -143,15 +147,17 @@ ol.breadcrumb {
 	}
 	.ft_date {
 		margin-top: 17px;
+		color: #8b96a1;
+		font-size: 90%;
 	}
 	.ft_title >	a.forumlink {
 		font-size: 21px;
 	}
 	.ft_title a.topictitle {
 		font-size: 16px;
-	}
-	.ft_title a.topictitle.unread {
-		font-weight: bold;
+		&.unread {
+			font-weight: bold;
+		}
 	}
 	.ft_desc, .ft_count {
 		text-align: center;
@@ -182,10 +188,16 @@ ol.breadcrumb {
 		padding: 8px;
 	}
 }
-
 // Comment form
 .forums_list.single_topic {
 	border: none;
+	.evo_comment {
+		.panel-footer {
+			a.to_top.postlink {
+				font-size: 14px !important
+			}
+		}
+	}
 	.panel-heading {
 		.evo_comment_title {
 			display: inline;
@@ -212,7 +224,7 @@ ol.breadcrumb {
 		}
 	}	
 }
-.bCommentAvatar {
+.bCommentAvatar, {
 	border-radius: 50%;
 	float: left;
 	margin: 4px 10px 10px 0;
@@ -438,9 +450,8 @@ ul.legend {
 		padding-top: 15px;
 		border-top: 1px solid #ddd;
 		margin-top: 15px;
-		div, span, .back_to_top {
+		div, span {
 			display: inline-block;
-			// MILOS> REDUNDANT STYLES float: none;
 			vertical-align: middle;
 		}
 	}
@@ -465,6 +476,12 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
+				span img.loadimg {
+					border-radius: 50% !important;
+				}
+			}
+			.post_main {
+				padding-right: 0px;
 			}
 		}
 	}
@@ -564,31 +581,35 @@ label.control-label[for=post_title] {
 // Low resolution layout *** MILOS ***
 // Responsive styles
 @media screen and (max-width: 1199px) {
-	.table-hover .group_row {
+	.front_panel {
 		.ft_count {
 			margin-top: 5px;
 		}
 	}
-	.table-hover .group_row.posts {
+	.posts_panel {
 		.ft_count {
-			margin-top: 10px;
+			margin-top: 10px !important;			
 		}
 	}
 }
 
 @media screen and (max-width: 991px) {
-	.table-hover .group_row.posts {
+	.front_panel {
+		.ft_count {
+			padding: 0px 7px;
+		}
+	}
+	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
 			margin-top: 5px;
 		}
 		.ft_title .floatright {
-			float: none;
 			display: inline-block;
 			margin-left: 8px;
 		}
 		.ft_count {
-			margin-top: 5px;
+			margin-top: 20px !important;
 		}
 	}
 }
@@ -598,23 +619,32 @@ label.control-label[for=post_title] {
 	}
 	.ft_date_shrinked {
 		display: inline-block !important;
-		margin-top: 5px;
 		text-align: center;
+		color: #8b96a1;
+		font-size: 90%;
 	}
-	.table-hover .group_row {
+	.front_panel {
 		.ft_count {
 			margin-top: 15px;
 		}
+		.ft_date_shrinked {
+			margin-top: 17px;
+		}
 	}
-	.posts {
+	.posts_panel {
 		.ft_count {
 			margin: 0px;
 			text-align: left;
+			margin-top: 0px !important;
+			margin-left: 45px;
+			padding-left: 5px;
 		}
 		.ft_date_shrinked {
 			text-align: left;
 			padding-left: 0px;
-			a {
+			padding-right: 15px;
+			float: left;
+			a, span {
 				margin-left: 4px;
 			}
 		}
@@ -626,18 +656,31 @@ label.control-label[for=post_title] {
 		.panel-body .ft_avatar {
 			display: none;
 		}
-		.panel-footer .floatright {
+		.post_main {
+			padding: 0px;
+		}
+		.panel-footer {
+			overflow: hidden;
+		}
+		/*.panel-footer .floatright {
 			float: none;
 			margin-top: 5px;
-		}
+		}*/
 	}
-	.evo_comment .panel-body .floatright {
-		display: none;
+	.evo_comment {
+		.panel-body .floatright {
+			display: none;
+		}
+		.evo_comment .panel-footer .floatright {
+			a.btn {
+				margin-top: 3px;
+			}
+		}
 	}
 }
 @media screen and (max-width: 600px) {
 	.widget_core_coll_search_form {
-	width: 100%;
+		width: 100%;
 	}
 	.table-hover .group_row {
 		width: 100%;
@@ -666,23 +709,34 @@ label.control-label[for=post_title] {
 			padding-right: 5px;
 			&.second_of_class {
 				padding-left: 0px;
+				margin-left: 0px;
 			}
 		}
 		.ft_date_shrinked {
-			width: 130px;
 			text-align: right;
 			float: right;
 		}
 	}
-	.table-hover .group_row.posts {
+	.front_panel {
+		.ft_count {
+			margin-left: 48px;
+		}
+		.ft_date_shrinked {
+			margin-top: 4px;
+			width: 80px;
+			padding-left: 0px;
+		}
+	}
+	.posts_panel {
 		.small { 
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
 			float: none;
 			text-align: left;
-			width: 70%;
+			display: inline;
 			margin-top: 2px;
+			width: auto;
 		}
 	}
 	.evo_content_block {		
@@ -702,20 +756,16 @@ label.control-label[for=post_title] {
 	.page_title, .panel-heading h2 {
 		font-size: 170%;
 	}
-	.group_row {
-		.ft_title a {
-			font-size: 92%;
-		}
-	}
-	.ft_date_shrinked {
-		display: none !important;
-	}
+	/*.panel-footer span[id*="vote_helpful_"] {
+		display: block;
+	}*/
 	.ft_date_shrinked_more {
 		display: block !important;
-		float: right;
 		text-align: right;
 		padding-right: 15px;
 		margin-top: 2px;
+		color: #8b96a1;
+		font-size: 90%;
 	}
 	.forums_list single_topic {		
 		.ft_author_info {
@@ -725,16 +775,26 @@ label.control-label[for=post_title] {
 			}
 		}
 	}
+	/* Disp front */
+	.front_panel {
+		.table-hover .group_row .ft_count {			
+			margin-left: 0px;
+			padding-left: 15px;
+		}
+		.ft_date_shrinked_more {			
+			float: right;
+		}
+	}
 	/* Disp posts */
-	.posts {		
+	.posts_panel {		
 		.ft_status_topic {
 			vertical-align: top;
 			margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;
-		}
-		.ft_date_shrinked_more {
+			margin-left: 0px;
+			padding-left: 15px;
 		}
 		.ft_author_info {
 			display: none !important;

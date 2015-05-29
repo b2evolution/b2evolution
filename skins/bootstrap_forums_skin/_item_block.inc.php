@@ -157,7 +157,18 @@ skin_widget( array(
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
 ?>
-			</div>		
+			</div>
+			<?php 
+
+
+			// List all tags attached to this topic:
+			$Item->tags( array(
+					'before' =>    '<span class="topic_tags clear">'.T_('Tags').': ',
+					'after' =>     '</span>',
+					'separator' => ', ',
+				) );
+
+?>	
 		</div><!-- ../panel-body -->
 		
 		<div class="panel-footer">
@@ -181,14 +192,6 @@ skin_widget( array(
 				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 			}
 			echo '</div>';
-
-			// List all tags attached to this topic:
-			$Item->tags( array(
-					'before' =>    '<span class="topic_tags">'.T_('Tags').': ',
-					'after' =>     '</span>',
-					'separator' => ', ',
-				) );
-
 			echo '<div class="floatright">';
 			$Item->edit_link( array(
 					'before' => ' ',

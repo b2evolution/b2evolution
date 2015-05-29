@@ -35,7 +35,7 @@ $chapters = $Skin->get_chapters( $cat );
 if( count( $chapters ) > 0 )
 {
 ?>
-	<div class="panel panel-default forums_list">
+	<div class="panel panel-default forums_list front_panel">
 <?php
 	foreach( $chapters as $Chapter )
 	{ // Loop through categories:
@@ -96,9 +96,7 @@ if( count( $chapters ) > 0 )
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
 			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
 			<!-- Apply this on XS size -->
-			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y H:i' ); ?></div>
-			<!-- Apply this on XXS size -->
-			<div class="ft_date_shrinked_more"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
+			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
 		</article>
 <?php
 		}

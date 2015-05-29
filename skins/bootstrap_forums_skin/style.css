@@ -82,30 +82,34 @@ ol.breadcrumb {
 .forums_list .group_row:hover {
   background-color: #f5f5f5;
 }
-.forums_list .posts {
+.forums_list .posts_panel {
   text-align: left;
 }
-.forums_list .posts .ft_title {
-  padding-left: 35px;
+.forums_list .posts_panel .ft_title {
+  padding-left: 5px;
 }
-.forums_list .posts .ft_title .ft_author_info {
+.forums_list .posts_panel .ft_title .ft_author_info {
   padding-top: 2px;
   font-size: 90%;
   color: #8b96a1;
 }
-.forums_list .posts .ft_title .ft_author_info.shrinked {
+.forums_list .posts_panel .ft_title .ft_author_info.shrinked {
   display: none;
 }
-.forums_list .posts .ft_title .fa {
+.forums_list .posts_panel .ft_title .fa {
   margin: 5px 5px 0px 0px;
 }
-.forums_list .posts .ft_title .small {
+.forums_list .posts_panel .ft_title .small {
   font-size: 90%;
 }
-.forums_list .posts .ft_date {
+.forums_list .posts_panel .ft_date {
   margin-top: 14px;
+  text-align: left;
 }
-.forums_list .posts .ft_count {
+.forums_list .posts_panel .ft_date img {
+  border-radius: 50%;
+}
+.forums_list .posts_panel .ft_count {
   margin-top: 20px;
 }
 .forums_list .ftb_status__ft_title {
@@ -128,6 +132,8 @@ ol.breadcrumb {
 }
 .forums_list .ft_date {
   margin-top: 17px;
+  color: #8b96a1;
+  font-size: 90%;
 }
 .forums_list .ft_title > a.forumlink {
   font-size: 21px;
@@ -172,6 +178,9 @@ ol.breadcrumb {
 }
 .forums_list.single_topic {
   border: none;
+}
+.forums_list.single_topic .evo_comment .panel-footer a.to_top.postlink {
+  font-size: 14px !important;
 }
 .forums_list.single_topic .panel-heading .evo_comment_title {
   display: inline;
@@ -406,8 +415,7 @@ ul.legend span.note {
   margin-top: 15px;
 }
 .single_topic .votes_help_spam div,
-.single_topic .votes_help_spam span,
-.single_topic .votes_help_spam .back_to_top {
+.single_topic .votes_help_spam span {
   display: inline-block;
   vertical-align: middle;
 }
@@ -428,6 +436,12 @@ ul.legend span.note {
 .single_topic .evo_content_block .panel-body .ft_avatar {
   padding: 0px;
   text-align: center;
+}
+.single_topic .evo_content_block .panel-body .ft_avatar span img.loadimg {
+  border-radius: 50% !important;
+}
+.single_topic .evo_content_block .panel-body .post_main {
+  padding-right: 0px;
 }
 .single_topic .ft_avatar > a {
   position: relative;
@@ -514,25 +528,27 @@ label.control-label[for=post_title] {
   margin: 0px 3px;
 }
 @media screen and (max-width: 1199px) {
-  .table-hover .group_row .ft_count {
+  .front_panel .ft_count {
     margin-top: 5px;
   }
-  .table-hover .group_row.posts .ft_count {
-    margin-top: 10px;
+  .posts_panel .ft_count {
+    margin-top: 10px !important;
   }
 }
 @media screen and (max-width: 991px) {
-  .table-hover .group_row.posts .ft_status_topic {
+  .front_panel .ft_count {
+    padding: 0px 7px;
+  }
+  .posts_panel .ft_status_topic {
     vertical-align: top;
     margin-top: 5px;
   }
-  .table-hover .group_row.posts .ft_title .floatright {
-    float: none;
+  .posts_panel .ft_title .floatright {
     display: inline-block;
     margin-left: 8px;
   }
-  .table-hover .group_row.posts .ft_count {
-    margin-top: 5px;
+  .posts_panel .ft_count {
+    margin-top: 20px !important;
   }
 }
 @media screen and (max-width: 767px) {
@@ -541,35 +557,56 @@ label.control-label[for=post_title] {
   }
   .ft_date_shrinked {
     display: inline-block !important;
-    margin-top: 5px;
     text-align: center;
+    color: #8b96a1;
+    font-size: 90%;
   }
-  .table-hover .group_row .ft_count {
+  .front_panel .ft_count {
     margin-top: 15px;
   }
-  .posts .ft_count {
+  .front_panel .ft_date_shrinked {
+    margin-top: 17px;
+  }
+  .posts_panel .ft_count {
     margin: 0px;
     text-align: left;
+    margin-top: 0px !important;
+    margin-left: 45px;
+    padding-left: 5px;
   }
-  .posts .ft_date_shrinked {
+  .posts_panel .ft_date_shrinked {
     text-align: left;
     padding-left: 0px;
+    padding-right: 15px;
+    float: left;
   }
-  .posts .ft_date_shrinked a {
+  .posts_panel .ft_date_shrinked a,
+  .posts_panel .ft_date_shrinked span {
     margin-left: 4px;
   }
   .legend-item {
     margin-bottom: 5px;
   }
+  .evo_content_block {
+    /*.panel-footer .floatright {
+			float: none;
+			margin-top: 5px;
+		}*/
+  }
   .evo_content_block .panel-body .ft_avatar {
     display: none;
   }
-  .evo_content_block .panel-footer .floatright {
-    float: none;
-    margin-top: 5px;
+  .evo_content_block .post_main {
+    padding: 0px;
+  }
+  .evo_content_block .panel-footer {
+    overflow: hidden;
   }
   .evo_comment .panel-body .floatright {
     display: none;
+  }
+  .evo_comment .evo_comment .panel-footer .floatright a.btn {
+    margin-top: 3px;
   }
 }
 @media screen and (max-width: 600px) {
@@ -605,20 +642,29 @@ label.control-label[for=post_title] {
   }
   .table-hover .group_row .ft_count.second_of_class {
     padding-left: 0px;
+    margin-left: 0px;
   }
   .table-hover .group_row .ft_date_shrinked {
-    width: 130px;
     text-align: right;
     float: right;
   }
-  .table-hover .group_row.posts .small {
+  .front_panel .ft_count {
+    margin-left: 48px;
+  }
+  .front_panel .ft_date_shrinked {
+    margin-top: 4px;
+    width: 80px;
+    padding-left: 0px;
+  }
+  .posts_panel .small {
     display: none;
   }
-  .table-hover .group_row.posts .ft_date_shrinked.item_list {
+  .posts_panel .ft_date_shrinked.item_list {
     float: none;
     text-align: left;
-    width: 70%;
+    display: inline;
     margin-top: 2px;
+    width: auto;
   }
   .evo_content_block .panel-body .floatright {
     display: none;
@@ -637,18 +683,16 @@ label.control-label[for=post_title] {
   .panel-heading h2 {
     font-size: 170%;
   }
-  .group_row .ft_title a {
-    font-size: 92%;
-  }
-  .ft_date_shrinked {
-    display: none !important;
-  }
+  /*.panel-footer span[id*="vote_helpful_"] {
+		display: block;
+	}*/
   .ft_date_shrinked_more {
     display: block !important;
-    float: right;
     text-align: right;
     padding-right: 15px;
     margin-top: 2px;
+    color: #8b96a1;
+    font-size: 90%;
   }
   .forums_list single_topic .ft_author_info {
     display: none;
@@ -656,18 +700,28 @@ label.control-label[for=post_title] {
   .forums_list single_topic .ft_author_info.shrinked {
     display: block !important;
   }
+  /* Disp front */
+  .front_panel .table-hover .group_row .ft_count {
+    margin-left: 0px;
+    padding-left: 15px;
+  }
+  .front_panel .ft_date_shrinked_more {
+    float: right;
+  }
   /* Disp posts */
-  .posts .ft_status_topic {
+  .posts_panel .ft_status_topic {
     vertical-align: top;
     margin-top: 8px;
   }
-  .posts .ft_count {
+  .posts_panel .ft_count {
     margin-top: 0px;
+    margin-left: 0px;
+    padding-left: 15px;
   }
-  .posts .ft_author_info {
+  .posts_panel .ft_author_info {
     display: none !important;
   }
-  .posts .ft_author_info.shrinked {
+  .posts_panel .ft_author_info.shrinked {
     display: inline;
   }
   /* Disp Single */

@@ -40,6 +40,14 @@ $params = array_merge( array(
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 	
+// In this skin, it makes no sense to navigate in any different mode than "same category"
+// Use the category from param
+$current_cat = param( 'cat', 'integer', 0 );
+if( $current_cat == 0 )
+{ // Use main category by default because the category wasn't set
+	$current_cat = $Item->main_cat_ID;
+}
+
 if( ! isset( $comment_template_counter ) )
 {
 $comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
@@ -205,16 +213,35 @@ echo $params['comment_info_after'];
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
 <div class="panel-footer small clearfix">
+		<a href="<?php
+		if( $disp == 'comments' )
+		{	// We are displaying a comment in the Latest comments page:
+			echo $Blog->get('lastcommentsurl');
+		}
+		else
+		{	// We are displaying a comment under a post/topic:
+			echo $Item->get_permanent_url();
+		}
+		?>#skin_wrapper" class="to_top postlink"><?php echo T_('Back to top'); ?></a>
 	<?php
 	$Comment->reply_link(); /* Link for replying to the Comment */
 	$Comment->vote_helpful( '', '', '&amp;', true, true );
-	?>
-	<div class="floatright">
-		<?php
-		$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); /* Link to backoffice for editing */
-		$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
-		?>
-	</div>
+		echo '<div class="floatright">';
+			$Item->edit_link( array(
+					'before' => '',
+					'after'  => '',
+					'title'  => T_('Edit this topic'),
+					'text'   => '#',
+					'class'  => button_class( 'text' ),
+				) );
+			echo ' <span class="'.button_class( 'group' ).'">';
+			// Set redirect after publish to the same category view of the items permanent url
+			$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
+			$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
+			$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
+			$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
+			echo '</span>';
+			echo '</div>';?>
 </div>
 
 <?php echo $params['comment_end'];

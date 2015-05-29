@@ -51,10 +51,10 @@ elseif( $comments_number > 25 )
 	$status_icon = 'fa-star';
 }
 ?>
-		<article class="container group_row posts">	
-			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-7 col-xs-12">		
+		<article class="container group_row posts_panel">	
+			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">		
 			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i></div>
-			<div class="ft_title"><?php
+			<div class="ft_title ellipsis"><?php
 				echo $status_title;
 				$Item->load_Blog();
 				if( $Item->Blog->get_setting( 'track_unread_content' ) )
@@ -74,26 +74,23 @@ elseif( $comments_number > 25 )
 						) );
 					$legend_statuses[] = $Item->status;
 				}
-				if( empty( $cat ) )
-				{ // Excerpt:
 					$Item->excerpt( array(
 						'before' => '<div class="small ellipsis">',
 						'after'  => '</div>',
 						) );
-				}
 				// Author info:
-				echo '<div class="ft_author_info">'.T_('Started by');
+				echo '<div class="ft_author_info ellipsis">'.T_('Started by');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
 				// Super small screen size Author info:
-				echo '<div class="ft_author_info shrinked">'.T_('By');
+				echo '<div class="ft_author_info shrinked ellipsis">'.T_('By');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
 				echo '</div>';
 			?></div>
 			</div>
-			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php
+			<div class="ft_count col-lg-1 col-md-1 col-sm-2 col-xs-2"><?php
 				if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 				{ // The comments are disabled
 					echo T_('n.a.');
@@ -145,10 +142,10 @@ elseif( $comments_number > 25 )
 			?></div>
 			
 			<!-- This is shrinked date that applies on lower screen res -->
-			<div class="ft_date_shrinked item_list col-xs-10"><?php
+			<div class="ft_date_shrinked item_list"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
-					$latest_Comment->date('m/j/y H:i');
+					$latest_Comment->date('m/j/y');
 					$latest_Comment->author2( array(
 							'link_text'   => 'login'
 						) );
@@ -157,31 +154,11 @@ elseif( $comments_number > 25 )
 				}
 				else
 				{ // No comments, Display info of post
-					echo $Item->get_mod_date( 'm/j/y H:i' );
+					echo $Item->get_mod_date( 'm/j/y' );
 					echo $Item->author( array(
 							'link_text' => 'login',
 						) );
 					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
 			?></div>	
-			<!-- This is shrinked date that applies on super lower screen res -->
-			<div class="ft_date_shrinked_more"><?php
-				if( $latest_Comment = & $Item->get_latest_Comment() )
-				{ // Display info about last comment
-					$latest_Comment->date('m/j/y ');
-					$latest_Comment->author2( array(
-							'link_text'   => 'login'
-						) );
-
-					echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
-				}
-				else
-				{ // No comments, Display info of post
-					echo $Item->get_mod_date( 'm/j/y H:i' );
-					echo $Item->author( array(
-							'link_text' => 'login',
-						) );
-					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
-				}
-			?></div>		
 		</article>
