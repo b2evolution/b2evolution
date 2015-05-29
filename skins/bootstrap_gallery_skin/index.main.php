@@ -278,6 +278,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					'disp_page'            => '',		// We already handled this case above
 					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
 					'author_link_text'     => 'preferredname',
+					
+		'item_class'        => 'evo_post evo_content_block',
+		'item_type_class'   => 'evo_post__ptyp_',
+		'item_status_class' => 'evo_post__',
 					// Login
 					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
 					'login_page_after'     => '</div></div>',
