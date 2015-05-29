@@ -2906,6 +2906,7 @@ class Form extends Widget
 	function button_input( $field_params = array() )
 	{
 		$field_params = array_merge( array(
+				'tag'          => 'input',
 				'type'         => 'submit',
 				'input_prefix' => "\t\t\t",
 				'class'        => '',
@@ -2946,7 +2947,7 @@ class Form extends Widget
 			}
 		}
 
-		return $this->display_or_return( $this->get_input_element( $field_params ) );
+		return $this->display_or_return( $this->get_button_element( $field_params ) );
 	}
 
 
@@ -2957,6 +2958,7 @@ class Form extends Widget
 	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
 	 *
 	 * The array must contain :
+	 *  - the button html tag: 'input', 'button'
 	 *  - the button type
 	 *  - the name (optional)
 	 *  - the value (optional)
@@ -3588,6 +3590,95 @@ class Form extends Widget
 		$r = $input_prefix
 			.'<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />'
 			.$input_suffix;
+
+		return $r;
+	}
+
+
+	/**
+	 * Generate a general button element.
+	 *
+	 * @param array Optional params.
+	 *    Additionally to {@link $_common_params} you can use:
+	 *    - input_prefix: Text before <input /> (string, default '')
+	 *    - input_suffix: Text after <input /> (string, default "\n")
+	 *    - input_help: Gets used as default value on empty input (type=text)
+	 *      elements. It gets attached through JavaScript (onfocus, onblur and form.onsubmit).
+	 *    - format_to_output: Use format_to_output in get_field_attribs_as_string? (boolean, default True)
+	 *
+	 * @return string The <input /> element.
+	 */
+	function get_button_element( $field_params = array(), $parse_common = true )
+	{
+		if( $parse_common )
+		{
+			$this->handle_common_params( $field_params );
+		}
+
+		if( isset( $field_params['input_prefix'] ) )
+		{
+			$input_prefix = $field_params['input_prefix'];
+			unset( $field_params['input_prefix'] ); // no HTML attribute
+		}
+		else
+		{
+			$input_prefix = '';
+		}
+
+		if( isset( $field_params['input_suffix'] ) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		if( isset($field_params['input_help']) && ( empty( $field_params['type'] ) || $field_params['type'] == 'text' ) )
+		{
+			$this->append_javascript[] = 'input_decorated_help( "'.$field_params['id'].'", "'.format_to_output( $field_params['input_help'], 'formvalue' ).'" );';
+
+			unset( $field_params['input_help'] ); // no HTML attribute
+		}
+
+		if( isset($field_params['format_to_output']) )
+		{
+			$format_to_output = $field_params['format_to_output'];
+			unset( $field_params['format_to_output'] );
+		}
+		else
+		{
+			$format_to_output = true;
+		}
+
+		if( isset( $field_params['inline'] ) )
+		{ // Delete 'inline' param from attributes list
+			unset( $field_params['inline'] );
+		}
+
+		if( isset( $field_params['input_required'] ) )
+		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
+			$field_params['required'] = $field_params['input_required'];
+			unset( $field_params['input_required'] );
+		}
+
+		$r = $input_prefix;
+
+		if( $field_params['tag'] == 'button' )
+		{
+			$value = $field_params['value'];
+			unset( $field_params['value'] );
+			unset( $field_params['tag'] );
+
+			$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
+		}
+		else
+		{
+			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
+		}
+
+		$r .= $input_suffix;
 
 		return $r;
 	}
