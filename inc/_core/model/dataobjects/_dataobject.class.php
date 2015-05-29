@@ -761,7 +761,7 @@ class DataObject
 		if( $restriction_Messages->count() )
 		{	// The will be cascading deletes, issue WARNING:
 			echo '<h3>'.T_('WARNING: Deleting this object will also delete:').'</h3>';
-			$restriction_Messages->display( '', '' );
+			$restriction_Messages->display( '', '', true, 'log_container delete_messages' );
 		}
 
 		echo '<p class="warning">'.$confirm_title.'</p>';
