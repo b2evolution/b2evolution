@@ -189,6 +189,13 @@ div.action_messages {
 	padding: 0; // Remove double padding, for example on delete collection action
 	margin-top: 0;
 }
+div.delete_messages ul {
+	margin: 0 0 10px 25px;
+	list-style: disc;
+	li {
+		list-style: inherit;
+	}
+}
 
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -953,6 +960,7 @@ table.table {
 }
 
 // Widgets table
+.widget_container_list tr.odd,
 .widget_row.odd {
 	background: #FFF;
 }

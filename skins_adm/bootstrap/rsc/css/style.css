@@ -159,6 +159,13 @@ div.action_messages ul li:last-child div.alert {
   padding: 0;
   margin-top: 0;
 }
+div.delete_messages ul {
+  margin: 0 0 10px 25px;
+  list-style: disc;
+}
+div.delete_messages ul li {
+  list-style: inherit;
+}
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
@@ -927,6 +934,7 @@ table.table tbody tr.group td {
 table.table tbody tr.group td a {
   color: #337ab7;
 }
+.widget_container_list tr.odd,
 .widget_row.odd {
   background: #FFF;
 }

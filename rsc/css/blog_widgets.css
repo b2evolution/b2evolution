@@ -26,12 +26,16 @@ margin:0 2em 0 0;
 	float: left;
 }
 
-.widget_actions{
+.widget_actions, span.widget_cache_status {
 	border-left:1px solid #9DB0BC;
 	margin-left:10px;
 	padding-left:10px;
-	cursor:pointer;
+	cursor:default;
 	float:right;
+}
+td.widget_cache_status, span.widget_cache_status {
+	width: 40px;
+	text-align: center;
 }
 
 .widget_actions img{

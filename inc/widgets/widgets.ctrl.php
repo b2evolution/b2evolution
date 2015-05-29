@@ -109,6 +109,8 @@ switch( $action )
 	case 'move_up':
 	case 'move_down':
 	case 'toggle':
+	case 'cache_enable':
+	case 'cache_disable':
 		param( 'wi_ID', 'integer', true );
 		$WidgetCache = & get_WidgetCache();
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
@@ -252,7 +254,7 @@ switch( $action )
 		$edited_ComponentWidget->load_from_Request();
 
 		if(	! param_errors_detected() )
-		{	// Update settings:
+		{ // Update settings:
 			$edited_ComponentWidget->dbupdate();
 			$Messages->add( T_('Widget settings have been updated'), 'success' );
 			switch( $display_mode )
@@ -278,7 +280,7 @@ switch( $action )
 		}
 		elseif( $display_mode == 'js' )
 		{ // send errors back as js
-			send_javascript_message( array(), true );
+			send_javascript_message( array( 'showMessagesWidgetSettings' => array() ), true );
 		}
 		break;
 
@@ -378,7 +380,41 @@ switch( $action )
 			// EXITS:
 			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
 		}
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		break;
+
+	case 'cache_enable':
+	case 'cache_disable':
+		// Enable or disable the block caching for the widget:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+
+		if( $edited_ComponentWidget->get_cache_status() == 'disallowed' )
+		{ // Don't allow to change cache status because it is not allowed by widget config
+			$Messages->add( T_( 'This widget cannot be cached in the block cache.' ), 'error' );
+		}
+		else
+		{ // Update widget cache status
+			$edited_ComponentWidget->set( 'allow_blockcache', $action == 'cache_enable' ? 1 : 0 );
+			$edited_ComponentWidget->dbupdate();
+
+			if( $action == 'cache_enable' )
+			{
+				$Messages->add( T_( 'Widget block caching has been enabled.' ), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_( 'Widget block caching has been disabled.' ), 'success' );
+			}
+		}
+
+		if ( $display_mode == 'js' )
+		{
+			// EXITS:
+			send_javascript_message( array( 'doToggleCache' => array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_cache_status() ) ) );
+		}
+		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
 
 	case 'activate':
@@ -410,7 +446,7 @@ switch( $action )
 			}
 		}
 
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
 
 	case 'delete':
@@ -536,10 +572,13 @@ if( $display_mode == 'normal' )
 	 *
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
-	var enabled_icon_tag = \''.get_icon( 'enabled', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
-	var disabled_icon_tag = \''.get_icon( 'disabled', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
+	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
+	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
 	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
 	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
+	var cache_enabled_icon_tag = \''.get_icon( 'cache_enabled', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
+	var cache_disabled_icon_tag = \''.get_icon( 'cache_disabled', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
+	var cache_disallowed_icon_tag = \''.get_icon( 'cache_disallowed', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery

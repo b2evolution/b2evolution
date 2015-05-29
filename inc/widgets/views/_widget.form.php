@@ -56,7 +56,7 @@ $Form->begin_fieldset( T_('Params') );
 		if( $l_name == 'allow_blockcache'
 		    && isset( $l_meta['disabled'] )
 		    && ( $l_meta['disabled'] == 'disabled' ) )
-		{ // Force checkbox "Allow caching" to unchecked when it is disabled from widget
+		{ // Force checkbox "Allow caching" to unchecked when it is disallowed from widget config
 			$l_value = 0;
 		}
 		// Display field:

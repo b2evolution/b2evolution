@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 9162 2015-05-22 13:29:23Z yura $
+ * @version $Id: blog_widgets.js 9233 2015-05-28 12:33:56Z yura $
  */
 
 
@@ -96,7 +96,7 @@ jQuery(document).ready( function()
 	});
 
 	// grab the widget ID out of the "delete" url and add as ID to parent row:
-	jQuery( '.widget_row td:nth-child(6)' ).each( function()
+	jQuery( '.widget_row td:nth-child(7)' ).each( function()
 	{
 		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
 		widget_id = widget_id.match(/wi_ID=([0-9]+)/)[1] // extract ID
@@ -113,9 +113,10 @@ jQuery(document).ready( function()
 		{ // grab each widget in container
 			var widget = jQuery( this ).attr( "id" );
 			the_widgets[ container ][ widget ] = new Array();
-			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget ).find( '.widget_name' ).parent().html();
+			the_widgets[ container ][ widget ]["name"] = jQuery( '#' + widget ).find( '.widget_name' ).parent().html();
 			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
 			the_widgets[ container ][ widget ]["enabled"] = jQuery( '#' + widget + ' .widget_is_enabled' ).size();
+			the_widgets[ container ][ widget ]["cache"] = jQuery( '#' + widget + ' .widget_cache_status [rel]' ).attr( 'rel' );
 		} );
 	});
 
@@ -133,7 +134,7 @@ jQuery(document).ready( function()
 		// create widget entry for each widget in each container
 		for( widget in the_widgets[container] )
 		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"] );
+			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"], the_widgets[container][widget]["cache"] );
 		}
 	}
 
@@ -404,14 +405,30 @@ function editWidget( widget )
 function widgetSettings( the_html )
 {
 	// add placeholder for widgets settings form:
-	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="panel panel-default"></div>' );
-	// var evobar_height = jQuery( '#evo_toolbar' ).height();
-	// jQuery( '#screen_mask' ).css({ top: evobar_height });
+	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="modal-content"></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
-	jQuery( '#widget_settings > form > span > a.close_link' ).bind( 'click', closeWidgetSettings );
+
+	// Create modal header for bootstrap skin
+	var page_title = jQuery( '#widget_settings' ).find( 'h2.page-title:first' );
+	if( page_title.length > 0 )
+	{
+		var page_title_icons = jQuery( '#widget_settings' ).find( 'span.pull-right:first' );
+		var page_title_icons_html = '';
+		if( page_title_icons.length > 0 )
+		{
+			page_title_icons.find( 'a.close_link' ).remove()
+			page_title_icons_html = '<span class="pull-right">' + page_title_icons.html() + '</span>';
+			page_title_icons.remove();
+		}
+		jQuery( '#widget_settings' ).prepend( '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' + page_title_icons_html + '<h4 class="modal-title">' + page_title.html() + '</h4></div>' );
+		page_title.remove();
+		jQuery( '#widget_settings button.close' ).bind( 'click', closeWidgetSettings );
+	}
+
+	jQuery( '#widget_settings a.close_link' ).bind( 'click', closeWidgetSettings );
 
 	// Close widget Settings if Escape key is pressed:
 	var keycode_esc = 27;
@@ -578,7 +595,7 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  * @param string wi_name Name of the new widget
  * @param boolean wi_enabled Is the widget enabled?
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_cache_status )
 {
 	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span>'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
@@ -592,13 +609,31 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 
 	// Add state indicator:
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+
-			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\', \''+crumb_url+'\' );">'+
+			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'+
 				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 			'</a>'+
 		'</span>' ) );
 
+	// Add icon to toggle cache status:
+	switch( wi_cache_status )
+	{
+		case 'enabled':
+			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'disable\' );">' + cache_enabled_icon_tag + '</a>';
+			break;
+
+		case 'disabled':
+			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'enable\' );">' + cache_disabled_icon_tag + '</a>';
+			break;
+
+		case 'disallowed':
+			var cacheIcon = cache_disallowed_icon_tag;
+			break;
+	}
+	cacheIcon = jQuery( '<span class="widget_cache_status">' + cacheIcon + '</span>' );
+	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
+
 	// Add action icons:
-	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\', \''+crumb_url+'\' );">'
+	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'
 				+( wi_enabled ? deactivate_icon_tag : activate_icon_tag )+'</a><a href="#" onclick="return editWidget( \''+wi_ID+'\' );">'
 				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
 				+delete_icon_tag+'</a></span>' );
@@ -646,6 +681,43 @@ function doToggle( wi_ID, wi_enabled )
 		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).removeClass( 'widget_checkbox_enabled' );
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
+}
+
+/**
+ * Toggle the widget cache status.
+ *
+ * @param string Widget ID.
+ * @param string Action: 'enable', 'disable'
+ */
+function toggleCacheWidget( wi_ID, action )
+{
+	SendAdminRequest( 'widgets', 'cache_' + action, 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
+	return false;
+}
+
+/**
+ * Callback for toggling a widget cache status.
+ *
+ * @param integer Widget ID
+ * @param integer new widget cache status
+ */
+function doToggleCache( wi_ID, wi_cache_status )
+{
+	switch( wi_cache_status )
+	{
+		case 'enabled':
+			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \'wi_ID_'+wi_ID+'\', \'disable\' );">' + cache_enabled_icon_tag + '</a>';
+			break;
+
+		case 'disabled':
+			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \'wi_ID_'+wi_ID+'\', \'enable\' );">' + cache_disabled_icon_tag + '</a>';
+			break;
+
+		case 'disallowed':
+			var cacheIcon = cache_disallowed_icon_tag;
+			break;
+	}
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( cacheIcon );
 }
 
 /**

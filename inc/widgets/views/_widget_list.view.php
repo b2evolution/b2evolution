@@ -66,6 +66,10 @@ function display_container( $container, $legend_suffix = '' )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap' ),
 			array(
+				'th' => T_('Cache'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap widget_cache_status' ),
+			array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap' ),
@@ -140,12 +144,12 @@ function display_container( $container, $legend_suffix = '' )
 			{
 				// Indicator for the JS UI:
 				echo '<span class="widget_is_enabled">';
-				echo action_icon( T_( 'The widget is enabled.' ), 'enabled', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_( 'The widget is enabled.' ), 'bullet_green', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 				echo '</span>';
 			}
 			else
 			{
-				echo action_icon( T_( 'The widget is disabled.' ), 'disabled', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_( 'The widget is disabled.' ), 'bullet_empty_grey', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			$Table->display_col_end();
 
@@ -179,6 +183,25 @@ function display_container( $container, $legend_suffix = '' )
 			else
 			{
 				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
+			}
+			$Table->display_col_end();
+
+			// Cache
+			$Table->display_col_start();
+			$widget_cache_status = $ComponentWidget->get_cache_status();
+			switch( $widget_cache_status )
+			{
+				case 'enabled':
+					echo action_icon( T_( 'Caching is enabled. Click to disable.' ), 'cache_enabled', regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+					break;
+
+				case 'disabled':
+					echo action_icon( T_( 'Caching is disabled. Click to enable.' ), 'cache_disabled', regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+					break;
+
+				case 'disallowed':
+					echo get_icon( 'cache_disallowed', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
+					break;
 			}
 			$Table->display_col_end();
 
@@ -224,19 +247,49 @@ foreach( $container_Widget_array as $container=>$dummy )
 echo '</fieldset>'."\n";
 
 echo '<span class="btn-group">';
-$Form->button( array( 'type' => 'button', 'value' => T_('Check All'), 'id' => 'widget_button_check_all' ) );
-$Form->button( array( 'type' => 'button', 'value' => T_('Uncheck All'), 'id' => 'widget_button_uncheck_all' ) );
+$Form->button( array(
+		'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+		'id'    => 'widget_button_check_all',
+		'tag'   => 'button',
+		'type'  => 'button'
+	) );
+$Form->button( array(
+		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+		'id'    => 'widget_button_uncheck_all',
+		'tag'   => 'button',
+		'type'  => 'button'
+	) );
 echo '</span>';
 
 echo '<span class="btn-group">';
-$Form->button( array( 'type' => 'button', 'value' => T_('Check Active'), 'id' => 'widget_button_check_active' ) );
-$Form->button( array( 'type' => 'button', 'value' => T_('Check Inactive'), 'id' => 'widget_button_check_inactive' ) );
+$Form->button( array(
+		'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_green' ).' '.T_('Check Active'),
+		'id'    => 'widget_button_check_active',
+		'tag'   => 'button',
+		'type'  => 'button'
+	) );
+$Form->button( array(
+		'value' => get_icon( 'check_all' ).' '.get_icon( 'bullet_empty_grey' ).' '.T_('Check Inactive'),
+		'id'    => 'widget_button_check_inactive',
+		'tag'   => 'button',
+		'type'  => 'button'
+	) );
 echo '</span>';
 
 echo ' '.T_('With checked do:');
 echo '<span class="btn-group">';
-$Form->button( array( 'type' => 'submit', 'value' => T_('Activate'), 'name' => 'actionArray[activate]' ) );
-$Form->button( array( 'type' => 'submit', 'value' => T_('De-activate'), 'name' => 'actionArray[deactivate]' ) );
+$Form->button( array(
+		'value' => get_icon( 'bullet_green' ).' '.T_('Activate'),
+		'name'  => 'actionArray[activate]',
+		'tag'   => 'button',
+		'type'  => 'submit'
+	) );
+$Form->button( array(
+		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('De-activate'),
+		'name'  => 'actionArray[deactivate]',
+		'tag'   => 'button',
+		'type'  => 'submit'
+	) );
 echo '</span>';
 
 $Form->end_form();

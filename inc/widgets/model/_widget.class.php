@@ -141,7 +141,7 @@ class ComponentWidget extends DataObject
 			if( $parname == 'allow_blockcache'
 					&& isset( $parmeta['disabled'] )
 					&& ( $parmeta['disabled'] == 'disabled' ) )
-			{ // Force checkbox "Allow caching" to unchecked when it is disabled from widget
+			{ // Force checkbox "Allow caching" to unchecked when it is disallowed from widget config
 				$parvalue = 0;
 			}
 			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget', NULL, $parvalue );
@@ -552,23 +552,9 @@ class ComponentWidget extends DataObject
 		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
 		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
 
-		// Check if current widget is disabled for caching
-		$default_widget_params = $this->get_param_definitions( array() );
-		if( ! empty( $default_widget_params )
-		    && isset( $default_widget_params['allow_blockcache'] )
-		    && isset( $default_widget_params['allow_blockcache']['disabled'] )
-		    && ( $default_widget_params['allow_blockcache']['disabled'] == 'disabled' ) )
-		{ // Widget cache is disabled
-			$widget_cache_disabled = true;
-		}
-		else
-		{ // Widget cache is allowed
-			$widget_cache_disabled = false;
-		}
-
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 		    || ! $this->disp_params['allow_blockcache']
-		    || $widget_cache_disabled )
+		    || $this->get_cache_status() == 'disallowed' )
 		{ // NO CACHING - We do NOT want caching for this collection or for this specific widget:
 
 			if( $display_containers )
@@ -656,6 +642,35 @@ class ComponentWidget extends DataObject
 				'wi_ID'   => $this->ID,				// Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID,		// Have the settings of the blog changed ? (ex: new skin)
 			);
+	}
+
+
+	/**
+	 * Get cache status
+	 *
+	 * @return string 'enabled', 'disabled', 'disallowed'
+	 */
+	function get_cache_status()
+	{
+		$default_widget_params = $this->get_param_definitions( array() );
+		if( ! empty( $default_widget_params )
+		    && isset( $default_widget_params['allow_blockcache'] )
+		    && isset( $default_widget_params['allow_blockcache']['disabled'] )
+		    && ( $default_widget_params['allow_blockcache']['disabled'] == 'disabled' ) )
+		{ // Widget cache is NOT allowed by widget config
+			return 'disallowed';
+		}
+		else
+		{ // Check current cache status if it is allowed
+			if( $this->get_param( 'allow_blockcache' ) )
+			{ // Enabled
+				return 'enabled';
+			}
+			else
+			{ // Disabled
+				return 'disabled';
+			}
+		}
 	}
 
 

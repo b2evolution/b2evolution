@@ -81,6 +81,7 @@ class ItemTag extends DataObject
 	{
 		// Name
 		$tag_name = param( 'tag_name', 'string', true );
+		$this->set( 'name', $tag_name );
 		if( $existing_tag_ID = $this->dbexists( 'tag_name', $tag_name ) )
 		{ // Other tag already exists with the same name:
 			if( empty( $this->ID ) )
@@ -94,19 +95,20 @@ class ItemTag extends DataObject
 				$new_tag_posts = intval( $DB->get_var( 'SELECT COUNT( itag_itm_ID ) FROM T_items__itemtag WHERE itag_tag_ID = '.$DB->quote( $existing_tag_ID ) ) );
 				$old_tag_posts = intval( $DB->get_var( 'SELECT COUNT( itag_itm_ID ) FROM T_items__itemtag WHERE itag_tag_ID = '.$DB->quote( $this->ID ) ) );
 
-				$Messages->add( sprintf( T_('The previously named "%s" tag (applied to %d posts) will be merged with the existing "%s" tag (already applied to %d posts). Are you sure?' ),
+				// Set this to know to display a confirmation message to merge this tag
+				$this->merge_tag_ID = $existing_tag_ID;
+				$this->merge_message = sprintf( T_('The previously named "%s" tag (applied to %d posts) will be merged with the existing "%s" tag (already applied to %d posts). Are you sure?' ),
 					$this->dget( 'name' ),
 					$old_tag_posts,
 					$tag_name,
 					$new_tag_posts,
 					'href="?ctrl=itemtags&amp;action=merge&amp;old_tag_ID='.$this->ID.'&amp;tag_ID='.$existing_tag_ID.'&amp;'.url_crumb( 'tag' ).'"',
-					'href="?ctrl=itemtags&amp;action=edit&amp;tag_ID='.$this->ID.'"' ), 'error' );
+					'href="?ctrl=itemtags&amp;action=edit&amp;tag_ID='.$this->ID.'"' );
 
-				// Set this true to display the buttons "Confirm" and "Cancel" after message
-				$this->merge_tag_ID = $existing_tag_ID;
+				// Return FALSE to don't save current changes without confirmation
+				return false;
 			}
 		}
-		$this->set( 'name', $tag_name );
 
 		return ! param_errors_detected();
 	}
