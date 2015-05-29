@@ -154,7 +154,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $random_password, $create_sample_contents;
+	global $new_db_version, $admin_url, $baseurl, $random_password, $create_sample_contents;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -230,18 +230,42 @@ function install_newdb()
 	update_install_progress_bar();
 
 	track_step( 'install-success' );
-	echo '<h2>'.T_('Installation successful!').'</h2>';
 
-	echo '<p><strong>';
-	printf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' );
-	echo '</strong></p>';
+	$install_result_title = T_('Installation successful!');
+	$install_result_body = '<p><strong>'
+		.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
+		.'</strong></p>'
+		.'<table>'
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>'
+			.'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
+		.'</table>'
+		.'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 
-	echo '<table>';
-	echo '<tr><td>', T_( 'Login' ), ': &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
-	printf( '<tr><td>%s: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', T_( 'Password' ), $random_password );
-	echo '</table>';
+	// Display installation data and instructions
+	echo '<h2>'.$install_result_title.'</h2>';
+	echo $install_result_body;
 
-	echo '<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
+	// Modal window with installation data and instructions
+	echo '<div class="modal fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="evo_modal__label_install">'.$install_result_title.'</h4>
+				</div>
+				<div class="modal-body">'.$install_result_body.'</div>
+				<div class="modal-footer" style="text-align:center">
+					<a href="'.$baseurl.'" class="btn btn-primary">'.T_('Go to Front-office').'</a>
+					<a href="'.$admin_url.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
+				</div>
+			</div>
+		</div>
+	</div>';
+
+	// JavaScript to open modal window with installation data and instructions
+	echo '<script type="text/javascript">'
+		.'jQuery( "#evo_modal__install" ).modal();'
+	.'</script>';
 }
 
 

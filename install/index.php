@@ -594,7 +594,7 @@ switch( $action )
 			}
 		?>
 
-		<form action="index.php" method="get">
+		<form action="index.php" method="get" class="evo_form__install">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
@@ -662,7 +662,7 @@ switch( $action )
 			}
 			?>
 
-			<p>
+			<p class="evo_form__install_buttons" style="margin-top:24px">
 				<button id="install_button" type="submit" class="btn btn-primary btn-lg">&nbsp; <?php echo T_('GO!')?> &nbsp;</button>
 			</p>
 			</form>
@@ -681,7 +681,7 @@ switch( $action )
 		track_step( 'installer-menu' );
 		?>
 
-		<form action="index.php" method="get">
+		<form action="index.php" method="get" class="evo_form__install">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
@@ -697,9 +697,9 @@ switch( $action )
 
 			<p class="text-danger"><?php echo T_('ATTENTION: all your b2evolution data will be lost and reset to its original state.'); ?></p>
 
-			<p>
-				<button id="delete_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & Continue')?> &raquo;</button>
-				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+			<p class="evo_form__install_buttons">
+				<button id="delete_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & Continue')?> &raquo;</button><?php
+				?><a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
 			</p>
 		<?php
 		}
@@ -709,7 +709,7 @@ switch( $action )
 			<input type="hidden" name="action" value="menu" />
 			<p><?php echo T_('We cannot install because there is already a b2evolution installation in the current database. You may delete it first or maybe upgrade it to the latest version.'); ?></p>
 
-			<p>
+			<p class="evo_form__install_buttons">
 				<button id="cancel_button" type="submit" class="btn btn-primary btn-lg">&laquo; <?php echo T_('Back to Menu')?></button>
 			</p>
 		<?php } ?>
@@ -727,7 +727,7 @@ switch( $action )
 		track_step( 'installer-menu' );
 		?>
 
-		<form action="index.php" method="get">
+		<form action="index.php" method="get" class="evo_form__install">
 			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
@@ -740,10 +740,12 @@ switch( $action )
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?><br /><br />
-					<?php echo T_('Which demo collections would you like to install?') ?>
+					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?>
 				</label>
-				<?php
+				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
+					<?php
+					echo T_('Which demo collections would you like to install?');
+
 					// Display the collections to select which install
 					$collections = array(
 							'home'   => T_('Home'),
@@ -769,14 +771,15 @@ switch( $action )
 
 					foreach( $collections as $coll_index => $coll_title )
 					{ // Display the checkboxes to select what demo collection to install
-				?>
-				<div class="checkbox" style="margin-left:2em">
-					<label>
-						<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-						<?php echo $coll_title; ?>
-					</label>
+					?>
+					<div class="checkbox" style="margin-left:1em">
+						<label>
+							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
+							<?php echo $coll_title; ?>
+						</label>
+					</div>
+					<?php } ?>
 				</div>
-				<?php } ?>
 			</div>
 			<?php
 				if( $test_install_all_features )
@@ -796,23 +799,29 @@ switch( $action )
 				</label>
 			</div>
 
-			<p>
+			<p class="evo_form__install_buttons">
 			<?php
 			if( $test_install_all_features && $allow_evodb_reset && $old_db_version = get_db_version() )
 			{ // We can allow to delete DB before installation
 			?>
 				<input type="hidden" name="delete_contents" value="1" />
-				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button>
-			<?php
+				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
 			}
 			else
 			{ // Allow only install new DB without deleting previous DB
 			?>
-			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button>
-			<?php } ?>
+			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
+			}
+			?><a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
 			</p>
 		</form>
 
+		<script type="text/javascript">
+			jQuery( '#create_sample_contents' ).click( function()
+			{
+				jQuery( '#create_sample_contents_options' ).toggle();
+			} );
+		</script>
 		<?php
 		break;
 
