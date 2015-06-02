@@ -1453,6 +1453,18 @@ function blogs_results( & $blogs_Results, $params = array() )
 			);
 	}
 
+	if( $params['display_fav'] )
+	{ // Display Favorite column
+		$blogs_Results->cols[] = array(
+				'th' => T_('Fav'),
+				'th_title' => T_('Favorite'),
+				'order' => 'blog_favorite',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
+			);
+	}
+
 	if( $params['display_name'] )
 	{	// Display Name column
 		$blogs_Results->cols[] = array(
@@ -1508,18 +1520,6 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_listed( #blog_in_bloglist# )%',
-			);
-	}
-
-	if( $params['display_fav'] )
-	{ // Display Favorite column
-		$blogs_Results->cols[] = array(
-				'th' => T_('Fav'),
-				'th_title' => T_('Favorite'),
-				'order' => 'blog_favorite',
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
 			);
 	}
 
@@ -1637,7 +1637,7 @@ function blog_row_listed( $value )
  * Make a link to switch setting value if user has permissions to edit blog settings
  *
  * @param integer Blog ID
- * @param boolean Blog setting name: 'favorite'
+ * @param boolean Blog setting name: 'fav'
  * @param boolean Blog setting value: 0, 1
  * @return string Icon or Link to change setting
  */
@@ -1662,12 +1662,12 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 	if( $setting_value )
 	{ // Setting is enabled
 		$action = 'disable_setting';
-		$icon = 'enabled';
+		$icon = 'star_on';
 	}
 	else
 	{ // Setting is disabled
 		$action = 'enable_setting';
-		$icon = 'disabled';
+		$icon = 'star_off';
 	}
 
 	if( $current_User->check_perm( 'blog_properties', 'false', false, $blog_ID ) )
