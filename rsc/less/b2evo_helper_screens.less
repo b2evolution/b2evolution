@@ -1,21 +1,49 @@
 /* This file is used to b2evolution help pages */
 
 // Space out content a bit
-body {
-	padding-top: 20px;
-	padding-bottom: 20px;
+
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
 	font-size: 16px;
 }
 
-nav ul {
-	margin-top: 17px;
+#content_wrapper {
+	min-height: 100%;
+	position: relative;
+	padding-bottom: 73px; // Height of the absoluted footer
 }
+
+// Space out content a bit
 
 // Everything but the jumbotron gets side spacing for mobile first views
 .header,
 .footer {
 	padding-right: 15px;
 	padding-left: 15px;
+}
+.header {
+	padding-top: 20px;
+}
+// Custom page footer
+.footer {
+	padding-bottom: 20px;
+	margin-top: 48px;
+	padding-top: 19px;
+	color: #777;
+	border-top: 1px solid #e5e5e5;
+}
+
+#sticky_footer {
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	margin-left: -15px !important;
+}
+
+nav ul {
+	margin-top: 17px;
 }
 
 // Make the masthead heading the same height as the navigation
@@ -24,14 +52,6 @@ nav ul {
 	margin-top: 0;
 	margin-bottom: 0;
 	line-height: 40px;
-}
-
-// Custom page footer
-.footer {
-	margin-top: 48px;
-	padding-top: 19px;
-	color: #777;
-	border-top: 1px solid #e5e5e5;
 }
 
 // Customize container
@@ -73,6 +93,18 @@ nav ul {
 	}
 	.jumbotron .h1 {
 			font-size: 42px;
+	}
+}
+
+@media screen and (max-width: 541px) {
+	#content_wrapper {
+		padding-bottom: 96px; // Height of the absoluted footer
+	}
+}
+
+@media screen and (max-width: 332px) {
+	#content_wrapper {
+		padding-bottom: 119px; // Height of the absoluted footer
 	}
 }
 

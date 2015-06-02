@@ -301,7 +301,7 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
 	<body>
-		<div class="container">
+		<div class="container" id="content_wrapper">
 			<div class="header">
 				<nav>
 					<ul class="nav nav-pills pull-right">
@@ -1144,7 +1144,7 @@ block_close();
 
 <!-- InstanceEndEditable -->
 
-			<footer class="footer">
+			<footer class="footer" id="sticky_footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
 				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
