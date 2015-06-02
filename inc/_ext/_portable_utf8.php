@@ -1658,8 +1658,9 @@ function iconv_loaded()
 		// To disable using the iconv extension please uncomment the next line
 		// $flag = false; return;
 		$flag = extension_loaded( 'iconv' );
-		if( $flag )
-		{ // iconv is loaded, set encodings to "UTF-8"
+		if( $flag && version_compare( phpversion(), '5.6', '<' ) )
+		{ // iconv is loaded and version < 5.6 set encodings to "UTF-8"
+			// in PHP version > 5.6 these settings are deprecated
 			iconv_set_encoding( "internal_encoding", "UTF-8" );
 			iconv_set_encoding( "input_encoding", "UTF-8" );
 			iconv_set_encoding( "output_encoding", "UTF-8" );
