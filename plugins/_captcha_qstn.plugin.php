@@ -56,17 +56,7 @@ class captcha_qstn_plugin extends Plugin
 
 	function GetDefaultSettings()
 	{
-		global $Settings, $test_install_all_features;
-
-		$default_questions = '';
-
-		if( $test_install_all_features )
-		{
-			$default_questions = $this->T_('What is the color of the sky? blue|grey|gray|dark')."\r\n".
-				$this->T_('What animal is Bugs Bunny? rabbit|a rabbit')."\r\n".
-				$this->T_('What color is a carrot? orange|yellow')."\r\n".
-				$this->T_('What color is a tomato? red');
-		}
+		global $Settings;
 
 		return array(
 				'use_for_anonymous_comment' => array(
@@ -89,7 +79,7 @@ class captcha_qstn_plugin extends Plugin
 				),
 				'questions' => array(
 					'label' => $this->T_('Questions'),
-					'defaultvalue' => $default_questions,
+					'defaultvalue' => '',
 					'note' => $this->T_('Type each question in one line with following format:<br />Question text? answer1|answer2|...|answerN'),
 					'cols' => 80,
 					'rows' => 10,
@@ -453,9 +443,9 @@ class captcha_qstn_plugin extends Plugin
 
 		$Form->info( $this->T_('Captcha question'), $question->cptq_question );
 		$Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
-				10, $this->T_('Captcha answer'), ( $params['use_placeholders'] ? '' : $this->T_('Please answer the question above').'.' ),
+				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' ),
 				array(
-						'placeholder' => $params['use_placeholders'] ? T_('Please answer the question above') : '',
+						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
 					)
 			);
 
