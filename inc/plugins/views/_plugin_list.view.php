@@ -106,6 +106,10 @@ function plugin_results_td_status( $plug_status, $plug_ID )
 	}
 	elseif( $plug_status == 'needs_config' )
 	{ // Needs config
+		if( $perm_edit )
+		{ // URL to edit plugin settings
+			$plugin_status_url = $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$plug_ID;
+		}
 		$plugin_status_icon = get_icon( 'question', 'imgtag', array( 'title' => T_('The plugin is not installed completely.') ) );
 	}
 	else

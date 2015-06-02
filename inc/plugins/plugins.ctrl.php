@@ -858,7 +858,7 @@ switch( $action )
 		<div class="panelinfo">
 
 			<?php
-			$Form = new Form( NULL, 'install_db_deltas', 'get' );
+			$Form = new Form( NULL, 'install_db_deltas', 'get', 'compact' );
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
@@ -886,7 +886,9 @@ switch( $action )
 				$Form->hidden( 'install_db_deltas_confirm_md5', md5(implode( '', $install_db_deltas )) );
 			}
 
-			$Form->submit( array( '', T_('Install!'), 'ActionButton' ) );
+			echo '<div class="center">';
+			$Form->submit( array( '', T_('Install!'), 'ActionButton btn-primary' ) );
+			echo '</div>';
 			$Form->end_form();
 			?>
 
@@ -902,7 +904,7 @@ switch( $action )
 		<div class="panelinfo">
 
 			<?php
-			$Form = new Form( '', 'uninstall_plugin', 'post' );
+			$Form = new Form( '', 'uninstall_plugin', 'post', 'compact' );
 
 			$Form->global_icon( T_('Cancel uninstall!'), 'close', regenerate_url() );
 
@@ -994,8 +996,6 @@ switch( $action )
 			$Form->info_field( T_('Help'), implode( ' ', $help_icons ) );
 		}
 
-		$Form->end_fieldset();
-
 		if( $edit_Plugin->ID < 1 )
 		{ // add "Install NOW" submit button (if not already installed)
 			$registrations = $admin_Plugins->count_regs($edit_Plugin->classname);
@@ -1007,11 +1007,13 @@ switch( $action )
 				$Form->hidden( 'action', 'install' );
 				$Form->hidden( 'plugin', $edit_Plugin->classname );
 
-				$Form->begin_fieldset( '', array( 'class'=>'fieldset center' ) );
-				$Form->submit( array( '', T_('Install NOW!'), 'ActionButton' ) );
-				$Form->end_fieldset();
+				echo '<div class="center">';
+				$Form->submit( array( '', T_('Install NOW!'), 'ActionButton btn-primary' ) );
+				echo '</div>';
 			}
 		}
+
+		$Form->end_fieldset();
 
 		$Form->end_form();
 		$action = '';
