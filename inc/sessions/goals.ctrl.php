@@ -235,7 +235,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget('name') );
-			$edited_Goal->dbdelete( true );
+			$edited_Goal->dbdelete();
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
 			$Messages->add( $msg, 'success' );
@@ -377,7 +377,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget('name') );
-			$edited_GoalCategory->dbdelete( true );
+			$edited_GoalCategory->dbdelete();
 			unset( $edited_GoalCategory );
 			forget_param( 'gcat_ID' );
 			$Messages->add( $msg, 'success' );

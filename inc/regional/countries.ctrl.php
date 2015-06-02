@@ -274,7 +274,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Country &laquo;%s&raquo; deleted.'), $edited_Country->dget('name') );
-			$edited_Country->dbdelete( true );
+			$edited_Country->dbdelete();
 			unset( $edited_Country );
 			forget_param( 'ctry_ID' );
 			$Messages->add( $msg, 'success' );

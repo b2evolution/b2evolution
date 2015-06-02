@@ -1366,6 +1366,13 @@ ul.jslog_error {
 .ufld_icon_links a {
   text-align: center;
 }
+@media (max-width: 600px) {
+  html,
+  body {
+    width: auto !important;
+    overflow-x: hidden !important;
+  }
+}
 
 /**
  * item_base.css 
@@ -1753,7 +1760,7 @@ div.filters {
 div.filters > div {
   margin-left: 0;
 }
-div.filters input.filter {
+div.filters button.filter {
   float: right;
   padding: 4px 12px;
 }

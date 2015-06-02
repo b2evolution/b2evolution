@@ -258,7 +258,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Region &laquo;%s&raquo; deleted.'), $edited_Region->dget('name') );
-			$edited_Region->dbdelete( true );
+			$edited_Region->dbdelete();
 			unset( $edited_Region );
 			forget_param( 'rgn_ID' );
 			$Messages->add( $msg, 'success' );

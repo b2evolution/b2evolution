@@ -650,11 +650,16 @@ class DataObject
 	 */
 	function check_relations( $what, $ignore = array(), $addlink = false )
 	{
-		global $DB;
+		global $DB, $Messages;
 
 		$this->init_relations();
 
 		$restriction_Messages = new Messages();
+
+		if( isset( $Messages ) && ! empty( $Messages->params ) )
+		{ // Set template for messages as it is used for current skin
+			$restriction_Messages->set_params( $Messages->params );
+		}
 
 		if( is_null( $this->$what ) )
 		{ // The relations are not defined
@@ -764,8 +769,8 @@ class DataObject
 			$restriction_Messages->display( '', '', true, 'log_container delete_messages' );
 		}
 
-		echo '<p class="warning">'.$confirm_title.'</p>';
-		echo '<p class="warning">'.T_('THIS CANNOT BE UNDONE!').'</p>';
+		echo '<p class="warning text-danger">'.$confirm_title.'</p>';
+		echo '<p class="warning text-danger">'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
 		$redirect_to = param( 'redirect_to', 'url', '' );
 

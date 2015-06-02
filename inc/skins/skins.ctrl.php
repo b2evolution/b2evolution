@@ -181,7 +181,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Skin &laquo;%s&raquo; uninstalled.'), $edited_Skin->dget('name') );
-			$edited_Skin->dbdelete( true );
+			$edited_Skin->dbdelete();
 			//unset( $edited_Skin );
 			//forget_param( 'skin_ID' );
 			$Messages->add( $msg, 'success' );

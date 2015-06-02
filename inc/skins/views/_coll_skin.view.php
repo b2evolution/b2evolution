@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $admin_url;
+global $admin_url, $Session;
 
 $skin_type = param( 'skin_type', 'string', 'normal' );
 
@@ -73,6 +73,8 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		Skin::disp_skinshot( $skinshot_title, $skinshot_title, $disp_params );
 	}
 
+	$fadeout_array = $Session->get( 'fadeout_array' );
+
 	$SkinCache->rewind();
 	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
 	{
@@ -90,11 +92,15 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 			'function'     => 'select',
 			'selected'     => $selected,
 			'select_url'   => $select_url,
-			'function_url' => $preview_url
+			'function_url' => $preview_url,
+			'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
 		);
 		// Display skinshot:
 		Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 	}
+
+	// Flush fadeout
+	$Session->delete( 'fadeout_array');
 
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{ // A link to install new skin:

@@ -58,7 +58,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Thread &laquo;%s&raquo; deleted.'), $edited_Thread->dget('title') );
-			$edited_Thread->dbdelete( true );
+			$edited_Thread->dbdelete();
 			unset( $edited_Thread );
 			unset( $edited_Message );
 			forget_param( 'thrd_ID' );

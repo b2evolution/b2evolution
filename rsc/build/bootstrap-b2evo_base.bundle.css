@@ -1366,6 +1366,13 @@ ul.jslog_error {
 .ufld_icon_links a {
   text-align: center;
 }
+@media (max-width: 600px) {
+  html,
+  body {
+    width: auto !important;
+    overflow-x: hidden !important;
+  }
+}
 
 /**
  * These are the generic styles that are common to "all" skins.
@@ -1466,6 +1473,19 @@ div.moderation_msg {
   padding: 0 1ex;
   border: 1px dotted #fa9;
   color: #e70;
+}
+.bg-primary,
+.bg-success,
+.bg-info,
+.bg-warning,
+.bg-danger {
+  padding: 10px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
 div.feedback_feed_msg {
   margin: 2em 2ex;
@@ -2442,7 +2462,7 @@ div.filters {
 div.filters > div {
   margin-left: 0;
 }
-div.filters input.filter {
+div.filters button.filter {
   float: right;
   padding: 4px 12px;
 }

@@ -5,10 +5,8 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
- * 
+ *
  * @package admin
- * 
- * @version $Id: links.ctrl.php 8437 2015-03-06 11:36:25Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -111,7 +109,7 @@ switch( $action )
 		}
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
-		$edited_Link->dbdelete( true );
+		$edited_Link->dbdelete();
 		unset( $edited_Link );
 
 		$LinkOwner->after_unlink_action( $deleted_link_ID );

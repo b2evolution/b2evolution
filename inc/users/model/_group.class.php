@@ -497,7 +497,7 @@ class Group extends DataObject
 	/**
 	 * Delete object from DB.
 	 */
-	function dbdelete( $Messages = NULL )
+	function dbdelete()
 	{
 		global $DB;
 
@@ -508,7 +508,7 @@ class Group extends DataObject
 		$GroupSettings->delete( $this->ID );
 		$GroupSettings->dbupdate( $this->ID );
 
-		parent::dbdelete( $Messages );
+		parent::dbdelete();
 
 		$DB->commit();
 	}

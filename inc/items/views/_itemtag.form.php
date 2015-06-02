@@ -31,7 +31,9 @@ if( ! empty( $edited_ItemTag->merge_tag_ID ) )
 	$Form->add_crumb( 'tag' );
 	$Form->hiddens_by_key( get_memorized( 'action,tag_ID' ) );
 
-	echo '<p>'.$edited_ItemTag->merge_message.'</p>';
+	global $Messages;
+	$Messages->add( $edited_ItemTag->merge_message, 'error' );
+	$Messages->display();
 
 	$Form->button( array( 'submit', 'actionArray[merge_confirm]', T_('Confirm'), 'SaveButton btn-danger' ) );
 	$Form->button( array( 'submit', 'actionArray[merge_cancel]', T_('Cancel'), 'SaveButton btn-default' ) );

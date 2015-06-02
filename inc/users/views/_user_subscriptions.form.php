@@ -156,13 +156,28 @@ $Form->begin_fieldset( T_('Communications') );
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
 	$emails_msgform = $Settings->get( 'emails_msgform' );
+
+	$email_messaging_note = '';
+	if( ! $UserSettings->get( 'enable_email', $edited_User->ID ) &&
+			( $emails_msgform == 'userset' ||
+				( $emails_msgform == 'adminset' && $current_User->check_perm( 'users', 'edit' ) )
+			) )
+	{ // Check if user has own blog and display a red note
+		$user_own_blogs_count = $edited_User->get_own_blogs_count();
+		if( $user_own_blogs_count > 0 )
+		{
+			$email_messaging_note = '<span class="red">'.sprintf( T_('You are the owner of %d collections. Visitors of these collections will <b>always</b> be able to contact you through a message form if needed (your email address will NOT be revealed).'),
+				$user_own_blogs_count ).'</span>';
+		}
+	}
+
 	if( $emails_msgform == 'userset' )
 	{ // user can set
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
 	elseif( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address. [Admin]' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled );
+		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ).' ['.T_('Admin').']', $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
 	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me'), false, false, $checklist_params );
 

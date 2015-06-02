@@ -57,7 +57,7 @@ switch( $action )
 		// Make sure we got a slug_ID:
 		param( 'slug_ID', 'string', true );
  		break;
- 
+
 	case 'create':
 		// Create new slug...
 		$edited_Slug = new Slug();
@@ -84,7 +84,7 @@ switch( $action )
 
 	case 'update':
 		// Update slug...
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'slug' );
 
@@ -123,7 +123,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Slug &laquo;%s&raquo; deleted.'), $edited_Slug->dget('title') );
-			$edited_Slug->dbdelete( true );
+			$edited_Slug->dbdelete();
 			unset( $edited_Slug );
 			forget_param( 'slug_ID' );
 			$Messages->add( $msg, 'success' );

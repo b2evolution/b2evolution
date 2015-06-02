@@ -3106,6 +3106,15 @@ class User extends DataObject
 		}
 		else
 		{ // current User is not logged in
+			global $Blog, $disp;
+
+			if( isset( $Blog, $disp ) &&
+			    $disp == 'msgform' &&
+			    $blog_owner_User = & $Blog->get_owner_User() &&
+			    $blog_owner_User->ID == $this->ID )
+			{ // Allow to contact with this user because he is owner of the selected blog
+				return 'email';
+			}
 			if( $this->accepts_email() )
 			{ // this user allows email
 				return 'email';
@@ -6097,6 +6106,24 @@ class User extends DataObject
 		$days = ( $date_end - $date_start ) / 86400;
 
 		return number_format( $days, 1, '.', '' );
+	}
+
+
+	/**
+	 * Get count of own blogs of the user
+	 *
+	 * @return integer
+	 */
+	function get_own_blogs_count()
+	{
+		global $DB;
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'COUNT( blog_ID )' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
+
+		return $DB->get_var( $SQL->get() );
 	}
 }
 

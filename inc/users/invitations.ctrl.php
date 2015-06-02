@@ -174,7 +174,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Invitation code &laquo;%s&raquo; deleted.'), $edited_Invitation->dget( 'code' ) );
-			$edited_Invitation->dbdelete( true );
+			$edited_Invitation->dbdelete();
 			unset( $edited_Invitation );
 			forget_param( 'ivc_ID' );
 			$Messages->add( $msg, 'success' );

@@ -157,7 +157,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('User field &laquo;%s&raquo; deleted.'), $edited_Userfield->dget('name') );
-			$edited_Userfield->dbdelete( true );
+			$edited_Userfield->dbdelete();
 			unset( $edited_Userfield );
 			forget_param( 'ufdf_ID' );
 			$Messages->add( $msg, 'success' );

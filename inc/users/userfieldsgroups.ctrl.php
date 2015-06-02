@@ -171,7 +171,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('User field group &laquo;%s&raquo; deleted.'), $edited_UserfieldGroup->dget('name') );
-			$edited_UserfieldGroup->dbdelete( true );
+			$edited_UserfieldGroup->dbdelete();
 			unset( $edited_UserfieldGroup );
 			forget_param( 'ufgp_ID' );
 			$Messages->add( $msg, 'success' );

@@ -185,7 +185,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Organization &laquo;%s&raquo; deleted.'), $edited_Organization->dget( 'name' ) );
-			$edited_Organization->dbdelete( true );
+			$edited_Organization->dbdelete();
 			unset( $edited_Organization );
 			forget_param( 'org_ID' );
 			$Messages->add( $msg, 'success' );

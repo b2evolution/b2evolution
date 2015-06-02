@@ -220,7 +220,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Currency &laquo;%s&raquo; deleted.'), $edited_Currency->dget('name') );
-			$edited_Currency->dbdelete( true );
+			$edited_Currency->dbdelete();
 			unset( $edited_Currency );
 			forget_param( 'curr_ID' );
 			$Messages->add( $msg, 'success' );

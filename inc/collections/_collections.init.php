@@ -1015,7 +1015,7 @@ class collections_Module extends Module
 				if( $confirmed )
 				{ // Unlink File from Item:
 					$deleted_link_ID = $edited_Link->ID;
-					$edited_Link->dbdelete( true );
+					$edited_Link->dbdelete();
 					unset($edited_Link);
 
 					$LinkOwner->after_unlink_action( $deleted_link_ID );

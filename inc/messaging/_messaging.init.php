@@ -524,7 +524,7 @@ class messaging_Module extends Module
 						if( $confirmed )
 						{
 							$msg = sprintf( T_('Thread &laquo;%s&raquo; deleted.'), $edited_Thread->dget('title') );
-							$edited_Thread->dbdelete( true );
+							$edited_Thread->dbdelete();
 							unset( $edited_Thread );
 							forget_param( 'thrd_ID' );
 							$Messages->add( $msg, 'success' );

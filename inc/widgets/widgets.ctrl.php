@@ -457,7 +457,7 @@ switch( $action )
 
 		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
 		$edited_widget_ID = $edited_ComponentWidget->ID;
-		$edited_ComponentWidget->dbdelete( true );
+		$edited_ComponentWidget->dbdelete();
 		unset( $edited_ComponentWidget );
 		forget_param( 'wi_ID' );
 		$Messages->add( $msg, 'success' );
@@ -579,6 +579,7 @@ if( $display_mode == 'normal' )
 	var cache_enabled_icon_tag = \''.get_icon( 'cache_enabled', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
 	var cache_disabled_icon_tag = \''.get_icon( 'cache_disabled', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
 	var cache_disallowed_icon_tag = \''.get_icon( 'cache_disallowed', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
+	var cache_denied_icon_tag = \''.get_icon( 'lightning', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery

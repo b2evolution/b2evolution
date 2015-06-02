@@ -89,10 +89,10 @@ switch( $action )
 	case 'create_new': // Record Itemtype and create new
 	case 'create_copy': // Record Itemtype and create similar
 		// Insert new post type...:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
-		
+
 		$edited_Itemtype = new ItemType();
 
 		// Check permission:
@@ -248,7 +248,7 @@ switch( $action )
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
 				$msg = sprintf( T_('Post type &laquo;%s&raquo; deleted.'), $edited_Itemtype->dget('name') );
-				$edited_Itemtype->dbdelete( true );
+				$edited_Itemtype->dbdelete();
 				unset( $edited_Itemtype );
 				forget_param( 'ityp_ID' );
 				$Messages->add( $msg, 'success' );

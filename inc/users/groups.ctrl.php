@@ -190,7 +190,7 @@ switch ( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
-			$edited_Group->dbdelete( $Messages );
+			$edited_Group->dbdelete();
 			unset($edited_Group);
 			forget_param('grp_ID');
 			$Messages->add( $msg, 'success' );

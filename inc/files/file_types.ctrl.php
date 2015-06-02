@@ -158,7 +158,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('File type &laquo;%s&raquo; deleted.'), $edited_Filetype->dget('name') );
-			$edited_Filetype->dbdelete( true );
+			$edited_Filetype->dbdelete();
 			unset( $edited_Filetype );
 			forget_param( 'ftyp_ID' );
 			$Messages->add( $msg, 'success' );

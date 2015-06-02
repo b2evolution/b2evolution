@@ -48,7 +48,7 @@ class Sanitizer {
 	 * [1]: http://ha.ckers.org/xss.html
 	 */
 	const EVIL_URI_PATTERN = '!(^|\s|\*/\s*)(javascript|vbscript)([^\w]|$)!i';
-	const XMLNS_ATTRIBUTE_PATTERN = "/^xmlns:[:A-Z_a-z-.0-9]+$/";
+	const XMLNS_ATTRIBUTE_PATTERN = '/^xmlns:[:A-Z_a-z-.0-9]+$/';
 
 	/**
 	 * List of all named character entities defined in HTML 4.01

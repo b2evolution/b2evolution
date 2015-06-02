@@ -98,6 +98,19 @@ div.moderation_msg {
   border: 1px dotted #fa9;
   color: #e70;
 }
+.bg-primary,
+.bg-success,
+.bg-info,
+.bg-warning,
+.bg-danger {
+  padding: 10px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
 div.feedback_feed_msg {
   margin: 2em 2ex;
   text-align: center;

@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 9233 2015-05-28 12:33:56Z yura $
+ * @version $Id: blog_widgets.js 9274 2015-06-01 11:56:23Z yura $
  */
 
 
@@ -303,7 +303,7 @@ function bufferedServerCall()
 	var new_widget_order = getWidgetOrder();
 	if( new_widget_order != current_widgets )
 	{	// widget order has changed, we need to update
-		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'+T_( 'Saving changes' )+'</div></a>' ); // inform user
+		jQuery( '#server_messages' ).html( '<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-info fade in">'+T_( 'Saving changes' )+'</div></li></ul></div>' ); // inform user
 
 		current_widgets = new_widget_order; // store current order
 		//add crumbs here
@@ -314,8 +314,8 @@ function bufferedServerCall()
 	}
 	else
 	{	// widget order either hasn't changed or has been changed back to original order
-		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'
-						+T_( 'Widget order unchanged' )+'</div></a>' ); // inform user
+		jQuery( '#server_messages' ).html( '<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-warning fade in">'
+						+T_( 'Widget order unchanged' )+'</div></li></ul></div>' ); // inform user
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ); // remove "needs updating"
 		colourWidgets(); // redo widget colours
 	}
@@ -628,6 +628,10 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 		case 'disallowed':
 			var cacheIcon = cache_disallowed_icon_tag;
 			break;
+
+		case 'denied':
+			var cacheIcon = '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
+			break;
 	}
 	cacheIcon = jQuery( '<span class="widget_cache_status">' + cacheIcon + '</span>' );
 	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
@@ -681,6 +685,8 @@ function doToggle( wi_ID, wi_enabled )
 		jQuery( '#wi_ID_' + wi_ID + ' .widget_checkbox' ).removeClass( 'widget_checkbox_enabled' );
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
+
+	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
 }
 
 /**
@@ -716,8 +722,14 @@ function doToggleCache( wi_ID, wi_cache_status )
 		case 'disallowed':
 			var cacheIcon = cache_disallowed_icon_tag;
 			break;
+
+		case 'denied':
+			var cacheIcon = '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
+			break;
 	}
 	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( cacheIcon );
+
+	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
 }
 
 /**

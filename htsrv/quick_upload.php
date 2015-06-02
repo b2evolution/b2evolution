@@ -286,10 +286,18 @@ if( $upload )
 		exit();
 	}
 
+	if( empty( $fm_FileRoot ) )
+	{ // Stop when this object is NULL, it can happens when media path has no rights to write
+		$message['text'] = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
+		$message['status'] = 'error';
+		out_echo( $message, $specialchars );
+		exit;
+	}
+
 	$newName = $file->getName();
 	$oldName = $newName;
 	// validate file name
-	if( $error_filename = process_filename( $newName ) )
+	if( $error_filename = process_filename( $newName, false, true, $fm_FileRoot, $path ) )
 	{ // Not a file name or not an allowed extension
 		$message['text'] = $error_filename;
 		$message['status'] = 'error';
@@ -300,14 +308,6 @@ if( $upload )
 
 	// Process a name of old name
 	process_filename( $oldName );
-
-	if( empty( $fm_FileRoot ) )
-	{ // Stop when this object is NULL, it can happens when media path has no rights to write
-		$message['text'] = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
-		$message['status'] = 'error';
-		out_echo( $message, $specialchars );
-		exit;
-	}
 
 	list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
 	$newName = $newFile->get( 'name' );

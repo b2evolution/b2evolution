@@ -50,7 +50,7 @@ a.filters_title:hover {
 tr.filters div, div.filters div {
 	margin-left: 15px;
 }
-input.filter {
+button.filter {
 	padding: 0;
 	margin: 0 0 1px .5ex;
 	float:right;

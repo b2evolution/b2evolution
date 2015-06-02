@@ -243,7 +243,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('City &laquo;%s&raquo; deleted.'), $edited_City->dget('name') );
-			$edited_City->dbdelete( true );
+			$edited_City->dbdelete();
 			unset( $edited_City );
 			forget_param( 'city_ID' );
 			$Messages->add( $msg, 'success' );

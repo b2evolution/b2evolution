@@ -19,6 +19,7 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
+global $Blog, $admin_url;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -53,11 +54,20 @@ $Form->begin_fieldset( T_('Params') );
 	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
 		$l_value = NULL;
-		if( $l_name == 'allow_blockcache'
-		    && isset( $l_meta['disabled'] )
-		    && ( $l_meta['disabled'] == 'disabled' ) )
-		{ // Force checkbox "Allow caching" to unchecked when it is disallowed from widget config
-			$l_value = 0;
+		if( $l_name == 'allow_blockcache' )
+		{
+			if( isset( $l_meta['disabled'] )
+			    && ( $l_meta['disabled'] == 'disabled' ) )
+			{ // Force checkbox "Allow caching" to unchecked when it is disallowed from widget config
+				$l_value = 0;
+			}
+
+			if( ! $Blog->get_setting( 'cache_enabled_widgets' ) )
+			{ // Widget/block cache is disabled by blog setting
+				$l_meta['allow_blockcache']['note'] = sprintf( T_('This widget could be cached but the block cache is OFF. Click to <a %s>here</a> enable.'),
+						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching"' );
+				$l_meta['disabled'] = 'disabled';
+			}
 		}
 		// Display field:
 		autoform_display_field( $l_name, $l_meta, $Form, 'Widget', $edited_ComponentWidget, NULL, $l_value );
