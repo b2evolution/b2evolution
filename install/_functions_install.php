@@ -642,7 +642,20 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11000 )
 	{ // Upgrade to 5.0.0-alpha-4
-		install_plugin( 'captcha_qstn_plugin' );
+		if( $test_install_all_features )
+		{
+			$captcha_qstn_plugin_settings = array(
+					'questions' => T_('What is the color of the sky? blue|grey|gray|dark')."\r\n".
+												 T_('What animal is Bugs Bunny? rabbit|a rabbit')."\r\n".
+												 T_('What color is a carrot? orange|yellow')."\r\n".
+												 T_('What color is a tomato? red')
+				);
+		}
+		else
+		{
+			$captcha_qstn_plugin_settings = array();
+		}
+		install_plugin( 'captcha_qstn_plugin', true, $captcha_qstn_plugin_settings );
 	}
 
 	if( $old_db_version < 11100 )
@@ -688,9 +701,10 @@ function install_basic_plugins( $old_db_version = 0 )
  *
  * @param string Plugin name
  * @param boolean TRUE - to activate plugin
+ * @param array Plugin settings
  * @return true on success
  */
-function install_plugin( $plugin, $activate = true )
+function install_plugin( $plugin, $activate = true, $settings = array() )
 {
 	/**
 	 * @var Plugins_admin
@@ -707,6 +721,15 @@ function install_plugin( $plugin, $activate = true )
 
 	load_funcs('plugins/_plugin.funcs.php');
 	install_plugin_db_schema_action( $edit_Plugin, true );
+
+	if( ! empty( $settings ) )
+	{ // Set plugin settings
+		foreach( $settings as $setting_name => $setting_value )
+		{
+			$edit_Plugin->Settings->set( $setting_name, $setting_value );
+		}
+		$edit_Plugin->Settings->dbupdate();
+	}
 
 	if( $activate )
 	{ // Try to enable plugin:
