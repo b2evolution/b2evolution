@@ -63,115 +63,158 @@ class bootstrap_main_Skin extends Skin
 	{
 		$r = array_merge( array(
 				// Front page
-				'front_bg_image' => array(
-					'label' => T_('Front page background image'),
-					'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-					'type' => 'text',
-					'size' => '50'
+				'1_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Background')
 				),
-				'front_title_color' => array(
-					'label' => T_('Front page title color'),
-					'note' => T_('E-g: #ff0000 for red'),
-					'defaultvalue' => '#F0F0F0',
-					'type' => 'color',
-				),
-				'front_text_color' => array(
-					'label' => T_('Front page text color'),
-					'note' => T_('E-g: #00ff00 for green'),
-					'defaultvalue' => '#FFFFFF',
-					'type' => 'color',
-				),
-				'front_link_color' => array(
-					'label' => T_('Front page link color'),
-					'note' => T_('E-g: #0000ff for blue'),
-					'defaultvalue' => '#FFFFFF',
-					'type' => 'color',
-				),
-				'front_icon_color' => array(
-					'label' => T_('Front page inverse icon color'),
-					'note' => T_('E-g: #00ff00 for green'),
-					'defaultvalue' => '#CCCCCC',
-					'type' => 'color',
-				),
-				'front_bg_color' => array(
-					'label' => T_('Front page main area background color'),
-					'note' => T_('E-g: #ff0000 for red'),
-					'defaultvalue' => '#000000',
-					'type' => 'color',
-				),
-				'front_bg_opacity' => array(
-					'label' => T_('Front page main area background opacity'),
-					'note' => '%',
-					'size' => '2',
-					'maxlength' => '3',
-					'defaultvalue' => '10',
-					'type' => 'integer',
-					'valid_range' => array(
-						'min' => 0, // from 0%
-						'max' => 100, // to 100%
+					'front_bg_image' => array(
+						'label' => T_('Front page background image'),
+						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
+						'type' => 'text',
+						'size' => '50'
 					),
+				'1_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				// Colorbox
-				'colorbox' => array(
-					'label' => T_('Colorbox Image Zoom'),
-					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+				'2_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Front Page Main Area')
 				),
-				'colorbox_vote_post' => array(
-					'label' => T_('Voting on Post Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'front_title_color' => array(
+						'label' => T_('Front page title color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
+					'front_text_color' => array(
+						'label' => T_('Front page text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
+					),
+					'front_link_color' => array(
+						'label' => T_('Front page link color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
+					),
+					'front_icon_color' => array(
+						'label' => T_('Front page inverse icon color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#CCCCCC',
+						'type' => 'color',
+					),
+					'front_bg_color' => array(
+						'label' => T_('Front page main area background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#000000',
+						'type' => 'color',
+					),
+					'front_bg_opacity' => array(
+						'label' => T_('Front page main area background opacity'),
+						'note' => '%',
+						'size' => '2',
+						'maxlength' => '3',
+						'defaultvalue' => '10',
+						'type' => 'integer',
+						'valid_range' => array(
+							'min' => 0, // from 0%
+							'max' => 100, // to 100%
+						),
+					),
+					'front_width' => array(
+						'label' => T_('Main Area Width'),
+						'note' => '',
+						'size' => '7',
+						'defaultvalue' => '450px',
+					),
+					'front_position' => array(
+						'label' => T_('Main Area Position'),
+						'note' => '',
+						'defaultvalue' => 'left',
+						'options' => array(
+								'left'   => T_('Left'),
+								'middle' => T_('Middle'),
+								'right'  => T_('Right'),
+							),
+						'type' => 'select',
+					),
+				'2_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_post_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+				'3_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Colorbox Image Zoom')
 				),
-				'colorbox_vote_comment' => array(
-					'label' => T_('Voting on Comment Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'colorbox' => array(
+						'label' => T_('Colorbox Image Zoom'),
+						'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post' => array(
+						'label' => T_('Voting on Post Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment' => array(
+						'label' => T_('Voting on Comment Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user' => array(
+						'label' => T_('Voting on User Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'3_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_comment_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+				'4_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Username options')
 				),
-				'colorbox_vote_user' => array(
-					'label' => T_('Voting on User Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'colorbox_vote_user_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				// Other settings
-				'gender_colored' => array(
-					'label' => T_('Display gender'),
-					'note' => T_('Use colored usernames to differentiate men & women.'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'bubbletip' => array(
-					'label' => T_('Username bubble tips'),
-					'note' => T_('Check to enable bubble tips on usernames'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'autocomplete_usernames' => array(
-					'label' => T_('Autocomplete usernames'),
-					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'gender_colored' => array(
+						'label' => T_('Display gender'),
+						'note' => T_('Use colored usernames to differentiate men & women.'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'bubbletip' => array(
+						'label' => T_('Username bubble tips'),
+						'note' => T_('Check to enable bubble tips on usernames'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'autocomplete_usernames' => array(
+						'label' => T_('Autocomplete usernames'),
+						'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'4_end' => array(
+					'layout' => 'end_fieldset',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -248,7 +291,7 @@ class bootstrap_main_Skin extends Skin
 			$icon_color = $this->get_setting( 'front_icon_color' );
 			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured a { color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured div.front_main_area a { color: '.$link_color." }\n";
 			}
 			if( $link_color && $icon_color )
 			{ // Custom icon color:
@@ -256,6 +299,23 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
 				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: '.$link_color." }\n";
 				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: '.$icon_color." }\n";
+			}
+
+			if( $width = $this->get_setting( 'front_width' ) )
+			{ // Custom width for front main area:
+				$custom_css .= 'div.front_main_area { width: '.$width." }\n";
+			}
+
+			if( $position = $this->get_setting( 'front_position' ) )
+			{ // Custom width for front main area:
+				if( $position == 'middle' )
+				{
+					$custom_css .= 'div.front_main_area { float: none; margin-left: auto; margin-right: auto;'." }\n";
+				}
+				elseif( $position == 'right' )
+				{
+					$custom_css .= 'div.front_main_area { float: right;'." }\n";
+				}
 			}
 
 			if( ! empty( $custom_css ) )
