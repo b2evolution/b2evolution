@@ -483,7 +483,12 @@ class Table extends Widget
 
 			echo $this->params['filter_button_before'];
 			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
-			$this->Form->submit( array( $submit_name, $submit_title, $this->params['filter_button_class'] ) );
+			$this->Form->button_input( array(
+					'tag'   => 'button',
+					'name'  => $submit_name,
+					'value' => get_icon( 'filter' ).' '.$submit_title,
+					'class' => $this->params['filter_button_class']
+				) );
 			echo $this->params['filter_button_after'];
 
 			if( ! empty( $this->force_checkboxes_to_inline ) )
