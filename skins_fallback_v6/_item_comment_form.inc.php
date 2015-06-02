@@ -28,7 +28,10 @@ $params = array_merge( array(
 		'form_title_text'      => T_('Leave a comment'),
 		'form_comment_text'    => T_('Comment text'),
 		'form_submit_text'     => T_('Send comment'),
-		'form_params'          => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
+		'form_params'          => array( // Use to change structure of form, i.e. fieldstart, fieldend and etc.
+			'comments_disabled_before' => '<p class="bg-warning">',
+			'comments_disabled_after' => '</p>',
+			), 
 		'policy_text'          => '',
 		'author_link_text'     => 'name',
 		'textarea_lines'       => 10,

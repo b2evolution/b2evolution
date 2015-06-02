@@ -550,6 +550,8 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 
 	$params['form_params'] = array_merge( array(
+			'comments_disabled_before' => '<div class="comment_posting_disabled_msg"><p>',
+			'comments_disabled_after' => '</p></div>',
 			'formstart'      => '',
 			'formend'        => '',
 			'fieldset_begin' => '<fieldset>',
@@ -604,17 +606,17 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 
 	echo $params['form_params']['fieldset_begin'];
 
-	echo '<div class="comment_posting_disabled_msg">';
+	echo $params['form_params']['comments_disabled_before'];
 	if( $is_logged_in )
 	{
-		echo '<p>'.$disabled_text.' '.$activateinfo_link.'</p>';
+		echo $disabled_text.' '.$activateinfo_link;
 	}
 	else
 	{ // not logged in, add login and register links
-		echo '<p>'.$disabled_text.' '.$login_link.'</p>';
+		echo $disabled_text.' '.$login_link;
 		echo $register_link;
 	}
-	echo '</div>';
+	echo $params['form_params']['comments_disabled_after'];
 
 	echo $params['form_params']['fieldset_end'];
 
