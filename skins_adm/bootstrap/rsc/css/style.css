@@ -17,6 +17,13 @@
   padding: 0;
   margin: 0;
 }
+#iframe_wrapper .container-fluid.page-content .row {
+  margin: 0;
+}
+#iframe_wrapper .container-fluid.page-content .row .col-md-12 {
+  padding-left: 0;
+  padding-right: 0;
+}
 .w80px {
   width: 80px;
 }
@@ -158,13 +165,6 @@ div.action_messages ul li:last-child div.alert {
 .container-fluid .action_messages.container-fluid {
   padding: 0;
   margin-top: 0;
-}
-div.delete_messages ul {
-  margin: 0 0 10px 25px;
-  list-style: disc;
-}
-div.delete_messages ul li {
-  list-style: inherit;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -1177,6 +1177,9 @@ div.level3 nav .nav > li > a {
 .skinshot .skinshot_placeholder .skinshot_name {
   padding-top: 24px;
   font-size: 170%;
+}
+.skinshot .legend {
+  margin: 0 1ex;
 }
 .skin_selector_block {
   margin: -15px 0 0 -15px;

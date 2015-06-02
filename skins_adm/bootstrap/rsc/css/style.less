@@ -29,6 +29,13 @@
 	.container-fluid.page-content {
 		padding: 0;
 		margin: 0;
+		.row {
+			margin: 0;
+			.col-md-12 {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
 	}
 }
 
@@ -188,13 +195,6 @@ div.action_messages {
 .container-fluid .action_messages.container-fluid {
 	padding: 0; // Remove double padding, for example on delete collection action
 	margin-top: 0;
-}
-div.delete_messages ul {
-	margin: 0 0 10px 25px;
-	list-style: disc;
-	li {
-		list-style: inherit;
-	}
 }
 
 /*
@@ -1211,6 +1211,9 @@ div.level3 nav .nav>li>a {
 			padding-top: 24px;
 			font-size: 170%;
 		}
+	}
+	.legend {
+		margin: 0 1ex;
 	}
 }
 .skin_selector_block {
