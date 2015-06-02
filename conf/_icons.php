@@ -875,6 +875,13 @@ function get_icon_info( $name )
 			'fa' => 'square-o'
 		);
 
+		case 'filter': return array(
+			'alt'  => T_('Filter'),
+			'size' => array( 1, 1 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'filter',
+			'fa' => 'filter'
+		);
 		case 'reset_filters': return array(
 			'alt'  => T_('Reset all filters'),
 			'size' => array( 16, 16 ),
@@ -1152,6 +1159,21 @@ function get_icon_info( $name )
 			'xy' => array( 0, 32 ),
 			'fa' => 'bolt',
 			'color' => '#CCC'
+		);
+
+		case 'star_on': return array(
+			'alt' => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 0, 208 ),
+			'fa' => 'star',
+			'color' => '#FC0'
+		);
+		case 'star_off': return array(
+			'alt' => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 16, 208 ),
+			'fa' => 'star-o',
+			'color' => '#999'
 		);
 	}
 }
