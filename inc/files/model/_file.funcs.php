@@ -495,15 +495,44 @@ function fix_filename_length( $filename, $remove_before_index )
  *
  * @param string file name (by reference) - this file name will be processed
  * @param boolean force validation ( replace not valid characters to '_' without warning )
+ * @param boolean Crop long file name to $filename_max_length
+ * @param object FileRoot
+ * @param string Path in the FileRoot
  * @return error message if the file name is not valid, false otherwise
  */
-function process_filename( & $filename, $force_validation = false )
+function process_filename( & $filename, $force_validation = false, $autocrop_long_file = false, $FileRoot = NULL, $path = '' )
 {
-	global $filename_max_length;
-
 	if( empty( $filename ) )
 	{
 		return T_( 'Empty file name is not valid.' );
+	}
+
+	if( $autocrop_long_file && ! empty( $FileRoot ) )
+	{ // Crop long file names
+		global $filename_max_length, $Messages;
+
+		if( ! empty( $filename_max_length ) &&
+				$filename_max_length > 8 &&
+				strlen( $filename ) > $filename_max_length )
+		{ // Limit file name by $filename_max_length
+			$new_file_ext_pos = strrpos( $filename, '.' );
+			$new_file_name = substr( $filename, 0, $new_file_ext_pos );
+			$new_file_name = trim( substr( $new_file_name, 0, $filename_max_length - 8 ) );
+			$new_file_ext = substr( $filename, $new_file_ext_pos - strlen( $filename ) + 1 );
+
+			$fnum = 1;
+			$FileCache = & get_FileCache();
+			do
+			{ // Make file name unique
+				$filename = $new_file_name.'-'.$fnum.'.'.$new_file_ext;
+				$newFile = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $path ).$filename, true );
+				$fnum++;
+			}
+			while( $newFile->exists() );
+			$filename = $newFile->get( 'name' );
+
+			$Messages->add( T_('The filename was too long. It has been shortened.'), 'warning' );
+		}
 	}
 
 	if( $force_validation )
@@ -1450,7 +1479,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		// Use new name on server if specified:
 		$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
 		// validate file name
-		if( $error_filename = process_filename( $newName, !$warn_invalid_filenames ) )
+		if( $error_filename = process_filename( $newName, !$warn_invalid_filenames, true, $fm_FileRoot, $path ) )
 		{ // Not a valid file name or not an allowed extension:
 			$failedFiles[$lKey] = $error_filename;
 			syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
