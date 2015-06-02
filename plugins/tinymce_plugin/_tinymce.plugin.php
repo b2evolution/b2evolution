@@ -284,6 +284,10 @@ class tinymce_plugin extends Plugin
 		<script type="text/javascript">
 			jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
 			{
+				if( jQuery( this ).val() == 'WYSIWYG' && ! confirm( '<?php echo TS_('WARNING: By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?') ?>' ) )
+				{ // Switch to WYSIWYG only after confirmation
+					return;
+				}
 				tinymce_plugin_toggleEditor('<?php echo $this->tmce_editor_id; ?>');
 			} );
 
