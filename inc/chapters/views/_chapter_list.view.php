@@ -225,6 +225,7 @@ $Table = new Table();
 
 $Table->title = sprintf( T_('Categories for blog: %s'), $Blog->get_maxlen_name( 50 ) );
 
+$Table->global_icon( T_('Refresh'), 'refresh', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 $Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4  );
 
 $Table->cols[] = array(
