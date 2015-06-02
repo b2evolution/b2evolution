@@ -122,8 +122,6 @@ class user_links_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		echo $this->disp_params['block_start'];
-
 		// Initialise css classes for icons depending on widget setting
 		$icon_colors_classes = '';
 		if( ! empty( $this->disp_params['icon_colors'] ) )
@@ -137,14 +135,12 @@ class user_links_Widget extends ComponentWidget
 			}
 		}
 
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
+		$r = '';
 
 		$widget_User = & $this->get_widget_User();
 		if( empty( $widget_User ) )
 		{ // No user detected
-			echo '<p class="red">'.sprintf( T_('User %s not found.'), '<b>'.format_to_output( $this->disp_params['login'], 'text' ).'</b>' ).'</p>';
+			$r .= '<p class="red">'.sprintf( T_('User %s not found.'), '<b>'.format_to_output( $this->disp_params['login'], 'text' ).'</b>' ).'</p>';
 		}
 
 		if( ! empty( $widget_User ) )
@@ -153,16 +149,29 @@ class user_links_Widget extends ComponentWidget
 			$url_fields = $widget_User->userfields_by_type( 'url' );
 			if( count( $url_fields ) )
 			{
-				echo '<div class="ufld_icon_links">';
+				$r .= '<div class="ufld_icon_links">';
 				foreach( $url_fields as $field )
 				{
-					echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
+					$r .= '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
 							.'<span class="'.$field->ufdf_icon_name.'"></span>'
 						.'</a>';
 				}
-				echo '</div>';
+				$r .= '</div>';
 			}
 		}
+
+		if( empty( $r ) )
+		{ // Nothing to display
+			return true;
+		}
+
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
+		echo $r;
 
 		echo $this->disp_params['block_body_end'];
 
