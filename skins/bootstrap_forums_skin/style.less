@@ -1,8 +1,3 @@
-html, body {
-	width: auto !important;		   // Spreads the body layout to the entire page, in order to retain whole content.
-	overflow-x: hidden !important; // Prevents scrolling to the right. With the !important tag it can't be overruled. 
-}
-
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -35,6 +30,12 @@ html, body {
 			border-radius: 4px;
 		}
 	}
+}
+
+.evo_comment_avatar span img, .evo_comment_avatar a img {
+	border-radius: 50%;
+	float:left;
+	margin: 0px 15px 15px 0px !important;
 }
 
 // Breadcrumbs
@@ -100,15 +101,7 @@ ol.breadcrumb {
 	.posts_panel {
 		text-align: left;
 		.ft_title {
-			padding-left: 5px;
-			.ft_author_info {
-				padding-top: 2px;
-				font-size: 90%;
-				color: #8b96a1;
-			}
-			.ft_author_info.shrinked {
-				display: none;
-			}
+			margin-left: 35px;
 			.fa {
 				margin: 5px 5px 0px 0px;
 			}
@@ -116,19 +109,28 @@ ol.breadcrumb {
 				font-size: 90%;
 			}
 		}
+		.ft_author_info {
+			margin-left: 35px;
+			padding-top: 2px;
+			font-size: 90%;
+			color: #8b96a1;
+		}
+		.ft_author_info.shrinked {
+			display: none;
+		}
 		.ft_date {
 			margin-top: 14px;
 			text-align: left;
 			img {
 				border-radius: 50%;
 			}
+			a.ft_author_avatar:hover {
+				background-color: transparent !important;
+			}
 		}
 		.ft_count {
 			margin-top: 20px;
 		}
-	}
-	.ftb_status__ft_title {
-		text-align: left;
 	}
 	.ft_status {
 		width: 30px;
@@ -155,9 +157,7 @@ ol.breadcrumb {
 	}
 	.ft_title a.topictitle {
 		font-size: 16px;
-		&.unread {
-			font-weight: bold;
-		}
+		font-weight: bold;
 	}
 	.ft_desc, .ft_count {
 		text-align: center;
@@ -191,13 +191,6 @@ ol.breadcrumb {
 // Comment form
 .forums_list.single_topic {
 	border: none;
-	.evo_comment {
-		.panel-footer {
-			a.to_top.postlink {
-				font-size: 14px !important
-			}
-		}
-	}
 	.panel-heading {
 		.evo_comment_title {
 			display: inline;
@@ -455,7 +448,6 @@ ul.legend {
 			vertical-align: middle;
 		}
 	}
-	.valign-top {
 		.floatright {
 			span[class*="status_"] {
 				left: 15px !important;
@@ -465,7 +457,6 @@ ul.legend {
 		.evo_post__full {
 			padding-bottom: 15px;
 		}
-	}
 	.star_rating {
 		display: inline-block;
 		margin: 0 10px;
@@ -644,6 +635,7 @@ label.control-label[for=post_title] {
 			padding-left: 0px;
 			padding-right: 15px;
 			float: left;
+			margin-top: 2px;
 			a, span {
 				margin-left: 4px;
 			}
@@ -735,7 +727,7 @@ label.control-label[for=post_title] {
 			float: none;
 			text-align: left;
 			display: inline;
-			margin-top: 2px;
+			margin-top: 4px;
 			width: auto;
 		}
 	}
@@ -812,4 +804,72 @@ label.control-label[for=post_title] {
 	.ft_author_info.shrinked {
 		display: block !important;
 	}
+	.evo_comment_avatar a img {
+		width: 65px;
+		height: 65px;
+		margin: 0px 15px 10px 0px !important;
+	}
+}
+
+// POSTS PANEL BADGE FIX
+.posts_panel_title_wrapper {
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+	.wrap {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		word-break: break-all;
+		word-wrap: break-word;
+		.topictitle {
+			display: inline;
+			min-width: 200px;
+		}
+	}
+	.cell1 {
+		width: 100%;
+	}
+	.cell2 {
+			width: 60px;
+		.floatright {
+			float: none !important;
+			display: inline;
+		}
+	}
+}
+.cell1, .cell2 {
+	display: table-cell;
+}
+
+// Comment-footer link size FIX
+.evo_comment {
+	.panel-footer {
+		a.to_top.postlink {
+			font-size: 14px !important;
+		}
+	}
+}
+#feedbacks {
+.evo_comment .panel-body .floatright span[class*="status_"] {
+	background: transparent none repeat scroll 0 0;
+    display: block;
+    height: 75px;
+    overflow: hidden;
+    position: relative;
+    width: 75px;
+	margin-top: -15px;
+	margin-right: -15px;
+}
+.evo_comment .panel-body .floatright span[class*="status_"] span {
+    display: block;
+    font-size: 9pt;
+    left: -12px;
+    padding: 3px 0;
+    position: relative;
+    text-align: center;
+    top: 15px;
+    transform: rotate(45deg);
+    width: 120px;
+}
 }

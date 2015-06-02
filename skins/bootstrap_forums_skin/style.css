@@ -1,8 +1,3 @@
-html,
-body {
-  width: auto !important;
-  overflow-x: hidden !important;
-}
 .evo_container__page_top {
   margin-top: 20px;
 }
@@ -19,6 +14,12 @@ body {
 .powered_by a img {
   background-color: #ffffff;
   border-radius: 4px;
+}
+.evo_comment_avatar span img,
+.evo_comment_avatar a img {
+  border-radius: 50%;
+  float: left;
+  margin: 0px 15px 15px 0px !important;
 }
 ol.breadcrumb {
   margin-left: 0;
@@ -86,21 +87,22 @@ ol.breadcrumb {
   text-align: left;
 }
 .forums_list .posts_panel .ft_title {
-  padding-left: 5px;
-}
-.forums_list .posts_panel .ft_title .ft_author_info {
-  padding-top: 2px;
-  font-size: 90%;
-  color: #8b96a1;
-}
-.forums_list .posts_panel .ft_title .ft_author_info.shrinked {
-  display: none;
+  margin-left: 35px;
 }
 .forums_list .posts_panel .ft_title .fa {
   margin: 5px 5px 0px 0px;
 }
 .forums_list .posts_panel .ft_title .small {
   font-size: 90%;
+}
+.forums_list .posts_panel .ft_author_info {
+  margin-left: 35px;
+  padding-top: 2px;
+  font-size: 90%;
+  color: #8b96a1;
+}
+.forums_list .posts_panel .ft_author_info.shrinked {
+  display: none;
 }
 .forums_list .posts_panel .ft_date {
   margin-top: 14px;
@@ -109,11 +111,11 @@ ol.breadcrumb {
 .forums_list .posts_panel .ft_date img {
   border-radius: 50%;
 }
+.forums_list .posts_panel .ft_date a.ft_author_avatar:hover {
+  background-color: transparent !important;
+}
 .forums_list .posts_panel .ft_count {
   margin-top: 20px;
-}
-.forums_list .ftb_status__ft_title {
-  text-align: left;
 }
 .forums_list .ft_status {
   width: 30px;
@@ -140,8 +142,6 @@ ol.breadcrumb {
 }
 .forums_list .ft_title a.topictitle {
   font-size: 16px;
-}
-.forums_list .ft_title a.topictitle.unread {
   font-weight: bold;
 }
 .forums_list .ft_desc,
@@ -178,9 +178,6 @@ ol.breadcrumb {
 }
 .forums_list.single_topic {
   border: none;
-}
-.forums_list.single_topic .evo_comment .panel-footer a.to_top.postlink {
-  font-size: 14px !important;
 }
 .forums_list.single_topic .panel-heading .evo_comment_title {
   display: inline;
@@ -419,11 +416,11 @@ ul.legend span.note {
   display: inline-block;
   vertical-align: middle;
 }
-.single_topic .valign-top .floatright span[class*="status_"] {
+.single_topic .floatright span[class*="status_"] {
   left: 15px !important;
   top: -15px !important;
 }
-.single_topic .valign-top .evo_post__full {
+.single_topic .evo_post__full {
   padding-bottom: 15px;
 }
 .single_topic .star_rating {
@@ -579,6 +576,7 @@ label.control-label[for=post_title] {
     padding-left: 0px;
     padding-right: 15px;
     float: left;
+    margin-top: 2px;
   }
   .posts_panel .ft_date_shrinked a,
   .posts_panel .ft_date_shrinked span {
@@ -663,7 +661,7 @@ label.control-label[for=post_title] {
     float: none;
     text-align: left;
     display: inline;
-    margin-top: 2px;
+    margin-top: 4px;
     width: auto;
   }
   .evo_content_block .panel-body .floatright {
@@ -731,4 +729,63 @@ label.control-label[for=post_title] {
   .ft_author_info.shrinked {
     display: block !important;
   }
+  .evo_comment_avatar a img {
+    width: 65px;
+    height: 65px;
+    margin: 0px 15px 10px 0px !important;
+  }
+}
+.posts_panel_title_wrapper {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+}
+.posts_panel_title_wrapper .wrap {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+.posts_panel_title_wrapper .wrap .topictitle {
+  display: inline;
+  min-width: 200px;
+}
+.posts_panel_title_wrapper .cell1 {
+  width: 100%;
+}
+.posts_panel_title_wrapper .cell2 {
+  width: 60px;
+}
+.posts_panel_title_wrapper .cell2 .floatright {
+  float: none !important;
+  display: inline;
+}
+.cell1,
+.cell2 {
+  display: table-cell;
+}
+.evo_comment .panel-footer a.to_top.postlink {
+  font-size: 14px !important;
+}
+#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] {
+  background: transparent none repeat scroll 0 0;
+  display: block;
+  height: 75px;
+  overflow: hidden;
+  position: relative;
+  width: 75px;
+  margin-top: -15px;
+  margin-right: -15px;
+}
+#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] span {
+  display: block;
+  font-size: 9pt;
+  left: -12px;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  top: 15px;
+  transform: rotate(45deg);
+  width: 120px;
 }

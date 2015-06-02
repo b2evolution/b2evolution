@@ -184,13 +184,15 @@ if( $Skin->enabled_status_banner( $Item->status ) )
 	{
 		$Item->status( array(
 				'format' => 'styled',
-				'class'  => 'badge',
 		 ) );
 		$legend_statuses[] = $Item->status;
 	}
 // Avatar:
 echo $params['comment_avatar_before'];
-$Comment->avatar();
+$Comment->author2( array(
+					'link_text'  => 'only_avatar',
+					'thumb_size' => 'crop-top-80x80',
+				) );
 echo $params['comment_avatar_after'];
 
 // Rating:

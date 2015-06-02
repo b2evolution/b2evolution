@@ -54,41 +54,51 @@ elseif( $comments_number > 25 )
 		<article class="container group_row posts_panel">	
 			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">		
 			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i></div>
-			<div class="ft_title ellipsis"><?php
-				echo $status_title;
-				$Item->load_Blog();
-				if( $Item->Blog->get_setting( 'track_unread_content' ) )
-				{ // Display icon about unread status
-					$Item->display_unread_status();
-				}
-				// Title:
-				$Item->title( array(
-						'link_class'      => 'topictitle'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
-						'post_navigation' => $params['post_navigation'],
-					) );
-				if( $Skin->enabled_status_banner( $Item->status ) )
-				{ // Status:
-					$Item->status( array(
-							'format' => 'styled',
-							'class'  => 'badge',
+				<div class="ft_title"><?php
+					echo '<div class="posts_panel_title_wrapper">';
+					echo '<div class="cell1"><div class="wrap">';
+					echo $status_title;
+					$Item->load_Blog();
+					if( $Item->Blog->get_setting( 'track_unread_content' ) )
+					{ // Display icon about unread status
+						$Item->display_unread_status();
+					}
+					// Title:
+					$Item->title( array(
+							'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
+							'post_navigation' => $params['post_navigation'],
 						) );
-					$legend_statuses[] = $Item->status;
-				}
-					$Item->excerpt( array(
-						'before' => '<div class="small ellipsis">',
-						'after'  => '</div>',
-						) );
-				// Author info:
-				echo '<div class="ft_author_info ellipsis">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-				echo '</div>';
-				// Super small screen size Author info:
-				echo '<div class="ft_author_info shrinked ellipsis">'.T_('By');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
-				echo '</div>';
-			?></div>
+					echo '</div></div>';
+					if( $Skin->enabled_status_banner( $Item->status ) )
+					{ // Status:
+						$Item->status( array(
+								'before' => '<div class="cell2">',
+								'after'  => '</div>',
+								'format' => 'styled',
+								'class'  => 'badge',
+							) );
+						$legend_statuses[] = $Item->status;
+					}
+					echo '</div>';
+						$Item->excerpt( array(
+							'before' => '<div class="small ellipsis">',
+							'after'  => '</div>',
+							) );
+					?>
+				</div>
+				<div class="ft_author_info ellipsis">
+					<?php
+					// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
+					echo T_('Started by');
+					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+					echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+					echo '</div>';
+					// Super small screen size Author info:
+					echo '<div class="ft_author_info shrinked ellipsis">'.T_('By');
+					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+					echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
+				?>
+				</div>
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-2 col-xs-2"><?php
 				if( $comments_number == 0 && $Item->comment_status == 'disabled' )
@@ -99,7 +109,8 @@ elseif( $comments_number > 25 )
 				{
 					printf( T_('%s replies'), '<b>'.$comments_number.'</b>' );
 				}
-			?></div>
+			?>
+			</div>
 			<div class="ft_date col-lg-3 col-md-3 col-sm-4"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
