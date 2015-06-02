@@ -82,7 +82,11 @@ echo $Widget->replace_vars( $template['block_start'] );
 	$Form->begin_form( '' );
 
 		$Form->hidden_ctrl();
-		$Form->submit( array( 'submit', T_('Filter'), 'search btn-info', '', 'float:right' ) );
+		$Form->button_input( array(
+				'tag'   => 'button',
+				'value' => get_icon( 'filter' ).' '.T_('Filter'),
+				'class' => 'search btn-info pull-right',
+			) );
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
@@ -309,12 +313,16 @@ echo $Widget->replace_vars( $template['block_start'] );
 			) );
 
 		echo '<br />';
-		$Form->submit( array( 'submit', T_('Filter'), 'search btn-info' ) );
+		$Form->button_input( array(
+				'tag'   => 'button',
+				'value' => get_icon( 'filter' ).' '.T_('Filter'),
+				'class' => 'search btn-info',
+			) );
 
 		if( $ItemList->is_filtered() )
 		{
 			// TODO: style this better:
-			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning">'.T_('Reset all filters!').'</a>';
+			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning">'.get_icon( 'filter' ).' '.T_('Reset all filters!').'</a>';
 		}
 
 	$Form->end_form();
