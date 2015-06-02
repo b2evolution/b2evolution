@@ -99,13 +99,13 @@ class coll_logo_Widget extends ComponentWidget
 							array( 'skin', T_('Skin folder') ),
 							array( 'coll', T_('Collection File Root') ),
 							array( 'shared', T_('Shared File Root') ) ),
-					'defaultvalue' => 'coll',
+					'defaultvalue' => 'skin',
 				),
 				'logo_file' => array(
 					'label' => T_('Image filename'),
-					'note' => T_('The image/logo file must be uploaded to the root of the selected image source'),
+					'note' => T_('Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
-					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-][a-z0-9_.\-]*$~i',
+					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
 																		'error'=>T_('Invalid filename.') ),
 				),
 				'width' => array(
@@ -148,8 +148,9 @@ class coll_logo_Widget extends ComponentWidget
 		{
 			case 'skin':
 				global $skins_url, $skins_path;
-				$image_url = $skins_url;
-				$image_path = $skins_path;
+				$skin_folder = $Blog->get_skin_folder();
+				$image_url = $skins_url.$skin_folder.'/';
+				$image_path = $skins_path.$skin_folder.'/';
 				break;
 
 			case 'shared':
