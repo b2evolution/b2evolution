@@ -502,7 +502,7 @@ switch( $action )
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
 			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
-			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), '', $continue_onclick ) ) );
+			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
 		else
@@ -559,7 +559,6 @@ switch( $action )
 
 		$success = param_check_not_empty( 'svn_url', T_('Please enter the URL of repository') );
 		$success = $success && param_check_url( 'svn_url', 'download_src' );
-		$success = $success && param_check_regexp( 'svn_folder', '#/blogs/$#', T_('A correct SVN folder path must ends with "/blogs/"') );
 
 		// Display the errors and the download form again to fix data
 		$Messages->display();
