@@ -415,4 +415,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 </script>
 <?php
 	$Widget->disp_template_raw( 'block_end' );
+
+	// Print JS function to allow edit file properties on modal window
+	echo_file_properties();
 ?>

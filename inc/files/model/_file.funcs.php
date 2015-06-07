@@ -2732,4 +2732,55 @@ function open_temp_file( & $temp_file_name )
 	// File handle
 	return $temp_handle;
 }
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to report user
+ *
+ * @param array Params
+ */
+function echo_file_properties()
+{
+	global $admin_url;
+?>
+<script type="text/javascript">
+	//<![CDATA[
+<?php
+// Initialize JavaScript to build and open window
+echo_modalwindow_js();
+?>
+	// Window to edit file
+	function file_properties( root, path, file )
+	{
+		openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+			'80%', '', true,
+			'<?php echo TS_('File properties'); ?>',
+			'<?php echo TS_('Save Changes!'); ?>', true, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo $admin_url; ?>',
+			data:
+			{
+				'ctrl': 'files',
+				'action': 'edit_properties',
+				'root': root,
+				'path': path,
+				'fm_selected': [ file ],
+				'mode': 'modal',
+				'crumb_file': '<?php echo get_crumb( 'file' ); ?>',
+			},
+			success: function( result )
+			{
+				openModalWindow( result, '80%', '',true,
+					'<?php echo TS_('File properties'); ?>',
+					'<?php echo TS_('Save Changes!'); ?>', false, true );
+			}
+		} );
+		return false;
+	}
+	//]]>
+</script>
+<?php
+}
 ?>

@@ -22,9 +22,12 @@ global $blog, $filename_max_length;
 
 $Form = new Form( NULL, 'fm_properties_checkchanges' );
 
-$Form->global_icon( T_('Close properties!'), 'close', regenerate_url() );
+if( get_param( 'mode' ) != 'modal' )
+{
+	$Form->global_icon( T_('Close properties!'), 'close', regenerate_url() );
+}
 
-$Form->begin_form( 'fform', T_('File properties') );
+$Form->begin_form( 'fform', ( get_param( 'mode' ) == 'modal' ? '' : T_('File properties') ) );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();

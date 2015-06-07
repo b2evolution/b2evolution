@@ -1605,28 +1605,31 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
 
-// require colorbox js
-require_js_helper( 'colorbox' );
-// require File Uploader js and css
-require_js( 'multiupload/fileuploader.js' );
-require_css( 'fileuploader.css' );
-
 $mode = param( 'mode', 'string', '' );
-if( $mode == 'upload' || $mode == 'import' )
-{ // Add css to remove spaces around window
-	require_css( 'fileadd.css', 'rsc_url' );
-}
 
-if( $mode == 'popup' )
-{ // Don't display navigation on popup mode
-	$AdminUI->clear_menu_entries( 'files' );
-}
+if( $mode != 'modal' )
+{
+	// require colorbox js
+	require_js_helper( 'colorbox' );
+	// require File Uploader js and css
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	if( $mode == 'upload' || $mode == 'import' )
+	{ // Add css to remove spaces around window
+		require_css( 'fileadd.css', 'rsc_url' );
+	}
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	if( $mode == 'popup' )
+	{ // Don't display navigation on popup mode
+		$AdminUI->clear_menu_entries( 'files' );
+	}
+
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
@@ -1649,7 +1652,10 @@ $AdminUI->disp_body_top();
 </script>
 <?php
 
-$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_begin();
+
+
+	}
 
 /*
  * Display payload:
@@ -1686,6 +1692,10 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 
 		case 'edit_properties':
 			// File properties (Meta data) dialog:
+			if( $mode == 'modal' )
+			{ // Unmemorize the mode param in order to submit form in mormal mode
+				forget_param( 'mode' );
+			}
 			$AdminUI->disp_view( 'files/views/_file_properties.form.php' );
 			break;
 
@@ -1735,18 +1745,20 @@ switch( $fm_mode )
 		break;
 }
 
+if( $mode != 'modal' )
+{
+	// -------------------
+	// Browsing interface:
+	// -------------------
+	// Display VIEW:
+	$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
 
-// -------------------
-// Browsing interface:
-// -------------------
-// Display VIEW:
-$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+	
+	// End payload block:
+	$AdminUI->disp_payload_end();
 
-
-// End payload block:
-$AdminUI->disp_payload_end();
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 
 ?>
