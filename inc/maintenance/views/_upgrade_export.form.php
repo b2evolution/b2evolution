@@ -39,7 +39,7 @@ if( empty( $revision_is_exported ) )
 else
 { // Init the buttons to select next action
 	$form_buttons[] = array( 'submit', 'actionArray[ready_svn]', T_( 'Skip Export' ), 'SaveButton' );
-	$form_buttons[] = array( 'submit', 'actionArray[force_export_svn]', T_( 'Force New Export' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[force_export_svn]', T_( 'Force New Export' ), 'SaveButton btn-warning' );
 }
 
 $Form->end_form( $form_buttons );

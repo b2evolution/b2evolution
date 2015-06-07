@@ -39,7 +39,7 @@ if( $action_success && $download_success )
 elseif( $download_success )
 { // Init the buttons to select next action
 	$form_buttons[] = array( 'submit', 'actionArray[unzip]', T_( 'Skip Download' ), 'SaveButton' );
-	$form_buttons[] = array( 'submit', 'actionArray[force_download]', T_( 'Force New Download' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[force_download]', T_( 'Force New Download' ), 'SaveButton btn-warning' );
 }
 else
 { // Init a button to back step

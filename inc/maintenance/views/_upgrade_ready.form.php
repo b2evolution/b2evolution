@@ -36,6 +36,6 @@ $Form->begin_fieldset( T_( 'Actions' ) );
 $action_backup_value = ( $action == 'ready_svn' ) ? 'backup_and_overwrite_svn' : 'backup_and_overwrite';
 $action_backup_title = ( empty( $new_version_status ) ) ? T_( 'Backup & Upgrade' ) : T_( 'Force Backup & Upgrade' );
 
-$Form->end_form( array( array( 'submit', 'actionArray['.$action_backup_value.']', $action_backup_title, 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray['.$action_backup_value.']', $action_backup_title, 'SaveButton'.( empty( $new_version_status ) ? '' : ' btn-warning' ) ) ) );
 
 ?>

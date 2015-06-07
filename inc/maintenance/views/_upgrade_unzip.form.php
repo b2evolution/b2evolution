@@ -41,7 +41,7 @@ elseif( $unzip_success )
 	$form_buttons[] = array( 'submit', 'actionArray[ready]', T_( 'Skip Unzip' ), 'SaveButton' );
 	if( file_exists( $upgrade_file ) )
 	{
-		$form_buttons[] = array( 'submit', 'actionArray[force_unzip]', T_( 'Force New Unzip' ), 'SaveButton' );
+		$form_buttons[] = array( 'submit', 'actionArray[force_unzip]', T_( 'Force New Unzip' ), 'SaveButton btn-warning' );
 	}
 }
 else
