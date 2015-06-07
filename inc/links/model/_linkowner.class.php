@@ -189,9 +189,9 @@ class LinkOwner
 		/**
 		 * asimo> Replace in select query the link_cmt_ID, link_itm_ID with the following ( it can be used only after MySQL 5.0)
 		 * (CASE
-			WHEN (link_cmt_ID IS NOT NULL) THEN 'comment'
-			WHEN (link_itm_ID IS NOT NULL) THEN 'item'
-			END) as owner_type
+		 *	WHEN (link_cmt_ID IS NOT NULL) THEN 'comment'
+		 *	WHEN (link_itm_ID IS NOT NULL) THEN 'item'
+		 *	END) as owner_type
 		 */
 		if( $order_by == NULL )
 		{
