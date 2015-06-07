@@ -21,6 +21,27 @@
   float: left;
   margin: 0px 15px 15px 0px !important;
 }
+#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] {
+  background: transparent none repeat scroll 0 0;
+  display: block;
+  height: 75px;
+  overflow: hidden;
+  position: relative;
+  width: 75px;
+  margin-top: -15px;
+  margin-right: -15px;
+}
+#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] span {
+  display: block;
+  font-size: 9pt;
+  left: -12px;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  top: 15px;
+  transform: rotate(45deg);
+  width: 120px;
+}
 ol.breadcrumb {
   margin-left: 0;
   float: left;
@@ -585,12 +606,6 @@ label.control-label[for=post_title] {
   .legend-item {
     margin-bottom: 5px;
   }
-  .evo_content_block {
-    /*.panel-footer .floatright {
-			float: none;
-			margin-top: 5px;
-		}*/
-  }
   .evo_content_block .panel-body .ft_avatar {
     display: none;
   }
@@ -681,9 +696,6 @@ label.control-label[for=post_title] {
   .panel-heading h2 {
     font-size: 170%;
   }
-  /*.panel-footer span[id*="vote_helpful_"] {
-		display: block;
-	}*/
   .ft_date_shrinked_more {
     display: block !important;
     text-align: right;
@@ -767,25 +779,4 @@ label.control-label[for=post_title] {
 }
 .evo_comment .panel-footer a.to_top.postlink {
   font-size: 14px !important;
-}
-#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] {
-  background: transparent none repeat scroll 0 0;
-  display: block;
-  height: 75px;
-  overflow: hidden;
-  position: relative;
-  width: 75px;
-  margin-top: -15px;
-  margin-right: -15px;
-}
-#feedbacks .evo_comment .panel-body .floatright span[class*="status_"] span {
-  display: block;
-  font-size: 9pt;
-  left: -12px;
-  padding: 3px 0;
-  position: relative;
-  text-align: center;
-  top: 15px;
-  transform: rotate(45deg);
-  width: 120px;
 }
