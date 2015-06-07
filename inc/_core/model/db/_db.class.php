@@ -1160,6 +1160,7 @@ class DB
 		// ======================================================
 		// print main results
 		$i=0;
+		// fp> TODO: this should NOT try to print binary fields, eg: file hashes in the files table
 		// Rewind to first row (should be there already).
 		mysql_data_seek($this->result, 0);
 		while( $one_row = $this->get_row(NULL, ARRAY_N) )
@@ -1541,7 +1542,15 @@ class DB
 	 * Note 2: standard syntax would be START TRANSACTION but it's not supported by older
 	 * MySQL versions whereas BEGIN is...
 	 *
-	 * Note 3: The default isolation level is REPEATABLE READ.
+	 * Note 3: The default isolation level is REPEATABLE READ (Default for InnoDB)
+	 *
+	 * - REPEATABLE READ: (most frequent use) several SELECTs in the same transaction will always return identical values
+	 * - READ COMMITTED: no good use?
+	 * - READ UNCOMMITED: dirty reads - no good use?
+	 * - SERIALIZABLE: (less frequent use) all SELECTs are automatically changed to SELECT .. LOCK IN SHARE MODE
+	 * IMPORTANT: SERIALIZABLE does NOT use the max isolation level which would be SELECT ... LOCK FOR UPDATE which you cna only do by manually changing the SELECTs
+	 * ex: SELECT counter_field FROM child_codes FOR UPDATE;
+	 *     UPDATE child_codes SET counter_field = counter_field + 1;
 	 */
 	function begin( $transaction_isolation_level = 'REPEATABLE READ' )
 	{
