@@ -262,7 +262,11 @@ switch( $action )
 				case 'js' : // js reply
 					$edited_ComponentWidget->init_display( array() );
 					$methods = array();
-					$methods['widgetSettingsCallback'] = array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_desc_for_list() );
+					$methods['widgetSettingsCallback'] = array(
+							$edited_ComponentWidget->ID,
+							$edited_ComponentWidget->get_desc_for_list(),
+							$edited_ComponentWidget->get_cache_status()
+						);
 					if( $action == 'update' )
 					{ // Close window after update, and don't close it when user wants continue editing after updating
 						$methods['closeWidgetSettings'] = array();
@@ -401,11 +405,11 @@ switch( $action )
 
 			if( $action == 'cache_enable' )
 			{
-				$Messages->add( T_( 'Widget block caching has been enabled.' ), 'success' );
+				$Messages->add( T_( 'Block caching has been turned on for this widget.' ), 'success' );
 			}
 			else
 			{
-				$Messages->add( T_( 'Widget block caching has been disabled.' ), 'success' );
+				$Messages->add( T_( 'Block caching has been turned off for this widget.' ), 'success' );
 			}
 		}
 
@@ -576,10 +580,10 @@ if( $display_mode == 'normal' )
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
 	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
 	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
-	var cache_enabled_icon_tag = \''.get_icon( 'cache_enabled', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
-	var cache_disabled_icon_tag = \''.get_icon( 'cache_disabled', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
-	var cache_disallowed_icon_tag = \''.get_icon( 'cache_disallowed', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
-	var cache_denied_icon_tag = \''.get_icon( 'lightning', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
+	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
+	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
+	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
+	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery

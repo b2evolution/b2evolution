@@ -134,6 +134,8 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	 */
 	function antispam_ipranges_actions( $aipr_ID, $tab_param )
 	{
+		global $admin_url;
+		
 		// A link to edit IP range
 		$r = action_icon( T_('Edit this IP range...'), 'properties',
 						$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID='.$aipr_ID.'&amp;action=iprange_edit' );

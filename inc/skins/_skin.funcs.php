@@ -1857,15 +1857,14 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) );
 
-		if( empty($skin_params) )
-		{	// Advertise this feature!!
+		if( empty( $skin_params ) )
+		{ // Advertise this feature!!
 			echo '<p>'.T_('This skin does not provide any configurable settings.').'</p>';
 		}
 		else
 		{
 			load_funcs( 'plugins/_plugin.funcs.php' );
 
-			echo '<div class="clear"></div>';
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
 			{

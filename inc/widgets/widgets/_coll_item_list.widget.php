@@ -388,17 +388,8 @@ class coll_item_list_Widget extends ComponentWidget
 
 			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $listBlog->ID );
 
-			$filters['cat_focus'] = 'main';
 			$filters['cat_array'] = $linkblog_cat_array;
 			$filters['cat_modifier'] = $linkblog_cat_modifier;
-			if( $Settings->get( 'chapter_ordering' ) == 'alpha' )
-			{ // Sort categories by name
-				$filters['orderby'] = 'T_categories.cat_name '.$filters['orderby'];
-			}
-			else
-			{ // Sort categories by order field (But sort also by cat name in order to don't break list when all categories has NULL order)
-				$filters['orderby'] = 'T_categories.cat_order T_categories.cat_name '.$filters['orderby'];
-			}
 		}
 
 		$ItemList->set_filters( $filters, false ); // we don't want to memorize these params
@@ -447,26 +438,24 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $chapter_mode )
 		{	// List grouped by chapter/category:
-			/**
-			 * @var ItemLight (or Item)
-			 */
-			while( $Item = & $ItemList->get_category_group() )
-			{
-				// Open new cat:
-				$Chapter = & $Item->get_main_Chapter();
+			$items_map_by_chapter = array();
+			$chapters_of_loaded_items = array();
 
-				echo $this->disp_params['item_start'];
-				echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
-				echo $this->disp_params['group_start'];
-
-				while( $Item = & $ItemList->get_item() )
-				{	// Display contents of the Item depending on widget params:
-					$content_is_displayed = $this->disp_contents( $Item ) || $content_is_displayed;
+			while( $iterator_Item = & $ItemList->get_item() )
+			{ // Display contents of the Item depending on widget params:
+				$Chapter = & $iterator_Item->get_main_Chapter();
+				if( ! isset( $items_map_by_chapter[$Chapter->ID] ) )
+				{
+					$items_map_by_chapter[$Chapter->ID] = array();
+					$chapters_of_loaded_items[] = $Chapter;
 				}
+				$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
+			}
 
-				// Close cat
-				echo $this->disp_params['group_end'];
-				echo $this->disp_params['item_end'];
+			usort( $chapters_of_loaded_items, 'Chapter::compare_chapters' );
+			foreach( $chapters_of_loaded_items as $Chapter )
+			{
+				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter ) || $content_is_displayed;
 			}
 		}
 		else
@@ -507,6 +496,38 @@ class coll_item_list_Widget extends ComponentWidget
 
 
 	/**
+	 * Display a chapter with all of its loaded items
+	 *
+	 * @param Chapter
+	 * @param array Items map by Chapter
+	 * @return boolean true if content was displayed, false otherwise
+	 */
+	function disp_chapter( $Chapter, & $items_map_by_chapter )
+	{
+		$content_is_displayed = false;
+
+		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
+		{ // Display Chapter only if it has some items
+			echo $this->disp_params['item_start'];
+			$Chapter->get_Blog();
+			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'('.$Chapter->Blog->get('shortname').')'.'</a>';
+			echo $this->disp_params['group_start'];
+
+			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
+			{ // Display contents of the Item depending on widget params:
+				$content_is_displayed = $this->disp_contents( $iterator_Item ) || $content_is_displayed;
+			}
+
+			// Close cat
+			echo $this->disp_params['group_end'];
+			echo $this->disp_params['item_end'];
+		}
+
+		return $content_is_displayed;
+	}
+
+
+	/**
 	 * Support function for above
 	 *
 	 * @param Item
@@ -514,11 +535,12 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function disp_contents( & $disp_Item )
 	{
+		global $disp, $Item;
+
 		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
 		$content_is_displayed = false;
 
 		// Is this the current item?
-		global $disp, $Item;
 		if( !empty($Item) && $disp_Item->ID == $Item->ID )
 		{	// The current page is currently displaying the Item this link is pointing to
 			// Let's display it as selected

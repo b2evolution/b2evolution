@@ -191,24 +191,24 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_cache_status = $ComponentWidget->get_cache_status();
 			if( $widget_cache_status == 'disallowed' )
 			{ // Widget/block cache is not allowed by widget config
-				echo get_icon( 'cache_disallowed', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
+				echo get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ), 'rel' => $widget_cache_status ) );
 			}
 			else
 			{
 				if( ! $Blog->get_setting( 'cache_enabled_widgets' ) )
 				{ // Widget/block cache is not allowed by blog setting
-					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ), 'lightning', $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL, array( 'rel' => 'denied' ) );
+					echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ), 'block_cache_denied', $admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL, array( 'rel' => 'denied' ) );
 				}
 				else
 				{
 					switch( $widget_cache_status )
 					{
 						case 'enabled':
-							echo action_icon( T_( 'Caching is enabled. Click to disable.' ), 'cache_enabled', regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+							echo action_icon( T_( 'Caching is enabled. Click to disable.' ), 'block_cache_on', regenerate_url( 'blog', 'action=cache_disable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
 							break;
 
 						case 'disabled':
-							echo action_icon( T_( 'Caching is disabled. Click to enable.' ), 'cache_disabled', regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
+							echo action_icon( T_( 'Caching is disabled. Click to enable.' ), 'block_cache_off', regenerate_url( 'blog', 'action=cache_enable&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL, array( 'rel' => $widget_cache_status ) );
 							break;
 					}
 				}

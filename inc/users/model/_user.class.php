@@ -3075,7 +3075,20 @@ class User extends DataObject
 	 */
 	function get_msgform_possibility( $current_User = NULL )
 	{
-		if( ! $this->check_status( 'can_receive_any_message' ) )
+		global $Blog;
+
+		if( isset( $Blog ) &&
+				$blog_owner_User = & $Blog->get_owner_User() &&
+				$blog_owner_User->ID == $this->ID )
+		{ // Allow to contact with this user because he is owner of the selected blog
+			$force_contact_blog_owner = true;
+		}
+		else
+		{
+			$force_contact_blog_owner = false;
+		}
+
+		if( ! $force_contact_blog_owner && ! $this->check_status( 'can_receive_any_message' ) )
 		{ // there is no way to send a message to a user with closed account
 			return NULL;
 		}
@@ -3086,7 +3099,7 @@ class User extends DataObject
 			{
 				global $current_User;
 			}
-			if( has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+			if( ! $force_contact_blog_owner && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
 			{ // Contat to this user is not enabled
 				return NULL;
 			}
@@ -3099,24 +3112,15 @@ class User extends DataObject
 					return 'PM';
 				}
 			}
-			if( $this->accepts_email() )
-			{ // this user allows email => send email
+			if( $force_contact_blog_owner || $this->accepts_email() )
+			{ // this user allows email => send email OR Force to allow to contact with this user because he is owner of the selected blog
 				return 'email';
 			}
 		}
 		else
 		{ // current User is not logged in
-			global $Blog, $disp;
-
-			if( isset( $Blog, $disp ) &&
-			    $disp == 'msgform' &&
-			    $blog_owner_User = & $Blog->get_owner_User() &&
-			    $blog_owner_User->ID == $this->ID )
-			{ // Allow to contact with this user because he is owner of the selected blog
-				return 'email';
-			}
-			if( $this->accepts_email() )
-			{ // this user allows email
+			if( $force_contact_blog_owner || $this->accepts_email() )
+			{ // this user allows email OR Force to allow to contact with this user because he is owner of the selected blog
 				return 'email';
 			}
 			if( $this->accepts_pm() )

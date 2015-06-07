@@ -75,7 +75,7 @@ if( empty( $blog ) )
 { // Init JS to quick edit an order of the blogs in the table cell by AJAX
 	init_field_editor_js( array(
 			'field_prefix' => 'order-blog-',
-			'action_url' => $ReqURI.'&order_action=update&order_data=',
+			'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
 		) );
 }
 

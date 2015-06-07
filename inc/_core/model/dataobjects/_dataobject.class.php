@@ -650,16 +650,11 @@ class DataObject
 	 */
 	function check_relations( $what, $ignore = array(), $addlink = false )
 	{
-		global $DB, $Messages;
+		global $DB;
 
 		$this->init_relations();
 
 		$restriction_Messages = new Messages();
-
-		if( isset( $Messages ) && ! empty( $Messages->params ) )
-		{ // Set template for messages as it is used for current skin
-			$restriction_Messages->set_params( $Messages->params );
-		}
 
 		if( is_null( $this->$what ) )
 		{ // The relations are not defined
@@ -751,7 +746,7 @@ class DataObject
 		$block_item_Widget = new Widget( 'block_item' );
 
 		$block_item_Widget->title = $confirm_title;
-		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo str_replace( 'panel-default', 'panel-danger', $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] ) );
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
 

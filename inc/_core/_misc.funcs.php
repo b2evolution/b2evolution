@@ -6929,9 +6929,10 @@ var modal_window_js_initialized = false;
  * @param boolean TRUE - to use transparent template
  * @param string Title of modal window (Used in bootstrap)
  * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
+ * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
  * @param boolean TRUE - to clear all previous windows
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -6990,9 +6991,12 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	if( use_buttons )
 	{
-		// Remove these elements, they are displayed as title and button of modal window
-		jQuery( '#modal_window legend' ).remove();
-		jQuery( '#modal_window #close_button' ).remove();
+		if( typeof( keep_panels ) == 'undefined' || ! keep_panels )
+		{ // Remove these elements, they are displayed as title and button of modal window
+			jQuery( '#modal_window legend' ).remove();
+			jQuery( '#modal_window #close_button' ).remove();
+			jQuery( '#modal_window .panel, #modal_window .panel-body' ).removeClass( 'panel panel-default panel-body' );
+		}
 
 		if( jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).length == 0 )
 		{ // Hide a submit button in the footer if real submit input doesn't exist

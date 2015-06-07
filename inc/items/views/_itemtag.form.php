@@ -25,15 +25,13 @@ if( ! empty( $edited_ItemTag->merge_tag_ID ) )
 { // Display a for to confirm merge the tag to other one
 	$Form = new Form( NULL, 'itemtagmerge_checkchanges', 'post', 'compact' );
 
-	$Form->begin_form( 'fform', T_('Merge tags?') );
+	$Form->begin_form( 'fform', T_('Merge tags?'), array( 'formstart_class' => 'panel-danger' ) );
 	$Form->hidden( 'tag_ID', $edited_ItemTag->merge_tag_ID );
 	$Form->hidden( 'old_tag_ID', $edited_ItemTag->ID );
 	$Form->add_crumb( 'tag' );
 	$Form->hiddens_by_key( get_memorized( 'action,tag_ID' ) );
 
-	global $Messages;
-	$Messages->add( $edited_ItemTag->merge_message, 'error' );
-	$Messages->display();
+	echo '<p>'.$edited_ItemTag->merge_message.'</p>';
 
 	$Form->button( array( 'submit', 'actionArray[merge_confirm]', T_('Confirm'), 'SaveButton btn-danger' ) );
 	$Form->button( array( 'submit', 'actionArray[merge_cancel]', T_('Cancel'), 'SaveButton btn-default' ) );

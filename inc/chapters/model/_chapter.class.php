@@ -154,7 +154,7 @@ class Chapter extends GenericCategory
 			}
 
 			// One of the chapters is a parent of the other, the parent is considered greater than the other
-			return isset( $path_to_root_a[$index] ) ? -1 : 1;
+			return isset( $path_to_root_a[$index] ) ? 1 : -1;
 		}
 
 		if( empty( $a_Chapter->parent_ID ) )

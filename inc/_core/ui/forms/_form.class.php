@@ -1859,6 +1859,12 @@ class Form extends Widget
 			unset( $form_params['title'] );
 		}
 
+		if( isset( $form_params['formstart_class'] ) )
+		{ // CSS class for formstart tag
+			$formstart_class = $form_params['formstart_class'];
+			unset( $form_params['formstart_class'] );
+		}
+
 		if( $this->form_type == 'div' )
 		{ // Use <div> tag instead of <form>
 			unset( $form_params['action'] );
@@ -1875,7 +1881,14 @@ class Form extends Widget
 		// fp> inline was needed for inline forms like the DELETE confirmation.
 		// fp> why does XHTML require all forms to have an embedded DIV?
 
-		$r .= $this->formstart;
+		if( isset( $formstart_class ) )
+		{
+			$r .= str_replace( '$formstart_class$', $formstart_class, $this->formstart );
+		}
+		else
+		{
+			$r .= $this->formstart;
+		}
 
 		if( empty( $form_title ) )
 		{

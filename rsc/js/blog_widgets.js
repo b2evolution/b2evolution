@@ -3,7 +3,6 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
- * @version $Id: blog_widgets.js 9274 2015-06-01 11:56:23Z yura $
  */
 
 
@@ -441,9 +440,10 @@ function widgetSettings( the_html )
 	});
 }
 
-function widgetSettingsCallback( the_widget, the_name )
+function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
 {
-	jQuery( '#wi_ID_'+the_widget+' .widget_name' ).html( the_name );
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_name' ).html( wi_name );
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 }
 
 function closeWidgetSettings()
@@ -615,25 +615,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 		'</span>' ) );
 
 	// Add icon to toggle cache status:
-	switch( wi_cache_status )
-	{
-		case 'enabled':
-			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'disable\' );">' + cache_enabled_icon_tag + '</a>';
-			break;
-
-		case 'disabled':
-			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'enable\' );">' + cache_disabled_icon_tag + '</a>';
-			break;
-
-		case 'disallowed':
-			var cacheIcon = cache_disallowed_icon_tag;
-			break;
-
-		case 'denied':
-			var cacheIcon = '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
-			break;
-	}
-	cacheIcon = jQuery( '<span class="widget_cache_status">' + cacheIcon + '</span>' );
+	cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
 	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
 
 	// Add action icons:
@@ -709,25 +691,7 @@ function toggleCacheWidget( wi_ID, action )
  */
 function doToggleCache( wi_ID, wi_cache_status )
 {
-	switch( wi_cache_status )
-	{
-		case 'enabled':
-			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \'wi_ID_'+wi_ID+'\', \'disable\' );">' + cache_enabled_icon_tag + '</a>';
-			break;
-
-		case 'disabled':
-			var cacheIcon = '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \'wi_ID_'+wi_ID+'\', \'enable\' );">' + cache_disabled_icon_tag + '</a>';
-			break;
-
-		case 'disallowed':
-			var cacheIcon = cache_disallowed_icon_tag;
-			break;
-
-		case 'denied':
-			var cacheIcon = '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
-			break;
-	}
-	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( cacheIcon );
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 
 	evoFadeBg( jQuery( '#wi_ID_' + wi_ID ), new Array( '#FFFF33' ), { speed: 3000 } );
 }
@@ -743,4 +707,30 @@ function doToggleCache( wi_ID, wi_cache_status )
 function str_repeat( data, multiplier )
 {
 	return new Array( multiplier + 1 ).join( data );
+}
+
+
+/**
+ * Get icon for widget cache status
+ *
+ * @param string Widget ID
+ * @param string Widget cache status
+ * @return string
+ */
+function getWidgetCacheIcon( wi_ID, wi_cache_status )
+{
+	switch( wi_cache_status )
+	{
+		case 'enabled':
+			return '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'disable\' );">' + cache_enabled_icon_tag + '</a>';
+
+		case 'disabled':
+			return '<a href="#" class="cache_action" onclick="return toggleCacheWidget( \''+wi_ID+'\', \'enable\' );">' + cache_disabled_icon_tag + '</a>';
+
+		case 'disallowed':
+			return cache_disallowed_icon_tag;
+
+		case 'denied':
+			return '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
+	}
 }

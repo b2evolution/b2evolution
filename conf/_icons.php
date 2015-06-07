@@ -1139,26 +1139,48 @@ function get_icon_info( $name )
 			'color' => '#ff9900'
 		);
 
-		case 'cache_enabled': return array(
+		case 'page_cache_on': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 128, 32 ),
+			'fa' => 'file-code-o',
+			'color' => '#000'
+		);
+		case 'page_cache_off': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 128, 32 ),
+			'fa' => 'bolt',
+			'color' => '#000'
+		);
+
+		case 'block_cache_on': return array(
 			'alt'  => '',
 			'size' => array( 16, 16 ),
 			'xy' => array( 128, 32 ),
 			'fa' => 'cube',
 			'color' => '#F90'
 		);
-		case 'cache_disabled': return array(
+		case 'block_cache_off': return array(
 			'alt'  => '',
 			'size' => array( 10, 16 ),
 			'xy' => array( 0, 32 ),
 			'fa' => 'bolt',
 			'color' => '#000'
 		);
-		case 'cache_disallowed': return array(
+		case 'block_cache_disabled': return array(
 			'alt'  => '',
 			'size' => array( 10, 16 ),
 			'xy' => array( 0, 32 ),
 			'fa' => 'bolt',
 			'color' => '#CCC'
+		);
+		case 'block_cache_denied': return array(
+			'alt'  => '',
+			'size' => array( 10, 16 ),
+			'xy' => array( 0, 32 ),
+			'fa' => 'bolt',
+			'color' => '#ff9900'
 		);
 
 		case 'star_on': return array(
