@@ -37,16 +37,19 @@ $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integ
 $admin_Plugins = & get_Plugins_admin();
 $admin_Plugins->restart();
 
-// Pre-walk list of plugins
+// Pre-walk list of plugins, this will register all existing plugins and verify the statuses
 while( $loop_Plugin = & $admin_Plugins->get_next() )
 {
 	if( $loop_Plugin->status == 'broken' && ! isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] ) )
-	{ // The plugin is not "broken" anymore (either the problem got fixed or it was "broken" from a canceled "install_db_schema" action)
-		// TODO: set this to the previous status (dh)
-		$Plugins->set_Plugin_status( $loop_Plugin, 'disabled' );
+	{ // The plugin is not "broken" anymore or it has only some required db changes (either the problem got fixed or it was "broken" from a canceled "install_db_schema" action)
+		load_funcs('plugins/_plugin.funcs.php');
+		if( install_plugin_db_schema_action( $loop_Plugin, false ) )
+		{ // There are no required db changes and no error detected so this plugin is not broken any more
+			// TODO: set this to the previous status (dh)
+			$Plugins->set_Plugin_status( $loop_Plugin, 'disabled' );
+		}
 	}
 }
-
 
 /*
  * Action Handling part I
@@ -628,6 +631,14 @@ switch( $action )
 			break;
 		}
 
+		load_funcs('plugins/_plugin.funcs.php');
+		if( $edit_Plugin->status == 'broken' && ! install_plugin_db_schema_action( $edit_Plugin ) )
+		{ // If the plugin is in broken status and has some required db changes then display the db changes
+			$action = 'install_db_schema';
+			$next_action = 'install_db_schema';
+			break;
+		}
+
 		// Detect new events, so they get displayed correctly in the "Edit events" fieldset:
 		$admin_Plugins->save_events( $edit_Plugin, array() );
 
@@ -726,14 +737,15 @@ switch( $action )
 			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
 
-		// Check if it can stay enabled, if it is
-		if( $edit_Plugin->status == 'enabled' )
+		// Check if we should change plugin status to 'needs_config'
+		// to view this plugin in list with orange "question" icon
+		if( $edit_Plugin->status == 'enabled' || $edit_Plugin->status == 'disabled' )
 		{
 			$enable_return = $edit_Plugin->BeforeEnable();
 			if( $enable_return !== true )
 			{
 				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
-				$Messages->add( T_('The plugin has been disabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+				$Messages->add( T_('The plugin has been disabled.').( empty( $enable_return ) ? '' : '<br />'.$enable_return ), 'error' );
 			}
 		}
 
