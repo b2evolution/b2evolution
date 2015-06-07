@@ -31,6 +31,7 @@ class SQL
 	var $having = '';
 	var $order_by = '';
 	var $limit = '';
+	var $append = '';
 	var $search_field = array();
 	var $search_field_regexp = array();
 	var $title;
@@ -59,6 +60,7 @@ class SQL
 		$sql .= $this->get_having();
 		$sql .= $this->get_order_by();
 		$sql .= $this->get_limit();
+		$sql .= $this->get_append();
 		return $sql;
 	}
 
@@ -75,6 +77,7 @@ class SQL
 		echo $this->get_having( '<br />HAVING ' );
 		echo $this->get_order_by( '<br />ORDER BY ' );
 		echo $this->get_limit( '<br />LIMIT ' );
+		echo $this->get_append( '<br />' );
 	}
 
 
@@ -170,6 +173,20 @@ class SQL
 		if( !empty($this->limit) )
 		{
 			return $prefix.$this->limit;
+		}
+
+		return '';
+	}
+
+
+  /**
+	 * Get anything to be appended at the end there is something to be appended
+	 */
+	function get_append( $prefix = ' ' )
+	{
+		if( !empty($this->append) )
+		{
+			return $prefix.$this->append;
 		}
 
 		return '';
@@ -326,6 +343,11 @@ class SQL
 	function LIMIT( $limit )
 	{
 		$this->limit = $limit;
+	}
+
+	function append( $append )
+	{
+		$this->append = $append;
 	}
 
 	/**
