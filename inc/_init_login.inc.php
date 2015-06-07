@@ -178,7 +178,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
 			if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
 			{ // User already has a maximum value of the attempts
-				$first_attempt = explode( ':', $login_attempts[0] );
+				$first_attempt = explode( '|', $login_attempts[0] );
 				if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
 				{ // User has used 9 attempts during X minutes, Display error and Refuse login
 					$login_error = sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) );
@@ -295,7 +295,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 			foreach( $login_attempts as $attempt )
 			{
-				$attempt = explode( ':', $attempt );
+				$attempt = explode( '|', $attempt );
 				$attempt_ip = $attempt[1];
 
 				$plugin_country_by_IP = '';
@@ -331,7 +331,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			{ // Unset first attempt to clear a space for new attempt
 				unset( $login_attempts[0] );
 			}
-			$login_attempts[] = $localtimenow.':'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
+			$login_attempts[] = $localtimenow.'|'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
 			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
 			$UserSettings->dbupdate();
 		}
