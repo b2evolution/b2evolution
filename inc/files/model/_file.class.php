@@ -2528,7 +2528,7 @@ class File extends DataObject
 	/**
 	 * Link file to object
 	 *
-	 * @param object LinkOwner
+	 * @param object LinkOwner (can be: LinkItem, LinkComment or LinkUser)
 	 * @param integer Order
 	 * @param string Position
 	 * @return integer Link ID
@@ -2537,8 +2537,7 @@ class File extends DataObject
 	{
 		global $DB;
 
-		// Automatically determine default position.
-		// First image becomes "teaser", otherwise "aftermore".
+		$DB->begin();
 
 		$order = $set_order;
 		$existing_Links = & $LinkOwner->get_Links();
@@ -2556,8 +2555,6 @@ class File extends DataObject
 				$order = $existing_order + 1;
 			}
 		}
-
-		$DB->begin( 'SERIALIZABLE' );
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );
