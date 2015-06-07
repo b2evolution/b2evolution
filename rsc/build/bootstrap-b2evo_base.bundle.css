@@ -2186,6 +2186,11 @@ a.btn.action_icon {
 a.btn.action_icon.hoverlink {
   text-decoration: none;
 }
+.form-horizontal .form-group,
+.form-horizontal .custom_content {
+  margin-left: 0;
+  margin-right: 0;
+}
 .form-horizontal .control-label {
   padding-left: 0;
 }
@@ -2703,14 +2708,6 @@ div.message_toolbars {
 }
 .modal-backdrop {
   position: fixed;
-}
-.modal-body .panel {
-  border: none;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-}
-.modal-body fieldset .panel {
-  margin-bottom: 0;
 }
 .tt-dropdown-menu {
   background-color: #FFFFFF;

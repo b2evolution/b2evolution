@@ -23,7 +23,7 @@ margin:0 2em 0 0;
 	border-right: 1px solid #9DB0BC;
 	margin-right: 10px;
 	padding-right: 10px;
-	float: left;
+	/*float: left;*/
 }
 
 .widget_actions, span.widget_cache_status {
