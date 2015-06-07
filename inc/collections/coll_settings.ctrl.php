@@ -56,12 +56,10 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
+	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 	// redirect to blog list:
 	header_redirect( $admin_url.'?ctrl=dashboard' );
 	// EXITED:
-	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
-	$action = 'nil';
-	$tab = '';
 }
 
 memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
@@ -296,7 +294,7 @@ switch( $action )
 
 	case 'enable_setting':
 	case 'disable_setting':
-		// Update DB:
+		// Update blog settings:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
@@ -307,11 +305,34 @@ switch( $action )
 		$update_redirect_url = $admin_url.'?ctrl=dashboard';
 
 		$setting = param( 'setting', 'string', '' );
+		$setting_value = ( $action == 'enable_setting' ? '1' : '0' );
+
 		switch( $setting )
 		{
 			case 'fav':
 				// Favorite Blog
-				$setting_name = 'favorite';
+				$edited_Blog->set( 'favorite', $setting_value );
+				$result_message = T_('The collection setting has been updated.');
+				break;
+
+			case 'page_cache':
+				// Page caching
+				$edited_Blog->set_setting( 'cache_enabled', $setting_value );
+				if( $setting_value )
+				{ // If we are enabling the page caching we should also enable AJAX forms
+					$edited_Blog->set_setting( 'ajax_form_enabled', 1 );
+				}
+				$result_message = $setting_value ?
+						T_('Page caching has been turned on for the collection.') :
+						T_('Page caching has been turned off for the collection.');
+				break;
+
+			case 'block_cache':
+				// Widget/block caching
+				$edited_Blog->set_setting( 'cache_enabled_widgets', $setting_value );
+				$result_message = $setting_value ?
+						T_('Block caching has been turned on for the collection.') :
+						T_('Block caching has been turned off for the collection.');
 				break;
 
 			default:
@@ -320,11 +341,10 @@ switch( $action )
 				break;
 		}
 
-		$setting_value = $action == 'enable_setting' ? '1' : '0';
-		$edited_Blog->set( $setting_name, $setting_value );
+		// Update the changed settings
 		$edited_Blog->dbupdate();
 
-		$Messages->add( T_('The blog setting has been updated.'), 'success' );
+		$Messages->add( $result_message, 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $update_redirect_url, 303 ); // Will EXIT
 

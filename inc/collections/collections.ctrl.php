@@ -446,7 +446,7 @@ switch( $action )
 			$delete_warning = T_('Deleting this collection will also delete ALL its categories, posts, comments and ALL its attached files in the collection\'s fileroot !');
 		}
 		?>
-		<div class="panelinfo panel panel-default">
+		<div class="panelinfo panel panel-default panel-danger">
 			<div class="panel-heading">
 				<h3 class="panel-title"><?php printf( T_('Delete collection [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
 			</div>
@@ -456,7 +456,7 @@ switch( $action )
 
 			<p><?php echo T_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!') ?></p>
 
-			<p class="warning"><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
+			<p class="warning text-danger"><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
 
 			<p>
 

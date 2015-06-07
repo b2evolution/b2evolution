@@ -1288,10 +1288,11 @@ function blogs_user_results_block( $params = array() )
 
 	// Initialize Results object
 	blogs_results( $blogs_Results, array(
-			'display_owner' => false,
-			'display_plist' => false,
-			'display_order' => false,
-			'display_fav'   => false,
+			'display_owner'   => false,
+			'display_plist'   => false,
+			'display_order'   => false,
+			'display_caching' => false,
+			'display_fav'     => false,
 		) );
 
 	if( is_ajax_content() )
@@ -1439,6 +1440,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'display_plist'    => true,
 			'display_fav'      => true,
 			'display_order'    => true,
+			'display_caching'  => true,
 			'display_actions'  => true,
 		), $params );
 
@@ -1534,6 +1536,16 @@ function blogs_results( & $blogs_Results, $params = array() )
 			);
 	}
 
+	if( $params['display_caching'] )
+	{	// Display Order column
+		$blogs_Results->cols[] = array(
+				'th' => T_('Caching'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_caching( {Obj} )%',
+			);
+	}
+
 	if( $params['display_actions'] )
 	{	// Display Actions column
 		$blogs_Results->cols[] = array(
@@ -1604,6 +1616,66 @@ function blog_row_order( $blog_ID, $blog_order )
 	{
 		$r = $blog_order;
 	}
+	return $r;
+}
+
+/**
+ * Get the action icons to toggle caching settings of blog
+ *
+ * @param object Blog
+ * @return string
+ */
+function blog_row_caching( $Blog )
+{
+	global $current_User, $admin_url;
+
+	// Get icon and title for page caching status
+	if( $Blog->get_setting( 'cache_enabled' ) )
+	{ // Page cache is enabled
+		$page_cache_icon = 'page_cache_on';
+		$page_cache_title = T_('Page caching is on. Anonymous users may not see the latest content for 10 minutes.');
+		$page_cache_action = 'disable_setting';
+	}
+	else
+	{ // Page cache is disabled
+		$page_cache_icon = 'page_cache_off';
+		$page_cache_title = T_('Page caching is off. Server performance will not be optimal.');
+		$page_cache_action = 'enable_setting';
+	}
+
+	// Get icon and title for widget/block caching status
+	if( $Blog->get_setting( 'cache_enabled_widgets' ) )
+	{ // Widget/block cache is enabled
+		$block_cache_icon = 'block_cache_on';
+		$block_cache_title = T_('Block caching is on. Some widgets may not update immediately.');
+		$block_cache_action = 'disable_setting';
+	}
+	else
+	{ // Widget/block cache is disabled
+		$block_cache_icon = 'block_cache_off';
+		$block_cache_title = T_('Block caching is off. Server performance will not be optimal.');
+		$block_cache_action = 'enable_setting';
+	}
+
+	$r = '';
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	{ // User has a permission to edit blog settings
+		$toggle_url = $admin_url.'?ctrl=coll_settings'
+			.'&amp;tab=general'
+			.'&amp;action=%s'
+			.'&amp;setting=%s'
+			.'&amp;blog='.$Blog->ID
+			.'&amp;'.url_crumb( 'collection' );
+		$r .= action_icon( $page_cache_title, $page_cache_icon, sprintf( $toggle_url, $page_cache_action, 'page_cache' ) ).' &nbsp; ';
+		$r .= action_icon( $block_cache_title, $block_cache_icon, sprintf( $toggle_url, $block_cache_action, 'block_cache' )  );
+	}
+	else
+	{ // No permissions to edit
+		$r .= get_icon( $page_cache_icon, 'imgtag', array( 'title' => $page_cache_title ) ).' &nbsp; ';
+		$r .= get_icon( $block_cache_icon, 'imgtag', array( 'title' => $block_cache_title ) );
+	}
+
 	return $r;
 }
 
