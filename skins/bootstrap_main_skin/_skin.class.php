@@ -62,56 +62,72 @@ class bootstrap_main_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				// Front page
 				'1_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Background')
+					'label'  => T_('Image section')
 				),
 					'front_bg_image' => array(
-						'label' => T_('Front page background image'),
+						'label' => T_('Background image'),
 						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
 						'type' => 'text',
 						'size' => '50'
+					),
+					'pict_title_color' => array(
+						'label' => T_('Title color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
+					'pict_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
+					'pict_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
+					'pict_note_color' => array(
+						'label' => T_('Note color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'2_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Main Area')
+					'label'  => T_('Front Page Main Area Overlay')
 				),
-					'front_title_color' => array(
-						'label' => T_('Front page title color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#F0F0F0',
-						'type' => 'color',
+					'front_width' => array(
+						'label' => T_('Width'),
+						'note' => '',
+						'size' => '7',
+						'defaultvalue' => '450px',
 					),
-					'front_text_color' => array(
-						'label' => T_('Front page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#FFFFFF',
-						'type' => 'color',
-					),
-					'front_link_color' => array(
-						'label' => T_('Front page link color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#FFFFFF',
-						'type' => 'color',
-					),
-					'front_icon_color' => array(
-						'label' => T_('Front page inverse icon color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#CCCCCC',
-						'type' => 'color',
+					'front_position' => array(
+						'label' => T_('Position'),
+						'note' => '',
+						'defaultvalue' => 'left',
+						'options' => array(
+								'left'   => T_('Left'),
+								'middle' => T_('Middle'),
+								'right'  => T_('Right'),
+							),
+						'type' => 'select',
 					),
 					'front_bg_color' => array(
-						'label' => T_('Front page main area background color'),
+						'label' => T_('Background color'),
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#000000',
 						'type' => 'color',
 					),
 					'front_bg_opacity' => array(
-						'label' => T_('Front page main area background opacity'),
+						'label' => T_('Background opacity'),
 						'note' => '%',
 						'size' => '2',
 						'maxlength' => '3',
@@ -122,22 +138,23 @@ class bootstrap_main_Skin extends Skin
 							'max' => 100, // to 100%
 						),
 					),
-					'front_width' => array(
-						'label' => T_('Main Area Width'),
-						'note' => '',
-						'size' => '7',
-						'defaultvalue' => '450px',
+					'front_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
 					),
-					'front_position' => array(
-						'label' => T_('Main Area Position'),
-						'note' => '',
-						'defaultvalue' => 'left',
-						'options' => array(
-								'left'   => T_('Left'),
-								'middle' => T_('Middle'),
-								'right'  => T_('Right'),
-							),
-						'type' => 'select',
+					'front_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
+					),
+					'front_icon_color' => array(
+						'label' => T_('Inverse icon color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#CCCCCC',
+						'type' => 'color',
 					),
 				'2_end' => array(
 					'layout' => 'end_fieldset',
@@ -258,6 +275,21 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
 			}
 
+			if( $color = $this->get_setting( 'pict_title_color' ) )
+			{ // Custom title color:
+				$custom_css .= 'body.pictured .main_page_wrapper .widget_core_coll_title h1 a { color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'pict_text_color' ) )
+			{ // Custom text color:
+				$custom_css .= 'body.pictured { color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'pict_link_color' ) )
+			{ // Custom link color:
+				$custom_css .= 'body.pictured .main_page_wrapper a:not([class*=btn]) { color: '.$color." }\n";
+			}
+
 			if( $color = $this->get_setting( 'front_bg_color' ) )
 			{ // Custom body background color:
 				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
@@ -277,21 +309,16 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
 			}
 
-			if( $color = $this->get_setting( 'front_title_color' ) )
-			{ // Custom title color:
-				$custom_css .= 'body.pictured .widget_core_coll_title h1 a { color: '.$color." }\n";
-			}
-
 			if( $color = $this->get_setting( 'front_text_color' ) )
 			{ // Custom text color:
-				$custom_css .= 'body.pictured, body.pictured h1 small { color: '.$color." }\n";
+				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small { color: '.$color." }\n";
 			}
 
 			$link_color = $this->get_setting( 'front_link_color' );
 			$icon_color = $this->get_setting( 'front_icon_color' );
 			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured div.front_main_area a { color: '.$link_color." }\n";
+				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a { color: '.$link_color." }\n";
 			}
 			if( $link_color && $icon_color )
 			{ // Custom icon color:
