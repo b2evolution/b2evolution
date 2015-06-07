@@ -166,6 +166,13 @@ div.action_messages ul li:last-child div.alert {
   padding: 0;
   margin-top: 0;
 }
+div.delete_messages ul {
+  margin: 0 0 10px 25px;
+  list-style: disc;
+}
+div.delete_messages ul li {
+  list-style: inherit;
+}
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
@@ -1109,19 +1116,19 @@ div.level3 nav .nav > li > a {
   margin-left: 20px;
 }
 .skin_settings_form {
-  float: left;
-  margin-left: 15px;
+  float: none;
+  margin-left: 295px;
 }
 .skin_settings_form .col-sm-2 {
-  width: 30%;
+  width: 20%;
 }
 .skin_settings_form .col-sm-10 {
-  width: 70%;
+  width: 80%;
 }
 @media (max-width: 992px) {
   .skin_settings_form {
-    float: none;
-    width: 100%;
+    margin-left: 0;
+    clear: both;
   }
 }
 @media (max-width: 767px) {

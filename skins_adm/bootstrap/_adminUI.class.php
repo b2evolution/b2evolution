@@ -465,7 +465,7 @@ class AdminUI extends AdminUI_general
 				return array(
 					'layout'         => 'fieldset',
 					'formclass'      => 'form-horizontal',
-					'formstart'      => '<div class="panel panel-default">'."\n",
+					'formstart'      => '<div class="panel panel-default $formstart_class$">'."\n",
 					'formend'        => '</div></div>',
 					'title_fmt'      => '<div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body $class$">'."\n",
 					'no_title_fmt'   => '<div class="panel-body $class$"><span class="pull-right">$global_icons$</span><div class="clear"></div>'."\n",
