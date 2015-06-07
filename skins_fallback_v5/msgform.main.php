@@ -140,7 +140,7 @@ if( $allow_msgform == NULL )
 { // should be Prevented by UI
 	if( !empty( $recipient_User ) )
 	{
-		$Messages->add( T_( 'The user does not want to get contacted through the message form.' ), 'error' );
+		$Messages->add( sprintf( T_( 'The user "%s" does not want to be contacted through the message form.' ), $recipient_User->get( 'login' ) ), 'error' );
 	}
 	elseif( !empty( $Comment ) )
 	{
