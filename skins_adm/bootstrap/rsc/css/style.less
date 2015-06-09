@@ -348,6 +348,16 @@ div.bPost {
 		}
 	}
 }
+#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+	border: none;
+	margin: 0;
+	div.bComment {
+		margin: 0 0 1ex 0;
+		&:not([class*=meta]) {
+			border: none;
+		}
+	}
+}
 div.PostActionsArea, div.CommentActionsArea {
 	background-color: #F5F5F5;
 	border-top: 1px solid #CCC;
@@ -852,13 +862,18 @@ h2.user_title {
 	font-size: 14px;
 	font-weight: normal;
 	color: #999;
-	padding-bottom: 5px;
+	margin: 20px 0 10px;
+	display: flex;
+	display: -webkit-flex;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
 	.step {
-		margin-right: 25px;
+		margin: 0 10px 10px 10px;
 		display: inline-block;
 		div {
 			background-color: #CCC;
-			border: 1px solid #999;
 			color: #999;
 			display: inline-block;
 			font-size: 15px;
@@ -873,7 +888,7 @@ h2.user_title {
 		font-weight: bold;
 		color: #666;
 		div {
-			background-color: #666;
+			background-color: #337ab7;
 			color: #FFF;
 		}
 	}

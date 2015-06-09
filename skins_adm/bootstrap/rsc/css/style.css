@@ -329,6 +329,16 @@ div.bPost {
   border-top: 1px solid #f66;
   background-color: #faa;
 }
+#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+  border: none;
+  margin: 0;
+}
+#fieldset_wrapper_itemform_meta_cmnt #comments_container div.bComment {
+  margin: 0 0 1ex 0;
+}
+#fieldset_wrapper_itemform_meta_cmnt #comments_container div.bComment:not([class*=meta]) {
+  border: none;
+}
 div.PostActionsArea,
 div.CommentActionsArea {
   background-color: #F5F5F5;
@@ -844,15 +854,20 @@ h2.user_title {
   font-size: 14px;
   font-weight: normal;
   color: #999;
-  padding-bottom: 5px;
+  margin: 20px 0 10px;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-around;
+  -webkit-justify-content: space-around;
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
 }
 .tool_steps .step {
-  margin-right: 25px;
+  margin: 0 10px 10px 10px;
   display: inline-block;
 }
 .tool_steps .step div {
   background-color: #CCC;
-  border: 1px solid #999;
   color: #999;
   display: inline-block;
   font-size: 15px;
@@ -871,7 +886,7 @@ h2.user_title {
   color: #666;
 }
 .tool_steps .step.current div {
-  background-color: #666;
+  background-color: #337ab7;
   color: #FFF;
 }
 .page_size_selector select {
@@ -1241,13 +1256,6 @@ form#thread_checkchanges ul.token-input-list-facebook {
 .user_report_form .panel .panel-body .form-group {
   margin-bottom: 0;
 }
-<<<<<<< .working
-.column_icon {
-  width: 24px;
-  display: inline-block;
-  text-align: center;
-}
-=======
 .btn-file {
   position: relative;
   overflow: hidden;
@@ -1265,4 +1273,8 @@ form#thread_checkchanges ul.token-input-list-facebook {
   cursor: inherit;
   display: block;
 }
->>>>>>> .merge-right.r9291
+.column_icon {
+  width: 24px;
+  display: inline-block;
+  text-align: center;
+}
