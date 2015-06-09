@@ -241,7 +241,7 @@ if( $params['register_form_footer'] )
 { // Display register form footer
 	echo '<div class="evo_login_dialog_standard_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
 
-	echo '<div class="evo_login_dialog_footer">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 
 echo $params['register_page_after'];

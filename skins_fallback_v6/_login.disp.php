@@ -106,7 +106,7 @@ if( $params['login_form_footer'] )
 { // Display login form footer
 	echo '<div class="evo_login_dialog_standard_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
-	echo '<div class="evo_login_dialog_footer">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 
 echo $params['login_page_after'];
