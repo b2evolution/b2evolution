@@ -516,6 +516,7 @@ function display_charts( $chart_data )
 		return;
 	}
 
+	echo '<div class="charts">';
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
@@ -536,6 +537,7 @@ function display_charts( $chart_data )
 				<div class="label">'.$chart_item['title'].'</div>
 			</div>';
 	}
+	echo '</div>';
 
 	echo '<div class="clear"></div>';
 }
@@ -597,36 +599,5 @@ function get_color_by_percent( $color_from, $color_middle, $color_to, $percent )
 	}
 
 	return $new_color;
-}
-
-
-/**
- * Limit number by min and max values
- *
- * @param integer Number
- * @param integer|NULL Minimum value or NULL to don't limit
- * @param integer|NULL Maximum value or NULL to don't limit
- */
-function limit_number_by_interval( $number, $min = NULL, $max = NULL )
-{
-	$number = intval( $number );
-
-	if( is_null( $min ) && is_null( $max ) )
-	{ // Nothing to limit
-		return $number;
-	}
-
-	if( ! is_null( $min ) && $number < $min )
-	{ // Limit by min
-		return $min;
-	}
-
-	if( ! is_null( $max ) && $number > $max )
-	{ // Limit by max
-		return $max;
-	}
-
-	// Original value
-	return $number;
 }
 ?>
