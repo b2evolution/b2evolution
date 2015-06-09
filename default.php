@@ -27,6 +27,15 @@ require_once $inc_path.'_main.inc.php';
 
 load_funcs('skins/_skin.funcs.php');
 
+// Set bootstrap css classes for messages
+$Messages->set_params( array(
+		'class_outerdiv' => 'action_messages container-fluid',
+		'class_success'  => 'alert alert-dismissible alert-success fade in',
+		'class_warning'  => 'alert alert-dismissible alert-warning fade in',
+		'class_error'    => 'alert alert-dismissible alert-danger fade in',
+		'class_note'     => 'alert alert-dismissible alert-info fade in',
+		'before_message' => '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>',
+	) );
 
 // --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 // Note: This is totally optional. General caching must be enabled in Global settings, otherwise this will do nothing.
@@ -103,10 +112,8 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 			{ // There is no blog on this system!
 				echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any content collection on this system yet.').'</strong></p>';
 
-				if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-				{ // Display this link only for users who can create blog
-					echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Create a first collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
-				}
+				// Display this link to create blog
+				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new&amp;redirect_to='.rawurlencode( regenerate_url() ).'">'.T_( 'Create a first collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			}
 			else
 			{
