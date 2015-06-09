@@ -2536,6 +2536,11 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="bSmallHead">';
 		echo '<div>';
 
+		if( $Comment->is_meta() )
+		{ // Display ID for each meta comment
+			echo '<span class="badge badge-info">'.$Comment->ID.'</span> ';
+		}
+
 		echo '<div class="bSmallHeadRight">';
 		$Comment->permanent_link( array(
 				'before' => '',
