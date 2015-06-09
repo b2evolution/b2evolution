@@ -246,7 +246,7 @@ function install_newdb()
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
-	echo '<div class="modal fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
+	echo '<div class="modal modal-success fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
