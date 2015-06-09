@@ -1135,7 +1135,7 @@ div.level3 nav .nav>li>a {
 .skin_settings {
 	float: left;
 	width: 280px;
-	margin-right: 20px;
+	margin-right: 15px;
 	.skin_setting_row {
 		margin-bottom: 15px;
 		> label {
@@ -1157,7 +1157,6 @@ div.level3 nav .nav>li>a {
 	}
 }
 .skin_settings_form {
-	float: none;
 	margin-left: 295px;
 	.col-sm-2 {
 		width: 20%;
@@ -1288,4 +1287,30 @@ form#thread_checkchanges ul.token-input-list-facebook {
 			}
 		}
 	}
+}
+
+// Style for file browse inputs
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	cursor: inherit;
+	display: block;
+}
+
+// Style for action icons in table columns
+.column_icon {
+	width: 24px;
+	display: inline-block;
+	text-align: center;
 }
