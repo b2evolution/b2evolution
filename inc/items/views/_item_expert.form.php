@@ -432,6 +432,42 @@ $Form->begin_form( '', '', $params );
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
+	// ####################### META COMMENTS #########################
+	$currentpage = param( 'currentpage', 'integer', 1 );
+	$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+	param( 'comments_number', 'integer', $total_comments_number );
+
+	$Form->begin_fieldset( T_('Meta comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ), array( 'id' => 'itemform_meta_cmnt', 'fold' => true ) );
+
+	global $CommentList;
+	$CommentList = new CommentList2( $Blog );
+
+	// Filter list:
+	$CommentList->set_filters( array(
+		'types' => array( 'meta' ),
+		'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+		'order' => 'ASC',
+		'post_ID' => $edited_Item->ID,
+		'comments' => 20,
+		'page' => $currentpage,
+		'expiry_statuses' => array( 'active' ),
+	) );
+	$CommentList->query();
+
+	// comments_container value shows, current Item ID
+	echo '<div id="styled_content_block">';
+	echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
+	// display comments
+	$CommentList->display_if_empty( array(
+			'before'    => '<div class="bComment"><p>',
+			'after'     => '</p></div>',
+			'msg_empty' => T_('No feedback for this post yet...'),
+		) );
+	require $inc_path.'comments/views/_comment_list.inc.php';
+	echo '</div>'; // comments_container div
+	echo '</div>';
+
+	$Form->end_fieldset();
 	?>
 
 </div>
