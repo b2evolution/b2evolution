@@ -1144,7 +1144,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 128, 32 ),
 			'fa' => 'file-code-o',
-			'color' => '#000'
+			'color' => '#F90'
 		);
 		case 'page_cache_off': return array(
 			'alt'  => '',
