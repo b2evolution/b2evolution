@@ -1086,14 +1086,14 @@ class _core_Module extends Module
 						{ // To hide the debug containers
 							$entries['blog']['entries']['containers'] = array(
 								'text' => T_('Hide containers'),
-								'href' => url_add_param( $ReqURI, 'display_containers=hide' ),
+								'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=hide' ),
 							);
 						}
 						else
 						{ // To show the debug containers
 							$entries['blog']['entries']['containers'] = array(
 								'text' => T_('Show containers'),
-								'href' => url_add_param( $ReqURI, 'display_containers=show' ),
+								'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=show' ),
 							);
 						}
 					}
@@ -1235,14 +1235,14 @@ class _core_Module extends Module
 				{ // To hide the debug containers
 					$dev_entries['containers'] = array(
 						'text' => T_('Hide containers'),
-						'href' => url_add_param( $ReqURI, 'display_containers=hide' ),
+						'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=hide' ),
 					);
 				}
 				else
 				{ // To show the debug containers
 					$dev_entries['containers'] = array(
 						'text' => T_('Show containers'),
-						'href' => url_add_param( $ReqURI, 'display_containers=show' ),
+						'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=show' ),
 					);
 				}
 
@@ -1250,14 +1250,14 @@ class _core_Module extends Module
 				{ // To hide the debug includes
 					$dev_entries['includes'] = array(
 						'text' => T_('Hide includes'),
-						'href' => url_add_param( $ReqURI, 'display_includes=hide' ),
+						'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_includes=hide' ),
 					);
 				}
 				else
 				{ // To show the debug includes
 					$dev_entries['includes'] = array(
 						'text' => T_('Show includes'),
-						'href' => url_add_param( $ReqURI, 'display_includes=show' ),
+						'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_includes=show' ),
 					);
 				}
 			}
