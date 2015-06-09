@@ -2342,7 +2342,7 @@ function display_login_form( $params )
  */
 function display_login_js_handler( $params )
 {
-	global $Blog, $dummy_fields;
+	global $Blog, $dummy_fields, $Session;
 
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
