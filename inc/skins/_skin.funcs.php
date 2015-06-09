@@ -1853,9 +1853,9 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		echo '</div>';
 
 		echo '</div>';
-		echo '<div class="floatleft skin_settings_form">';
+		echo '<div class="skin_settings_form">';
 
-		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) );
+		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array( 'for_editing' => true ) );
 
 		if( empty( $skin_params ) )
 		{ // Advertise this feature!!
@@ -1864,6 +1864,28 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		else
 		{
 			load_funcs( 'plugins/_plugin.funcs.php' );
+
+			// Check if skin settings contain at least one fieldset
+			$skin_fieldsets_exist = false;
+			foreach( $skin_params as $l_name => $l_meta )
+			{
+				if( isset( $l_meta['layout'] ) && $l_meta['layout'] == 'begin_fieldset' )
+				{
+					$skin_fieldsets_exist = true;
+					break;
+				}
+			}
+
+			if( ! $skin_fieldsets_exist )
+			{ // Enclose all skin settings in single group if no group on the skin
+				array_unshift( $skin_params, array(
+						'layout' => 'begin_fieldset',
+						'label'  => T_('Skin settings')
+					) );
+				array_push( $skin_params, array(
+						'layout' => 'end_fieldset'
+					) );
+			}
 
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
