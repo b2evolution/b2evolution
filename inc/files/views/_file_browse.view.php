@@ -392,7 +392,10 @@ if( isset( $edited_User ) )
 						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 						$Form->hiddens_by_key( get_memorized('ctrl') );
 						echo '<div>';
-						echo '<input name="uploadfile[]" type="file" size="10" />';
+						echo '<span class="btn btn-default btn-file">';
+						echo T_('Choose File').'<input name="uploadfile[]" type="file" size="10" />';
+						echo '</span> ';
+						echo '<span>'.T_('no file selected').'</span> &nbsp; ';
 						echo '<input class="ActionButton btn btn-default" type="submit" value="&gt; '.T_('Quick upload!').'" />';
 						echo '</div>';
 					$Form->end_form();

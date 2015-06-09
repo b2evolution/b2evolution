@@ -370,8 +370,14 @@ if( $upload )
 
 			if( isset( $LinkOwner ) )
 			{ // Link the uploaded file to the object only if it is found in DB
-				$new_link_ID = $newFile->link_to_Object( $LinkOwner );
-				$current_File = $newFile;
+				$LinkCache = & get_LinkCache();
+				do
+				{
+					$new_link_ID = $newFile->link_to_Object( $LinkOwner );
+					// Check if Link has been created really
+					$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
+				}
+				while( empty( $new_Link ) );
 			}
 		}
 
@@ -433,15 +439,13 @@ if( $upload )
 		$message['warning'] = $warning;
 		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
 
-		if( ! empty( $new_link_ID ) )
+		if( ! empty( $new_Link ) )
 		{ // Send also the link data if it was created
-			$message['link_ID'] = $new_link_ID;
+			$message['link_ID'] = $new_Link->ID;
 			$message['link_url'] = $newFile->get_view_link();
-			$message['link_actions'] = link_actions( $new_link_ID, 'last', $link_owner_type );
-			$LinkCache = & get_LinkCache();
-			$new_Link = & $LinkCache->get_by_ID( $new_link_ID );
+			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
 			$mask_row = (object) array(
-					'link_ID'       => $new_link_ID,
+					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,
 					'link_position' => $new_Link->get( 'position' ),
 				);
