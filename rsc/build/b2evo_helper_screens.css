@@ -126,3 +126,10 @@ span.flag {
 .evo_form__install .evo_form__install_buttons .btn + .btn {
   margin-left: 1em;
 }
+.modal.modal-success .modal-header {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-bottom: 1px solid #d6e9c6;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}

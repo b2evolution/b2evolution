@@ -1,7 +1,7 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
- * @version $Id: backoffice.js 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: backoffice.js 9342 2015-06-08 12:20:29Z yura $
  */
 
 jQuery( document ).ready( function()
@@ -10,6 +10,14 @@ jQuery( document ).ready( function()
 	{ // Highlight each element that requires this
 		evoFadeBg( this, new Array( '#FFFF33' ), { speed: 3000 } );
 	} );
+} );
+
+
+// Event for styled button to browse files
+jQuery( document ).on( 'change', '.btn-file :file', function()
+{
+	var label = jQuery( this ).val().replace( /\\/g, '/' ).replace( /.*\//, '' );
+	jQuery( this ).parent().next().html( label );
 } );
 
 
