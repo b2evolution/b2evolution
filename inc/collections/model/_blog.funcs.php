@@ -1658,6 +1658,8 @@ function blog_row_caching( $Blog )
 	}
 
 	$r = '';
+	$before = '<span class="column_icon">';
+	$after = '</span>';
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{ // User has a permission to edit blog settings
@@ -1667,13 +1669,13 @@ function blog_row_caching( $Blog )
 			.'&amp;setting=%s'
 			.'&amp;blog='.$Blog->ID
 			.'&amp;'.url_crumb( 'collection' );
-		$r .= action_icon( $page_cache_title, $page_cache_icon, sprintf( $toggle_url, $page_cache_action, 'page_cache' ) ).' &nbsp; ';
-		$r .= action_icon( $block_cache_title, $block_cache_icon, sprintf( $toggle_url, $block_cache_action, 'block_cache' )  );
+		$r .= $before.action_icon( $page_cache_title, $page_cache_icon, sprintf( $toggle_url, $page_cache_action, 'page_cache' ) ).$after;
+		$r .= $before.action_icon( $block_cache_title, $block_cache_icon, sprintf( $toggle_url, $block_cache_action, 'block_cache' ) ).$after;
 	}
 	else
 	{ // No permissions to edit
-		$r .= get_icon( $page_cache_icon, 'imgtag', array( 'title' => $page_cache_title ) ).' &nbsp; ';
-		$r .= get_icon( $block_cache_icon, 'imgtag', array( 'title' => $block_cache_title ) );
+		$r .= $before.get_icon( $page_cache_icon, 'imgtag', array( 'title' => $page_cache_title ) ).$after;
+		$r .= $before.get_icon( $block_cache_icon, 'imgtag', array( 'title' => $block_cache_title ) ).$after;
 	}
 
 	return $r;

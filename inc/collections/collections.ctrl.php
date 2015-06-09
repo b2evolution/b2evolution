@@ -48,7 +48,12 @@ switch( $action )
 	case 'new':
 		// New collection: Select blog type
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		if( ! $current_User->check_perm( 'blogs', 'create' ) )
+		{
+			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
