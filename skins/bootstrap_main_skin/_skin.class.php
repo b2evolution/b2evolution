@@ -90,8 +90,8 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
-					'pict_note_color' => array(
-						'label' => T_('Note color'),
+					'pict_muted_color' => array(
+						'label' => T_('Muted text color'),
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
@@ -288,6 +288,11 @@ class bootstrap_main_Skin extends Skin
 			if( $color = $this->get_setting( 'pict_link_color' ) )
 			{ // Custom link color:
 				$custom_css .= 'body.pictured .main_page_wrapper a:not([class*=btn]) { color: '.$color." }\n";
+			}
+
+			if( $color = $this->get_setting( 'pict_muted_color' ) )
+			{ // Custom muted text color:
+				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'front_bg_color' ) )
