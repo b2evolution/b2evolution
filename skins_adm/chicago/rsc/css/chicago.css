@@ -1146,6 +1146,16 @@ div.skinshot_noshot {
 	margin: 20px 0 10px;
 }
 
+/* Skin settings */
+.skin_settings_form {
+	margin-left: 280px;
+}
+.fform .skin_settings_form fieldset.fieldset {
+	width: auto;
+	border: 1px solid #9db0bc;
+	padding: 1ex;
+	margin: 0;
+}
 
 /*
  * System checks
@@ -1211,4 +1221,27 @@ div#ffield_item_tags ul.token-input-list-facebook {
 span.note.status_draft span {
 	color: #fff;
 	background-color: #FFCC33;
+}
+
+/* Style for file browse inputs */
+.btn-file {
+	position: relative;
+	overflow: hidden;
+	background: #FFF;
+	padding: 0 5px;
+	border: 1px solid #AAA;
+	border-radius: 4px;
+}
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	cursor: inherit;
+	display: block;
 }
