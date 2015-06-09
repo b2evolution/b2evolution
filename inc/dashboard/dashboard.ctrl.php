@@ -526,27 +526,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 					'type'  => 'number',
 				);
 		}
-		// Web posts
-		$chart_data[] = array(
-				'title' => T_('Web posts'),
-				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_admin' ), 0, $post_all_counter ),
-				'100%'  => $post_all_counter,
-				'type'  => 'percent',
-			);
-		// XMLRPC posts
-		$chart_data[] = array(
-				'title' => T_('XMLRPC posts'),
-				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_xmlrpc' ), 0, $post_all_counter ),
-				'100%'  => $post_all_counter,
-				'type'  => 'percent',
-			);
-		// Email posts
-		$chart_data[] = array(
-				'title' => T_('Email posts'),
-				'value' => limit_number_by_interval( $global_Cache->get( 'post_through_email' ), 0, $post_all_counter ),
-				'100%'  => $post_all_counter,
-				'type'  => 'percent',
-			);
 		if( empty( $blog ) )
 		{
 			// Slugs
@@ -673,9 +652,6 @@ jQuery( 'document' ).ready( function()
 		animate: 700
 	}
 	jQuery( '.chart .number' ).easyPieChart( chart_params );
-
-	chart_params['barColor'] = '#00F';
-	jQuery( '.chart .percent' ).easyPieChart( chart_params );
 } );
 
 function get_color_by_percent( color_from, color_middle, color_to, percent )
