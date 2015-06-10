@@ -307,6 +307,7 @@ div.bPost {
 
 #comments_container {
 	div.bComment {
+		overflow: hidden;
 		padding: 0;
 		margin: 1ex;
 		border: 1px solid #ddd;
@@ -862,7 +863,7 @@ h2.user_title {
 	font-size: 14px;
 	font-weight: normal;
 	color: #999;
-	margin: 20px 0 10px;
+	margin: 40px 0 30px;
 	display: flex;
 	display: -webkit-flex;
 	justify-content: space-around;
@@ -891,6 +892,10 @@ h2.user_title {
 			background-color: #337ab7;
 			color: #FFF;
 		}
+	}
+	.step.completed div {
+		background-color: #5cb85c;
+		color: #FFF;
 	}
 }
 
