@@ -1093,7 +1093,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	$cat_select_form_fields = $form_fields;
 	$ChapterCache = & get_ChapterCache();
 
-	$r .= '<table cellspacing="0" class="catselect table table-striped table-bordered table-hover table-condensed">';
+	$r .= '<table cellspacing="0" class="catselect table table-striped table-hover table-condensed">';
 	if( get_post_cat_setting($blog) == 3 )
 	{ // Main + Extra cats option is set, display header
 		$r .= cat_select_header( $params );
@@ -1129,7 +1129,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
 				continue;
 
-			$r .= '<tr class="group" id="catselect_blog'.$l_Blog->ID.'"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
 
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
@@ -1159,13 +1159,14 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	echo $r;
 
+	$Form->end_fieldset();
+
 	if( isset($blog) && get_allow_cross_posting() )
 	{
 		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
 			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
 		});</script>';
 	}
-	$Form->end_fieldset();
 }
 
 /**
@@ -1764,47 +1765,93 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	global $Blog, $current_User;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
-	// ---------- PREVIEW ----------
-	if( !$inskin || $display_preview )
-	{
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
-
-	// ---------- SAVE ----------
-	$next_action = ($creating ? 'create' : 'update');
-	if( !$inskin )
-	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
-	}
-
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
 	if( ! isset( $edited_Item->status ) )
 	{
 		$edited_Item->status = $highest_publish_status;
 	}
 
-	// Display a save button with title depending on post status
-	$button_titles = get_visibility_statuses( 'button-titles' );
-	$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
+	// ---------- VISIBILITY ----------
+	if( ! $inskin )
+	{ // Only for back-office
+		global $AdminUI;
 
-	if( $edited_Item->status != $highest_publish_status )
-	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$publish_style = 'display: inline';
+		echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
+		$status_options = get_visibility_statuses();
+
+		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+		{ // Use dropdown for bootstrap skin
+			$Form->hidden( 'post_status', $edited_Item->status );
+			echo '<div class="btn-group post_status_dropdown">';
+			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'.$status_options[ $edited_Item->status ].' <span class="caret"></span></button>';
+			echo '<ul class="dropdown-menu" role="menu">';
+			foreach( $status_options as $status_key => $status_title )
+			{
+				echo '<li class="btn-status-'.$status_key.'">'.$status_title.'</li>';
+			}
+			echo '</ul>';
+			echo '</div>';
+		}
+		else
+		{ // Use standard select element for other skins
+			echo '<select name="post_status">';
+			foreach( $status_options as $status_key => $status_title )
+			{
+				echo '<option value="'.$status_key.'"'
+							.( $edited_Item->status == $status_key ? ' selected="selected"' : '' )
+							.' class="btn-status-'.$status_key.'">'
+						.$status_title
+					.'</option>';
+			}
+			echo '</select>';
+		}
+	}
+
+	// ---------- PREVIEW ----------
+	if( ! $inskin || $display_preview )
+	{
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+	}
+
+	echo '<span class="btn-group">';
+
+	// ---------- SAVE ----------
+	$next_action = ($creating ? 'create' : 'update');
+	if( ! $inskin )
+	{ // Show Save & Edit only on admin mode
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
+	}
+
+	if( $inskin )
+	{ // Front-office: display a save button with title depending on post status
+		$button_titles = get_visibility_statuses( 'button-titles' );
+		$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
 	}
 	else
-	{
-		$publish_style = 'display: none';
+	{ // Use static button title on back-office
+		$button_title = T_('Save');
 	}
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
+
+	echo '</span>';
+
 	$Form->hidden( 'publish_status', $highest_publish_status );
-	$Form->submit( array(
-		'actionArray['.$next_action.'_publish]',
-		/* TRANS: This is the value of an input submit button */ $publish_text,
-		'SaveButton btn-status-published',
-		'',
-		$publish_style
-	) );
+
+	if( $inskin )
+	{ // Display this button only on front-office
+
+		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
+		$publish_style = ( $edited_Item->status == $highest_publish_status ) ? 'display: none' : 'display: inline';
+
+		$Form->submit( array(
+			'actionArray['.$next_action.'_publish]',
+			/* TRANS: This is the value of an input submit button */ $publish_text,
+			'SaveButton btn-status-published',
+			'',
+			$publish_style
+		) );
+	}
 }
 
 
@@ -1847,9 +1894,9 @@ function echo_publishnowbutton_js()
 
 	?>
 	<script type="text/javascript">
-		var item_save_btn_titles = {<?php echo $button_titles_js_array ?>};
-		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
+		function update_post_status_buttons( status, update_title )
 		{
+			var item_save_btn_titles = {<?php echo $button_titles_js_array ?>};
 			var publishnow_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>_publish]"]' );
 			var public_status = '<?php echo $highest_publish_status; ?>';
 
@@ -1863,11 +1910,33 @@ function echo_publishnowbutton_js()
 			}
 
 			// Change title of the save buttons
-			var status = jQuery( this ).val();
 			var save_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>]"]' );
-			save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
-			save_btn = save_btn.add( '.edit_actions input[name="actionArray[update_edit]"]' );
-			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + this.value ) );
+			if( update_title )
+			{
+				save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
+			}
+			save_btn = save_btn.add( '.edit_actions input[name="actionArray[update_edit]"]' )
+				.add( '.edit_actions input[name="actionArray[create_edit]"]' );
+			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+		}
+		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
+		{
+			update_post_status_buttons( jQuery( this ).val(), true );
+		} );
+
+		jQuery( 'select[name=post_status]' ).change( function()
+		{
+			update_post_status_buttons( jQuery( this ).val(), false );
+		} );
+
+		jQuery( '.post_status_dropdown li' ).click( function()
+		{
+			var status = jQuery( this ).attr( 'class' ).replace( 'btn-status-', '' );
+			update_post_status_buttons( status, false );
+			var button = jQuery( this ).parent().prev();
+			button.html( jQuery( this ).html() + ' <span class="caret"></span></button>' )
+				.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+			jQuery( 'input[type=hidden][name=post_status]' ).val( status );
 		} );
 	</script>
 	<?php
@@ -3119,42 +3188,6 @@ function delete_session_Item( $item_ID )
 
 	$Session->delete( 'edited_items' );
 	$Session->set( 'edited_items', $edited_items );
-}
-
-
-/**
- * Log a creating of new item (Increase counter in global cache)
- *
- * @param string Source of item creation ( 'through_admin', 'through_xmlrpc', 'through_email' )
- */
-function log_new_item_create( $created_through )
-{
-	/**
-	 * @var AbstractSettings
-	 */
-	global $global_Cache;
-
-	if( empty( $global_Cache ) )
-	{	// Init global cache if it is not defined (for example, during on install process)
-		$global_Cache = new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 0 /* load all */ );
-	}
-
-	if( !in_array( $created_through, array( 'through_admin', 'through_xmlrpc', 'through_email' ) ) )
-	{	// Set default value if source is wrong
-		$created_through = 'through_admin';
-	}
-
-	// Set variable name for current post counter
-	$cache_var_name = 'post_'.$created_through;
-
-	// Get previuos counter value
-	$counter = (int) $global_Cache->get( $cache_var_name );
-
-	// Increase counter
-	$global_Cache->set( $cache_var_name, $counter + 1 );
-
-	// Update the changed data in global cache
-	$global_Cache->dbupdate();
 }
 
 

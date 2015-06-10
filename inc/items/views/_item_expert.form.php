@@ -553,17 +553,6 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 
-	// ################### VISIBILITY / SHARING ###################
-
-	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility', 'fold' => true ) );
-
-	$Form->switch_layout( 'linespan' );
-	visibility_select( $Form, $edited_Item->status );
-	$Form->switch_layout( NULL );
-
-	$Form->end_fieldset();
-
-
 	// ################### TEXT RENDERERS ###################
 
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers', 'fold' => true ) );
