@@ -297,7 +297,7 @@ if( $upload )
 	$newName = $file->getName();
 	$oldName = $newName;
 	// validate file name
-	if( $error_filename = process_filename( $newName, false, true, $fm_FileRoot, $path ) )
+	if( $error_filename = process_filename( $newName, true, true, $fm_FileRoot, $path ) )
 	{ // Not a file name or not an allowed extension
 		$message['text'] = $error_filename;
 		$message['status'] = 'error';
@@ -307,7 +307,7 @@ if( $upload )
 	}
 
 	// Process a name of old name
-	process_filename( $oldName );
+	process_filename( $oldName, true );
 
 	list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
 	$newName = $newFile->get( 'name' );
@@ -378,6 +378,7 @@ if( $upload )
 					$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
 				}
 				while( empty( $new_Link ) );
+				$current_File = $newFile; // $current_File is used in the function link_actions() as global var
 			}
 		}
 
