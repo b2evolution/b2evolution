@@ -1446,8 +1446,8 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 		$edited_Item->set( 'comment_status', $params['comment_status'] );
 	}
 
-	$edited_Item->dbinsert( 'through_xmlrpc' );
-	if( empty($edited_Item->ID) )
+	$edited_Item->dbinsert();
+	if( empty( $edited_Item->ID ) )
 	{
 		return xmlrpcs_resperror( 99, 'Error while inserting item: '.$DB->last_error );
 	}

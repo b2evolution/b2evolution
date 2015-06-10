@@ -490,7 +490,7 @@ function pbm_process_messages( & $mbox, $limit )
 			$edited_Item->set( 'renderers', $renderers );
 
 			// INSERT INTO DB:
-			$edited_Item->dbinsert( 'through_email' );
+			$edited_Item->dbinsert();
 
 			pbm_msg( sprintf('Item created?: '.(isset($edited_Item->ID) ? 'yes' : 'no') ) );
 

@@ -4955,10 +4955,9 @@ class Item extends ItemLight
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
-	 * @param string Source of item creation ( 'through_admin', 'through_xmlrpc', 'through_email' )
 	 * @return boolean true on success
 	 */
-	function dbinsert( $created_through = 'through_admin' )
+	function dbinsert()
 	{
 		global $DB, $current_User, $Plugins;
 
@@ -5057,12 +5056,8 @@ class Item extends ItemLight
 		}
 
 		if( ! $result )
-		{	// Rollback current transaction
+		{ // Rollback current transaction
 			$DB->rollback();
-		}
-		else
-		{	// Log a creating of new item on success result
-			log_new_item_create( $created_through );
 		}
 
 		return $result;
