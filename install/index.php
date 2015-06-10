@@ -675,10 +675,9 @@ switch( $action )
 	case 'menu-install':
 		/*
 		 * -----------------------------------------------------------------------------------
-		 * Menu Install (STEP 2)
+		 * b2evolution is already installed (STEP 2)
 		 * -----------------------------------------------------------------------------------
 		 */
-		track_step( 'installer-menu' );
 		?>
 
 		<form action="index.php" method="get" class="evo_form__install">
@@ -724,7 +723,7 @@ switch( $action )
 		 * Menu Install Options (STEP 3)
 		 * -----------------------------------------------------------------------------------
 		 */
-		track_step( 'installer-menu' );
+		track_step( 'installer-options' );
 		?>
 
 		<form action="index.php" method="get" class="evo_form__install">
@@ -1001,10 +1000,16 @@ switch( $action )
 			// Update the progress bar status
 			update_install_progress_bar();
 
+			$upgrade_result_title = T_('Upgrade completed successfully!');
+			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
+
 			?>
-			<p class="text-success"><?php echo T_('Upgrade completed successfully!')?></p>
-			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' )?></p>
+			<p class="text-success"><?php echo $upgrade_result_title; ?></p>
+			<p><?php echo $upgrade_result_body; ?></p>
 			<?php
+
+			// Display modal window with upgrade data and instructions
+			display_install_result_window( $upgrade_result_title, $upgrade_result_body );
 		}
 		else
 		{

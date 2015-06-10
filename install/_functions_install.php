@@ -246,26 +246,7 @@ function install_newdb()
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
-	echo '<div class="modal modal-success fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="evo_modal__label_install">'.$install_result_title.'</h4>
-				</div>
-				<div class="modal-body">'.$install_result_body.'</div>
-				<div class="modal-footer" style="text-align:center">
-					<a href="'.$baseurl.'" class="btn btn-primary">'.T_('Go to Front-office').'</a>
-					<a href="'.$admin_url.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
-				</div>
-			</div>
-		</div>
-	</div>';
-
-	// JavaScript to open modal window with installation data and instructions
-	echo '<script type="text/javascript">'
-		.'jQuery( "#evo_modal__install" ).modal();'
-	.'</script>';
+	display_install_result_window( $install_result_title, $install_result_body );
 }
 
 
@@ -1484,5 +1465,39 @@ function check_local_installation()
 				$_SERVER['SERVER_NAME'] == '::1' )
 			)
 		);
+}
+
+
+/**
+ * Display modal window after install process with some data
+ *
+ * @param string Title
+ * @param string Body
+ */
+function display_install_result_window( $title, $body )
+{
+	global $baseurl, $admin_url;
+
+	// Modal window with info
+	echo '<div class="modal modal-success fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="evo_modal__label_install">'.$title.'</h4>
+				</div>
+				<div class="modal-body">'.$body.'</div>
+				<div class="modal-footer" style="text-align:center">
+					<a href="'.$baseurl.'" class="btn btn-primary">'.T_('Go to Front-office').'</a>
+					<a href="'.$admin_url.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
+				</div>
+			</div>
+		</div>
+	</div>';
+
+	// JavaScript to open modal window with info
+	echo '<script type="text/javascript">'
+		.'jQuery( "#evo_modal__install" ).modal();'
+	.'</script>';
 }
 ?>
