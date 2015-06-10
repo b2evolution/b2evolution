@@ -153,6 +153,22 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		$params = array_merge( array(
+				'featured_intro_before' => '',
+				'featured_intro_after'  => '',
+			), $params );
+
+		parent::init_display( $params );
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -160,11 +176,6 @@ class coll_featured_intro_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $Item;
-
-		$params = array_merge( array(
-				'featured_intro_before' => '',
-				'featured_intro_after'  => '',
-			), $params );
 
 		$this->init_display( $params );
 
