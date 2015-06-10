@@ -1472,12 +1472,8 @@ class Comment extends DataObject
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
 			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
 			if( ! $button )
-			{
-				$text = get_icon( 'recycle' ).' '.$text;
-			}
-			else
-			{
-				$text = $text;
+			{ // Append icon before text
+				$text = ( $this->status == 'trash' || $this->is_meta() ? get_icon( 'delete' ) : get_icon( 'recycle' ) ).' '.$text;
 			}
 		}
 		if( $title == '#' )

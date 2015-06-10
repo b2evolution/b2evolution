@@ -327,12 +327,23 @@ function system_check_caches( $repair = true )
  */
 function system_init_caches( $verbose = false )
 {
-	global $cache_path, $Settings, $DB;
+	global $cache_path, $Settings, $Plugins, $DB;
 
 	// create /_cache and /_cache/plugins/ folders
 	if( !system_create_cache_folder( $verbose ) )
 	{ // The error message were displayed
 		return false;
+	}
+
+	if( ! is_object( $Settings ) )
+	{ // create Settings object
+		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+		$Settings = new GeneralSettings();
+	}
+	if( ! is_object( $Plugins ) )
+	{ // create Plugins object
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
 	}
 
 	$Settings->set( 'newblog_cache_enabled', true );
