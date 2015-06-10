@@ -1574,6 +1574,10 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 }
 
+if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
+{ // Set manual link for edit expert mode
+	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
