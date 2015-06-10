@@ -761,29 +761,38 @@ if( !empty( $skin ) )
 					// All others will default to index.main.php
 				);
 
-			if( !empty($disp_handlers[$disp]) )
+			if( ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+			{ // Get template name for the current Item if it is defined by Item Type
+				$item_type_template_name = $ItemType->get( 'template_name' );
+			}
+
+			if( ! empty( $item_type_template_name ) && file_exists( $disp_handler = $ads_current_skin_path.$item_type_template_name.'.main.php' ) )
+			{ // The item type has a specific template for this display:
+				$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this skin and item type)', 'skins' );
+			}
+			elseif( ! empty( $disp_handlers[ $disp ] ) )
 			{
-				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
-				{	// The skin has a customized page handler for this display:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skins' );
+				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
+				{ // The skin has a customized page handler for this display:
+					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this skin)', 'skins' );
 				}
-				elseif( $disp_handler = skin_fallback_path( $disp_handlers[$disp] ) )
-				{	// Skins have a general page handler for this display:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (for CSS include -- added in v 4.1)', 'skins' );
+				elseif( $disp_handler = skin_fallback_path( $disp_handlers[ $disp ] ) )
+				{ // Skins have a general page handler for this display:
+					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (for CSS include -- added in v 4.1)', 'skins' );
 				}
 				else
-				{	// Use the default handler from the skins dir:
+				{ // Use the default handler from the skins dir:
 					$disp_handler = $ads_current_skin_path.'index.main.php';
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default handler)', 'skins' );
+					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler)', 'skins' );
 				}
 			}
 			else
-			{	// Use the default handler from the skins dir:
+			{ // Use the default handler from the skins dir:
 				$disp_handler = $ads_current_skin_path.'index.main.php';
-				$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default index handler)', 'skins' );
+				$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default index handler)', 'skins' );
 			}
 
-			// CALL THE MAIN TEMPLTE NOW:
+			// CALL THE MAIN TEMPLATE NOW:
 			require $disp_handler;
 		}
 
