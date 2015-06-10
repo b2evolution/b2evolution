@@ -9,16 +9,25 @@
 	left: 0;
 }
 
-.chart{
-	float: left;
+.charts {
+	display: flex;
+	display: -webkit-flex;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+}
+.chart {
+	display: inline-block;
 	width: 75px;
 	text-align: center;
 	margin: 5px;
 }
-.chart .percent, .chart .number{
+.chart .number {
 	height: 75px;
 	line-height: 75px;
 }
-.chart .label{
+.chart .label {
 	font-size: 11px;
+	padding: 0;
 }
