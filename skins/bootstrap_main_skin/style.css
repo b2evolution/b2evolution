@@ -77,18 +77,18 @@ body.pictured .container.main_page_wrapper {
   height: 100%;
   min-height: 100%;
 }
-body.pictured .panel {
+body.pictured .container.main_page_wrapper .panel {
   color: #333;
 }
-body.pictured .panel a:not([class]) {
+body.pictured .container.main_page_wrapper .panel a:not([class]) {
   color: #337ab7;
   text-decoration: none;
 }
-body.pictured .panel a:not([class]):hover {
+body.pictured .container.main_page_wrapper .panel a:not([class]):hover {
   color: #23527c;
   text-decoration: underline;
 }
-body.pictured .panel input {
+body.pictured .container.main_page_wrapper .panel input {
   -webkit-font-smoothing: subpixel-antialiased;
 }
 #bg_picture {
