@@ -87,7 +87,7 @@ $force_io_charset_if_accepted = 'utf-8'; // Temporary solution to force here the
 /**
  * This variable is included here for documentation only.
  *
- * If not empty, this will issue a MySQL SET NAMES command.
+ * If not empty, this will issue a mysqli::set_charset() command.
  * This must be a MySQL charset. Example: 'latin1' or 'utf8'
  * fp> Actually, DB::set_connection_charset(x,true) can convert from 'iso-8859-1' to 'latin1' for example.
  *

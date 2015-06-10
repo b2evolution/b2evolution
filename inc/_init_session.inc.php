@@ -41,7 +41,7 @@ load_class( 'sessions/model/_session.class.php', 'Session' );
  * The Session object.
  * It has to be instantiated before the "SessionLoaded" hook.
  * @global Session
- * @todo dh> This needs the same "SET NAMES" MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
+ * @todo dh> This needs the same mysqli::set_charset MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
  * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to calls on the $Session object, e.g. below?
  *       fp> We might want to use a special session for CLI. And for cron jobs through http as well.
  */

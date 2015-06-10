@@ -172,8 +172,8 @@ class Session
  							session_unserialize_load_all_classes();
 						}
 						// TODO: dh> This can fail, if there are special chars in sess_data:
-						//       It will be encoded in $evo_charset _after_ "SET NAMES", but
-						//       get retrieved here, _before_ any "SET NAMES" (if $db_config['connection_charset'] is not set (default))!
+						//       It will be encoded in $evo_charset _after_ mysqli::set_charset but
+						//       get retrieved here, _before_ any mysqli::set_charset (if $db_config['connection_charset'] is not set (default))!
 						$this->_data = @unserialize($row->sess_data);
 
 						if( $old_callback !== false )
