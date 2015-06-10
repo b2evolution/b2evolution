@@ -6267,6 +6267,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY bloggroup_perm_edit ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
 		task_end();
 
+		// Init Caches:
+		task_begin( '(Re-)Initializing caches...' );
+		load_funcs('tools/model/_system.funcs.php');
+		if( system_init_caches( true ) )
+		{ // cache was initialized successfully
+			// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
+			system_check_caches();
+			// Display task end with 'OK' only in case of successfuly executed init caches process
+			task_end();
+		}
+		else
+		{ // Caches could not be initialized successfully, an error message was displayed inside the init function
+			echo "<br />\n";
+		}
+
 		/*
 		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
 		 *
@@ -6317,20 +6332,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$Plugins = new Plugins();
 		}
 
-		// Init Caches: (it should be possible to do this with each upgrade)
-		task_begin( '(Re-)Initializing caches...' );
-		load_funcs('tools/model/_system.funcs.php');
-		if( system_init_caches( true ) )
-		{ // cache was initialized successfully
-			// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
-			system_check_caches();
-			// Display task end with 'OK' only in case of successfuly executed init caches process
-			task_end();
-		}
-		else
-		{ // Caches could not be initialized successfully, an error message was displayed inside the init function
-			echo "<br />\n";
-		}
+		// fp> TODO: put cache repair code back here
 
 		// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
 		// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.
