@@ -44,11 +44,6 @@ if( is_admin_page() )
 	$Results->title .= get_manual_link( 'messaging' );
 }
 
-if( $unread_messages_count > 0 && !$perm_abuse_management )
-{
-	$Results->title = $Results->title.' <span class="badge badge-important">'.$unread_messages_count.'</span></b>';
-}
-
 /**
  * Callback to add filters on top of the result set
  *

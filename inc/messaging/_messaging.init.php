@@ -358,7 +358,7 @@ class messaging_Module extends Module
 			$unread_messages_count = get_unread_messages_count();
 			if( $unread_messages_count > 0 )
 			{
-				$right_entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge">'.$unread_messages_count.'</span></b>';
+				$right_entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge badge-important">'.$unread_messages_count.'</span></b>';
 			}
 		}
 
@@ -373,7 +373,7 @@ class messaging_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $dispatcher;
+		global $admin_url;
 		/**
 		 * @var User
 		 */
@@ -390,12 +390,24 @@ class messaging_Module extends Module
 		}
 
 		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Permission to view messaging:
+		{ // Permission to view messaging:
+
+			// Count unread messages for current user
+			$unread_messages_count = get_unread_messages_count();
+			if( $unread_messages_count > 0 )
+			{
+				$messages_counter = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
+			}
+			else
+			{
+				$messages_counter = '';
+			}
+
 			$AdminUI->add_menu_entries( NULL, array(
 						'messaging' => array(
-						'text' => T_('Messages'),
+						'text' => T_('Messages').$messages_counter,
 						'title' => T_('Messages'),
-						'href' => $dispatcher.'?ctrl=threads',
+						'href' => $admin_url.'?ctrl=threads',
 						'entries' => get_messaging_sub_entries( true )
 					),
 				), 'users' );
