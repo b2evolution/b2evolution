@@ -47,7 +47,7 @@ $Form->hidden( 'action', 'update_settings_blog' );
 
 $Form->begin_fieldset( T_('Caching').get_manual_link('collections-caching-settings') );
 
-	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
+	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), get_icon( 'page_cache_on' ).' '.T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
 
 	$cache_note = '('.T_( 'See Blog Settings for existing' ).')';
 	$Form->checklist( array(
