@@ -847,7 +847,9 @@ function get_tool_steps( $steps, $current_step )
 	$r = '<div class="tool_steps">';
 	foreach( $steps as $step_num => $step_title )
 	{
-		$r .= '<div class="step'.( $step_num == $current_step ? ' current' : '' ).'">'
+		$r .= '<div class="step'
+						.( $step_num == $current_step ? ' current' : '' )
+						.( $step_num < $current_step ? ' completed' : '' ).'">'
 					.'<div>'.$step_num
 						.( $step_num < $current_step ? '<span>&#10003;</span>' : '' )
 					.'</div>'
