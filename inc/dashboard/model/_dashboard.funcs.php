@@ -521,9 +521,9 @@ function display_charts( $chart_data )
 	{
 		if( $chart_item['type'] == 'number' )
 		{ // Calculate a percent with log10 where max value is 100000
-			$chart_percent = log10_percent( $chart_item['value'] );
+			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'] );
 			// Set a color for value, from green(0%) to red(100%)
-			$chart_color = get_color_by_percent( '#0F0', '#FC0', '#F00', $chart_percent );
+			$chart_color = get_color_by_percent( '#61bd4f', '#f2d600', '#ffab4a', $chart_percent );
 		}
 		else
 		{ // Calculate a real percent

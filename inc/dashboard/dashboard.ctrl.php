@@ -642,7 +642,7 @@ jQuery( 'document' ).ready( function()
 	var chart_params = {
 		barColor: function(percent)
 		{
-			return get_color_by_percent( {r:0, g:255, b:0}, {r:255, g:204, b:0}, {r:255, g:0, b:0}, percent );
+			return get_color_by_percent( {r:97, g:189, b:79}, {r:242, g:214, b:0}, {r:255, g:171, b:74}, percent );
 		},
 		size: 75,
 		trackColor: '#eee',
