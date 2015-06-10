@@ -1691,23 +1691,28 @@ form.inskin .edit_fieldgroup .label {
 form.inskin .edit_area textarea {
   width: 100%;
 }
+#itemform_categories .extracats {
+  max-height: 500px;
+  overflow: auto;
+}
 table.catselect {
   border-spacing: 0;
   width: 100%;
   border: 1px solid #bbb;
 }
-table.catselect th {
+table.catselect thead tr th {
   padding: .3ex 1ex;
-  background-color: #ddd;
+  background-color: #d4d4d4;
   border-bottom: 1px solid #bbb;
+  color: #333;
 }
 table.catselect td {
   padding: .2ex 1ex;
+  background: none;
 }
 table.catselect tr.group td {
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
-  background-color: #ccc;
   font-weight: bold;
 }
 table.catselect tr.odd,
@@ -1716,11 +1721,7 @@ table.catselect tr.odd input {
 }
 table.catselect tr.even,
 table.catselect tr.even input {
-  background-color: #ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-  background-color: #ccc;
+  background: none !important;
 }
 table.catselect th.selector,
 table.catselect td.selector {
@@ -1730,6 +1731,11 @@ table.catselect td.selector {
 }
 table.catselect #new_category_name {
   background-color: white;
+  width: 92% !important;
+}
+table.catselect tbody tr.group.catselect_blog__current td {
+  background: #31b0d5;
+  color: #FFF;
 }
 .raty_star_on,
 .raty_star_off,
@@ -2193,6 +2199,10 @@ a.btn.action_icon.hoverlink {
 .form-horizontal .control-label {
   padding-left: 0;
 }
+.form-horizontal .form-control-inline {
+  display: inline-block;
+  width: auto;
+}
 .form-horizontal .info_full {
   padding: 0 20px;
 }
@@ -2295,10 +2305,6 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #itemform_edit_timestamp > input[type=text] {
   display: inline-block;
   width: auto;
-}
-.form-horizontal #itemform_extra,
-.form-horizontal #itemform_edit_timestamp {
-  padding: 10px 0;
 }
 .form-horizontal #itemform_extra #itemform_edit_timestamp,
 .form-horizontal #itemform_edit_timestamp #itemform_edit_timestamp {
@@ -2511,19 +2517,6 @@ a:hover .glyphicon {
   bottom: 0;
   text-align: center;
 }
-table.catselect tr.even,
-table.catselect tr.even input {
-  background: none !important;
-}
-table.catselect th,
-table.catselect td {
-  border-left: none;
-  border-bottom: none;
-  background: none !important;
-}
-table.catselect input#new_category_name {
-  width: 92% !important;
-}
 #colorbox #cboxVoting label {
   display: inline;
   font-size: 10px !important;
@@ -2698,6 +2691,12 @@ div.message_toolbars {
   position: relative;
   top: -1px;
 }
+.evobar-menu .badge {
+  padding: 3px 7px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 #colorbox,
 #colorbox *,
 #colorbox *:before,
@@ -2738,6 +2737,9 @@ div.message_toolbars {
 .jumbotron {
   font-size: 21px;
   font-weight: 200;
+}
+.btn[class*=btn-status-] {
+  border: 1px solid #ccc;
 }
 .btn-status-draft {
   color: #000;
@@ -2806,6 +2808,9 @@ div.message_toolbars {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
+}
+.post_status_dropdown .dropdown-menu {
+  overflow: hidden;
 }
 .mce-container label.mce-label {
   max-width: none;

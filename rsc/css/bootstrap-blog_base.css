@@ -315,23 +315,28 @@ form.inskin .edit_fieldgroup .label {
 form.inskin .edit_area textarea {
   width: 100%;
 }
+#itemform_categories .extracats {
+  max-height: 500px;
+  overflow: auto;
+}
 table.catselect {
   border-spacing: 0;
   width: 100%;
   border: 1px solid #bbb;
 }
-table.catselect th {
+table.catselect thead tr th {
   padding: .3ex 1ex;
-  background-color: #ddd;
+  background-color: #d4d4d4;
   border-bottom: 1px solid #bbb;
+  color: #333;
 }
 table.catselect td {
   padding: .2ex 1ex;
+  background: none;
 }
 table.catselect tr.group td {
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
-  background-color: #ccc;
   font-weight: bold;
 }
 table.catselect tr.odd,
@@ -340,11 +345,7 @@ table.catselect tr.odd input {
 }
 table.catselect tr.even,
 table.catselect tr.even input {
-  background-color: #ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-  background-color: #ccc;
+  background: none !important;
 }
 table.catselect th.selector,
 table.catselect td.selector {
@@ -354,6 +355,11 @@ table.catselect td.selector {
 }
 table.catselect #new_category_name {
   background-color: white;
+  width: 92% !important;
+}
+table.catselect tbody tr.group.catselect_blog__current td {
+  background: #31b0d5;
+  color: #FFF;
 }
 .raty_star_on,
 .raty_star_off,

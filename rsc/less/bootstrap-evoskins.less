@@ -66,6 +66,10 @@ a.btn.action_icon {
 	.control-label {
 		padding-left: 0;
 	}
+	.form-control-inline {
+		display: inline-block;
+		width: auto;
+	}
 	// Info field that uses full width
 	.info_full {
 		padding: 0 20px;
@@ -184,7 +188,6 @@ a.btn.action_icon {
 		#itemform_edit_timestamp {
 			padding: 10px 0;
 		}
-		padding: 10px 0;
 		label {
 			padding-left: 20px;
 			margin-right: 5px;
@@ -409,21 +412,6 @@ a:hover .glyphicon {
 	text-align: center;
 }
 
-// Table for select categories of item
-table.catselect {
-	tr.even, tr.even input{
-		background: none !important;
-	}
-	th, td {
-		border-left: none;
-		border-bottom: none;
-		background: none !important;
-	}
-	input#new_category_name {
-		width: 92% !important;
-	}
-}
-
 // The voting panel of pictures
 #colorbox #cboxVoting {
 	label {
@@ -621,6 +609,12 @@ div.edit_toolbars, div.message_toolbars {
 	position: relative;
 	top: -1px;
 }
+.evobar-menu .badge {
+	padding: 3px 7px;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
 
 // Fix colorbox sizes
 #colorbox,
@@ -668,6 +662,9 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Buttons for the post statuses
+.btn[class*=btn-status-] {
+	border: 1px solid #ccc;
+}
 .btn-status-draft {
 	color: #000;
 	background-color: #ff9;
@@ -735,6 +732,11 @@ div.edit_toolbars, div.message_toolbars {
 .btn-status-redirected:hover {
 	color: #fff;
 	background-color: #613192;
+}
+.post_status_dropdown {
+	.dropdown-menu {
+		overflow: hidden;
+	}
 }
 
 // Fix label width on TinyMCE modal windows

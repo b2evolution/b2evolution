@@ -360,45 +360,48 @@ form.inskin .edit_area textarea{
 
 
 // Categories selection table:
+#itemform_categories .extracats {
+	max-height: 500px;
+	overflow: auto;
+}
 table.catselect {
 	border-spacing:0;
 	width:100%;
 	border: 1px solid #bbb;
-}
-table.catselect th {
-	padding: .3ex 1ex;
-	background-color: #ddd;
-	border-bottom: 1px solid #bbb;
-}
-table.catselect td {
-	padding: .2ex 1ex;
-}
-table.catselect tr.group td {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #bbb;
-	background-color: #ccc;
-	font-weight: bold;
-}
-table.catselect tr.odd,
-table.catselect tr.odd input {
-	background-color: #eee;
-}
-table.catselect tr.even,
-table.catselect tr.even input {
-	background-color:#ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-	background-color:#ccc;
-}
-table.catselect th.selector,
-table.catselect td.selector {
-	width: 1%;
-	text-align:center;
-	border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-	background-color:white;
+	thead tr th {
+		padding: .3ex 1ex;
+		background-color: #d4d4d4;
+		border-bottom: 1px solid #bbb;
+		color: #333;
+	}
+	td {
+		padding: .2ex 1ex;
+		background: none;
+	}
+	tr.group td {
+		border-top: 1px solid #bbb;
+		border-bottom: 1px solid #bbb;
+		font-weight: bold;
+	}
+	tr.odd, tr.odd input {
+		background-color: #eee;
+	}
+	tr.even, tr.even input {
+		background: none !important;
+	}
+	th.selector, td.selector {
+		width: 1%;
+		text-align:center;
+		border-right: 1px solid #bbb;
+	}
+	#new_category_name {
+		background-color: white;
+		width: 92% !important;
+	}
+	tbody tr.group.catselect_blog__current td {
+		background: #31b0d5;
+		color: #FFF;
+	}
 }
 
 // Raty icons (stars)

@@ -1492,6 +1492,10 @@ a.btn.action_icon.hoverlink {
 .form-horizontal .control-label {
   padding-left: 0;
 }
+.form-horizontal .form-control-inline {
+  display: inline-block;
+  width: auto;
+}
 .form-horizontal .info_full {
   padding: 0 20px;
 }
@@ -1594,10 +1598,6 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #itemform_edit_timestamp > input[type=text] {
   display: inline-block;
   width: auto;
-}
-.form-horizontal #itemform_extra,
-.form-horizontal #itemform_edit_timestamp {
-  padding: 10px 0;
 }
 .form-horizontal #itemform_extra #itemform_edit_timestamp,
 .form-horizontal #itemform_edit_timestamp #itemform_edit_timestamp {
@@ -1810,19 +1810,6 @@ a:hover .glyphicon {
   bottom: 0;
   text-align: center;
 }
-table.catselect tr.even,
-table.catselect tr.even input {
-  background: none !important;
-}
-table.catselect th,
-table.catselect td {
-  border-left: none;
-  border-bottom: none;
-  background: none !important;
-}
-table.catselect input#new_category_name {
-  width: 92% !important;
-}
 #colorbox #cboxVoting label {
   display: inline;
   font-size: 10px !important;
@@ -1997,6 +1984,12 @@ div.message_toolbars {
   position: relative;
   top: -1px;
 }
+.evobar-menu .badge {
+  padding: 3px 7px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 #colorbox,
 #colorbox *,
 #colorbox *:before,
@@ -2037,6 +2030,9 @@ div.message_toolbars {
 .jumbotron {
   font-size: 21px;
   font-weight: 200;
+}
+.btn[class*=btn-status-] {
+  border: 1px solid #ccc;
 }
 .btn-status-draft {
   color: #000;
@@ -2105,6 +2101,9 @@ div.message_toolbars {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
+}
+.post_status_dropdown .dropdown-menu {
+  overflow: hidden;
 }
 .mce-container label.mce-label {
   max-width: none;
