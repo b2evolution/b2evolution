@@ -59,15 +59,18 @@ function get_actions_for_itemtype( $id )
  */
 function get_name_for_itemtype( $id, $name )
 {
-	if( ! ItemType::is_reserved( $id ) )
-	{ // not reserved id
-		$ret_name = '<strong><a href="'.regenerate_url( 'action,ID', 'ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a></strong>';
+	global $current_User;
+
+	if( ! ItemType::is_reserved( $id ) && $current_User->check_perm( 'options', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_name = '<a href="'.regenerate_url( 'action,ID', 'ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}
 	else
 	{
-		$ret_name = '<strong>'.$name.'</strong>';
+		$ret_name = $name;
 	}
-	return $ret_name;
+
+	return '<strong>'.$ret_name.'</strong>';
 }
 
 
@@ -83,6 +86,13 @@ $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ityp_name',
 		'td' => '%get_name_for_itemtype(#ityp_ID#, #ityp_name#)%',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Back-office tab'),
+		'order' => 'ityp_backoffice_tab',
+		'td' => '$ityp_backoffice_tab$',
+		'th_class' => 'shrinkwrap',
 	);
 
 $Results->cols[] = array(
