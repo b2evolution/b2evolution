@@ -82,7 +82,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	$fieldset_title = T_( 'Images &amp; Attachments' );
 
 	if( $creating )
-	{	// Creating new Item
+	{ // Creating new Item
 		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Link existing files').'</a>';
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
@@ -108,7 +108,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
-	{	// Check that we have permission to edit owner:
+	{ // Check that we have permission to edit owner:
 		$fieldset_title .= ' - '
 			.action_icon( T_('Link existing files'), 'folder',
 				$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID(),
@@ -117,7 +117,10 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 			);
 	}
 
-	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold ) );
+	// Get a count of links in order to deny folding when there is at least one link
+	$links_count = count( $LinkOwner->get_Links() );
+
+	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold, 'deny_fold' => ( $links_count > 0 ) ) );
 
 	echo '<div id="attachmentframe_wrapper">'
 				.'<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type
