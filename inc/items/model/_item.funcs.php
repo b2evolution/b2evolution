@@ -186,10 +186,12 @@ function init_inskin_editing()
 }
 
 /**
- * Return an Item if an Intro or a Featured item is available for display in current disp.
+ * If an Intro Post is available, return it. If not, see if a Featured Post is available and return it.
+ *
+ * Note: this will set the global $FeaturedList which may be used to obtain several featured Items.
  *
  * @param string Name of $disp where we should display it
- * @param string Collection Ids:
+ * @param string Collection IDs:
  *                 NULL: depend on blog setting "Collections to aggregate"
  *                 empty: current blog only
  *                 "*": all blogs
@@ -218,15 +220,17 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// Set default filters for the current page:
 		$FeaturedList->set_default_filters( $MainList->filters );
 
+		// FIRST: Try to find an Intro post:
+
 		if( ! $MainList->is_filtered() )
 		{	// This is not a filtered page, so we are on the home page.
 			if( $restrict_disp == 'front' )
-			{ // Special Front page:
+			{	// Special Front page:
 				// Use Intro-Front posts
 				$restrict_to_types = '1400';
 			}
 			else
-			{ // Default front page displaying posts:
+			{	// Default front page displaying posts:
 				// The competing intro-* types are: 'main' and 'all':
 				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
 				$restrict_to_types = '1500,1600';
@@ -265,6 +269,9 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// Run the query:
 		$FeaturedList->query();
 
+
+		// SECOND: If no Intro, try to find an Featured post:
+
 		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front' )
 		{ // No Intro page was found, try to find a featured post instead:
 
@@ -281,11 +288,11 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		}
 	}
 
-	// Get next featured item
+	// Get first Item in the result set.
 	$Item = $FeaturedList->get_item();
 
 	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out normal display:
+	{	// Memorize that ID so that it can later be filtered out of normal display:
 		$featured_displayed_item_IDs[] = $Item->ID;
 	}
 
