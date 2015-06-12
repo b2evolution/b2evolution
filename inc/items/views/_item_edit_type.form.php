@@ -73,9 +73,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Template name'),
 		'order' => 'ityp_template_name',
-		'td' => '$ityp_template_name$',
+		'td' => '%conditional( #ityp_template_name# == "", "", #ityp_template_name#.".*.php" )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => '%conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, "info", "" )%'
+		'td_class' => 'center %conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, " info", "" )%'
 	);
 
 // Display results:

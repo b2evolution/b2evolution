@@ -7103,12 +7103,20 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 
 	$params = array_merge( array(
-			'before' => '',
-			'after'  => ' ',
-		) );
+			'before'    => '',
+			'after'     => ' ',
+			'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+		), $params );
 
-	global $UserSettings;
-	$value = intval( $UserSettings->get( 'fold_'.$id ) );
+	if( $params['deny_fold'] )
+	{ // Deny folding for this case
+		$value = 0;
+	}
+	else
+	{ // Get the fold value from user settings
+		global $UserSettings;
+		$value = intval( $UserSettings->get( 'fold_'.$id ) );
+	}
 
 	// Icon
 	if( $value )
@@ -7148,10 +7156,11 @@ function echo_fieldset_folding_js()
 
 ?>
 <script type="text/javascript">
-jQuery( 'span[id^=icon_folding_]' ).click( function()
+jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
 {
+	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
 	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
-	var value_obj = jQuery( this ).prev();
+	var value_obj = is_icon ? jQuery( this ).prev() : jQuery( this ).prev().prev();
 
 	if( wrapper_obj.length == 0 || value_obj.length == 0 )
 	{ // Invalid layout
@@ -7170,7 +7179,7 @@ jQuery( 'span[id^=icon_folding_]' ).click( function()
 	}
 
 	// Change icon image
-	var clickimg = jQuery( this );
+	var clickimg = is_icon ? jQuery( this ) : jQuery( this ).prev();
 	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
 	{ // Fontawesome icon | Glyph bootstrap icon
 		if( clickimg.data( 'toggle' ) != '' )

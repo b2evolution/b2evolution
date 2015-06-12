@@ -144,8 +144,7 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ POST CONTENTS #############################
 
-	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
+	$Form->begin_fieldset( sprintf( T_('%s contents'), $edited_Item->get( 't_type' ) ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -317,6 +316,49 @@ $Form->begin_form( '', '', $params );
 	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210, 'style' => 'width: 100%;' ) );
 	echo '</td></tr>';
 
+	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
+	{ // Display tags
+		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+
+		$link_to_tags_manager = '';
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{ // Display a link to manage tags only when current use has the rights
+			$link_to_tags_manager = ' &ndash; <a href="'.$admin_url.'?ctrl=itemtags&amp;tag_item_ID='.$edited_Item->ID.'">'.T_('Go to tags manager').'</a>';
+		}
+		// Checkbox to suggest tags
+		$suggest_checkbox = '<label>'
+				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
+				.T_('Auto-suggest tags as you type (based on existing tag)').$link_to_tags_manager
+			.'</label>';
+		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide tags
+		$Form->hidden( 'item_tags', $item_tags );
+	}
+
+	$edited_Item_excerpt = $edited_Item->get('excerpt');
+	if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
+	{ // Display excerpt
+		$field_required = ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ) ? $required_star : '';
+		$field_class = param_has_error( 'post_excerpt' ) ? ' field_error' : '';
+		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Excerpt').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->textarea_input( 'post_excerpt', $edited_Item_excerpt, 3, '', array(
+				'class'    => $field_class,
+				'required' => $field_required,
+				'style'    => 'width:100%'
+			) );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide excerpt
+		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_Item_excerpt ) );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
 	{ // Display <title> tag
 		$field_required = ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' ) ? $required_star : '';
@@ -356,51 +398,7 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting('metakeywords') );
 	}
 
-	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
-	{ // Display tags
-		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-
-		$link_to_tags_manager = '';
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{ // Display a link to manage tags only when current use has the rights
-			$link_to_tags_manager = ' &ndash; <a href="'.$admin_url.'?ctrl=itemtags&amp;tag_item_ID='.$edited_Item->ID.'">'.T_('Go to tags manager').'</a>';
-		}
-		// Checkbox to suggest tags
-		$suggest_checkbox = '<label>'
-				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
-				.T_('Auto-suggest tags as you type (based on existing tag)').$link_to_tags_manager
-			.'</label>';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td></tr>';
-	}
-	else
-	{ // Hide tags
-		$Form->hidden( 'item_tags', $item_tags );
-	}
-
 	echo '</table>';
-
-	$edited_Item_excerpt = $edited_Item->get('excerpt');
-	if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
-	{ // Display excerpt
-		$field_required = ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ) ? $required_star : '';
-		$field_class = param_has_error( 'post_excerpt' ) ? ' field_error' : '';
-	?>
-
-	<div id="itemform_post_excerpt" class="edit_fieldgroup">
-		<label for="post_excerpt"><?php echo $field_required; ?><strong><?php echo T_('Excerpt') ?>:</strong>
-		<span class="notes"><?php echo T_('(for XML feeds)') ?></span></label><br />
-		<textarea name="post_excerpt" rows="2" cols="25" class="form-control form_textarea_input<?php echo $field_class; ?>" id="post_excerpt"><?php echo htmlspecialchars( $edited_Item_excerpt ) ?></textarea>
-	</div>
-
-	<?php
-	}
-	else
-	{ // Hide excerpt
-		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_Item_excerpt ) );
-	}
 
 	if( $edited_Item->get('excerpt_autogenerated') )
 	{ // store hash of current post_excerpt to detect if it was changed.
@@ -437,7 +435,10 @@ $Form->begin_form( '', '', $params );
 	$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 	param( 'comments_number', 'integer', $total_comments_number );
 
-	$Form->begin_fieldset( T_('Meta comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ), array( 'id' => 'itemform_meta_cmnt', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Meta comments')
+					.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' )
+					.action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+				array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
 	global $CommentList;
 	$CommentList = new CommentList2( $Blog );
@@ -555,7 +556,9 @@ $Form->begin_form( '', '', $params );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Text Renderers')
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
 	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
@@ -609,7 +612,9 @@ $Form->begin_form( '', '', $params );
 
 	// ################### GOAL TRACKING ###################
 
-	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' ).action_icon( T_('New goal'), 'new', $admin_url.'?ctrl=goals&amp;action=new', T_('New goal').' &raquo;', 3, 4, array( 'class' => 'action_icon floatright' ) ), array( 'id' => 'itemform_goals', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' )
+					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals', T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+				array( 'id' => 'itemform_goals', 'fold' => true ) );
 
 	$Form->switch_layout( 'table' );
 	$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
