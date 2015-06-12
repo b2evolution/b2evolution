@@ -879,14 +879,15 @@ class Form extends Widget
 	function begin_fieldset( $title = '', $field_params = array() )
 	{
 		$field_params = array_merge( array(
-				'class' => 'fieldset',
-				'fold'  => false, // TRUE to enable folding for this fieldset
+				'class'     => 'fieldset',
+				'fold'      => false, // TRUE to enable folding for this fieldset
+				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
 			), $field_params );
 
 		if( $field_params['fold'] )
 		{ // Display icon to collapse/expand fildset
-			$folding_icon = get_fieldset_folding_icon( $field_params['id'] );
-			if( is_logged_in() )
+			$folding_icon = get_fieldset_folding_icon( $field_params['id'], $field_params );
+			if( ! $field_params['deny_fold'] && is_logged_in() )
 			{ // Only loggedin users can fold fieldset
 				global $UserSettings;
 				if( intval( $UserSettings->get( 'fold_'.$field_params['id'] ) ) === 1 )
@@ -894,12 +895,16 @@ class Form extends Widget
 					$field_params['class'] = trim( $field_params['class'].' folded' );
 				}
 			}
+
+			// Add wrapper for title text to fold fieldset by JS as such as icon does this
+			$title = preg_replace( '/^([^<]+)(<.+)?$/', '<span id="title_folding_'.$field_params['id'].'">$1</span>$2', $title );
 		}
 		else
 		{ // No folding icon
 			$folding_icon = '';
 		}
 		unset( $field_params['fold'] );
+		unset( $field_params['deny_fold'] );
 
 		switch( $this->layout )
 		{
