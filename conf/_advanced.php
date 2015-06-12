@@ -825,8 +825,8 @@ $sendmail_additional_params = '-r $return-address$';
 
 
 /**
- * Use CDN urls of the array $library_cdn_urls below
- * Set to FALSE in order to use the LOCAL urls of the array $library_local_urls
+ * Would you like to use CDNs as definied in the array $library_cdn_urls below 
+ * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns
  */
