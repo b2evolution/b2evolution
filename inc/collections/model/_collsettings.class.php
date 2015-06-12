@@ -155,7 +155,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_item_subscriptions' => 0,			// Don't allow email subscriptions for a specific post by default
 			'use_workflow' => 0,						// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
-			'blog_footer_text' => '&copy;$year$ by $owner$',
+			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
