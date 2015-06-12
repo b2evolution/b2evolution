@@ -563,13 +563,13 @@ img.loadimg {
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
 }
-div.evo_image_block {
+figure {
+  margin: 1em 0;
+}
+.evo_image_block {
   text-align: center;
 }
-div.evo_image_block img {
-  margin: 1ex 0;
-}
-.replied_comment div.evo_image_block img {
+.replied_comment .evo_image_block img {
   max-width: 100%;
   height: auto;
 }
@@ -1706,6 +1706,9 @@ table.catselect thead tr th {
   border-bottom: 1px solid #bbb;
   color: #333;
 }
+table.catselect > thead:first-child > tr:first-child > th {
+  border-top: 1px solid #bbb;
+}
 table.catselect td {
   padding: .2ex 1ex;
   background: none;
@@ -2594,6 +2597,13 @@ legend.panel-heading {
   font-weight: normal;
   margin-bottom: 0;
 }
+legend.panel-heading a.action_icon.pull-right {
+  line-height: 16px;
+}
+legend.panel-heading a.action_icon.pull-right span.fa {
+  position: relative;
+  top: 1px;
+}
 .panel-title .icon {
   vertical-align: middle;
   position: relative;
@@ -2692,10 +2702,14 @@ div.message_toolbars {
   top: -1px;
 }
 .evobar-menu .badge {
+  font-weight: normal;
   padding: 3px 7px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+.nav .badge {
+  font-weight: normal;
 }
 #colorbox,
 #colorbox *,
@@ -2738,12 +2752,42 @@ div.message_toolbars {
   font-size: 21px;
   font-weight: 200;
 }
+.status_color_draft {
+  color: #ffff99;
+}
+.status_color_review {
+  color: #cc0099;
+}
+.status_color_community {
+  color: #2e8bb9;
+}
+.status_color_protected {
+  color: #ff9c2a;
+}
+.status_color_private {
+  color: #dc143c;
+}
+.status_color_published {
+  color: #99ee44;
+}
+.status_color_deprecated {
+  color: #000000;
+}
+.status_color_redirected {
+  color: #663399;
+}
+.status_color_trash {
+  color: #ff6666;
+}
+.status_color_meta {
+  color: #5133ab;
+}
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ff9;
+  background-color: #ffff99;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -2752,7 +2796,7 @@ div.message_toolbars {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #CC0099;
+  background-color: #cc0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -2760,7 +2804,7 @@ div.message_toolbars {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2E8BB9;
+  background-color: #2e8bb9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -2768,7 +2812,7 @@ div.message_toolbars {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #FF9C2A;
+  background-color: #ff9c2a;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -2776,7 +2820,7 @@ div.message_toolbars {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #DC143C;
+  background-color: #dc143c;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -2784,7 +2828,7 @@ div.message_toolbars {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99EE44;
+  background-color: #99ee44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -2795,11 +2839,11 @@ div.message_toolbars {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000;
+  background-color: #000000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333;
+  background-color: #333333;
 }
 .btn-status-redirected {
   color: #fff;

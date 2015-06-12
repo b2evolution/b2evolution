@@ -500,6 +500,13 @@ legend.panel-heading {
 	font-size: 16px;
 	font-weight: normal;
 	margin-bottom: 0;
+	a.action_icon.pull-right {
+		line-height: 16px;
+		span.fa {
+			position: relative;
+			top: 1px;
+		}
+	}
 }
 .panel-title {
 	.icon {
@@ -610,10 +617,14 @@ div.edit_toolbars, div.message_toolbars {
 	top: -1px;
 }
 .evobar-menu .badge {
+	font-weight: normal;
 	padding: 3px 7px;
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
+}
+.nav .badge {
+	font-weight: normal;
 }
 
 // Fix colorbox sizes
@@ -661,77 +672,129 @@ div.edit_toolbars, div.message_toolbars {
 	font-weight: 200;
 }
 
+// Colors for statuses of posts and comments
+@status_color_draft:            #ff9;
+@status_color_draft_hover:      #f3f392;
+@status_color_review:           #CC0099;
+@status_color_review_hover:     #c20092;
+@status_color_community:        #2E8BB9;
+@status_color_community_hover:  #2c84b0;
+@status_color_protected:        #FF9C2A;
+@status_color_protected_hover:  #f39528;
+@status_color_private:          #DC143C;
+@status_color_private_hover:    #d21339;
+@status_color_published:        #99EE44;
+@status_color_published_hover:  #92e341;
+@status_color_deprecated:       #000;
+@status_color_deprecated_hover: #333;
+@status_color_redirected:       #663399;
+@status_color_redirected_hover: #613192;
+@status_color_trash:            #f66;
+@status_color_meta:             #5133ab;
+
+// Status colors:
+.status_color_draft {
+	color: @status_color_draft;
+}
+.status_color_review {
+	color: @status_color_review;
+}
+.status_color_community {
+	color: @status_color_community;
+}
+.status_color_protected {
+	color: @status_color_protected;
+}
+.status_color_private {
+	color: @status_color_private;
+}
+.status_color_published {
+	color: @status_color_published;
+}
+.status_color_deprecated {
+	color: @status_color_deprecated;
+}
+.status_color_redirected {
+	color: @status_color_redirected;
+}
+.status_color_trash {
+	color: @status_color_trash;
+}
+.status_color_meta {
+	color: @status_color_meta;
+}
+
 // Buttons for the post statuses
 .btn[class*=btn-status-] {
 	border: 1px solid #ccc;
 }
 .btn-status-draft {
 	color: #000;
-	background-color: #ff9;
+	background-color: @status_color_draft;
 	border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
 	color: #000;
-	background-color: #f3f392;
+	background-color: @status_color_draft_hover;
 }
 .btn-status-review {
 	color: #fff;
-	background-color: #CC0099;
+	background-color: @status_color_review;
 }
 .btn-status-review:hover {
 	color: #fff;
-	background-color: #c20092;
+	background-color: @status_color_review_hover;
 }
 .btn-status-community {
 	color: #fff;
-	background-color: #2E8BB9;
+	background-color: @status_color_community;
 }
 .btn-status-community:hover {
 	color: #fff;
-	background-color: #2c84b0;
+	background-color: @status_color_community_hover;
 }
 .btn-status-protected {
 	color: #fff;
-	background-color: #FF9C2A;
+	background-color: @status_color_protected;
 }
 .btn-status-protected:hover {
 	color: #fff;
-	background-color: #f39528;
+	background-color: @status_color_protected_hover;
 }
 .btn-status-private {
 	color: #fff;
-	background-color: #DC143C;
+	background-color: @status_color_private;
 }
 .btn-status-private:hover {
 	color: #fff;
-	background-color: #d21339;
+	background-color: @status_color_private_hover;
 }
 .btn-status-published {
 	color: #000;
-	background-color: #99EE44;
+	background-color: @status_color_published;
 	.glyphicon {
 		color: inherit !important;
 	}
 }
 .btn-status-published:hover {
 	color: #000;
-	background-color: #92e341;
+	background-color: @status_color_published_hover;
 }
 .btn-status-deprecated {
 	color: #fff;
-	background-color: #000;
+	background-color: @status_color_deprecated;
 }
 .btn-status-deprecated:hover {
 	color: #fff;
-	background-color: #333;
+	background-color: @status_color_deprecated_hover;
 }
 .btn-status-redirected {
 	color: #fff;
-	background-color: #663399;
+	background-color: @status_color_redirected;
 }
 .btn-status-redirected:hover {
 	color: #fff;
-	background-color: #613192;
+	background-color: @status_color_redirected_hover;
 }
 .post_status_dropdown {
 	.dropdown-menu {

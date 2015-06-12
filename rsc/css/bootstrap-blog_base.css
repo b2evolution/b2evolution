@@ -330,6 +330,9 @@ table.catselect thead tr th {
   border-bottom: 1px solid #bbb;
   color: #333;
 }
+table.catselect > thead:first-child > tr:first-child > th {
+  border-top: 1px solid #bbb;
+}
 table.catselect td {
   padding: .2ex 1ex;
   background: none;
