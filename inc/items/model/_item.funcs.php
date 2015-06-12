@@ -1777,14 +1777,14 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
 			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group post_status_dropdown">';
-			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+			echo '<div class="btn-group dropup post_status_dropdown">';
+			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
 						.' <span class="caret"></span></button>';
-			echo '<ul class="dropdown-menu" role="menu">';
+			echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 			foreach( $status_options as $status_key => $status_title )
 			{
-				echo '<li rel="'.$status_key.'"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></li>';
+				echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
 			}
 			echo '</ul>';
 			echo '</div>';
@@ -1926,14 +1926,17 @@ function echo_publishnowbutton_js()
 			update_post_status_buttons( jQuery( this ).val(), false );
 		} );
 
-		jQuery( '.post_status_dropdown li' ).click( function()
+		jQuery( '.post_status_dropdown li a' ).click( function()
 		{
-			var status = jQuery( this ).attr( 'rel' );
+			var item = jQuery( this ).parent();
+			var status = item.attr( 'rel' );
 			update_post_status_buttons( status, false );
-			var button = jQuery( this ).parent().prev();
-			button.find( 'span:first' ).html( jQuery( this ).find( 'span:last' ).html() );
+			var button = item.parent().prev();
+			button.find( 'span:first' ).html( item.find( 'span:last' ).html() );
 			button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 			jQuery( 'input[type=hidden][name=post_status]' ).val( status );
+			item.parent().parent().removeClass( 'open' );
+			return false;
 		} );
 	</script>
 	<?php
