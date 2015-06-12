@@ -430,45 +430,52 @@ $Form->begin_form( '', '', $params );
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
-	// ####################### META COMMENTS #########################
-	$currentpage = param( 'currentpage', 'integer', 1 );
-	$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
-	param( 'comments_number', 'integer', $total_comments_number );
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $edited_Item ) )
+	{
+		// ####################### META COMMENTS #########################
+		$currentpage = param( 'currentpage', 'integer', 1 );
+		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+		param( 'comments_number', 'integer', $total_comments_number );
 
-	$Form->begin_fieldset( T_('Meta comments')
-					.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' )
-					.action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4, array( 'class' => 'action_icon pull-right' ) ),
-				array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+		$Form->begin_fieldset( T_('Meta comments')
+						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
+					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
-	global $CommentList;
-	$CommentList = new CommentList2( $Blog );
+		global $CommentList;
+		$CommentList = new CommentList2( $Blog );
 
-	// Filter list:
-	$CommentList->set_filters( array(
-		'types' => array( 'meta' ),
-		'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-		'order' => 'ASC',
-		'post_ID' => $edited_Item->ID,
-		'comments' => 20,
-		'page' => $currentpage,
-		'expiry_statuses' => array( 'active' ),
-	) );
-	$CommentList->query();
-
-	// comments_container value shows, current Item ID
-	echo '<div id="styled_content_block">';
-	echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
-	// display comments
-	$CommentList->display_if_empty( array(
-			'before'    => '<div class="bComment"><p>',
-			'after'     => '</p></div>',
-			'msg_empty' => T_('No feedback for this post yet...'),
+		// Filter list:
+		$CommentList->set_filters( array(
+			'types' => array( 'meta' ),
+			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+			'order' => 'ASC',
+			'post_ID' => $edited_Item->ID,
+			'comments' => 20,
+			'page' => $currentpage,
+			'expiry_statuses' => array( 'active' ),
 		) );
-	require $inc_path.'comments/views/_comment_list.inc.php';
-	echo '</div>'; // comments_container div
-	echo '</div>';
+		$CommentList->query();
 
-	$Form->end_fieldset();
+		// comments_container value shows, current Item ID
+		echo '<div id="styled_content_block">';
+		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
+		// display comments
+		$CommentList->display_if_empty( array(
+				'before'    => '<div class="bComment"><p>',
+				'after'     => '</p></div>',
+				'msg_empty' => T_('No feedback for this post yet...'),
+			) );
+		require $inc_path.'comments/views/_comment_list.inc.php';
+		echo '</div>'; // comments_container div
+		echo '</div>';
+
+		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
+		{ // Display a link to add new meta comment if current user has a permission
+			echo action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 );
+		}
+
+		$Form->end_fieldset();
+	}
 	?>
 
 </div>
@@ -649,7 +656,7 @@ $Form->begin_form( '', '', $params );
 	}
 	$GoalCache->load_where( $goals_where_sql );
 	$Form->select_input_object( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ), $GoalCache,
-		get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 2px 0 14px;position:relative;top:-5px;') ).T_('Goal'),
+		get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 5px 0 14px;position:relative;top:-1px;') ).T_('Goal'),
 		array(
 			'allow_none' => true,
 			'note' => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin-left:5px" align="top" />'
