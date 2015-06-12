@@ -41,10 +41,10 @@ $params = array_merge( array(
 		echo '<div class="post_images col-xl-9 col-lg-8 col-md-6 col-sm-6">';
 		$Item->images( array(
 				'before'              => '',
-				'before_image'        => '<div class="single-image">',
-				'before_image_legend' => '<div class="image_legend">',
-				'after_image_legend'  => '</div>',
-				'after_image'         => '</div>',
+				'before_image'        => '<figure class="single-image">',
+				'before_image_legend' => '<figcaption class="evo_image_legend">',
+				'after_image_legend'  => '</figcaption>',
+				'after_image'         => '</figure>',
 				'after'               => '<div class="clear"></div>',
 				'image_size'          => $Skin->get_setting( 'single_thumb_size' ),
 				'image_align'         => 'middle',

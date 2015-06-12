@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays a post for a blog
+ * This is the template that displays a page for a blog
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.

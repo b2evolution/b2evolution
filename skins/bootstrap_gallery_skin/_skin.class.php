@@ -286,7 +286,7 @@ class bootstrap_gallery_Skin extends Skin
 		if( isset( $thumbnail_sizes[ $single_thumb_size ] ) )
 		{
 			// Make the width of image block as fixed to don't expand it by long post title text
-			$custom_css .= '	.post_images .image_block .image_legend { width:'.$thumbnail_sizes[ $single_thumb_size ][1].'px; max-width:'.$thumbnail_sizes[ $single_thumb_size ][1]."px }\n";
+			$custom_css .= '	.post_images .single-image .evo_image_legend { width:'.$thumbnail_sizes[ $single_thumb_size ][1].'px; max-width:'.$thumbnail_sizes[ $single_thumb_size ][1]."px }\n";
 			// Set width & height for block with text "No pictures yet"
 			/*$custom_css .= '	.posts_list .evo_post b { width:'.( $thumbnail_sizes[ $single_thumb_size ][1] - 20 ).'px;'
 				.'height:'.( $thumbnail_sizes[ $single_thumb_size ][2] - 20 ).'px'." }\n";*/

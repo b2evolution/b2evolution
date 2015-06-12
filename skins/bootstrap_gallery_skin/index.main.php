@@ -230,7 +230,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 		<?php
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item() )
+		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			echo '<div class="panel panel-default"><div class="panel-body">';
@@ -245,43 +245,16 @@ siteskin_include( '_site_body_header.inc.php' );
 		}
 		?>
 
-		<?php
-		if( $disp == 'single' || $disp == 'page' )
-		{ // --------------------------------- START OF A POST -----------------------------------
-			// Display message if no post:
-			display_if_empty();
-			if( isset( $single_Item ) )
-			{ // Use Item that already is defined above
-				$Item = & $single_Item;
-			}
-			else
-			{ // Get next Item object
-				$Item = & mainlist_get_item();
-			}
-			if( $Item )
-			{
-				// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-				skin_include( '_item_block.inc.php', array(
-						'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-					) );
-				// ----------------------------END ITEM BLOCK  ----------------------------
-			}
-		} // ---------------------------------- END OF A POST ------------------------------------
-		?>
-
 		</div>
 
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'disp_single'          => '',		// We already handled this case above
-					'disp_page'            => '',		// We already handled this case above
 					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
 					'author_link_text'     => 'preferredname',
-					
-		'item_class'        => 'evo_post evo_content_block',
-		'item_type_class'   => 'evo_post__ptyp_',
-		'item_status_class' => 'evo_post__',
+					'item_class'        => 'evo_post evo_content_block',
+					'item_type_class'   => 'evo_post__ptyp_',
+					'item_status_class' => 'evo_post__',
 					// Login
 					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
 					'login_page_after'     => '</div></div>',
