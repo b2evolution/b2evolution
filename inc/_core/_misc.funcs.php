@@ -4892,7 +4892,7 @@ function get_manual_link( $topic, $link_text = NULL, $action_word = NULL, $word_
 			{
 				$action_word = T_('Manual');
 			}
-			$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, $action_word, 5, $word_weight, array( 'target' => '_blank', 'style' => 'vertical-align:top' ) );
+			$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, $action_word, 5, $word_weight, array( 'target' => '_blank' ) );
 		}
 		else
 		{
