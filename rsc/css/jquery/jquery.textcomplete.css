@@ -3,52 +3,52 @@
 	text-align: left;
 }
 
-.dropdown-menu {
+.textcomplete-list {
 	border: 1px solid #ddd;
 	background-color: #fff;
 	text-align: left;
 }
 
-.dropdown-menu li {
+.textcomplete-list li {
 	border-top: 1px solid #ddd;
 	padding: 2px 5px;
 	margin: 0;
 }
-.dropdown-menu li a {
+.textcomplete-list li a {
 	color: #000;
 }
 
-.dropdown-menu li:first-child {
+.textcomplete-list li:first-child {
 	border-top: none;
 }
 
-.dropdown-menu li:hover,
-.dropdown-menu li:hover mark,
-.dropdown-menu .active {
+.textcomplete-list li:hover,
+.textcomplete-list li:hover mark,
+.textcomplete-list .active {
 	color: #fff;
 	background-color: #3b5998;
 }
-.dropdown-menu li:hover a,
-.dropdown-menu .active a,
-.dropdown-menu .active mark,
-.dropdown-menu .active {
+.textcomplete-list li:hover a,
+.textcomplete-list .active a,
+.textcomplete-list .active mark,
+.textcomplete-list .active {
 	color: #fff;
 	text-decoration: none;
 }
-.dropdown-menu mark {
+.textcomplete-list mark {
 	background: none;
 }
 
 
 /* SHOULD not modify */
 
-.dropdown-menu {
+.textcomplete-list {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 }
 
-.dropdown-menu a:hover {
+.textcomplete-list a:hover {
 	cursor: pointer;
 }
 
