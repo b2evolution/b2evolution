@@ -85,6 +85,7 @@ while( $Comment = & $CommentList->get_next() )
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
 					'image_size'            => $params['comment_image_size'],
+					'image_class'           => $params['comment_image_class'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
