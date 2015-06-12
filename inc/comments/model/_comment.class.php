@@ -2616,10 +2616,10 @@ class Comment extends DataObject
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before_image'          => '<div class="image_block">',
-				'before_image_legend'   => '<div class="image_legend">',
-				'after_image_legend'    => '</div>',
-				'after_image'           => '</div>',
+				'before_image'          => '<figure class="evo_image_block">',
+				'before_image_legend'   => '<figcaption class="evo_image_legend">',
+				'after_image_legend'    => '</figcaption>',
+				'after_image'           => '</figure>',
 				'image_size'            => 'fit-400x320',
 				'image_text'            => '', // Text below attached pictures
 				'attachments_mode'      => 'read', // read | view
@@ -2650,14 +2650,20 @@ class Comment extends DataObject
 			}
 		}
 
-		$images_is_attached = false;
+		$images_above_content = '';
+		$images_below_content = '';
 		foreach( $attachments as $index => $attachment )
 		{
-			if( !empty( $this->ID ) )
+			if( ! empty( $this->ID ) )
 			{ // Normal mode when comment exists in DB (NOT PREVIEW mode)
 				$Link = $attachment;
+				$link_position = $Link->get( 'position' );
 				$params['Link'] = $Link;
 				$attachment = $attachment->get_File();
+			}
+			else
+			{ // Set default position for preview files
+				$link_position = ( $index == 0 ) ? 'teaser' : 'aftermore';
 			}
 
 			$File = $attachment;
@@ -2690,7 +2696,14 @@ class Comment extends DataObject
 
 			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
 			{ // File was processed by plugin
-				echo $r;
+				if( $link_position == 'teaser' )
+				{ // Image should be displayed above content
+					$images_above_content .= $r;
+				}
+				else
+				{ // Image should be displayed below content
+					$images_below_content .= $r;
+				}
 				unset( $attachments[ $index ] );
 				continue;
 			}
@@ -2709,25 +2722,38 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					echo $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, '', '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, '', '', '', '#' );
 				}
 				else
 				{
-					echo $Link->get_tag( array_merge( array(
+					$r = $Link->get_tag( array_merge( array(
 						'image_link_to'    => $image_link_to,
 						'image_link_title' => T_('Posted by ').$this->get_author_name(),
 						'image_link_rel'   => $image_link_rel,
 					), $params ) );
 				}
+
+				if( $link_position == 'teaser' )
+				{ // Image should be displayed above content
+					$images_above_content .= $r;
+				}
+				else
+				{ // Image should be displayed below content
+					$images_below_content .= $r;
+				}
+
 				unset( $attachments[ $index ] );
-				$images_is_attached = true;
 			}
 			$params = $temp_params;
 		}
 
-		if( $images_is_attached && $params['image_text'] != '' )
-		{ // Display info text below pictures
-			echo $params['image_text'];
+		if( ! empty( $images_above_content ) )
+		{ // Display images above content
+			echo $images_above_content;
+			if( $params['image_text'] != '' )
+			{ // Display info text below pictures
+				echo $params['image_text'];
+			}
 		}
 
 		if( $ban_urls )
@@ -2742,6 +2768,15 @@ class Comment extends DataObject
 		else
 		{ // don't ban urls
 			echo $this->get_content( $format );
+		}
+
+		if( ! empty( $images_below_content ) )
+		{ // Display images below content
+			echo $images_below_content;
+			if( empty( $images_above_content ) && $params['image_text'] != '' )
+			{ // Display info text below pictures
+				echo $params['image_text'];
+			}
 		}
 
 		if( isset( $attachments ) )
