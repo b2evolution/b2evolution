@@ -49,7 +49,7 @@ global $Hit;
 
 global $Plugins;
 
-global $locale_from_get, $disp_handler;
+global $locale_from_get, $disp_handler, $disp_handler_type;
 
 global $Session;
 
@@ -102,10 +102,26 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 </div>
 
 <?php
-	if( isset($Blog) && $Session->get( 'display_includes_'.$Blog->ID ) )
+	if( isset( $Blog ) && $Session->get( 'display_includes_'.$Blog->ID ) )
 	{ // Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--include dev-blocks--belowtoolbar">';
-		echo '<div class="dev-blocks-name"><b>MAIN template:</b> '.rel_path_to_base($disp_handler).'</div>';
+		echo '<div class="dev-blocks-name"><b>MAIN template: ';
+		if( ! empty( $disp_handler_type ) )
+		{
+			switch( $disp_handler_type )
+			{
+				case 'custom':
+					echo 'custom -&gt; Found:';
+					break;
+				case 'fallback':
+					echo 'custom -&gt; Fallback to:';
+					break;
+				default:
+					echo 'default:';
+					break;
+			}
+		}
+		echo '</b> '.rel_path_to_base( $disp_handler ).'</div>';
 		echo '</div>';
 	}
 ?>
