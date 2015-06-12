@@ -512,27 +512,25 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #1 will we used by Home
 	skin_install( 'bootstrap_main_skin' );
 
-	// Note: Skin #2 will we used by Blog A
+	// Note: Skin #2 will we used by Blog A and Blog B
 	skin_install( 'bootstrap_blog_skin' );
 
-	// Note: Skin #3 will we used by Blog B
-	skin_install( 'evocamp' );
+	// Note: Skin #3 will we used by Photos
+	skin_install( 'bootstrap_gallery_skin' );
 
-	// Note: Skin #4 will we used by Photos
-	skin_install( 'photoalbums' );
-
-	// Note: Skin #5 will we used by Forums
+	// Note: Skin #4 will we used by Forums
 	skin_install( 'bootstrap_forums_skin' );
 
-	// Note: Skin #6 will we used by Manual
+	// Note: Skin #5 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
 	skin_install( 'asevo' );
-	skin_install( 'bootstrap_gallery_skin' );
 	skin_install( 'dating_mood' );
+	skin_install( 'evocamp' );
 	skin_install( 'evopress' );
 	skin_install( 'forums' );
 	skin_install( 'manual' );
+	skin_install( 'photoalbums' );
 	skin_install( 'photoblog' );
 	skin_install( 'pixelgreen' );
 	skin_install( 'pureforums' );
@@ -591,7 +589,10 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		install_plugin( 'smilies_plugin' );
+		if( $test_install_all_features )
+		{
+			install_plugin( 'smilies_plugin' );
+		}
 		install_plugin( 'videoplug_plugin' );
 	}
 
@@ -643,6 +644,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.0.0-alpha-5
 		// antispam
 		install_plugin( 'basic_antispam_plugin' );
+		install_plugin( 'geoip_plugin' );
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
@@ -665,9 +667,8 @@ function install_basic_plugins( $old_db_version = 0 )
 		// widget
 		install_plugin( 'facebook_plugin' );
 		install_plugin( 'whosonline_plugin' );
-		// Un-Classified
+		// Unclassified
 		install_plugin( 'bookmarklet_plugin' );
-		install_plugin( 'geoip_plugin' );
 	}
 
 	if( $old_db_version < 11200 )
