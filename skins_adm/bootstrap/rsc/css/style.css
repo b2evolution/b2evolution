@@ -917,6 +917,13 @@ h2.user_title {
 #itemform_edit_workflow div.tile label {
   float: none;
 }
+#itemform_edit_workflow .form-group {
+  display: inline-block;
+  margin-right: 20px;
+}
+#itemform_edit_workflow .form-group .controls {
+  display: inline-block;
+}
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url("../../../../rsc/img/ajax-loader/fff.gif");
