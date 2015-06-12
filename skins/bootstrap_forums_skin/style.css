@@ -23,7 +23,6 @@
 }
 #feedbacks .evo_comment .panel-body .floatright span[class*="status_"] {
   background: transparent none repeat scroll 0 0;
-  display: block;
   height: 75px;
   overflow: hidden;
   position: relative;
@@ -437,10 +436,6 @@ ul.legend span.note {
   display: inline-block;
   vertical-align: middle;
 }
-.single_topic .floatright span[class*="status_"] {
-  left: 15px !important;
-  top: -15px !important;
-}
 .single_topic .evo_post__full {
   padding-bottom: 15px;
 }
@@ -460,6 +455,10 @@ ul.legend span.note {
 }
 .single_topic .evo_content_block .panel-body .post_main {
   padding-right: 0px;
+}
+.single_topic .evo_content_block span[class*="status_"] {
+  left: 15px;
+  top: -15px;
 }
 .single_topic .ft_avatar > a {
   position: relative;
@@ -486,10 +485,6 @@ body.round_avatars .single_topic #styled_content_block .ft_avatar a > img {
   -ms-border-radius: 50%;
   -o-border-radius: 50%;
   border-radius: 50%;
-}
-#styled_content_block span[class*='status_'] {
-  top: -15px;
-  left: 15px;
 }
 .vote_spam {
   float: left;
