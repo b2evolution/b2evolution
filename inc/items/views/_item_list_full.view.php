@@ -215,13 +215,13 @@ while( $Item = & $ItemList->get_item() )
 			<?php
 				// Display images that are linked to this post:
 				$Item->images( array(
-						'before' =>              '<div class="bImages">',
-						'before_image' =>        '<div class="image_block">',
-						'before_image_legend' => '<div class="image_legend">',
-						'after_image_legend' =>  '</div>',
-						'after_image' =>         '</div>',
-						'after' =>               '</div>',
-						'image_size' =>          'fit-320x320',
+						'before'              => '<div class="evo_post_images">',
+						'before_image'        => '<figure class="evo_image_block">',
+						'before_image_legend' => '<figcaption class="evo_image_legend">',
+						'after_image_legend'  => '</figcaption>',
+						'after_image'         => '</figure>',
+						'after'               => '</div>',
+						'image_size'          => 'fit-320x320',
 						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
 					) );
@@ -233,10 +233,10 @@ while( $Item = & $ItemList->get_item() )
 					$Item->content_teaser( array(
 							'before'              => '',
 							'after'               => '',
-							'before_image'        => '<div class="image_block">',
-							'before_image_legend' => '<div class="image_legend">',
-							'after_image_legend'  =>  '</div>',
-							'after_image'         => '</div>',
+							'before_image'        => '<figure class="evo_image_block">',
+							'before_image_legend' => '<figcaption class="evo_image_legend">',
+							'after_image_legend'  => '</figcaption>',
+							'after_image'         => '</figure>',
 							'image_size'          => 'fit-320x320',
 						) );
 					$Item->more_link();
