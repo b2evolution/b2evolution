@@ -146,13 +146,16 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 	?>
 
 	<footer>
+
 		<?php
-		// List all tags attached to this post:
-		$Item->tags( array(
-				'before'    => '<nav class="small">'.T_('Tags').': ',
-				'after'     => '</nav>',
-				'separator' => ', ',
-			) );
+			if( ! $Item->is_intro() )
+			{ // List all tags attached to this post:
+				$Item->tags( array(
+						'before'    => '<nav class="small">'.T_('Tags').': ',
+						'after'     => '</nav>',
+						'separator' => ', ',
+					) );
+			}
 		?>
 
 		<nav class="small">
