@@ -93,13 +93,15 @@ $Results->cols[] = array(
 		'order' => 'ityp_backoffice_tab',
 		'td' => '$ityp_backoffice_tab$',
 		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Template name'),
 		'order' => 'ityp_template_name',
-		'td' => '$ityp_template_name$',
+		'td' => '%conditional( #ityp_template_name# == "", "", #ityp_template_name#.".*.php" )%',
 		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
 	);
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
