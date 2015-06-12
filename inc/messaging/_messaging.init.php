@@ -358,7 +358,7 @@ class messaging_Module extends Module
 			$unread_messages_count = get_unread_messages_count();
 			if( $unread_messages_count > 0 )
 			{
-				$right_entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge badge-important">'.$unread_messages_count.'</span></b>';
+				$right_entries['messages']['text'] = T_('Messages').' <span class="badge badge-important">'.$unread_messages_count.'</span>';
 			}
 		}
 
