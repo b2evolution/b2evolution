@@ -143,32 +143,27 @@ skin_widget( array(
 			?></div>
 			<div class="post_main col-md-11 col-sm-10 col-xs-12">
 				<?php
-				$post_header_class = 'bPostDate';
-				if( $Skin->enabled_status_banner( $Item->status ) )
-				{
-					$Item->status( array( 'format' => 'styled' ) );
-					$legend_statuses[] = $Item->status;
-				}
-				?>
-<?php
-	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', $params );
-	// Note: You can customize the default item content by copying the generic
-	// /skins/_item_content.inc.php file into the current skin folder.
-	// -------------------------- END OF POST CONTENT -------------------------
-?>
+					$post_header_class = 'bPostDate';
+					if( $Skin->enabled_status_banner( $Item->status ) )
+					{
+						$Item->status( array( 'format' => 'styled' ) );
+						$legend_statuses[] = $Item->status;
+					}
+
+					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+					skin_include( '_item_content.inc.php', $params );
+					// Note: You can customize the default item content by copying the generic
+					// /skins/_item_content.inc.php file into the current skin folder.
+					// -------------------------- END OF POST CONTENT -------------------------
+
+					// List all tags attached to this topic:
+					$Item->tags( array(
+							'before' =>    '<span class="topic_tags clear">'.T_('Tags').': ',
+							'after' =>     '</span>',
+							'separator' => ', ',
+						) );
+				?>	
 			</div>
-			<?php 
-
-
-			// List all tags attached to this topic:
-			$Item->tags( array(
-					'before' =>    '<span class="topic_tags clear">'.T_('Tags').': ',
-					'after' =>     '</span>',
-					'separator' => ', ',
-				) );
-
-?>	
 		</div><!-- ../panel-body -->
 		
 		<div class="panel-footer">
