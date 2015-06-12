@@ -208,7 +208,7 @@ if( $MainList->result_num_rows > 0 )
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-				'image_size'   => 'fit-400x320',
+				'image_size'   => 'fit-1280x720',
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}

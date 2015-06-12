@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'item_type_class'    => 'evo_post__ptyp_',
 		'item_status_class'  => 'evo_post__',
 		'item_disp_class'    => NULL,
-		'image_size'         => 'fit-400x320',
+		'image_size'         => 'fit-1280x720',
 	), $params );
 
 // In this skin, it makes no sense to navigate in any different mode than "same category"

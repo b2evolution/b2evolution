@@ -37,7 +37,8 @@ $params = array_merge( array(
 		'comment_text_after'      => '</div>',
 		'comment_info_before'     => '<footer class="evo_comment_info clear text-muted"><small>',
 		'comment_info_after'      => '</small></footer></div>',
-		'comment_image_size'      => 'fit-400x320',
+		'comment_image_size'      => 'fit-1280x720',
+		'comment_image_class'     => 'img-responsive',
 	), $params );
 
 

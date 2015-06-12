@@ -32,11 +32,12 @@ $params = array_merge( array(
 		'comment_info_after'    => '</small></footer></div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'before_image'          => '<div class="image_block">',
-		'before_image_legend'   => '<div class="image_legend">',
-		'after_image_legend'    => '</div>',
-		'after_image'           => '</div>',
-		'image_size'            => 'fit-400x320',
+		'before_image'          => '<figure class="evo_image_block">',
+		'before_image_legend'   => '<figcaption class="evo_image_legend">',
+		'after_image_legend'    => '</figcaption>',
+		'after_image'           => '</figure>',
+		'image_size'            => 'fit-1280x720',
+		'image_class'           => 'img-responsive',
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 	
