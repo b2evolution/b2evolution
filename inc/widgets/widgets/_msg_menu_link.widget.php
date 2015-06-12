@@ -273,7 +273,7 @@ class msg_menu_link_Widget extends ComponentWidget
 
 		if( ( $this->disp_params[ 'show_badge' ] ) && ( $unread_messages_count > 0 ) )
 		{
-			$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
+			$badge = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
 			if( isset( $this->BlockCache ) )
 			{ // Do not cache if bage is displayed because the number of unread messages are always changing
 				$this->BlockCache->abort_collect();
