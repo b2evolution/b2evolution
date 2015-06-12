@@ -4,6 +4,12 @@
  * Repositiory: https://github.com/yuku-t/jquery-textcomplete
  * License:     MIT
  * Author:      Yuku Takahashi
+ * 
+ * Modifications:
+ * 
+ * 1) June 12, 2015 by Yura Bakhtin:
+ *    Change "<ul class="dropdown-menu"></ul>" to "<ul class="textcomplete-list"></ul>"
+ *    to avoid conflicts with bootstrap css
  */
 
 ;(function ($) {
@@ -113,7 +119,7 @@
 
     html = {
       wrapper: '<div class="textcomplete-wrapper"></div>',
-      list: '<ul class="dropdown-menu"></ul>'
+      list: '<ul class="textcomplete-list"></ul>'
     };
     css = {
       wrapper: {
