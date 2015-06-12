@@ -44,10 +44,13 @@ class UserSettings extends AbstractSettings
 		'pref_browse_tab' => 'full',
 
 		// Folding settings, 1 - Hide, 0 - Show
+		'fold_itemform_workflow_props' => 1,
+		'fold_itemform_links' => 1,
+		'fold_itemform_plugin_googlemap' => 1,
+		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
-		'fold_itemform_renderers' => 1,
 		'fold_itemform_comments' => 1,
-		'fold_itemform_adv_props' => 1,
+		'fold_itemform_goals' => 1,
 
 		'fm_imglistpreview' => 1,
 		'fm_showdate'       => 'compact',
