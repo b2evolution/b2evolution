@@ -72,7 +72,7 @@ if( count( $admin_Plugins->get_plugin_groups() ) )
 	 */
 	$Results->grp_cols[] = array(
 			'td_colspan' => 0,
-			'td' => '~conditional( {Obj}->group != "", {Obj}->group, "'.T_('Un-Classified').'" )~',
+			'td' => '~conditional( {Obj}->group != "", {Obj}->group, "'.T_('Unclassified').'" )~',
 		);
 }
 

@@ -78,7 +78,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 			<td colspan="5" class="first"><?php
 			if( $current_group == '' || $current_group == 'Un-Grouped' )
 			{
-				echo T_('Un-Classified');
+				echo T_('Unclassified');
 			}
 			else
 			{
