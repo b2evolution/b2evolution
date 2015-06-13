@@ -16,7 +16,29 @@
 
 // MILOS > Intro posts style padding alignment
 main .well {
-	padding-bottom: 29px;
+	padding: 15px 15px 25px 15px;
+	header .small.text-muted {
+		margin: 4px 0px 10px 0px;
+		a {
+			color: inherit;
+		}
+	}
+}
+.post_tags {
+	margin: 15px 0px;
+	a {
+		background-color: white;
+		border: 1px solid #ddd;
+		padding: 5px;
+		.border-radius;
+		&:before {
+			font-family: FontAwesome;
+			content: '\f02b \00a0 ';
+		}
+	}
+}
+.post_comments_link {
+	margin-bottom: 10px;
 }
 
 a.permalink_right
