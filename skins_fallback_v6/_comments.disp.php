@@ -37,7 +37,8 @@ $params = array_merge( array(
 		'comment_text_after'      => '</div>',
 		'comment_info_before'     => '<footer class="evo_comment_info clear text-muted"><small>',
 		'comment_info_after'      => '</small></footer></div>',
-		'comment_image_size'      => 'fit-400x320',
+		'comment_image_size'      => 'fit-1280x720',
+		'comment_image_class'     => 'img-responsive',
 	), $params );
 
 
@@ -84,6 +85,7 @@ while( $Comment = & $CommentList->get_next() )
 					'link_to'               => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 					'author_link_text'      => $params['author_link_text'],
 					'image_size'            => $params['comment_image_size'],
+					'image_class'           => $params['comment_image_class'],
 				) );
 			// Note: You can customize the default item comment by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.

@@ -43,7 +43,6 @@
 #feedbacks {
 	.evo_comment .panel-body .floatright span[class*="status_"] {
 		background: transparent none repeat scroll 0 0;
-		display: block;
 		height: 75px;
 		overflow: hidden;
 		position: relative;
@@ -243,7 +242,7 @@ ol.breadcrumb {
 		}
 	}	
 }
-.bCommentAvatar, {
+.bCommentAvatar {
 	border-radius: 50%;
 	float: left;
 	margin: 4px 10px 10px 0;
@@ -474,15 +473,9 @@ ul.legend {
 			vertical-align: middle;
 		}
 	}
-		.floatright {
-			span[class*="status_"] {
-				left: 15px !important;
-				top: -15px !important;
-			}
-		}
-		.evo_post__full {
-			padding-bottom: 15px;
-		}
+	.evo_post__full {
+		padding-bottom: 15px;
+	}
 	.star_rating {
 		display: inline-block;
 		margin: 0 10px;
@@ -500,6 +493,10 @@ ul.legend {
 			.post_main {
 				padding-right: 0px;
 			}
+		}
+		span[class*="status_"] {
+			left: 15px;
+			top: -15px;
 		}
 	}
 	// Profile pictures
@@ -524,12 +521,6 @@ body.round_avatars .single_topic #styled_content_block .ft_avatar {
 	> a:before, > a, > span, a > img {
 		.border-radius(50%);
 	}
-}
-
-// Statuses of posts/comments display in table view
-#styled_content_block span[class*='status_'] {
-	top: -15px;
-	left: 15px;
 }
 
 // Voting panels

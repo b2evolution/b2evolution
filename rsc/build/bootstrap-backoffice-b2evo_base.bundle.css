@@ -573,7 +573,7 @@ figure {
   max-width: 100%;
   height: auto;
 }
-div.image_legend {
+.evo_image_legend {
   font-size: 84%;
   color: #aaa;
   margin: 1ex;
@@ -2142,9 +2142,6 @@ div.message_toolbars {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
-}
-.post_status_dropdown .dropdown-menu {
-  overflow: hidden;
 }
 .mce-container label.mce-label {
   max-width: none;

@@ -1706,9 +1706,9 @@ function create_demo_contents()
 
 <p>You are currently looking at an info page about "%s".</p>
 
-<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
-<p>If needed, an evoskin can format info pages differently from regular posts.</p>');
+<p>If needed, skins can format info pages differently from regular posts.</p>');
 
 
 	// Update the progress bar status
@@ -1787,9 +1787,9 @@ function create_demo_contents()
 
 <p>You are currently looking at an info page about this site.</p>
 
-<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
-<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
+<p>If needed, skins can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
 			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
 		$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
@@ -2063,6 +2063,12 @@ function create_demo_contents()
 	if( $install_collection_photos )
 	{ // ---------------- Insert the POSTS for Photos blog ---------------- //
 		task_begin( 'Creating sample posts for Collection Photos... ' );
+
+		// Insert a PAGE:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->insert( 1, T_('About Photos'), sprintf( $info_page, T_('Photos') ), $now, $cat_photo_album,
+			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
 
 		// Insert a post into photoblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);

@@ -58,7 +58,7 @@ $params = array_merge( array(
 		'comment_error_start'   => '<div class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
 		'comment_error_end'     => '</div>',
 		'comment_template'      => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'comment_image_size'    => 'fit-400x320',
+		'comment_image_size'    => 'fit-1280x720',
 		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'               => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		// Comment notification functions:

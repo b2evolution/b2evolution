@@ -32,11 +32,12 @@ $params = array_merge( array(
 		'comment_info_after'    => '</small></footer></div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'before_image'          => '<div class="image_block">',
-		'before_image_legend'   => '<div class="image_legend">',
-		'after_image_legend'    => '</div>',
-		'after_image'           => '</div>',
-		'image_size'            => 'fit-400x320',
+		'before_image'          => '<figure class="evo_image_block">',
+		'before_image_legend'   => '<figcaption class="evo_image_legend">',
+		'after_image_legend'    => '</figcaption>',
+		'after_image'           => '</figure>',
+		'image_size'            => 'fit-1280x720',
+		'image_class'           => 'img-responsive',
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 	
@@ -61,18 +62,14 @@ if( $disp == 'single' || $disp == 'post' )
  */
 $Comment = & $params['Comment'];
 
+$comment_class = 'vs_'.$Comment->status;
+
 // Load comment's Item object:
 $Comment->get_Item();
 
 
 $Comment->anchor();
-echo $params['comment_start'];
-
-// Status
-if( $Comment->status != 'published' )
-{	// display status of comment (typically an angled banner in the top right corner):
-	$Comment->status( 'styled' );
-}
+echo '<article class="evo_comment panel panel-default '.$comment_class.'" id="comment_'.$Comment->ID.'">';
 
 // Title
 echo $params['comment_title_before'];
@@ -180,13 +177,7 @@ switch( $Comment->get( 'type' ) )
 		break;
 }
 echo $params['comment_title_after'];
-if( $Skin->enabled_status_banner( $Item->status ) )
-	{
-		$Item->status( array(
-				'format' => 'styled',
-		 ) );
-		$legend_statuses[] = $Item->status;
-	}
+
 // Avatar:
 echo $params['comment_avatar_before'];
 $Comment->author2( array(
@@ -203,7 +194,15 @@ $Comment->rating( array(
 
 // Text:
 echo $params['comment_text_before'];
+
+if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
+{ // Don't display status for previewed comments
+	$Comment->statuses();
+	$legend_statuses[] = $Comment->status;
+}
+
 $Comment->content( 'htmlbody', false, true, $params );
+
 echo $params['comment_text_after'];
 
 // Info:
@@ -228,22 +227,22 @@ echo $params['comment_info_after'];
 	<?php
 	$Comment->reply_link(); /* Link for replying to the Comment */
 	$Comment->vote_helpful( '', '', '&amp;', true, true );
-		echo '<div class="floatright">';
-			$Item->edit_link( array(
-					'before' => '',
-					'after'  => '',
-					'title'  => T_('Edit this topic'),
-					'text'   => '#',
-					'class'  => button_class( 'text' ),
-				) );
-			echo ' <span class="'.button_class( 'group' ).'">';
-			// Set redirect after publish to the same category view of the items permanent url
-			$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
-			$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
-			$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
-			$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
-			echo '</span>';
-			echo '</div>';?>
+	echo '<div class="pull-right">';
+		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ), '&amp;', true, $comment_redirect_url ); /* Link for editing */
+		echo ' <span class="'.button_class( 'group' ).'">';
+		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+		$Comment->moderation_links( array(
+				'ajax_button' => true,
+				'class'       => button_class( 'text' ),
+				'redirect_to' => $comment_redirect_url,
+				'detect_last' => !$delete_button_is_displayed,
+			) );
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+
+		echo '</span>';
+	echo '</div>';
+?>
 </div>
 
 <?php echo $params['comment_end'];

@@ -47,7 +47,7 @@ $params = array_merge( array(
 		'before_comment_form'  => '',
 		'after_comment_form'   => '</div></div>',
 		'form_comment_redirect_to' => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
-		'comment_image_size'       => 'fit-400x320',
+		'comment_image_size'       => 'fit-1280x720',
 		'comment_attach_info'      => get_icon( 'help', 'imgtag', array(
 				'data-toggle'    => 'tooltip',
 				'data-placement' => 'bottom',

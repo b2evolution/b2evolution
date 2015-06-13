@@ -299,9 +299,6 @@ textarea.message_text {
 
 .evo_post {
 	margin-bottom: 2em;
-	.bTitle {
-		margin: 0;
-	}
 	.small.text-muted {
 		margin: 4px 0 10px;
 		a, a .glyphicon {
@@ -443,8 +440,13 @@ html, body {
 .posts_list {
 text-align: center;
 	.evo_post {
-	display: inline-block;
-  vertical-align: middle;
+		display: inline-block;
+		vertical-align: middle;
+
+		display: inline-block;
+		vertical-align: top;
+		text-align: center;
+		margin: 25px 44px;
 	}
 	.evo_post img, .posts_list .evo_post b {
 		transition: all 0.15s ease-in-out;
@@ -476,10 +478,6 @@ text-align: center;
 	text-align: center;
 }
 .evo_post {
-	display: inline-block;
-	vertical-align: top;
-	text-align: center;
-	margin: 25px 44px;
 }
 .evo_post_content {
 	padding-top: 15px;	
@@ -515,9 +513,6 @@ div.evo_image_index div {
 	&:hover {
 		background: none;
 	}
-}
-.alert-dismissible .close {
-	right: 0px;
 }
 .post_images {
 	text-align: center;
@@ -639,10 +634,13 @@ div.evo_image_index div {
 	-o-transition: all 0.15s ease-in-out;
 	-ms-transition: all 0.15s ease-in-out;
 }
-.post_images div:hover img {
+.post_images figure:hover img {
 	transform:scale(1.06);
 	-ms-transform:scale(1.06); /* IE 9 */
 	-webkit-transform:scale(1.06); /* Safari and Chrome */
+}
+.evo_image_legend {
+	display: table;
 }
 
 // Responsive styles
@@ -738,7 +736,7 @@ div.evo_image_index div {
 	}
 }
 
-/* XL Bootstrap Grid Layot */
+/* XL Bootstrap Grid Layout */
 .visible-xl-block,
 .visible-xl-inline,
 .visible-xl-inline-block,

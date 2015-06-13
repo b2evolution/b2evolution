@@ -573,7 +573,7 @@ figure {
   max-width: 100%;
   height: auto;
 }
-div.image_legend {
+.evo_image_legend {
   font-size: 84%;
   color: #aaa;
   margin: 1ex;
@@ -1381,6 +1381,9 @@ ul.jslog_error {
  *
  * Override this with style.css in your skin folder.
  */
+main .well {
+  padding-bottom: 29px;
+}
 a.permalink_right {
   float: right;
   margin: 0 0 0 1em;
@@ -2852,9 +2855,6 @@ div.message_toolbars {
 .btn-status-redirected:hover {
   color: #fff;
   background-color: #613192;
-}
-.post_status_dropdown .dropdown-menu {
-  overflow: hidden;
 }
 .mce-container label.mce-label {
   max-width: none;

@@ -278,7 +278,7 @@
 
 			function createOptionList() {
 				var ulContainer = document.createElement("ul");
-				jQuery(ulContainer).addClass("dropdown-menu");
+				jQuery(ulContainer).addClass("textcomplete-list");
 				document.body.appendChild(ulContainer);
 				return ulContainer;
 			}

@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'item_type_class'    => 'evo_post__ptyp_',
 		'item_status_class'  => 'evo_post__',
 		'item_disp_class'    => NULL,
-		'image_size'         => 'fit-400x320',
+		'image_size'         => 'fit-1280x720',
 	), $params );
 
 // In this skin, it makes no sense to navigate in any different mode than "same category"
@@ -61,7 +61,7 @@ skin_widget( array(
 
 <a name="top"></a>
 <a name="p<?php echo $Item->ID; ?>"></a>
-<div class="forums_list single_topic">
+<div id="styled_content_block" class="forums_list single_topic">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
 	
 	<section class="panel panel-default">
@@ -113,7 +113,7 @@ skin_widget( array(
 	</div>
 	</section>
 	
-	<section id="styled_content_block" class="table evo_content_block">
+	<section class="table evo_content_block">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
@@ -156,13 +156,15 @@ skin_widget( array(
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
 
-					// List all tags attached to this topic:
+				if( ! $Item->is_intro() )
+				{ // List all tags attached to this topic:
 					$Item->tags( array(
-							'before' =>    '<span class="topic_tags clear">'.T_('Tags').': ',
-							'after' =>     '</span>',
+							'before'    => '<span class="topic_tags clear">'.T_('Tags').': ',
+							'after'     => '</span>',
 							'separator' => ', ',
 						) );
-				?>	
+				}
+				?>
 			</div>
 		</div><!-- ../panel-body -->
 		
@@ -208,7 +210,6 @@ skin_widget( array(
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
-</div><!-- ../forums_list single_topic -->
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
@@ -225,6 +226,8 @@ echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 	?>
+
+</div><!-- ../forums_list single_topic -->
 
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)

@@ -1252,3 +1252,7 @@ span.note.status_draft span {
 	cursor: inherit;
 	display: block;
 }
+
+span[id^=title_folding_] {
+	cursor: default;
+}

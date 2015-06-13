@@ -35,7 +35,8 @@ $params = array_merge( array(
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
 		'after_image'           => '</figure>',
-		'image_size'            => 'fit-400x320',
+		'image_size'            => 'fit-1280x720',
+		'image_class'           => 'img-responsive',
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays a post for a blog
+ * This is the template that displays a post in a collection
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
@@ -12,7 +12,6 @@
  * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -24,9 +23,10 @@ while( mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array(
+	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-		) );
+			'image_size'   => 'fit-1280x720',
+		), $params ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 
 } // ---------------------------------- END OF POSTS ------------------------------------

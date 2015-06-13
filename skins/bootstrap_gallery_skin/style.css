@@ -246,9 +246,6 @@ textarea.message_text {
 .evo_post {
   margin-bottom: 2em;
 }
-.evo_post .bTitle {
-  margin: 0;
-}
 .evo_post .small.text-muted {
   margin: 4px 0 10px;
 }
@@ -384,8 +381,11 @@ body {
   margin-top: 0px;
 }
 .posts_list .evo_post {
-  display: inline-block;
   vertical-align: middle;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  margin: 25px 44px;
 }
 .posts_list .evo_post img,
 .posts_list .posts_list .evo_post b {
@@ -418,12 +418,6 @@ body {
 .posts_list,
 .col-lg-12 h2 {
   text-align: center;
-}
-.evo_post {
-  display: inline-block;
-  vertical-align: top;
-  text-align: center;
-  margin: 25px 44px;
 }
 .evo_post_content {
   padding-top: 15px;
@@ -461,9 +455,6 @@ div.evo_image_index div:hover img {
 }
 div.evo_image_index div:hover {
   background: none;
-}
-.alert-dismissible .close {
-  right: 0px;
 }
 .post_images {
   text-align: center;
@@ -583,12 +574,15 @@ div.evo_image_index div:hover {
   -o-transition: all 0.15s ease-in-out;
   -ms-transition: all 0.15s ease-in-out;
 }
-.post_images div:hover img {
+.post_images figure:hover img {
   transform: scale(1.06);
   -ms-transform: scale(1.06);
   /* IE 9 */
   -webkit-transform: scale(1.06);
   /* Safari and Chrome */
+}
+.evo_image_legend {
+  display: table;
 }
 @media screen and (max-width: 1199px) {
   .float-right {
@@ -672,7 +666,7 @@ div.evo_image_index div:hover {
   background-color: #ffffff;
   border-radius: 4px;
 }
-/* XL Bootstrap Grid Layot */
+/* XL Bootstrap Grid Layout */
 .visible-xl-block,
 .visible-xl-inline,
 .visible-xl-inline-block,

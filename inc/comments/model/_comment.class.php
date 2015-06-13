@@ -2621,6 +2621,7 @@ class Comment extends DataObject
 				'after_image_legend'    => '</figcaption>',
 				'after_image'           => '</figure>',
 				'image_size'            => 'fit-400x320',
+				'image_class'           => '',
 				'image_text'            => '', // Text below attached pictures
 				'attachments_mode'      => 'read', // read | view
 				'attachments_view_text' => '',
@@ -2722,7 +2723,7 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, '', '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
 				}
 				else
 				{

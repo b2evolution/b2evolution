@@ -123,9 +123,6 @@ echo '</div>';
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'disp_posts'  => '',		// We already handled this case above
-					'disp_single' => '',		// We already handled this case above
-					'disp_page'   => '',		// We already handled this case above
 					'author_link_text' => 'preferredname',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(

@@ -275,7 +275,7 @@ switch( $content_mode )
 						'before_image'        => $params['before_image'],
 						'before_image_legend' => $params['before_image_legend'],
 						'after_image_legend'  => $params['after_image_legend'],
-						'after_image'         => $params['after_image_legend'],
+						'after_image'         => $params['after_image'],
 						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],

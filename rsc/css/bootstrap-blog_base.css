@@ -5,6 +5,9 @@
  *
  * Override this with style.css in your skin folder.
  */
+main .well {
+  padding-bottom: 29px;
+}
 a.permalink_right {
   float: right;
   margin: 0 0 0 1em;
