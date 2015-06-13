@@ -37,6 +37,7 @@ $params = array_merge( array(
 		'author_link_text'           => 'preferredname',
 	), $params );
 
+
 echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get rid of this ID, use class .evo_content_block instead
 ?>
 
