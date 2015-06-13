@@ -25,7 +25,7 @@ while( mainlist_get_item() )
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'image_size'   =>	'fit-400x320',
+			'image_size'   => 'fit-1280x720',
 		), $params ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 
