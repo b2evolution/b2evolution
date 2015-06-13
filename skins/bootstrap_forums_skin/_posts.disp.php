@@ -165,27 +165,10 @@ if( isset( $MainList ) && ( empty( $cat ) ||
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $cat ) )
 		{ // Display category title
-			echo '<div class="panel-heading">'.$category->get( 'name' ).'</div>';
+			echo '<div class="panel-heading"><h3 class="panel-title">'.$category->get( 'name' ).'</h3></div>';
 		}
 	}
 	?>
-	<div class="panel-body">
-	<?php
-		// Buttons to post/reply
-		$Skin->display_post_button( $cat );
-
-		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( array(
-				'block_start' => '<div class="navigation">',
-				'block_end'   => '</div>',
-				'prev_text'   => T_('Previous'),
-				'next_text'   => T_('Next'),
-				'prev_class'  => 'prev',
-				'next_class'  => 'next',
-			) );
-		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-		?>
-	</div>
 
 	<section class="table table-hover">
 <?php

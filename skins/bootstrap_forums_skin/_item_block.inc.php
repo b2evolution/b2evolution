@@ -61,11 +61,34 @@ skin_widget( array(
 
 <a name="top"></a>
 <a name="p<?php echo $Item->ID; ?>"></a>
+
+	<?php
+		// Buttons to prev/next post on single disp
+		if( !$Item->is_featured() )
+		{
+			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+			item_prevnext_links( array(
+					'block_start'     => '<ul class="pager col-lg-12 post_nav">',
+					'prev_start'      => '<li class="prev-left">',
+					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
+					'prev_end'        => '</li>',
+					'separator'       => ' ',
+					'next_start'      => '<li class="next-right">',
+					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
+					'next_end'        => '</li>',
+					'block_end'       => '</ul>',
+					'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
+					'post_navigation' => 'same_category', // force to stay in the same category in this skin
+					'featured'        => false, // don't include the featured posts into navigation list
+				) );
+			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
+		}
+	?>
+
 <div id="styled_content_block" class="forums_list single_topic">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
 	
-	<section class="panel panel-default">
-	<div class="panel-heading">
+	<div class="single_page_title">
 		<?php
 		// Page title
 		$Item->title( array(
@@ -85,33 +108,6 @@ skin_widget( array(
 				echo '</div>';
 		?>
 	</div>
-	<div class="panel-body"><?php
-		// Buttons to post/reply
-		$post_buttons = $Skin->get_post_button( $current_cat, $Item );
-		echo $post_buttons;
-
-		if( !$Item->is_featured() )
-		{
-			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-			item_prevnext_links( array(
-					'block_start'     => '<ul class="pager post_nav">',
-					'prev_start'      => '<li>',
-					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
-					'prev_end'        => '</li>',
-					'separator'       => ' ',
-					'next_start'      => '<li>',
-					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
-					'next_end'        => '</li>',
-					'block_end'       => '</ul>',
-					'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
-					'post_navigation' => 'same_category', // force to stay in the same category in this skin
-					'featured'        => false, // don't include the featured posts into navigation list
-				) );
-			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
-		}
-		?>
-	</div>
-	</section>
 	
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
@@ -143,7 +139,7 @@ skin_widget( array(
 			?></div>
 			<div class="post_main col-md-11 col-sm-10 col-xs-12">
 				<?php
-					$post_header_class = 'bPostDate';
+					// fp> what's that?? $post_header_class = 'bPostDate';
 					if( $Skin->enabled_status_banner( $Item->status ) )
 					{
 						$Item->status( array( 'format' => 'styled' ) );
@@ -218,6 +214,10 @@ skin_widget( array(
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array ( 
 			'disp_section_title'    => false,
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_after'  => '</span>',
+			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10 col-xs-12">',
+			'comment_text_after'    => '</div>',
 		) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

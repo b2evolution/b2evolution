@@ -33,10 +33,19 @@
 }
 
 // Same effect on every avatar (logged in, logged out)
+.evo_comment_avatar {
+	padding-left: 0px;
+	padding-right: 0px;
+	text-align: center !important;
+	float: left;
+}
+.evo_comment_text {
+	padding-right: 0px;
+}
 .evo_comment_avatar span img, .evo_comment_avatar a img {
 	border-radius: 50%;
-	float:left;
-	margin: 0px 15px 15px 0px !important;
+	float: none !important;
+	margin: 0px 0px 14px 0px !important;
 }
 
 // Badge fix on comments, disp=single
@@ -58,6 +67,8 @@
 		position: relative;
 		text-align: center;
 		top: 15px;
+		-ms-transform: rotate(45deg);
+		-webkit-transform: rotate(45deg);
 		transform: rotate(45deg);
 		width: 120px;
 	}
@@ -358,6 +369,14 @@ ul.legend {
 .post_nav.pager {
 	float: right;
 	margin: 0;
+	margin-bottom: 20px;
+	padding-right: 0px;
+	.prev-left {
+		float: left;
+	}
+	.next-right {
+		float: right;
+	}	
 }
 
 // Login/Register forms:
@@ -460,6 +479,12 @@ ul.legend {
 }
 
 // Single topic view
+.single_page_title {
+	margin-bottom: 20px;	
+		.ft_author_info.shrinked {
+			display: none;
+		}
+}
 .single_topic {
 	.ft_post_info {
 		padding: 8px;
@@ -486,7 +511,7 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
-				span img.loadimg {
+				span img.loadimg, a img.loadimg {
 					border-radius: 50% !important;
 				}
 			}
@@ -504,7 +529,7 @@ ul.legend {
 		> a {
 			position: relative;
 			&:before {
-				box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2) inset;
+			//	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2) inset;
 				content: "";
 				display: block;
 				height: 100%;
@@ -676,10 +701,18 @@ label.control-label[for=post_title] {
 		.panel-body .floatright {
 			display: none;
 		}
+		.evo_comment_text {
+			padding-left: 0px;
+		}
 		.evo_comment .panel-footer .floatright {
 			a.btn {
 				margin-top: 3px;
 			}
+		}
+	}
+	#feedbacks {
+		.evo_comment_avatar span img, .evo_comment_avatar a img {
+			display: none;
 		}
 	}
 }
@@ -769,7 +802,7 @@ label.control-label[for=post_title] {
 		color: #8b96a1;
 		font-size: 90%;
 	}
-	.forums_list single_topic {		
+	.single_page_title {		
 		.ft_author_info {
 			display: none;
 			&.shrinked {

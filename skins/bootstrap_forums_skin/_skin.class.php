@@ -288,7 +288,7 @@ class bootstrap_forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-default" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
