@@ -120,10 +120,78 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </nav><!-- .row -->
 
-
 <main><!-- This is were a link like "Jump to main content" would land -->
 
-	<!-- ================================= START OF MAIN AREA ================================== -->
+	<!-- =================================== START OF POST TITLE BAR =================================== -->
+
+	<?php
+		if( $single_Item = & mainlist_get_item() )
+		{ // Get Item here, because it can be not defined yet, e.g. in Preview mode
+		?>
+		<div class="row">
+			<div class="col-xs-12">
+			<nav class="nav_album">
+
+			<a href="<?php $Blog->disp( 'url', 'raw' ) ?>" title="<?php echo format_to_output( T_('All Albums'), 'htmlattr' ); ?>" class="all_albums">All Albums</a>
+
+			<span class="nav_album_title">
+				<?php
+					$single_Item->title( array(
+							'link_type' => 'permalink',
+							'before'    => '',
+							'after'     => '',
+						) );
+				?>
+				<div class="nav_album_number hidden-xs">
+					<?php printf( T_('%s photos'), $single_Item->get_number_of_images() ); ?>
+				</div>
+				<?php 	
+					if( $Skin->enabled_status_banner( $Item->status ) )
+					{ // Status banner
+						$single_Item->status( array(
+								'before' => '<div class="post_status">',							
+								'class' => 'badge',
+								'after'  => '</div>',
+								'format' => 'styled',
+							) );
+					}
+					$single_Item->edit_link( array( // Link to backoffice for editing
+							'before'    => '',
+							'after'     => '',
+							'text'      => get_icon( 'edit' ),
+							'title'     => T_('Edit title/description...'),
+						) );
+				?>
+			</span><!-- .nav_album_title -->
+		
+			<?php
+				// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+				item_prevnext_links( array(
+						'template' => '$prev$$next$',
+						'block_start' => '<ul class="pager hidden-xs">',
+						'next_class' => 'next',
+						'next_start'  => '<li class="next">',
+						'next_text' => 'Next',
+						'next_no_item' => '',
+						'next_end'    => '</li>',
+						'prev_class' => 'previous',
+						'prev_start'  => '<li class="previous">',
+						'prev_text' => 'Previous',
+						'prev_no_item' => '',
+						'prev_end'    => '',
+						'block_end'   => '</ul>',
+					) );
+				// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
+			?>
+		
+			<div class="clear"></div>
+			
+			</nav><!-- .nav_album -->
+			</div><!-- .col -->
+		</div><!-- .row -->
+		<?php
+		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
+	?>
 
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -133,68 +201,86 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
+		
+	<article class="row">	
 
 	<?php
-	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( array(
-			'title_before'      => '<div class="row"><div class="col-xs-12><h2>',
-			'title_after'       => '</h2></div></div>',
-			'title_none'        => '',
-			'glue'              => ' - ',
-			'title_single_disp' => false,
-			'format'            => 'htmlbody',
-			'arcdir_text'       => T_('Index'),
-			'catdir_text'       => '',
-			'category_text'     => T_('Gallery').': ',
-			'categories_text'   => T_('Galleries').': ',
-			'user_text'         => '',
-		) );
-	// ------------------------------ END OF REQUEST TITLE -----------------------------
+		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
 
-	<div class="row">
-
-		<div class="col-xs-12">
-
+	<div class="post_images col-xl-9 col-lg-8 col-md-6 col-sm-6">
 		<?php
-			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-			skin_include( '$disp$', array(
-					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-					'author_link_text'     => 'preferredname',
-					'item_class'           => 'evo_post evo_content_block',
-					'item_type_class'      => 'evo_post__ptyp_',
-					'item_status_class'    => 'evo_post__',
-					// Login
-					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
-					'login_page_after'     => '</div></div>',
-					// Register
-					'register_page_before' => '<div class="login_block"><div class="evo_details">',
-					'register_page_after'  => '</div></div>',
-					'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
+			// Display images that are linked to this post:
+			$Item->images( array(
+					'before'              => '',
+					'before_image'        => '<figure class="single-image">',
+					'before_image_legend' => '<figcaption class="evo_image_legend">',
+					'after_image_legend'  => '</figcaption>',
+					'after_image'         => '</figure>',
+					'after'               => '<div class="clear"></div>',
+					'image_size'          => $Skin->get_setting( 'single_thumb_size' ),
+					'image_align'         => 'middle',
 				) );
-			// Note: you can customize any of the sub templates included here by
-			// copying the matching php file into your skin directory.
-			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
-		
-		</div><!-- .col -->
-		
-	</div><!-- .row -->
+	</div>
 
+	<div class="evo_post_content col-xl-3 col-lg-4 col-md-6 col-sm-6">
+
+		<div class="evo_details">
+
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				// Note: at the top of this file, we set: 'image_size' =>	'', // Do not display images in content block - Image is handled separately
+				skin_include( '_item_content.inc.php', array(
+						'feature_block'          => false,
+						'item_class'        	 => 'evo_post',
+						'item_type_class'   	 => 'evo_post__ptyp_',
+						'item_status_class' 	 => 'evo_post__',
+						'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+						'image_size'             => '', // Do not display images in content block - Image is handled separately
+						'url_link_text_template' => '', // link will be displayed (except player if podcast)
+					) );
+				// Note: You can customize the default item content by copying the generic
+				// /skins/_item_content.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
+
+			<?php
+				// URL link, if the post has one:
+				$Item->url_link( array(
+						'before'        => '<div class="small evo_print">'.T_('Link').': ',
+						'after'         => '</div>',
+						'text_template' => '$url$',
+						'url_template'  => '$url$',
+						'target'        => '',
+						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
+					) );
+			?>
+
+			<div class="item_comments">
+				<?php
+					// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+					skin_include( '_item_feedback.inc.php', array(
+							'before_section_title' => '<h4>',
+							'after_section_title'  => '</h4>',
+							'author_link_text'     => 'preferredname',
+							'comment_image_size'   => 'fit-256x256',
+						) );
+					// Note: You can customize the default item feedback by copying the generic
+					// /skins/_item_feedback.inc.php file into the current skin folder.
+					// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+				?>
+			</div>
+
+		</div>
+
+	</div>
 
 	<?php
-	if( $disp != 'catdir' )
-	{	// Don't display the pages on disp=catdir because we don't have a limit by page there
-		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( array(
-				'block_start' => '<div class="nav_pages">',
-				'block_end' => '</div>',
-				'prev_text' => '&lt;&lt;',
-				'next_text' => '&gt;&gt;',
-			) );
-		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-	}
+		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
+
+	</article><!-- .row -->
 
 </main>
 

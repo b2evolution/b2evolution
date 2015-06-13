@@ -33,7 +33,7 @@ $list_is_empty = display_if_empty( $params_no_content );
 if( ! $list_is_empty )
 {
 ?>
-<div class="posts_list col-md-12 col-sm-12">
+<div class="posts_list">
 <?php
 	while( $Item = & mainlist_get_item() )
 	{ // For each blog post, do everything below up to the closing curly brace "}"
