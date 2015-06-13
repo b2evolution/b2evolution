@@ -6267,28 +6267,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY bloggroup_perm_edit ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no'" );
 		task_end();
 
-		// Init Caches:
-		task_begin( '(Re-)Initializing caches...' );
-		load_funcs('tools/model/_system.funcs.php');
-		if( system_init_caches( true ) )
-		{ // cache was initialized successfully
-			// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
-			system_check_caches();
-			// Display task end with 'OK' only in case of successfuly executed init caches process
-			task_end();
-		}
-		else
-		{ // Caches could not be initialized successfully, an error message was displayed inside the init function
-			echo "<br />\n";
-		}
+		// fp> Note: do NOT put back and "add upgrades" comment here. The comment is OUTSIDE of the block now!
 
-		/*
-		 * ADD UPGRADES FOR i7 BRANCH __ABOVE__ IN THIS BLOCK.
-		 *
-		 * This part will be included in trunk and i7 branches
-		 */
-
-		//set_upgrade_checkpoint( '11430' );
+		// set_upgrade_checkpoint( '11430' );
 	}
 
 	/*
@@ -6332,7 +6313,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$Plugins = new Plugins();
 		}
 
-		// fp> TODO: put cache repair code back here
+		// Init Caches:
+		load_funcs('tools/model/_system.funcs.php');
+		system_init_caches( true, ($old_db_version <= 11410) ); // Only force enabling the caches if we upgrade from a version older or equal to 11410 (6.4.2-beta)
+		// note: the above outputs messages
+
+		// Check/Repair Caches:
+		task_begin( 'Checking &amp; repairing caches...' );
+		load_funcs('tools/model/_system.funcs.php');
+		// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
+		system_check_caches( true );
+		// fp> TODO: display error messages
+		task_end();
 
 		// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
 		// This requires an up to date database, and also $Plugins and $GeneralSettings objects must be initialized before this.

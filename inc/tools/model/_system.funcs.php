@@ -273,6 +273,9 @@ function system_check_blog_cache( $blog_ID = NULL, $repair = false )
 }
 
 
+/**
+ * Check and repair cache folders.
+ */
 function system_check_caches( $repair = true )
 {
 	global $DB;
@@ -324,36 +327,45 @@ function system_check_caches( $repair = true )
 
 /**
  * Initialize cache settings and folders (during install or upgrade)
+ *
+ * This is called on install and on upgrade.
  */
-function system_init_caches( $verbose = false )
+function system_init_caches( $verbose = false, $force_enable = true )
 {
 	global $cache_path, $Settings, $Plugins, $DB;
 
 	// create /_cache and /_cache/plugins/ folders
+	task_begin( 'Checking/creating <code>/_cache/</code> &amp; <code>/_cache/plugins/</code> folders...' );
 	if( !system_create_cache_folder( $verbose ) )
 	{ // The error message were displayed
+		task_end('');
 		return false;
 	}
+	task_end();
 
-	if( ! is_object( $Settings ) )
-	{ // create Settings object
-		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-		$Settings = new GeneralSettings();
-	}
-	if( ! is_object( $Plugins ) )
-	{ // create Plugins object
-		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
-		$Plugins = new Plugins();
-	}
-
-	$Settings->set( 'newblog_cache_enabled', true );
-	set_cache_enabled( 'general_cache_enabled', true );
-	$existing_blogs = system_get_blog_IDs( false );
-	foreach( $existing_blogs as $blog_ID )
+	if( $force_enable )
 	{
-		set_cache_enabled( 'cache_enabled', true, $blog_ID );
+		task_begin( 'Enabling page caching by default...' );
+
+		if( ! is_object( $Settings ) )
+		{ // create Settings object
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		// New blog should have their cache enabled by default: (?)
+		$Settings->set( 'newblog_cache_enabled', true );
+
+		// Enable general cache
+		set_cache_enabled( 'general_cache_enabled', true );
+
+		// Enable caches for all collections:
+		$existing_blogs = system_get_blog_IDs( false );
+		foreach( $existing_blogs as $blog_ID )
+		{
+			set_cache_enabled( 'cache_enabled', true, $blog_ID );
+		}
+		task_end();
 	}
-	return true;
 }
 
 

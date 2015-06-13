@@ -86,7 +86,7 @@ function load_db_schema()
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo 'Loading module: '.$module.'/model/_'.$module.'.install.php<br />';
+		echo 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />';
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 }

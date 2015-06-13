@@ -2825,10 +2825,7 @@ Hello
 	install_basic_widgets( $new_db_version );
 
 	load_funcs( 'tools/model/_system.funcs.php' );
-	if( ! system_init_caches( true ) )
-	{
-		echo "<br />\n";
-	}
+	system_init_caches( true, true ); // Outputs messages
 }
 
 

@@ -265,9 +265,9 @@ function task_begin( $title )
  * End install task.
  * This will offer other display methods in the future
  */
-function task_end()
+function task_end( $message = 'OK.' )
 {
-	echo "OK.<br />\n";
+	echo $message."<br />\n";
 }
 
 
@@ -964,7 +964,7 @@ function create_relations()
  */
 function install_htaccess( $upgrade = false )
 {
-	echo '<p>'.T_('Preparing to install .htaccess ...').' ';
+	echo '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ';
 
 	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
 	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
