@@ -511,43 +511,53 @@ div.item_location {
   position: relative;
   overflow: hidden;
 }
-.note.status_draft span {
+.note.status_draft span,
+.evo_status__draft {
   color: #000;
   background-color: #ff9;
 }
-.note.status_review span {
+.note.status_review span,
+.evo_status__review {
   color: #fff;
   background-color: #CC0099;
 }
-.note.status_community span {
+.note.status_community span,
+.evo_status__community {
   color: #fff;
   background-color: #2E8BB9;
 }
-.note.status_protected span {
+.note.status_protected span,
+.evo_status__protected {
   color: #fff;
   background-color: #FF9C2A;
 }
-.note.status_private span {
+.note.status_private span,
+.evo_status__private {
   color: #fff;
   background-color: #DC143C;
 }
-.note.status_published span {
+.note.status_published span,
+.evo_status__published {
   color: #000;
   background-color: #99EE44;
 }
-.note.status_deprecated span {
+.note.status_deprecated span,
+.evo_status__deprecated {
   color: #fff;
   background-color: #000;
 }
-.note.status_redirected span {
+.note.status_redirected span,
+.evo_status__redirected {
   color: #fff;
   background-color: #663399;
 }
-.note.status_trash span {
+.note.status_trash span,
+.evo_status__trash {
   color: #fff;
   background-color: #f66;
 }
-.note.status_meta span {
+.note.status_meta span,
+.evo_status__meta {
   color: #fff;
   background-color: #5133ab;
 }
