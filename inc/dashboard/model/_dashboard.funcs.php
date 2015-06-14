@@ -275,9 +275,16 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$hidden_status = ( $index > 5 ) ? ' hidden_comment' : '';
 
 		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
+
+/* OLD:
 		echo '<div class="floatright"><span class="note status_'.$Comment->status.'"><span>';
 		$Comment->status();
 		echo '</span></span></div>';
+	NEW:
+*/
+		$Comment->format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+			) );
 
 		echo $Comment->get_author( array(
 				'before'      => '<div class="dashboard_comment_avatar">',
