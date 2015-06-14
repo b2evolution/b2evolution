@@ -285,7 +285,7 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $this->disp_params['block_start'];
 			echo $this->disp_params['block_body_start'];
 			echo T_('The requested Blog doesn\'t exist any more!');
-			echo $this->disp_params['block_end_start'];
+			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 			return;
 		}
