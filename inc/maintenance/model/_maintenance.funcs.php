@@ -565,7 +565,7 @@ function check_upgrade_config( $display_message = false )
 		if( $display_message )
 		{ // Display error message
 			global $Messages;
-			$Messages->add( T_('WARNING: upgrade_policy.conf not found. ALL FILES WILL BE BLINDLY UPGRADED WITHOUT DISCRIMINATION. Please refer to /conf/upgrade_policy_sample.conf for more info.') );
+			$Messages->add( T_('WARNING: <code>upgrade_policy.conf</code> not found. ALL FILES WILL BE BLINDLY UPGRADED WITHOUT DISCRIMINATION. Please refer to <code>/conf/upgrade_policy_sample.conf</code> for more info.') );
 		}
 		return false;
 	}
@@ -610,7 +610,7 @@ function get_upgrade_config( $action )
 	$config_handle = @fopen( $conf_path.'upgrade_policy.conf', 'r' );
 	if( ! $config_handle )
 	{ // No permissions to open file
-		$upgrade_policy_config = sprintf( T_('No permission to open %s.'), '&laquo;<b>upgrade_policy.conf</b>&raquo;' );
+		$upgrade_policy_config = sprintf( T_('No permission to open the %s file.'), '<code>upgrade_policy.conf</code>' );
 		return $upgrade_policy_config;
 	}
 
@@ -624,7 +624,7 @@ function get_upgrade_config( $action )
 
 	if( empty( $config_content ) )
 	{ // Config file is empty for required action
-		$upgrade_policy_config = sprintf( T_('%s is empty.'), '&laquo;<b>upgrade_policy.conf</b>&raquo;' );
+		$upgrade_policy_config = sprintf( T_('The %s file is empty.'), '<code>upgrade_policy.conf</code>' );
 		return $upgrade_policy_config;
 	}
 
@@ -703,14 +703,14 @@ function remove_after_upgrade()
 	}
 	elseif( empty( $upgrade_removed_files ) )
 	{ // No files/folders to remove, Exit here
-		$config_error = sprintf( T_('No "remove" sections have been defined in the file %s.'), '&laquo;<b>upgrade_policy.conf</b>&raquo;' );
+		$config_error = sprintf( T_('No "remove" sections have been defined in the file %s.'), '<code>upgrade_policy.conf</code>' );
 	}
 
 	if( !empty( $config_error ) )
 	{ // Display config error
 		echo '<div class="red">';
 		echo $config_error;
-		echo ' '.T_('No cleanup is being done. You should manually remove the /install folder and check for other unwanted files...');
+		echo ' '.T_('No cleanup is being done. You should manually remove the <code>/install</code> folder and check for other unwanted files...');
 		echo '</div>';
 		return;
 	}
@@ -718,7 +718,7 @@ function remove_after_upgrade()
 	foreach( $upgrade_removed_files as $file_path )
 	{
 		$file_path = $basepath.$file_path;
-		$log_message = sprintf( T_('Removing %s as stated in upgrade_policy.conf...'), '&laquo;<b>'.$file_path.'</b>&raquo;' ).' ';
+		$log_message = sprintf( T_('Removing %s as stated in upgrade_policy.conf...'), '<code>'.$file_path.'</code>' ).' ';
 		$success = true;
 		if( file_exists( $file_path ) )
 		{ // File exists
