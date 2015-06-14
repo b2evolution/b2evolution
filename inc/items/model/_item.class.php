@@ -4390,8 +4390,8 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before' => '',
 				'after'  => '',
-				'format' => 'htmlbody', // Output format, see {@link format_to_output()}
-				'class'  => '',
+				'format' => 'htmlbody', // DO NOT USE 'styled' ->DEPRECATED! INSTEAD: Valid values: see {@link format_to_output()}
+				'class'  => '',			// DEPRECATED
 			), $params );
 
 		$r = $params['before'];
@@ -4403,10 +4403,16 @@ class Item extends ItemLight
 				break;
 
 			case 'styled':
+				// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="evo_status__banner evo_status__$status$">$status_title$</div>' ) );
 				$r .= get_styled_status( $this->status, $this->get('t_status'), $params['class'] );
 				break;
+				
+			case 'pill':
+				// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="badge evo_status__$status$">$status_title$</div>' ) );
+				$r .= get_pill_status( $this->status, $this->get('t_status'), $params['class'] );
+				break;
 
-			default:
+			default: // other formats
 				$r .= format_to_output( $this->get('t_status'), $params['format'] );
 				break;
 		}
@@ -4440,6 +4446,29 @@ class Item extends ItemLight
 			), $params );
 
 		echo $this->get_status( $params );
+	}
+
+
+	/**
+	 * Display status of item in a formatted way, following a provided template
+	 *
+	 * There are 2 possible variables: 
+	 * - $status$ = the raw status
+	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 *
+	 * @param array Params
+	 */
+	function format_status( $params = array() )
+	{
+		$params = array_merge( array(
+				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
+			), $params );
+
+		$r = str_replace( '$status$', $this->status, $params['template'] );
+		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
+	
+		echo format_to_output( $r, $params['format'] );
 	}
 
 

@@ -1405,12 +1405,24 @@ function get_colored_status( $Comment )
  * @param string Status class
  * @return string Styled template for status
  */
+// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="evo_status__banner evo_status__$status$">$status_title$</div>' ) );
 function get_styled_status( $status_value, $status_title, $status_class = '' )
 {
 	return '<div class="floatright">'
 		.'<span class="note status_'.$status_value.'">'
 		.'<span'.( empty( $status_class ) ? '' : ' class="'.$status_class.'"' ).'>'.format_to_output( $status_title ).'</span>'
 		.'</span>'
+		.'</div>';
+}
+
+// Pill styled status
+// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="badge evo_status__$status$">$status_title$</div>' ) );
+function get_pill_status( $status_value, $status_title, $status_class = '' )
+{
+	return '<div class="floatright">'
+		.'<div class="status_'.$status_value.'">'
+		.'<div'.( empty( $status_class ) ? '' : ' class="'.$status_class.'"' ).'>'.format_to_output( $status_title ).'</div>'
+		.'</div>'
 		.'</div>';
 }
 
