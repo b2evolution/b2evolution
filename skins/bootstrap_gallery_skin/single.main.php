@@ -148,12 +148,16 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php 	
 					if( $Skin->enabled_status_banner( $Item->status ) )
 					{ // Status banner
+/* OLD:						
 						$single_Item->status( array(
 								'before' => '<div class="post_status">',							
 								'class' => 'badge',
 								'after'  => '</div>',
 								'format' => 'styled',
 							) );
+NEW:
+*/
+						$Item->format_status( array( 'template' => '<div class="evo_status badge evo_status__$status$">$status_title$</div>' ) );						
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',

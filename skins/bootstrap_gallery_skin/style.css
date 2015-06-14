@@ -509,9 +509,9 @@ div.evo_image_index div:hover {
   font-size: 16px;
   margin-left: 5px;
 }
-.nav_album .post_status {
-  display: inline-block;
-  margin: 5px 3px -4px 3px;
+.nav_album .evo_status {
+  position: relative;
+  top: -1px;
 }
 .nav_album .pager {
   float: right;
