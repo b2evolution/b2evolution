@@ -64,79 +64,102 @@ class bootstrap_blog_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				'layout' => array(
-					'label' => T_('Layout'),
-					'note' => '',
-					'defaultvalue' => 'right_sidebar',
-					'options' => array(
-							'single_column' => T_('Single column'),
-							'left_sidebar'  => T_('Left Sidebar'),
-							'right_sidebar' => T_('Right Sidebar'),
-						),
-					'type' => 'select',
+				'section_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Layout Settings')
 				),
-				// Colorbox
-				'colorbox' => array(
-					'label' => T_('Colorbox Image Zoom'),
-					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'layout' => array(
+						'label' => T_('Layout'),
+						'note' => '',
+						'defaultvalue' => 'right_sidebar',
+						'options' => array(
+								'single_column' => T_('Single column'),
+								'left_sidebar'  => T_('Left Sidebar'),
+								'right_sidebar' => T_('Right Sidebar'),
+							),
+						'type' => 'select',
+					),
+				'section_username_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_post' => array(
-					'label' => T_('Voting on Post Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+
+				'section_colorbox_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Colorbox Image Zoom')
 				),
-				'colorbox_vote_post_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'colorbox' => array(
+						'label' => T_('Colorbox Image Zoom'),
+						'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post' => array(
+						'label' => T_('Voting on Post Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment' => array(
+						'label' => T_('Voting on Comment Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user' => array(
+						'label' => T_('Voting on User Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'section_colorbox_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_comment' => array(
-					'label' => T_('Voting on Comment Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+
+
+				'section_username_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Username options')
 				),
-				'colorbox_vote_comment_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'gender_colored' => array(
+						'label' => T_('Display gender'),
+						'note' => T_('Use colored usernames to differentiate men & women.'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'bubbletip' => array(
+						'label' => T_('Username bubble tips'),
+						'note' => T_('Check to enable bubble tips on usernames'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'autocomplete_usernames' => array(
+						'label' => T_('Autocomplete usernames'),
+						'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'section_username_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_user' => array(
-					'label' => T_('Voting on User Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'colorbox_vote_user_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				// Other settings
-				'gender_colored' => array(
-					'label' => T_('Display gender'),
-					'note' => T_('Use colored usernames to differentiate men & women.'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'bubbletip' => array(
-					'label' => T_('Username bubble tips'),
-					'note' => T_('Check to enable bubble tips on usernames'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'autocomplete_usernames' => array(
-					'label' => T_('Autocomplete usernames'),
-					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
+
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
