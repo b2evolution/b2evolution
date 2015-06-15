@@ -48,32 +48,6 @@
 	margin: 0px 0px 14px 0px !important;
 }
 
-// Badge fix on comments, disp=single
-#feedbacks {
-	.evo_comment .panel-body .floatright span[class*="status_"] {
-		background: transparent none repeat scroll 0 0;
-		height: 75px;
-		overflow: hidden;
-		position: relative;
-		width: 75px;
-		margin-top: -15px;
-		margin-right: -15px;
-	}
-	.evo_comment .panel-body .floatright span[class*="status_"] span {
-		display: block;
-		font-size: 9pt;
-		left: -12px;
-		padding: 3px 0;
-		position: relative;
-		text-align: center;
-		top: 15px;
-		-ms-transform: rotate(45deg);
-		-webkit-transform: rotate(45deg);
-		transform: rotate(45deg);
-		width: 120px;
-	}
-}
-
 // Breadcrumbs
 ol.breadcrumb {
 	margin-left: 0;
@@ -366,10 +340,10 @@ ul.legend {
 }
 
 // Post navigation
-.post_nav.pager {
+.pager {
 	float: right;
 	margin: 0;
-	margin-bottom: 20px;
+	margin-bottom: 15px;
 	padding-right: 0px;
 	.prev-left {
 		float: left;
@@ -775,11 +749,6 @@ label.control-label[for=post_title] {
 			display: inline;
 			margin-top: 4px;
 			width: auto;
-		}
-	}
-	.evo_content_block {		
-		.panel-body .floatright {
-			display: none;
 		}
 	}
 }

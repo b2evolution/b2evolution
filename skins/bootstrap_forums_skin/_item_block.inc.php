@@ -127,6 +127,14 @@ skin_widget( array(
 								'time_format' => 'M j, Y H:i',
 							) );
 					}
+					
+					if( $Skin->enabled_status_banner( $Item->status ) )
+					{ // Status banner
+						$Item->format_status( array(
+								'template' => '<div class="floatright evo_status badge evo_status__$status$">$status_title$</div>',
+								) );
+						$legend_statuses[] = $Item->status;
+					}
 				?></h4>	
 		</div>
 		
@@ -139,13 +147,6 @@ skin_widget( array(
 			?></div>
 			<div class="post_main col-md-11 col-sm-10 col-xs-12">
 				<?php
-					// fp> what's that?? $post_header_class = 'bPostDate';
-					if( $Skin->enabled_status_banner( $Item->status ) )
-					{
-						$Item->status( array( 'format' => 'styled' ) );
-						$legend_statuses[] = $Item->status;
-					}
-
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', $params );
 					// Note: You can customize the default item content by copying the generic

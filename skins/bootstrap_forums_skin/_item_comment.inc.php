@@ -176,6 +176,16 @@ switch( $Comment->get( 'type' ) )
 		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 		break;
 }
+
+// Status banners
+if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
+{ // Don't display status for previewed comments
+		$Comment->format_status( array(
+				'template' => '<div class="floatright evo_status badge evo_status__$status$">$status_title$</div>',
+			) );
+		$legend_statuses[] = $Comment->status;
+}
+
 echo $params['comment_title_after'];
 
 // Avatar:
@@ -194,12 +204,6 @@ $Comment->rating( array(
 
 // Text:
 echo $params['comment_text_before'];
-
-if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
-{ // Don't display status for previewed comments
-	$Comment->statuses();
-	$legend_statuses[] = $Comment->status;
-}
 
 $Comment->content( 'htmlbody', false, true, $params );
 

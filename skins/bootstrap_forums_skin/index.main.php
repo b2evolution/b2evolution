@@ -48,7 +48,6 @@ if( $disp == 'posts' )
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'body_class'        => $Skin->get_setting( 'avatar_style' ) == 'round' ? 'round_avatars' : NULL,
 	'edit_text_create'  => T_('Start a new topic'),
 	'edit_text_update'  => T_('Edit post'),
 	'catdir_text'       => T_('Forum'),
