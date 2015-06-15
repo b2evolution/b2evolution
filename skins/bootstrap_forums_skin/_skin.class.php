@@ -62,108 +62,144 @@ class bootstrap_forums_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				// === MILOS
-				/*'page_link_color' => array(
-					'label' => T_('Page link color'),
-					'note' => T_('E-g: #00ff00 for green'),
-					'defaultvalue' => '#337ab7',
-					'type' => 'color',
+				'section_forum_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Forum Display Settings')
 				),
-				'current_tab_text_color' => array(
-					'label' => T_('Current tab text color'),
-					'note' => T_('E-g: #ff6600 for orange'),
-					'defaultvalue' => '#333',
-					'type' => 'color',
+					'display_post_date' => array(
+						'label' => T_('Post date'),
+						'note' => T_('Display the date of each post'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'banner_public' => array(
+						'label' => T_('Display "Public" banner'),
+						'note' => T_('Display banner for "Public" posts (posts & comments)'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'section_forum_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'page_bg_color' => array(
-					'label' => T_('Page background color'),
-					'note' => T_('E-g: #ff0000 for red'),
-					'defaultvalue' => '#fff',
-					'type' => 'color',
-				),*/	
-				// === ../MILOS
-				'avatar_style' => array(
-					'label' => T_('Style of profile pictures'),
-					'note' => '',
-					'defaultvalue' => 'round',
-					'type' => 'radio',
-					'options' => array(
-						array( 'round', T_('Round the corners of profile pictures') ),
-						array( 'square', T_('Original pictures with square corners') ) ),
-					'field_lines' => true,
+
+/*
+				'section_page_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Page Styles')
 				),
-				'display_post_date' => array(
-					'label' => T_('Post date'),
-					'note' => T_('Display the date of each post'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'page_text_size' => array(
+						'label' => T_('Page text size'),
+						'note' => T_('Default value is 14 pixels.'),
+						'defaultvalue' => '14px',
+						'size' => '4px',
+						'type' => 'text',
+					),
+					'page_text_color' => array(
+						'label' => T_('Page text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_link_color' => array(
+						'label' => T_('Page link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'current_tab_text_color' => array(
+						'label' => T_('Current tab text color'),
+						'note' => T_('E-g: #ff6600 for orange'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_bg_color' => array(
+						'label' => T_('Page background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+				'section_page_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox' => array(
-					'label' => T_('Colorbox Image Zoom'),
-					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+*/
+
+				'section_colorbox_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Colorbox Image Zoom')
 				),
-				'colorbox_vote_post' => array(
-					'label' => T_('Voting on Post Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'colorbox' => array(
+						'label' => T_('Colorbox Image Zoom'),
+						'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post' => array(
+						'label' => T_('Voting on Post Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_post_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment' => array(
+						'label' => T_('Voting on Comment Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_comment_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user' => array(
+						'label' => T_('Voting on User Images'),
+						'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+					'colorbox_vote_user_numbers' => array(
+						'label' => T_('Display Votes'),
+						'note' => T_('Check to display number of likes and dislikes'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'section_colorbox_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_post_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+
+
+				'section_username_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Username options')
 				),
-				'colorbox_vote_comment' => array(
-					'label' => T_('Voting on Comment Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
+					'gender_colored' => array(
+						'label' => T_('Display gender'),
+						'note' => T_('Use colored usernames to differentiate men & women.'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'bubbletip' => array(
+						'label' => T_('Username bubble tips'),
+						'note' => T_('Check to enable bubble tips on usernames'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
+					'autocomplete_usernames' => array(
+						'label' => T_('Autocomplete usernames'),
+						'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
+				'section_username_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'colorbox_vote_comment_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'colorbox_vote_user' => array(
-					'label' => T_('Voting on User Images'),
-					'note' => T_('Check this to enable AJAX voting buttons in the colorbox zoom view'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'colorbox_vote_user_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'gender_colored' => array(
-					'label' => T_('Display gender'),
-					'note' => T_('Use colored usernames to differentiate men & women.'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'bubbletip' => array(
-					'label' => T_('Username bubble tips'),
-					'note' => T_('Check to enable bubble tips on usernames'),
-					'defaultvalue' => 0,
-					'type' => 'checkbox',
-				),
-				'autocomplete_usernames' => array(
-					'label' => T_('Autocomplete usernames'),
-					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
-				'banner_public' => array(
-					'label' => T_('"Public" banner'),
-					'note' => T_('Display banner for "Public" posts (posts & comments)'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
+
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -201,55 +237,6 @@ class bootstrap_forums_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
-
-		// === MILOS 
-		
-		// Add custom CSS:
-		$custom_css = '';
-		// ===== Custom page styles: =====
-		
-		/*$custom_styles = array();
-		// Link color
-		if( $text_color = $this->get_setting( 'page_link_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	a { '.implode( ';', $custom_styles )." }\n";
-		}
-		
-		$custom_styles = array();
-		// Current tab text color
-		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	ul.nav.nav-tabs li a.selected { '.implode( ';', $custom_styles )." }\n";
-		}
-		
-		$custom_styles = array();
-		// Page background color
-		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
-		{
-			$custom_styles[] = 'background-color: '.$bg_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
-		}*/
-		
-		if( !empty( $custom_css ) )
-		{
-			$custom_css = '<style type="text/css">
-	<!--
-'.$custom_css.'	-->
-	</style>';
-			add_headline( $custom_css );
-		}
-		// ===../MILOS
 		
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
