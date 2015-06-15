@@ -4407,11 +4407,6 @@ class Item extends ItemLight
 				$r .= get_styled_status( $this->status, $this->get('t_status'), $params['class'] );
 				break;
 				
-			case 'pill':
-				// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="badge evo_status__$status$">$status_title$</div>' ) );
-				$r .= get_pill_status( $this->status, $this->get('t_status'), $params['class'] );
-				break;
-
 			default: // other formats
 				$r .= format_to_output( $this->get('t_status'), $params['format'] );
 				break;

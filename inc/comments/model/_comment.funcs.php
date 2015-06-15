@@ -1415,17 +1415,6 @@ function get_styled_status( $status_value, $status_title, $status_class = '' )
 		.'</div>';
 }
 
-// Pill styled status
-// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="badge evo_status__$status$">$status_title$</div>' ) );
-function get_pill_status( $status_value, $status_title, $status_class = '' )
-{
-	return '<div class="floatright">'
-		.'<div class="status_'.$status_value.'">'
-		.'<div'.( empty( $status_class ) ? '' : ' class="'.$status_class.'"' ).'>'.format_to_output( $status_title ).'</div>'
-		.'</div>'
-		.'</div>';
-}
-
 
 /**
  * Get the edit actions for comment
