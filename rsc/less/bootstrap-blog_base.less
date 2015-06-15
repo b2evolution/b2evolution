@@ -563,55 +563,56 @@ div.item_location {
 	overflow: hidden;
 }
 
+
 .note.status_draft span,		// This is deprecated
 .evo_status__draft {				// This is clean
-	color: #000;
-	background-color: #ff9;
+	color: #000 !important;
+	background-color: #ff9 !important;
 }
 .note.status_review span,		// This is deprecated
 .evo_status__review {			// This is clean
-	color: #fff;
-	background-color: #CC0099;
+	color: #fff !important;
+	background-color: #CC0099 !important;
 }
 .note.status_community span,	// This is deprecated
 .evo_status__community {		// This is clean
-	color: #fff;
-	background-color: #2E8BB9;
+	color: #fff !important;
+	background-color: #2E8BB9 !important;
 }
 .note.status_protected span,	// This is deprecated
 .evo_status__protected {		// This is clean
-	color: #fff;
-	background-color: #FF9C2A;
+	color: #fff !important;
+	background-color: #FF9C2A !important;
 }
 .note.status_private span,		// This is deprecated
 .evo_status__private {			// This is clean
-	color: #fff;
-	background-color: #DC143C;
+	color: #fff !important;
+	background-color: #DC143C !important;
 }
 .note.status_published span,	// This is deprecated
 .evo_status__published {		// This is clean
-	color: #000;
-	background-color: #99EE44;
+	color: #000 !important;
+	background-color: #99EE44 !important;
 }
 .note.status_deprecated span,	// This is deprecated
 .evo_status__deprecated {		// This is clean
-	color: #fff;
-	background-color: #000;
+	color: #fff !important;
+	background-color: #000 !important;
 }
 .note.status_redirected span,	// This is deprecated
 .evo_status__redirected {		// This is clean
-	color: #fff;
-	background-color: #663399;
+	color: #fff !important;
+	background-color: #663399 !important;
 }
 .note.status_trash span,		// This is deprecated
 .evo_status__trash {				// This is clean
-	color: #fff;
-	background-color: #f66;
+	color: #fff !important;
+	background-color: #f66 !important;
 }
 .note.status_meta span,			// This is deprecated
 .evo_status__meta {				// This is clean
-	color: #fff;
-	background-color: #5133ab;
+	color: #fff !important;
+	background-color: #5133ab !important;
 }
 
 #styled_content_block span[class*=status_] span {
@@ -676,7 +677,8 @@ div.results .status_meta span {
 }
 
 // Visibility of status banners and buttons depending on comment status
-#styled_content_block [class*='vs_'] [class*='status_'] {
+#styled_content_block [class^='vs_'] [class='status_'] {
+	// fp>yura: document an example of what this is supposed to macth + explain where it is used
 	display: none;
 }
 #styled_content_block .vs_published .status_published,
@@ -688,10 +690,12 @@ div.results .status_meta span {
 	display: block;
 }
 
-[class*='vs_'] [class*='btn_'] {
+[class^='vs_'] [class^='btn_'] {
+	// fp>yura: document an example of what this is supposed to macth + explain where it is used
 	display: none;
 }
-[class*='vs_'] .btn_next_status {
+[class^='vs_'] .btn_next_status {
+	// fp>yura: document an example of what this is supposed to macth + explain where it is used
 	display: inline-block;
 }
 

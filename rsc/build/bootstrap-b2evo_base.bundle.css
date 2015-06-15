@@ -1889,53 +1889,53 @@ div.item_location {
 }
 .note.status_draft span,
 .evo_status__draft {
-  color: #000;
-  background-color: #ff9;
+  color: #000 !important;
+  background-color: #ff9 !important;
 }
 .note.status_review span,
 .evo_status__review {
-  color: #fff;
-  background-color: #CC0099;
+  color: #fff !important;
+  background-color: #CC0099 !important;
 }
 .note.status_community span,
 .evo_status__community {
-  color: #fff;
-  background-color: #2E8BB9;
+  color: #fff !important;
+  background-color: #2E8BB9 !important;
 }
 .note.status_protected span,
 .evo_status__protected {
-  color: #fff;
-  background-color: #FF9C2A;
+  color: #fff !important;
+  background-color: #FF9C2A !important;
 }
 .note.status_private span,
 .evo_status__private {
-  color: #fff;
-  background-color: #DC143C;
+  color: #fff !important;
+  background-color: #DC143C !important;
 }
 .note.status_published span,
 .evo_status__published {
-  color: #000;
-  background-color: #99EE44;
+  color: #000 !important;
+  background-color: #99EE44 !important;
 }
 .note.status_deprecated span,
 .evo_status__deprecated {
-  color: #fff;
-  background-color: #000;
+  color: #fff !important;
+  background-color: #000 !important;
 }
 .note.status_redirected span,
 .evo_status__redirected {
-  color: #fff;
-  background-color: #663399;
+  color: #fff !important;
+  background-color: #663399 !important;
 }
 .note.status_trash span,
 .evo_status__trash {
-  color: #fff;
-  background-color: #f66;
+  color: #fff !important;
+  background-color: #f66 !important;
 }
 .note.status_meta span,
 .evo_status__meta {
-  color: #fff;
-  background-color: #5133ab;
+  color: #fff !important;
+  background-color: #5133ab !important;
 }
 #styled_content_block span[class*=status_] span {
   display: block;
@@ -1994,7 +1994,7 @@ div.results .status_meta span {
 .track_content {
   margin: 5px;
 }
-#styled_content_block [class*='vs_'] [class*='status_'] {
+#styled_content_block [class^='vs_'] [class='status_'] {
   display: none;
 }
 #styled_content_block .vs_published .status_published,
@@ -2005,10 +2005,10 @@ div.results .status_meta span {
 #styled_content_block .vs_draft .status_draft {
   display: block;
 }
-[class*='vs_'] [class*='btn_'] {
+[class^='vs_'] [class^='btn_'] {
   display: none;
 }
-[class*='vs_'] .btn_next_status {
+[class^='vs_'] .btn_next_status {
   display: inline-block;
 }
 .evo_image_index {
