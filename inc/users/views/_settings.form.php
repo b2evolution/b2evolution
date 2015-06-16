@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitud
 
 	$Form->radio( 'uset_location_city', $Settings->get( 'location_city' ), $location_options, T_('City') );
 
-	$Form->text_input( 'uset_minimum_age', $Settings->get( 'minimum_age' ), 5, T_('Minimum age'), '', array( 'input_suffix' => ' '.T_('years') ) );
+	$Form->text_input( 'uset_minimum_age', $Settings->get( 'minimum_age' ), 3, T_('Minimum age'), '', array( 'input_suffix' => ' '.T_('years old.') ) );
 
 	$Form->radio( 'uset_multiple_sessions', $Settings->get( 'multiple_sessions' ), array(
 					array( 'never', T_('Never allow') ),
