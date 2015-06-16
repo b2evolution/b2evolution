@@ -155,7 +155,14 @@ ol.breadcrumb {
 		float: left;
 	}
 	.ft_count {
-		margin-top: 15px;
+		margin-top: 8px;
+		font-size: 90%;
+		strong {
+			display: block;
+			a {
+				font-size: 100%;
+			}
+		}
 	}
 	.ft_date {
 		margin-top: 17px;
@@ -604,6 +611,7 @@ label.control-label[for=post_title] {
 	.front_panel {
 		.ft_count {
 			padding: 0px 7px;
+			margin-top: 8px;
 		}
 	}
 	.posts_panel {
@@ -631,9 +639,6 @@ label.control-label[for=post_title] {
 		font-size: 90%;
 	}
 	.front_panel {
-		.ft_count {
-			margin-top: 15px;
-		}
 		.ft_date_shrinked {
 			margin-top: 17px;
 		}
@@ -732,6 +737,9 @@ label.control-label[for=post_title] {
 	.front_panel {
 		.ft_count {
 			margin-left: 48px;
+			strong {
+				display: inline;
+			}
 		}
 		.ft_date_shrinked {
 			margin-top: 4px;
@@ -861,4 +869,37 @@ label.control-label[for=post_title] {
 			font-size: 14px !important;
 		}
 	}
+}
+
+// Visibility of status banners and buttons depending on comment status
+// It is used by AJAX to change a comment status:
+//     On AJAX success result we change only a visibility of the status banners and buttons
+//     and we do NOT reload a comment content
+.vs_published,
+.vs_community,
+.vs_protected,
+.vs_private,
+.vs_review,
+.vs_draft {
+	.evo_status {
+		// Hide all status banners by default in order to show only current
+		display: none;
+	}
+	a.btn[class*='btn_lower_'], a.btn[class*='btn_raise_'] {
+		// Hide all status buttons by default
+		display: none;
+		&.btn_next_status {
+			// Make visible only the active buttons (for previous and next allowed statuses)
+			display: inline-block;
+		}
+	}
+}
+.vs_published .evo_status__published,
+.vs_community .evo_status__community,
+.vs_protected .evo_status__protected,
+.vs_private .evo_status__private,
+.vs_review .evo_status__review,
+.vs_draft .evo_status__draft {
+	// Make visible banner status only of the current status
+	display: block;
 }

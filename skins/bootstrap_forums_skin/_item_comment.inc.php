@@ -69,7 +69,7 @@ $Comment->get_Item();
 
 
 $Comment->anchor();
-echo '<article class="evo_comment panel panel-default '.$comment_class.'" id="comment_'.$Comment->ID.'">';
+echo '<article class="'.$comment_class.' evo_comment panel panel-default" id="comment_'.$Comment->ID.'">';
 
 // Title
 echo $params['comment_title_before'];
@@ -107,7 +107,7 @@ switch( $Comment->get( 'type' ) )
 		if( $params['comment_post_display'] )
 		{
 			echo $params['comment_post_before'];
-			echo T_(' in response to:').' ';
+			echo ' '.T_('in response to:').' ';
 			$Comment->Item->title( array(
 					'link_type' => 'permalink',
 				) );
@@ -180,7 +180,7 @@ switch( $Comment->get( 'type' ) )
 // Status banners
 if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 { // Don't display status for previewed comments
-		$Comment->format_status( array(
+		$Comment->format_statuses( array(
 				'template' => '<div class="floatright evo_status badge evo_status__$status$">$status_title$</div>',
 			) );
 		$legend_statuses[] = $Comment->status;

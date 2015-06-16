@@ -71,11 +71,8 @@ elseif( $comments_number > 25 )
 					echo '</div></div>';
 					if( $Skin->enabled_status_banner( $Item->status ) )
 					{ // Status:
-						$Item->status( array(
-								'before' => '<div class="cell2">',
-								'after'  => '</div>',
-								'format' => 'styled',
-								'class'  => 'badge',
+						$Item->format_status( array(
+								'template' => '<div class="cell2"><div class="evo_status badge evo_status__$status$">$status_title$</div></div>',
 							) );
 						$legend_statuses[] = $Item->status;
 					}

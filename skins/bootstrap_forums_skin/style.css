@@ -139,7 +139,14 @@ ol.breadcrumb {
   float: left;
 }
 .forums_list .ft_count {
-  margin-top: 15px;
+  margin-top: 8px;
+  font-size: 90%;
+}
+.forums_list .ft_count strong {
+  display: block;
+}
+.forums_list .ft_count strong a {
+  font-size: 100%;
 }
 .forums_list .ft_date {
   margin-top: 17px;
@@ -554,6 +561,7 @@ label.control-label[for=post_title] {
 @media screen and (max-width: 991px) {
   .front_panel .ft_count {
     padding: 0px 7px;
+    margin-top: 8px;
   }
   .posts_panel .ft_status_topic {
     vertical-align: top;
@@ -576,9 +584,6 @@ label.control-label[for=post_title] {
     text-align: center;
     color: #8b96a1;
     font-size: 90%;
-  }
-  .front_panel .ft_count {
-    margin-top: 15px;
   }
   .front_panel .ft_date_shrinked {
     margin-top: 17px;
@@ -668,6 +673,9 @@ label.control-label[for=post_title] {
   }
   .front_panel .ft_count {
     margin-left: 48px;
+  }
+  .front_panel .ft_count strong {
+    display: inline;
   }
   .front_panel .ft_date_shrinked {
     margin-top: 4px;
@@ -781,4 +789,48 @@ label.control-label[for=post_title] {
 }
 .evo_comment .panel-footer a.to_top.postlink {
   font-size: 14px !important;
+}
+.vs_published .evo_status,
+.vs_community .evo_status,
+.vs_protected .evo_status,
+.vs_private .evo_status,
+.vs_review .evo_status,
+.vs_draft .evo_status {
+  display: none;
+}
+.vs_published a.btn[class*='btn_lower_'],
+.vs_community a.btn[class*='btn_lower_'],
+.vs_protected a.btn[class*='btn_lower_'],
+.vs_private a.btn[class*='btn_lower_'],
+.vs_review a.btn[class*='btn_lower_'],
+.vs_draft a.btn[class*='btn_lower_'],
+.vs_published a.btn[class*='btn_raise_'],
+.vs_community a.btn[class*='btn_raise_'],
+.vs_protected a.btn[class*='btn_raise_'],
+.vs_private a.btn[class*='btn_raise_'],
+.vs_review a.btn[class*='btn_raise_'],
+.vs_draft a.btn[class*='btn_raise_'] {
+  display: none;
+}
+.vs_published a.btn[class*='btn_lower_'].btn_next_status,
+.vs_community a.btn[class*='btn_lower_'].btn_next_status,
+.vs_protected a.btn[class*='btn_lower_'].btn_next_status,
+.vs_private a.btn[class*='btn_lower_'].btn_next_status,
+.vs_review a.btn[class*='btn_lower_'].btn_next_status,
+.vs_draft a.btn[class*='btn_lower_'].btn_next_status,
+.vs_published a.btn[class*='btn_raise_'].btn_next_status,
+.vs_community a.btn[class*='btn_raise_'].btn_next_status,
+.vs_protected a.btn[class*='btn_raise_'].btn_next_status,
+.vs_private a.btn[class*='btn_raise_'].btn_next_status,
+.vs_review a.btn[class*='btn_raise_'].btn_next_status,
+.vs_draft a.btn[class*='btn_raise_'].btn_next_status {
+  display: inline-block;
+}
+.vs_published .evo_status__published,
+.vs_community .evo_status__community,
+.vs_protected .evo_status__protected,
+.vs_private .evo_status__private,
+.vs_review .evo_status__review,
+.vs_draft .evo_status__draft {
+  display: block;
 }

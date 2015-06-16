@@ -74,11 +74,11 @@ if( count( $chapters ) > 0 )
 					<?php
 					if( $Chapter->dget( 'description' ) != '' )
 					{
-						echo '<br /><span class="ft_desc">'.$Chapter->dget( 'description' ).'</span>';
+						echo '<br /><span class="ft_desc ellipsis">'.$Chapter->dget( 'description' ).'</span>';
 					}
 					if( count( $Chapter->children ) > 0 )
 					{ // Subforums exist
-						echo '<div class="subcats">';
+						echo '<div class="subcats ellipsis">';
 						echo T_('Subforums').': ';
 						$cc = 0;
 						foreach( $Chapter->children as $child_Chapter )
@@ -92,8 +92,10 @@ if( count( $chapters ) > 0 )
 					?>
 				</div>
 			</div>
-			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<b>'.get_postcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
-			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<b>'.get_commentcount_in_category( $Chapter->ID ).'</b>' ); ?></div>
+			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2">
+				<?php printf( T_('%s topics'), '<strong><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></strong>' ); ?>
+			</div>
+			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<strong><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></strong>' ); ?></div>
 			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
