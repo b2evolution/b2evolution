@@ -6322,8 +6322,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Checking &amp; repairing caches...' );
 		load_funcs('tools/model/_system.funcs.php');
 		// Check all cache folders if exist and work properly. Try to repair cache folders if they aren't ready for operation.
-		system_check_caches( true );
-		// fp> TODO: display error messages
+		$check_cache_messages = system_check_caches( true );
+		if( is_array( $check_cache_messages ) && count( $check_cache_messages ) )
+		{ // Display errors of the cache checking
+			foreach( $check_cache_messages as $check_cache_message )
+			{
+				echo '<br /><span class="text-warning">'.$check_cache_message.'</span>';
+			}
+			echo '<br />';
+		}
 		task_end();
 
 		// Check if profile picture links should be recreated. It won't be executed in each upgrade, but only in those cases when it is required.
