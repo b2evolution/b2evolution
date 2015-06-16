@@ -146,7 +146,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					<?php printf( T_('%s photos'), $single_Item->get_number_of_images() ); ?>
 				</div>
 				<?php 	
-					if( $Skin->enabled_status_banner( $Item->status ) )
+					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
 /* OLD:						
 						$single_Item->status( array(
@@ -157,7 +157,7 @@ siteskin_include( '_site_body_header.inc.php' );
 							) );
 NEW:
 */
-						$Item->format_status( array( 'template' => '<div class="evo_status badge evo_status__$status$">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status badge evo_status__$status$">$status_title$</div>' ) );						
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',

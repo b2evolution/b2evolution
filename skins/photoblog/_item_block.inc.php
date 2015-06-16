@@ -65,7 +65,9 @@ $params = array_merge( array(
 			<?php
 				if( $Item->status != 'published' )
 				{
-					$Item->status( array( 'format' => 'styled' ) );
+					$Item->format_status( array(
+							'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						) );
 				}
 				// Link to comments, trackbacks, etc.:
 				$Item->feedback_link( array(

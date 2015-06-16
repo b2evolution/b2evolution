@@ -111,7 +111,9 @@ while( $Item = & mainlist_get_item() )
 		<?php
 			if( $Item->status != 'published' )
 			{
-				$Item->status( array( 'format' => 'styled' ) );
+				$Item->format_status( array(
+						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					) );
 			}
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(

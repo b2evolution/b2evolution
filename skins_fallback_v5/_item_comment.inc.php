@@ -55,8 +55,10 @@ $Comment->get_Item();
 
 	// Status
 	if( $Comment->status != 'published' )
-	{	// display status of comment (typically an angled banner in the top right corner):
-		$Comment->status( 'styled' );
+	{ // display status of comment (typically an angled banner in the top right corner):
+		$Comment->format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+			) );
 	}
 
 	// Post title

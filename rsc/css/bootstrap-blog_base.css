@@ -618,23 +618,6 @@ div.results .status_meta span {
 .track_content {
   margin: 5px;
 }
-#styled_content_block [class^='vs_'] [class='status_'] {
-  display: none;
-}
-#styled_content_block .vs_published .status_published,
-#styled_content_block .vs_community .status_community,
-#styled_content_block .vs_protected .status_protected,
-#styled_content_block .vs_private .status_private,
-#styled_content_block .vs_review .status_review,
-#styled_content_block .vs_draft .status_draft {
-  display: block;
-}
-[class^='vs_'] [class^='btn_'] {
-  display: none;
-}
-[class^='vs_'] .btn_next_status {
-  display: inline-block;
-}
 .evo_image_index {
   margin: 1ex auto;
   text-align: center;

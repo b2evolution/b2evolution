@@ -65,7 +65,9 @@ $Comment = & $params['Comment'];
 		<?php
 			if( $Comment->status != 'published' )
 			{
-				$Comment->status( 'styled' );
+				$Comment->format_status( array(
+						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					) );
 			}
 			$Comment->rating();
 			$Comment->content( 'htmlbody', false, true, $params );

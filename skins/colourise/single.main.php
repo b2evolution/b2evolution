@@ -75,7 +75,9 @@ skin_include( '_body_header.inc.php' );
 				<?php
 				if( $Item->status != 'published' )
 				{
-					$Item->status( array( 'format' => 'styled' ) );
+					$Item->format_status( array(
+							'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						) );
 				}
 				?>
 				<h2><?php

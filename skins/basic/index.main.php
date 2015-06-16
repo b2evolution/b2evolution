@@ -173,7 +173,9 @@ siteskin_include( '_site_body_header.inc.php' );
 
 					if( $Item->status != 'published' )
 					{
-						$Item->status( array( 'before' => ' &bull; <small>'.T_('Status').': ', 'after' => '</small>' ) );
+						$Item->format_status( array(
+								'template' => ' &bull; <small>'.T_('Status').': $status_title$</small>',
+							) );
 					}
 				?>
 

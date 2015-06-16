@@ -100,7 +100,9 @@ $Item->title( array(
 			$post_header_class = 'bPostDate';
 			if( $Skin->enabled_status_banner( $Item->status ) )
 			{
-				$Item->status( array( 'format' => 'styled' ) );
+				$Item->format_status( array(
+						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					) );
 				$post_header_class .= ' '.$Item->status;
 				$legend_statuses[] = $Item->status;
 			}

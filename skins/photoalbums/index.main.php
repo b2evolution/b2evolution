@@ -118,12 +118,10 @@ if( $disp == 'single' )
 				'text'      => get_icon( 'edit' ),
 				'title'     => T_('Edit title/description...'),
 			) );
-		if( $Skin->enabled_status_banner( $Item->status ) )
+		if( $Skin->enabled_status_banner( $single_Item->status ) )
 		{ // Status banner
-			$single_Item->status( array(
-					'before' => '<div class="post_status">',
-					'after'  => '</div>',
-					'format' => 'styled'
+			$single_Item->format_status( array(
+					'template' => '<div class="post_status"><div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div></div>',
 				) );
 		}
 	?>

@@ -50,7 +50,9 @@ echo '<div id="styled_content_block">'; // Beginning of post display
 	<?php
 		if( $Item->status != 'published' )
 		{
-			$Item->status( array( 'format' => 'styled' ) );
+			$Item->format_status( array(
+					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				) );
 		}
 		$Item->permanent_link( array(
 				'text' => '#icon#',

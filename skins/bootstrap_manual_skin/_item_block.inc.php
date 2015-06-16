@@ -97,7 +97,9 @@ if( $disp == 'single' )
 	}
 	if( $Item->status != 'published' )
 	{
-		$Item->status( array( 'format' => 'styled' ) );
+		$Item->format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+			) );
 	}
 	$Item->title( array(
 			'link_type'  => $params['item_link_type'],
