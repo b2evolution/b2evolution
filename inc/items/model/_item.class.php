@@ -4445,6 +4445,30 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get status of item in a formatted way, following a provided template
+	 *
+	 * There are 2 possible variables: 
+	 * - $status$ = the raw status
+	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_format_status( $params = array() )
+	{
+		$params = array_merge( array(
+				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
+			), $params );
+
+		$r = str_replace( '$status$', $this->status, $params['template'] );
+		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
+	
+		return format_to_output( $r, $params['format'] );
+	}
+
+
+	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
 	 * There are 2 possible variables: 
@@ -4455,15 +4479,7 @@ class Item extends ItemLight
 	 */
 	function format_status( $params = array() )
 	{
-		$params = array_merge( array(
-				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
-				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
-			), $params );
-
-		$r = str_replace( '$status$', $this->status, $params['template'] );
-		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
-	
-		echo format_to_output( $r, $params['format'] );
+		echo $this->get_format_status( $params );
 	}
 
 

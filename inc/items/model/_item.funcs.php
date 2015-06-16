@@ -746,7 +746,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 		}
 	}
 
-	if( is_logged_in( false ) )
+	if( is_logged_in( false ) && $filter_by_perm )
 	{ // User is logged in and the account was activated
 		if( $current_User->check_perm( 'blogs', 'editall', false ) )
 		{ // User has permission to all blogs posts and comments, we don't have to check blog specific permissions.
@@ -2650,7 +2650,9 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '</div>';
 
 		echo '<div class="bCommentContent">';
-		$Comment->status( 'styled' );
+		$Comment->format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+			) );
 		if( ! $Comment->is_meta() )
 		{ // Don't display the titles for meta comments
 			echo '<div class="bCommentTitle">';
@@ -3855,7 +3857,9 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 	$col = '';
 	if( $display_status && is_logged_in() )
 	{ // Display status
-		$col .= $Item->get_status( array( 'format' => 'styled' ) );
+		$col .= $Item->get_format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+			) );
 	}
 
 	if( $display_flag )

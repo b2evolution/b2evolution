@@ -3201,13 +3201,40 @@ class Comment extends DataObject
 	{
 		$params = array_merge( array(
 				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
-				'format' => 'htmlbody', // Output format, see {@link format_to_output()}
+				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
+				'status'   => $this->status,
+				'title'    => $this->get( 't_status' ),
 			), $params );
 
-		$r = str_replace( '$status$', $this->status, $params['template'] );
-		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
+		$r = str_replace( array( '$status$', '$status_title$' ),
+			array( $params['status'], $params['title'] ),
+			$params['template'] );
 	
 		echo format_to_output( $r, $params['format'] );
+	}
+
+
+	/**
+	 * Template function: display all statuses and only one is visible by css class name
+	 *
+	 * Statuses:
+	 * - published
+	 * - community
+	 * - protected
+	 * - review
+	 * - private
+	 * - draft
+	 */
+	function format_statuses( $params = array() )
+	{
+		$statuses = get_visibility_statuses( '', array( 'deprecated', 'redirected', 'trash' ) );
+
+		foreach( $statuses as $status => $title )
+		{
+			$params['status'] = $status;
+			$params['title'] = $title;
+			$this->format_status( $params );
+		}
 	}
 
 

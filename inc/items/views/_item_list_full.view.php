@@ -208,7 +208,11 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 
 		<div class="bContent">
-			<?php $Item->status( array( 'format' => 'styled' ) ); ?>
+			<?php
+				$Item->format_status( array(
+						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					) );
+			?>
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
 			<h3 class="bTitle"><?php $Item->title( array( 'target_blog' => '' )) ?></h3>
 

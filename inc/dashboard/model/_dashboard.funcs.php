@@ -458,9 +458,8 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		// Load item's creator user:
 		$Item->get_creator_User();
 
-		$Item->status( array(
-				'before' => '<div class="floatright"><span class="note status_'.$Item->status.'"><span>',
-				'after'  => '</span></span></div>',
+		$Item->format_status( array(
+				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 			) );
 
 		echo '<div class="dashboard_float_actions">';
