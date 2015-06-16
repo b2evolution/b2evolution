@@ -587,8 +587,15 @@ switch( $action )
 					load_funcs( 'tools/model/_system.funcs.php' );
 					if( system_check_charset_update() )
 					{
-						$require_charset_update = true;
-						display_install_messages( sprintf( T_("WARNING: Some of your tables have different charset than the expected %s. It is strongly recommended to upgrade your database charset by running the preselected task below:"), utf8_strtoupper( $evo_charset ) ) );
+						if( ! is_null( $old_db_version ) && $old_db_version < $new_db_version )
+						{ // DB is not updagraded to new version yet, We should not suggest to normalize DB to avoid errors
+							display_install_messages( sprintf( T_('WARNING: Some of your tables have a different charset than the expected %s. You should normalize your database after upgrade.'), utf8_strtoupper( $evo_charset ) ), 'warning' );
+						}
+						else
+						{ // DB is already upgraded to last version, Siggest to normalize DB
+							$require_charset_update = true;
+							display_install_messages( sprintf( T_('WARNING: Some of your tables have a different charset than the expected %s. It is strongly recommended to normalize your database charset by running the preselected task below:'), utf8_strtoupper( $evo_charset ) ) );
+						}
 					}
 				}
 			}
