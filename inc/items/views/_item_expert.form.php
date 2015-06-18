@@ -144,7 +144,8 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $edited_Item->get( 't_type' ) ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content', 'fold' => true ) );
+	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
+	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -620,7 +621,7 @@ $Form->begin_form( '', '', $params );
 	// ################### GOAL TRACKING ###################
 
 	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' )
-					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals', T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals&amp;blog='.$Blog->ID, T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_goals', 'fold' => true ) );
 
 	$Form->switch_layout( 'table' );
@@ -681,7 +682,8 @@ $Form->begin_form( '', '', $params );
 $Form->end_form();
 
 // ####################### JS BEHAVIORS #########################
-echo_publishnowbutton_js();
+// JS code for status dropdown select button
+echo_status_dropdown_button_js( 'post' );
 echo_link_files_js();
 echo_autocomplete_tags();
 if( empty( $edited_Item->ID ) )

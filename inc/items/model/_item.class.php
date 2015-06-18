@@ -609,8 +609,10 @@ class Item extends ItemLight
 
 		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
-		{
+		if( $current_User->check_perm( 'admin', 'restricted' ) &&
+		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
+		{ // Allow to update timestamp fields only if user has a permission to edit such fields
+		  //    and also if user has an access to back-office
 			$item_dateset = param( 'item_dateset', 'integer', NULL );
 			if( $item_dateset !== NULL )
 			{
@@ -625,8 +627,8 @@ class Item extends ItemLight
 					}
 				}
 				elseif( $this->dateset == 0 )
-				{	// Set date to NOW:
-					$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
+				{ // Set date to NOW:
+					$this->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 				}
 			}
 		}
@@ -673,17 +675,21 @@ class Item extends ItemLight
 		}
 
 		// TAGS:
-		$item_tags = param( 'item_tags', 'string', NULL );
-		if( $item_tags !== NULL ) {
-			$this->set_tags_from_string( get_param('item_tags') );
-			// Update setting 'suggest_item_tags' of the current User
-			global $UserSettings;
-			$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
-			$UserSettings->dbupdate();
-		}
-		if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
-		{ // Tags must be entered
-			param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
+		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{ // User should has an access to back-office to edit tags
+			$item_tags = param( 'item_tags', 'string', NULL );
+			if( $item_tags !== NULL )
+			{
+				$this->set_tags_from_string( get_param('item_tags') );
+				// Update setting 'suggest_item_tags' of the current User
+				global $UserSettings;
+				$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
+				$UserSettings->dbupdate();
+			}
+			if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
+			{ // Tags must be entered
+				param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
+			}
 		}
 
 		// WORKFLOW stuff:
@@ -3211,6 +3217,7 @@ class Item extends ItemLight
 									'link_anchor_one' => '#',
 									'link_anchor_more' => '#',
 									'link_title' => '#',
+									'link_class' => '',
 									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
 									'url' => '#',
 								), $params );
@@ -3307,7 +3314,8 @@ class Item extends ItemLight
 
 		if( !empty( $params['url'] ) )
 		{
-			$r .= '<a href="'.$params['url'].$anchor.'" ';	// Position on feedback
+			$r .= '<a href="'.$params['url'].$anchor.'" class="'.$params['link_class'].'" ';	// Position on feedback
+			$r .= 'class="'.$params['link_class'].'"';
 			$r .= 'title="'.$params['link_title'].'"';
 			$r .= '>';
 			$r .= $link_text;
@@ -7340,7 +7348,7 @@ class Item extends ItemLight
 		switch( $attr )
 		{
 			case 'link':
-				return '<a href="'.$attr_href.'" onclick="'.$attr_onclick.'" title="'.$link_title.'">'.$link_text.'</a>';
+				return '<a href="'.$attr_href.'" onclick="'.$attr_onclick.'" title="'.$link_title.'" class="post_type_link">'.$link_text.'</a>';
 				break;
 
 			case 'onclick':

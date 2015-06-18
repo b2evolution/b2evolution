@@ -1755,6 +1755,15 @@ function load_publish_status( $creating = false )
 }
 
 
+/**
+ * Display buttons to update a post
+ *
+ * @param object Form
+ * @param boolean Is creating action
+ * @param object edited Item
+ * @param boolean Is in-skin editing
+ * @param boolean TRUE to display a preview button
+ */
 function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
 	global $Blog, $current_User;
@@ -1772,7 +1781,11 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		global $AdminUI;
 
 		echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
-		$status_options = get_visibility_statuses();
+
+		// Get those statuses which are not allowed for the current User to create posts in this blog
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+		// Get allowed visibility statuses
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
@@ -1853,6 +1866,41 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 
 /**
+ * Display buttons to update a post
+ *
+ * @param object Form
+ * @param object edited Item
+ */
+function echo_item_status_buttons( $Form, $edited_Item )
+{
+	global $next_action, $action, $Blog;
+
+	// Get those statuses which are not allowed for the current User to create posts in this blog
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+	// Get allowed visibility statuses
+	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+
+	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
+
+	$Form->hidden( 'post_status', $edited_Item->status );
+	echo '<div class="btn-group dropup post_status_dropdown">';
+	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
+				.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+			.'</button>'
+			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+				.'<span class="caret"></span>'
+			.'</button>';
+	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+	foreach( $status_options as $status_key => $status_title )
+	{
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+	}
+	echo '</ul>';
+	echo '</div>';
+}
+
+
+/**
  * Output JavaScript code for "Add/Link files" link
  *
  * This is a part of the process that makes it smoother to "Save & start attaching files".
@@ -1908,34 +1956,53 @@ function echo_publishnowbutton_js()
 
 			// Change title of the save buttons
 			var save_btn = jQuery( '.edit_actions input[name="actionArray[<?php echo $next_action; ?>]"]' );
-			if( update_title )
-			{
-				save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
-			}
+			save_btn.val( typeof( item_save_btn_titles[ status ] ) == 'undefined' ? '<?php echo TS_('Save Changes!') ?>' : item_save_btn_titles[ status ] );
 			save_btn = save_btn.add( '.edit_actions input[name="actionArray[update_edit]"]' )
 				.add( '.edit_actions input[name="actionArray[create_edit]"]' );
 			save_btn.attr( 'class', save_btn.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 		}
 		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
 		{
-			update_post_status_buttons( jQuery( this ).val(), true );
+			update_post_status_buttons( jQuery( this ).val() );
 		} );
+	</script>
+	<?php
+}
 
-		jQuery( 'select[name=post_status]' ).change( function()
-		{
-			update_post_status_buttons( jQuery( this ).val(), false );
-		} );
 
-		jQuery( '.post_status_dropdown li a' ).click( function()
+/**
+ * JS Behaviour: Output JavaScript code to dynamically select status by dropdown
+ * button or submit a form if the button is used for submit action
+ *
+ * This function is used by the post and omment edit screens.
+ *
+ * @param string Type: 'post' or 'commnet'
+ */
+function echo_status_dropdown_button_js( $type = 'post' )
+{
+	?>
+	<script type="text/javascript">
+		jQuery( '.<?php echo $type; ?>_status_dropdown li a' ).click( function()
 		{
 			var item = jQuery( this ).parent();
 			var status = item.attr( 'rel' );
-			update_post_status_buttons( status, false );
-			var button = item.parent().prev();
-			button.find( 'span:first' ).html( item.find( 'span:last' ).html() );
-			button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-			jQuery( 'input[type=hidden][name=post_status]' ).val( status );
-			item.parent().parent().removeClass( 'open' );
+			var dropdown_buttons = item.parent().parent().find( 'button' );
+			var first_button = dropdown_buttons.parent().find( 'button:first' );
+			var save_buttons = jQuery( '.edit_actions input[type="submit"]' ).add( dropdown_buttons );
+
+			save_buttons.each( function()
+			{ // Change status class name to new changed for all buttons
+				jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+			} );
+			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
+			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
+			item.parent().parent().removeClass( 'open' ); // hide dropdown menu
+
+			if( first_button.attr( 'type' ) == 'submit' )
+			{ // Submit form if current dropdown button is used to submit form
+				first_button.click();
+			}
+
 			return false;
 		} );
 	</script>
