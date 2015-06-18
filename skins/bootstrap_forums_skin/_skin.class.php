@@ -237,7 +237,7 @@ class bootstrap_forums_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
-		
+
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
 			require_js( '#jqueryUI#', 'blog' );
@@ -337,12 +337,6 @@ class bootstrap_forums_Skin extends Skin
 			{ // Iterate through childrens or the given parent Chapter
 				$skin_chapters_cache[$Chapter->ID] = $ChapterCache->get_by_ID( $Chapter->ID );
 				$Chapter->sort_children();
-				$children = array();
-				foreach( $Chapter->children as $sub_Chapter )
-				{ // Set Chapter childrens
-					$children[$sub_Chapter->ID] = $sub_Chapter;
-				}
-				$skin_chapters_cache[$Chapter->ID]->children = $children;
 			}
 		}
 		else

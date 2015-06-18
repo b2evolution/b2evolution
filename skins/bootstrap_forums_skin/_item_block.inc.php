@@ -131,8 +131,8 @@ skin_widget( array(
 					if( $Skin->enabled_status_banner( $Item->status ) )
 					{ // Status banner
 						$Item->format_status( array(
-								'template' => '<div class="floatright evo_status badge evo_status__$status$">$status_title$</div>',
-								) );
+								'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+							) );
 						$legend_statuses[] = $Item->status;
 					}
 				?></h4>	
@@ -145,7 +145,7 @@ skin_widget( array(
 					'thumb_size' => 'crop-top-80x80',
 				) );
 			?></div>
-			<div class="post_main col-md-11 col-sm-10 col-xs-12">
+			<div class="post_main col-md-11 col-sm-10">
 				<?php
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', $params );
@@ -217,7 +217,7 @@ skin_widget( array(
 			'disp_section_title'    => false,
 			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
-			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10 col-xs-12">',
+			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
 		) );
 		// Note: You can customize the default item feedback by copying the generic

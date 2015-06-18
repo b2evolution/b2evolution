@@ -21,12 +21,13 @@ $params = array_merge( array(
 		'comment_post_before'   => '<h4 class="evo_comment_post_title">',
 		'comment_post_after'    => '</h4>',
 		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
-		'comment_title_after'   => '</h4></div><div class="panel-body">',
-		'comment_avatar_before' => '<span class="evo_comment_avatar">',
+		'comment_status_before' => '</h4>',
+		'comment_title_after'   => '</div><div class="panel-body">',
+		'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 		'comment_avatar_after'  => '</span>',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
-		'comment_text_before'   => '<div class="evo_comment_text">',
+		'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
@@ -177,11 +178,13 @@ switch( $Comment->get( 'type' ) )
 		break;
 }
 
+echo $params['comment_status_before'];
+
 // Status banners
 if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 { // Don't display status for previewed comments
 		$Comment->format_statuses( array(
-				'template' => '<div class="floatright evo_status badge evo_status__$status$">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 			) );
 		$legend_statuses[] = $Comment->status;
 }

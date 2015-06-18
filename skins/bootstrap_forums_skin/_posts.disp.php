@@ -207,25 +207,26 @@ elseif( isset( $current_Chapter ) )
 ?>
 	</section>
 
-	<div class="panel-body">
+	<div class="panel-body comments_link__pagination">
 	<?php
 		// Buttons to post/reply
 		$Skin->display_post_button( $cat );
 
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start' => '<div class="navigation">',
-				'block_end'   => '</div>',
-				'prev_text'   => T_('Previous'),
-				'next_text'   => T_('Next'),
-				'prev_class'  => 'prev',
-				'next_class'  => 'next',
+				'block_start'           => '<ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span><b>$page_num$</b></span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'prev_text'             => '&lt;&lt;',
+				'next_text'             => '&gt;&gt;',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 	</div>
-
 </div>
 <?php
+
 } // ---------------------------------- END OF POSTS ------------------------------------
 ?>

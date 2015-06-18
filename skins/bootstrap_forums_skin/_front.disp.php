@@ -37,18 +37,19 @@ if( count( $chapters ) > 0 )
 ?>
 	<div class="panel panel-default forums_list front_panel">
 <?php
-	foreach( $chapters as $Chapter )
+	foreach( $chapters as $root_Chapter )
 	{ // Loop through categories:
-		if( $Chapter->meta )
+		if( $root_Chapter->meta )
 		{ // Meta category
-			$chapters_children = $Chapter->children;
+			$root_Chapter->sort_children();
+			$chapters_children = $root_Chapter->children;
 ?>
-		<header class="panel-heading meta_category"><a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a></header>
+		<header class="panel-heading meta_category"><a href="<?php echo $root_Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $root_Chapter->dget( 'name' ); ?></a></header>
 <?php
 		}
 		else
 		{ // Simple category with posts
-			$chapters_children = array( $Chapter );
+			$chapters_children = array( $root_Chapter );
 		}
 ?>
 		<section class="table table-hover">
@@ -81,6 +82,7 @@ if( count( $chapters ) > 0 )
 						echo '<div class="subcats ellipsis">';
 						echo T_('Subforums').': ';
 						$cc = 0;
+						$Chapter->sort_children();
 						foreach( $Chapter->children as $child_Chapter )
 						{ // Display subforum
 							echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
@@ -93,9 +95,9 @@ if( count( $chapters ) > 0 )
 				</div>
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2">
-				<?php printf( T_('%s topics'), '<strong><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></strong>' ); ?>
+				<?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?>
 			</div>
-			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<strong><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></strong>' ); ?></div>
+			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
 			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>

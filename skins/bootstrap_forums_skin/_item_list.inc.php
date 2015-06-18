@@ -72,7 +72,7 @@ elseif( $comments_number > 25 )
 					if( $Skin->enabled_status_banner( $Item->status ) )
 					{ // Status:
 						$Item->format_status( array(
-								'template' => '<div class="cell2"><div class="evo_status badge evo_status__$status$">$status_title$</div></div>',
+								'template' => '<div class="cell2"><div class="evo_status evo_status__$status$ badge">$status_title$</div></div>',
 							) );
 						$legend_statuses[] = $Item->status;
 					}
@@ -102,9 +102,9 @@ elseif( $comments_number > 25 )
 				{ // The comments are disabled
 					echo T_('n.a.');
 				}
-				else
+				else if( $latest_Comment = & $Item->get_latest_Comment() )
 				{
-					printf( T_('%s replies'), '<b>'.$comments_number.'</b>' );
+					printf( T_('%s replies'), '<div><a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a></div>' );
 				}
 			?>
 			</div>
@@ -123,8 +123,8 @@ elseif( $comments_number > 25 )
 					$latest_Comment->author2( array(
 							'before'      => '<br />',
 							'before_user' => '<br />',
-							'after'       => ' ',
-							'after_user'  => ' ',
+							'after'       => '',
+							'after_user'  => '',
 							'link_text'   => 'login'
 						) );
 
@@ -145,7 +145,7 @@ elseif( $comments_number > 25 )
 							'before'    => '<br />',
 							'link_text' => 'login',
 						) );
-					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
 			?></div>
 			
@@ -153,7 +153,7 @@ elseif( $comments_number > 25 )
 			<div class="ft_date_shrinked item_list"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
-					$latest_Comment->date('m/j/y');
+					$latest_Comment->date('m/j/y ');
 					$latest_Comment->author2( array(
 							'link_text'   => 'login'
 						) );
@@ -166,7 +166,7 @@ elseif( $comments_number > 25 )
 					echo $Item->author( array(
 							'link_text' => 'login',
 						) );
-					echo '<a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
 			?></div>	
 		</article>
