@@ -1669,19 +1669,19 @@ function create_demo_contents()
 
 	if( $install_collection_forums )
 	{ // Create categories for forums
-		$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_forums_ID, NULL, false, NULL, NULL, true );
-		$cat_forums_ann = cat_create( T_('Welcome'), $cat_forums_forum_group, $blog_forums_ID, T_('Welcome description') );
-		$cat_forums_aforum = cat_create( T_('A forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum') );
-		$cat_forums_anforum = cat_create( T_('Another forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum') );
-		$cat_forums_another_group = cat_create( T_('Another group'), 'NULL', $blog_forums_ID, NULL, false, NULL, NULL, true );
-		$cat_forums_news = cat_create( T_('News'), $cat_forums_another_group, $blog_forums_ID, T_('News description') );
-		$cat_forums_bg = cat_create( T_('Background'), $cat_forums_another_group, $blog_forums_ID, T_('Background description') );
-		$cat_forums_fun = cat_create( T_('Fun'), $cat_forums_another_group, $blog_forums_ID, T_('Fun description') );
-		$cat_forums_life = cat_create( T_('In real life'), $cat_forums_fun, $blog_forums_ID );
-		$cat_forums_web = cat_create( T_('On the web'), $cat_forums_fun, $blog_forums_ID );
-		$cat_forums_sports = cat_create( T_('Sports'), $cat_forums_life, $blog_forums_ID );
-		$cat_forums_movies = cat_create( T_('Movies'), $cat_forums_life, $blog_forums_ID );
-		$cat_forums_music = cat_create( T_('Music'), $cat_forums_life, $blog_forums_ID );
+		$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_forums_ID, NULL, false, 1, NULL, true );
+			$cat_forums_ann = cat_create( T_('Welcome'), $cat_forums_forum_group, $blog_forums_ID, T_('Welcome description'), false, 1 );
+			$cat_forums_aforum = cat_create( T_('A forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum'), false, 2 );
+			$cat_forums_anforum = cat_create( T_('Another forum'), $cat_forums_forum_group, $blog_forums_ID, T_('Short description of this forum'), false, 3 );
+		$cat_forums_another_group = cat_create( T_('Another group'), 'NULL', $blog_forums_ID, NULL, false, 2, NULL, true );
+			$cat_forums_bg = cat_create( T_('Background'), $cat_forums_another_group, $blog_forums_ID, T_('Background description'), false, 1 );
+			$cat_forums_news = cat_create( T_('News'), $cat_forums_another_group, $blog_forums_ID, T_('News description'), false, 2 );
+			$cat_forums_fun = cat_create( T_('Fun'), $cat_forums_another_group, $blog_forums_ID, T_('Fun description'), false, 3 );
+				$cat_forums_life = cat_create( T_('In real life'), $cat_forums_fun, $blog_forums_ID, NULL, false, 4, 'alpha' );
+					$cat_forums_movies = cat_create( T_('Movies'), $cat_forums_life, $blog_forums_ID );
+					$cat_forums_music = cat_create( T_('Music'), $cat_forums_life, $blog_forums_ID );
+					$cat_forums_sports = cat_create( T_('Sports'), $cat_forums_life, $blog_forums_ID );
+				$cat_forums_web = cat_create( T_('On the web'), $cat_forums_fun, $blog_forums_ID, NULL, false, 5 );
 	}
 
 	if( $install_collection_manual )
