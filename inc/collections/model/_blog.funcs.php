@@ -373,7 +373,9 @@ function set_working_blog( $new_blog_ID )
 
 
 /**
- * @param string
+ * Get collection kinds
+ *
+ * @param string Blog type
  * @return array|string
  */
 function get_collection_kinds( $kind = NULL )
@@ -390,12 +392,12 @@ function get_collection_kinds( $kind = NULL )
 				'desc' => T_('A standard blog with the most common features.'),
 			),
 		'photo' => array(
-				'name' => T_('Photoblog'),
-				'desc' => T_('A blog optimized for publishing photos.'),
+				'name' => T_('Gallery'),
+				'desc' => T_('A collection optimized for publishing photo albums.'),
 			),
 		'group' => array(
-				'name' => T_('Group blog'),
-				'desc' => T_('A blog optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form.'),
+				'name' => T_('Collaborative space'),
+				'desc' => T_('A collection optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form.'),
 			),
 		'forum' => array(
 				'name' => T_('Forum'),
@@ -415,8 +417,8 @@ function get_collection_kinds( $kind = NULL )
 		$kinds = array_merge( $l_kinds, $kinds );
 	}
 
-	if( is_null($kind) )
-	{	// Return kinds array
+	if( is_null( $kind ) )
+	{ // Return kinds array
 		return $kinds;
 	}
 
@@ -1288,6 +1290,7 @@ function blogs_user_results_block( $params = array() )
 
 	// Initialize Results object
 	blogs_results( $blogs_Results, array(
+			'display_type'    => false,
 			'display_owner'   => false,
 			'display_plist'   => false,
 			'display_order'   => false,
@@ -1389,7 +1392,7 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	// Create result set:
-	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '--------A' );
+	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '---------A' );
 	$blogs_Results->Cache = & get_BlogCache();
 	$blogs_Results->title = $params['results_title'];
 	$blogs_Results->no_results_text = $no_results;
@@ -1433,6 +1436,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	$params = array_merge( array(
 			'display_id'       => true,
 			'display_name'     => true,
+			'display_type'     => true,
 			'display_fullname' => true,
 			'display_owner'    => true,
 			'display_url'      => true,
@@ -1468,7 +1472,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_name'] )
-	{	// Display Name column
+	{ // Display Name column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Name'),
 				'order' => 'blog_shortname',
@@ -1476,17 +1480,28 @@ function blogs_results( & $blogs_Results, $params = array() )
 			);
 	}
 
-	if( $params['display_name'] )
-	{	// Display Full Name column
+	if( $params['display_type'] )
+	{ // Display Type column
+		$blogs_Results->cols[] = array(
+				'th' => T_('Type'),
+				'order' => 'blog_type',
+				'td' => '%blog_row_type( #blog_type#, #blog_ID# )%',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+			);
+	}
+
+	if( $params['display_fullname'] )
+	{ // Display Full Name column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Full Name'),
 				'order' => 'blog_name',
-				'td' => '%strmaxlen( #blog_name#, 40, NULL, "raw" )%',
+				'td' => '%blog_row_fullname( #blog_name#, #blog_ID# )%',
 			);
 	}
 
 	if( $params['display_owner'] )
-	{	// Display Owner column
+	{ // Display Owner column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Owner'),
 				'order' => 'user_login',
@@ -1495,7 +1510,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_url'] )
-	{	// Display Blog URL column
+	{ // Display Blog URL column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Blog URL'),
 				'td' => '<a href="@get(\'url\')@">@get(\'url\')@</a>',
@@ -1503,13 +1518,13 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_locale'] )
-	{	// Display Locale column
+	{ // Display Locale column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Locale'),
 				'order' => 'blog_locale',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%locale_flag( #blog_locale# )%',
+				'td' => '%blog_row_locale( #blog_locale#, #blog_ID# )%',
 			);
 	}
 
@@ -1521,12 +1536,12 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'order' => 'blog_in_bloglist',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_listed( #blog_in_bloglist# )%',
+				'td' => '%blog_row_listed( #blog_in_bloglist#, #blog_ID# )%',
 			);
 	}
 
 	if( $params['display_order'] )
-	{	// Display Order column
+	{ // Display Order column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Order'),
 				'order' => 'blog_order',
@@ -1537,7 +1552,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_caching'] )
-	{	// Display Order column
+	{ // Display Order column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Caching'),
 				'th_class' => 'shrinkwrap',
@@ -1547,7 +1562,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_actions'] )
-	{	// Display Actions column
+	{ // Display Actions column
 		$blogs_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
@@ -1594,6 +1609,122 @@ function blog_row_name( $coll_name, $coll_ID )
 	return $r;
 }
 
+
+/**
+ * Get a blog full name with link to edit
+ *
+ * @param string Blog full name
+ * @param integer Blog ID
+ * @return string Link
+ */
+function blog_row_fullname( $coll_fullname, $coll_ID )
+{
+	global $current_User, $admin_url;
+
+	$coll_fullname = strmaxlen( $coll_fullname, 40, NULL, 'raw' );
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
+	{ // Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;blog='.$coll_ID;
+		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
+		$r .= $coll_fullname;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $coll_fullname;
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get a blog type with link to edit
+ *
+ * @param string Blog type
+ * @param integer Blog ID
+ * @return string Link
+ */
+function blog_row_type( $coll_type, $coll_ID )
+{
+	global $current_User, $admin_url, $Settings;
+
+	$type_titles = array(
+			'main'   => T_('Main'),
+			'std'    => T_('Blog'),
+			'photo'  => T_('Gallery'),
+			'group'  => T_('Collab'),
+			'forum'  => T_('Forum'),
+			'manual' => T_('Manual'),
+		);
+
+	$type_title = isset( $type_titles[ $coll_type ] ) ? $type_titles[ $coll_type ] : $coll_type;
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
+	{ // Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$coll_ID;
+		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
+		$r .= $type_title;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $type_title;
+	}
+
+	// Display the icons depending on how blog is used as default
+	$r .= ' ';
+	if( $coll_ID == $Settings->get( 'default_blog_ID' ) )
+	{ // This blog is default
+		$r .= action_icon( T_('Default collection to display'), 'coll_default', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+	}
+	if( $coll_ID == $Settings->get( 'info_blog_ID' ) )
+	{ // This blog is used for info
+		$r .= action_icon( T_('Collection for info pages'), 'coll_info', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+	}
+	if( $coll_ID == $Settings->get( 'login_blog_ID' ) )
+	{ // This blog is used for login actions
+		$r .= action_icon( T_('Collection for login/registration'), 'coll_login', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+	}
+	if( $coll_ID == $Settings->get( 'msg_blog_ID' ) )
+	{ // This blog is used for messaging
+		$r .= action_icon( T_('Collection for profiles/messaging'), 'coll_message', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get a blog locale with link to edit
+ *
+ * @param string Blog locale
+ * @param integer Blog ID
+ * @return string Link
+ */
+function blog_row_locale( $coll_locale, $coll_ID )
+{
+	global $current_User, $admin_url;
+
+	$coll_locale = locale_flag( $coll_locale, NULL, NULL, NULL, false );
+
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
+	{ // Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;blog='.$coll_ID;
+		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
+		$r .= $coll_locale;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $coll_locale;
+	}
+
+	return $r;
+}
+
+
 /**
  * Get a blog order with link to edit
  *
@@ -1606,7 +1737,7 @@ function blog_row_order( $blog_ID, $blog_order )
 	global $current_User, $admin_url;
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog_ID ) )
-	{	// Blog setting & can edit
+	{ // Blog setting & can edit
 		$edit_url = $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog_ID.'#blog_order';
 		$r = '<a href="'.$edit_url.'" id="order-blog-'.$blog_ID.'" style="display:block;">';
 		$r .= $blog_order;
@@ -1618,6 +1749,7 @@ function blog_row_order( $blog_ID, $blog_order )
 	}
 	return $r;
 }
+
 
 /**
  * Get the action icons to toggle caching settings of blog
@@ -1688,21 +1820,42 @@ function blog_row_caching( $Blog )
  * @param integer Value
  * @return string Title
  */
-function blog_row_listed( $value )
+function blog_row_listed( $value, $coll_ID )
 {
+	global $current_User, $admin_url;
+
 	switch( $value )
 	{
 		case 'public':
-			return T_('Always');
+			$title = T_('Always');
+			break;
 		case 'logged':
-			return T_('Logged in');
+			$title = T_('Logged in');
+			break;
 		case 'member':
-			return T_('Members');
+			$title = T_('Members');
+			break;
 		case 'never':
-			return T_('Never');
+			$title = T_('Never');
+			break;
+		default:
+			$title = $value;
+			break;
 	}
 
-	return $value;
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $coll_ID ) )
+	{ // Blog setting & can edit
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;blog='.$coll_ID;
+		$r = '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">';
+		$r .= $title;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $title;
+	}
+
+	return $r;
 }
 
 
