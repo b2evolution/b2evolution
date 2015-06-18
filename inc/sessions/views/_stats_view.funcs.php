@@ -561,7 +561,7 @@ function hit_iprange_status( $IP_address )
  */
 function hit_iprange_status_title( $IP_address )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 
 	// Get status code of IP range by IP address
 	$ip_range_status = hit_iprange_status( $IP_address );
@@ -580,7 +580,7 @@ function hit_iprange_status_title( $IP_address )
 
 	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 	{ // Current user has access to view IP ranges
-		global $admin_url, $blog;
+		global $blog;
 		$blog_param = empty( $blog ) ? '' : '&amp;blog=1';
 		return '<a href="'.$admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges&amp;ip_address='.$IP_address.$blog_param.'">'.aipr_status_title( $ip_range_status ).'</a>';
 	}

@@ -336,7 +336,7 @@ switch( $tab )
 		break;
 
 	case 'goals':
-		$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals' );
+		$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
 		switch( $tab3 )
 		{
 			case 'hits':

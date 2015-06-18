@@ -546,7 +546,7 @@ class _core_Module extends Module
 
 			case 3:		// Trusted Users (group ID 3) have permission by default:
 			case 4: 	// Normal Users (group ID 4) have permission by default:
-				$permadmin = 'normal';
+				$permadmin = 'no_toolbar';
 				$permusers = 'none';
 				$permoptions = 'none';
 				$permspam = 'view';
@@ -560,7 +560,7 @@ class _core_Module extends Module
 			// case 6:  // Spammers/restricted Users
 			default:
 				// Other groups have no permission by default
-				$permadmin = 'none';
+				$permadmin = 'no_toolbar';
 				$permusers = 'none';
 				$permoptions = 'none';
 				$permspam = 'none';
@@ -943,6 +943,7 @@ class _core_Module extends Module
 				$entries['blog'] = array(
 					'text' => T_('Collection'),
 					'href' => $collection_url,
+					'disabled' => true,
 				);
 			}
 			$entries['tools'] = array(

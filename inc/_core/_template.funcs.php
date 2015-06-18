@@ -412,6 +412,8 @@ function get_request_title( $params = array() )
 			'usercomments_text'   => T_('User comments'),
 			'download_head_text'  => T_('Download').' - $file_title$ - $post_title$',
 			'download_body_text'  => '',
+			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
+			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -643,26 +645,38 @@ function get_request_title( $params = array() )
 			{	// Create post
 				$title = $params['edit_text_create'];
 			}
-			if( $params['auto_pilot'] != 'seo_title' )
-			{	// Add advanced edit and close icon
+			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
+			{ // Add advanced edit and close icon
+				$params['edit_links_template'] = array_merge( array(
+						'before'              => '<span class="title_action_icons">',
+						'after'               => '</span>',
+						'advanced_link_class' => '',
+						'close_link_class'    => '',
+					), $params['edit_links_template'] );
+
 				global $edited_Item;
 				if( !empty( $edited_Item ) && $edited_Item->ID > 0 )
-				{	// Set the cancel editing url as permanent url of the item
+				{ // Set the cancel editing url as permanent url of the item
 					$cancel_url = $edited_Item->get_permanent_url();
 				}
 				else
-				{	// Set the cancel editing url to home page of the blog
+				{ // Set the cancel editing url to home page of the blog
 					$cancel_url = $Blog->gen_blogurl();
 				}
 
-				$title .= '<span class="title_action_icons">';
-				if( $current_User->check_perm( 'admin', 'normal' ) )
+				$title .= $params['edit_links_template']['before'];
+				if( $current_User->check_perm( 'admin', 'restricted' ) )
 				{
 					global $advanced_edit_link;
-					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array( 'onclick' => $advanced_edit_link['onclick'] ) );
+					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array(
+							'onclick' => $advanced_edit_link['onclick'],
+							'class'   => $params['edit_links_template']['advanced_link_class'].' action_icon',
+						) );
 				}
-				$title .= action_icon( T_('Cancel editing'), 'close', $cancel_url, ' '.T_('Cancel editing'), NULL, 3 );
-				$title .= '</span>';
+				$title .= action_icon( T_('Cancel editing'), 'close', $cancel_url, ' '.T_('Cancel editing'), NULL, 3, array(
+						'class' => $params['edit_links_template']['close_link_class'].' action_icon',
+					) );
+				$title .= $params['edit_links_template']['after'];
 			}
 			$r[] = $title;
 			break;
@@ -670,13 +684,23 @@ function get_request_title( $params = array() )
 		case 'edit_comment':
 			global $comment_Item, $edited_Comment;
 			$title = $params['edit_comment_text'];
-			if( $params['auto_pilot'] != 'seo_title' )
-			{	// Add advanced edit and close icon
-				$title .= '<span class="title_action_icons">';
-				if( $current_User->check_perm( 'admin', 'normal' ) )
+			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
+			{ // Add advanced edit and close icon
+				$params['edit_links_template'] = array_merge( array(
+						'before'              => '<span class="title_action_icons">',
+						'after'               => '</span>',
+						'advanced_link_class' => '',
+						'close_link_class'    => '',
+					), $params['edit_links_template'] );
+
+				$title .= $params['edit_links_template']['before'];
+				if( $current_User->check_perm( 'admin', 'restricted' ) )
 				{
 					$advanced_edit_url = url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;blog='.$Blog->ID.'&amp;comment_ID='.$edited_Comment->ID );
-					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_url, ' '.T_('Advanced editing'), NULL, 3, array( 'onclick' => 'return switch_edit_view();' ) );
+					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_url, ' '.T_('Advanced editing'), NULL, 3, array(
+							'onclick' => 'return switch_edit_view();',
+							'class'   => $params['edit_links_template']['advanced_link_class'].' action_icon',
+						) );
 				}
 				if( empty( $comment_Item ) )
 				{
@@ -684,9 +708,11 @@ function get_request_title( $params = array() )
 				}
 				if( !empty( $comment_Item ) )
 				{
-					$title .= action_icon( T_('Cancel editing'), 'close', url_add_tail( $comment_Item->get_permanent_url(), '#c'.$edited_Comment->ID ), ' '.T_('Cancel editing'), NULL, 3 );
+					$title .= action_icon( T_('Cancel editing'), 'close', url_add_tail( $comment_Item->get_permanent_url(), '#c'.$edited_Comment->ID ), ' '.T_('Cancel editing'), NULL, 3, array(
+							'class' => $params['edit_links_template']['close_link_class'].' action_icon',
+						) );
 				}
-				$title .= '</span>';
+				$title .= $params['edit_links_template']['after'];
 			}
 			$r[] = $title;
 			break;

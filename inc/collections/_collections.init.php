@@ -861,7 +861,7 @@ class collections_Module extends Module
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'blog_settings' => array(
 						'text' => T_('Common Settings'),
-						'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings',
+						'href' => $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog='.$blog,
 						)
 					)
 				);

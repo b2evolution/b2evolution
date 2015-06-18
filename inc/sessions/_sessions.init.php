@@ -205,10 +205,10 @@ class sessions_Module extends Module
 							'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;blog=0' ),
 						'goals' => array(
 							'text' => T_('Goals').'&hellip;',
-							'href' => $admin_url.'?ctrl=goals' ),
+							'href' => $admin_url.'?ctrl=goals&amp;blog=0' ),
 						'settings' => array(
 							'text' => T_('Settings').'&hellip;',
-							'href' => $admin_url.'?ctrl=stats&amp;tab=settings' ),
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings&amp;blog=0' ),
 						)
 				) );
 
@@ -345,15 +345,15 @@ class sessions_Module extends Module
 					array(
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => $admin_url.'?ctrl=goals',
+							'href' => $admin_url.'?ctrl=goals&amp;blog='.$blog,
 							'entries' => array(
 								'goals' => array(
 									'text' => T_('Goals'),
-									'href' => $admin_url.'?ctrl=goals'
+									'href' => $admin_url.'?ctrl=goals&amp;blog='.$blog
 									),
 								'cats' => array(
 									'text' => T_('Categories'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats'
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats&amp;blog='.$blog
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
@@ -361,13 +361,13 @@ class sessions_Module extends Module
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats'
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats&amp;blog='.$blog
 									),
 								),
 							),
 						'settings' => array(
 							'text' => T_('Settings'),
-							'href' => $admin_url.'?ctrl=stats&amp;tab=settings' ),
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings&amp;blog='.$blog ),
 						)
 				);
 			}

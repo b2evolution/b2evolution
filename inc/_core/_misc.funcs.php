@@ -6819,7 +6819,7 @@ function echo_modalwindow_js()
 		}
 	}
 
-	if( isset( $skin_modal_window_js_func ) && function_exists( $skin_modal_window_js_func ) )
+	if( ! empty( $skin_modal_window_js_func ) && is_string( $skin_modal_window_js_func ) && function_exists( $skin_modal_window_js_func ) )
 	{ // Call skin function only if it exists
 		call_user_func( $skin_modal_window_js_func );
 		$modal_window_js_initialized = true;

@@ -2151,13 +2151,13 @@ class Comment extends DataObject
 		{
 			$action = 'publish';
 			$action_icon = get_icon( 'move_up_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
-			$class .= 'btn_raise_'.$next_status;
+			$class .= 'btn_raise_status_'.$next_status;
 		}
 		else
 		{
 			$action = 'restrict';
 			$action_icon = get_icon( 'move_down_'.$next_status_in_row[2], 'imgtag', array( 'title' => '' ) );
-			$class .= 'btn_lower_'.$next_status;
+			$class .= 'btn_lower_status_'.$next_status;
 		}
 
 		$params = array_merge( array(
@@ -3200,14 +3200,24 @@ class Comment extends DataObject
 	function format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
-				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
-				'status'   => $this->status,
-				'title'    => $this->get( 't_status' ),
+				'template'     => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'format'       => 'htmlbody', // Output format, see {@link format_to_output()}
+				'status'       => NULL,
+				'status_title' => NULL,
 			), $params );
 
+		if( is_null( $params['status'] ) )
+		{ // Use current status of this comment
+			$params['status'] = $this->status;
+		}
+
+		if( is_null( $params['status_title'] ) )
+		{ // Use current status title of this comment
+			$params['status_title'] = $this->get( 't_status' );
+		}
+
 		$r = str_replace( array( '$status$', '$status_title$' ),
-			array( $params['status'], $params['title'] ),
+			array( $params['status'], $params['status_title'] ),
 			$params['template'] );
 	
 		echo format_to_output( $r, $params['format'] );
@@ -3232,7 +3242,7 @@ class Comment extends DataObject
 		foreach( $statuses as $status => $title )
 		{
 			$params['status'] = $status;
-			$params['title'] = $title;
+			$params['status_title'] = $title;
 			$this->format_status( $params );
 		}
 	}

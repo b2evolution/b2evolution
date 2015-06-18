@@ -666,8 +666,8 @@ function update_moderation_buttons( selector, raise_status, lower_status )
 	// Clear previous classes of first and last visible buttons
 	jQuery( selector ).removeClass( 'first-child last-child btn_next_status' );
 	// Make the raise and lower button are visible
-	jQuery( selector + '.btn_raise_' + raise_status ).addClass( 'btn_next_status' );
-	jQuery( selector + '.btn_lower_' + lower_status ).addClass( 'btn_next_status' );
+	jQuery( selector + '.btn_raise_status_' + raise_status ).addClass( 'btn_next_status' );
+	jQuery( selector + '.btn_lower_status_' + lower_status ).addClass( 'btn_next_status' );
 	// Add classes for first and last buttons to fix round corners
 	jQuery( selector + ':visible:first' ).addClass( 'first-child' );
 	jQuery( selector + ':visible:last' ).addClass( 'last-child' );

@@ -38,7 +38,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		return 0;
 	}
 
-	$show_statuses = is_admin_page() ? get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) ) : get_inskin_statuses( $blog, 'comment' );
+	$show_statuses = ( is_admin_page() || ( ! $filter_by_perm ) ) ? get_visibility_statuses( 'keys', array( 'trash', 'redirected' ) ) : get_inskin_statuses( $blog, 'comment' );
 	$filter_index = $filter_by_perm ? 0 : 1;
 	if( !isset($cache_ctp_number) || !isset($cache_ctp_number[$filter_index][$post_id]) )
 	{ // we need a query to count comments
@@ -277,62 +277,102 @@ function get_allowed_statuses( $blog )
  */
 function echo_comment_buttons( $Form, $edited_Comment )
 {
-	global $Blog, $current_User, $highest_publish_status;
+	global $Blog, $AdminUI;
 
-	// ---------- SAVE ------------
-	$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
-
-	// ---------- PUBLISH ---------
-	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'comment', $Blog->ID );
-	$current_status_value = get_status_permvalue( $edited_Comment->status );
-	$highest_status_value = get_status_permvalue( $highest_publish_status );
-	$Form->hidden( 'publish_status', $highest_publish_status );
-	if( ( $current_status_value < $highest_status_value ) && ( $highest_publish_status != 'draft' )
-		&& $current_User->check_perm( 'comment!'.$highest_publish_status, 'edit', false, $edited_Comment ) )
-	{ // User may publish this comment with a "more public" status
-		 $publish_style = 'display: inline';
+	if( $edited_Comment->is_meta() )
+	{ // Meta comments don't have a status, Display only one button to update
+		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	}
 	else
-	{
-		$publish_style = 'display: none';
+	{ // Normal comments have a status, Display the buttons to change it and update
+		if( $edited_Comment->status != 'trash' )
+		{
+			// ---------- VISIBILITY ----------
+			echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
+			// Get those statuses which are not allowed for the current User to create comments in this blog
+			if( $edited_Comment->is_meta() )
+			{ // Don't restrict statuses for meta comments
+				$restricted_statuses = array();
+			}
+			else
+			{ // Restrict statuses for normal comments
+				$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' );
+			}
+			$exclude_statuses = array_merge( $restricted_statuses, array( 'redirected', 'trash' ) );
+			// Get allowed visibility statuses
+			$status_options = get_visibility_statuses( '', $exclude_statuses );
+
+			if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+			{ // Use dropdown for bootstrap skin
+				$Form->hidden( 'comment_status', $edited_Comment->status );
+				echo '<div class="btn-group dropup comment_status_dropdown">';
+				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
+								.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
+							.' <span class="caret"></span></button>';
+				echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
+				foreach( $status_options as $status_key => $status_title )
+				{
+					echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+				}
+				echo '</ul>';
+				echo '</div>';
+			}
+			else
+			{ // Use standard select element for other skins
+				echo '<select name="comment_status">';
+				foreach( $status_options as $status_key => $status_title )
+				{
+					echo '<option value="'.$status_key.'"'
+								.( $edited_Comment->status == $status_key ? ' selected="selected"' : '' )
+								.' class="btn-status-'.$status_key.'">'
+							.$status_title
+						.'</option>';
+				}
+				echo '</select>';
+			}
+		}
+
+		echo '<span class="btn-group">';
+
+		// ---------- SAVE BUTTONS ----------
+		$Form->submit( array( 'actionArray[update_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Comment->status ) );
+		$Form->submit( array( 'actionArray[update]', T_('Save'), 'SaveButton btn-status-'.$edited_Comment->status ) );
+
+		echo '</span>';
 	}
-	$Form->submit( array(
-		'actionArray[update_publish]',
-		$publish_text,
-		'SaveButton btn-status-published',
-		'',
-		$publish_style
-	) );
 }
 
 
 /**
- * JS Behaviour: Output JavaScript code to dynamically show or hide the "Publish!"
- * button depending on the selected comment status.
+ * Display buttons to update a comment
  *
- * This function is used by the comment edit screen.
+ * @param object Form
+ * @param object edited Comment
  */
-function echo_comment_publishbt_js()
+function echo_comment_status_buttons( $Form, $edited_Comment )
 {
-	global $next_action, $highest_publish_status;
-	?>
-	<script type="text/javascript">
-	jQuery( '#commentform_visibility input[type=radio]' ).click( function()
-	{
-		var commentpublish_btn = jQuery( '.edit_actions input[name="actionArray[update_publish]"]' );
-		var public_status = '<?php echo $highest_publish_status; ?>';
+	global $Blog;
 
-		if( this.value == public_status || public_status == 'draft' )
-		{	// Hide the "Publish NOW !" button:
-			commentpublish_btn.css( 'display', 'none' );
-		}
-		else
-		{	// Show the button:
-			commentpublish_btn.css( 'display', 'inline' );
-		}
-	} );
-	</script>
-	<?php
+	// Get those statuses which are not allowed for the current User to create posts in this blog
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
+	// Get allowed visibility statuses
+	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+
+	$Form->hidden( 'comment_status', $edited_Comment->status );
+	echo '<div class="btn-group dropup comment_status_dropdown">';
+	echo '<button type="submit" class="btn btn-status-'.$edited_Comment->status.'" name="actionArray[update]">'
+				.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
+			.'</button>'
+			.'<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
+				.'<span class="caret"></span>'
+			.'</button>';
+	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
+	foreach( $status_options as $status_key => $status_title )
+	{
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+	}
+	echo '</ul>';
+	echo '</div>';
 }
 
 

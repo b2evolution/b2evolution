@@ -157,17 +157,17 @@ switch( $action )
 				{
 					case 'create_copy':
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID.'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
 						// We have EXITed already at this point!!
 						break;
 					case 'create_new':
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
+						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID, 303 ); // Will EXIT
 						// We have EXITed already at this point!!
 						break;
 					case 'create':
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+						header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
 						// We have EXITed already at this point!!
 						break;
 				}
@@ -199,7 +199,7 @@ switch( $action )
 
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
+						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
 			}
 			else
 			{
@@ -212,7 +212,7 @@ switch( $action )
 			{
 				$action = 'list';
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+				header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 		}
@@ -240,7 +240,7 @@ switch( $action )
 			forget_param( 'goal_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+			header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -308,17 +308,17 @@ switch( $action )
 			{
 				case 'cat_create_copy':
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new&gcat_ID='.$edited_GoalCategory->ID, 303 ); // Will EXIT
+					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new&blog='.$Blog->ID.'&gcat_ID='.$edited_GoalCategory->ID, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 					break;
 				case 'cat_create_new':
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new', 303 ); // Will EXIT
+					header_redirect( '?ctrl=goals&tab3=cats&action=cat_new&blog='.$Blog->ID, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 					break;
 				case 'cat_create':
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+					header_redirect( '?ctrl=goals&tab3=cats&blog='.$Blog->ID, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 					break;
 			}
@@ -348,7 +348,7 @@ switch( $action )
 			$DB->commit();
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+			header_redirect( '?ctrl=goals&tab3=cats&blog='.$Blog->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 
@@ -382,7 +382,7 @@ switch( $action )
 			forget_param( 'gcat_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=goals&tab3=cats', 303 ); // Will EXIT
+			header_redirect( '?ctrl=goals&tab3=cats&blog='.$Blog->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -397,25 +397,25 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats' );
-$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals' );
+$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
 
 $AdminUI->set_page_manual_link( 'analytics-tab' );
 
 switch( $tab3 )
 {
 	case 'goals':
-		$AdminUI->breadcrumbpath_add( T_('Goal definitions'), '?ctrl=goals' );
+		$AdminUI->breadcrumbpath_add( T_('Goal definitions'), '?ctrl=goals&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-settings' );
 		break;
 	case 'stats':
-		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats' );
+		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-stats' );
 		// Init jqPlot charts
 		init_jqplot_js();
 		break;
 	case 'cats':
-		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats' );
+		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-category-settings' );
 		init_colorpicker_js();
 		break;

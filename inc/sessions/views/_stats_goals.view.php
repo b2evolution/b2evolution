@@ -95,8 +95,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goals',
 	'url_ignore' => 'results_goals_page,final',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;final=0&amp;s=&amp;cat=0' ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;final=1' ),
+		'all' => array( T_('All'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=0&amp;s=&amp;cat=0' ),
+		'final' => array( T_('Final'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=1' ),
 		)
 	);
 
@@ -111,7 +111,7 @@ $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'goal_name',
 		'td' => $perm_options_edit ?
-			'<a href="'.$admin_url.'?ctrl=goals&amp;action=edit&amp;goal_ID=$goal_ID$" style="color:$gcat_color$~conditional( #gcat_color# == "", "", ";font-weight:bold" )~">$goal_name$</a>' :
+			'<a href="'.$admin_url.'?ctrl=goals&amp;action=edit&amp;blog='.$blog.'&amp;goal_ID=$goal_ID$" style="color:$gcat_color$~conditional( #gcat_color# == "", "", ";font-weight:bold" )~">$goal_name$</a>' :
 			'<span style="color:$gcat_color$~conditional( #gcat_color# == "", "", ";font-weight:bold" )~">$goal_name$</span>',
 	);
 
@@ -119,7 +119,7 @@ $Results->cols[] = array(
 		'th' => T_('Category'),
 		'order' => 'gcat_name',
 		'td' => $perm_options_edit ?
-			'<a href="'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;gcat_ID=$goal_gcat_ID$" style="color:$gcat_color$">$gcat_name$</a>' :
+			'<a href="'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;blog='.$blog.'&amp;gcat_ID=$goal_gcat_ID$" style="color:$gcat_color$">$gcat_name$</a>' :
 			'<span style="color:$gcat_color$">$gcat_name$</span>',
 		'extra' => array( 'style' => 'color:#gcat_color#' )
 	);

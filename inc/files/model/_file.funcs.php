@@ -1125,14 +1125,14 @@ if ( !function_exists('sys_get_temp_dir'))
  */
 function file_controller_build_tabs()
 {
-	global $AdminUI, $current_User, $blog;
+	global $AdminUI, $current_User, $blog, $admin_url;
 
 	$AdminUI->add_menu_entries(
 			'files',
 			array(
 					'browse' => array(
 						'text' => T_('Browse'),
-						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
+						'href' => $admin_url.'?ctrl=files' ),
 					)
 				);
 
@@ -1143,7 +1143,7 @@ function file_controller_build_tabs()
 				array(
 						'upload' => array(
 							'text' => /* TRANS: verb */ T_('Advanced Upload'),
-							'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
+							'href' => $admin_url.'?ctrl=upload' ),
 					)
 			);
 	}
@@ -1155,7 +1155,7 @@ function file_controller_build_tabs()
 			array(
 				'settings' => array(
 					'text' => T_('Settings'),
-					'href' => '?ctrl=fileset',
+					'href' => $admin_url.'?ctrl=fileset',
 					)
 				)
 			);
@@ -1165,32 +1165,32 @@ function file_controller_build_tabs()
 			array(
 					'settings' => array(
 						'text' => T_('Settings'),
-						'href' => '?ctrl=fileset' ),
+						'href' => $admin_url.'?ctrl=fileset' ),
 					'filetypes' => array(
 						'text' => T_('File types'),
-						'href' => '?ctrl=filetypes' ),
+						'href' => $admin_url.'?ctrl=filetypes' ),
 				)
 			);
 	}
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
-	{	// Permission to edit settings:
+	{ // Permission to edit settings:
 		$AdminUI->add_menu_entries(
 			'files',
 			array(
 				'moderation' => array(
 					'text' => T_('Moderation'),
-					'href' => '?ctrl=filemod',
+					'href' => $admin_url.'?ctrl=filemod',
 					'entries' => array(
 						'likes' => array(
 							'text' => T_('Likes'),
-							'href' => '?ctrl=filemod&amp;tab=likes' ),
+							'href' => $admin_url.'?ctrl=filemod&amp;tab=likes' ),
 						'suspicious' => array(
 							'text' => T_('Suspicious'),
-							'href' => '?ctrl=filemod&amp;tab=suspicious' ),
+							'href' => $admin_url.'?ctrl=filemod&amp;tab=suspicious' ),
 						'duplicates' => array(
 							'text' => T_('Duplicates'),
-							'href' => '?ctrl=filemod&amp;tab=duplicates' ),
+							'href' => $admin_url.'?ctrl=filemod&amp;tab=duplicates' ),
 						)
 					)
 				)

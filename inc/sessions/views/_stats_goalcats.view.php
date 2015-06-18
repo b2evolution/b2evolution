@@ -46,7 +46,7 @@ $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'gcat_name',
 		'td' => $perm_options_edit ?
-			'<a href="'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;gcat_ID=$gcat_ID$" style="color:$gcat_color$;font-weight:bold">$gcat_name$</a>' :
+			'<a href="'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;blog='.$blog.'&amp;gcat_ID=$gcat_ID$" style="color:$gcat_color$;font-weight:bold">$gcat_name$</a>' :
 			'<b style="color:$gcat_color$">$gcat_name$</b>',
 	);
 
@@ -64,9 +64,9 @@ if( $perm_options_edit )
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => '%action_icon( "'.T_('Edit this goal category...').'", "edit", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;gcat_ID=#gcat_ID#" )%'
-				.'%action_icon( "'.T_('Copy this goal category...').'", "copy", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_copy&amp;gcat_ID=#gcat_ID#" )%'
-				.'~conditional( #gcat_ID# > 1, \'%action_icon( "'.T_('Delete this goal category...').'", "delete", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_delete&amp;gcat_ID=#gcat_ID#&amp;'.url_crumb( 'goalcat' ).'" )%\', "" )~',
+			'td' => '%action_icon( "'.T_('Edit this goal category...').'", "edit", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_edit&amp;blog='.$blog.'&amp;gcat_ID=#gcat_ID#" )%'
+				.'%action_icon( "'.T_('Copy this goal category...').'", "copy", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_copy&amp;blog='.$blog.'&amp;gcat_ID=#gcat_ID#" )%'
+				.'~conditional( #gcat_ID# > 1, \'%action_icon( "'.T_('Delete this goal category...').'", "delete", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_delete&amp;blog='.$blog.'&amp;gcat_ID=#gcat_ID#&amp;'.url_crumb( 'goalcat' ).'" )%\', "" )~',
 		);
 
 	$Results->global_icon( T_('Create a new goal category...'), 'new', regenerate_url( 'action', 'action=cat_new' ), T_('New goal category').' &raquo;', 3, 4 );

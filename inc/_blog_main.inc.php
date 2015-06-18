@@ -762,7 +762,7 @@ if( !empty( $skin ) )
 				);
 
 			if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
-			    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+			    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) && $ItemType->get( 'template_name' ) != '' )
 			{ // Get template name for the current Item if it is defined by Item Type
 				$disp_handler_custom = $ItemType->get( 'template_name' ).'.main.php';
 

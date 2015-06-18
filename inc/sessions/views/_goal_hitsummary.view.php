@@ -157,8 +157,8 @@ $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats' ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1' ),
+		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats&amp;blog='.$blog ),
+		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1&amp;blog='.$blog ),
 		)
 	);
 
