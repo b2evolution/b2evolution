@@ -27,13 +27,18 @@ main .well {
 .post_tags {
 	margin: 15px 0px;
 	a {
-		background-color: white;
 		border: 1px solid #ddd;
-		padding: 5px;
+		padding: 3px 5px;
+		background: #eee;
 		.border-radius;
+		color: black;
 		&:before {
 			font-family: FontAwesome;
 			content: '\f02b \00a0 ';
+		}
+		&:hover {
+			text-decoration: none;
+			background: #ddd;
 		}
 	}
 }
@@ -674,6 +679,39 @@ div.results .status_meta span {
 
 .track_content {
 	margin: 5px;
+}
+
+// Visibility of status banners and buttons depending on comment status
+// It is used for example on forums skins where we use AJAX to change a comment status.
+//     On AJAX success result we change only a visibility of the status banners and buttons
+//     and we do NOT reload a comment content
+.vs_published,
+.vs_community,
+.vs_protected,
+.vs_private,
+.vs_review,
+.vs_draft {
+	.evo_status {
+		// Hide all status banners by default in order to show only current
+		display: none;
+	}
+	a.btn[class*='btn_lower_status_'], a.btn[class*='btn_raise_status_'] {
+		// Hide all status buttons by default
+		display: none;
+		&.btn_next_status {
+			// Make visible only the active buttons (for previous and next allowed statuses)
+			display: inline-block;
+		}
+	}
+}
+.vs_published .evo_status__published,
+.vs_community .evo_status__community,
+.vs_protected .evo_status__protected,
+.vs_private .evo_status__private,
+.vs_review .evo_status__review,
+.vs_draft .evo_status__draft {
+	// Make visible banner status only of the current status
+	display: block;
 }
 
 // Photo Index widget

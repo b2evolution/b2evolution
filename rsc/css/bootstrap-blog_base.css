@@ -18,18 +18,23 @@ main .well header .small.text-muted a {
   margin: 15px 0px;
 }
 .post_tags a {
-  background-color: white;
   border: 1px solid #ddd;
-  padding: 5px;
+  padding: 3px 5px;
+  background: #eee;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
+  color: black;
 }
 .post_tags a:before {
   font-family: FontAwesome;
   content: '\f02b \00a0 ';
+}
+.post_tags a:hover {
+  text-decoration: none;
+  background: #ddd;
 }
 .post_comments_link {
   margin-bottom: 10px;
@@ -617,6 +622,50 @@ div.results .status_meta span {
 }
 .track_content {
   margin: 5px;
+}
+.vs_published .evo_status,
+.vs_community .evo_status,
+.vs_protected .evo_status,
+.vs_private .evo_status,
+.vs_review .evo_status,
+.vs_draft .evo_status {
+  display: none;
+}
+.vs_published a.btn[class*='btn_lower_status_'],
+.vs_community a.btn[class*='btn_lower_status_'],
+.vs_protected a.btn[class*='btn_lower_status_'],
+.vs_private a.btn[class*='btn_lower_status_'],
+.vs_review a.btn[class*='btn_lower_status_'],
+.vs_draft a.btn[class*='btn_lower_status_'],
+.vs_published a.btn[class*='btn_raise_status_'],
+.vs_community a.btn[class*='btn_raise_status_'],
+.vs_protected a.btn[class*='btn_raise_status_'],
+.vs_private a.btn[class*='btn_raise_status_'],
+.vs_review a.btn[class*='btn_raise_status_'],
+.vs_draft a.btn[class*='btn_raise_status_'] {
+  display: none;
+}
+.vs_published a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_community a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_protected a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_private a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_review a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_draft a.btn[class*='btn_lower_status_'].btn_next_status,
+.vs_published a.btn[class*='btn_raise_status_'].btn_next_status,
+.vs_community a.btn[class*='btn_raise_status_'].btn_next_status,
+.vs_protected a.btn[class*='btn_raise_status_'].btn_next_status,
+.vs_private a.btn[class*='btn_raise_status_'].btn_next_status,
+.vs_review a.btn[class*='btn_raise_status_'].btn_next_status,
+.vs_draft a.btn[class*='btn_raise_status_'].btn_next_status {
+  display: inline-block;
+}
+.vs_published .evo_status__published,
+.vs_community .evo_status__community,
+.vs_protected .evo_status__protected,
+.vs_private .evo_status__private,
+.vs_review .evo_status__review,
+.vs_draft .evo_status__draft {
+  display: block;
 }
 .evo_image_index {
   margin: 1ex auto;

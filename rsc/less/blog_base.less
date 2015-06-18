@@ -793,23 +793,38 @@ div.results span[class*=status_] span {
 }
 
 // Visibility of status banners and buttons depending on comment status
-#styled_content_block [class*='vs_'] [class*='status_'] {
-	display: none;
-}
-#styled_content_block .vs_published .status_published,
-#styled_content_block .vs_community .status_community,
-#styled_content_block .vs_protected .status_protected,
-#styled_content_block .vs_private .status_private,
-#styled_content_block .vs_review .status_review,
-#styled_content_block .vs_draft .status_draft {
-	display: block;
-}
-
-[class*='vs_'] [class*='btn_'] {
-	display: none;
-}
-[class*='vs_'] .btn_next_status {
-	display: inline-block;
+// It is used for example on forums skins where we use AJAX to change a comment status.
+//     On AJAX success result we change only a visibility of the status banners and buttons
+//     and we do NOT reload a comment content
+#styled_content_block {
+	.vs_published,
+	.vs_community,
+	.vs_protected,
+	.vs_private,
+	.vs_review,
+	.vs_draft {
+		.note[class*=status_] {
+			// Hide all status banners by default in order to show only current
+			display: none;
+		}
+		a[class*='btn_lower_status_'], a[class*='btn_raise_status_'] {
+			// Hide all status buttons by default
+			display: none;
+			&.btn_next_status {
+				// Make visible only the active buttons (for previous and next allowed statuses)
+				display: inline-block;
+			}
+		}
+	}
+	.vs_published .note.status_published,
+	.vs_community .note.status_community,
+	.vs_protected .note.status_protected,
+	.vs_private .note.status_private,
+	.vs_review .note.status_review,
+	.vs_draft .note.status_draft {
+		// Make visible banner status only of the current status
+		display: block;
+	}
 }
 
 // Photo Index widget

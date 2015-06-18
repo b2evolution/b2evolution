@@ -2143,6 +2143,14 @@ div.message_toolbars {
   color: #fff;
   background-color: #613192;
 }
+.btn-status-trash {
+  color: #fff;
+  background-color: #ff6666;
+}
+.btn-status-trash:hover {
+  color: #fff;
+  background-color: #ff4444;
+}
 .mce-container label.mce-label {
   max-width: none;
 }
