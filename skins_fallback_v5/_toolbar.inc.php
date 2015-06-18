@@ -105,9 +105,10 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 	if( ! is_admin_page() && isset( $Blog ) && $Session->get( 'display_includes_'.$Blog->ID ) )
 	{ // Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--include dev-blocks--belowtoolbar">';
-		echo '<div class="dev-blocks-name"><b>MAIN template: ';
+		echo '<div class="dev-blocks-name"><b>';
 		if( ! empty( $disp_handler_custom ) )
-		{
+		{ // Custom template
+			echo 'CUSTOM Main template: ';
 			if( empty( $disp_handler_custom_found ) )
 			{ // Custom template in NOT found
 				echo $disp_handler_custom.' -&gt; Fallback to:';
@@ -116,6 +117,10 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 			{ // Custom template in found
 				echo $disp_handler_custom.' -&gt; Found:';
 			}
+		}
+		else
+		{ // Default template
+			echo 'Main template: ';
 		}
 		echo '</b> '.rel_path_to_base( $disp_handler ).'</div>';
 		echo '</div>';
