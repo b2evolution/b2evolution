@@ -137,6 +137,19 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
+	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	{ // These fields can be edited only by users which have an access to back-office
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{ // Time stamp field values
+			$Form->hidden( 'item_dateset', $edited_Item->get( 'dateset' ) );
+			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
+			$Form->hidden( 'item_issue_time', substr( $edited_Item->get( 'issue_date' ), 11 ) );
+		}
+		// Tags
+		$Form->hidden( 'item_tags', $item_tags );
+		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
+	}
+
 	$disp_edit_categories = true;
 	if( ! $params['disp_edit_categories'] )
 	{	// When categories are hidden, we store a cat_ID in the hidden input
@@ -225,19 +238,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 
 	if( ! $display_item_settings_is_defined )
 	{
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-		{ // ------------------------------------ TIME STAMP -------------------------------------
-			$Form->begin_fieldset();
-
-			$Form->switch_layout( 'none' );
-			echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-			issue_date_control( $Form, false, '<strong>'.T_('Issue date').'</strong>' );
-			echo '</div>';
-			$Form->switch_layout( NULL );
-
-			$Form->end_fieldset();
-		}
-
 		// ################### VISIBILITY / SHARING ###################
 		// Get those statuses which are not allowed for the current User to create posts in this blog
 		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
@@ -269,29 +269,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 		echo $item_renderer_checkboxes;
 		$Form->end_fieldset();
-	}
-
-	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
-	{ // Display tags
-		$Form->switch_layout( 'none' );
-		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
-		echo '<table cellspacing="0" width="100%" class="item_tags">';
-		echo '<tr><td class="label shrinkwrap"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label> '
-			// Checkbox to suggest tags
-			.'<span title="'.format_to_output( T_('Check this to let b2evolution auto-suggest tags as you type, based on the tags existing on other posts.'), 'htmlattr' ).'">'
-				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
-				.'<label for="suggest_item_tags"><strong>'.T_('suggest').':</strong></label>'
-			.'</span>'
-		.'</td>';
-		echo '<td class="input">';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td></tr>';
-		echo '</table>';
-		$Form->switch_layout( NULL );
-	}
-	else
-	{ // Hide tags
-		$Form->hidden( 'item_tags', $item_tags );
 	}
 ?>
 
