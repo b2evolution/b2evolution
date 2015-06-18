@@ -27,8 +27,7 @@ global $backup_paths, $backup_tables, $backup_path;
  */
 $current_Backup = new Backup();
 
-$Form->begin_fieldset( T_( 'Advanced backup options' ).' '.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_backup_options' ) ),
-	array( 'legend_params' => array( 'onclick' => 'toggle_clickopen(\'backup_options\')' ) ) );
+$Form->begin_fieldset( T_( 'Advanced backup options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
 
 echo '<div id="clickdiv_backup_options">';
 
@@ -75,5 +74,7 @@ if( function_exists( 'gzopen' ) )
 echo '</div>';
 
 $Form->end_fieldset();
+
+// Fieldset folding
+echo_fieldset_folding_js();
 ?>
-<script type="text/javascript">toggle_clickopen( "backup_options" );</script>
