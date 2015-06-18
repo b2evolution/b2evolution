@@ -52,14 +52,6 @@ $Comment->get_Item();
 $Comment->anchor();
 echo $params['comment_start'];
 
-// Status
-if( $Comment->status != 'published' )
-{ // display status of comment (typically an angled banner in the top right corner):
-	$Comment->format_status( array(
-			'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-		) );
-}
-
 // Post title
 if( $params['comment_post_display'] )
 {
@@ -129,6 +121,15 @@ switch( $Comment->get( 'type' ) )
 		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 		break;
 }
+
+// Status
+if( $Comment->status != 'published' )
+{ // display status of comment (typically an angled banner in the top right corner):
+	$Comment->format_status( array(
+			'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+		) );
+}
+
 echo $params['comment_title_after'];
 
 // Avatar:

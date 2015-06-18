@@ -94,7 +94,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 				) );
 		}
 		// Permalink:
@@ -167,11 +167,12 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 			$Item->feedback_link( array(
 							'type' => 'comments',
 							'link_before' => '',
-							'link_after' => '',
+							'link_after' => '</p>',
 							'link_text_zero' => '#',
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
+							'link_class' => 'btn btn-default btn-sm',
 						) );
 
 			// Link to comments, trackbacks, etc.:
