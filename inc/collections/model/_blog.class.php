@@ -318,6 +318,7 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
+				$this->set_setting( 'category_ordering', 'manual' );
 
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
