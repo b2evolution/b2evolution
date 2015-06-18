@@ -1,7 +1,6 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
- * @version $Id: backoffice.js 9342 2015-06-08 12:20:29Z yura $
  */
 
 jQuery( document ).ready( function()
@@ -56,20 +55,36 @@ function toggle_clickopen( id, hide, displayVisible )
 	}
 
 	clickimg = jQuery( clickimg );
-	var xy = clickimg.css( 'background-position' ).match( /-*\d+/g );
-
-	if( hide )
-	{
-		clickdiv.style.display = 'none';
-		// Shift background position to the right to the one icon in the sprite
-		clickimg.css( 'background-position', ( parseInt( xy[0] ) + 16 ) + 'px ' + parseInt( xy[1] ) + 'px' );
+	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
+	{ // Fontawesome icon | Glyph bootstrap icon
+		if( clickimg.data( 'toggle' ) != '' )
+		{ // This icon has a class name to toggle
+			var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
+			if( clickimg.data( 'toggle-orig-class' ) == undefined )
+			{ // Store original class name in data
+				clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
+			}
+			if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
+			{ // Replace original class name with exnpanded
+				clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
+					.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
+			}
+			else
+			{ // Revert back original class
+				clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
+					.addClass( clickimg.data( 'toggle-orig-class' ) );
+			}
+		}
 	}
 	else
-	{
-		clickdiv.style.display = displayVisible;
-		// Shift background position to the left to the one icon in the sprite
-		clickimg.css( 'background-position', ( parseInt( xy[0] ) - 16 ) + 'px ' + parseInt( xy[1] ) + 'px' );
+	{ // Sprite icon
+		var xy = clickimg.css( 'background-position' ).match( /-*\d+/g );
+		// Shift background position to the right/left to the one icon in the sprite
+		clickimg.css( 'background-position', ( parseInt( xy[0] ) + ( hide ? 16 : - 16 ) ) + 'px ' + parseInt( xy[1] ) + 'px' );
 	}
+
+	// Hide/Show content block
+	clickdiv.style.display = hide ? 'none' : displayVisible;
 
 	return false;
 }
@@ -229,7 +244,7 @@ function b2edit_open_preview( form, newaction )
  *
  * This is used to switch to another blog or tab, but "keep" the input in the form.
  */
-function b2edit_reload( form, newaction, blog, params )
+function b2edit_reload( form, newaction, blog, params, reset )
 {
 	// Set the new form action URL:
 	if( ! set_new_form_action(form, newaction) )
@@ -282,8 +297,30 @@ function b2edit_reload( form, newaction, blog, params )
 	// TODO: dh> this seems to actually delete any events attached to beforeunload, which can cause problems if e.g. a plugin hooks this event
 	window.onbeforeunload = null;
 
+	if( typeof( reset ) != 'undefined' && reset == true )
+	{ // Reset the form:
+		form.reset();
+	}
+
 	// Submit the form:
 	form.submit();
 
 	return false;
+}
+
+
+/**
+ * Submits the form after clicking on link to change item type
+ *
+ * This is used to switch to another blog or tab, but "keep" the input in the form.
+ */
+function b2edit_type( msg, newaction, submit_action )
+{
+	var reset = false;
+	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	{ // Ask about saving of the changes in the form
+		reset = ! confirm( msg );
+	}
+
+	return b2edit_reload( document.getElementById( 'item_checkchanges' ), newaction, null, { action: submit_action }, reset );
 }
