@@ -329,10 +329,6 @@ class pureforums_Skin extends Skin
 			{ // Iterate through childrens or the given parent Chapter
 				$skin_chapters_cache[$Chapter->ID] = $ChapterCache->get_by_ID( $Chapter->ID );
 				$Chapter->sort_children();
-				foreach( $Chapter->children as $sub_Chapter )
-				{ // Set Chapter childrens
-					$skin_chapters_cache[$Chapter->ID]->children[$sub_Chapter->cat_ID] = $sub_Chapter;
-				}
 			}
 		}
 		else
