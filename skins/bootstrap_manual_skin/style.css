@@ -90,26 +90,6 @@ table.catselect input#new_category_name {
 label.control-label[for=post_title] {
   width: auto;
 }
-.item_tags td.label {
-  background: none;
-  color: #000;
-  text-shadow: none;
-  padding: 0 5px 0 0;
-  font-size: 100%;
-}
-.item_tags td.label label,
-.item_tags td.label span {
-  margin-top: 10px;
-}
-.item_tags td.input {
-  width: 90%;
-}
-.item_tags td.input label {
-  display: none;
-}
-.item_tags .controls {
-  margin-left: 0;
-}
 textarea.message_text {
   width: 95%;
 }

@@ -140,8 +140,6 @@ if( empty( $hide_widget_container_menu ) )
 					'catdir_text'       => '',
 					'front_text'        => '',
 					'posts_text'        => '',
-					'edit_text_create'  => T_('Post a new topic'),
-					'edit_text_update'  => T_('Edit post'),
 					'register_text'     => '',
 					'login_text'        => '',
 					'lostpassword_text' => '',
@@ -149,6 +147,7 @@ if( empty( $hide_widget_container_menu ) )
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'display_edit_links'=> false,
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		

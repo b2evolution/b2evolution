@@ -98,7 +98,7 @@ if( $disp == 'single' )
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
