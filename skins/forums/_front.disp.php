@@ -30,21 +30,22 @@ if( count( $chapters ) > 0 )
 			<th width="160"><?php echo T_('Last change'); ?></th>
 		</tr>
 <?php
-	foreach( $chapters as $Chapter )
+	foreach( $chapters as $root_Chapter )
 	{	// Loop through categories:
-		if( $Chapter->meta )
+		if( $root_Chapter->meta )
 		{	// Meta category
-			$chapters_children = $Chapter->children;
+			$root_Chapter->sort_children();
+			$chapters_children = $root_Chapter->children;
 ?>
 		<tr class="meta_category">
-			<th colspan="2"><a href="<?php echo $Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $Chapter->dget( 'name' ); ?></a></th>
+			<th colspan="2"><a href="<?php echo $root_Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $root_Chapter->dget( 'name' ); ?></a></th>
 			<td colspan="2">&nbsp;</td>
 		</tr>
 <?php
 		}
 		else
 		{	// Simple category with posts
-			$chapters_children = array( $Chapter );
+			$chapters_children = array( $root_Chapter );
 		}
 
 		foreach( $chapters_children as $Chapter )
@@ -74,6 +75,7 @@ if( count( $chapters ) > 0 )
 					echo '<div class="subcats">';
 					echo T_('Subforums').': ';
 					$cc = 0;
+					$Chapter->sort_children();
 					foreach( $Chapter->children as $child_Chapter )
 					{ // Display subforum
 						echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
