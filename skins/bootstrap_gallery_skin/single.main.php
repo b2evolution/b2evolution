@@ -157,7 +157,7 @@ siteskin_include( '_site_body_header.inc.php' );
 							) );
 NEW:
 */
-						$single_Item->format_status( array( 'template' => '<div class="evo_status badge evo_status__$status$">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',

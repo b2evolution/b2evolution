@@ -128,22 +128,6 @@ table.catselect input#new_category_name {
 label.control-label[for=evo_post_title] {
   width: auto;
 }
-.item_tags td.label {
-  background: none;
-  color: #000;
-  text-shadow: none;
-  padding: 0;
-  font-size: 100%;
-}
-.item_tags td.input {
-  width: 90%;
-}
-.item_tags td.input label {
-  display: none;
-}
-.item_tags .controls {
-  margin-left: 0;
-}
 textarea.message_text {
   width: 95%;
 }
@@ -158,9 +142,6 @@ textarea.message_text {
 }
 .comment_form .panel .panel-body {
   padding: 0;
-}
-.form-horizontal legend {
-  padding: 0 10px;
 }
 .form-horizontal .form-group,
 .form-horizontal .custom_content {
