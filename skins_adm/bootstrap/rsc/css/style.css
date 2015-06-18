@@ -629,6 +629,12 @@ fieldset ul {
 #item_locations select {
   width: 160px;
 }
+#itemform_content .panel-title > a.post_type_link {
+  color: #337ab7;
+}
+#itemform_content .panel-title > a.post_type_link:hover {
+  color: #23527c;
+}
 #itemform_extra input {
   max-width: 80px;
 }
@@ -1292,4 +1298,10 @@ form#thread_checkchanges ul.token-input-list-facebook {
   width: 24px;
   display: inline-block;
   text-align: center;
+}
+#comment_checkchanges > .pull-right {
+  margin-bottom: 22px;
+}
+input[name=new_cat_order] {
+  width: 100%;
 }
