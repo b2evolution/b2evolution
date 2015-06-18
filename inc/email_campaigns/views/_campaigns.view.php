@@ -32,7 +32,7 @@ $Results->title = T_('Email campaigns').get_manual_link( 'email-campaigns' );
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new', T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->cols[] = array(
