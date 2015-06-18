@@ -29,6 +29,7 @@ switch( $action )
 {
 	case 'edit':
 	case 'update':
+	case 'update_edit':
 	case 'switch_view':
 	case 'publish':
 	case 'restrict':
@@ -68,8 +69,8 @@ switch( $action )
 		}
 		else
 		{ // set default perm check values
-			$comment_status = param( 'comment_status', 'string', 'CURSTATUS' );
-			$check_permname = 'comment!'.$comment_status;
+			$comment_status = param( 'comment_status', 'string', NULL );
+			$check_permname = 'comment!'.( empty( $comment_status ) ? 'CURSTATUS' : $comment_status );
 			$check_permlevel = ( $action == 'delete' ) ? 'delete' : 'edit';
 		}
 		// Check permission:
@@ -223,6 +224,7 @@ switch( $action )
 
 	case 'update_publish':
 	case 'update':
+	case 'update_edit':
 	case 'switch_view':
 		// fp> TODO: $edited_Comment->load_from_Request( true );
 
@@ -347,7 +349,8 @@ switch( $action )
 		param_check_not_empty( 'content', T_('Empty comment content is not allowed.') );
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( $current_User->check_perm( 'admin', 'restricted' ) &&
+		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // We use user date
 			param_date( 'comment_issue_date', T_('Please enter a valid comment date.'), true );
 			if( strlen(get_param('comment_issue_date')) )
@@ -360,13 +363,16 @@ switch( $action )
 		param( 'comment_rating', 'integer', NULL );
 		$edited_Comment->set_from_Request( 'rating' );
 
-		$comment_status = param( 'comment_status', 'string', 'published' );
+		$comment_status = param( 'comment_status', 'string', NULL );
 		if( $action == 'update_publish' )
 		{
 			$comment_status = $publish_status;
 		}
-		$old_comment_status = $edited_Comment->get( 'status' );
-		$edited_Comment->set( 'status', $comment_status );
+		if( ! empty( $comment_status ) )
+		{ // Update status only if it was defined on the submitted form
+			$old_comment_status = $edited_Comment->get( 'status' );
+			$edited_Comment->set( 'status', $comment_status );
+		}
 
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
@@ -376,7 +382,7 @@ switch( $action )
 			break;
 		}
 
-		if( $old_comment_status != $comment_status )
+		if( isset( $old_comment_status ) && $old_comment_status != $comment_status )
 		{ // Comment moderation is done, handle moderation "secret"
 			$edited_Comment->handle_qm_secret();
 		}
@@ -393,8 +399,11 @@ switch( $action )
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
-			header_redirect( $redirect_to );
-			/* exited */
+			if( $action != 'update_edit' )
+			{ // Redirect to previous page(e.g. comments list) after updating except of action "Save & Edit"
+				header_redirect( $redirect_to );
+				/* exited */
+			}
 		}
 
 		break;
@@ -666,7 +675,7 @@ if( $tab3 == 'fullview' )
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'elevate' ) ) )
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
 }
@@ -676,7 +685,7 @@ require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
-if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'switch_view' ) ) )
+if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'update_edit', 'switch_view' ) ) )
 { // Page with comment edit form
 	// Initialize js to autocomplete usernames in comment form
 	init_autocomplete_usernames_js();
@@ -703,7 +712,8 @@ switch( $action )
 	case 'edit':
 	case 'elevate':
 	case 'update_publish':
-	case 'update':	// on error
+	case 'update': // on error
+	case 'update_edit': // on error
 	case 'switch_view':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
