@@ -72,22 +72,22 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 
 	$create_new_blog_link = ' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>';
 
-	$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default collection to display'), array(
+	$Form->select_input_object( 'default_blog_ID', $Settings->get( 'default_blog_ID' ), $BlogCache, get_icon( 'coll_default' ).' '.T_('Default collection to display'), array(
 			'note' => T_('This collection will be displayed on index.php.').$create_new_blog_link,
 			'allow_none' => true,
 			'loop_object_method' => 'get_maxlen_name' ) );
 
-	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, T_('Collection for info pages'), array(
+	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for info pages'), array(
 		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 
-	$Form->select_input_object( 'login_blog_ID', $Settings->get( 'login_blog_ID' ), $BlogCache, T_('Collection for login/registration'), array(
+	$Form->select_input_object( 'login_blog_ID', $Settings->get( 'login_blog_ID' ), $BlogCache, get_icon( 'coll_login' ).' '.T_('Collection for login/registration'), array(
 		'note' => T_('This collection will be used for all login/registration functions.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 
-	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, T_('Collection for profiles/messaging'), array(
+	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, get_icon( 'coll_message' ).' '.T_('Collection for profiles/messaging'), array(
 		'note' => T_('This collection will be used for all messaging, profile viewing and profile editing functions.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );

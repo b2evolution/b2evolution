@@ -1197,6 +1197,42 @@ function get_icon_info( $name )
 			'fa' => 'star-o',
 			'color' => '#999'
 		);
+
+		case 'elevate': return array(		// Elevate comment into a post
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'fa' => 'newspaper-o',
+		);
+
+		case 'coll_default': return array(	// Default collection to display
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'fa' => 'compass',
+			'color' => '#F90'
+		);
+		case 'coll_info': return array(		// Collection used for info pages
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'fa' => 'info-circle',
+			'color' => '#F90'
+		);
+		case 'coll_login': return array(		// Collection used for login
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'fa' => 'check-circle',
+			'color' => '#F90'
+		);
+		case 'coll_message': return array(	// Collection used for messaging
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'fa' => 'comments',
+			'color' => '#F90'
+		);
 	}
 }
 ?>
