@@ -23,14 +23,15 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_level' );
+$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_level, gset_value' );
 $SQL->FROM( 'T_groups' );
+$SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON gset_grp_ID = grp_ID AND gset_name = "perm_admin"' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(grp_ID)' );
 $count_SQL->FROM( 'T_groups' );
 
-$Results = new Results( $SQL->get(), 'grp_', '--D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'grp_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-groups-tab' );
 
@@ -50,40 +51,50 @@ $Results->cols[] = array(
 		'td' => '$grp_ID$',
 	);
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
-{	// User can edit this group
-	$Results->cols[] = array(
-			'th' => T_('Name'),
-			'order' => 'grp_name',
-			'td' => '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID=$grp_ID$"><b>$grp_name$</b></a>',
-		);
+// Check if user can edit users
+$has_perm_users_edit = $current_User->check_perm( 'users', 'edit', false );
 
-	$Results->cols[] = array(
-			'th' => T_('Level'),
-			'th_class' => 'shrinkwrap small',
-			'td_class' => 'shrinkwrap group_level_edit small',
-			'order' => 'grp_level',
-			'default_dir' => 'D',
-			'td' => '<a href="#" rel="$grp_level$">$grp_level$</a>',
-		);
-}
-else
-{	// No permission to edit group
-	$Results->cols[] = array(
-			'th' => T_('Name'),
-			'order' => 'grp_name',
-			'td' => '$grp_name$',
-		);
+$Results->cols[] = array(
+		'th' => T_('Name'),
+		'order' => 'grp_name',
+		'td' => $has_perm_users_edit ?
+				'<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID=$grp_ID$"><b>$grp_name$</b></a>' :
+				'$grp_name$',
+	);
 
-	$Results->cols[] = array(
-			'th' => T_('Level'),
-			'th_class' => 'shrinkwrap small',
-			'td_class' => 'shrinkwrap small',
-			'order' => 'grp_level',
-			'default_dir' => 'D',
-			'td' => '$grp_level$',
-		);
+function grp_row_backoffice( $value )
+{
+	switch( $value )
+	{
+		case 'normal':
+			return T_( 'Normal' );
+		case 'restricted':
+			return T_( 'Restricted' );
+		case 'none':
+			return T_( 'No Access' );
+		case 'no_toolbar':
+		default:
+			return T_( 'No Toolbar' );
+	}
 }
+$Results->cols[] = array(
+		'th' => T_('Back-office access'),
+		'order' => 'gset_value',
+		'td' => '%grp_row_backoffice( #gset_value# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Level'),
+		'th_class' => 'shrinkwrap small',
+		'td_class' => 'shrinkwrap small'.( $has_perm_users_edit ? ' group_level_edit' : '' ),
+		'order' => 'grp_level',
+		'default_dir' => 'D',
+		'td' => $has_perm_users_edit ?
+				'<a href="#" rel="$grp_level$">$grp_level$</a>' :
+				'$grp_level$',
+	);
 
 function grp_actions( & $row )
 {
