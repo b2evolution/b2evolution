@@ -434,12 +434,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		echo $this->disp_params['list_start'];
-
 		if( $chapter_mode )
 		{	// List grouped by chapter/category:
 			$items_map_by_chapter = array();
 			$chapters_of_loaded_items = array();
+			$group_by_blogs = false;
+			$prev_chapter_blog_ID = NULL;
 
 			while( $iterator_Item = & $ItemList->get_item() )
 			{ // Display contents of the Item depending on widget params:
@@ -450,16 +450,42 @@ class coll_item_list_Widget extends ComponentWidget
 					$chapters_of_loaded_items[] = $Chapter;
 				}
 				$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
+				// Group by blogs if there are chapters from multiple blogs
+				if( ! $group_by_blogs && ( $Chapter->blog_ID != $prev_chapter_blog_ID ) )
+				{ // group by blogs is not decided yet
+					$group_by_blogs = ( $prev_chapter_blog_ID != NULL );
+					$prev_chapter_blog_ID = $Chapter->blog_ID;
+				}
 			}
 
 			usort( $chapters_of_loaded_items, 'Chapter::compare_chapters' );
+			$displayed_blog_ID = NULL;
+
+			if( $group_by_blogs && isset( $this->disp_params['collist_start'] ) )
+			{ // Start list of blogs
+				echo $this->disp_params['collist_start'];
+			}
+
 			foreach( $chapters_of_loaded_items as $Chapter )
 			{
+				if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
+				{
+					$Chapter->get_Blog();
+					echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
+					$displayed_blog_ID = $Chapter->blog_ID;
+				}
 				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter ) || $content_is_displayed;
+			}
+
+			if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
+			{ // End of blog list
+				echo $this->disp_params['collist_end'];
 			}
 		}
 		else
-		{	// Plain list:
+		{ // Plain list:
+			echo $this->disp_params['list_start'];
+
 			/**
 			 * @var ItemLight (or Item)
 			 */
@@ -467,18 +493,18 @@ class coll_item_list_Widget extends ComponentWidget
 			{ // Display contents of the Item depending on widget params:
 				$content_is_displayed = $this->disp_contents( $Item ) || $content_is_displayed;
 			}
-		}
 
-		if( isset( $this->disp_params['page'] ) )
-		{
-			if( empty( $this->disp_params['pagination'] ) )
+			if( isset( $this->disp_params['page'] ) )
 			{
-				$this->disp_params['pagination'] = array();
+				if( empty( $this->disp_params['pagination'] ) )
+				{
+					$this->disp_params['pagination'] = array();
+				}
+				$ItemList->page_links( $this->disp_params['pagination'] );
 			}
-			$ItemList->page_links( $this->disp_params['pagination'] );
-		}
 
-		echo $this->disp_params['list_end'];
+			echo $this->disp_params['list_end'];
+		}
 
 		echo $this->disp_params['block_body_end'];
 
@@ -508,9 +534,10 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
 		{ // Display Chapter only if it has some items
+			echo $this->disp_params['list_start'];
 			echo $this->disp_params['item_start'];
 			$Chapter->get_Blog();
-			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'('.$Chapter->Blog->get('shortname').')'.'</a>';
+			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
 			echo $this->disp_params['group_start'];
 
 			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
@@ -521,6 +548,7 @@ class coll_item_list_Widget extends ComponentWidget
 			// Close cat
 			echo $this->disp_params['group_end'];
 			echo $this->disp_params['item_end'];
+			echo $this->disp_params['list_end'];
 		}
 
 		return $content_is_displayed;
