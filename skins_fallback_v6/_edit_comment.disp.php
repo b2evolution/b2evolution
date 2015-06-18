@@ -41,6 +41,21 @@ $Form->begin_form( 'evo_comment' );
 	$Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->hidden( 'redirect_to', $edited_Comment->get_permanent_url() );
 
+	if( $current_User->check_perm( 'admin', 'restricted' ) &&
+	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{ // ------------------------------------ TIME STAMP -------------------------------------
+		$Form->hidden( 'comment_issue_date', mysql2localedate( $edited_Comment->get( 'date' ) ) );
+		$Form->hidden( 'comment_issue_time', substr( $edited_Comment->get( 'date' ), 11 ) );
+	}
+
+	$Form->begin_fieldset( get_request_title( array_merge( array(
+			'edit_links_template' => array(
+				'before'              => '<span class="pull-right">',
+				'after'               => '</span>',
+				'advanced_link_class' => 'btn btn-info btn-sm',
+				'close_link_class'    => 'btn btn-default btn-sm',
+			) ), $params ) ) );
+
 	$Form->info( T_('In response to'), $comment_Item->get_title() );
 
 	if( $Blog->get_setting( 'threaded_comments' ) )
@@ -59,6 +74,14 @@ $Form->begin_form( 'evo_comment' );
 		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 	}
 
+	if( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) )
+	{ // Rating is editable
+		$edited_Comment->rating_input( array(
+				'before' => $Form->begin_field( 'comment_rating_field', T_('Rating'), true ),
+				'after' => $Form->inputend.$Form->fieldend
+			) );
+	}
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
@@ -75,6 +98,7 @@ $Form->begin_form( 'evo_comment' );
 	$Form->inputstart .= $comment_toolbar;
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
+			'rows' => 11,
 			'class' => 'evo_comment_field autocomplete_usernames',
 			'id' => $dummy_fields[ 'content' ]
 		) );
@@ -83,44 +107,14 @@ $Form->begin_form( 'evo_comment' );
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-	{ // ------------------------------------ TIME STAMP -------------------------------------
-		$Form->begin_fieldset( '', array( 'id' => 'comment_date_field' ) );
-		echo $Form->begin_field( NULL, T_('Comment date') );
-		$Form->switch_layout( 'blockspan' );
-		$Form->date_input( 'comment_issue_date', $edited_Comment->date, '', array( 'size' => "10" ) );
-		$Form->time_input( 'comment_issue_time', $edited_Comment->date, '', array( 'size' => "10" ) );
-		$Form->switch_layout( NULL );
-		$Form->end_fieldset();
-	}
-
-	if( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) )
-	{ // Rating is editable
-		$edited_Comment->rating_input( array(
-				'before' => $Form->begin_field( 'comment_rating_field', T_('Rating'), true ),
-				'after' => $Form->inputend.$Form->fieldend
-			) );
-	}
-
-	// Get those statuses which are not allowed for the current User to create comments in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
-	// Get allowed visibility statuses
-	$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
-	if( count( $sharing_options ) == 1 )
-	{ // Only one visibility status is available, don't show radio but set hidden field
-		$Form->hidden( 'comment_status', $sharing_options[0][0] );
-	}
-	else
-	{ // Display visibiliy options
-		$Form->radio( 'comment_status', $edited_Comment->status, $sharing_options, T_('Visibility'), true );
-	}
-
 	// Display renderers checkboxes ( Note: This contains inputs )
 	$comment_renderer_checkboxes = $edited_Comment->renderer_checkboxes( NULL, false );
 	if( !empty( $comment_renderer_checkboxes ) )
 	{
 		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
 	}
+
+	$Form->end_fieldset();
 
 	// Display comment attachments
 	$LinkOwner = new LinkComment( $edited_Comment );
@@ -138,8 +132,8 @@ $Form->begin_form( 'evo_comment' );
 		}
 	}
 
-	echo '<div class="center margin2ex">';
-	$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton', '' ) );
+	echo '<div class="edit_actions form-group text-center">';
+	echo_comment_status_buttons( $Form, $edited_Comment );
 	echo '</div>';
 $Form->end_form();
 
@@ -158,4 +152,6 @@ $Form->end_form();
 </script>
 <?php
 
+// JS code for status dropdown submit button
+echo_status_dropdown_button_js( 'comment' );
 ?>
