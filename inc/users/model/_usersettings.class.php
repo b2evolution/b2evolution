@@ -51,6 +51,7 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_extra' => 1,
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
+		'fold_upgrade_backup_options' => 1,
 
 		'fm_imglistpreview' => 1,
 		'fm_showdate'       => 'compact',

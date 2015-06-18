@@ -1192,7 +1192,16 @@ function skin_include( $template_name, $params = array() )
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--include">';
-		echo '<div class="dev-blocks-name">skin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
+		echo '<div class="dev-blocks-name">';
+		if( empty( $item_type_template_name ) )
+		{ // Default template
+			echo 'skin_include( <b>'.$template_name.'</b> )';
+		}
+		else
+		{ // Custom template
+			echo '<b>CUSTOM</b> skin_include( <b>'.$item_type_template_name.'</b> )';
+		}
+		echo ' -> '.$debug_info.'</div>';
 	}
 
 	switch( $disp_handled )
