@@ -248,10 +248,19 @@ $Form->begin_form();
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-// Display ALL containers (fp> I removed the things that thought it knew which containers are part of the current skin because cearly, in i7, nobody knows)
-foreach( $container_Widget_array as $container=>$dummy )
+// Start by displaying all containers we know are in the current skin: (may be different in i8?)
+foreach( $container_list as $container )
 {
 	display_container( $container );
+}
+
+// Now display all other containers that also have widgets in them, just in case we need them:
+foreach( $container_Widget_array as $container=>$dummy )
+{
+	if( !in_array( $container, $container_list ) )
+	{	// No already displayed, display now:
+		display_container( $container );
+	}
 }
 
 echo '</fieldset>'."\n";
