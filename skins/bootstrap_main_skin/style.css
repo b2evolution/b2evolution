@@ -484,3 +484,14 @@ body.pictured .secondary_area .widget_core_org_members a.user_link {
 body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #23527c;
 }
+@media (max-width: 640px) {
+  body.pictured .front_main_content .ufld_icon_links a {
+    width: 45px;
+    height: 45px;
+    margin: 5px;
+  }
+  body.pictured .front_main_content .ufld_icon_links a .fa {
+    font-size: 20px;
+    line-height: 45px;
+  }
+}
