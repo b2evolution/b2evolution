@@ -6269,7 +6269,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		// fp> Note: do NOT put back and "add upgrades" comment here. The comment is OUTSIDE of the block now!
 
-		// set_upgrade_checkpoint( '11430' );
+		set_upgrade_checkpoint( '11430' );
+	}
+
+	if( $old_db_version < 11440 )
+	{ // part 18.n trunk aka 14th part of "i7"
+
+		task_begin( 'Upgrading base domains table...' );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
+		task_end();
+
+		// set_upgrade_checkpoint( '11440' );
 	}
 
 	/*
