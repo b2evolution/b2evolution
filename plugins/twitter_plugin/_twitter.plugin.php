@@ -250,7 +250,11 @@ class twitter_plugin extends Plugin
 		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
 
 		// set callback url
-		$callback = $this->get_htsrv_url( 'twitter_callback', array( 'target_type' => $target_type, 'target_id' => $target_id ), '&', true );
+		$callback = $this->get_htsrv_url( 'twitter_callback', array(), '&', true );
+		// Use the separate params for this request instead of using
+		//     array $params(second param of the func above)
+		//     because twitter cannot redirects to this complex url with serialized data
+		$callback = url_add_param( $callback, 'target_type='.$target_type.'&target_id='.$target_id, '&' );
 
 		$req_token = $connection->getRequestToken( $callback );
 
@@ -333,13 +337,13 @@ class twitter_plugin extends Plugin
 	{
 		global $Session, $Messages, $admin_url;
 
-		if( ! isset( $params['target_type'] ) || ! isset( $params['target_id'] ) )
+		$target_type = param( 'target_type', 'string', NULL );
+		$target_id = param( 'target_id', 'integer', NULL );
+
+		if( is_null( $target_type ) || is_null( $target_id ) )
 		{
 			bad_request_die( 'Missing target params!' );
 		}
-
-		$target_type = $params['target_type'];
-		$target_id = $params['target_id'];
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
