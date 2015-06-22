@@ -46,7 +46,7 @@ $schema_queries['T_basedomains'] = array(
 		'Creating table for base domains',
 		"CREATE TABLE T_basedomains (
 			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
+			dom_name   VARCHAR(250)  COLLATE utf8_bin NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			PRIMARY KEY     (dom_ID),
