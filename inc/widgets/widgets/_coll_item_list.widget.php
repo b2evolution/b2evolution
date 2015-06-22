@@ -465,16 +465,31 @@ class coll_item_list_Widget extends ComponentWidget
 			{ // Start list of blogs
 				echo $this->disp_params['collist_start'];
 			}
+			else
+			{ // Display list start, all chapters are in the same group ( not grouped by blogs )
+				echo $this->disp_params['list_start'];
+			}
 
 			foreach( $chapters_of_loaded_items as $Chapter )
 			{
 				if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
 				{
 					$Chapter->get_Blog();
+					if( $displayed_blog_ID != NULL )
+					{ // Display the end of the previous blog's chapter list
+						echo $this->disp_params['list_end'];
+					}
 					echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
+					// Display start of blog's chapter list
+					echo $this->disp_params['list_start'];
 					$displayed_blog_ID = $Chapter->blog_ID;
 				}
 				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter ) || $content_is_displayed;
+			}
+
+			if( $content_is_displayed )
+			{ // End of a chapter list - if some content was displayed this is always required
+				echo $this->disp_params['list_end'];
 			}
 
 			if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
@@ -534,21 +549,19 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
 		{ // Display Chapter only if it has some items
-			echo $this->disp_params['list_start'];
 			echo $this->disp_params['item_start'];
 			$Chapter->get_Blog();
 			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
+			echo $this->disp_params['item_end'];
 			echo $this->disp_params['group_start'];
 
 			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
 			{ // Display contents of the Item depending on widget params:
-				$content_is_displayed = $this->disp_contents( $iterator_Item ) || $content_is_displayed;
+				$content_is_displayed = $this->disp_contents( $iterator_Item, true ) || $content_is_displayed;
 			}
 
-			// Close cat
+			// Close cat group
 			echo $this->disp_params['group_end'];
-			echo $this->disp_params['item_end'];
-			echo $this->disp_params['list_end'];
 		}
 
 		return $content_is_displayed;
@@ -559,14 +572,18 @@ class coll_item_list_Widget extends ComponentWidget
 	 * Support function for above
 	 *
 	 * @param Item
+	 * @param boolean set to true if Items are displayed grouped by chapters, false otherwise
 	 * @return boolean TRUE - if content is displayed
 	 */
-	function disp_contents( & $disp_Item )
+	function disp_contents( & $disp_Item, $chapter_mode = false )
 	{
 		global $disp, $Item;
 
 		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
 		$content_is_displayed = false;
+
+		// Set a 'group_' prefix for param keys if the items are grouped by chapters
+		$disp_param_prefix = $chapter_mode ? 'group_' : '';
 
 		// Is this the current item?
 		if( !empty($Item) && $disp_Item->ID == $Item->ID )
@@ -581,11 +598,11 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $link_class == $this->disp_params['link_selected_class'] )
 		{
-			echo $this->disp_params['item_selected_start'];
+			echo $this->disp_params[$disp_param_prefix.'item_selected_start'];
 		}
 		else
 		{
-			echo $this->disp_params['item_start'];
+			echo $this->disp_params[$disp_param_prefix.'item_start'];
 		}
 
 		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
@@ -657,11 +674,11 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $link_class == $this->disp_params['link_selected_class'] )
 		{
-			echo $this->disp_params['item_selected_end'];
+			echo $this->disp_params[$disp_param_prefix.'item_selected_end'];
 		}
 		else
 		{
-			echo $this->disp_params['item_end'];
+			echo $this->disp_params[$disp_param_prefix.'item_end'];
 		}
 
 		return $content_is_displayed;
