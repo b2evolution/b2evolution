@@ -486,6 +486,11 @@ span.loader_img.loader_user_deldata {
  * Obviously, this file no longer contains only basic styles.
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
+html,
+body {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
 div.dev-blocks {
   border: 1px solid #f00;
   margin: 0;
@@ -601,6 +606,9 @@ img.avatar_above_login {
   width: 1%;
   white-space: nowrap;
   text-align: center;
+}
+.shrinkwrap.left {
+  text-align: left;
 }
 .block {
   margin: 1ex;
@@ -1365,13 +1373,6 @@ ul.jslog_error {
 }
 .ufld_icon_links a {
   text-align: center;
-}
-@media (max-width: 600px) {
-  html,
-  body {
-    width: auto !important;
-    overflow-x: hidden !important;
-  }
 }
 
 /**

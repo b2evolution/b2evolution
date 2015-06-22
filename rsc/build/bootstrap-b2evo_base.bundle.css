@@ -486,6 +486,11 @@ span.loader_img.loader_user_deldata {
  * Obviously, this file no longer contains only basic styles.
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
+html,
+body {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
 div.dev-blocks {
   border: 1px solid #f00;
   margin: 0;
@@ -601,6 +606,9 @@ img.avatar_above_login {
   width: 1%;
   white-space: nowrap;
   text-align: center;
+}
+.shrinkwrap.left {
+  text-align: left;
 }
 .block {
   margin: 1ex;
@@ -1366,13 +1374,6 @@ ul.jslog_error {
 .ufld_icon_links a {
   text-align: center;
 }
-@media (max-width: 600px) {
-  html,
-  body {
-    width: auto !important;
-    overflow-x: hidden !important;
-  }
-}
 
 /**
  * These are the generic styles that are common to "all" skins.
@@ -1394,7 +1395,6 @@ main .well header .small.text-muted a {
   margin: 15px 0px;
 }
 .post_tags a {
-  border: 1px solid #ddd;
   padding: 3px 5px;
   background: #eee;
   -webkit-border-radius: 4px;
@@ -1403,16 +1403,21 @@ main .well header .small.text-muted a {
   -o-border-radius: 4px;
   border-radius: 4px;
   color: black;
+  margin-right: 3px;
 }
 .post_tags a:before {
   font-family: FontAwesome;
   content: '\f02b \00a0 ';
+  color: #aaa;
 }
 .post_tags a:hover {
   text-decoration: none;
   background: #ddd;
 }
 .post_comments_link {
+  margin-bottom: 10px;
+}
+.more_link_button {
   margin-bottom: 10px;
 }
 a.permalink_right {
@@ -1508,18 +1513,16 @@ div.moderation_msg {
   border: 1px dotted #fa9;
   color: #e70;
 }
-.bg-primary,
-.bg-success,
-.bg-info,
-.bg-warning,
-.bg-danger {
-  padding: 10px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+.comment_form .panel-body .alert.alert-primary,
+.comment_form .panel-body .alert.alert-success,
+.comment_form .panel-body .alert.alert-info,
+.comment_form .panel-body .alert.alert-warning,
+.comment_form .panel-body .alert.alert-danger {
+  margin: 0px;
+  padding: 10px 15px;
+}
+.comment_form .bg-warning {
+  margin: 0px !important;
 }
 div.feedback_feed_msg {
   margin: 2em 2ex;
@@ -1650,6 +1653,12 @@ div.section_requires_javascript p.ajax-loader {
 div.results {
   width: 100%;
   overflow: auto;
+}
+.pager {
+  margin-bottom: 16px;
+}
+.pager li a {
+  margin-bottom: 4px;
 }
 table.rating_summary {
   float: left;
@@ -1891,6 +1900,9 @@ div.item_location {
   display: block;
   position: relative;
   overflow: hidden;
+}
+.panel-heading .badge {
+  top: 2px !important;
 }
 .note.status_draft span,
 .evo_status__draft {
@@ -2135,23 +2147,36 @@ input.btn-lg {
 .profile_column_right legend.panel-heading {
   padding: 10px 15px;
 }
-@media (max-width: 767px) {
-  .profile_column_left {
-    margin: 0 auto;
-    float: none;
-  }
-  .profile_column_right {
-    margin-left: 0;
-    width: 100%;
-    float: left;
-  }
-}
 @media (max-width: 1199px) {
   .profile_content .col-sm-3 {
     width: 35%;
   }
   .profile_content .col-sm-9 {
     width: 65%;
+  }
+}
+@media (max-width: 767px) {
+  .profile_column_left {
+    margin: 0 auto;
+    float: none;
+    width: 100%;
+  }
+  .profile_column_left .loadimg {
+    width: 100%;
+  }
+  .profile_column_right {
+    margin-left: 0;
+    width: 100%;
+    float: left;
+  }
+  .evo_comment .panel-title.pull-right {
+    float: none !important;
+    clear: both;
+  }
+}
+@media (max-width: 375px) {
+  .evo_form .control-buttons .submit {
+    margin-bottom: 4px;
   }
 }
 

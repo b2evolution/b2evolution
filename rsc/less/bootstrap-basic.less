@@ -3,6 +3,12 @@
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
 
+// MILOS> Prevents from scrolling right on all Bootstrap skins
+html, body {
+	width: auto !important;
+	overflow-x: hidden !important;
+}
+
 // CSS to show containers, widgets and includes: 
 @import "_dev-blocks.module.less";
 
@@ -81,6 +87,9 @@ img.avatar_above_login {
 	width: 1%;
 	white-space: nowrap;
 	text-align: center;
+}
+.shrinkwrap.left {
+	text-align: left;
 }
 
 .block {
@@ -892,9 +901,3 @@ ul.jslog_error {
 	}
 }
 // --------------- //
-@media (max-width: 600px) { // MILOS> Prevents from scrolling right on lower screens
-	html, body {
-		width: auto !important;
-		overflow-x: hidden !important;
-	}
-}

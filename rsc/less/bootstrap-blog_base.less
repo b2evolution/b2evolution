@@ -27,14 +27,15 @@ main .well {
 .post_tags {
 	margin: 15px 0px;
 	a {
-		border: 1px solid #ddd;
 		padding: 3px 5px;
 		background: #eee;
 		.border-radius;
 		color: black;
+		margin-right: 3px;
 		&:before {
 			font-family: FontAwesome;
 			content: '\f02b \00a0 ';
+			color: #aaa;
 		}
 		&:hover {
 			text-decoration: none;
@@ -43,6 +44,10 @@ main .well {
 	}
 }
 .post_comments_link {
+	margin-bottom: 10px;
+}
+
+.more_link_button {
 	margin-bottom: 10px;
 }
 
@@ -155,10 +160,14 @@ div.moderation_msg
 	color: #e70;
 }
 
-.bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger {
-	padding: 10px;
-	.border-radius;
-	margin-bottom: 20px;
+.comment_form .panel-body .alert {
+	&.alert-primary, &.alert-success, &.alert-info, &.alert-warning, &.alert-danger {
+		margin: 0px;
+		padding: 10px 15px;
+	}
+}
+.comment_form .bg-warning {
+	margin: 0px !important;
 }
 
 div.feedback_feed_msg {
@@ -312,6 +321,13 @@ div.section_requires_javascript p.ajax-loader {
 div.results {
 	width: 100%;
 	overflow: auto;
+}
+
+.pager { // Overrules BS original style: separates disp=single navigation links
+	margin-bottom: 16px;
+	li a {
+		margin-bottom: 4px;
+	}
 }
 
 // Rating Summary for all comments of the selected post on disp=single
@@ -568,6 +584,10 @@ div.item_location {
 	overflow: hidden;
 }
 
+// Vertical alignment for panel-heading badges
+.panel-heading .badge {
+	top: 2px !important;
+}
 
 .note.status_draft span,		// This is deprecated
 .evo_status__draft {				// This is clean
@@ -805,17 +825,6 @@ input.btn-lg {
 .profile_column_right legend.panel-heading {
 	padding: 10px 15px;
 }
-@media (max-width: 767px) {
-	.profile_column_left {
-		margin: 0 auto;
-		float: none;
-	}
-	.profile_column_right {
-		margin-left: 0;
-		width: 100%;
-		float: left;
-	}
-}
 @media (max-width: 1199px) {
 	.profile_content {
 		.col-sm-3 {
@@ -824,5 +833,29 @@ input.btn-lg {
 		.col-sm-9 {
 			width: 65%;
 		}
+	}
+}
+@media (max-width: 767px) {
+	.profile_column_left {
+		margin: 0 auto;
+		float: none;
+		width: 100%;
+		.loadimg {
+			width: 100%;
+		}
+	}
+	.profile_column_right {
+		margin-left: 0;
+		width: 100%;
+		float: left;
+	}
+	.evo_comment .panel-title.pull-right { // On BS Blog skin aligns items in comments > panel-title
+		float: none !important;
+		clear: both;
+	}
+}
+@media (max-width: 375px) {
+	.evo_form .control-buttons .submit { // Separates form buttons on low resolution when they are not inline
+		margin-bottom: 4px;
 	}
 }
