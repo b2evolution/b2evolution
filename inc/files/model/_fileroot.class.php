@@ -213,7 +213,7 @@ class FileRoot
 	/**
 	 * @static
 	 */
-	function gen_ID( $root_type, $root_in_type_ID )
+	static function gen_ID( $root_type, $root_in_type_ID )
 	{
 		if( !is_number( $root_in_type_ID ) )
 		{

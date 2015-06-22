@@ -238,11 +238,11 @@ class Module
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @param string function name
-	 * $param object user's Group - can't be NULL
+	 * @param object user's Group - can't be NULL
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 *                 NULL if permission not implemented.
 	 */
-	function check_perm( $permname, $permlevel, $permtarget, $function, $Group )
+	static function check_perm( $permname, $permlevel, $permtarget, $function, $Group )
 	{
 		if( empty( $Group ) )
 		{ // group must be set
