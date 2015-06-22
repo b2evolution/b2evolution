@@ -228,6 +228,7 @@ switch( $action )
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
 						.'</a> '.$edited_ComponentWidget->get_help_link(),
+						$edited_ComponentWidget->get_cache_status( true ),
 					),
 					// Open widget settings:
 					'editWidget' => array(
@@ -265,7 +266,7 @@ switch( $action )
 					$methods['widgetSettingsCallback'] = array(
 							$edited_ComponentWidget->ID,
 							$edited_ComponentWidget->get_desc_for_list(),
-							$edited_ComponentWidget->get_cache_status()
+							$edited_ComponentWidget->get_cache_status( true )
 						);
 					if( $action == 'update' )
 					{ // Close window after update, and don't close it when user wants continue editing after updating
@@ -416,7 +417,10 @@ switch( $action )
 		if ( $display_mode == 'js' )
 		{
 			// EXITS:
-			send_javascript_message( array( 'doToggleCache' => array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_cache_status() ) ) );
+			send_javascript_message( array( 'doToggleCache' => array(
+					$edited_ComponentWidget->ID,
+					$edited_ComponentWidget->get_cache_status( true ),
+				) ) );
 		}
 		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
@@ -558,6 +562,9 @@ if( $display_mode == 'normal' )
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ) );
 
 	$AdminUI->set_path( 'collections', 'widgets' );
+
+	// We should activate toolbar menu items for this controller and mode
+	$activate_collection_toolbar = true;
 
 	// load the js and css required to make the magic work
 	add_js_headline( '

@@ -624,7 +624,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	$is_logged_in = is_logged_in();
 	if( !$is_logged_in )
 	{ // user is not logged in
-		$login_link = '<a href="'.get_login_url( 'cannot comment', $item_url ).'">'.T_( 'Log in now!' ).'</a>';
+		$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot comment', $item_url ).'">'.T_( 'Log in now!' ).'</a>';
 	}
 	elseif( $current_User->check_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated

@@ -104,6 +104,7 @@ switch( $action )
 	case 'update_edit':
 	case 'update':
 	case 'update_publish':
+	case 'update_status':
 	case 'publish':
 	case 'publish_now':
 	case 'restrict':
@@ -125,6 +126,9 @@ switch( $action )
 
 			// Memorize action for list of post types
 			memorize_param( 'action', 'string', '', $action );
+
+			// Use this param to know how to redirect after item type updating
+			param( 'from_tab', 'string', '' );
 		}
 
 		if( empty( $edited_Item ) )
@@ -989,6 +993,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
+		param( 'from_tab', 'string', NULL );
 		param( 'post_ID', 'integer', true, true );
 		param( 'ityp_ID', 'integer', true );
 
@@ -1006,17 +1011,77 @@ switch( $action )
 
 		set_session_Item( $edited_Item );
 
-		// REDIRECT / EXIT
-		if( $post_ID > 0 )
-		{ // Edit item form
-			header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID );
+		if( ! empty( $from_tab ) && $from_tab == 'type' )
+		{ // It goes from items lists to update item type immediately
+			$Messages->add( T_('Post type has been updated.'), 'success' );
+
+			// Update item to set new type right now
+			$edited_Item->dbupdate();
+
+			// Set redirect back to items list with new item type tab
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+
+			// Highlight the updated item in list
+			$Session->set( 'highlight_id', $edited_Item->ID );
 		}
 		else
-		{ // New item form
-			header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1' );
+		{ // Set default redirect urls (It goes from the item edit form)
+			if( $post_ID > 0 )
+			{ // Edit item form
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID;
+			}
+			else
+			{ // New item form
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1';
+			}
 		}
+
+		// REDIRECT / EXIT
+		header_redirect( $redirect_to );
 		/* EXITED */
 		break;
+
+	case 'update_status':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		param( 'status', 'string', true );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'item_post!'.$status, 'edit', true, $edited_Item );
+
+		// Set new post type
+		$edited_Item->set( 'status', $status );
+
+		if( $edited_Item->get( 'status' ) == 'redirected' && empty( $edited_Item->url ) )
+		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
+			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
+		}
+
+		if( param_errors_detected() )
+		{ // If errors then redirect to edit form
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID;
+		}
+		else
+		{ // No errors, Update the item and redirect back to list
+			$Messages->add( T_('Post status has been updated.'), 'success' );
+
+			// Update item to set new type right now
+			$edited_Item->dbupdate();
+
+			// Set redirect back to items list with new item type tab
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+
+			// Highlight the updated item in list
+			$Session->set( 'highlight_id', $edited_Item->ID );
+		}
+
+		// REDIRECT / EXIT
+		header_redirect( $redirect_to );
+		/* EXITED */
+		break;
+
 
 	case 'mass_save' :
 		// Check that this action request is not a CSRF hacked request:
@@ -1454,6 +1519,13 @@ switch( $action )
 					$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
 							'style' => 'margin-right: 3ex'
 					) );
+
+				// Params we need for tab switching
+				$tab_switch_params = 'p='.$edited_Item->ID;
+			}
+			else
+			{
+				$tab_switch_params = '';
 			}
 
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )

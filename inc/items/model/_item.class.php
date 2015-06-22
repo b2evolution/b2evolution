@@ -3315,7 +3315,6 @@ class Item extends ItemLight
 		if( !empty( $params['url'] ) )
 		{
 			$r .= '<a href="'.$params['url'].$anchor.'" class="'.$params['link_class'].'" ';	// Position on feedback
-			$r .= 'class="'.$params['link_class'].'"';
 			$r .= 'title="'.$params['link_title'].'"';
 			$r .= '>';
 			$r .= $link_text;
@@ -7321,42 +7320,56 @@ class Item extends ItemLight
 	 *                    'onclick' - javascript event onclick
 	 * @param string Link text
 	 * @param string Link title
+	 * @return string
 	 */
 	function get_type_edit_link( $attr = 'link', $link_text = '', $link_title = '' )
 	{
-		global $admin_url;
+		global $admin_url, $current_User;
 
-		if( $attr != 'onclick' )
-		{ // Init an url
-			if( $this->ID > 0 )
-			{
-				$attr_href = $admin_url.'?ctrl=items&amp;action=edit_type&amp;post_ID='.$this->ID;
-			}
-			else
-			{
-				$attr_href = $admin_url.'?ctrl=items&amp;action=new_type';
-			}
-		}
+		// Check if current user can edit the type of this item
+		$has_perm_edit = is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
 
-		if( $attr != 'url' )
-		{ // Init an event 'onclick'
-			$attr_onclick = 'return b2edit_type( \''.TS_('Do you want to save your changes before changing the Post Type?').'\','
-				.' \''.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'\','
-				.' \''.( $this->ID > 0 ? 'edit_type' : 'new_type' ).'\' );';
+		if( $has_perm_edit )
+		{ // Initialize url params only when current user has a permission to edit this
+			if( $attr != 'onclick' )
+			{ // Init an url
+				if( $this->ID > 0 )
+				{
+					$attr_href = $admin_url.'?ctrl=items&amp;action=edit_type&amp;post_ID='.$this->ID;
+				}
+				else
+				{
+					$attr_href = $admin_url.'?ctrl=items&amp;action=new_type';
+				}
+			}
+
+			if( $attr != 'url' )
+			{ // Init an event 'onclick'
+				$attr_onclick = 'return b2edit_type( \''.TS_('Do you want to save your changes before changing the Post Type?').'\','
+					.' \''.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'\','
+					.' \''.( $this->ID > 0 ? 'edit_type' : 'new_type' ).'\' );';
+			}
 		}
 
 		switch( $attr )
 		{
 			case 'link':
-				return '<a href="'.$attr_href.'" onclick="'.$attr_onclick.'" title="'.$link_title.'" class="post_type_link">'.$link_text.'</a>';
+				if( empty( $attr_href ) )
+				{ // No perm to edit item type
+					return $link_text;
+				}
+				else
+				{ // Current user can edit this item
+					return '<a href="'.$attr_href.'" onclick="'.$attr_onclick.'" title="'.$link_title.'" class="post_type_link">'.$link_text.'</a>';
+				}
 				break;
 
 			case 'onclick':
-				return $attr_onclick;
+				return empty( $attr_onclick ) ? '' : $attr_onclick;
 				break;
 
 			case 'url':
-				return $attr_href;
+				return empty( $attr_href ) ? '' : $attr_href;
 				break;
 		}
 	}
@@ -7369,7 +7382,7 @@ class Item extends ItemLight
 	 */
 	function & get_ItemType()
 	{
-		if( is_null( $this->ItemType ) )
+		if( empty( $this->ItemType ) )
 		{
 			$ItemTypeCache = & get_ItemTypeCache();
 			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );

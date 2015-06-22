@@ -3784,20 +3784,22 @@ function items_results( & $items_Results, $params = array() )
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
-			'tab' => '',
-			'field_prefix' => '',
-			'display_date' => true,
-			'display_permalink' => true,
-			'display_blog' => true,
-			'display_type' => true,
-			'display_author' => true,
-			'display_title' => true,
-			'display_title_flag' => true,
-			'display_title_status' => true,
+			'tab'                        => '',
+			'field_prefix'               => '',
+			'display_date'               => true,
+			'display_permalink'          => true,
+			'display_blog'               => true,
+			'display_author'             => true,
+			'display_type'               => true,
+			'display_title'              => true,
+			'display_title_flag'         => true,
+			'display_title_status'       => true,
 			'display_visibility_actions' => true,
-			'display_ord' => true,
-			'display_history' => true,
-			'display_actions' => true,
+			'display_status'             => true,
+			'display_ord'                => true,
+			'display_status'             => true,
+			'display_history'            => true,
+			'display_actions'            => true,
 		), $params );
 
 	if( $params['display_date'] )
@@ -3830,17 +3832,7 @@ function items_results( & $items_Results, $params = array() )
 		}
 	}
 
-	if( $params['tab'] == 'intros' && $params['display_type'] )
-	{ // Display Type column:
-		$items_Results->cols[] = array(
-				'th' => T_('Type'),
-				'th_class' => 'nowrap',
-				'td_class' => 'nowrap',
-				'order' => $params['field_prefix'].'ityp_ID',
-				'td' => '@type()@',
-			);
-	}
-	else if( $params['display_author'] )
+	if( $params['display_author'] )
 	{ // Display Author column:
 		$items_Results->cols[] = array(
 				'th' => T_('Author'),
@@ -3851,27 +3843,40 @@ function items_results( & $items_Results, $params = array() )
 			);
 	}
 
+	if( $params['display_type'] )
+	{ // Display Type column:
+		$items_Results->cols[] = array(
+				'th' => T_('Type'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'order' => $params['field_prefix'].'ityp_ID',
+				'td' => '%item_row_type( {Obj} )%',
+			);
+	}
+
 	if( $params['display_title'] )
 	{ // Display Title column
 		$items_Results->cols[] = array(
 				'th' => T_('Title'),
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
-				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].', '.(int)$params['display_title_status'].' )%</strong>',
+				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>',
 			);
 	}
 
-	if( $params['display_visibility_actions'] )
-	{ // Display Visibility actions
+	if( $params['display_status'] )
+	{ // Display Ord column
 		$items_Results->cols[] = array(
-				'th' => T_('Title'),
-				'td_class' => 'shrinkwrap',
-				'td' => '%item_visibility( {Obj} )%',
+				'th' => T_('Status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap left',
+				'order' => $params['field_prefix'].'status',
+				'td' => '%item_row_status( {Obj}, {CUR_IDX} )%',
 			);
 	}
 
 	if( $params['display_ord'] )
-	{	// Display Ord column
+	{ // Display Ord column
 		$items_Results->cols[] = array(
 				'th' => T_('Ord'),
 				'order' => $params['field_prefix'].'order',
@@ -3881,7 +3886,7 @@ function items_results( & $items_Results, $params = array() )
 	}
 
 	if( $params['display_history'] )
-	{	// Display History (i) column
+	{ // Display History (i) column
 		$items_Results->cols[] = array(
 				'th' => /* TRANS: abbrev for info */ T_('i'),
 				'th_title' => T_('Item history information'),
@@ -3894,7 +3899,7 @@ function items_results( & $items_Results, $params = array() )
 	}
 
 	if( $params['display_actions'] )
-	{	// Display Actions column
+	{ // Display Actions column
 		$items_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'td_class' => 'shrinkwrap',
@@ -3968,22 +3973,75 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 }
 
 /**
- * Get the icons to publish or to deprecate the item
+ * Get item type title with link to change this
  *
  * @param object Item
- * @return string Action icons
+ * @return string
  */
-function item_visibility( $Item )
+function item_row_type( $Item )
 {
-	// Display publish NOW button if current user has the rights:
-	$r = $Item->get_publish_link( ' ', ' ', get_icon( 'publish' ), '#', '' );
+	$type_edit_url = $Item->get_type_edit_link( 'url' );
+	$type_title = $Item->get_type_setting( 'name' );
 
-	// Display deprecate if current user has the rights:
-	$r .= $Item->get_deprecate_link( ' ', ' ', get_icon( 'deprecate' ), '#', '' );
+	if( empty( $type_edit_url ) )
+	{ // No perm to edit post type
+		return $type_title;
+	}
+	else
+	{ // Display a link to quick change type
+		return '<a href="'.$type_edit_url.'&amp;from_tab=type">'.$type_title.'</a>';
+	}
+}
 
-	if( empty( $r ) )
-	{	// for IE
-		$r = '&nbsp;';
+
+/**
+ * Get buttons to change item type
+ *
+ * @param object Item
+ * @param integer Index of the row on page
+ * @return string
+ */
+function item_row_status( $Item, $index )
+{
+	global $current_User, $AdminUI, $Blog, $admin_url;
+
+	if( empty( $Blog ) )
+	{ // global Blog object is not set, e.g. back-office User activity tab
+		$Item->load_Blog();
+		$blog_ID = $Item->Blog->ID;
+	}
+	else
+	{
+		$blog_ID = $Blog->ID;
+	}
+
+	// Get those statuses which are not allowed for the current User to create posts in this blog
+	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create' ), array( 'trash' ) );
+	// Get allowed visibility statuses
+	$status_options = get_visibility_statuses( '', $exclude_statuses );
+
+	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
+	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	{ // Use dropdown for bootstrap skin and if current user can edit this post
+		$r = '<div class="btn-group '.( $index > 5 ? 'dropup' : 'dropdown' ).' post_status_dropdown">'
+				.'<button type="button" class="btn btn-sm btn-status-'.$Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+						.'<span>'.$status_options[ $Item->status ].'</span>'
+					.' <span class="caret"></span></button>'
+				.'<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
+					.$admin_url.'?ctrl=items&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.'" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+		}
+		$r .= '</ul>'
+			.'</div>';
+	}
+	else
+	{ // Display only status badge when user has no permission to edit this post and for chicago skin
+		$r = $Item->get_format_status( array(
+			'template' => '<span class="note status_$status$"><span>$status_title$</span></span>',
+		) );
 	}
 
 	return $r;

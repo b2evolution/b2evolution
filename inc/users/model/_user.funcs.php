@@ -2836,7 +2836,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			{	// End previous group
 				$Form->end_fieldset();
 			}
-			$Form->begin_fieldset( T_( $userfield->ufgp_name ), array( 'id' => $userfield->ufgp_ID ) );
+			$Form->begin_fieldset( $userfield->ufgp_name, array( 'id' => $userfield->ufgp_ID ) );
 		}
 
 		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );

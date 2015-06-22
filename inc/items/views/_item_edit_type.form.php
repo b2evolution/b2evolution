@@ -46,11 +46,13 @@ $Results->global_icon( T_('Do NOT change the type'), 'close', $close_url );
  */
 function get_name_for_itemtype( $ityp_ID, $name )
 {
-	global $admin_url, $edited_Item;
+	global $admin_url, $edited_Item, $from_tab;
 
 	$current = $edited_Item->ityp_ID == $ityp_ID ? ' '.T_('(current)') : '';
 
-	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.'&amp;'.url_crumb( 'item' ).'">'
+	$from_tab_param = empty( $from_tab ) ? '' : '&amp;from_tab='.$from_tab;
+
+	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.'&amp;'.url_crumb( 'item' ).'">'
 		.$name.'</a></strong>'
 		.$current;
 }

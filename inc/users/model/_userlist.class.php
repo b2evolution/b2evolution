@@ -38,7 +38,7 @@ class UserList extends DataObjectList2
 	 * Boolean var, TRUE - to memorize params (regenerate_url)
 	 */
 	var $memorize = true;
-	
+
 	/**
 	 * @var array Params to build query
 	 */
@@ -531,7 +531,7 @@ class UserList extends DataObjectList2
 		// This is more efficient than manipulating all fields at once.
 
 		// *** STEP 1 ***
-		$user_IDs = $this->filters['users'];
+		$user_IDs = isset( $this->filters['users'] ) ? $this->filters['users'] : array();
 		if( $this->refresh_query || // Some filters are changed
 		    $localtimenow - $Session->get( $this->filterset_name.'_refresh_time' ) > 7200 ) // Time has passed ( 2 hours )
 		{	// We should create new list of user IDs
