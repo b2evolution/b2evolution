@@ -350,7 +350,7 @@ if( $Item->can_see_comments( true ) )
 
 		// _______________________________________________________________
 		// Display count of comments to be moderated:
-		$Item->feedback_moderation( 'feedbacks', '<p class="bg-info">', '</p>', '',
+		$Item->feedback_moderation( 'feedbacks', '<p class="alert alert-info">', '</p>', '',
 				T_('This post has 1 feedback awaiting moderation... %s'),
 				T_('This post has %d feedbacks awaiting moderation... %s') );
 		// _______________________________________________________________

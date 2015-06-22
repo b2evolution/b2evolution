@@ -341,7 +341,7 @@ echo '<div class="profile_column_right">';
 			{ // End previous group
 				$profileForm->end_fieldset();
 			}
-			$profileForm->begin_fieldset( T_( $userfield->ufgp_name ), array( 'id' => 'fieldset_user_fields' ) );
+			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
 		}
 
 		if( $userfield->ufdf_type == 'text' )
