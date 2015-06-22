@@ -239,6 +239,10 @@ if( $tab == 'system' )
 }
 else
 { // From Blog settings
+
+	// We should activate toolbar menu items for this controller and tab
+	$activate_collection_toolbar = true;
+
 	$AdminUI->set_path( 'collections', 'skin', 'manage_skins' );
 
 	/**

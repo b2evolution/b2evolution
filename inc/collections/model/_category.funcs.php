@@ -186,6 +186,8 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 
 	if( !isset( $number_of_comments_in_cat[(string) $blog_ID] ) )
 	{
+		global $posttypes_specialtypes;
+
 		$SQL = new SQL();
 		$SQL->SELECT( 'cat_ID, COUNT( comment_ID ) c' );
 		$SQL->FROM( 'T_comments' );
@@ -197,6 +199,10 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
+		if( ! empty( $posttypes_specialtypes ) )
+		{ // Get content post types, Exclide pages, intros, sidebar links and ads
+			$SQL->WHERE_and( 'post_ityp_ID NOT IN( '.$DB->quote( $posttypes_specialtypes ).' )' );
+		}
 		$SQL->GROUP_BY( 'cat_ID' );
 
 		$number_of_comments_in_cat[(string) $blog_ID] = $DB->get_assoc( $SQL->get() );

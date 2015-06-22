@@ -24,6 +24,9 @@ global $current_User;
 
 global $collections_Module;
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 

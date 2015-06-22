@@ -22,6 +22,9 @@ global $UserSettings;
 
 $action = param_action( 'list' );
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 /*
  * Init the objects we want to work on.
  */

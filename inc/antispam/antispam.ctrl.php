@@ -460,6 +460,9 @@ if( $display_mode != 'js' )
 {
 	if( $tab == 'stats' )
 	{
+		// We should activate toolbar menu items for this controller and tab
+		$activate_collection_toolbar = true;
+
 		if( isset( $collections_Module ) )
 		{ // Display list of blogs:
 			if( $current_User->check_perm( 'stats', 'view' ) )

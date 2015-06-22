@@ -34,6 +34,9 @@ else if( $tab == 'manage_skins' )
 
 param_action( 'edit' );
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
 if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check

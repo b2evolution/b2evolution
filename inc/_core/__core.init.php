@@ -886,7 +886,7 @@ class _core_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $baseurl, $home_url, $admin_url, $debug, $debug_jslog, $dev_menu, $seo_page_type, $robots_index;
-		global $Blog, $blog;
+		global $Blog, $blog, $activate_collection_toolbar;
 
 		global $Settings;
 
@@ -954,8 +954,8 @@ class _core_Module extends Module
 		}
 
 
-		if( ! empty( $Blog ) )
-		{ // A blog is currently selected:
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
+		{ // A blog is currently selected AND we can activate toolbar items for selected collection:
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				$write_item_url = $Blog->get_write_item_url();
@@ -963,7 +963,7 @@ class _core_Module extends Module
 				{ // write item URL is not empty, so it's sure that user can create new post
 					if( !$perm_admin_normal )
 					{
-						$entries[ 'write' ] = array(
+						$entries['write'] = array(
 							'text' => '<span class="fa fa-plus-square"></span> '.T_('Post'),
 						);
 					}

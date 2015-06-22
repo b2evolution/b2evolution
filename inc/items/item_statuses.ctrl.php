@@ -29,6 +29,9 @@ global $dispatcher;
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 $tab = param( 'tab', 'string', 'settings', true );
 
 $AdminUI->set_path( 'collections', 'settings', 'statuses' );

@@ -14,6 +14,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 if( valid_blog_requested() )
 {
 	$current_User->check_perm( 'blog_cats', 'edit', true, $blog );

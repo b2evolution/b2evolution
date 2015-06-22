@@ -26,6 +26,9 @@ global $dispatcher;
 global $collections_Module, $DB;
 param_action();
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 

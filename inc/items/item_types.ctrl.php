@@ -35,6 +35,9 @@ $special_range = ItemType::get_special_range();
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
+
 $tab = param( 'tab', 'string', 'settings', true );
 
 $tab3 = param( 'tab3', 'string', 'types', true );

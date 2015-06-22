@@ -130,15 +130,15 @@ class sessions_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog;
+		global $Blog, $activate_collection_toolbar;
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( !empty($Blog) && $current_User->check_perm( 'stats', 'list' ) )
-		{	// Permission to view stats for user's blogs:
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list' ) )
+		{ // Permission to view stats for user's blogs:
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(

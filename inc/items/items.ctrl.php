@@ -46,6 +46,8 @@ $action = param_action( 'list' );
 
 $AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 
+// We should activate toolbar menu items for this controller
+$activate_collection_toolbar = true;
 
 /*
  * Init the objects we want to work on.

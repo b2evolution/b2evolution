@@ -48,6 +48,9 @@ if( $blog )
 
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Collection Dashboard'), $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
+
+	// We should activate toolbar menu items for this controller and action
+	$activate_collection_toolbar = true;
 }
 else
 { // Site dashboard

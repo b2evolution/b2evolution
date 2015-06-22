@@ -345,6 +345,9 @@ switch( $tab )
 		// Check minimum permission:
 		$current_User->check_perm( 'options', 'view', true );
 
+		// We should activate toolbar menu items for this controller and tab
+		$activate_collection_toolbar = true;
+
 		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
 		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
@@ -372,6 +375,9 @@ switch( $tab )
 		$AdminUI->clear_menu_entries( 'collections' );
 
 		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+
+		// We should activate toolbar menu items for this controller and tab
+		$activate_collection_toolbar = true;
 		break;
 }
 
