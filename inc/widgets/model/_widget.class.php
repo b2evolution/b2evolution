@@ -71,6 +71,11 @@ class ComponentWidget extends DataObject
 	*/
 	var $BlockCache;
 
+	/**
+	* @var Blog
+	*/
+	var $Blog = NULL;
+
 
 	/**
 	 * Constructor
@@ -483,6 +488,10 @@ class ComponentWidget extends DataObject
 					'item_selected_text_end' => '',
 					'group_start' => '<ul>',
 					'group_end' => '</ul>',
+					'group_item_start' => '<li>',
+					'group_item_end' => '</li>',
+					'group_item_selected_start' => '<li class="selected">',
+					'group_item_selected_end' => '</li>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
@@ -517,7 +526,7 @@ class ComponentWidget extends DataObject
 		global $rsc_url;
 
 		// prepare for display:
-		$this->init_display( $params ); 
+		$this->init_display( $params );
 
 		switch( $this->type )
 		{
@@ -648,9 +657,10 @@ class ComponentWidget extends DataObject
 	/**
 	 * Get cache status
 	 *
-	 * @return string 'enabled', 'disabled', 'disallowed'
+	 * @param boolean TRUE to check if blog allows a caching for widgets
+	 * @return string 'enabled', 'disabled', 'disallowed', 'denied'
 	 */
-	function get_cache_status()
+	function get_cache_status( $check_blog_restriction  = false )
 	{
 		$default_widget_params = $this->get_param_definitions( array() );
 		if( ! empty( $default_widget_params )
@@ -662,6 +672,15 @@ class ComponentWidget extends DataObject
 		}
 		else
 		{ // Check current cache status if it is allowed
+			if( $check_blog_restriction )
+			{ // Check blog restriction for widget caching
+				$widget_Blog = & $this->get_Blog();
+				if( ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+				{ // Widget/block cache is not allowed by blog setting
+					return 'denied';
+				}
+			}
+
 			if( $this->get_param( 'allow_blockcache' ) )
 			{ // Enabled
 				return 'enabled';
@@ -853,5 +872,21 @@ class ComponentWidget extends DataObject
 		BlockCache::invalidate_key( 'wi_ID', $this->ID );
 	}
 
+
+	/**
+	 * Get Blog
+	 *
+	 * @return object Blog
+	 */
+	function & get_Blog()
+	{
+		if( $this->Blog === NULL )
+		{ // Get blog only first time
+			$BlogCache = & get_BlogCache();
+			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+		}
+
+		return $this->Blog;
+	}
 }
 ?>
