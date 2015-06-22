@@ -537,6 +537,10 @@ function display_charts( $chart_data )
 			$chart_item['value'] = $chart_percent.'%';
 			$chart_color = '#00F';
 		}
+		if( $chart_item['value'] > 0 && $chart_percent == 0 )
+		{ // Display a little chart for not null values
+			$chart_percent = 0.01;
+		}
 		// Display chart
 		echo '<div class="chart">
 				<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
