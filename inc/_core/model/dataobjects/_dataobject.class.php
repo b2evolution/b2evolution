@@ -211,6 +211,12 @@ class DataObject
 			$self_db_config = call_user_func( array( $class_name, 'get_class_db_config' ) );
 		}
 
+		if( isset( $params['force_delete'] ) )
+		{ // In case of force deletion, also delete restrictions
+			$delete_restrictions = call_user_func( array( $class_name, 'get_delete_restrictions' ) );
+			$delete_cascades = array_merge( $delete_cascades, $delete_restrictions );
+		}
+
 		$delete_query = 'DELETE '.$self_db_config['dbtablename'];
 		$from_clause = ' FROM '.$self_db_config['dbtablename'];
 
@@ -222,6 +228,19 @@ class DataObject
 			}
 
 			$sql_where = $self_db_config['dbIDname'].' IN ( '.implode( ', ', $object_ids ).' )';
+		}
+
+		if( empty( $object_ids ) )
+		{
+			$sub_query = 'SELECT '.$self_db_config['dbIDname'].'
+						FROM '.$self_db_config['dbtablename'].'
+						WHERE '.$sql_where;
+			$object_ids = $DB->get_col( $sub_query );
+
+			if( empty( $object_ids ) )
+			{
+				return 0;
+			}
 		}
 
 		$use_transaction = ( isset( $params['use_transaction'] ) ) ? $params['use_transaction'] : true;
@@ -248,21 +267,27 @@ class DataObject
 
 			if( isset( $cascade['class'] ) )
 			{ // The cascade class attributum is set, call the corresponding db_delete_where() function
-				$class_db_config = call_user_func( array( $cascade['class'], 'get_class_db_config' ) );
 				if( empty( $object_ids ) )
 				{ // delete by where condition
-					$cascade_condition = $cascade['fk'].' IN (
-						SELECT '.$self_db_config['dbIDname'].'
+					$sub_query = 'SELECT '.$self_db_config['dbIDname'].'
 						FROM '.$self_db_config['dbtablename'].'
-						WHERE '.$sql_where.$more_restriction.' )';
+						WHERE '.$sql_where.$more_restriction;
+					if( $self_db_config['dbtablename'] == $cascade['table'] )
+					{ // We are removing items from the same table, avoid infinite loop
+						$object_ids = $DB->get_col( $sub_query );
+						if( empty( $object_ids ) )
+						{ // There are no entries in the foreign key table with the given condition, so nothing to delete
+							continue;
+						}
+					}
 				}
-				else
-				{ // delete by foreign key ids
-					$cascade_condition = $cascade['fk'].' IN ( '.implode( ', ', $object_ids ).' )';
-				}
+
+				// Set cascade condition based on the already known foreign key ids or on the sub query in case of unknown foreign keys
+				$cascade_condition = $cascade['fk'].' IN ( '.( empty( $object_ids ) ? $sub_query : implode( ', ', $object_ids ) ).' )';
 
 				load_class( $cascade['class_path'], $cascade['class'] );
 				// Delete the given class objects together with all of its delete cascades
+				$params['force_delete'] = true;
 				$result = call_user_func( array( $cascade['class'], 'db_delete_where' ), $cascade['class'], $cascade_condition, NULL, $params );
 				if( $result === false )
 				{ // Delete cascade operation failed in a cascade class
@@ -276,12 +301,22 @@ class DataObject
 			}
 
 			$alias = $cascade['table'].++$index;
-			$delete_query .= ', '.$alias;
-			$from_clause .= ' LEFT JOIN '.$cascade['table'].' AS '.$alias.' ON '.$alias.'.'.$cascade['fk'].' = '.$self_db_config['dbIDname'].$more_restriction;
+
+			$result = $DB->query( 'DELETE '.$alias.'
+				FROM '.$cascade['table'].' AS '.$alias.'
+				WHERE '.$alias.'.'.$cascade['fk'].' IN ( '.implode( ', ', $object_ids ).' )'.$more_restriction,
+				'Delete object from db with where condition' );
+			if( $result === false )
+			{ // There is an open transaction, needs to be closed.
+				if( $use_transaction ) {
+					$DB->rollback();
+				}
+				return $result;
+			}
 		}
 
 		// Delete this (main/parent) object:
-		$result = $DB->query( $delete_query.$from_clause.' WHERE '.$sql_where, 'Delete object from db with were condition' );
+		$result = $DB->query( $delete_query.$from_clause.' WHERE '.$sql_where, 'Delete object from db with where condition' );
 		if( $use_transaction )
 		{ // There is an open transaction, needs to be closed.
 			( $result === false ) ? $DB->rollback() : $DB->commit();

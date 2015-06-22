@@ -420,85 +420,44 @@ switch( $action )
 
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
+		$delete_notes = array();
+
+		// Check how many posts and comments will be deleted
+		$number_of_items = $edited_Blog->get_number_of_items();
+		if( $number_of_items > 0 )
+		{ // There is at least one item
+			$number_of_comments = $edited_Blog->get_number_of_comments();
+			if( $number_of_comments > 0 )
+			{ // There is at least one comment
+				$delete_notes[] = array( sprintf( T_('WARNING: This blog contains %d items and %d comments.'), $number_of_items, $number_of_comments ), 'warning' );
+			}
+			else
+			{
+				$delete_notes[] = array( sprintf( T_('WARNING: This blog contains %d items.'), $number_of_items ), 'warning' );
+			}
+		}
 
 		// Check if the deleting blog is used as default blog and Display a warning
 		if( $default_Blog = & get_setting_Blog( 'default_blog_ID' ) && $default_Blog->ID == $edited_Blog->ID )
 		{ // Default blog
-			$Messages->add( T_('WARNING: You are about to delete the default collection.'), 'warning' );
+			$delete_notes[] = array( T_('WARNING: You are about to delete the default collection.'), 'warning' );
 		}
 		if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) && $info_Blog->ID == $edited_Blog->ID  )
 		{ // Info blog
-			$Messages->add( T_('WARNING: You are about to delete the collection used for info pages.'), 'warning' );
+			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for info pages.'), 'warning' );
 		}
 		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $login_Blog->ID == $edited_Blog->ID  )
 		{ // Login blog
-			$Messages->add( T_('WARNING: You are about to delete the collection used for login/registration pages.'), 'warning' );
+			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for login/registration pages.'), 'warning' );
 		}
 		if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $msg_Blog->ID == $edited_Blog->ID  )
 		{ // Messaging blog
-			$Messages->add( T_('WARNING: You are about to delete the collection used for messaging pages.'), 'warning' );
+			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for messaging pages.'), 'warning' );
 		}
-		$Messages->display();
 
-		// Not confirmed
-		if( $current_User->check_perm( 'files', 'view', false ) )
-		{ // User has permission to view files in this blog's fileroot, diplay link
-			$delete_warning = sprintf( T_('Deleting this collection will also delete ALL its categories, posts, comments and ALL its attached files in the collection\'s <a %s>fileroot</a> !'),
-				'href="'.$edited_Blog->get_filemanager_link().'"' );
-		}
-		else
-		{ // User has no permission to view files in this blog's fielroot
-			$delete_warning = T_('Deleting this collection will also delete ALL its categories, posts, comments and ALL its attached files in the collection\'s fileroot !');
-		}
-		?>
-		<div class="panelinfo panel panel-default panel-danger">
-			<div class="panel-heading">
-				<h3 class="panel-title"><?php printf( T_('Delete collection [%s]?'), $edited_Blog->dget( 'name' ) )?></h3>
-			</div>
-			<div class="panel-body">
-
-			<p class="warning"><?php echo $delete_warning; ?></p>
-
-			<p><?php echo T_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!') ?></p>
-
-			<p class="warning text-danger"><?php echo T_('THIS CANNOT BE UNDONE!') ?></p>
-
-			<p>
-
-			<?php
-				$redirect_to = param( 'redirect_to', 'url', '' );
-
-				$Form = new Form( NULL, '', 'get', 'none' );
-
-				$Form->begin_form( 'inline' );
-					$Form->add_crumb( 'collection' );
-					$Form->hidden_ctrl();
-					$Form->hidden( 'tab', $tab );
-					$Form->hidden( 'action', 'delete' );
-					$Form->hidden( 'blog', $edited_Blog->ID );
-					$Form->hidden( 'confirm', 1 );
-					$Form->hidden( 'redirect_to', $redirect_to );
-					$Form->submit( array( '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
-				$Form->end_form();
-
-				$Form = new Form( !empty( $redirect_to ) ? $redirect_to: NULL, '', 'get', 'none' );
-
-				$Form->begin_form( 'inline' );
-					if( empty( $redirect_to ) )
-					{ // If redirect url is not defined we should go to blogs list after cancel action
-						$Form->hidden_ctrl();
-						$Form->hidden( 'tab', $tab );
-						$Form->hidden( 'blog', 0 );
-					}
-					$Form->submit( array( '', T_('CANCEL'), 'CancelButton' ) );
-				$Form->end_form();
-			?>
-
-			</p>
-
-			</div>
-		</div>
-		<?php
+		$delete_notes[] = array( T_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!'), 'note' );
+		$edited_Blog->confirm_delete( sprintf( T_('Delete collection &laquo;%s&raquo;?'), $edited_Blog->get_name() ), 'collection', $action,
+			get_memorized( 'action' ), $delete_notes );
 		break;
 
 

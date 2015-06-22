@@ -166,7 +166,8 @@ class ItemLight extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_parent_ID', 'msg'=>T_('%d links to child items'),
+					'class'=>'Item', 'class_path'=>'items/model/_item.class.php' ),
 			);
 	}
 

@@ -279,9 +279,12 @@ class File extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_itm_ID', 'msg' => T_('%d linked items') ),
-				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_cmt_ID', 'msg' => T_('%d linked comments') ),
-				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_usr_ID', 'msg' => T_('%d linked users (profile pictures)') ),
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_itm_ID', 'msg' => T_('%d linked items'),
+					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_cmt_ID', 'msg' => T_('%d linked comments'),
+					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
+				array( 'table' => 'T_links', 'fk' => 'link_file_ID', 'field' => 'link_usr_ID', 'msg' => T_('%d linked users (profile pictures)'),
+					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 

@@ -96,6 +96,30 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Get this class db table config params
+	 *
+	 * @return array
+	 */
+	static function get_class_db_config()
+	{
+		static $chapter_db_config;
+
+		if( !isset( $chapter_db_config ) )
+		{
+			$chapter_db_config = array_merge( parent::get_class_db_config(),
+				array(
+					'dbtablename'        => 'T_categories',
+					'dbprefix'           => 'cat_',
+					'dbIDname'           => 'cat_ID',
+				)
+			);
+		}
+
+		return $chapter_db_config;
+	}
+
+
+	/**
 	 * Get delete restriction settings
 	 *
 	 * @return array
@@ -103,8 +127,10 @@ class Chapter extends GenericCategory
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
-				array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
+				array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories'),
+					'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat'),
+					'class'=>'Item', 'class_path'=>'items/model/_item.class.php' ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
 			);
 	}

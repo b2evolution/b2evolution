@@ -518,7 +518,9 @@ class Message extends DataObject
 
 		if( ! empty( $sql_where ) )
 		{
-			$object_ids = $DB->get_col( 'SELECT msg_ID FROM T_messaging__message WHERE '.$sql_where );
+			$messages_to_delete = $DB->get_assoc( 'SELECT msg_ID, msg_thread_ID FROM T_messaging__message WHERE '.$sql_where );
+			$object_ids = array_keys( $messages_to_delete );
+			$thread_ids_to_delete = array_unique( $messages_to_delete );
 		}
 
 		if( ! $object_ids )
@@ -528,6 +530,10 @@ class Message extends DataObject
 		}
 
 		$message_ids_to_delete = implode( ', ', $object_ids );
+		if( empty( $thread_ids_to_delete ) )
+		{ // Make sure thread ids of the messages are collected
+			$thread_ids_to_delete = $DB->get_col( 'SELECT msg_thread_ID FROM T_messaging__message WHERE msg_ID IN ( '.$message_ids_to_delete.' )' );
+		}
 
 		// Update thread statuses first unread message IDs
 		$result = $DB->query( 'UPDATE T_messaging__threadstatus
@@ -553,7 +559,14 @@ class Message extends DataObject
 		if( $result !== false )
 		{ // Delete those threads where all of the messages were deleted
 			load_class( 'messaging/model/_thread.class.php', 'Thread' );
-			if( Thread::db_delete_where( 'Thread', 'thrd_ID NOT IN ( SELECT DISTINCT( msg_thread_ID ) FROM T_messaging__message )' ) === false )
+			$orphan_thread_ids = $DB->get_col( '
+				SELECT msg_thread_ID FROM T_messaging__message
+				WHERE msg_thread_ID IN ( '.implode( ', ', $thread_ids_to_delete ).' )
+				GROUP BY msg_thread_ID
+					HAVING COUNT(*) < 1' );
+
+			// Delete orphan threads if there are any
+			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids ) === false ) )
 			{ // Deleting threads was unsuccessful
 				$result = false;
 			}

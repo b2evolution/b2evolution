@@ -188,20 +188,6 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get delete restriction settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_restrictions()
-	{
-		return array(
-				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories') ),
-				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition' => 'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root') ),
-			);
-	}
-
-
-	/**
 	 * Get delete cascade settings
 	 *
 	 * @return array
@@ -215,6 +201,10 @@ class Blog extends DataObject
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
+				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories with all of its content recursively'),
+						'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root'),
+						'class'=>'File', 'class_path'=>'files/model/_file.class.php' ),
 			);
 	}
 
@@ -2464,8 +2454,6 @@ class Blog extends DataObject
 	/**
 	 * Delete a blog and dependencies from database
 	 *
-	 * Includes WAY TOO MANY requests because we try to be compatible with MySQL 3.23, bleh!
-	 *
 	 * @param boolean true if you want to echo progress
 	 */
 	function dbdelete( $echo = false )
@@ -2475,117 +2463,7 @@ class Blog extends DataObject
 		// Try to obtain some serious time to do some serious processing (5 minutes)
 		set_max_execution_time(300);
 
-		// Note: No need to localize the status messages...
-		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
-
-		$DB->begin();
-
-		// Get list of cats that are going to be deleted (3.23)
-		if( $echo ) echo '<br />Getting category list to delete... ';
-		$cat_list = implode( ',', $DB->get_col( "
-				SELECT cat_ID
-				  FROM T_categories
-				 WHERE cat_blog_ID = $this->ID" ) );
-
-		if( empty( $cat_list ) )
-		{ // There are no cats to delete
-			if( $echo ) echo 'None!';
-		}
-		else
-		{ // Delete the cats & dependencies
-
-			// Get list of posts that are going to be deleted (3.23)
-			if( $echo ) echo '<br />Getting post list to delete... ';
-			$post_list = implode( ',', $DB->get_col( "
-					SELECT postcat_post_ID
-					  FROM T_postcats
-					 WHERE postcat_cat_ID IN ($cat_list)" ) );
-
-			if( empty( $post_list ) )
-			{ // There are no posts to delete
-				if( $echo ) echo 'None!';
-			}
-			else
-			{ // Delete the posts & dependencies
-
-				// TODO: There's also a constraint FK_post_parent_ID..
-
-				// Delete postcats
-				if( $echo ) echo '<br />Deleting post-categories... ';
-				$ret = $DB->query(	"DELETE FROM T_postcats
-															WHERE postcat_cat_ID IN ($cat_list)" );
-				if( $echo ) printf( '(%d rows)', $ret );
-				$Messages->add( T_('Deleted post-categories'), 'success' );
-
-				// Delete comments
-				if( $echo ) echo '<br />Deleting comments on blog\'s posts... ';
-				$comments_list = implode( ',', $DB->get_col( "
-						SELECT comment_ID
-						  FROM T_comments
-						 WHERE comment_item_ID IN ($post_list)" ) );
-				if( !empty( $comments_list ) )
-				{	// Delete the comments & dependencies
-					$DB->query( "DELETE FROM T_comments__votes
-												WHERE cmvt_cmt_ID IN ($comments_list)" );
-					$ret = $DB->query( "DELETE FROM T_comments
-															WHERE comment_item_ID IN ($post_list)" );
-				}
-				else
-				{	// No comments in this blog
-					$ret = 0;
-				}
-				if( $echo ) printf( '(%d rows)', $ret );
-				$Messages->add( T_('Deleted comments on blog\'s posts'), 'success' );
-
-
-				// Delete posts
-				if( $echo ) echo '<br />Deleting blog\'s posts... ';
-				$DB->query( "DELETE FROM T_items__itemtag
-											WHERE itag_itm_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_items__item_settings
-											WHERE iset_item_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_items__prerendering
-											WHERE itpr_itm_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_items__status
-											WHERE pst_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_items__subscriptions
-											WHERE isub_item_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_users__postreadstatus
-											WHERE uprs_post_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_items__version
-											WHERE iver_itm_ID IN ($post_list)" );
-				$DB->query( "DELETE l, lv FROM T_links AS l
-					 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
-					WHERE l.link_itm_ID IN ($post_list)" );
-				$DB->query( "DELETE FROM T_slug
-											WHERE slug_itm_ID IN ($post_list)" );
-				$ret = $DB->query( "DELETE FROM T_items__item
-															WHERE post_ID IN ($post_list)" );
-				if( $echo ) printf( '(%d rows)', $ret );
-				$Messages->add( T_('Deleted blog\'s posts'), 'success' );
-
-			} // / are there posts?
-
-			// Delete categories
-			if( $echo ) echo '<br />Deleting blog\'s categories... ';
-			$ret = $DB->query( "DELETE FROM T_categories
-													WHERE cat_blog_ID = $this->ID" );
-			if( $echo ) printf( '(%d rows)', $ret );
-			$Messages->add( T_('Deleted blog\'s categories'), 'success' );
-
-		} // / are there cats?
-
-		// Delete the blog cache folder - try to delete even if cache is disabled
-		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-		$PageCache = new PageCache( $this );
-		$PageCache->cache_delete();
-
-		// Delete the blog files/links from DB
-		$DB->query( 'DELETE f, l, lv FROM T_files AS f
-			LEFT JOIN T_links l ON l.link_file_ID = f.file_ID
-			LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
-			    WHERE f.file_root_type = "collection"
-			      AND f.file_root_ID = '.$this->ID );
+		if( $echo ) echo 'Delete collection with all of it\'s content... ';
 
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
@@ -2593,13 +2471,14 @@ class Blog extends DataObject
 		// Delete main (blog) object:
 		if( ! parent::dbdelete() )
 		{
-			$DB->rollback();
-
 			$Messages->add( 'Blog has not been deleted.', 'error' );
 			return false;
 		}
 
-		$DB->commit();
+		// Delete the blog cache folder - try to delete even if cache is disabled
+		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+		$PageCache = new PageCache( $this );
+		$PageCache->cache_delete();
 
 		// Delete blog's media folder recursively
 		$FileRootCache = & get_FileRootCache();
@@ -2934,21 +2813,25 @@ class Blog extends DataObject
 			return NULL;
 		}
 
+		$blog_contact_url = $this->get( 'msgformurl', array(
+				'url_suffix' => 'recipient_id='.$owner_User->ID
+			) );
+
 		if( $with_redirect )
 		{
 			if( $owner_User->get_msgform_possibility() != 'login' )
 			{
-				$r = $this->get('msgformurl').'&amp;redirect_to='
+				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='
 					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
-					.rawurlencode( regenerate_url('','','','&') );
+					.rawurlencode( regenerate_url('','','','&') ) );
 			}
 			else
-			{	// no email option - try to log in and send private message (only registered users can send PM)
-				$r = $this->get('msgformurl').'&amp;redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' ) );
+			{ // no email option - try to log in and send private message (only registered users can send PM)
+				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' ) ) );
 			}
 		}
 
-		return $r;
+		return $blog_contact_url;
 	}
 
 
@@ -3032,6 +2915,46 @@ class Blog extends DataObject
 
 		return $DB->get_var( $sql );
 
+	}
+
+
+	/**
+	 * Get the number of items in this collection
+	 * Note: It counts all items with any kind of visibility status
+	 *
+	 * @return integer the number of items
+	 */
+	function get_number_of_items()
+	{
+		global $DB;
+
+		$sql = 'SELECT COUNT(post_ID)
+				FROM T_items__item WHERE post_main_cat_ID IN (
+					SELECT cat_ID FROM T_categories
+					WHERE cat_blog_ID = '.$this->ID.' )';
+
+		return $DB->get_var( $sql );
+	}
+
+
+	/**
+	 * Get the number of comments in this collection
+	 * Note: It counts all comments with any kind of visibility status, except comments in trash
+	 *
+	 * @return integer the number of not recycled comments
+	 */
+	function get_number_of_comments()
+	{
+		global $DB;
+
+		$sql = 'SELECT COUNT(comment_ID)
+				FROM T_comments
+				LEFT JOIN T_items__item ON comment_item_ID = post_ID
+				WHERE comment_status != "trash" AND post_main_cat_ID IN (
+					SELECT cat_ID FROM T_categories
+					WHERE cat_blog_ID = '.$this->ID.' )';
+
+		return $DB->get_var( $sql );
 	}
 
 
