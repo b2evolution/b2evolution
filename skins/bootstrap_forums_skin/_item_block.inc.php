@@ -111,31 +111,37 @@ skin_widget( array(
 	
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
-				<?php
-					$Item->author( array(
-						'link_text' => 'login',
-					) );
-				?>
-				<?php
-					if( $Skin->get_setting( 'display_post_date' ) )
-					{ // We want to display the post date:
-						$Item->issue_time( array(
-								'before'      => '',
-								'after'       => ' &nbsp; &nbsp; ',
-								'time_format' => 'M j, Y H:i',
-							) );
-					}
-					
-					if( $Skin->enabled_status_banner( $Item->status ) )
-					{ // Status banner
-						$Item->format_status( array(
-								'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
-							) );
-						$legend_statuses[] = $Item->status;
-					}
-				?></h4>	
+		<div class="panel-heading posts_panel_title_wrapper">
+			<div class="cell1 ellipsis">
+				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
+					<?php
+						$Item->author( array(
+							'link_text' => 'login',
+						) );
+					?>
+					<?php
+						if( $Skin->get_setting( 'display_post_date' ) )
+						{ // We want to display the post date:
+							$Item->issue_time( array(
+									'before'      => '',
+									'after'       => ' &nbsp; &nbsp; ',
+									'time_format' => 'M j, Y H:i',
+								) );
+						}
+					?>
+				</h4>
+			</div>	
+					<?php
+						if( $Skin->enabled_status_banner( $Item->status ) )
+						{ // Status banner
+							echo '<div class="cell2">';
+							$Item->format_status( array(
+									'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+								) );
+							$legend_statuses[] = $Item->status;
+							echo '</div>';
+						}
+					?>	
 		</div>
 		
 		<div class="panel-body">
@@ -156,9 +162,9 @@ skin_widget( array(
 				if( ! $Item->is_intro() )
 				{ // List all tags attached to this topic:
 					$Item->tags( array(
-							'before'    => '<span class="topic_tags clear">'.T_('Tags').': ',
-							'after'     => '</span>',
-							'separator' => ', ',
+							'before'    => '<nav class="small post_tags">',
+							'after'     => '</nav>',
+							'separator' => ' ',
 						) );
 				}
 				?>
@@ -215,7 +221,14 @@ skin_widget( array(
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array ( 
 			'disp_section_title'    => false,
-			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'comment_post_after'    => '</h4>',
+
+			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
+			'comment_status_before' => '</h4></div>',
+			'comment_title_after'   => '</div>',
+
+			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',

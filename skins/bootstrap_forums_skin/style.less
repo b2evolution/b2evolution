@@ -346,6 +346,10 @@ ol.breadcrumb {
 }
 
 // Legend table & list
+.legends legend {
+	text-align: center;
+	border: none;
+}
 .legend {
 	text-align: center;
 	margin: 20px auto;
@@ -384,7 +388,7 @@ ul.legend {
 
 // Post navigation
 .pager {
-	margin: 0;
+	margin: 0px 0px 15px 0px;
 	padding-right: 0px;
 	.prev-left {
 		float: left;
@@ -513,9 +517,10 @@ ul.legend {
 			vertical-align: middle;
 		}
 	}
+	/* LATEST CHANGE
 	.evo_post__full {
 		padding-bottom: 15px;
-	}
+	}*/
 	.star_rating {
 		display: inline-block;
 		margin: 0 10px;
@@ -716,6 +721,9 @@ label.control-label[for=post_title] {
 			a.btn {
 				margin-top: 3px;
 			}
+		}
+		.evo_comment_post_title {
+			display: block !important;
 		}
 	}
 	.vs_published {
@@ -940,5 +948,20 @@ label.control-label[for=post_title] {
 		a.to_top.postlink {
 			font-size: 14px !important;
 		}
+	}
+}
+
+// Positions on the action buttons near page titles
+.evo_post_title {
+	display: table;
+	h1 {
+		display: table-cell;
+		margin: 0;
+		padding: 20px 0 10px;
+	}
+	.btn-group {
+		display: table-cell;
+		padding: 20px 0 10px 30px;
+		vertical-align: middle;
 	}
 }

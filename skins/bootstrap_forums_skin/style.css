@@ -312,6 +312,10 @@ ol.breadcrumb {
   height: 0;
   clear: both;
 }
+.legends legend {
+  text-align: center;
+  border: none;
+}
 .legend {
   text-align: center;
   margin: 20px auto;
@@ -348,7 +352,7 @@ ul.legend span.note {
   float: none;
 }
 .pager {
-  margin: 0;
+  margin: 0px 0px 15px 0px;
   padding-right: 0px;
 }
 .pager .prev-left {
@@ -462,6 +466,12 @@ ul.legend span.note {
 .single_page_title .ft_author_info.shrinked {
   display: none;
 }
+.single_topic {
+  /* LATEST CHANGE
+	.evo_post__full {
+		padding-bottom: 15px;
+	}*/
+}
 .single_topic .ft_post_info {
   padding: 8px;
 }
@@ -474,9 +484,6 @@ ul.legend span.note {
 .single_topic .votes_help_spam span {
   display: inline-block;
   vertical-align: middle;
-}
-.single_topic .evo_post__full {
-  padding-bottom: 15px;
 }
 .single_topic .star_rating {
   display: inline-block;
@@ -649,6 +656,9 @@ label.control-label[for=post_title] {
   }
   .evo_comment .evo_comment .panel-footer .floatright a.btn {
     margin-top: 3px;
+  }
+  .evo_comment .evo_comment_post_title {
+    display: block !important;
   }
   .vs_published .evo_comment_avatar {
     margin-right: 15px;
@@ -854,4 +864,17 @@ label.control-label[for=post_title] {
 }
 .evo_comment .panel-footer a.to_top.postlink {
   font-size: 14px !important;
+}
+.evo_post_title {
+  display: table;
+}
+.evo_post_title h1 {
+  display: table-cell;
+  margin: 0;
+  padding: 20px 0 10px;
+}
+.evo_post_title .btn-group {
+  display: table-cell;
+  padding: 20px 0 10px 30px;
+  vertical-align: middle;
 }

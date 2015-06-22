@@ -16,7 +16,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat;
+global $number_of_posts_in_cat, $cat, $legend_icons, $Item;
+
+$params = array(
+		'item_class' => 'jumbotron evo_content_block evo_post',
+	);
 
 // Breadcrumbs
 skin_widget( array(
@@ -29,6 +33,52 @@ skin_widget( array(
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
 	) );
+
+if( ! is_array( $legend_icons ) )
+{ // Init this array only first time
+	$legend_icons = array();
+}
+
+// ------------------------------- START OF INTRO-FRONT POST -------------------------------
+if( $Item = get_featured_Item( 'front' ) )
+{ // We have a intro-front post to display:
+?>
+<div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
+
+	<?php
+	$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+
+	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
+			'before' => '',
+			'after'  => '',
+			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+			'class'  => button_class( 'text' ),
+		) );
+	if( $Item->status != 'published' )
+	{
+		$Item->format_status( array(
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+			) );
+	}
+	$Item->title( array(
+			'link_type'  => 'none',
+			'before'     => '<div class="evo_post_title"><h1>',
+			'after'      => '</h1><div class="'.button_class( 'group' ).'">'.$action_links.'</div></div>',
+			'nav_target' => false,
+		) );
+
+	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+	skin_include( '_item_content.inc.php', $params );
+	// Note: You can customize the default item content by copying the generic
+	// /skins/_item_content.inc.php file into the current skin folder.
+	// -------------------------- END OF POST CONTENT -------------------------
+
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+	?>
+</div>
+<?php
+// ------------------------------- END OF INTRO-FRONT POST -------------------------------
+}
 
 $chapters = $Skin->get_chapters( $cat );
 
@@ -60,11 +110,13 @@ if( count( $chapters ) > 0 )
 			{ // Set icon for locked chapter
 				$chapter_icon = 'fa-lock big';
 				$chapter_icon_title = T_('This forum is locked: you cannot post, reply to, or edit topics.');
+				$legend_icons['forum_locked'] = 1;
 			}
 			else
 			{ // Set icon for unlocked chapter
 				$chapter_icon = 'fa-folder big';
 				$chapter_icon_title = T_('No new posts');
+				$legend_icons['forum_default'] = 1;
 			}
 ?>
 		<article class="container group_row">

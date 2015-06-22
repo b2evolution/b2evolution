@@ -24,11 +24,15 @@ global $Item, $cat;
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
  */
-global $legend_statuses;
+global $legend_statuses, $legend_icons;
 
-if( !is_array( $legend_statuses ) )
-{	// Init this array only first time
+if( ! is_array( $legend_statuses ) )
+{ // Init this array only first time
 	$legend_statuses = array();
+}
+if( ! is_array( $legend_icons ) )
+{ // Init this array only first time
+	$legend_icons = array();
 }
 
 $comments_number = generic_ctp_number( $Item->ID, 'comments', get_inskin_statuses( $Item->get_blog_ID(), 'comment' ) );
@@ -36,19 +40,23 @@ $comments_number = generic_ctp_number( $Item->ID, 'comments', get_inskin_statuse
 $status_icon = 'fa-comments';
 $status_title = '';
 $status_alt = T_('No new posts');
+$legend_icons['topic_default'] = 1;
 if( $Item->is_featured() || $Item->is_intro() )
-{	// Special icon for featured & intro posts
+{ // Special icon for featured & intro posts
 	$status_icon = 'fa-bullhorn';
 	$status_title = '<strong>'.T_('Sticky').':</strong> ';
+	$legend_icons['topic_sticky'] = 1;
 }
 elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )
-{	// The post is closed for comments
+{ // The post is closed for comments
 	$status_icon = 'fa-lock';
 	$status_alt = T_('This topic is locked: you cannot edit posts or make replies.');
+	$legend_icons['topic_locked'] = 1;
 }
 elseif( $comments_number > 25 )
-{	// Popular topic
+{ // Popular topic
 	$status_icon = 'fa-star';
+	$legend_icons['topic_popular'] = 1;
 }
 ?>
 		<article class="container group_row posts_panel">	
