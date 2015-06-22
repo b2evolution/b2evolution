@@ -84,7 +84,7 @@ if( isset($collections_Module) )
 		|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
 	{ // Try the memorized blog from the previous action:
 		$blog = $user_selected_blog;
-		if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
+		if( ! ( $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
 		{ // That one doesn't exist either...
 			$blog = 0;
 			// Unset $Blog because otherwise isset( $Blog ) returns true and it may cause issues later

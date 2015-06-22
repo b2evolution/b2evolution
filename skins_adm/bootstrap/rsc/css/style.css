@@ -956,6 +956,7 @@ span[id^=title_folding_] {
   margin-right: 0;
 }
 div.results {
+  overflow: auto;
   margin-top: 0;
 }
 table.table thead tr th {
@@ -976,6 +977,9 @@ table.table tbody tr.group td {
 }
 table.table tbody tr.group td a {
   color: #337ab7;
+}
+#items_type_ajax_content div.table_scroll {
+  min-height: 500px;
 }
 .widget_container_list tr.odd,
 .widget_row.odd {
@@ -1062,6 +1066,9 @@ div.coll-selector {
   padding-top: 18px;
   background-color: #ddd;
   margin-bottom: -3px;
+}
+div.coll-selector .btn-group {
+  margin-right: 8px;
 }
 div.level2 {
   padding-top: 17px;

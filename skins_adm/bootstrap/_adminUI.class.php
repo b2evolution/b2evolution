@@ -305,7 +305,7 @@ class AdminUI extends AdminUI_general
 				// Template for a list of Collections (Blogs)
 				return array(
 						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after' => '</div></nav></div>',
+						'after' => '</div>$button_add_blog$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
@@ -469,6 +469,7 @@ class AdminUI extends AdminUI_general
 					'formend'        => '</div></div>',
 					'title_fmt'      => '<div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body $class$">'."\n",
 					'no_title_fmt'   => '<div class="panel-body $class$"><span class="pull-right">$global_icons$</span><div class="clear"></div>'."\n",
+					'no_title_no_icons_fmt' => '<div class="panel-body $class$">'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
@@ -741,7 +742,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_bloglist_buttons( $title = '' )
 	{
-		global $blog;
+		global $blog, $current_User, $admin_url;
 
 		$max_buttons = 7;
 
@@ -838,7 +839,17 @@ class AdminUI extends AdminUI_general
 				.$template['select_end'];
 		}
 
-		$r .= $template['after'];
+		// Button to add new collection
+		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{ // Display a button to add new collection if current user has a permission
+			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-info" title="'.T_('New Collection').'">'.get_icon( 'new', 'imgtag', array( 'title' => T_('New Collection') ) ).'</a>';
+		}
+		else
+		{ // No permission to add new collection
+			$button_add_blog = '';
+		}
+
+		$r .= str_replace( '$button_add_blog$', $button_add_blog, $template['after'] );
 
 		return $r;
 	}

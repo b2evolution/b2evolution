@@ -570,18 +570,19 @@ function addNewWidget( widget_list_item, admin_call )
  * @param string container Container to add widget to
  * @param intger wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param string wi_cache_status Cache status
  */
-function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
+function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_cache_status )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
+	createWidget( 'wi_ID_'+wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', 1, wi_cache_status );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
-	{	// send outstanding updates
+	{ // send outstanding updates
 		reorder_delay_remaining = 0;
 	}
 	else
-	{	// no outstanding updates, store current order
+	{ // no outstanding updates, store current order
 		current_widgets = getWidgetOrder(); // store current order
 	}
 }
@@ -615,7 +616,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 		'</span>' ) );
 
 	// Add icon to toggle cache status:
-	cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
+	var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
 	jQuery( newWidget ).prepend( cacheIcon ); // add widget action icons
 
 	// Add action icons:
