@@ -192,7 +192,10 @@ if( isset( $use_l10n ) && $use_l10n )
 			//$Debuglog->add( 'String ['.$string.'] not found', 'locale' );
 			// Return the English string:
 			$r = $string;
-			$messages_charset = 'iso-8859-1'; // our .php file encoding
+
+			// $messages_charset = 'iso-8859-1'; // our .php file encoding  
+			// fp> I am changing the above for the User custom field group labels (in theroy the php files are plain ASCII anyways!!)
+			$messages_charset = $evo_charset;
 		}
 
 		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
