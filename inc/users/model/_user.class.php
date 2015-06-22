@@ -3075,12 +3075,16 @@ class User extends DataObject
 	 */
 	function get_msgform_possibility( $current_User = NULL )
 	{
-		global $Blog;
+		global $DB;
 
-		if( isset( $Blog ) &&
-				$blog_owner_User = & $Blog->get_owner_User() &&
-				$blog_owner_User->ID == $this->ID )
-		{ // Allow to contact with this user because he is owner of the selected blog
+		$check_owner_SQL = new SQL();
+		$check_owner_SQL->SELECT( 'blog_ID' );
+		$check_owner_SQL->FROM( 'T_blogs' );
+		$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
+		$check_owner_SQL->LIMIT( '1' );
+
+		if( $DB->get_var( $check_owner_SQL->get() ) )
+		{ // Allow to contact with this user because he is owner of at least one blog
 			$force_contact_blog_owner = true;
 		}
 		else
