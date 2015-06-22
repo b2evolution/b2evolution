@@ -167,7 +167,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 			$Item->feedback_link( array(
 							'type' => 'comments',
 							'link_before' => '',
-							'link_after' => '</p>',
+							'link_after' => '',
 							'link_text_zero' => '#',
 							'link_text_one' => '#',
 							'link_text_more' => '#',
