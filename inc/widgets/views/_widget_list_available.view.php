@@ -59,7 +59,7 @@ $widget_groups = array (
 
 $core_componentwidget_defs = array(
 	'multipurpose' => array(
-			'coll_logo',
+			'image',
 			'coll_avatar',
 			'free_html',
 			'user_links',
@@ -89,6 +89,7 @@ $core_componentwidget_defs = array(
 			'coll_comment_list',      // Comment list
 		),
 	'collection' => array(
+			'coll_logo',
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',

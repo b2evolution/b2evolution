@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Image Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -16,21 +16,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
- * ComponentWidget Class
+ * iamge_Widget Class
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
  * @package evocore
  */
-class coll_logo_Widget extends ComponentWidget
+class image_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
 	 */
-	function coll_logo_Widget( $db_row = NULL )
+	function image_Widget( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_logo' );
+		parent::ComponentWidget( $db_row, 'core', 'image' );
 	}
 
 
@@ -41,7 +41,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'logo-title-widget' );
+		return get_manual_url( 'image-widget' );
 	}
 
 
@@ -50,7 +50,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Logo title');
+		return T_('Image');
 	}
 
 
@@ -62,9 +62,9 @@ class coll_logo_Widget extends ComponentWidget
 	function get_short_desc()
 	{
 		$this->load_param_array();
-		if( !empty($this->param_array['logo_file'] ) )
+		if( !empty($this->param_array['image_file'] ) )
 		{
-			return $this->param_array['logo_file'];
+			return $this->param_array['image_file'];
 		}
 		else
 		{
@@ -78,7 +78,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Include a logo (as a title replacement).');
+		return T_('Include an image.');
 	}
 
 
@@ -99,9 +99,9 @@ class coll_logo_Widget extends ComponentWidget
 							array( 'skin', T_('Skin folder') ),
 							array( 'coll', T_('Collection File Root') ),
 							array( 'shared', T_('Shared File Root') ) ),
-					'defaultvalue' => 'coll',
+					'defaultvalue' => 'skin',
 				),
-				'logo_file' => array(
+				'image_file' => array(
 					'label' => T_('Image filename'),
 					'note' => T_('Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
@@ -112,7 +112,7 @@ class coll_logo_Widget extends ComponentWidget
 					'label' => T_('Image width'),
 					'note' => T_('pixels'),
 					'type' => 'integer',
-					'defaultvalue' => '',
+					'defaultvalue' => '300',
 					'allow_empty' => true,
 				),
 				'height' => array(
@@ -126,7 +126,7 @@ class coll_logo_Widget extends ComponentWidget
 					'label' => T_('Check file'),
 					'note' => T_('Check if file exists. If not, no IMG tag will be created.'),
 					'type' => 'checkbox',
-					'defaultvalue' => false,
+					'defaultvalue' => true,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -166,7 +166,7 @@ class coll_logo_Widget extends ComponentWidget
 				break;
 		}
 
-		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['image_file'] ) )
 		{ // Logo file doesn't exist, Exit here because of widget setting requires this
 			return true;
 		}
@@ -186,12 +186,9 @@ class coll_logo_Widget extends ComponentWidget
 			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
 		}
 
-		$title = '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'"'.$image_attrs.' />'
+		echo '<a href="'.$Blog->get( 'url' ).'">'
+							.'<img src="'.$image_url.$this->disp_params['image_file'].' alt=""'.$image_attrs.' />'
 							.'</a>';
-
-		// Display as a title:
-		$this->disp_title( $title );
 
 		echo $this->disp_params['block_end'];
 
