@@ -1413,7 +1413,7 @@ jQuery( document ).ready( function()
 				break;
 
 			case 'utf8check':
-				var btn_title = '<?php echo TS_('CONVERT DB!'); ?>';
+				var btn_title = '<?php echo TS_('CHECK DB!'); ?>';
 				var btn_class = 'btn-primary';
 				break;
 
