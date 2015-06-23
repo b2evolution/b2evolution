@@ -510,7 +510,7 @@ class Skin extends DataObject
 	 *
 	 * @static
 	 */
-	function disp_skinshot( $skin_folder, $skin_name, $disp_params = array() )
+	static function disp_skinshot( $skin_folder, $skin_name, $disp_params = array() )
 	{
 		global $skins_path, $skins_url, $kind;
 
