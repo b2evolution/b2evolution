@@ -4000,7 +4000,7 @@ class User extends DataObject
 
 		if( $r != '' && $avatar_overlay_text != '' )
 		{ // Add overlay text if it is enabled
-			$r = $this->get_avatar_overlay_text( $r, $size, $avatar_overlay_text, $class );
+			$r = $this->get_avatar_overlay_text( $r, $size, $avatar_overlay_text, $class, $File );
 		}
 
 		return $r;
@@ -4010,46 +4010,75 @@ class User extends DataObject
 	/**
 	 * Get overlay text for avatar img tag
 	 *
-	 * @param img tag
-	 * @param avatar size
-	 * @param avatar overlay text
-	 * @param string class
-	 * @return html string, img tag with overlay text
+	 * @param string Tag <img />
+	 * @param array Avatar size, keys: 'width' & 'height'
+	 * @param string Avatar overlay text
+	 * @param string Class
+	 * @param object File
+	 * @return string Tag <img /> with overlay text
 	 */
-	function get_avatar_overlay_text( $img_tag, $size, $avatar_overlay_text, $class = '' )
+	function get_avatar_overlay_text( $img_tag, $thumb_size, $avatar_overlay_text, $class = '', $File = NULL )
 	{
 		preg_match( '/ width="(\d+)" height="(\d+)" /i', $img_tag, $img_sizes );
 		if( count( $img_sizes ) == 3 )
-		{	// img tag has a defined width & height
+		{ // img tag has a defined width & height
 			$width = $img_sizes[1];
 			$height = $img_sizes[2];
 		}
 		else
-		{	// We try to get a sizes from config
+		{ // We try to get a sizes from config
 			global $thumbnail_sizes;
-			if( isset( $thumbnail_sizes[$size] ) )
-			{	// Set a sizes
-				$width = $thumbnail_sizes[$size][1];
-				$height = $thumbnail_sizes[$size][2];
+			if( isset( $thumbnail_sizes[ $thumb_size ] ) )
+			{ // Set a sizes
+				$thumb_width = $thumbnail_sizes[ $thumb_size ][1];
+				$thumb_height = $thumbnail_sizes[ $thumb_size ][2];
+				if( is_null( $File ) )
+				{ // Use the size of thumbnail config if File is not defined
+					$width = $thumb_width;
+					$height = $thumb_height;
+				}
+				else
+				{ // Try to calculate what sizes are used for thumbnail really
+					list( $orig_width, $orig_height ) = $File->get_image_size( 'widthheight' );
+
+					load_funcs('files/model/_image.funcs.php');
+					if( check_thumbnail_sizes( $thumbnail_sizes[ $thumb_size ][0], $thumb_width, $thumb_height, $orig_width, $orig_height ) )
+					{ // Use the sizes of the original image
+						$width = $orig_width;
+						$height = $orig_height;
+					}
+					else
+					{ // Calculate the sizes depending on thumbnail type
+						if( $thumbnail_sizes[ $thumb_size ][0] == 'fit' )
+						{
+							list( $width, $height ) = scale_to_constraint( $orig_width, $orig_height, $thumb_width, $thumb_height );
+						}
+						else
+						{ // crop & crop-top
+							$width = $thumb_width;
+							$height = $thumb_height;
+						}
+					}
+				}
 			}
 		}
 
 		if( empty( $width ) || empty( $height ) )
-		{	// If sizes is not defined we cannot calculate a font-size for an overlay text
+		{ // If sizes is not defined we cannot calculate a font-size for an overlay text
 			return $img_tag;
 		}
 
 		$overlay_lines = explode( "\n", str_replace( "\r", '', $avatar_overlay_text ) );
 		$max_line_length = 0;
 		foreach( $overlay_lines as $line )
-		{	// Find the most long line of the overlay text
+		{ // Find the most long line of the overlay text
 			if( $max_line_length < strlen($line) )
 			{	// Get max long line
 				$max_line_length = strlen($line);
 			}
 		}
 		if( $max_line_length > 0 )
-		{	// Display an overlay text if max length is defined
+		{ // Display an overlay text if max length is defined
 			// Calculate approximate font size, 1.7 - is custom coefficient of the font
 			$font_size = ceil( ( $width / $max_line_length ) * 1.7 );
 			// Set line-height for centering text by vertical
@@ -4059,7 +4088,7 @@ class User extends DataObject
 
 			$tag_is_linked = false;
 			if( strpos( $img_tag, '</a>' ) !== false )
-			{	// img_tag is located inside tag <a>, we should to remove a end of the tag and then add
+			{ // img_tag is located inside tag <a>, we should to remove a end of the tag and then add
 				$img_tag = str_replace( '</a>', '', $img_tag );
 				$tag_is_linked = true;
 			}
@@ -4069,7 +4098,7 @@ class User extends DataObject
 						nl2br($avatar_overlay_text).
 					'</div>';
 			if( $tag_is_linked )
-			{	// Add end of the tag which is removed above
+			{ // Add end of the tag which is removed above
 				$img_tag .= '</a>';
 			}
 			$img_tag .= '</div>';

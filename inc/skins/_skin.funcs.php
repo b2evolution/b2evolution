@@ -603,7 +603,7 @@ var downloadInterval = setInterval( function()
 			{ // Initialize data for crop action
 				global $current_User, $cropped_File;
 				$file_ID = param( 'file_ID', 'integer' );
-				if( $cropped_File = $current_User->get_File_by_ID( $file_ID ) )
+				if( $cropped_File = $current_User->get_File_by_ID( $file_ID, $error_code ) )
 				{ // Current user can crops this file
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );

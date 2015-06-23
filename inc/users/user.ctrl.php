@@ -967,7 +967,7 @@ switch( $action )
 				}
 
 				$file_ID = param( 'file_ID', 'integer' );
-				$cropped_File = & $edited_User->get_File_by_ID( $file_ID );
+				$cropped_File = & $edited_User->get_File_by_ID( $file_ID, $error_code );
 				if( ! $cropped_File )
 				{ // Wrong file for cropping
 					break;

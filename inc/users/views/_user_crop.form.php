@@ -67,6 +67,7 @@ if( is_admin_page() )
 else
 {
 	global $Blog;
+	$form_title = '';
 	$form_class = 'bComment';
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );
 }
@@ -84,10 +85,13 @@ if( $display_mode != 'js' && is_admin_page() )
 	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
-$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
-
 // Display this error when JS is not enabled
-echo '<noscript><p class="error">'.T_('Please activate Javascript in your browser in order to use this feature.').'</p></noscript>';
+echo '<noscript>'
+		.'<p class="error text-danger">'.T_('Please activate Javascript in your browser in order to use this feature.').'</p>'
+		.'<style type="text/css">form#user_checkchanges { display:none }</style>'
+	.'</noscript>';
+
+$Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 if( is_admin_page() )
 {
@@ -100,7 +104,7 @@ else
 }
 $Form->add_crumb( 'user' );
 $Form->hidden( 'user_tab', param( 'user_tab_from', 'string', 'avatar' ) );
-$Form->hidden( 'user_ID', $edited_User->ID );
+$Form->hidden( 'user_ID', isset( $edited_User ) ? $edited_User->ID : $current_User->ID );
 $Form->hidden( 'file_ID', $cropped_File->ID );
 $Form->hidden( 'image_crop_data', '' );
 if( isset( $Blog ) )
