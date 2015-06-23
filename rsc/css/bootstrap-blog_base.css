@@ -524,9 +524,6 @@ div.item_location {
   position: relative;
   overflow: hidden;
 }
-.panel-heading .badge {
-  top: 2px !important;
-}
 .note.status_draft span,
 .evo_status__draft {
   color: #000 !important;

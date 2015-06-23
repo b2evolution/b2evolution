@@ -1194,14 +1194,16 @@ div.debug td.odd {
 .table_scroll table.table tr td {
   vertical-align: middle;
 }
-.table_scroll table.table tr td.firstcol.shrinkwrap a img {
+.table_scroll table.table tr td.firstcol.shrinkwrap {
+  padding: 1px 5px;
+}
+.table_scroll table.table tr td.firstcol.shrinkwrap a img,
+.table_scroll table.table tr td.firstcol.shrinkwrap span img {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
-  height: 48px;
-  width: 48px;
 }
 a.jslog_switcher {
   cursor: pointer;
@@ -1912,9 +1914,6 @@ div.item_location {
   display: block;
   position: relative;
   overflow: hidden;
-}
-.panel-heading .badge {
-  top: 2px !important;
 }
 .note.status_draft span,
 .evo_status__draft {
