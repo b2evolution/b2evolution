@@ -249,7 +249,7 @@ switch( $content_mode )
 					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
 				) );
 
-			// Display CONTENT:
+			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
@@ -263,18 +263,19 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 				) );
 
+			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
 			$Item->more_link( array(
 					'force_more'  => $params['force_more'],
 					'before'      => $params['before_more_link'],
 					'after'       => $params['after_more_link'],
-					'link_text'   => $params['more_link_text'],
-					'anchor_text' => $params['anchor_text'],
+					'link_text'   => $params['more_link_text'],		// text to display as the more link
+					'anchor_text' => $params['anchor_text'],			// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
 					'link_to'     => $params['more_link_to'],
 				) );
 
+			// Display images that are linked "after more" to this post:
 			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{
-				// Display images that are linked "after more" to this post:
+			{	
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],
@@ -297,6 +298,7 @@ switch( $content_mode )
 					) );
 			}
 
+			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
 					'before'              => $params['before_content_extension'],
 					'after'               => $params['after_content_extension'],
