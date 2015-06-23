@@ -1752,6 +1752,43 @@ function convert_table_to_utf8_ascii( $table )
 /**
  * Upgrade DB to UTF-8 and fix ASCII fields
  */
+function db_check_utf8_ascii()
+{
+	global $db_config, $tableprefix, $DB, $evo_charset;
+
+	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
+	evo_flush();
+
+	// Get the tables that have different charset than what we expect
+	$expected_connection_charset = DB::php_to_mysql_charmap( $evo_charset );
+	$tables = $DB->get_col( 'SELECT T.table_name
+			FROM information_schema.`TABLES` T,
+				information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA
+			WHERE CCSA.collation_name = T.table_collation
+				AND T.table_schema = '.$DB->quote( $db_config['name'] ).'
+				AND T.table_name LIKE "'.$tableprefix.'%"
+				AND CCSA.character_set_name != '.$DB->quote( $expected_connection_charset ) );
+
+	if( empty( $tables ) )
+	{ // All tables are correct
+		echo '<p>'.T_('All your tables seem to be using UTF-8. You can still run the normalization tool to make a deep check.').'</p>';
+	}
+	else
+	{ // Display what tables should be normalized
+		echo '<p>'.T_('We have detected the following tables as not using UTF-8:').'</p>';
+		echo '<ul>';
+		foreach( $tables as $table )
+		{
+			echo '<li>'.$table.'</li>';
+		}
+		echo '</ul>';
+	}
+}
+
+
+/**
+ * Upgrade DB to UTF-8 and fix ASCII fields
+ */
 function db_upgrade_to_utf8_ascii()
 {
 	global $db_config, $tableprefix, $DB;

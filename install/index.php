@@ -125,6 +125,7 @@ switch( $action )
 	case 'menu-install':
 	case 'menu-options':
 	case 'localeinfo':
+	case 'utf8check':
 	case 'utf8upgrade':
 		$try_db_connect = true;
 		break;
@@ -246,6 +247,7 @@ switch( $action )
 		$title = T_('Delete b2evolution tables');
 		break;
 
+	case 'utf8check':
 	case 'utf8upgrade':
 		$title = T_('Convert/Normalize your DB to UTF-8/ASCII');
 		break;
@@ -656,7 +658,7 @@ switch( $action )
 			?>
 			<div class="radio">
 				<label>
-					<input type="radio" name="action" id="utf8upgrade" value="utf8upgrade"<?php echo ( $require_charset_update ) ? ' checked="checked"' : '' ?>/>
+					<input type="radio" name="action" id="utf8check" value="utf8check"<?php echo ( $require_charset_update ) ? ' checked="checked"' : '' ?>/>
 					<?php echo T_('<strong>Convert/Normalize your DB to UTF-8/ASCII</strong>: The content tables in your b2evolution MySQL database will be converted to UTF-8 instead of their current charset. Some system tables will also be converted to plain ASCII for better performance.')?>
 				</label>
 			</div>
@@ -1126,6 +1128,34 @@ switch( $action )
 
 		// A link to back to install menu
 		display_install_back_link();
+		break;
+
+
+	case 'utf8check':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * CHECK DB tables for expecting COLLATION
+		 * -----------------------------------------------------------------------------------
+		 */
+
+		load_funcs('_core/model/db/_upgrade.funcs.php');
+		?>
+
+		<form action="index.php" method="get" class="evo_form__install">
+			<input type="hidden" name="locale" value="<?php echo $default_locale; ?>" />
+			<input type="hidden" name="confirmed" value="0" />
+			<input type="hidden" name="installer_version" value="10" />
+			<input type="hidden" name="action" value="utf8upgrade" />
+
+			<?php db_check_utf8_ascii(); ?>
+
+			<p class="evo_form__install_buttons">
+				<button type="submit" class="btn btn-primary btn-lg"><?php echo T_('Proceed with normalization procedure!'); ?></button><?php
+				?><a href="index.php?locale=<?php echo $default_locale; ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel'); ?></a>
+			</p>
+		</form>
+
+		<?php
 		break;
 
 

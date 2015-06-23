@@ -1412,7 +1412,7 @@ jQuery( document ).ready( function()
 				var btn_class = 'btn-primary';
 				break;
 
-			case 'utf8upgrade':
+			case 'utf8check':
 				var btn_title = '<?php echo TS_('CONVERT DB!'); ?>';
 				var btn_class = 'btn-primary';
 				break;

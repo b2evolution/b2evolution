@@ -20,9 +20,11 @@ load_funcs( 'tools/model/_system.funcs.php' );
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
 
-if( $current_User->check_perm( 'options', 'edit' ) && $action != 'utf8upgrade' && system_check_charset_update() )
+if( $current_User->check_perm( 'options', 'edit' ) &&
+    ( $action != 'utf8check' && $action != 'utf8upgrade' ) &&
+    system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( T_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8upgrade&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( T_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 param( 'tab', 'string', '', true );
@@ -290,8 +292,9 @@ if( empty($tab) )
 			$template_title = T_('Log of test flush').get_manual_link( 'test-flush-tool' );
 			break;
 
+		case 'utf8check':
 		case 'utf8upgrade':
-			// Upgrade DB to UTF-8
+			// Check/Upgrade DB to UTF-8
 			load_funcs('_core/model/db/_upgrade.funcs.php');
 			$template_action = $action;
 			break;
