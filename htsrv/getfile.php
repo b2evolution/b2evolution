@@ -138,8 +138,8 @@ if( ! empty( $size ) && $File->is_image() )
 
 		list( $src_width, $src_height ) = imgsize( $File->get_full_path() );
 
-		if( ! $resample_all_images && $src_width <= $thumb_width && $src_height <= $thumb_height )
-		{	// There is no need to resample, use original!
+		if( ! $resample_all_images && check_thumbnail_sizes( $thumb_type, $thumb_width, $thumb_height, $src_width, $src_height ) )
+		{ // There is no need to resample, use original!
 			$err = $File->get_af_thumb_path( $size_name, $mimetype, true, $size_x );
 
 			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
@@ -149,7 +149,7 @@ if( ! empty( $size ) && $File->is_image() )
 			}
 		}
 		else
-		{	// Resample
+		{ // Resample
 			list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
 
 			if( empty( $err ) )

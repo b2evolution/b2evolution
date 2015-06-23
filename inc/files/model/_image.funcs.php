@@ -319,10 +319,62 @@ function output_image( $imh, $mimetype )
 
 
 /**
+ * Check and fix thumbnail sizes depending on original image sizes
+ * It is useful to fix thumbnail sizes for images less than requested thumbnail
+ *
+ * @param string Thumbnail type ('crop'|'crop-top'|'fit')
+ * @param integer Thumbnail width
+ * @param integer Thumbnail height
+ * @param integer Original image width
+ * @param integer Original image height
+ * @return boolean TRUE if no need to resample
+ */
+function check_thumbnail_sizes( $thumb_type, & $thumb_width, & $thumb_height, $src_width, $src_height )
+{
+	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
+	{ // If original image sizes are less than thumbnail sizes
+		if( $thumb_type == 'fit' )
+		{ // There is no need to resample, use original!
+			return true;
+		}
+		else
+		{ // crop & crop-top
+			$src_ratio = number_format( $src_width / $src_height, 4, '.', '' );
+			$thumb_ratio = number_format( $thumb_width / $thumb_height, 4, '.', '' );
+			if( $src_ratio == $thumb_ratio )
+			{ // If original image has the same ratio then no need to resample
+				return true;
+			}
+			else
+			{ // Set new thumb sizes depending on thumbnail ratio
+				if( $thumb_ratio == 1 )
+				{ // Use min size for square size
+					$thumb_width = ( $src_width > $src_height ) ? $src_height : $src_width;
+					$thumb_height = $thumb_width;
+				}
+				elseif( $thumb_ratio > $src_ratio )
+				{ // If thumbnail ratio > original image ratio
+					$thumb_width = $src_width;
+					$thumb_height = round( $src_width / $thumb_ratio );
+				}
+				else//if( $thumb_ratio < $src_ratio )
+				{ // If thumbnail ratio < original image ratio
+					$thumb_width = round( $src_height * $thumb_ratio );
+					$thumb_height = $src_height;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Generate a thumbnail
  *
  * @param resource Image resource
- * @param string Thumbnail type ('crop'|'fit')
+ * @param string Thumbnail type ('crop'|'crop-top'|'fit')
  * @param int Thumbnail width
  * @param int Thumbnail height
  * @param int Thumbnail percent of blur effect (0 - No blur, 1% - Max blur effect, 99% - Min blur effect)
@@ -341,7 +393,7 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $th
 		$thumb_height = $thumb_height * $size_x;
 	}
 
-	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
+	if( check_thumbnail_sizes( $thumb_type, $thumb_width, $thumb_height, $src_width, $src_height ) )
 	{ // There is no need to resample, use original!
 		return array( NULL, $src_imh );
 	}
