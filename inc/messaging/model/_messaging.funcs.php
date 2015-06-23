@@ -1695,42 +1695,46 @@ function delete_orphan_threads( $user_ids = NULL )
 
 	$DB->begin();
 
-	// get orphan thread ids
-	$SQL = new SQL();
-	$SQL->SELECT( 'DISTINCT( tsta_thread_ID )' );
-	$SQL->FROM( 'T_messaging__threadstatus' );
-	// sub query to select not orphan thread ids
-	$sub_query = 'SELECT DISTINCT ( tsta_thread_ID )
-					FROM T_messaging__threadstatus
-					INNER JOIN T_users ON user_ID = tsta_user_ID';
-
-	// Set the query where condition based on the received param value
-	if( empty( $user_ids ) )
-	{
-		$SQL->WHERE( 'tsta_thread_ID NOT IN ( '.$sub_query.' )' );
-	}
-	elseif( is_array( $user_ids ) )
+	if( is_array( $user_ids ) )
 	{
 		$users = implode( ', ', $user_ids );
-		$SQL->WHERE( 'tsta_user_ID IN ( '.$users.' )' );
-		$SQL->WHERE_and( 'tsta_thread_ID NOT IN ( '.$sub_query.' AND tsta_user_ID NOT IN ( '.$users.' ) )' );
-	}
-	elseif( is_number( $user_ids ) )
-	{
-		$SQL->WHERE( 'tsta_user_ID = '.$user_ids );
-		$SQL->WHERE_and( 'tsta_thread_ID NOT IN ( '.$sub_query.' AND tsta_user_ID <> '.$user_ids.' )' );
+		$in_users_condition = ' OR user_ID IN ( '.$users.' )';
+		$not_in_users_condition = ' AND user_ID NOT IN ( '.$users.' )';
 	}
 	else
 	{
-		debug_die( 'Invalid user ids param received!' );
+		$in_users_condition = is_number( $user_ids ) ? ' OR user_ID = '.$user_ids : '';
+		$not_in_users_condition = is_number( $user_ids ) ? ' AND user_ID != '.$user_ids : '';
 	}
 
-	$thread_ids = $DB->get_col( $SQL->get(), 0, 'Get orphan threads' );
-	if( ! empty( $thread_ids ) )
+	// Get those thread ids which have already deleted participants or which participants will be deleted now
+	$affected_threads_ids = $DB->get_col(
+		'SELECT DISTINCT tsta_thread_ID
+		FROM evo_messaging__threadstatus
+		LEFT JOIN evo_users ON tsta_user_ID = user_ID
+		WHERE user_ID IS NULL'.$in_users_condition );
+
+	if( empty( $affected_threads_ids ) )
+	{ // There are no affected thread ids, nothing to delete
+		return true;
+	}
+
+	// Filter previously collected thread ids to get those which have existing users outside of the deleted ones
+	$not_orphan_threads = $DB->get_col(
+		'SELECT DISTINCT tsta_thread_ID
+		FROM evo_messaging__threadstatus
+		LEFT JOIN evo_users ON tsta_user_ID = user_ID
+		WHERE tsta_thread_ID IN ( '.implode( ', ', $affected_threads_ids ).' )
+			AND user_ID IS NOT NULL'.$not_in_users_condition );
+
+	// Orphan thread ids are the affected threads minus the ones with existing users
+	$orphan_thread_ids = array_diff( $affected_threads_ids, $not_orphan_threads );
+
+	if( ! empty( $orphan_thread_ids ) )
 	{ // There are orphan threads ( or orphan thread targets )
 		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		// Delete all orphan threads with all cascade relations
-		if( Thread::db_delete_where( 'Thread', NULL, $thread_ids, array( 'use_transaction' => false ) ) === false )
+		if( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
 		{ // Deleting orphan threads failed
 			$DB->rollback();
 			return false;
