@@ -103,7 +103,7 @@ switch( $action )
 			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
 		}
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=stats', 303 ); // Will EXIT
+		header_redirect( '?ctrl=stats&blog='.$blog, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -144,7 +144,7 @@ switch( $action )
 			$Settings->dbupdate();
 			$Messages->add( T_( 'Settings updated.' ), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=stats&tab=settings', 303 ); // Will EXIT
+			header_redirect( '?ctrl=stats&tab=settings&blog='.$blog, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -210,7 +210,14 @@ switch( $action )
 			$Messages->add( T_('New domain created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = $tab_from == 'antispam' ? $admin_url.'?ctrl=antispam&tab3=domains' : $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3;
+			if( $tab_from == 'antispam' )
+			{ // Updating from antispam controller
+				$redirect_to = $admin_url.'?ctrl=antispam&tab3=domains';
+			}
+			else
+			{ // Updating from analitics collection page
+				$redirect_to = $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog;
+			}
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -223,7 +230,7 @@ if( isset($collections_Module) && $tab_from != 'antispam' )
 	if( $perm_view_all )
 	{
 		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-						$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
 	}
 	else
 	{	// No permission to view aggregated stats:
@@ -319,7 +326,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( $action == 'domain_new' )
 		{
-			$AdminUI->breadcrumbpath_add( T_('Add domain'), '?ctrl=stats&amp;tab='.$tab.'&amp;action=domain_new' );
+			$AdminUI->breadcrumbpath_add( T_('Add domain'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;action=domain_new' );
 		}
 		if( empty( $tab3 ) )
 		{

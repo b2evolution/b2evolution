@@ -145,7 +145,7 @@ switch( $action )
 
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
+						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
 			}
 			else
 			{
