@@ -172,7 +172,7 @@ class CollectionSettings extends AbstractSettings
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 
 		// Other settings:
-			'image_size_user_list' => 'crop-top-32x32', // Used in disp = users
+			'image_size_user_list' => 'crop-top-48x48', // Used in disp = users
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
 
 		// Time frame settings:

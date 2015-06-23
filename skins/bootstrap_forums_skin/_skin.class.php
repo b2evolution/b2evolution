@@ -174,6 +174,7 @@ class bootstrap_forums_Skin extends Skin
 				),
 
 
+				// WARNING: default value for bubbletips is specific!
 				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
@@ -187,7 +188,7 @@ class bootstrap_forums_Skin extends Skin
 					'bubbletip' => array(
 						'label' => T_('Username bubble tips'),
 						'note' => T_('Check to enable bubble tips on usernames'),
-						'defaultvalue' => 0,
+						'defaultvalue' => 1,		// On the forums skin, we want to enable this! 
 						'type' => 'checkbox',
 					),
 					'autocomplete_usernames' => array(
