@@ -29,9 +29,9 @@ if( $edited_Blog->ID == 0 )
 { // "New blog" form: Display a form title and icon to close form
 	global $kind;
 	$kind_title = get_collection_kinds( $kind );
-	$form_title = sprintf( T_('New %s'), $kind_title ).':';
+	$form_title = sprintf( T_('New "%s" collection'), $kind_title ).':';
 
-	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3 );
+	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort New "%s" collection'), $kind_title ), 3, 3 );
 }
 
 $Form->begin_form( 'fform', $form_title );
@@ -56,7 +56,7 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type' 
 	if( isset( $collection_kinds[ $edited_Blog->get( 'type' ) ] ) )
 	{ // Display type of this blog
 		echo '<p>'
-			.sprintf( T_('This is %s &ndash; '), $collection_kinds[ $edited_Blog->get( 'type' ) ]['name'] )
+			.sprintf( T_('This is a "%s" collection &ndash; '), $collection_kinds[ $edited_Blog->get( 'type' ) ]['name'] )
 			.$collection_kinds[ $edited_Blog->get( 'type' ) ]['desc']
 		.'</p>';
 		if( $edited_Blog->ID > 0 )

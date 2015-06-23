@@ -66,7 +66,7 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New %s'), get_collection_kinds($kind) ) ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New "%s" collection'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'new-name':

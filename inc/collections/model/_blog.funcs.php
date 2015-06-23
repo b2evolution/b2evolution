@@ -374,6 +374,7 @@ function set_working_blog( $new_blog_ID )
 
 /**
  * Get collection kinds
+ * (might be extended by plugins)
  *
  * @param string Blog type
  * @return array|string
@@ -384,28 +385,36 @@ function get_collection_kinds( $kind = NULL )
 
 	$kinds = array(
 		'main' => array(
-				'name' => T_('Main'),
-				'desc' => T_('A collection optimized to be used for the site homepage as well as for generic functions such as messaging, user profiles, etc.'),
+				'name' => T_('Home / Main'),
+				'class' => 'btn-primary',
+				'desc' => T_('A collection optimized to be used as a site homepage and/or for generic functions such as messaging, user profiles, etc.'),
+				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as provate messaging, user profile editing, etc.'),
 			),
 		'std' => array(
-				'name' => T_('Standard blog'),
-				'desc' => T_('A standard blog with the most common features.'),
+				'name' => T_('Blog'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection optimized to be used as a standard blog (with the most common features).'),
+				'note' => T_('Many users start with a blog and add other features later.'),
 			),
 		'photo' => array(
 				'name' => T_('Gallery'),
 				'desc' => T_('A collection optimized for publishing photo albums.'),
-			),
-		'group' => array(
-				'name' => T_('Collaborative space'),
-				'desc' => T_('A collection optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form.'),
+				'note' => T_('Use this if you want to publish images without much text.'),
 			),
 		'forum' => array(
 				'name' => T_('Forum'),
 				'desc' => T_('A collection optimized to be used as a forum. (This should be used with a forums skin)'),
+				'note' => T_('Use this if you want a place for your user community to interact.'),
 			),
 		'manual' => array(
 				'name' => T_('Manual'),
 				'desc' => T_('A collection optimized to be used as an online manual, book or guide. (This should be used with a manual skin)'),
+				'note' => T_('Use this if you want to publish organized information with chapters, sub-chapters, etc.'),
+			),
+		'group' => array(
+				'name' => T_('Tracker'),
+				'desc' => T_('A collection optimized for issue tracking or collaborative editing. Look for the workflow properties on the post editing form.'),
+				'note' => T_('Use this if several users need to collaborate on resolving issues or publishing articles...'),
 			),
 		);
 

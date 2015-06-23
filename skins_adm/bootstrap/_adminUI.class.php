@@ -842,7 +842,7 @@ class AdminUI extends AdminUI_general
 		// Button to add new collection
 		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 		{ // Display a button to add new collection if current user has a permission
-			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-info" title="'.T_('New Collection').'">'.get_icon( 'new', 'imgtag', array( 'title' => T_('New Collection') ) ).'</a>';
+			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
 		}
 		else
 		{ // No permission to add new collection

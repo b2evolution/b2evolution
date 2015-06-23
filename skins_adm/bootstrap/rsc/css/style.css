@@ -1031,13 +1031,17 @@ div.available_widgets .widget_list {
 div.available_widgets #available_widgets_inner {
   top: 87px;
 }
-.coll_kind h3 {
-  margin: 0;
+table.coll_kind {
+  max-width: 960px;
+  margin: 30px auto 10px;
 }
-.coll_kind td {
-  padding: 0 10px 10px 0;
+table.coll_kind td {
+  padding: 10px 10px 10px 0;
 }
-.coll_kind .btn {
+table.coll_kind td.coll_kind__desc {
+  padding-top: 18px;
+}
+table.coll_kind .btn {
   width: 100%;
 }
 .btn-right {
@@ -1068,7 +1072,7 @@ div.coll-selector {
   margin-bottom: -3px;
 }
 div.coll-selector .btn-group {
-  margin-right: 8px;
+  margin-right: 4px;
 }
 div.level2 {
   padding-top: 17px;
