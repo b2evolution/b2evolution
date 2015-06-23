@@ -17,7 +17,7 @@ global $kind, $admin_url, $action, $AdminUI;
 
 $kind_title = get_collection_kinds( $kind );
 
-echo action_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort New %s'), $kind_title ), 3, 3, array( 'class' => 'action_icon floatright' ) );
+echo action_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3, 3, array( 'class' => 'action_icon floatright' ) );
 
 echo '<h2 class="page-title">'.sprintf( T_('New %s'), $kind_title ).':</h2>';
 
