@@ -14,9 +14,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $UserSettings, $Plugins, $tab;
+global $admin_url, $UserSettings, $Plugins, $tab, $blog;
 
-$tab_param = empty( $tab ) ? '' : '&amp;tab='.$tab;
+$tab_param = empty( $tab ) ? '' : '&amp;tab='.$tab.( empty( $blog ) ? '' : '&amp;blog='.$blog );
 
 $ip_address = param( 'ip_address', 'string', '', true );
 
