@@ -532,7 +532,7 @@ class ItemType extends DataObject
 	 *
 	 * @return array ( key => Blog ID, value => ItemType ID )
 	 */
-	function get_default_ids()
+	static function get_default_ids()
 	{
 		global $DB;
 
