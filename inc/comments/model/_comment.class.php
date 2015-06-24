@@ -3486,11 +3486,11 @@ class Comment extends DataObject
 			$meta_SQL = new SQL();
 			$meta_SQL->SELECT( 'user_ID, "meta_comment"' );
 			$meta_SQL->FROM( 'T_users' );
-			$meta_SQL->FROM_add( 'INNER JOIN evo_groups ON user_grp_ID = grp_ID' );
-			$meta_SQL->FROM_add( 'LEFT JOIN evo_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
-			$meta_SQL->FROM_add( 'LEFT JOIN evo_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
-			$meta_SQL->FROM_add( 'LEFT JOIN evo_blogusers ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$edited_Blog->ID );
-			$meta_SQL->FROM_add( 'LEFT JOIN evo_bloggroups ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$edited_Blog->ID );
+			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$edited_Blog->ID );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$edited_Blog->ID );
 			// Check if users have access to the back-office
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments

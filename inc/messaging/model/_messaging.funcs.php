@@ -1710,8 +1710,8 @@ function delete_orphan_threads( $user_ids = NULL )
 	// Get those thread ids which have already deleted participants or which participants will be deleted now
 	$affected_threads_ids = $DB->get_col(
 		'SELECT DISTINCT tsta_thread_ID
-		FROM evo_messaging__threadstatus
-		LEFT JOIN evo_users ON tsta_user_ID = user_ID
+		FROM T_messaging__threadstatus
+		LEFT JOIN T_users ON tsta_user_ID = user_ID
 		WHERE user_ID IS NULL'.$in_users_condition );
 
 	if( empty( $affected_threads_ids ) )
@@ -1722,8 +1722,8 @@ function delete_orphan_threads( $user_ids = NULL )
 	// Filter previously collected thread ids to get those which have existing users outside of the deleted ones
 	$not_orphan_threads = $DB->get_col(
 		'SELECT DISTINCT tsta_thread_ID
-		FROM evo_messaging__threadstatus
-		LEFT JOIN evo_users ON tsta_user_ID = user_ID
+		FROM T_messaging__threadstatus
+		LEFT JOIN T_users ON tsta_user_ID = user_ID
 		WHERE tsta_thread_ID IN ( '.implode( ', ', $affected_threads_ids ).' )
 			AND user_ID IS NOT NULL'.$not_in_users_condition );
 
