@@ -537,6 +537,7 @@ class ItemType extends DataObject
 		global $DB;
 
 		// Get default value of blog setting "default_post_type"
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
 		$CollectionSettings = new CollectionSettings();
 		$item_types['default'] = $CollectionSettings->get_default( 'default_post_type' );
 
