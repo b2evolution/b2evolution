@@ -169,7 +169,7 @@ echo '<div class="profile_column_left">';
 	}
 	if( ! empty( $location ) )
 	{ // Display location only if at least one selected
-		echo '<p>'.implode( ', ', $location ).'</p>';
+		echo '<p><span class="nowrap">'.implode( '</span>, <span class="nowrap">', $location ).'</span></p>';
 	}
 
 	// Buttons:
