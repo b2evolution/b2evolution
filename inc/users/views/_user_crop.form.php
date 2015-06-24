@@ -133,7 +133,7 @@ echo '<div id="target_cropped_image">'.$cropped_image_tag.'</div>';
 echo '</div><div>';
 
 // Preview thumbnails
-echo '<div class="preview_cropped_images">';
+echo '<div class="preview_cropped_images" style="display:none">';
 	echo '<div class="preview_cropped_image" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
 	echo '<div class="preview_cropped_image" style="width:64px;height:64px">'.$cropped_image_tag.'</div>';
 	echo '<div class="preview_cropped_image circle" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
@@ -142,7 +142,7 @@ echo '</div>';
 
 echo '</div></div>';
 
-echo '<p class="crop_button bottom">';
+echo '<p class="crop_button bottom" style="display:none">';
 $Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton' ) );
 echo '</p>';
 
@@ -185,9 +185,6 @@ function init_jcrop_tool( image_obj )
 
 	var min_width = Math.floor( <?php echo intval( $Settings->get( 'min_picture_size' ) ); ?> * Math.min( target_cropped_image_width, target_cropped_image_height ) / <?php echo $file_size; ?> );
 	var min_height = min_width;
-
-	var max_width = Math.floor( 1024 * Math.min( target_cropped_image_width, target_cropped_image_height ) / <?php echo $file_size; ?> );
-	var max_height = max_width;
 
 	// Set default selected crop area
 	if( target_cropped_image_width == target_cropped_image_height )
@@ -235,11 +232,17 @@ function init_jcrop_tool( image_obj )
 	{
 		aspectRatio: 1,
 		minSize: [ min_width, min_height ],
-		maxSize: [ max_width, max_height ],
 		setSelect: [ x1, y1, x2, y2 ],
 		onChange: show_preview_cropped_image,
 		onSelect: show_preview_cropped_image,
 	} );
+
+	// Display the crop elements only after initialization
+	jQuery( '.preview_cropped_images, .crop_button' ).show();
+	if( jQuery( '#modal_window' ).length > 0 )
+	{
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).attr( 'style', 'display:inline-block !important' );
+	}
 }
 
 // Update thumbnails on change a crop area

@@ -4186,7 +4186,7 @@ echo_modalwindow_js();
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 			'auto', '', true,
 			'<?php echo TS_('Crop profile picture'); ?>',
-			'<?php echo TS_('Crop'); ?>', true );
+			[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ], true );
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -4205,7 +4205,7 @@ echo_modalwindow_js();
 			{
 				openModalWindow( result, 'auto', '',true,
 				'<?php echo TS_('Crop profile picture'); ?>',
-				'<?php echo TS_('Crop'); ?>' );
+				[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ] );
 			}
 		} );
 		return false;

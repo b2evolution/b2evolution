@@ -543,11 +543,13 @@ function crop_image( $File, $x, $y, $width, $height, $min_size = 0, $max_size = 
 	$y = $src_height * ( $y / 100 );
 	$width = $src_width * ( $width / 100 );
 	$height = $src_height * ( $height / 100 );
+	$dest_width = $width;
+	$dest_height = $height;
 
 	if( $max_size > 0 )
 	{ // Check if we should limit by max size
-		$width = $width > $max_size ? $max_size : $width;
-		$height = $height > $max_size ? $max_size : $height;
+		$dest_width = $dest_width > $max_size ? $max_size : $dest_width;
+		$dest_height = $dest_height > $max_size ? $max_size : $dest_height;
 	}
 	if( $min_size > 0 )
 	{ // Check if we should limit by min size
@@ -564,10 +566,10 @@ function crop_image( $File, $x, $y, $width, $height, $min_size = 0, $max_size = 
 		$y = $src_height - $height;
 	}
 
-	$dst_imh = imagecreatetruecolor( $width, $height );
+	$dst_imh = imagecreatetruecolor( $dest_width, $dest_height );
 
 	// Crop image
-	if( ! @imagecopyresampled( $dst_imh, $src_imh, 0, 0, $x, $y, $width, $height, $width, $height ) )
+	if( ! @imagecopyresampled( $dst_imh, $src_imh, 0, 0, $x, $y, $dest_width, $dest_height, $width, $height ) )
 	{ // If func imagecopyresampled is not defined for example:
 		return false;
 	}
