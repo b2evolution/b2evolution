@@ -435,11 +435,11 @@ switch( $action )
 			$number_of_comments = $edited_Blog->get_number_of_comments();
 			if( $number_of_comments > 0 )
 			{ // There is at least one comment
-				$delete_notes[] = array( sprintf( T_('WARNING: This blog contains %d items and %d comments.'), $number_of_items, $number_of_comments ), 'warning' );
+				$delete_notes[] = array( sprintf( T_('WARNING: This collection contains %d items and %d comments.'), $number_of_items, $number_of_comments ), 'warning' );
 			}
 			else
 			{
-				$delete_notes[] = array( sprintf( T_('WARNING: This blog contains %d items.'), $number_of_items ), 'warning' );
+				$delete_notes[] = array( sprintf( T_('WARNING: This collection contains %d items.'), $number_of_items ), 'warning' );
 			}
 		}
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-06-23 17:17+0200\n"
+"POT-Creation-Date: 2015-06-24 20:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,12 +108,12 @@ msgid "New window"
 msgstr ""
 
 #: ../../../conf/_icons.php:265 ../conf/_icons.php:289
-#: ../../../inc/_core/_misc.funcs.php:7132
+#: ../../../inc/_core/_misc.funcs.php:7139
 msgid "Expand"
 msgstr ""
 
 #: ../../../conf/_icons.php:277 ../conf/_icons.php:298
-#: ../../../inc/_core/_misc.funcs.php:7126
+#: ../../../inc/_core/_misc.funcs.php:7133
 msgid "Collapse"
 msgstr ""
 
@@ -276,7 +276,7 @@ msgid "Rem"
 msgstr ""
 
 #: ../../../conf/_icons.php:501 ../inc/_core/_misc.funcs.php:2783
-#: ../../../inc/_core/_misc.funcs.php:6982
+#: ../../../inc/_core/_misc.funcs.php:6989
 msgid "Close"
 msgstr ""
 
@@ -457,7 +457,7 @@ msgstr ""
 #: ../../../skins/blackorange_skin/_skin.class.php:256
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:280
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:52
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:465
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:466
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:446
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:459
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:284
@@ -489,7 +489,7 @@ msgstr ""
 #: ../../../skins/blackorange_skin/_skin.class.php:257
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:281
 #: ../../../skins/bootstrap_forums_skin/_search.disp.php:53
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:466
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:467
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:447
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:460
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:285
@@ -917,7 +917,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_advanced.form.php:208
 #: ../../../inc/collections/views/_coll_comments.form.php:235
 #: ../../../inc/collections/views/_coll_features.form.php:150
-#: ../../../inc/collections/views/_coll_general.form.php:193
+#: ../../../inc/collections/views/_coll_general.form.php:194
 #: ../../../inc/collections/views/_coll_group_perm.form.php:294
 #: ../../../inc/collections/views/_coll_home.form.php:70
 #: ../../../inc/collections/views/_coll_other.form.php:98
@@ -1606,7 +1606,7 @@ msgid "File"
 msgstr ""
 
 #: ../../../htsrv/viewfile.php:188 ../inc/_core/_misc.funcs.php:5393
-#: ../../../inc/collections/views/_coll_general.form.php:74
+#: ../../../inc/collections/views/_coll_general.form.php:75
 #: ../../../inc/files/views/_file_links.view.php:98
 #: ../../../inc/items/model/_item.funcs.php:3860
 #: ../../../inc/items/views/_item_expert.form.php:157
@@ -1634,7 +1634,7 @@ msgid "Title"
 msgstr ""
 
 #: ../../../htsrv/viewfile.php:192 ../inc/chapters/views/_chapter.form.php:64
-#: ../../../inc/collections/views/_coll_general.form.php:184
+#: ../../../inc/collections/views/_coll_general.form.php:185
 #: ../../../inc/items/views/_itemtype.form.php:65
 #: ../../../inc/maintenance/views/_upgrade.form.php:41
 #: ../../../inc/plugins/views/_plugin_list.view.php:188
@@ -2596,8 +2596,8 @@ msgstr ""
 #: ../../../inc/_core/_misc.funcs.php:4893
 #: ../../../inc/collections/model/_blog.class.php:327
 #: ../../../inc/collections/model/_blog.class.php:328
-#: ../../../inc/collections/model/_blog.funcs.php:407
-#: ../../../inc/collections/model/_blog.funcs.php:1659
+#: ../../../inc/collections/model/_blog.funcs.php:410
+#: ../../../inc/collections/model/_blog.funcs.php:1668
 #: ../../../inc/cron/_cron.funcs.php:182 ../install/_functions_create.php:2314
 #: ../../../install/index.php:764
 msgid "Manual"
@@ -2628,7 +2628,7 @@ msgid "Date last touched"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:5397 ../inc/_core/_misc.funcs.php:5418
-#: ../../../inc/collections/views/_coll_general.form.php:80
+#: ../../../inc/collections/views/_coll_general.form.php:81
 msgid "URL \"filename\""
 msgstr ""
 
@@ -2666,7 +2666,7 @@ msgstr ""
 #: ../../../inc/chapters/views/_chapter.form.php:60
 #: ../../../inc/chapters/views/_chapter_list.view.php:239
 #: ../../../inc/chapters/views/_chapter_move.form.php:44
-#: ../../../inc/collections/model/_blog.funcs.php:1477
+#: ../../../inc/collections/model/_blog.funcs.php:1486
 #: ../../../inc/cron/views/_cronjob_list.view.php:187
 #: ../../../inc/email_campaigns/views/_campaigns.view.php:56
 #: ../../../inc/email_campaigns/views/_campaigns_html.form.php:29
@@ -2731,12 +2731,12 @@ msgid "Name"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:5415
-#: ../../../inc/collections/views/_coll_general.form.php:76
+#: ../../../inc/collections/views/_coll_general.form.php:77
 msgid "Short name"
 msgstr ""
 
 #: ../../../inc/_core/_misc.funcs.php:5416
-#: ../../../inc/collections/views/_coll_general.form.php:186
+#: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "Tagline"
 msgstr ""
 
@@ -2750,7 +2750,7 @@ msgstr ""
 msgid "(Please check UNIX file permissions on the parent folder. %s)"
 msgstr ""
 
-#: ../../../inc/_core/_misc.funcs.php:6644
+#: ../../../inc/_core/_misc.funcs.php:6651
 msgid "Click to edit"
 msgstr ""
 
@@ -4629,7 +4629,7 @@ msgstr ""
 
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:65
 #: ../../../inc/chapters/views/_chapter_list.view.php:232
-#: ../../../inc/collections/model/_blog.funcs.php:1454
+#: ../../../inc/collections/model/_blog.funcs.php:1463
 #: ../../../inc/collections/views/_coll_group_perm.form.php:122
 #: ../../../inc/cron/views/_cronjob_list.view.php:172
 #: ../../../inc/email_campaigns/views/_campaigns.view.php:39
@@ -4672,7 +4672,7 @@ msgstr ""
 #: ../../../inc/antispam/views/_antispam_ipranges.view.php:151
 #: ../../../inc/antispam/views/_antispam_list.view.php:168
 #: ../../../inc/chapters/views/_chapter_list.view.php:272
-#: ../../../inc/collections/model/_blog.funcs.php:1567
+#: ../../../inc/collections/model/_blog.funcs.php:1576
 #: ../../../inc/comments/model/_comment.funcs.php:1269
 #: ../../../inc/comments/views/_trash_comments.view.php:64
 #: ../../../inc/cron/views/_cronjob_list.view.php:260
@@ -5117,7 +5117,8 @@ msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:55
 #: ../../../inc/collections/model/_blog.class.php:352
-#: ../../../inc/collections/model/_blog.funcs.php:1655
+#: ../../../inc/collections/model/_blog.funcs.php:394
+#: ../../../inc/collections/model/_blog.funcs.php:1664
 #: ../../../inc/items/model/_item.funcs.php:3827
 #: ../../../inc/sessions/views/_stats_view.funcs.php:150
 #: ../../../inc/tools/views/_phpbb_forums.form.php:51
@@ -5158,8 +5159,8 @@ msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:69
 #: ../../../inc/chapters/views/_chapter_list.view.php:246
-#: ../../../inc/collections/model/_blog.funcs.php:1546
-#: ../../../inc/collections/views/_coll_general.form.php:169
+#: ../../../inc/collections/model/_blog.funcs.php:1555
+#: ../../../inc/collections/views/_coll_general.form.php:170
 #: ../../../inc/items/model/_item.funcs.php:3476
 #: ../../../inc/items/views/_item_expert.form.php:524
 #: ../../../inc/items/views/_item_list_full.view.php:157
@@ -5316,15 +5317,15 @@ msgid "Can use APIs"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:472
-#: ../../../inc/collections/model/_blog.funcs.php:1839
+#: ../../../inc/collections/model/_blog.funcs.php:1848
 #: ../../../inc/collections/views/_coll_comments.form.php:206
-#: ../../../inc/collections/views/_coll_general.form.php:175
+#: ../../../inc/collections/views/_coll_general.form.php:176
 #: ../../../inc/items/views/_itemtype.form.php:77
 msgid "Never"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:473
-#: ../../../inc/collections/model/_blog.funcs.php:1830
+#: ../../../inc/collections/model/_blog.funcs.php:1839
 msgid "Always"
 msgstr ""
 
@@ -5698,8 +5699,12 @@ msgstr ""
 
 #. TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum"
 #: ../../../inc/collections/collections.ctrl.php:69
-#: ../../../inc/collections/collections.ctrl.php:86
 #: ../../../inc/collections/views/_coll_general.form.php:32
+#, php-format
+msgid "New \"%s\" collection"
+msgstr ""
+
+#: ../../../inc/collections/collections.ctrl.php:86
 #: ../../../inc/skins/views/_coll_sel_skin.view.php:22
 #, php-format
 msgid "New %s"
@@ -5735,19 +5740,19 @@ msgid "Site settings updated."
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:369
-#: ../../../inc/collections/model/_blog.funcs.php:1403
+#: ../../../inc/collections/model/_blog.funcs.php:1412
 #: ../../../skins_adm/bootstrap/_adminUI.class.php:845
 msgid "New Collection"
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:438
 #, php-format
-msgid "WARNING: This blog contains %d items and %d comments."
+msgid "WARNING: This collection contains %d items and %d comments."
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:442
 #, php-format
-msgid "WARNING: This blog contains %d items."
+msgid "WARNING: This collection contains %d items."
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:449
@@ -5858,8 +5863,8 @@ msgid "My forum"
 msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:297
-#: ../../../inc/collections/model/_blog.funcs.php:403
-#: ../../../inc/collections/model/_blog.funcs.php:1658
+#: ../../../inc/collections/model/_blog.funcs.php:405
+#: ../../../inc/collections/model/_blog.funcs.php:1667
 #: ../../../skins/bootstrap_forums_skin/index.main.php:32
 #: ../../../skins/bootstrap_forums_skin/index.main.php:54
 #: ../../../skins/bootstrap_forums_skin/index.main.php:55
@@ -6130,28 +6135,28 @@ msgstr ""
 msgid "The requested blog does not exist (any more?)"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:387
-#: ../../../inc/collections/model/_blog.funcs.php:1654
-#: ../../../inc/items/model/_item.funcs.php:1181
-#: ../../../inc/users/views/_user_avatar.form.php:208
-msgid "Main"
+#: ../../../inc/collections/model/_blog.funcs.php:388
+msgid "Home / Main"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:388
-msgid "A collection optimized to be used for the site homepage as well as for generic functions such as messaging, user profiles, etc."
+#: ../../../inc/collections/model/_blog.funcs.php:390
+msgid "A collection optimized to be used as a site homepage and/or for generic functions such as messaging, user profiles, etc."
 msgstr ""
 
 #: ../../../inc/collections/model/_blog.funcs.php:391
-msgid "Standard blog"
+msgid "Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as provate messaging, user profile editing, etc."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:392
-#: ../../../inc/collections/views/_coll_sel_type.view.php:40
-msgid "A standard blog with the most common features."
+#: ../../../inc/collections/model/_blog.funcs.php:396
+msgid "A collection optimized to be used as a standard blog (with the most common features)."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:395
-#: ../../../inc/collections/model/_blog.funcs.php:1656
+#: ../../../inc/collections/model/_blog.funcs.php:397
+msgid "Many users start with a blog and add other features later."
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:400
+#: ../../../inc/collections/model/_blog.funcs.php:1665
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:28
 #: ../../../skins/bootstrap_gallery_skin/index.main.php:148
 #: ../../../skins/bootstrap_gallery_skin/single.main.php:28
@@ -6161,261 +6166,277 @@ msgstr ""
 msgid "Gallery"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:396
+#: ../../../inc/collections/model/_blog.funcs.php:401
 msgid "A collection optimized for publishing photo albums."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:399
-msgid "Collaborative space"
+#: ../../../inc/collections/model/_blog.funcs.php:402
+msgid "Use this if you want to publish images without much text."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:400
-msgid "A collection optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form."
-msgstr ""
-
-#: ../../../inc/collections/model/_blog.funcs.php:404
+#: ../../../inc/collections/model/_blog.funcs.php:406
 msgid "A collection optimized to be used as a forum. (This should be used with a forums skin)"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:408
+#: ../../../inc/collections/model/_blog.funcs.php:407
+msgid "Use this if you want a place for your user community to interact."
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:411
 msgid "A collection optimized to be used as an online manual, book or guide. (This should be used with a manual skin)"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:468
+#: ../../../inc/collections/model/_blog.funcs.php:412
+msgid "Use this if you want to publish organized information with chapters, sub-chapters, etc."
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:415
+msgid "Tracker"
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:416
+msgid "A collection optimized for issue tracking or collaborative editing. Look for the workflow properties on the post editing form."
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:417
+msgid "Use this if several users need to collaborate on resolving issues or publishing articles..."
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:477
 msgid "General caching has been enabled."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:472
+#: ../../../inc/collections/model/_blog.funcs.php:481
 msgid "Page caching has been enabled."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:479
+#: ../../../inc/collections/model/_blog.funcs.php:488
 msgid "General caching could not be enabled. Check /cache/ folder file permissions."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:483
+#: ../../../inc/collections/model/_blog.funcs.php:492
 msgid "Page caching could not be enabled. Check /cache/ folder file permissions."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:493
+#: ../../../inc/collections/model/_blog.funcs.php:502
 msgid "General caching has been disabled. Cache contents have been purged."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:497
+#: ../../../inc/collections/model/_blog.funcs.php:506
 msgid "Page caching has been disabled. Cache contents have been purged."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:761
+#: ../../../inc/collections/model/_blog.funcs.php:770
 #, php-format
 msgid "IMPORTANT: your account is not active yet! Activate your account now by clicking on the activation link in the email we sent you. <a %s>More info &raquo;</a>"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:814
+#: ../../../inc/collections/model/_blog.funcs.php:823
 msgid "Make private!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:967
-#: ../../../inc/collections/model/_blog.funcs.php:988
+#: ../../../inc/collections/model/_blog.funcs.php:976
+#: ../../../inc/collections/model/_blog.funcs.php:997
 msgid "Everyone"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:967
-#: ../../../inc/collections/model/_blog.funcs.php:988
-#: ../../../inc/collections/model/_blog.funcs.php:1055
+#: ../../../inc/collections/model/_blog.funcs.php:976
+#: ../../../inc/collections/model/_blog.funcs.php:997
+#: ../../../inc/collections/model/_blog.funcs.php:1064
 msgid "Public"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:968
-#: ../../../inc/collections/model/_blog.funcs.php:989
-#: ../../../inc/collections/model/_blog.funcs.php:1056
+#: ../../../inc/collections/model/_blog.funcs.php:977
+#: ../../../inc/collections/model/_blog.funcs.php:998
+#: ../../../inc/collections/model/_blog.funcs.php:1065
 msgid "Community"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:968
-#: ../../../inc/collections/model/_blog.funcs.php:989
+#: ../../../inc/collections/model/_blog.funcs.php:977
+#: ../../../inc/collections/model/_blog.funcs.php:998
 msgid "Logged in users only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:969
-#: ../../../inc/collections/model/_blog.funcs.php:990
+#: ../../../inc/collections/model/_blog.funcs.php:978
+#: ../../../inc/collections/model/_blog.funcs.php:999
 msgid "Blog members only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:969
-#: ../../../inc/collections/model/_blog.funcs.php:990
-#: ../../../inc/collections/model/_blog.funcs.php:1057
-#: ../../../inc/collections/model/_blog.funcs.php:1836
-#: ../../../inc/collections/views/_coll_general.form.php:159
+#: ../../../inc/collections/model/_blog.funcs.php:978
+#: ../../../inc/collections/model/_blog.funcs.php:999
+#: ../../../inc/collections/model/_blog.funcs.php:1066
+#: ../../../inc/collections/model/_blog.funcs.php:1845
+#: ../../../inc/collections/views/_coll_general.form.php:160
 #: ../../../inc/collections/views/_coll_group_perm.form.php:115
 #: ../../../inc/collections/views/_coll_user_perm.form.php:119
 msgid "Members"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:970
-#: ../../../inc/collections/model/_blog.funcs.php:991
+#: ../../../inc/collections/model/_blog.funcs.php:979
+#: ../../../inc/collections/model/_blog.funcs.php:1000
 msgid "Moderators only (+You)"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:970
-#: ../../../inc/collections/model/_blog.funcs.php:991
-#: ../../../inc/collections/model/_blog.funcs.php:1059
+#: ../../../inc/collections/model/_blog.funcs.php:979
+#: ../../../inc/collections/model/_blog.funcs.php:1000
+#: ../../../inc/collections/model/_blog.funcs.php:1068
 msgid "Review"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:971
-#: ../../../inc/collections/model/_blog.funcs.php:992
-#: ../../../inc/collections/model/_blog.funcs.php:1058
+#: ../../../inc/collections/model/_blog.funcs.php:980
+#: ../../../inc/collections/model/_blog.funcs.php:1001
+#: ../../../inc/collections/model/_blog.funcs.php:1067
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:410
 msgid "Private"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:971
-#: ../../../inc/collections/model/_blog.funcs.php:992
+#: ../../../inc/collections/model/_blog.funcs.php:980
+#: ../../../inc/collections/model/_blog.funcs.php:1001
 msgid "You only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:972
-#: ../../../inc/collections/model/_blog.funcs.php:993
-#: ../../../inc/collections/model/_blog.funcs.php:1060
+#: ../../../inc/collections/model/_blog.funcs.php:981
+#: ../../../inc/collections/model/_blog.funcs.php:1002
+#: ../../../inc/collections/model/_blog.funcs.php:1069
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:415
 msgid "Draft"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:972
-#: ../../../inc/collections/model/_blog.funcs.php:993
+#: ../../../inc/collections/model/_blog.funcs.php:981
+#: ../../../inc/collections/model/_blog.funcs.php:1002
 msgid "You only (+backoffice users)"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:973
-#: ../../../inc/collections/model/_blog.funcs.php:994
-#: ../../../inc/collections/model/_blog.funcs.php:1061
+#: ../../../inc/collections/model/_blog.funcs.php:982
+#: ../../../inc/collections/model/_blog.funcs.php:1003
+#: ../../../inc/collections/model/_blog.funcs.php:1070
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:420
 msgid "Deprecated"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:973
-#: ../../../inc/collections/model/_blog.funcs.php:994
+#: ../../../inc/collections/model/_blog.funcs.php:982
+#: ../../../inc/collections/model/_blog.funcs.php:1003
 msgid "Not published!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:974
-#: ../../../inc/collections/model/_blog.funcs.php:1062
+#: ../../../inc/collections/model/_blog.funcs.php:983
+#: ../../../inc/collections/model/_blog.funcs.php:1071
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:425
 msgid "Redirected"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:975
-#: ../../../inc/collections/model/_blog.funcs.php:1063
+#: ../../../inc/collections/model/_blog.funcs.php:984
+#: ../../../inc/collections/model/_blog.funcs.php:1072
 msgid "Recycled"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:985
+#: ../../../inc/collections/model/_blog.funcs.php:994
 msgid "Change status to"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:986
+#: ../../../inc/collections/model/_blog.funcs.php:995
 msgid "Visible by"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1002
+#: ../../../inc/collections/model/_blog.funcs.php:1011
 msgid "Visible by anyone"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1003
+#: ../../../inc/collections/model/_blog.funcs.php:1012
 msgid "Visible by logged-in users only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1004
+#: ../../../inc/collections/model/_blog.funcs.php:1013
 msgid "Visible by members only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1005
+#: ../../../inc/collections/model/_blog.funcs.php:1014
 msgid "Waiting for moderator review"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1006
+#: ../../../inc/collections/model/_blog.funcs.php:1015
 msgid "Visible by you only"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1007
+#: ../../../inc/collections/model/_blog.funcs.php:1016
 msgid "Unfinished post"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1013
+#: ../../../inc/collections/model/_blog.funcs.php:1022
 msgid "Save as Public!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1014
+#: ../../../inc/collections/model/_blog.funcs.php:1023
 msgid "Save for Community!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1015
+#: ../../../inc/collections/model/_blog.funcs.php:1024
 msgid "Save for Members!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1016
+#: ../../../inc/collections/model/_blog.funcs.php:1025
 msgid "Save for Review!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1017
+#: ../../../inc/collections/model/_blog.funcs.php:1026
 msgid "Save as Private!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1018
+#: ../../../inc/collections/model/_blog.funcs.php:1027
 msgid "Save as Draft!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1019
+#: ../../../inc/collections/model/_blog.funcs.php:1028
 msgid "Save as Deprecated!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1020
+#: ../../../inc/collections/model/_blog.funcs.php:1029
 msgid "Save as Redirected!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1026
+#: ../../../inc/collections/model/_blog.funcs.php:1035
 #: ../../../inc/comments/model/_comment.class.php:1586
 #: ../../../inc/items/model/_item.class.php:4290
 msgid "Deprecate!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1027
+#: ../../../inc/collections/model/_blog.funcs.php:1036
 msgid "Open to moderators!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1027
+#: ../../../inc/collections/model/_blog.funcs.php:1036
 msgid "Restrict to moderators!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1028
+#: ../../../inc/collections/model/_blog.funcs.php:1037
 msgid "Open to members!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1028
+#: ../../../inc/collections/model/_blog.funcs.php:1037
 msgid "Restrict to members!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1029
+#: ../../../inc/collections/model/_blog.funcs.php:1038
 msgid "Open to community!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1029
+#: ../../../inc/collections/model/_blog.funcs.php:1038
 msgid "Restrict to community!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1030
+#: ../../../inc/collections/model/_blog.funcs.php:1039
 msgid "Make public!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1238
+#: ../../../inc/collections/model/_blog.funcs.php:1247
 msgid "Blogs owned by the user"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1239
+#: ../../../inc/collections/model/_blog.funcs.php:1248
 msgid "User does not own any blogs"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1288
+#: ../../../inc/collections/model/_blog.funcs.php:1297
 #: ../../../inc/comments/model/_comment.funcs.php:1089
 #: ../../../inc/items/model/_item.funcs.php:3583
 #: ../../../inc/items/model/_item.funcs.php:3683
@@ -6423,33 +6444,33 @@ msgstr ""
 msgid "Delete all"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1288
+#: ../../../inc/collections/model/_blog.funcs.php:1297
 #, php-format
 msgid "Delete all blogs owned by %s"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1333
+#: ../../../inc/collections/model/_blog.funcs.php:1342
 msgid "List of Collections configured on this system"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1334
+#: ../../../inc/collections/model/_blog.funcs.php:1343
 msgid "No blog has been created yet!"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1335
+#: ../../../inc/collections/model/_blog.funcs.php:1344
 msgid "Sorry, you have no permission to edit/view any blog's properties."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1465
+#: ../../../inc/collections/model/_blog.funcs.php:1474
 msgid "Fav"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1466
+#: ../../../inc/collections/model/_blog.funcs.php:1475
 msgid "Favorite"
 msgstr ""
 
 #. TRANS: file type
-#: ../../../inc/collections/model/_blog.funcs.php:1486
+#: ../../../inc/collections/model/_blog.funcs.php:1495
 #: ../../../inc/collections/views/_coll_type.form.php:43
 #: ../../../inc/comments/views/_comment.form.php:267
 #: ../../../inc/files/views/_file_list.inc.php:112
@@ -6469,24 +6490,24 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1497
+#: ../../../inc/collections/model/_blog.funcs.php:1506
 msgid "Full Name"
 msgstr ""
 
 #. TRANS: file owner
-#: ../../../inc/collections/model/_blog.funcs.php:1506
-#: ../../../inc/collections/views/_coll_general.form.php:148
-#: ../../../inc/collections/views/_coll_general.form.php:152
+#: ../../../inc/collections/model/_blog.funcs.php:1515
+#: ../../../inc/collections/views/_coll_general.form.php:149
+#: ../../../inc/collections/views/_coll_general.form.php:153
 #: ../../../inc/files/views/_file_list.inc.php:129
 #: ../../../inc/items/views/_item_expert.form.php:530
 msgid "Owner"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1515
+#: ../../../inc/collections/model/_blog.funcs.php:1524
 msgid "Blog URL"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1523
+#: ../../../inc/collections/model/_blog.funcs.php:1532
 #: ../../../inc/items/model/_itemlistlight.class.php:1211
 #: ../../../inc/items/model/_itemlistlight.class.php:1214
 #: ../../../inc/locales/_locale_settings.form.php:80
@@ -6502,84 +6523,90 @@ msgstr ""
 msgid "Locale"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1534
+#: ../../../inc/collections/model/_blog.funcs.php:1543
 msgid "Listed"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1535
+#: ../../../inc/collections/model/_blog.funcs.php:1544
 msgid "Public List"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1557
+#: ../../../inc/collections/model/_blog.funcs.php:1566
 #: ../../../inc/collections/views/_coll_advanced.form.php:111
 #: ../../../inc/collections/views/_coll_settings_blog.form.php:48
 #: ../../../inc/tools/system.ctrl.php:214
 msgid "Caching"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1601
-#: ../../../inc/collections/model/_blog.funcs.php:1629
-#: ../../../inc/collections/model/_blog.funcs.php:1667
-#: ../../../inc/collections/model/_blog.funcs.php:1715
-#: ../../../inc/collections/model/_blog.funcs.php:1849
-#: ../../../inc/collections/model/_blog.funcs.php:1931
+#: ../../../inc/collections/model/_blog.funcs.php:1610
+#: ../../../inc/collections/model/_blog.funcs.php:1638
+#: ../../../inc/collections/model/_blog.funcs.php:1676
+#: ../../../inc/collections/model/_blog.funcs.php:1724
+#: ../../../inc/collections/model/_blog.funcs.php:1858
+#: ../../../inc/collections/model/_blog.funcs.php:1940
 #: ../../../inc/files/views/_file_list.inc.php:436
 msgid "Edit properties..."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1657
+#: ../../../inc/collections/model/_blog.funcs.php:1663
+#: ../../../inc/items/model/_item.funcs.php:1181
+#: ../../../inc/users/views/_user_avatar.form.php:208
+msgid "Main"
+msgstr ""
+
+#: ../../../inc/collections/model/_blog.funcs.php:1666
 msgid "Collab"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1680
+#: ../../../inc/collections/model/_blog.funcs.php:1689
 #: ../../../inc/collections/views/_coll_settings_site.form.php:75
 msgid "Default collection to display"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1684
+#: ../../../inc/collections/model/_blog.funcs.php:1693
 #: ../../../inc/collections/views/_coll_settings_site.form.php:80
 msgid "Collection for info pages"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1688
+#: ../../../inc/collections/model/_blog.funcs.php:1697
 #: ../../../inc/collections/views/_coll_settings_site.form.php:85
 msgid "Collection for login/registration"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1692
+#: ../../../inc/collections/model/_blog.funcs.php:1701
 #: ../../../inc/collections/views/_coll_settings_site.form.php:90
 msgid "Collection for profiles/messaging"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1768
+#: ../../../inc/collections/model/_blog.funcs.php:1777
 msgid "Page caching is on. Anonymous users may not see the latest content for 10 minutes."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1774
+#: ../../../inc/collections/model/_blog.funcs.php:1783
 msgid "Page caching is off. Server performance will not be optimal."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1782
+#: ../../../inc/collections/model/_blog.funcs.php:1791
 msgid "Block caching is on. Some widgets may not update immediately."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1788
+#: ../../../inc/collections/model/_blog.funcs.php:1797
 msgid "Block caching is off. Server performance will not be optimal."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1833
+#: ../../../inc/collections/model/_blog.funcs.php:1842
 msgid "Logged in"
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1880
+#: ../../../inc/collections/model/_blog.funcs.php:1889
 msgid "The blog is a favorite."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1881
+#: ../../../inc/collections/model/_blog.funcs.php:1890
 msgid "The blog is not a favorite."
 msgstr ""
 
-#: ../../../inc/collections/model/_blog.funcs.php:1936
+#: ../../../inc/collections/model/_blog.funcs.php:1945
 msgid "Delete this blog..."
 msgstr ""
 
@@ -7041,7 +7068,7 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:104
 #: ../../../skins/blackorange_skin/_skin.class.php:115
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:155
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:195
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:196
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:214
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:229
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:134
@@ -7460,166 +7487,166 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:34
 #: ../../../inc/skins/views/_coll_sel_skin.view.php:20
-#, php-format
-msgid "Abort New %s"
+msgid "Abort creating new collection"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:34
 #: ../../../inc/skins/views/_coll_sel_skin.view.php:20
-msgid "Abort creating new collection"
+#, php-format
+msgid "Abort new \"%s\" collection"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:59
 #, php-format
-msgid "This is %s &ndash; "
+msgid "This is a \"%s\" collection"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:65
+#: ../../../inc/collections/views/_coll_general.form.php:66
 msgid "Change collection type / Reset"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:72
+#: ../../../inc/collections/views/_coll_general.form.php:73
 msgid "General parameters"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:74
+#: ../../../inc/collections/views/_coll_general.form.php:75
 msgid "Will be displayed on top of the blog."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:76
+#: ../../../inc/collections/views/_coll_general.form.php:77
 msgid "Will be used in selection menus and throughout the admin interface."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:81
+#: ../../../inc/collections/views/_coll_general.form.php:82
 #, php-format
 msgid "\"slug\" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:86
+#: ../../../inc/collections/views/_coll_general.form.php:87
 msgid "URL Name"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:86
+#: ../../../inc/collections/views/_coll_general.form.php:87
 msgid "Used to uniquely identify this blog in URLs."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:92
+#: ../../../inc/collections/views/_coll_general.form.php:93
 msgid "Language / locale"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:111
+#: ../../../inc/collections/views/_coll_general.form.php:112
 #: ../../../inc/locales/_locale_settings.form.php:208
 msgid "Regional settings"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:112
+#: ../../../inc/collections/views/_coll_general.form.php:113
 msgid "Collection Locale"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:116
+#: ../../../inc/collections/views/_coll_general.form.php:117
 msgid "Always force to collection locale"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:117
+#: ../../../inc/collections/views/_coll_general.form.php:118
 msgid "Use browser / user locale when possible"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:118
+#: ../../../inc/collections/views/_coll_general.form.php:119
 msgid "Navigation/Widget Display"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:122
+#: ../../../inc/collections/views/_coll_general.form.php:123
 msgid "Always force to post locale"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:123
+#: ../../../inc/collections/views/_coll_general.form.php:124
 msgid "Follow navigation locale"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:124
+#: ../../../inc/collections/views/_coll_general.form.php:125
 msgid "Content Display"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:129
+#: ../../../inc/collections/views/_coll_general.form.php:130
 #, php-format
 msgid "This collection uses %s."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:132
+#: ../../../inc/collections/views/_coll_general.form.php:133
 #, php-format
 msgid "Go to <a %s>Regional Settings</a> to enable additional locales."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:140
+#: ../../../inc/collections/views/_coll_general.form.php:141
 msgid "Collection permissions"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:148
+#: ../../../inc/collections/views/_coll_general.form.php:149
 msgid "Login of this blog's owner."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:157
+#: ../../../inc/collections/views/_coll_general.form.php:158
 msgid "Everyone (Public Blog)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:158
+#: ../../../inc/collections/views/_coll_general.form.php:159
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:141
 msgid "Logged in users"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:160
+#: ../../../inc/collections/views/_coll_general.form.php:161
 msgid "Allow access to"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:162
+#: ../../../inc/collections/views/_coll_general.form.php:163
 msgid "This will turn on the advanced User and Group permissions tabs for this blog."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:162
+#: ../../../inc/collections/views/_coll_general.form.php:163
 msgid "Use advanced perms"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:167
+#: ../../../inc/collections/views/_coll_general.form.php:168
 msgid "Lists of collections"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:172
+#: ../../../inc/collections/views/_coll_general.form.php:173
 msgid "Always (Public)"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:173
+#: ../../../inc/collections/views/_coll_general.form.php:174
 msgid "For logged-in users only"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:174
+#: ../../../inc/collections/views/_coll_general.form.php:175
 msgid "For members only"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:176
+#: ../../../inc/collections/views/_coll_general.form.php:177
 msgid "Select when you want this blog to appear in the list of blogs on this system."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:176
+#: ../../../inc/collections/views/_coll_general.form.php:177
 msgid "Show in front-office list"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:179
+#: ../../../inc/collections/views/_coll_general.form.php:180
 msgid "Include in the quick blog selector at the top of the back office pages."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:179
+#: ../../../inc/collections/views/_coll_general.form.php:180
 msgid "Show in back-office favorites"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:186
+#: ../../../inc/collections/views/_coll_general.form.php:187
 msgid "This is displayed under the blog name on the blog template."
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:188
+#: ../../../inc/collections/views/_coll_general.form.php:189
 msgid "Long Description"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_general.form.php:188
+#: ../../../inc/collections/views/_coll_general.form.php:189
 msgid "This is displayed on the blog template."
 msgstr ""
 
@@ -8029,12 +8056,16 @@ msgstr ""
 msgid "What kind of collection would you like to create?"
 msgstr ""
 
-#: ../../../inc/collections/views/_coll_sel_type.view.php:39
-msgid "Standard"
+#: ../../../inc/collections/views/_coll_sel_type.view.php:24
+msgid "Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_sel_type.view.php:46
-msgid "Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time."
+msgid "Standard"
+msgstr ""
+
+#: ../../../inc/collections/views/_coll_sel_type.view.php:47
+msgid "A standard blog with the most common features."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_seo.form.php:57
@@ -8768,11 +8799,11 @@ msgid "Reset"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_type.form.php:46
-msgid "Reset all parameters as for a new blog."
+msgid "Reset all parameters as for a new collection."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_type.form.php:47
-msgid "(Only keep blog name, owner, URL, categories and content)."
+msgid "(Only keep collection name, owner, URL, categories and content)."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_urls.form.php:78
@@ -11229,23 +11260,23 @@ msgstr ""
 msgid "Open in a new window"
 msgstr ""
 
-#: ../../../inc/files/model/_file.class.php:2626
+#: ../../../inc/files/model/_file.class.php:2611
 msgid "Comment "
 msgstr ""
 
-#: ../../../inc/files/model/_file.class.php:2683
+#: ../../../inc/files/model/_file.class.php:2668
 #: ../../../inc/links/model/_link.funcs.php:307
 #: ../../../inc/links/views/_link_list.inc.php:137
 msgid "Locate this directory!"
 msgstr ""
 
-#: ../../../inc/files/model/_file.class.php:2687
+#: ../../../inc/files/model/_file.class.php:2672
 #: ../../../inc/links/model/_link.funcs.php:307
 #: ../../../inc/links/views/_link_list.inc.php:139
 msgid "Locate this file!"
 msgstr ""
 
-#: ../../../inc/files/model/_file.class.php:2888
+#: ../../../inc/files/model/_file.class.php:2873
 #: ../../../inc/items/views/_item_history_compare.view.php:43
 #: ../../../inc/tools/views/_email_sent.view.php:130
 #: ../../../inc/tools/views/_email_sent_details.view.php:38
@@ -11254,7 +11285,7 @@ msgstr ""
 msgid "Deleted user"
 msgstr ""
 
-#: ../../../inc/files/model/_file.class.php:2916
+#: ../../../inc/files/model/_file.class.php:2901
 #, php-format
 msgid "%d times by %s"
 msgstr ""
@@ -11859,7 +11890,7 @@ msgid "Choose File"
 msgstr ""
 
 #: ../../../inc/files/views/_file_browse.view.php:398
-msgid "no file selected"
+msgid "No file selected"
 msgstr ""
 
 #: ../../../inc/files/views/_file_browse.view.php:399
@@ -13507,7 +13538,7 @@ msgid "This is a tinyurl you can copy/paste into twitter, emails and other place
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:7239
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:278
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:279
 #: ../../../skins/bootstrap_forums_skin/index.main.php:51
 #: ../../../skins/bootstrap_forums_skin/index.main.php:179
 #: ../../../skins/bootstrap_forums_skin/index.main.php:285
@@ -13570,8 +13601,8 @@ msgstr ""
 #: ../../../inc/items/model/_itemlight.class.php:518
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:506
 #: ../../../skins/bootstrap_forums_skin/_legend.inc.php:47
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:287
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:298
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:288
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:299
 #: ../../../skins/forums/_legend.inc.php:46 ../skins/pureforums/_legend.inc.php:47
 msgid "Locked"
 msgstr ""
@@ -14519,9 +14550,10 @@ msgstr ""
 msgid "Any"
 msgstr ""
 
+#. TRANS: list of "posts"/"intros"/"custom types"/etc
 #: ../../../inc/items/views/_item_list_table.view.php:65
 #, php-format
-msgid "%s list"
+msgid "\"%s\" list"
 msgstr ""
 
 #: ../../../inc/items/views/_item_list_table.view.php:84
@@ -19580,8 +19612,8 @@ msgstr ""
 #: ../../../skins/blackorange_skin/_skin.class.php:261
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:284
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:285
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:469
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:470
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:471
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:450
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:451
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:463
@@ -21605,56 +21637,56 @@ msgstr ""
 msgid "ANALYZE database tables"
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:148
+#: ../../../inc/tools/views/_misc_tools.view.php:144
+msgid "Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)"
+msgstr ""
+
+#: ../../../inc/tools/views/_misc_tools.view.php:149
 msgid "Cleanup tools"
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:151
+#: ../../../inc/tools/views/_misc_tools.view.php:152
 msgid "Find and delete all orphan Tag entries (not used anywhere) - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:152
+#: ../../../inc/tools/views/_misc_tools.view.php:153
 msgid "Find all broken posts (with no matching Category) + Option to delete with related objects - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:153
+#: ../../../inc/tools/views/_misc_tools.view.php:154
 msgid "Find all broken slugs (with no matching Item) + Option to delete - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:154
+#: ../../../inc/tools/views/_misc_tools.view.php:155
 msgid "Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:155
+#: ../../../inc/tools/views/_misc_tools.view.php:156
 msgid "Find and delete all orphan comment Uploads - Disk &amp; DB."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:156
+#: ../../../inc/tools/views/_misc_tools.view.php:157
 msgid "Find and delete all orphan File objects (with no matching file on disk) - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:157
+#: ../../../inc/tools/views/_misc_tools.view.php:158
 msgid "Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:158
+#: ../../../inc/tools/views/_misc_tools.view.php:159
 msgid "Prune old hits &amp; sessions (includes OPTIMIZE) - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:159
+#: ../../../inc/tools/views/_misc_tools.view.php:160
 msgid "Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:160
+#: ../../../inc/tools/views/_misc_tools.view.php:161
 msgid "Recreate autogenerated excerpts - DB only."
 msgstr ""
 
-#: ../../../inc/tools/views/_misc_tools.view.php:161
-msgid "Convert item content separators to [teaserbreak] and [pagebreak] - DB only."
-msgstr ""
-
 #: ../../../inc/tools/views/_misc_tools.view.php:162
-msgid "Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII) - DB only."
+msgid "Convert item content separators to [teaserbreak] and [pagebreak] - DB only."
 msgstr ""
 
 #: ../../../inc/tools/views/_phpbb_config.form.php:24
@@ -23810,7 +23842,7 @@ msgstr ""
 #: ../../../inc/users/views/_display.form.php:77 ../skins/asevo/_skin.class.php:92
 #: ../../../skins/blackorange_skin/_skin.class.php:103
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:143
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:183
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:184
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:202
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:217
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:122
@@ -23834,7 +23866,7 @@ msgstr ""
 #: ../../../inc/users/views/_display.form.php:126 ../skins/asevo/_skin.class.php:98
 #: ../../../skins/blackorange_skin/_skin.class.php:109
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:149
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:189
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:190
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:208
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:223
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:128
@@ -23853,7 +23885,7 @@ msgstr ""
 #: ../../../inc/users/views/_display.form.php:85 ../skins/asevo/_skin.class.php:97
 #: ../../../skins/blackorange_skin/_skin.class.php:108
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:148
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:188
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:189
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:207
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:222
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:127
@@ -25584,7 +25616,7 @@ msgstr ""
 msgid "Index"
 msgstr ""
 
-#: ../../../inc/widgets/_widgets.funcs.php:166
+#: ../../../inc/widgets/_widgets.funcs.php:162
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:98
 #: ../../../skins/manual/404_not_found.main.php:125
 msgid "Search this manual:"
@@ -28516,7 +28548,7 @@ msgid "Change config"
 msgstr ""
 
 #: ../../../install/_functions_install.php:1416
-msgid "CONVERT DB!"
+msgid "CHECK DB!"
 msgstr ""
 
 #: ../../../install/_functions_install.php:1492
@@ -31030,7 +31062,7 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:91
 #: ../../../skins/blackorange_skin/_skin.class.php:102
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:142
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:182
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:183
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:201
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:216
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:121
@@ -31049,7 +31081,7 @@ msgstr ""
 #: ../../../skins/asevo/_skin.class.php:103
 #: ../../../skins/blackorange_skin/_skin.class.php:114
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:154
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:194
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:195
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:213
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:228
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:133
@@ -31331,7 +31363,7 @@ msgid "Layout Settings"
 msgstr ""
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:139
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:179
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:180
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:198
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:213
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:118
@@ -31352,7 +31384,7 @@ msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_front.disp.php:112
 #: ../../../skins/bootstrap_forums_skin/_posts.disp.php:103
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:287
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:288
 #: ../../../skins/forums/_front.disp.php:56 ../skins/forums/_posts.disp.php:105
 #: ../../../skins/forums/_skin.class.php:292 ../skins/pureforums/_front.disp.php:53
 #: ../../../skins/pureforums/_posts.disp.php:76
@@ -31512,7 +31544,7 @@ msgid "Sticky"
 msgstr ""
 
 #: ../../../skins/bootstrap_forums_skin/_item_list.inc.php:53
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:298
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:299
 #: ../../../skins/forums/_item_list.inc.php:47 ../skins/forums/_skin.class.php:303
 #: ../../../skins/pureforums/_item_list.inc.php:47
 #: ../../../skins/pureforums/_skin.class.php:290
@@ -31601,16 +31633,16 @@ msgstr ""
 msgid "Display banner for \"Public\" posts (posts & comments)"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:278
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:279
 #: ../../../skins/forums/_skin.class.php:283 ../skins/pureforums/_skin.class.php:270
 msgid "Post new topic"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:303
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:304
 msgid "Reply"
 msgstr ""
 
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:303
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:304
 #: ../../../skins/forums/_skin.class.php:308 ../skins/pureforums/_skin.class.php:295
 msgid "Reply to topic"
 msgstr ""
