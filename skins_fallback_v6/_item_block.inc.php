@@ -172,7 +172,8 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 							'link_text_one' => '#',
 							'link_text_more' => '#',
 							'link_title' => '#',
-							'link_class' => 'btn btn-default btn-sm',
+							// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
+							// But why do we even have a comment link on the home page ? (only when logged in)
 						) );
 
 			// Link to comments, trackbacks, etc.:
