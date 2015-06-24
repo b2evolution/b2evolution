@@ -94,7 +94,7 @@ class coll_media_index_Widget extends ComponentWidget
 						'list' => T_('List'),
 						'flow' => T_('Flowing Blocks')
 					),
-				'defaultvalue' => 'grid',
+				'defaultvalue' => 'flow',
 			),
 			'disp_image_title' => array(
 				'label' => T_( 'Display image title' ),
