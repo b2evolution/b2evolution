@@ -1,5 +1,10 @@
 <?php
 /**
+ * ==========================================================
+ * IMPORTANT: do NOT duplicate this file into a custom skin.
+ * If you do, your skin may break at any future core upgrade.
+ * ==========================================================
+ *
  * This is the HTML footer include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:

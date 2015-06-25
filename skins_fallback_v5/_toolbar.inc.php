@@ -1,17 +1,14 @@
 <?php
 /**
+ * ==========================================================
+ * IMPORTANT: do NOT duplicate this file into a custom skin.
+ * If you do, your skin may break at any future core upgrade.
+ * ==========================================================
+ *
  * This is the Evo Toolbar include template.
  *
  * For a quick explanation of b2evo 2.0 skins, please start here:
  * {@link http://b2evolution.net/man/skin-development-primer}
- *
- * This is meant to be included in a page template.
- *
- * @todo dh> with disabled JavaScript the expanded submenu boxes
- *           for "Customize" do not get moved to the correct
- *           place/screen offset.
- *           I think the display of the submenus should get done
- *           only with JS in this case (and not with hover).
  *
  * @package evoskins
  */
