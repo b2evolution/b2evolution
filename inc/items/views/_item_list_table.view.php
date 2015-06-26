@@ -135,7 +135,7 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 				$ItemList->global_icon( T_( 'Create multiple posts...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ityp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
 			}
 			break;
-		}
+	}
 
 	if( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) )
 	{	// We have the permission to create and edit posts with this post type:
