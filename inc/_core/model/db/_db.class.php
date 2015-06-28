@@ -305,7 +305,7 @@ class DB
 	 *    - 'debug_profile_queries': Profile queries? (calls "SHOW PROFILE" after each query)
 	 *    - 'debug_dump_function_trace_for_queries': Collect call stack for queries? (showing where queries have been called)
 	 */
-	function DB( $params )
+	function __construct( $params )
 	{
 		global $debug, $evo_charset;
 
