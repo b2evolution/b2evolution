@@ -126,7 +126,7 @@ class EvoUnitTestCase extends UnitTestCase
 			$expected_connection_charset = $DB->php_to_mysql_charmap($evo_charset);
 			if( $DB->connection_charset != $expected_connection_charset )
 			{
-				echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
+				echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (mysqli::set_charset(%s))',
 					$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
 				// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
 				die();
