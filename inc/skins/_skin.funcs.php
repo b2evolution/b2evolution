@@ -20,10 +20,10 @@ $GLOBALS['debug_skins'] = true;
 
 
 /**
- * Template tag. Initializes internal states for the most common skin displays.
+ * Initialize internal states for the most common skin displays.
  *
- * For more specific skins, this function should not be called and
- * equivalent code should be customized within the skin.
+ * For more specific skins, this function may not be called and
+ * equivalent code may be customized within the skin.
  *
  * @param string What are we going to display. Most of the time the global $disp should be passed.
  */
@@ -67,7 +67,7 @@ function skin_init( $disp )
 
 	global $Messages, $PageCache;
 
-	global $Session;
+	global $Session, $current_User;
 
 	global $search_result_loaded;
 
@@ -502,16 +502,199 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'msgform':
+			// get expected message form type
+			$msg_type = param( 'msg_type', 'string', '' );
+			// initialize
+			$recipient_User = NULL;
+			$Comment = NULL;
+			$allow_msgform = NULL;
+
+			// get possible params
+			$recipient_id = param( 'recipient_id', 'integer', 0, true );
+			$comment_id = param( 'comment_id', 'integer', 0, true );
+			$post_id = param( 'post_id', 'integer', 0, true );
+			$subject = param( 'subject', 'string', '' );
+
+			// try to init recipient_User
+			if( !empty( $recipient_id ) )
+			{
+				$UserCache = & get_UserCache();
+				$recipient_User = & $UserCache->get_by_ID( $recipient_id );
+			}
+			elseif( !empty( $comment_id ) )
+			{ // comment id is set, try to get comment author user
+				$CommentCache = & get_CommentCache();
+				$Comment = $CommentCache->get_by_ID( $comment_id, false );
+
+				if( $Comment = $CommentCache->get_by_ID( $comment_id, false ) )
+				{
+					$recipient_User = & $Comment->get_author_User();
+					if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
+					{ // set allow message form to email because comment author (not registered) accepts email
+						$allow_msgform = 'email';
+						param( 'recipient_address', 'string', $Comment->get_author_email() );
+						param( 'recipient_name', 'string', $Comment->get_author_name() );
+					}
+				}
+			}
+			else
+			{ // Recipient was not defined, try set the blog owner as recipient
+				global $Blog;
+				if( empty( $Blog ) )
+				{ // Blog is not set, this is an invalid request
+					debug_die( 'Invalid send message request!');
+				}
+				$recipient_User = $Blog->get_owner_User();
+			}
+
+			if( $recipient_User )
+			{ // recipient User is set
+				// get_msgform_possibility returns NULL (false), only if there is no messaging option between current_User and recipient user
+				$allow_msgform = $recipient_User->get_msgform_possibility();
+				if( $allow_msgform == 'login' )
+				{ // user must login first to be able to send a message to this User
+					$disp = 'login';
+					param( 'action', 'string', 'req_login' );
+					// override redirect to param
+					param( 'redirect_to', 'url', regenerate_url(), true, true );
+					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
+					{ // Redirect to special blog for messaging actions if it is defined in general settings
+						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
+					}
+					$Messages->add( T_( 'You must log in before you can contact this user' ) );
+				}
+				elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )
+				{ // user is not activated
+					if( $recipient_User->accepts_email() )
+					{ // recipient User accepts email allow to send email
+						$allow_msgform = 'email';
+						$msg_type = 'email';
+						$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
+						$Messages->add( sprintf( T_( 'You must activate your account before you can send a private message to %s. However you can send them an email if you\'d like. <a %s>More info &raquo;</a>' ), $recipient_User->get( 'login' ), $activateinfo_link ), 'warning' );
+					}
+					else
+					{ // Redirect to the activate info page for not activated users
+						$Messages->add( T_( 'You must activate your account before you can contact a user. <b>See below:</b>' ) );
+						header_redirect( get_activate_info_url(), 302 );
+						// will have exited
+					}
+				}
+				elseif( ( $msg_type == 'PM' ) && ( $allow_msgform == 'email' ) )
+				{ // only email is allowed but user expect private message form
+					if( ( !empty( $current_User ) ) && ( $recipient_id == $current_User->ID ) )
+					{
+						$Messages->add( T_( 'You cannot send a private message to yourself. However you can send yourself an email if you\'d like.' ), 'warning' );
+					}
+					else
+					{
+						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
+					}
+				}
+				elseif( ( $msg_type != 'email' ) && ( $allow_msgform == 'PM' ) )
+				{ // private message form should be displayed, change display to create new individual thread with the given recipient user
+					// check if creating new PM is allowed
+					if( check_create_thread_limit( true ) )
+					{ // thread limit reached
+						header_redirect();
+						// exited here
+					}
+
+					// Load classes
+					load_class( 'messaging/model/_thread.class.php', 'Thread' );
+					load_class( 'messaging/model/_message.class.php', 'Message' );
+
+					// Set global variable to auto define the FB autocomplete plugin field
+					$recipients_selected = array( array(
+							'id'    => $recipient_User->ID,
+							'title' => $recipient_User->login,
+						) );
+
+					init_tokeninput_js( 'blog' );
+
+					$disp = 'threads';
+					$edited_Thread = new Thread();
+					$edited_Message = new Message();
+					$edited_Message->Thread = & $edited_Thread;
+					$edited_Thread->recipients = $recipient_User->login;
+					param( 'action', 'string', 'new', true );
+					param( 'thrdtype', 'string', 'individual', true );
+				}
+
+				if( $allow_msgform == 'email' )
+				{ // set recippient user param
+					set_param( 'recipient_id', $recipient_User->ID );
+				}
+			}
+
+			if( $allow_msgform == NULL )
+			{ // should be Prevented by UI
+				if( !empty( $recipient_User ) )
+				{
+					$Messages->add( sprintf( T_( 'The user "%s" does not want to be contacted through the message form.' ), $recipient_User->get( 'login' ) ), 'error' );
+				}
+				elseif( !empty( $Comment ) )
+				{
+					$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
+				}
+
+				$blogurl = $Blog->gen_blogurl();
+				// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
+				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+				header_redirect( $redirect_to, 302 );
+				// exited here
+			}
+
+			if( $allow_msgform == 'PM' || $allow_msgform == 'email' )
+			{ // Some message form is available
+				// Get the suggested subject for the email:
+				if( empty($subject) )
+				{ // no subject provided by param:
+					if( ! empty($comment_id) )
+					{
+						// fp>TODO there should be NO SQL in this file. Make a $ItemCache->get_by_comment_ID().
+						$row = $DB->get_row( '
+							SELECT post_title
+								FROM T_items__item, T_comments
+							 WHERE comment_ID = '.$DB->quote($comment_id).'
+								 AND post_ID = comment_item_ID' );
+
+						if( $row )
+						{
+							$subject = T_('Re:').' '.sprintf( /* TRANS: Used as mail subject; %s gets replaced by an item's title */ T_( 'Comment on %s' ), $row->post_title );
+						}
+					}
+
+					if( empty($subject) && ! empty($post_id) )
+					{
+						// fp>TODO there should be NO SQL in this file. Use $ItemCache->get_by_ID.
+						$row = $DB->get_row( '
+								SELECT post_title
+									FROM T_items__item
+								 WHERE post_ID = '.$post_id );
+						if( $row )
+						{
+							$subject = T_('Re:').' '.$row->post_title;
+						}
+					}
+				}
+				if( $allow_msgform == 'PM' )
+				{
+					$edited_Thread->title = $subject;
+				}
+				else
+				{
+					param( 'subject', 'string', $subject, true );
+				}
+			}
+
 			if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 			{ // Redirect to special blog for messaging actions if it is defined in general settings
 				header_redirect( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ) );
 			}
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-
 			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{	// We prefer robots not to index these pages:
+			{ // We prefer robots not to index these pages:
 				$robots_index = false;
 			}
 			break;
@@ -519,12 +702,366 @@ var downloadInterval = setInterval( function()
 		case 'messages':
 		case 'contacts':
 		case 'threads':
+			switch( $disp )
+			{
+				case 'messages':
+					// Actions ONLY for disp=messages
+
+					// fp> The correct place to get thrd_ID is here, because we want it in redirect_to in case we need to ask for login.
+					$thrd_ID = param( 'thrd_ID', 'integer', '', true );
+
+					if( !is_logged_in() )
+					{ // Redirect to the login page for anonymous users
+						$Messages->add( T_( 'You must log in to read your messages.' ) );
+						header_redirect( get_login_url('cannot see messages'), 302 );
+						// will have exited
+					}
+
+					// check if user status allow to view messages
+					if( !$current_User->check_status( 'can_view_messages' ) )
+					{ // user status does not allow to view messages
+						if( $current_User->check_status( 'can_be_validated' ) )
+						{ // user is logged in but his/her account is not activate yet
+							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
+							header_redirect( get_activate_info_url(), 302 );
+							// will have exited
+						}
+
+						$Messages->add( 'You are not allowed to view Messages!' );
+						header_redirect( $Blog->gen_blogurl(), 302 );
+						// will have exited
+					}
+
+					// check if user permissions allow to view messages
+					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					{ // Redirect to the blog url for users without messaging permission
+						$Messages->add( 'You are not allowed to view Messages!' );
+						header_redirect( $Blog->gen_blogurl(), 302 );
+						// will have exited
+					}
+
+					if( !empty( $thrd_ID ) )
+					{ // if this thread exists and current user is part of this thread update status because won't be any unread messages on this conversation
+						// we need to mark this early to make sure the unread message count will be correct in the evobar
+						mark_as_read_by_user( $thrd_ID, $current_User->ID );
+					}
+
+					if( ( $unsaved_message_params = get_message_params_from_session() ) !== NULL )
+					{ // set Message and Thread saved params from Session
+						global $edited_Message, $action;
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$edited_Message = new Message();
+						$edited_Message->text = $unsaved_message_params[ 'message' ];
+						$edited_Message->original_text = $unsaved_message_params[ 'message_original' ];
+						$edited_Message->set_renderers( $unsaved_message_params[ 'renderers' ] );
+						$edited_Message->thread_ID = $thrd_ID;
+						$action = $unsaved_message_params[ 'action' ];
+					}
+
+					// Include this file to expand/collapse the filters panel when JavaScript is disabled
+					global $inc_path;
+					require_once $inc_path.'_filters.inc.php';
+					break;
+
+				case 'contacts':
+					// Actions ONLY for disp=contacts
+
+					if( !is_logged_in() )
+					{ // Redirect to the login page for anonymous users
+						$Messages->add( T_( 'You must log in to manage your contacts.' ) );
+						header_redirect( get_login_url('cannot see contacts'), 302 );
+						// will have exited
+					}
+
+					if( !$current_User->check_status( 'can_view_contacts' ) )
+					{ // user is logged in, but his status doesn't allow to view contacts
+						if( $current_User->check_status( 'can_be_validated' ) )
+						{ // user is logged in but his/her account was not activated yet
+							// Redirect to the account activation page
+							$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );
+							header_redirect( get_activate_info_url(), 302 );
+							// will have exited
+						}
+
+						// Redirect to the blog url for users without messaging permission
+						$Messages->add( 'You are not allowed to view Contacts!' );
+						$blogurl = $Blog->gen_blogurl();
+						// If it was a front page request or the front page is set to display 'contacts' then we must not redirect to the front page because it is forbidden for the current User
+						$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'contacts' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+						header_redirect( $redirect_to, 302 );
+					}
+
+					if( has_cross_country_restriction( 'any' ) && empty( $current_User->ctry_ID ) )
+					{ // User may browse/contact other users only from the same country
+						$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+						header_redirect( get_user_profile_url() );
+					}
+
+					// Get action parameter from request:
+					$action = param_action();
+
+					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					{ // Redirect to the blog url for users without messaging permission
+						$Messages->add( 'You are not allowed to view Contacts!' );
+						$blogurl = $Blog->gen_blogurl();
+						// If it was a front page request or the front page is set to display 'contacts' then we must not redirect to the front page because it is forbidden for the current User
+						$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'contacts' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+						header_redirect( $redirect_to, 302 );
+						// will have exited
+					}
+
+					switch( $action )
+					{
+						case 'add_user': // Add user to contacts list
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$user_ID = param( 'user_ID', 'integer', 0 );
+							if( $user_ID > 0 )
+							{ // Add user to contacts
+								if( create_contacts_user( $user_ID ) )
+								{ // Add user to the group
+									$group_ID = param( 'group_ID', 'string', '' );
+									if( $result = create_contacts_group_users( $group_ID, $user_ID, 'group_ID_combo' ) )
+									{ // User has been added to the group
+										$Messages->add( sprintf( T_('User has been added to the &laquo;%s&raquo; group.'), $result['group_name'] ), 'success' );
+									}
+									else
+									{ // User has been added ONLY to the contacts list
+										$Messages->add( 'User has been added to your contacts.', 'success' );
+									}
+								}
+								header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+							}
+							break;
+
+						case 'unblock': // Unblock user
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$user_ID = param( 'user_ID', 'integer', 0 );
+							if( $user_ID > 0 )
+							{
+								set_contact_blocked( $user_ID, 0 );
+								$Messages->add( T_('Contact was unblocked.'), 'success' );
+							}
+							break;
+
+						case 'remove_user': // Remove user from contacts group
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$view = param( 'view', 'string', 'profile' );
+							$user_ID = param( 'user_ID', 'integer', 0 );
+							$group_ID = param( 'group_ID', 'integer', 0 );
+							if( $user_ID > 0 && $group_ID > 0 )
+							{ // Remove user from selected group
+								if( remove_contacts_group_user( $group_ID, $user_ID ) )
+								{ // User has been removed from the group
+									if( $view == 'contacts' )
+									{ // Redirect to the contacts list
+										header_redirect( $Blog->get( 'contactsurl', array( 'glue' => '&' ) ) );
+									}
+									else
+									{ // Redirect to the user profile page
+										header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+									}
+								}
+							}
+							break;
+
+						case 'add_group': // Add users to the group
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$group = param( 'group', 'string', '' );
+							$users = param( 'users', 'string', '' );
+
+							if( $result = create_contacts_group_users( $group, $users ) )
+							{	// Users have been added to the group
+								$Messages->add( sprintf( T_('%d contacts have been added to the &laquo;%s&raquo; group.'), $result['count_users'], $result['group_name'] ), 'success' );
+								$redirect_to = $Blog->get( 'contactsurl', array( 'glue' => '&' ) );
+
+								$item_ID = param( 'item_ID', 'integer', 0 );
+								if( $item_ID > 0 )
+								{
+									$redirect_to = url_add_param( $redirect_to, 'item_ID='.$item_ID, '&' );
+								}
+								header_redirect( $redirect_to );
+							}
+							break;
+
+						case 'rename_group': // Rename the group
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$group_ID = param( 'group_ID', 'integer', true );
+
+							if( rename_contacts_group( $group_ID ) )
+							{
+								$item_ID = param( 'item_ID', 'integer', 0 );
+
+								$redirect_to = url_add_param( $Blog->get( 'contactsurl', array( 'glue' => '&' ) ), 'g='.$group_ID, '&' );
+								if( $item_ID > 0 )
+								{
+									$redirect_to = url_add_param( $redirect_to, 'item_ID='.$item_ID, '&' );
+								}
+
+								$Messages->add( T_('The group has been renamed.'), 'success' );
+								header_redirect( $redirect_to );
+							}
+							break;
+
+						case 'delete_group': // Delete the group
+							// Check that this action request is not a CSRF hacked request:
+							$Session->assert_received_crumb( 'messaging_contacts' );
+
+							$group_ID = param( 'group_ID', 'integer', true );
+
+							if( delete_contacts_group( $group_ID ) )
+							{
+								$item_ID = param( 'item_ID', 'integer', 0 );
+
+								$redirect_to = $Blog->get( 'contactsurl', array( 'glue' => '&' ) );
+								if( $item_ID > 0 )
+								{
+									$redirect_to = url_add_param( $redirect_to, 'item_ID='.$item_ID, '&' );
+								}
+
+								$Messages->add( T_('The group has been deleted.'), 'success' );
+								header_redirect( $redirect_to );
+							}
+							break;
+					}
+
+					modules_call_method( 'switch_contacts_actions', array( 'action' => $action ) );
+
+					// Include this file to expand/collapse the filters panel when JavaScript is disabled
+					global $inc_path;
+					require_once $inc_path.'_filters.inc.php';
+					break;
+
+				case 'threads':
+					// Actions ONLY for disp=threads
+
+					if( !is_logged_in() )
+					{ // Redirect to the login page for anonymous users
+						$Messages->add( T_( 'You must log in to read your messages.' ) );
+						header_redirect( get_login_url('cannot see messages'), 302 );
+						// will have exited
+					}
+
+					if( !$current_User->check_status( 'can_view_threads' ) )
+					{ // user status does not allow to view threads
+						if( $current_User->check_status( 'can_be_validated' ) )
+						{ // user is logged in but his/her account is not activate yet
+							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
+							header_redirect( get_activate_info_url(), 302 );
+							// will have exited
+						}
+
+						$Messages->add( 'You are not allowed to view Messages!' );
+
+						$blogurl = $Blog->gen_blogurl();
+						// If it was a front page request or the front page is set to display 'threads' then we must not redirect to the front page because it is forbidden for the current User
+						$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'threads' ) ) ? url_add_param( $blogurl, 'disp=404', '&' ) : $blogurl;
+						header_redirect( $redirect_to, 302 );
+						// will have exited
+					}
+
+					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					{ // Redirect to the blog url for users without messaging permission
+						$Messages->add( 'You are not allowed to view Messages!' );
+						$blogurl = $Blog->gen_blogurl();
+						// If it was a front page request or the front page is set to display 'threads' then we must not redirect to the front page because it is forbidden for the current User
+						$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'threads' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+						header_redirect( $redirect_to, 302 );
+						// will have exited
+					}
+
+					$action = param( 'action', 'string', 'view' );
+					if( $action == 'new' )
+					{ // Before new message form is displayed ...
+						if( has_cross_country_restriction( 'contact' ) && empty( $current_User->ctry_ID ) )
+						{ // Cross country contact restriction is enabled, but user country is not set yet
+							$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+							header_redirect( get_user_profile_url() );
+						}
+						elseif( check_create_thread_limit( true ) )
+						{ // don't allow to create new thread, because the new thread limit was already reached
+							set_param( 'action', 'view' );
+						}
+					}
+
+					// Load classes
+					load_class( 'messaging/model/_thread.class.php', 'Thread' );
+					load_class( 'messaging/model/_message.class.php', 'Message' );
+
+					// Get action parameter from request:
+					$action = param_action( 'view' );
+
+					switch( $action )
+					{
+						case 'new':
+							// Check permission:
+							$current_User->check_perm( 'perm_messaging', 'reply', true );
+
+							global $edited_Thread, $edited_Message;
+
+							$edited_Thread = new Thread();
+							$edited_Message = new Message();
+							$edited_Message->Thread = & $edited_Thread;
+
+							modules_call_method( 'update_new_thread', array( 'Thread' => & $edited_Thread ) );
+
+							if( ( $unsaved_message_params = get_message_params_from_session() ) !== NULL )
+							{ // set Message and Thread saved params from Session
+								$edited_Message->text = $unsaved_message_params[ 'message' ];
+								$edited_Message->original_text = $unsaved_message_params[ 'message_original' ];
+								$edited_Message->set_renderers( $unsaved_message_params[ 'renderers' ] );
+								$edited_Thread->title = $unsaved_message_params[ 'subject' ];
+								$edited_Thread->recipients = $unsaved_message_params[ 'thrd_recipients' ];
+								$edited_Message->Thread = $edited_Thread;
+
+								global $thrd_recipients_array, $thrdtype, $action, $creating_success;
+
+								$thrd_recipients_array = $unsaved_message_params[ 'thrd_recipients_array' ];
+								$thrdtype = $unsaved_message_params[ 'thrdtype' ];
+								$action = $unsaved_message_params[ 'action' ];
+								$creating_success = !empty( $unsaved_message_params[ 'creating_success' ] ) ? $unsaved_message_params[ 'creating_success' ] : false;
+							}
+							else
+							{
+								if( empty( $edited_Thread->recipients ) )
+								{
+									$edited_Thread->recipients = param( 'thrd_recipients', 'string', '' );
+								}
+								if( empty( $edited_Thread->title ) )
+								{
+									$edited_Thread->title = param( 'subject', 'string', '' );
+								}
+							}
+							break;
+
+						default:
+							// Check permission:
+							$current_User->check_perm( 'perm_messaging', 'reply', true );
+							break;
+					}
+
+					// Include this file to expand/collapse the filters panel when JavaScript is disabled
+					global $inc_path;
+					require_once $inc_path.'_filters.inc.php';
+					break;
+			}
+
+			// Actions for disp = messages, contacts, threads:
+
 			if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 			{ // Redirect to special blog for messaging actions if it is defined in general settings
 				header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
 			}
 
-			init_results_js( 'blog' ); // Add functions to work with Results tables
 			// just in case some robot would be logged in:
 			$seo_page_type = 'Messaging module';
 			$robots_index = false;
@@ -536,6 +1073,26 @@ var downloadInterval = setInterval( function()
 		case 'login':
 			global $Plugins, $transmit_hashed_password;
 
+			if( is_logged_in() )
+			{ // User is already logged in
+				if( $current_User->check_status( 'can_be_validated' ) )
+				{ // account is not active yet, redirect to the account activation page
+					$Messages->add( T_( 'You are logged in but your account is not activated. You will find instructions about activating your account below:' ) );
+					header_redirect( get_activate_info_url(), 302 );
+					// will have exited
+				}
+
+				// User is already logged in, redirect to "redirect_to" page
+				$Messages->add( T_( 'You are already logged in.' ), 'note' );
+				$redirect_to = param( 'redirect_to', 'url', NULL );
+				if( empty( $redirect_to ) )
+				{ // If empty redirect to referer page
+					$redirect_to = '';
+				}
+				header_redirect( $redirect_to, 302 );
+				// will have exited
+			}
+
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
@@ -543,13 +1100,6 @@ var downloadInterval = setInterval( function()
 
 			$seo_page_type = 'Login form';
 			$robots_index = false;
-			require_js( 'functions.js', 'blog' );
-
-			$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-			if( $transmit_hashed_password )
-			{ // Include JS for client-side password hashing:
-				require_js( 'build/sha1_md5.bmin.js', 'blog' );
-			}
 			break;
 
 		case 'register':
@@ -589,6 +1139,47 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'activateinfo':
+			if( !is_logged_in() )
+			{ // Redirect to the login page for anonymous users
+				$Messages->add( T_( 'You must log in before you can activate your account.' ) );
+				header_redirect( get_login_url('cannot see messages'), 302 );
+				// will have exited
+			}
+
+			if( !$current_User->check_status( 'can_be_validated' ) )
+			{ // don't display activateinfo screen
+				$after_email_validation = $Settings->get( 'after_email_validation' );
+				if( $after_email_validation == 'return_to_original' )
+				{ // we want to return to original page after account activation
+					// check if Session 'validatemail.redirect_to' param is still set
+					$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+					if( empty( $redirect_to ) )
+					{ // Session param is empty try to get general redirect_to param
+						$redirect_to = param( 'redirect_to', 'url', '' );
+					}
+					else
+					{ // cleanup validateemail.redirect_to param from session
+						$Session->delete('core.validatemail.redirect_to');
+					}
+				}
+				else
+				{ // go to after email validation url which is set in the user general settings form
+					$redirect_to = $after_email_validation;
+				}
+				if( empty( $redirect_to ) || preg_match( '#disp=activateinfo#', $redirect_to ) )
+				{ // redirect_to is pointing to the activate info display or is empty
+					// redirect to referer page
+					$redirect_to = '';
+				}
+
+				if( $current_User->check_status( 'is_validated' ) )
+				{
+					$Messages->add( T_( 'Your account has already been activated.' ) );
+				}
+				header_redirect( $redirect_to, 302 );
+				// will have exited
+			}
+
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
@@ -598,20 +1189,17 @@ var downloadInterval = setInterval( function()
 		case 'profile':
 			init_userfields_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 		case 'avatar':
+			require_js( '#jquery#', 'blog' );
+			require_js( '#jcrop#', 'blog' );
+			require_css( '#jcrop_css#', 'blog' );
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
-			{ // Initialize data for crop action
+			{ // Check data for crop action:
 				global $current_User, $cropped_File;
 				$file_ID = param( 'file_ID', 'integer' );
-				if( $cropped_File = $current_User->get_File_by_ID( $file_ID, $error_code ) )
-				{ // Current user can crops this file
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
-					require_css( '#jcrop_css#', 'blog' );
-				}
-				else
-				{ // Wrong file for cropping
-					unset( $action );
+				if( ! ( $cropped_File = $current_User->get_File_by_ID( $file_ID, $error_code ) ) )
+				{ // Current user cannot crop this file
+					set_param( 'action', '' );
 				}
 			}
 		case 'pwdchange':
@@ -628,21 +1216,132 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'users':
+			if( !is_logged_in() && !$Settings->get( 'allow_anonymous_user_list' ) ) 
+			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
+				$Messages->add( T_( 'You must log in to view the user directory.' ) );
+				header_redirect( get_login_url( 'cannot see user' ), 302 );
+				// will have exited
+			}
+
+			if( is_logged_in() && ( !check_user_status( 'can_view_users' ) ) )
+			{ // user status doesn't permit to view users list
+				if( check_user_status( 'can_be_validated' ) )
+				{ // user is logged in but his/her account is not active yet
+					// Redirect to the account activation page
+					$Messages->add( T_( 'You must activate your account before you can view the user directory. <b>See below:</b>' ) );
+					header_redirect( get_activate_info_url(), 302 );
+					// will have exited
+				}
+
+				// set where to redirect
+				$error_redirect_to = ( empty( $Blog) ? $baseurl : $Blog->gen_blogurl() );
+				$Messages->add( T_( 'Your account status currently does not permit to view the user directory.' ) );
+				header_redirect( $error_redirect_to, 302 );
+				// will have exited
+			}
+
+			if( has_cross_country_restriction( 'users', 'list' ) && empty( $current_User->ctry_ID ) )
+			{ // User may browse other users only from the same country
+				$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+				header_redirect( get_user_profile_url() );
+			}
+
+			// Include this file to expand/collapse the filters panel when JavaScript is disabled
+			global $inc_path;
+			require_once $inc_path.'_filters.inc.php';
+
 			$seo_page_type = 'Users list';
 			$robots_index = false;
-			require_js( '#jqueryUI#', 'blog' );
-			require_css( '#jqueryUI_css#', 'blog' );
-			init_results_js( 'blog' ); // Add functions to work with Results tables
 			break;
 
 		case 'user':
-			$seo_page_type = 'User display';
-			if( is_logged_in() )
-			{	// Used for combo_box contacts groups
-				require_js( 'form_extensions.js', 'blog' );
+			// get user_ID because we want it in redirect_to in case we need to ask for login.
+			$user_ID = param( 'user_ID', 'integer', '', true );
+			// set where to redirect in case of error
+			$error_redirect_to = ( empty( $Blog) ? $baseurl : $Blog->gen_blogurl() );
+
+			if( !is_logged_in() )
+			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
+				$user_available_by_group_level = true;
+				if( ! empty( $user_ID ) )
+				{
+					$UserCache = & get_UserCache();
+					if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
+					{ // If user exists we can check if the anonymous users have an access to view the user by group level limitation
+						$User->get_Group();
+						$user_available_by_group_level = $User->Group->level >= $Settings->get('allow_anonymous_user_level_min') && $User->Group->level <= $Settings->get('allow_anonymous_user_level_max');
+					}
+				}
+
+				if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level || empty( $user_ID ) )
+				{ // If this user is not available for anonymous users
+					$Messages->add( T_('You must log in to view this user profile.') );
+					header_redirect( get_login_url('cannot see user'), 302 );
+					// will have exited
+				}
 			}
-			// Load javascript function to open popup windows fro contacts, report and etc.
-			//load_funcs( 'users/model/_user.funcs.php' );
+
+			if( is_logged_in() && ( !check_user_status( 'can_view_user', $user_ID ) ) )
+			{ // user is logged in, but his/her status doesn't permit to view user profile
+				if( check_user_status('can_be_validated') )
+				{ // user is logged in but his/her account is not active yet
+					// Redirect to the account activation page
+					$Messages->add( T_('You must activate your account before you can view this user profile. <b>See below:</b>') );
+					header_redirect( get_activate_info_url(), 302 );
+					// will have exited
+				}
+
+				$Messages->add( T_('Your account status currently does not permit to view this user profile.') );
+				header_redirect( $error_redirect_to, 302 );
+				// will have exited
+			}
+
+			if( !empty($user_ID) )
+			{
+				$UserCache = & get_UserCache();
+				$User = & $UserCache->get_by_ID( $user_ID, false );
+
+				if( empty( $User ) )
+				{
+					$Messages->add( T_('The requested user does not exist!') );
+					header_redirect( $error_redirect_to );
+					// will have exited
+				}
+
+				if( $User->check_status('is_closed') )
+				{
+					$Messages->add( T_('The requested user account is closed!') );
+					header_redirect( $error_redirect_to );
+					// will have exited
+				}
+
+				if( has_cross_country_restriction( 'any' ) )
+				{
+					if( empty( $current_User->ctry_ID  ) )
+					{ // Current User country is not set
+						$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+						header_redirect( get_user_profile_url() );
+						// will have exited
+					}
+
+					if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
+					{ // Current user country is different then edited user country and cross country user browsing is not enabled.
+						$Messages->add( T_('You don\'t have permission to view this user profile.') );
+						header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );
+						// will have exited
+					}
+				}
+			}
+
+			// Initialize users list from session cache in order to display prev/next links:
+			// It is used to navigate between users
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			global $UserList;
+			$UserList = new UserList();
+			$UserList->memorize = false;
+			$UserList->load_from_Request();
+
+			$seo_page_type = 'User display';
 			break;
 
 		case 'edit':

@@ -3178,11 +3178,6 @@ class Blog extends DataObject
 						require $skin_template_name;
 						exit;
 					}
-					elseif( $global_template_name = skin_fallback_path( $template ) )
-					{ // Display a special template for all skins
-						require $global_template_name;
-						exit;
-					}
 					else
 					{ // Display a template from site skins
 						siteskin_include( $template );

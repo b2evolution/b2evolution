@@ -777,15 +777,25 @@ class Skin extends DataObject
 	 */
 	function display_init( $features = array() )
 	{
-		global $debug, $Messages;
+		global $debug, $Messages, $disp;
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
-			$features = array( 'b2evo_base_css', 'style_css', 'colorbox' );
+			$features = array( 'b2evo_base_css', 'style_css', 'colorbox', 'disp_auto' );
 		}
 
-		foreach( $features as $feature )
+		// "Temporary" patch to at least have disp_auto unless another disp_xxx was specified. Use 'disp_off' to NOT include anuthing.
+		if( !preg_grep( '/disp_.*/', $features ) )
 		{
+			$features[] = 'disp_auto';
+		}
+
+		// We're NOT using foreach so that the array can continue to grow during parsing: (see 'disp_auto')
+		for( $i = 0; isset($features[$i]); $i++ )
+		{
+			// Get next feature to include:
+			$feature = $features[$i];
+
 			switch( $feature ) 
 			{
 				case 'jquery':
@@ -882,9 +892,122 @@ class Skin extends DataObject
 					}
 					break;
 
+				case 'disp_auto':
+					// Automatically add a disp_xxx for current $disp:
+					$features[] = 'disp_'.$disp;
+					break;
+
+				case 'disp_users':
+					// Specific features for disp=users:
+
+					// Used to add new search field "Specific criteria":
+					require_js( '#jqueryUI#', 'blog' );
+					require_css( '#jqueryUI_css#', 'blog' );
+
+					// Require results.css to display thread query results in a table:
+					if( ! in_array( 'bootstrap', $features ) )
+					{ // Only for NON-bootstrap skins
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
+
+					// Require functions.js to show/hide a panel with filters:
+					require_js( 'functions.js', 'blog' );
+
+					// Add functions to work with Results tables:
+// fp>yura: example of what we need this for?
+					init_results_js( 'blog' );
+					break;
+
+				case 'disp_messages':
+					// Specific features for disp=messages:
+
+// fp>yura: what is the following used for?
+					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+
+					// Require results.css to display message query results in a table
+					if( ! in_array( 'bootstrap', $features ) )
+					{ // Only for NON-bootstrap skins
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
+
+					// Require functions.js to show/hide a panel with filters:
+					require_js( 'functions.js', 'blog' );
+
+					// Add functions to work with Results tables:
+// fp>yura: example of what we need this for?
+					init_results_js( 'blog' );
+					break;
+
+				case 'disp_contacts':
+					// Specific features for disp=contacts:
+
+// fp>yura: confirm which combo box?   "Add to new contact group" ?
+					require_js( 'form_extensions.js', 'blog' ); // Used for combo_box
+
+					// Require results.css to display contact query results in a table
+					if( ! in_array( 'bootstrap', $features ) )
+					{ // Only for NON-bootstrap skins
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
+
+					// Require functions.js to show/hide a panel with filters:
+					require_js( 'functions.js', 'blog' );
+
+					// Add functions to work with Results tables
+// fp>yura: example of what we need this for?
+					init_results_js( 'blog' );
+					break;
+
+				case 'disp_threads':
+					// Specific features for disp=threads:
+
+					if( get_param( 'action' ) == 'new' )
+					{ // Used to suggest usernames for the field "Recipients":
+						init_tokeninput_js( 'blog' );
+					}
+
+// fp>yura: what is the following used for?
+					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+
+					// Require results.css to display thread query results in a table:
+					if( ! in_array( 'bootstrap', $features ) )
+					{ // Only for NON-bootstrap skins
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
+
+					// Require functions.js to show/hide a panel with filters:
+					require_js( 'functions.js', 'blog' );
+
+					// Add functions to work with Results tables
+// fp>yura: example of what we need this for?
+					init_results_js( 'blog' );
+					break;
+
+				case 'disp_login':
+					// Specific features for disp=threads:
+
+					global $Settings, $Plugins;
+
+// fp>yura: what is the following used for?
+					require_js( 'functions.js', 'blog' );
+
+					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
+					if( $transmit_hashed_password )
+					{ // Include JS for client-side password hashing:
+						require_js( 'build/sha1_md5.bmin.js', 'blog' );
+					}
+					break;
+
+				case 'disp_msgform':
+					// Specific features for disp=threads:
+
+// fp>yura: what is the following used for?
+					init_ajax_forms( 'blog' ); // auto requires jQuery
+					break;
 
 				default:
-					debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
+					// We no longer want to do this because of 'disp_auto':
+					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
 			}
 		}
 	}

@@ -705,7 +705,7 @@ if( !empty( $skin ) )
 { // We want to display with a skin now:
 	$Timer->resume( 'SKIN DISPLAY' );
 
-	$Debuglog->add('Selected skin: '.$skin, 'skins' );
+	$Debuglog->add( 'Selected skin: '.$skin, 'skins' );
 
 	// Instantiate PageCache:
 	$Timer->resume( 'PageCache' );
@@ -761,40 +761,33 @@ if( !empty( $skin ) )
 					// All others will default to index.main.php
 				);
 
+			// Handle custom templates defined by the Item Type:
 			if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
 			    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) && $ItemType->get( 'template_name' ) != '' )
-			{ // Get template name for the current Item if it is defined by Item Type
+			{ // Get template name for the current Item if it is defined by its Item Type:
 				$disp_handler_custom = $ItemType->get( 'template_name' ).'.main.php';
 
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handler_custom ) )
-				{ // Custom template is found in skin folder
+				{ // Custom template is found in skin folder:
 					$disp_handler_custom_found = true;
 					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom for item type)', 'skins' );
 				}
-				elseif( $disp_handler = skin_fallback_path( $disp_handler_custom ) )
-				{ // Custom template is found only in fallback skin folders
-					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (fallback to custom for item type)', 'skins' );
-				}
 				else
-				{ // No found custom template
+				{ // Custom template not found:
 					$disp_handler = NULL;
 				}
 			}
 
 			if( empty( $disp_handler ) )
-			{ // Set $disp_handler only if it is not defined above
+			{ // Set $disp_handler only if it is not defined above:
 				if( ! empty( $disp_handlers[ $disp ] ) )
 				{
 					if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
-					{ // The skin has a customized page handler for this display:
+					{ // The current skin has a customized page handler for this disp:
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this skin)', 'skins' );
 					}
-					elseif( $disp_handler = skin_fallback_path( $disp_handlers[ $disp ] ) )
-					{ // Skins have a general page handler for this display:
-						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (for CSS include -- added in v 4.1)', 'skins' );
-					}
 					else
-					{ // Use the default handler from the skins dir:
+					{ // Fallback to the default "index" handler from the current skin dir:
 						$disp_handler = $ads_current_skin_path.'index.main.php';
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler)', 'skins' );
 					}
