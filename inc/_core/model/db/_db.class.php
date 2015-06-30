@@ -1223,11 +1223,11 @@ class DB
 
 	/**
 	 * Format a SQL query
-	 * @static
+	 *
 	 * @param string SQL
 	 * @param boolean Format with/for HTML?
 	 */
-	function format_query( $sql, $html = true, $maxlen = NULL )
+	static function format_query( $sql, $html = true, $maxlen = NULL )
 	{
 		$sql = trim( str_replace("\t", '  ', $sql ) );
 		if( $maxlen )
@@ -1346,8 +1346,8 @@ class DB
 				$div_id = 'db_query_sql_'.$i.'_'.$get_md5_query();
 				if( strlen($query['sql']) > 512 )
 				{
-					$sql_short = $this->format_query( $query['sql'], true, 512 );
-					$sql = $this->format_query( $query['sql'], true );
+					$sql_short = DB::format_query( $query['sql'], true, 512 );
+					$sql = DB::format_query( $query['sql'], true );
 
 					echo '<code id="'.$div_id.'" style="display:none">'.$sql_short.'</code>';
 					echo '<code id="'.$div_id.'_full">'.$sql.'</code>';
@@ -1355,14 +1355,14 @@ class DB
 				}
 				else
 				{
-					echo '<code>'.$this->format_query( $query['sql'] ).'</code>';
+					echo '<code>'.DB::format_query( $query['sql'] ).'</code>';
 				}
 				echo "\n";
 			}
 			else
 			{
 				echo '= Query #'.$count_queries.': '.$query['title']." =\n";
-				echo $this->format_query( $query['sql'], false )."\n\n";
+				echo DB::format_query( $query['sql'], false )."\n\n";
 			}
 
 			// Color-Format duration: long => red, fast => green, normal => black
@@ -1738,8 +1738,6 @@ class DB
 		$r = true;
 		if( $charset != $this->connection_charset )
 		{
-			// mysqli::set_charset is not supported by MySQL 3.23 and for a non-supported charset even not in MySQL 5 probably..
-
 			$save_show_errors = $this->show_errors;
 			$save_halt_on_error = $this->halt_on_error;
 			$this->show_errors = false;
