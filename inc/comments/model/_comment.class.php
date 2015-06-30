@@ -3772,6 +3772,15 @@ class Comment extends DataObject
 				}
 				// Also update new post
 				$update_item_last_touched_date = true;
+
+				// Also move all child comments to new post
+				$child_comment_IDs = $this->get_child_comment_IDs();
+				if( count( $child_comment_IDs ) )
+				{
+					$DB->query( 'UPDATE T_comments
+						  SET comment_item_ID = '.$DB->quote( $this->item_ID ).'
+						WHERE comment_ID IN ( '.$DB->quote( $child_comment_IDs ).' )' );
+				}
 			}
 
 			$this->update_last_touched_date( $update_item_last_touched_date );
@@ -4100,6 +4109,43 @@ class Comment extends DataObject
 	function is_meta()
 	{
 		return $this->type == 'meta';
+	}
+
+
+	/**
+	 * Get all child comment IDs
+	 *
+	 * @param integer Parent comment ID
+	 * @return array Comment IDs
+	 */
+	function get_child_comment_IDs( $parent_comment_ID = NULL )
+	{
+		global $DB;
+
+		if( $parent_comment_ID === NULL )
+		{ // Use current comment ID as main parent ID
+			$parent_comment_ID = $this->ID;
+		}
+
+		// Get child comment of level 1
+		$comments_SQL = new SQL();
+		$comments_SQL->SELECT( 'comment_ID' );
+		$comments_SQL->FROM( 'T_comments' );
+		$comments_SQL->WHERE( 'comment_in_reply_to_cmt_ID = '.$parent_comment_ID );
+		$parent_comment_IDs = $DB->get_col( $comments_SQL->get() );
+
+		$comment_IDs = array();
+		foreach( $parent_comment_IDs as $comment_ID )
+		{ // Get all children recursively
+			$comment_IDs[] = $comment_ID;
+			$child_comment_IDs = $this->get_child_comment_IDs( $comment_ID );
+			foreach( $child_comment_IDs as $child_comment_ID )
+			{
+				$comment_IDs[] = $child_comment_ID;
+			}
+		}
+
+		return $comment_IDs;
 	}
 }
 
