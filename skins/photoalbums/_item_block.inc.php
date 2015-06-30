@@ -134,7 +134,7 @@ function change_position_nav()
 
 var $nav = jQuery( '.nav_album' );
 var nav_size = $nav.size();
-var nav_top = <?php echo ( is_logged_in() ? 23 : 0 ) ; ?>;
+var nav_top = <?php echo ( show_toolbar() ? 23 : 0 ) ; ?>;
 var $navSpacer = $( '<div />', {
 		'class':  'nav_album_spacer',
 		'height': $nav.outerHeight( true ),
