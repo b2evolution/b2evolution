@@ -39,7 +39,7 @@ if( empty( $curr_Item ) )
 		$curr_Item->title( array(
 				'before'          => $params['before_title'],
 				'after'           => $params['after_title'].$item_edit_link.'<div class="clear"></div>',
-				'before_title'    => get_icon( 'post' ),
+				'before_title'    => get_icon( 'file_message' ),
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',

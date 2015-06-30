@@ -13,6 +13,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+global $hide_widget_container;
+
 ?>
 
 	</main>
@@ -36,6 +38,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	<!-- =================================== START OF FOOTER =================================== -->
 	<div class="col-md-12 center">
 
+		<?php
+		if( empty( $hide_widget_container['footer'] ) )
+		{ // Display 'Footer' widget container
+		?>
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
@@ -47,6 +53,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
 		</div>
+		<?php } ?>
 
 		<p>
 			<?php

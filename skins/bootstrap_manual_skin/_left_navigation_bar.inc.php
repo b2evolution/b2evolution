@@ -13,13 +13,17 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Settings, $Session;
+global $Settings, $Session, $hide_widget_container;
 ?>
 <!-- =================================== START OF SIDEBAR =================================== -->
 <aside class="col-md-3 pull-left">
 
 	<div id="evo_container__sidebar">
 
+		<?php
+		if( empty( $hide_widget_container['sidebar'] ) )
+		{ // Display 'Sidebar' widget container
+		?>
 		<div class="evo_container evo_container__sidebar">
 		<?php
 			// <div data-spy="affix" data-offset-top="165" class="affix_block">
@@ -49,14 +53,19 @@ global $Settings, $Session;
 					// Widget 'Content Hierarchy':
 					'item_before_opened'   => get_icon( 'collapse' ),
 					'item_before_closed'   => get_icon( 'expand' ),
-					'item_before_post'     => get_icon( 'post' ),
+					'item_before_post'     => get_icon( 'file_message' ),
 					'expand_all'           => false,
 					'sorted'               => true
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 
+		<?php
+		if( empty( $hide_widget_container['sidebar2'] ) )
+		{ // Display 'Sidebar' widget container
+		?>
 		<div class="evo_container evo_container__sidebar2">
 		<?php
 			// <div data-spy="affix" data-offset-top="165" class="affix_block">
@@ -86,13 +95,14 @@ global $Settings, $Session;
 					// Widget 'Content Hierarchy':
 					'item_before_opened'   => get_icon( 'collapse' ),
 					'item_before_closed'   => get_icon( 'expand' ),
-					'item_before_post'     => get_icon( 'post' ),
+					'item_before_post'     => get_icon( 'file_message' ),
 					'expand_all'           => false,
 					'sorted'               => true
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 
 		<?php
 			// Please help us promote b2evolution and leave this logo on your blog:

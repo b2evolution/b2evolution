@@ -47,7 +47,7 @@ skin_widget( array(
 		'class_selected'       => '',
 		'item_before_opened'   => get_icon( 'collapse' ),
 		'item_before_closed'   => get_icon( 'expand' ),
-		'item_before_post'     => get_icon( 'post' ),
+		'item_before_post'     => get_icon( 'file_message' ),
 	) );
 // ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
 

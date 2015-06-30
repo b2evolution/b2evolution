@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Skin, $hide_widget_container_menu;
+global $app_version, $disp, $Skin, $hide_widget_container;
 
 if( version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
@@ -19,8 +19,15 @@ if( version_compare( $app_version, '6.4' ) < 0 )
 }
 
 
-// Hide the widget container "Menu"
-$hide_widget_container_menu = true;
+// Hide the widget containers depending on skin settings
+$hide_widget_container = array(
+		'header'   => ! $Skin->is_visible_container( 'header' ),
+		'page_top' => ! $Skin->is_visible_container( 'page_top' ),
+		'menu'     => ! $Skin->is_visible_container( 'menu' ),
+		'sidebar'  => ! $Skin->is_visible_container( 'sidebar' ),
+		'sidebar2' => ! $Skin->is_visible_container( 'sidebar2' ),
+		'footer'   => ! $Skin->is_visible_container( 'footer' ),
+	);
 
 global $bootstrap_manual_posts_text;
 
