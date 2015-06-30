@@ -157,28 +157,19 @@ class pureforums_Skin extends Skin
 	{
 		global $disp;
 
-		// Load Font Awesome:
-		require_css( 'http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css' );
-
-		// Add CSS:
-		// require_css( 'basic_styles.css', 'blog' ); // the REAL basic styles
-		// require_css( 'basic.css', 'blog' ); // Basic styles
-		// require_css( 'blog_base.css', 'blog' ); // Default styles for the blog navigation
-		// require_css( 'item_base.css', 'blog' ); // Default styles for the post CONTENT
-		// require_css( 'b2evo_base.bundle.css', 'blog' ); // Concatenation of the above
-		require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
+		parent::display_init( array(
+				'font_awesome',   // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
+				'b2evo_base_css', // Include the b2evo_base CSS (OLD / v5 style) - Use this when you DON'T use Bootstrap:
+				'colorbox',       // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
+				'disp_auto',		// Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
+			) );
 
 		// require_css( 'pureforums_header.css', 'relative' );
 		// require_css( 'pureforums_main.css', 'relative' );
 		// require_css( 'pureforums_footer.css', 'relative' );
 		// require_css( 'pureforums.bundle.css', 'relative' ); // Concatenation of the above
 		require_css( 'pureforums.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
-
-		// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
-		if( $this->get_setting( 'colorbox' ) )
-		{
-			require_js_helper( 'colorbox', 'blog' );
-		}
 
 		if( $this->get_setting( 'width_switcher' ) )
 		{ // Functions to switch between the width sizes
