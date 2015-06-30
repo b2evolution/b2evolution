@@ -215,15 +215,15 @@ function tool_create_sample_users( $group_ID, $num_users )
 	$count = 1;
 	for( $i = 1; $i <= $num_users; $i++ )
 	{
-		$login = generate_random_key( rand(3, 20), 'abcdefghijklmnopqrstuvwxyz1234567890' );
+		$login = generate_random_passwd();
 		while( user_exists( $login ) )
 		{ // Generate new unique login
-			$login = generate_random_key( rand(3, 20), 'abcdefghijklmnopqrstuvwxyz1234567890' );
+			$login = generate_random_passwd();
 		}
 
 		$User = new User();
 		// Create out of range hashes for better security
-		$User->set( 'pass', generate_random_key( 32, 'abcdefghijklmnopqrstuvwxyz1234567890' ) );
+		$User->set( 'pass', generate_random_passwd() );
 		$User->set( 'login', $login );
 		$User->set( 'email', 'test_'.$i.'@test.com' );
 		$User->set( 'firstname', 'Test user '.$i );
