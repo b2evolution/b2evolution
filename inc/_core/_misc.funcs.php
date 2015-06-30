@@ -212,7 +212,7 @@ function shutdown()
 	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
 	if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
 	{ // Autopruning is requested
-		load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
+		load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 		Hitlist::dbprune(); // will prune once per day, according to Settings
 	}
 
@@ -6944,6 +6944,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
 	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
+	var style_body_height = height.match( /px/i ) ? ' style="height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
 	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
 
 	if( typeof( buttons ) != 'undefined' && buttons != '' )
@@ -6977,7 +6978,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 					'<h4 class="modal-title">' + title + '</h4>' +
 				'</div>';
 		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + '>' + body_html + '</div>';
+		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html + '</div>';
 
 		if( use_buttons )
 		{

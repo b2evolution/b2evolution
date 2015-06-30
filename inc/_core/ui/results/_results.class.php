@@ -2079,7 +2079,7 @@ class Results extends Table
 			$page_size_options = $default_page_size_option + $page_size_options;
 		}
 
-		$html = '<small>';
+		$html = '<small class="page_size_selector">';
 		$html .= T_('Lines per page:');
 
 		$html .= ' <select name="'.$this->limit_param.'" onchange="location.href=\''.regenerate_url( $this->page_param.','.$this->limit_param, $this->limit_param, $page_url ).'=\'+this.value" class="form-control input-sm">';

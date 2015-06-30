@@ -2711,6 +2711,12 @@ function display_activateinfo( $params )
 
 	if( $current_User->grp_ID == 1 )
 	{ // allow admin users to validate themselves by a single click:
+		global $Session, $redirect_to;
+
+		if( empty( $redirect_to ) )
+		{ // Set where to redirect
+			$redirect_to = regenerate_url();
+		}
 
 		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 

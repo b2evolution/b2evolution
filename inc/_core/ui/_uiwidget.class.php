@@ -76,21 +76,23 @@ class Widget
 	 * @param integer 1-5: weight of the icon. the icon will be displayed only if its weight is >= than the user setting threshold
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
+	 * @param string Group name is used to group several buttons in one as dropdown button for bootstrap skins
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array() )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
 	{
 		$link_attribs = array_merge( array(
 				'class' => 'action_icon'
 			), $link_attribs );
 
 		$this->global_icons[] = array(
-			'title' => $title,
-			'icon'  => $icon,
-			'url'   => $url,
-			'word'  => $word,
+			'title'        => $title,
+			'icon'         => $icon,
+			'url'          => $url,
+			'word'         => $word,
 			'icon_weight'  => $icon_weight,
 			'word_weight'  => $word_weight,
-			'link_attribs' => $link_attribs );
+			'link_attribs' => $link_attribs,
+			'group'        => $group );
 	}
 
 
@@ -216,7 +218,9 @@ class Widget
 	 */
 	function gen_global_icons()
 	{
-		$r = '';
+		global $AdminUI;
+
+		$icons = array();
 
 		foreach( $this->global_icons as $icon_params )
 		{
@@ -232,8 +236,43 @@ class Widget
 				}
 				$icon_params['link_attribs']['class'] = ( empty( $icon_params['link_attribs']['class'] ) ? '' : $icon_params['link_attribs']['class'].' ' ).$global_icons_class;
 			}
-			$r .= action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
+			if( $icon_params['group'] != NULL && isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+			{ // It is a groupped button for bootstrap skin
+				if( ! isset( $icons[ $icon_params['group'] ] ) )
+				{ // Initialize an array for grouped icons
+					$icons[ $icon_params['group'] ] = array();
+				}
+				$icons[ $icon_params['group'] ][] = $icon_params;
+			}
+			else
+			{ // Separated icon
+				$icons[] = action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
 						$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] );
+			}
+		}
+
+		$r = '';
+		foreach( $icons as $icon )
+		{
+			if( is_array( $icon ) && count( $icon ) )
+			{ // Grouped icons
+				$first_icon = $icon[0];
+				$r .= '<div class="btn-group dropdown">';
+				$r .= '<a href="'.$first_icon['url'].'" class="btn btn-sm btn-default" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
+				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+							.' <span class="caret"></span></button>';
+				$r .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
+				foreach( $icon as $grouped_icon )
+				{
+					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.$grouped_icon['title'].'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+				}
+				$r .= '</ul>';
+				$r .= '</div>';
+			}
+			else
+			{ // Separated icon
+				$r .= $icon;
+			}
 		}
 
 		return $r;
