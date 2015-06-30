@@ -54,18 +54,18 @@ code {
 	display: none;
 }
 */
+.absolute_center {
+  display: block;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 /* I DON'T THINK THESE APPLY TO ANYTHING
 .indented {
 	margin-left: 3em;
-}
-.absolute_center {
-	display: block;
-	margin: auto;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
 }
 .border {
 	border: 1px solid #000;
@@ -1081,7 +1081,9 @@ table.widget_grid {
   display: -webkit-flex;
   display: flex;
   flex-flow: row wrap;
+  -webkit-flex-flow: row wrap;
   justify-content: space-around;
+  -webkit-justify-content: space-around;
 }
 .widget_flow_blocks div,
 table.widget_grid div {
@@ -1552,7 +1554,7 @@ a.btn.action_icon.hoverlink {
 }
 .form-horizontal .controls input.large,
 .form-horizontal .controls textarea.form_textarea_input {
-  width: 97%;
+  width: 100%;
 }
 .form-horizontal .radio-group .controls > .help-inline {
   padding-top: 10px;
@@ -1677,10 +1679,12 @@ a.btn.action_icon.hoverlink {
 .form-inline .form-control.large {
   width: 97%;
 }
-.form-inline .form-group {
+.form-inline .form-group,
+.form-inline #criteria_type_A2 {
   margin-top: 2px;
 }
-.form-inline .form-group.large {
+.form-inline .form-group.large,
+.form-inline #criteria_type_A2.large {
   width: 100%;
 }
 #register_form div#ffield_m {
@@ -1784,6 +1788,18 @@ div.results .table-bordered th.lastcol {
 }
 div.results .table-bordered th {
   border-bottom: none;
+}
+div.results .page_size_selector {
+  margin-bottom: 5px;
+  display: block;
+}
+div.results .page_size_selector select.form-control {
+  display: inline-block;
+  width: auto;
+}
+div.results .pagination {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 div.filters {
   margin-bottom: 0;
@@ -1909,6 +1925,9 @@ select:focus:invalid:focus {
 }
 .panel-heading .btn {
   margin: -6px 0 0 6px;
+}
+.panel-heading .btn-group {
+  margin-left: 6px;
 }
 legend.panel-heading {
   font-size: 16px;

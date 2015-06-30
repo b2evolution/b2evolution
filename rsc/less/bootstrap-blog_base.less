@@ -25,9 +25,11 @@ main .well {
 	}
 }
 .post_tags {
-	margin: 15px 0px;
+	margin: 15px 0px 10px 0px;
 	a {
+		display: inline-block;
 		padding: 3px 5px;
+		margin-bottom: 5px;
 		background: #eee;
 		.border-radius;
 		color: black;
@@ -71,7 +73,7 @@ table.bCalendarTable caption {
 	white-space: nowrap;
 }
 table.bCalendarTable {
-	margin: 0 auto 1em auto;
+	margin: 15px auto;
 	font-size: 77%;
 	border-collapse: separate;
 	border-spacing: 0px;
@@ -96,6 +98,7 @@ td.bCalendarEmptyCell {
 #bCalendarToday {
 	background-color: #f6eeee;
 	border: 1px solid #900;
+	.border-radius;
 }
 
 /* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
@@ -452,6 +455,9 @@ table.catselect {
 	tbody tr.group.catselect_blog__current td {
 		background: #31b0d5;
 		color: #FFF;
+	}
+	.catsel_name label {
+		font-weight: normal;
 	}
 }
 
@@ -850,7 +856,7 @@ input.btn-lg {
 	}
 }
 @media (max-width: 375px) {
-	.evo_form .control-buttons .submit { // Separates form buttons on low resolution when they are not inline
+	.evo_form .control-buttons .submit, .evo_form .control-buttons .preview { // Separates form buttons on low resolution when they are not inline
 		margin-bottom: 4px;
 	}
 }

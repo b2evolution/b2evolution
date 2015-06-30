@@ -72,8 +72,11 @@ background:#ee8;
 }
 */
 .widget_container li.droppable-hover {
-	border-top: 2px solid #f00;
-	padding-top: 1px;
+	border-bottom: 2px solid #f00;
+	padding-bottom: 1px;
+}
+#current_widgets div.ui-droppable.droppable-hover {
+	border-bottom: 2px solid #f00;
 }
 
 .add_widget{

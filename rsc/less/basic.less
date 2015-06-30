@@ -753,10 +753,22 @@ table.widget_grid .note {
 	margin: 0;
 }
 // Flow blocks (Used on media index widget)
-.widget_flow_blocks > div {
-	display: inline-block;
-	margin: 2px;
-	padding: 0;
+.widget_flow_blocks, table.widget_grid {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	flex-flow: row wrap;
+	-webkit-flex-flow: row wrap;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	div {
+		margin-bottom: 15px;
+		&:last-child {
+			margin-bottom: 0px !important;
+		}
+	}
 }
 .widget_flow_blocks > div img {
 	border-radius: 3px;

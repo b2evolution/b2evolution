@@ -101,7 +101,7 @@ a.btn.action_icon {
 		}
 		// Every textareas and spec inputs should be full width
 		input.large, textarea.form_textarea_input {
-			width: 97%;
+			width: 100%;
 		}
 	}
 	.radio-group .controls > .help-inline {
@@ -236,7 +236,7 @@ a.btn.action_icon {
 			width: 97%;
 		}
 	}
-	.form-group {
+	.form-group, #criteria_type_A2 {
 		margin-top: 2px;
 		&.large {
 			width: 100%;
@@ -348,6 +348,18 @@ div.results {
 		th {
 			border-bottom: none;
 		}
+	}
+	.page_size_selector {
+		margin-bottom: 5px;
+		display: block;
+		select.form-control {
+			display: inline-block;
+			width: auto;
+		}
+	}
+	.pagination {
+		margin-top: 5px;
+		margin-bottom: 5px;
 	}
 }
 // Filters in results table
@@ -494,6 +506,9 @@ select:focus:invalid:focus {
 	}
 	.btn {
 		margin: -6px 0 0 6px;
+	}
+	.btn-group {
+		margin-left: 6px;
 	}
 }
 legend.panel-heading {

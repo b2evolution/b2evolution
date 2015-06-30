@@ -15,10 +15,12 @@ main .well header .small.text-muted a {
   color: inherit;
 }
 .post_tags {
-  margin: 15px 0px;
+  margin: 15px 0px 10px 0px;
 }
 .post_tags a {
+  display: inline-block;
   padding: 3px 5px;
+  margin-bottom: 5px;
   background: #eee;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -59,7 +61,7 @@ table.bCalendarTable caption {
   white-space: nowrap;
 }
 table.bCalendarTable {
-  margin: 0 auto 1em auto;
+  margin: 15px auto;
   font-size: 77%;
   border-collapse: separate;
   border-spacing: 0px;
@@ -84,6 +86,11 @@ td.bCalendarEmptyCell {
 #bCalendarToday {
   background-color: #f6eeee;
   border: 1px solid #900;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
 }
 /* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
 td#prev,
@@ -405,6 +412,9 @@ table.catselect #new_category_name {
 table.catselect tbody tr.group.catselect_blog__current td {
   background: #31b0d5;
   color: #FFF;
+}
+table.catselect .catsel_name label {
+  font-weight: normal;
 }
 .raty_star_on,
 .raty_star_off,
@@ -795,7 +805,8 @@ input.btn-lg {
   }
 }
 @media (max-width: 375px) {
-  .evo_form .control-buttons .submit {
+  .evo_form .control-buttons .submit,
+  .evo_form .control-buttons .preview {
     margin-bottom: 4px;
   }
 }
