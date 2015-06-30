@@ -62,7 +62,6 @@ if( ! empty( $legend_icons ) || ! empty( $legend_statuses ) )
 foreach( $legends as $l => $legend )
 { // Print out all legends
 ?>
-<div class="legend">
 	<?php
 	foreach( $legend as $legend_key => $legend_data )
 	{ // Display legend icon with description
@@ -77,7 +76,6 @@ foreach( $legends as $l => $legend )
 		}
 	}
 	?>
-</div>
 <?php } ?>
 
 <?php

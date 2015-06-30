@@ -153,12 +153,15 @@ siteskin_include( '_site_body_header.inc.php' );
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
 					'block_start' => '<div class="action_messages">',
 					'block_end'   => '</div>',
 				) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
+		}
 		?>
 
 		<?php
@@ -236,8 +239,8 @@ siteskin_include( '_site_body_header.inc.php' );
 						'page_current_template' => '<span><b>$page_num$</b></span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
-						'prev_text'             => '&lt;&lt;',
-						'next_text'             => '&gt;&gt;',
+						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'

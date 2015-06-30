@@ -229,8 +229,8 @@ elseif( isset( $current_Chapter ) )
 				'page_current_template' => '<span><b>$page_num$</b></span>',
 				'page_item_before'      => '<li>',
 				'page_item_after'       => '</li>',
-				'prev_text'             => '&lt;&lt;',
-				'next_text'             => '&gt;&gt;',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>

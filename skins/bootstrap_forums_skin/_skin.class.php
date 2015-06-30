@@ -188,7 +188,7 @@ class bootstrap_forums_Skin extends Skin
 					'bubbletip' => array(
 						'label' => T_('Username bubble tips'),
 						'note' => T_('Check to enable bubble tips on usernames'),
-						'defaultvalue' => 1,		// On the forums skin, we want to enable this! 
+						'defaultvalue' => 1,		// On the forums skin, we want to enable this!
 						'type' => 'checkbox',
 					),
 					'autocomplete_usernames' => array(
@@ -198,6 +198,25 @@ class bootstrap_forums_Skin extends Skin
 						'type' => 'checkbox',
 					),
 				'section_username_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+
+				'section_access_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('When access requires login...')
+				),
+					'access_login' => array(
+						'label' => T_('Display on login screen'),
+						'note' => '',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),    1 ),
+							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
+							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
+						),
+				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -309,46 +328,6 @@ class bootstrap_forums_Skin extends Skin
 		{ // Display button
 			return '<div class="post_button btn-group">'.$post_button.'</div>';
 		}
-	}
-
-	/**
-	 * Get chapters
-	 *
-	 * @param integer Chapter parent ID
-	 */
-	function get_chapters( $parent_ID = 0 )
-	{
-		global $Blog, $skin_chapters_cache;
-
-		if( isset( $skin_chapters_cache ) )
-		{ // Get chapters from cache
-			return $skin_chapters_cache;
-		}
-
-		$ChapterCache = & get_ChapterCache();
-		$ChapterCache->reveal_children( $Blog->ID, true );
-
-		$skin_chapters_cache = array();
-		if( $parent_ID > 0 )
-		{ // Get children of selected chapter
-			$ChapterCache = & get_ChapterCache();
-			$parent_Chapter = $ChapterCache->get_by_ID( $parent_ID );
-			$parent_Chapter->sort_children();
-			foreach( $parent_Chapter->children as $Chapter )
-			{ // Iterate through childrens or the given parent Chapter
-				$skin_chapters_cache[$Chapter->ID] = $ChapterCache->get_by_ID( $Chapter->ID );
-				$Chapter->sort_children();
-			}
-		}
-		else
-		{ // Get the current blog root chapters
-			foreach( $ChapterCache->subset_root_cats[ $Blog->ID] as $Chapter )
-			{
-				$skin_chapters_cache[$Chapter->ID] = $Chapter;
-			}
-		}
-
-		return $skin_chapters_cache;
 	}
 
 
@@ -716,6 +695,21 @@ class bootstrap_forums_Skin extends Skin
 				// Delegate to parent class:
 				return parent::get_template( $name );
 		}
+	}
+
+
+	/**
+	 * Check if we can display a widget container
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @param string Skin setting name
+	 * @return boolean TRUE to display
+	 */
+	function is_visible_container( $container_key, $setting_name = 'access_login' )
+	{
+		$access = $this->get_setting( $setting_name );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 }

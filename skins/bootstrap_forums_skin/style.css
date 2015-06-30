@@ -315,12 +315,15 @@ ol.breadcrumb {
 .legends legend {
   text-align: center;
   border: none;
+  font-variant: small-caps;
 }
-.legend {
+.legend,
+.legend-item {
   text-align: center;
-  margin: 20px auto;
+  margin: 0 auto 20px;
 }
-.legend div {
+.legend div,
+.legend-item div {
   padding: 0 20px 0 5px;
   display: inline-block;
 }
@@ -331,7 +334,7 @@ ul.legend {
   padding: 0;
 }
 ul.legend.evo_posts.evo_forums {
-  margin: 10px 0;
+  margin: 0 auto 20px;
 }
 ul.legend li {
   list-style: none;

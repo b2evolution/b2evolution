@@ -44,6 +44,10 @@ siteskin_include( '_site_body_header.inc.php' );
 <header class="row">
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+		<?php
+		if( $Skin->is_visible_container( 'page_top' ) )
+		{ // Display 'Page Top' widget container
+		?>
 		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
@@ -61,9 +65,14 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 	</div><!-- .col -->
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+		<?php
+		if( $Skin->is_visible_container( 'header' ) )
+		{ // Display 'Header' widget container
+		?>
 		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
@@ -78,9 +87,45 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 	</div><!-- .col -->
 
 </header><!-- .row -->
+
+
+<?php
+if( $Skin->is_visible_container( 'menu' ) )
+{ // Display 'Menu' widget container
+?>
+<nav class="row">
+
+	<div class="col-xs-12">
+		<ul class="nav nav-tabs evo_container evo_container__menu">
+		<?php
+			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			// Note: this container is designed to be a single <ul> list
+			skin_container( NT_('Menu'), array(
+					// The following params will be used as defaults for widgets included in this container:
+					'block_start'         => '',
+					'block_end'           => '',
+					'block_display_title' => false,
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => '<li class="evo_widget $wi_class$">',
+					'item_end'            => '</li>',
+					'item_selected_start' => '<li class="active evo_widget $wi_class$">',
+					'item_selected_end'   => '</li>',
+					'item_title_before'   => '',
+					'item_title_after'    => '',
+				) );
+			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+		?>
+		</ul>
+	</div><!-- .col -->
+
+</nav><!-- .row -->
+<?php } ?>
 
 
 <div class="row">
@@ -128,6 +173,10 @@ siteskin_include( '_site_body_header.inc.php' );
 	<!-- =================================== START OF FOOTER =================================== -->
 	<div class="col-md-12 center">
 
+		<?php
+		if( $Skin->is_visible_container( 'footer' ) )
+		{ // Display 'Footer' widget container
+		?>
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
@@ -139,6 +188,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
 		</div>
+		<?php } ?>
 
 		<p>
 			<?php
