@@ -4033,35 +4033,14 @@ class User extends DataObject
 			global $thumbnail_sizes;
 			if( isset( $thumbnail_sizes[ $thumb_size ] ) )
 			{ // Set a sizes
-				$thumb_width = $thumbnail_sizes[ $thumb_size ][1];
-				$thumb_height = $thumbnail_sizes[ $thumb_size ][2];
-				if( is_null( $File ) )
-				{ // Use the size of thumbnail config if File is not defined
-					$width = $thumb_width;
-					$height = $thumb_height;
+				if( ! is_null( $File ) && $thumb_sizes = $File->get_thumb_size( $thumb_size ) )
+				{ // Get sizes that are used for thumbnail really
+					list( $width, $height ) = $thumb_sizes;
 				}
 				else
-				{ // Try to calculate what sizes are used for thumbnail really
-					list( $orig_width, $orig_height ) = $File->get_image_size( 'widthheight' );
-
-					load_funcs('files/model/_image.funcs.php');
-					if( check_thumbnail_sizes( $thumbnail_sizes[ $thumb_size ][0], $thumb_width, $thumb_height, $orig_width, $orig_height ) )
-					{ // Use the sizes of the original image
-						$width = $orig_width;
-						$height = $orig_height;
-					}
-					else
-					{ // Calculate the sizes depending on thumbnail type
-						if( $thumbnail_sizes[ $thumb_size ][0] == 'fit' )
-						{
-							list( $width, $height ) = scale_to_constraint( $orig_width, $orig_height, $thumb_width, $thumb_height );
-						}
-						else
-						{ // crop & crop-top
-							$width = $thumb_width;
-							$height = $thumb_height;
-						}
-					}
+				{ // Use the size of thumbnail config if File is not defined
+					$width = $thumbnail_sizes[ $thumb_size ][1];
+					$height = $thumbnail_sizes[ $thumb_size ][2];
 				}
 			}
 		}

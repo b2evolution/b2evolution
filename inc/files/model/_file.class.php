@@ -2174,6 +2174,51 @@ class File extends DataObject
 
 
 	/**
+	 * Calculate what sizes are used for thumbnail really
+	 *
+	 * @param string Thumbnail size name
+	 * @return boolean|array FALSE on wrong size name OR Array with keys: 0 - width, 1 - height
+	 */
+	function get_thumb_size( $size_name = 'fit-80x80' )
+	{
+		global $thumbnail_sizes;
+
+		if( ! isset( $thumbnail_sizes[ $size_name ] ) )
+		{ // Wrong thumbnail size name
+			return false;
+		}
+
+		$thumb_type = $thumbnail_sizes[ $size_name ][0];
+		$thumb_width = $thumbnail_sizes[ $size_name ][1];
+		$thumb_height = $thumbnail_sizes[ $size_name ][2];
+
+		load_funcs('files/model/_image.funcs.php');
+
+		list( $orig_width, $orig_height ) = $this->get_image_size( 'widthheight' );
+
+		if( check_thumbnail_sizes( $thumb_type, $thumb_width, $thumb_height, $orig_width, $orig_height ) )
+		{ // Use the sizes of the original image
+			$width = $orig_width;
+			$height = $orig_height;
+		}
+		else
+		{ // Calculate the sizes depending on thumbnail type
+			if( $thumb_type == 'fit' )
+			{
+				list( $width, $height ) = scale_to_constraint( $orig_width, $orig_height, $thumb_width, $thumb_height );
+			}
+			else
+			{ // crop & crop-top
+				$width = $thumb_width;
+				$height = $thumb_height;
+			}
+		}
+
+		return array( $width, $height );
+	}
+
+
+	/**
 	 * Returns an array of things like:
 	 * - src
 	 * - title
@@ -2229,6 +2274,11 @@ class File extends DataObject
 				&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
 			{ // no error, add width and height attribs
 				$img_attribs += $size_arr;
+			}
+			elseif( $thumb_sizes = $this->get_thumb_size( $size_name ) )
+			{ // Get sizes that are used for thumbnail really
+				$img_attribs['width'] = $thumb_sizes[0];
+				$img_attribs['height'] = $thumb_sizes[1];
 			}
 		}
 

@@ -1169,9 +1169,6 @@ switch( $action )
 			break;
 		}
 
-		require_js( '#jcrop#', 'blog', false, true );
-		require_css( '#jcrop_css#', 'blog', NULL, NULL, '#', true );
-
 		$BlogCache = &get_BlogCache();
 		$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 		$skin_ID = $Blog->get_skin_ID();

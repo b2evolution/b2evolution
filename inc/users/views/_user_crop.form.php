@@ -122,7 +122,7 @@ $Form->begin_fieldset( T_('Crop profile picture').$close_icon, array( 'class' =>
 $cropped_image_tag = $cropped_File->get_tag( '', '', '', '', 'original', '' );
 
 echo '<p class="crop_button top">';
-$Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton' ) );
+$Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton btn-primary' ) );
 echo '</p>';
 
 echo '<div id="image_crop_block"'.( ( ! is_admin_page() && $display_mode != 'js' ) ? ' class="short_width"' : '' ).'><div>';
@@ -143,7 +143,7 @@ echo '</div>';
 echo '</div></div>';
 
 echo '<p class="crop_button bottom" style="display:none">';
-$Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton' ) );
+$Form->button( array( 'submit', 'actionArray[crop]', T_('Crop'), 'SaveButton btn-primary' ) );
 echo '</p>';
 
 $Form->end_fieldset();
@@ -238,10 +238,14 @@ function init_jcrop_tool( image_obj )
 	} );
 
 	// Display the crop elements only after initialization
-	jQuery( '.preview_cropped_images, .crop_button' ).show();
+	jQuery( '.preview_cropped_images' ).show();
 	if( jQuery( '#modal_window' ).length > 0 )
-	{
+	{ // Crop button on bootstrap skins
 		jQuery( '#modal_window .modal-footer button[type=submit]' ).attr( 'style', 'display:inline-block !important' );
+	}
+	else
+	{ // Crop button on other skins
+		jQuery( '.crop_button' ).show();
 	}
 }
 

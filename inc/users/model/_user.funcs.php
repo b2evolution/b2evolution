@@ -4182,9 +4182,12 @@ echo_modalwindow_js();
 		{
 			user_tab_from = 'avatar';
 		}
-		var window_width = jQuery( window ).width();
+		var width = jQuery( window ).width();
+		width = ( width > 750 ) ? 750 : ( ( width < 320 ) ? 320 : width );
+		var height = jQuery( window ).height() - 35;
+		height = ( height > 750 ) ? 750 : ( ( height < 320 ) ? 320 : height );
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-			'auto', '', true,
+			width+'px', height+'px', true,
 			'<?php echo TS_('Crop profile picture'); ?>',
 			[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ], true );
 		jQuery.ajax(
@@ -4196,14 +4199,14 @@ echo_modalwindow_js();
 				<?php echo $ajax_params; ?>
 				'user_ID': user_ID,
 				'file_ID': file_ID,
-				'window_width'  : Math.round( window_width > 790 ? ( window_width * 0.9 - 128 ): window_width ),
-				'window_height' : Math.round( jQuery( window ).height() * 0.8 ),
+				'window_width'  : width - 187,
+				'window_height' : height - 187,
 				'display_mode': 'js',
 				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 			},
 			success: function( result )
 			{
-				openModalWindow( result, 'auto', '',true,
+				openModalWindow( result, width+'px', height+'px', true,
 				'<?php echo TS_('Crop profile picture'); ?>',
 				[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ] );
 			}

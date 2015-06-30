@@ -754,12 +754,16 @@ if( $display_mode != 'js')
 		case 'profile':
 			$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+			require_js( '#jcrop#', 'rsc_url' );
+			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'avatar':
 			if( isset($GLOBALS['files_Module']) )
 			{
 				$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			}
+			require_js( '#jcrop#', 'rsc_url' );
+			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'pwdchange':
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
@@ -973,10 +977,10 @@ switch( $action )
 					break;
 				}
 
-				require_js( '#jcrop#', 'rsc_url', false, true );
-				require_css( '#jcrop_css#', 'rsc_url', NULL, NULL, '#', true );
 				if( $display_mode != 'js')
 				{
+					require_js( '#jcrop#', 'rsc_url' );
+					require_css( '#jcrop_css#', 'rsc_url' );
 					$AdminUI->disp_payload_begin();
 				}
 				$window_width = param( 'window_width', 'integer' );
