@@ -233,6 +233,26 @@ class bootstrap_main_Skin extends Skin
 				'4_end' => array(
 					'layout' => 'end_fieldset',
 				),
+
+
+				'section_access_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('When access requires login...')
+				),
+					'access_login_containers' => array(
+						'label' => T_('Display on login screen'),
+						'note' => '',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),    1 ),
+							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
+// missing menu container , default 0
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) 
+							),
+						),
+				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -709,6 +729,21 @@ class bootstrap_main_Skin extends Skin
 				// Delegate to parent class:
 				return parent::get_template( $name );
 		}
+	}
+
+
+	/**
+	 * Check if we can display a widget container
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @param string Skin setting name
+	 * @return boolean TRUE to display
+	 */
+	function is_visible_container( $container_key, $setting_name = 'access_login_containers' )
+	{
+		$access = $this->get_setting( $setting_name );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 }

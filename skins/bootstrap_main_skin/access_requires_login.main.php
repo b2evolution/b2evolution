@@ -52,6 +52,10 @@ echo '</div>';
 <header class="row">
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+		<?php
+// disabled because implementation is broken:	if( $Skin->is_visible_container( 'page_top' ) )
+		{ // Display 'Page Top' widget container
+		?>
 		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
@@ -69,9 +73,14 @@ echo '</div>';
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 	</div><!-- .col -->
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+		<?php
+//		if( $Skin->is_visible_container( 'header' ) )
+		{ // Display 'Header' widget container
+		?>
 		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
@@ -86,6 +95,7 @@ echo '</div>';
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
 		</div>
+		<?php } ?>
 	</div><!-- .col -->
 
 </header><!-- .row -->
@@ -142,6 +152,10 @@ echo '</div>';
 
 		<footer class="col-md-12 center">
 	
+			<?php
+//			if( $Skin->is_visible_container( 'footer' ) )
+			{ // Display 'Footer' widget container
+			?>
 			<div class="evo_container evo_container__footer">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
@@ -152,6 +166,7 @@ echo '</div>';
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
 			</div>
+			<?php } ?>
 	
 			<p>
 			<?php
