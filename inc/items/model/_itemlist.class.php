@@ -291,7 +291,7 @@ class ItemList2 extends ItemListLight
 									.$this->ItemQuery->get_order_by()
 									.$this->ItemQuery->get_limit();
 
-		// echo $DB->format_query( $step1_sql );
+		// echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
 		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'ItemList2::Query() Step 1: Get ID list' ) );
@@ -309,7 +309,7 @@ class ItemList2 extends ItemListLight
 			$this->sql .= ' WHERE 0';
 		}
 
-		//echo $DB->format_query( $this->sql );
+		//echo DB::format_query( $this->sql );
 
 		// ATTENTION: we skip the parent on purpose here!! fp> refactor
 		DataObjectList2::query( false, false, false, 'ItemList2::Query() Step 2' );
@@ -850,7 +850,7 @@ class ItemList2 extends ItemListLight
 									.$next_Query->get_order_by()
 									.$next_Query->get_limit();
 
-		//echo $DB->format_query( $step1_sql );
+		//echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
 		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );

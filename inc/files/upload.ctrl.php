@@ -82,13 +82,14 @@ $ads_list_path = false; // false by default, gets set if we have a valid root
  */
 $fm_FileRoot = NULL;
 
-$FileRootCache = & get_FileRootCache();
+load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 
-$available_Roots = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
 
-if( ! empty($root) )
+if( ! empty( $root ) )
 { // We have requested a root folder by string:
-	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
+	$FileRootCache = & get_FileRootCache();
+	$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
 	if( ! $fm_FileRoot || !isset( $available_Roots[$fm_FileRoot->ID] ) || !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones. If avatar upload is in progress, the edited user root doesn't have to be available.

@@ -211,7 +211,11 @@ class FileRoot
 	}
 
 	/**
-	 * @static
+	 * Generate ID for File Root
+	 *
+	 * @param string Root type: 'user', 'shared', 'collection', 'skins', 'import'
+	 * @param integer Root ID
+	 * @return string
 	 */
 	static function gen_ID( $root_type, $root_in_type_ID )
 	{

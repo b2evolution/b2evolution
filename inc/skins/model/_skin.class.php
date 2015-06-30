@@ -508,7 +508,9 @@ class Skin extends DataObject
 	 *
 	 * Including for NON installed skins.
 	 *
-	 * @static
+	 * @param string Skin folder
+	 * @param string Skin name
+	 * @param array Params
 	 */
 	static function disp_skinshot( $skin_folder, $skin_name, $disp_params = array() )
 	{

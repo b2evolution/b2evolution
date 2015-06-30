@@ -3,7 +3,6 @@
 
 // by Edd Dumbill (C) 1999-2002
 // <edd@usefulinc.com>
-// $Id: _xmlrpcs.inc.php 4151 2013-07-05 22:29:35Z fplanque $
 
 // Copyright (c) 1999,2000,2002 Edd Dumbill.
 // All rights reserved.
@@ -608,18 +607,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		*/
 		function service($data=null, $return_payload=false)
 		{
-			if ($data === null)
+			if( $data === null )
 			{
-				// workaround for a known bug in php ver. 5.2.2 that broke $HTTP_RAW_POST_DATA
-				$ver = phpversion();
-				if ($ver[0] >= 5)
-				{
-					$data = file_get_contents('php://input');
-				}
-				else
-				{
-					$data = isset($GLOBALS['HTTP_RAW_POST_DATA']) ? $GLOBALS['HTTP_RAW_POST_DATA'] : '';
-				}
+				$data = file_get_contents( 'php://input' );
 			}
 			$raw_data = $data;
 
@@ -949,12 +939,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		*/
 		function parseRequest($data, $req_encoding='')
 		{
-			// 2005/05/07 commented and moved into caller function code
-			//if($data=='')
-			//{
-			//	$data=$GLOBALS['HTTP_RAW_POST_DATA'];
-			//}
-
 			// G. Giunta 2005/02/13: we do NOT expect to receive html entities
 			// so we do not try to convert them into xml character entities
 			//$data = xmlrpc_html_entity_xlate($data);
@@ -1280,8 +1264,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		*/
 		function echoInput()
 		{
-			$r=new xmlrpcresp(new xmlrpcval( "'Aha said I: '" . $GLOBALS['HTTP_RAW_POST_DATA'], 'string'));
-			print $r->serialize();
 		}
 	}
 

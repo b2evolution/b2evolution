@@ -833,8 +833,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	// ________________________ Handle Roots ______________________
 	if( $Root === NULL )
 	{ // We want to list all roots:
-		$FileRootCache = & get_FileRootCache();
-		$_roots = $FileRootCache->get_available_FileRoots();
+		$_roots = FileRootCache::get_available_FileRoots();
 
 		foreach( $_roots as $l_Root )
 		{
@@ -1209,9 +1208,7 @@ function file_controller_build_tabs()
  */
 function rename_cachefolders( $oldname, $newname )
 {
-	$FileRootCache = & get_FileRootCache();
-
-	$available_Roots = $FileRootCache->get_available_FileRoots();
+	$available_Roots = FileRootCache::get_available_FileRoots();
 
 	$slash_oldname = '/'.$oldname;
 

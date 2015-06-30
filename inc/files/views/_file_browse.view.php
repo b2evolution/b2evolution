@@ -19,10 +19,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $fm_Filelist;
 /**
- * @var FileRootCache
- */
-global $FileRootCache;
-/**
  * @var string
  */
 global $fm_flatmode;
@@ -163,7 +159,7 @@ if( isset( $edited_User ) )
 				// $Form->hidden_ctrl();
 				$Form->hiddens_by_key( get_memorized() );
 
-				$rootlist = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
+				$rootlist = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
 				if( count($rootlist) > 1 )
 				{ // provide list of roots to choose from
 					?>

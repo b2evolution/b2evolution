@@ -584,19 +584,17 @@ class PageCache
 	/**
 	 * Check if the file with the given file path should be removed during prune page cache
 	 *
-	 * @static
-	 *
 	 * @param $file_path
 	 * @return boolean true if the file should be removed, false otherwise
 	 */
-	function checkDelete( $file_path )
+	static function checkDelete( $file_path )
 	{
 		if( strpos( $file_path, 'CVS' ) !== false )
 		{ // skip CVS folders - This could be more specific
 			return false;
 		}
 		// get file name from path
-		$file_name = basename($file_path);
+		$file_name = basename( $file_path );
 
 		// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
 		if( ( $file_name == 'index.html' ) || ( substr( $file_name, 0, 1 ) == '.' ) || ( $file_name == 'sample.htaccess' ) )
@@ -619,12 +617,10 @@ class PageCache
 	/**
 	 * Delete those files from the given directory, which results true value on checkDelete function
 	 *
-	 * @static
-	 *
 	 * @param string directory path
 	 * @param string the first error occured deleting the directory content
 	 */
-	function deleteDirContent( $path, & $first_error )
+	static function deleteDirContent( $path, & $first_error )
 	{
 		$path = trailing_slash( $path );
 
@@ -669,11 +665,9 @@ class PageCache
 	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively)
 	 * except index.html files and hiddenfiles (starting with .)
 	 *
-	 * @static
-	 *
 	 * @return string empty string on success, error message otherwise.
 	 */
-	function prune_page_cache()
+	static function prune_page_cache()
 	{
 		global $cache_path;
 

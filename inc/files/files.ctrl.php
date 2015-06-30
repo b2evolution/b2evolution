@@ -146,7 +146,7 @@ $fm_FileRoot = NULL;
 
 $FileRootCache = & get_FileRootCache();
 
-$available_Roots = $FileRootCache->get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:

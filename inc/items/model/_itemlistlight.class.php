@@ -770,7 +770,7 @@ class ItemListLight extends DataObjectList2
 									.$this->ItemQuery->get_order_by()
 									.$this->ItemQuery->get_limit();
 
-		// echo $DB->format_query( $this->sql );
+		// echo DB::format_query( $this->sql );
 
 		parent::query( false, false, false, 'ItemListLight::query()' );
 	}

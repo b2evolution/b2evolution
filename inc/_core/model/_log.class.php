@@ -166,7 +166,6 @@ class Log
 	/**
 	 * Get head/foot for a specific category, designed for internal use of {@link display()}
 	 *
-	 * @static
 	 * @access private
 	 *
 	 * @param mixed head or foot (array [ category => head/foot, category => 'string', 'template',
@@ -174,7 +173,7 @@ class Log
 	 * @param string the category (or container)
 	 * @param string template, where the head/foot gets used (%s)
 	 */
-	function get_head_foot( $headfoot, $category, $template = NULL )
+	static function get_head_foot( $headfoot, $category, $template = NULL )
 	{
 		if( is_string($headfoot) && $category == 'container' )
 		{ // container head or foot

@@ -96,11 +96,11 @@ switch( $action )
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune( $date ) )
 		{
-			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date) ), 'success' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date ) ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date ) ), 'note' );
 		}
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=stats&blog='.$blog, 303 ); // Will EXIT

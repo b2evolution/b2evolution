@@ -792,10 +792,9 @@ class CommentList2 extends DataObjectList2
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
-	 * @static
 	 * @return string Empty, if ok.
 	 */
-	function dbprune()
+	static function dbprune()
 	{
 		/**
 		 * @var DB

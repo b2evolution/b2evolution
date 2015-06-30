@@ -323,8 +323,8 @@ function output_image( $imh, $mimetype )
  * It is useful to fix thumbnail sizes for images less than requested thumbnail
  *
  * @param string Thumbnail type ('crop'|'crop-top'|'fit')
- * @param integer Thumbnail width
- * @param integer Thumbnail height
+ * @param integer Thumbnail width (by reference)
+ * @param integer Thumbnail height (by reference)
  * @param integer Original image width
  * @param integer Original image height
  * @return boolean TRUE if no need to resample

@@ -3053,9 +3053,11 @@ class Item extends ItemLight
 	 */
 	function & get_placeholder_File( $video_File )
 	{
+		$r = NULL;
+
 		if( empty( $video_File ) )
 		{ // No File for placeholder
-			return NULL;
+			return $r;
 		}
 
 		if( ! isset( $this->placeholder_FileList ) )
@@ -3063,7 +3065,7 @@ class Item extends ItemLight
 			$LinkOwner = new LinkItem( $this );
 			if( ! $this->placeholder_FileList = & $LinkOwner->get_attachment_FileList( 1000 ) )
 			{ // No attached files
-				return NULL;
+				return $r;
 			}
 		}
 
@@ -3082,7 +3084,7 @@ class Item extends ItemLight
 			}
 		}
 
-		return NULL;
+		return $r;
 	}
 
 

@@ -23,38 +23,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class Hitlist
 {
-
-
-	/**
-	 * Delete a hit.
-	 *
-	 * @static
-	 * @param int ID to delete
-	 * @return mixed Return value of {@link DB::query()}
-	 */
-	function delete( $hit_ID )
-	{
-		global $DB;
-
-		return $DB->query( "DELETE FROM T_hitlog WHERE hit_ID = $hit_ID", 'Delete a hit' );
-	}
-
-
 	/**
 	 * Delete all hits for a specific date
 	 *
-	 * @static
 	 * @param int unix timestamp to delete hits for
 	 * @return mixed Return value of {@link DB::query()}
 	 */
-	function prune( $date )
+	static function prune( $date )
 	{
 		global $DB;
 
-		$iso_date = date ('Y-m-d', $date);
-		$sql = "
-			DELETE FROM T_hitlog
-			 WHERE DATE_FORMAT(hit_datetime,'%Y-%m-%d') = '$iso_date'";
+		$sql = 'DELETE FROM T_hitlog
+			WHERE DATE_FORMAT( hit_datetime, "%Y-%m-%d" ) = '.$DB->quote( date( 'Y-m-d', $date ) );
 
 		return $DB->query( $sql, 'Prune hits for a specific date' );
 	}
@@ -63,20 +43,19 @@ class Hitlist
 	/**
 	 * Change type for a hit
 	 *
-	 * @static
 	 * @param int ID to change
 	 * @param string new type, must be valid ENUM for hit_referer_type field
 	 * @return mixed Return value of {@link DB::query()}
 	 */
-	function change_type( $hit_ID, $type )
+	static function change_type( $hit_ID, $type )
 	{
 		global $DB;
 
 		$sql = '
 				UPDATE T_hitlog
-				   SET hit_referer_type = '.$DB->quote($type).",
-				       hit_datetime = hit_datetime " /* prevent mySQL from updating timestamp */ ."
-				 WHERE hit_ID = $hit_ID";
+				   SET hit_referer_type = '.$DB->quote( $type ).',
+				       hit_datetime = hit_datetime ' /* prevent mySQL from updating timestamp */ .'
+				 WHERE hit_ID = '.$DB->quote( $hit_ID );
 		return $DB->query( $sql, 'Change type for a specific hit' );
 	}
 
@@ -91,13 +70,12 @@ class Hitlist
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
-	 * @static
 	 * @return array array(
 	 *   'result'  => 'error' | 'ok'
 	 *   'message' => Message of the error or result data
 	 * )
 	 */
-	function dbprune()
+	static function dbprune()
 	{
 		/**
 		 * @var DB

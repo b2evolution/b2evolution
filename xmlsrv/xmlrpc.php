@@ -27,13 +27,6 @@ if( isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST' )
 // Disable Cookies
 $_COOKIE = array();
 
-if( ! isset($HTTP_RAW_POST_DATA) )
-{
-	$HTTP_RAW_POST_DATA = implode("\r\n", file('php://input'));
-}
-// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '<?xml' isn't on the very first line
-$HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
-
 
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';

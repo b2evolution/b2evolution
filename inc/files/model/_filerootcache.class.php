@@ -39,27 +39,27 @@ class FileRootCache
 	 * @todo fp> it would probably make sense to refactor this as the constructor for the file roots
 	 * and initialize the whole cache at construction time
 	 *
-	 * @static
-	 *
 	 * @param string Special file root ID (Used e.g. to view file root of the special user)
 	 * @return array of FileRoots (key being the FileRoot's ID)
 	 */
-	function get_available_FileRoots( $special_root_ID = NULL )
+	static function get_available_FileRoots( $special_root_ID = NULL )
 	{
 		global $current_User;
 		global $collections_Module;
 
 		$r = array();
 
+		$FileRootCache = & get_FileRootCache();
+
 		if( ! empty( $special_root_ID ) &&
-		    ( $special_FileRoot = & $this->get_by_ID( $special_root_ID, true ) ) &&
+		    ( $special_FileRoot = & $FileRootCache->get_by_ID( $special_root_ID, true ) ) &&
 		    $current_User->check_perm( 'files', 'edit', false, $special_FileRoot ) )
 		{ // Try to add special file root if current user has an access
 			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
 		}
 
 		// The user's blog (if available) is the default/first one:
-		$user_FileRoot = & $this->get_by_type_and_ID( 'user', $current_User->ID, true );
+		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $current_User->ID, true );
 		if( $user_FileRoot )
 		{ // We got a user media dir:
 			$r[ $user_FileRoot->ID ] = & $user_FileRoot;
@@ -71,7 +71,7 @@ class FileRootCache
 			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
 			foreach( $bloglist as $blog_ID )
 			{
-				if( $Root = & $this->get_by_type_and_ID( 'collection', $blog_ID, true ) )
+				if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID, true ) )
 				{
 					$r[ $Root->ID ] = & $Root;
 				}
@@ -79,7 +79,7 @@ class FileRootCache
 		}
 
 		// Shared root:
-		$shared_FileRoot = & $this->get_by_type_and_ID( 'shared', 0, true );
+		$shared_FileRoot = & $FileRootCache->get_by_type_and_ID( 'shared', 0, true );
 		if( $shared_FileRoot )
 		{ // We got a shared dir:
 			$r[ $shared_FileRoot->ID ] = & $shared_FileRoot;
@@ -87,7 +87,7 @@ class FileRootCache
 
 		if( isset($collections_Module) )
 		{ // Skins root:
-			$skins_FileRoot = & $this->get_by_type_and_ID( 'skins', 0, false );
+			$skins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'skins', 0, false );
 			if( $skins_FileRoot )
 			{ // We got a skins dir:
 				$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
@@ -95,7 +95,7 @@ class FileRootCache
 		}
 
 		// Import root:
-		$import_FileRoot = & $this->get_by_type_and_ID( 'import', 0, true );
+		$import_FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', 0, true );
 		if( $import_FileRoot )
 		{ // We got an import dir:
 			$r[ $import_FileRoot->ID ] = & $import_FileRoot;

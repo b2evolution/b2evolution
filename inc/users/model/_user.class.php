@@ -4789,14 +4789,16 @@ class User extends DataObject
 		{ // user is only allowed to update him/herself
 			$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
 			$error_code = 'only_own_profile';
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( empty( $file_ID ) )
 		{ // File ID is empty
 			$Messages->add( T_('You did not specify a file.'), 'error' );
 			$error_code = 'wrong_file';
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		$FileCache = & get_FileCache();
@@ -4805,14 +4807,16 @@ class User extends DataObject
 		{ // File does't exist
 			$Messages->add( T_('The requested file does not exist!'), 'error' );
 			$error_code = 'wrong_file';
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( $File->_FileRoot->type != 'user' || ( $File->_FileRoot->in_type_ID != $this->ID && ! $can_moderate_user ) )
 		{ // don't allow use the pictures from other users
 			$Messages->add( T_('The requested file doesn\'t belong to this user.'), 'error' );
 			$error_code = 'other_user';
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		return $File;

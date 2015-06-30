@@ -1597,7 +1597,7 @@ class Form extends Widget
 		$field_class = ' class="'.$field_class.'"';
 
 		// Display <select> with periods values
-		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.$this->get_valid_id($field_prefix).'_value"'.$field_class.'>';
+		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
 		$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).">---</option>\n";
 		foreach( $periods_values as $period_value )
 		{
@@ -1606,7 +1606,7 @@ class Form extends Widget
 		$r .= '</select>'."\n";
 
 		// Display <select> with periods titles
-		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.$this->get_valid_id($field_prefix).'_name"'.$field_class.'>';
+		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
 		$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).">---</option>\n";
 		foreach( $periods as $period )
 		{
@@ -2507,14 +2507,14 @@ class Form extends Widget
 
 	/**
 	 * Get the OPTION list as string for use in a SELECT.
-	 * @static
+	 *
 	 * @param array Options (key => value)
 	 * @param string Selected value (if any)
 	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
 	 *                which are strings will be used).
 	 * @return string
 	 */
-	function get_select_options_string($field_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false)
+	static function get_select_options_string($field_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false)
 	{
 		$r = '';
 
@@ -3307,7 +3307,7 @@ class Form extends Widget
 			if( ! isset( $loop_radio['name'] ) )  $loop_radio['name'] = $field_name;
 			if( ! isset( $loop_radio['id'] ) )
 			{ // build unique id:
-				$loop_radio['id'] = $this->get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
+				$loop_radio['id'] = Form::get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
 			}
 
 			if( isset($loop_radio['checked']) )
@@ -3705,10 +3705,9 @@ class Form extends Widget
 	/**
 	 * Convert a given string (e.g. fieldname) to a valid HTML id.
 	 *
-	 * @static
 	 * @return string
 	 */
-	function get_valid_id( $id )
+	static function get_valid_id( $id )
 	{
 		static $id_count = 0;
 		if( substr( $id, -2 ) == '[]' )
@@ -3878,7 +3877,7 @@ class Form extends Widget
 									&& $field_params['type'] != 'submit'
 									) )
 				{ // Save ID with field_params and _common_params (for get_label())
-					$field_params['id'] = $this->_common_params['id'] = $this->get_valid_id($field_params['name']);
+					$field_params['id'] = $this->_common_params['id'] = Form::get_valid_id( $field_params['name'] );
 				}
 			}
 			else
