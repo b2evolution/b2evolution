@@ -73,13 +73,16 @@ class bootstrap_blog_Skin extends Skin
 						'note' => '',
 						'defaultvalue' => 'right_sidebar',
 						'options' => array(
-								'single_column' => T_('Single column'),
-								'left_sidebar'  => T_('Left Sidebar'),
-								'right_sidebar' => T_('Right Sidebar'),
+								'single_column'              => T_('Single Column Large'),
+								'single_column_normal'       => T_('Single Column'),
+								'single_column_narrow'       => T_('Single Column Narrow'),
+								'single_column_extra_narrow' => T_('Single Column Extra Narrow'),
+								'left_sidebar'               => T_('Left Sidebar'),
+								'right_sidebar'              => T_('Right Sidebar'),
 							),
 						'type' => 'select',
 					),
-				'section_username_end' => array(
+				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -157,6 +160,27 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'checkbox',
 					),
 				'section_username_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+
+				'section_access_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('When access requires login...')
+				),
+					'access_login_containers' => array(
+						'label' => T_('Display on login screen'),
+						'note' => '',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),    1 ),
+							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
+							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
+							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
+							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
+						),
+				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -532,6 +556,71 @@ class bootstrap_blog_Skin extends Skin
 		}
 	}
 
+
+	/**
+	 * Check if we can display a widget container
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @param string Skin setting name
+	 * @return boolean TRUE to display
+	 */
+	function is_visible_container( $container_key, $setting_name = 'access_login_containers' )
+	{
+		$access = $this->get_setting( $setting_name );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+	}
+
+
+	/**
+	 * Check if we can display a sidebar for the current layout
+	 *
+	 * @return boolean TRUE to display a sidebar
+	 */
+	function is_visible_sidebar()
+	{
+		$layout = $this->get_setting( 'layout' );
+
+		return ( $layout == 'left_sidebar' || $layout == 'right_sidebar' );
+	}
+
+
+	/**
+	 * Get value for attbiute "class" of column block
+	 * depending on skin setting "Layout"
+	 *
+	 * @return string
+	 */
+	function get_column_class()
+	{
+		switch( $this->get_setting( 'layout' ) )
+		{
+			case 'single_column':
+				// Single Column Large
+				return 'col-md-12';
+
+			case 'single_column_normal':
+				// Single Column
+				return 'col-xs-12 col-sm-12 col-md-12 col-lg-10 col-lg-offset-1';
+
+			case 'single_column_narrow':
+				// Single Column Narrow
+				return 'col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2';
+
+			case 'single_column_extra_narrow':
+				// Single Column Extra Narrow
+				return 'col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3';
+
+			case 'left_sidebar':
+				// Left Sidebar
+				return 'col-md-9 pull-right';
+
+			case 'right_sidebar':
+				// Right Sidebar
+			default:
+				return 'col-md-9';
+		}
+	}
 }
 
 ?>

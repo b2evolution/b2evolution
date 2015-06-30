@@ -130,6 +130,10 @@ label.control-label[for=post_title] {
 textarea.message_text {
   width: 95%;
 }
+.evo_comment_title a,
+.pull-right .evo_comment_type {
+  color: #337ab7;
+}
 .comment_form h3 {
   margin: 0;
 }
@@ -339,4 +343,7 @@ div.log_container {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;
+}
+footer.row {
+  margin-top: 20px;
 }

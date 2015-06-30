@@ -115,8 +115,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo ( $Skin->get_setting( 'layout' ) == 'single_column' ? 'col-md-12' : 'col-md-9' ); 
-			echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-right' : '' ); ?>">
+	<div class="<?php echo $Skin->get_column_class(); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -204,8 +203,8 @@ siteskin_include( '_site_body_header.inc.php' );
 						'page_current_template' => '<span><b>$page_num$</b></span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
-						'prev_text'             => '&lt;&lt;',
-						'next_text'             => '&gt;&gt;',
+						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
@@ -245,7 +244,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
+					'featured_intro_before' => '<div class="jumbotron"><div class="intro_background_image"></div>',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Sending a message'),
@@ -260,7 +259,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 	<?php
-	if( $Skin->get_setting( 'layout' ) != 'single_column' )
+	if( $Skin->is_visible_sidebar() )
 	{
 	?>
 	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
