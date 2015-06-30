@@ -84,7 +84,7 @@ jQuery(document).ready( function()
 				jQuery( ".fade_me" ).removeClass( "fade_me" ); // remove any existing fades
 				jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' ); // close any open windows
 
-				jQuery( ui.draggable ).appendTo( jQuery( '#container_' + jQuery( this ).find( '.container_name' ).html().replace( ' ', '_' ) ) ); // add the dragged widget to this container
+				jQuery( ui.draggable ).prependTo( jQuery( '#container_' + jQuery( this ).find( '.container_name' ).html().replace( / /g, '_' ).replace( /:/g, '-' ) ) ); // add the dragged widget to this container
 				jQuery( ui.draggable ).addClass( "fade_me server_update" ); // add fade class
 				jQuery( ui.draggable ).droppable( "enable" );	// enable dropping if disabled
 				doFade( ".fade_me" ); // fade the widget
@@ -233,7 +233,7 @@ function makeDroppable( selector )
 				}
 				else
 				{	// this is an existing widget, just move it
-					jQuery( ui.draggable ).insertBefore( this ); // add the dragged widget before this widget
+					jQuery( ui.draggable ).insertAfter( this ); // add the dragged widget before this widget
 					jQuery( ui.draggable ).addClass( "fade_me server_update" ); // add fade class
 					jQuery( ui.draggable ).droppable( "enable" );	// enable dropping if disabled
 				}
