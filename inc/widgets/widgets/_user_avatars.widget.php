@@ -63,8 +63,8 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ) ),
-				'defaultvalue' => 'grid',
+				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ), 'flow' => T_( 'Flowing Blocks' ) ),
+				'defaultvalue' => 'flow',
 			),
 			'grid_nb_cols' => array(
 				'label' => T_( 'Columns' ),
@@ -316,15 +316,19 @@ class user_avatars_Widget extends ComponentWidget
 		while( $User = & $UserList->get_next() )
 		{
 			if( $layout == 'grid' )
-			{
+			{ // Grid layout
 				if( $count % $nb_cols == 0 )
 				{
 					$r .= $this->disp_params[ 'grid_colstart' ];
 				}
 				$r .= $this->disp_params[ 'grid_cellstart' ];
 			}
+			elseif( $layout == 'flow' )
+			{ // Flow block layout
+				$r .= $this->disp_params[ 'flow_block_start' ];
+			}
 			else
-			{
+			{ // List layout
 				$r .= $this->disp_params[ 'item_start' ];
 			}
 
@@ -355,15 +359,19 @@ class user_avatars_Widget extends ComponentWidget
 			++$count;
 
 			if( $layout == 'grid' )
-			{
+			{ // Grid layout
 				$r .= $this->disp_params[ 'grid_cellend' ];
 				if( $count % $nb_cols == 0 )
 				{
 					$r .= $this->disp_params[ 'grid_colend' ];
 				}
 			}
+			elseif( $layout == 'flow' )
+			{ // Flow block layout
+				$r .= $this->disp_params[ 'flow_block_end' ];				
+			}
 			else
-			{
+			{ // List layout
 				$r .= $this->disp_params[ 'item_end' ];
 			}
 		}
@@ -382,6 +390,10 @@ class user_avatars_Widget extends ComponentWidget
 		{
 			echo $this->disp_params[ 'grid_start' ];
 		}
+		elseif( $layout == 'flow' )
+		{ // Flow block layout
+			echo $this->disp_params[ 'flow_start' ];
+		}
 		else
 		{
 			echo $this->disp_params[ 'list_start' ];
@@ -397,6 +409,10 @@ class user_avatars_Widget extends ComponentWidget
 			}
 
 			echo $this->disp_params[ 'grid_end' ];
+		}
+		elseif ( $layout == 'flow' )
+		{ // Flow block layout
+			echo $this->disp_params[ 'flow_end' ];
 		}
 		else
 		{
