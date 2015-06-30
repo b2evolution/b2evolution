@@ -469,7 +469,8 @@ class AbstractSettings
 
 		if( isset($atCache->value) )
 		{
-			if( $atCache->value === (string)$value )
+			if( ( is_array( $value ) && serialize(  $value ) === $atCache->value ) ||
+			    ( ! is_array( $value ) && $atCache->value === (string)$value ) )
 			{ // already set
 				$Debuglog->add( $debugMsg.' Already set to the same value.', 'settings' );
 				return false;
