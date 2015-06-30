@@ -97,51 +97,6 @@ $Form->begin_form( '', '', $params );
 <div class="left_col col-md-9">
 
 	<?php
-	// ############################ WORKFLOW #############################
-
-	if( $Blog->get_setting( 'use_workflow' ) )
-	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
-
-			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
-			$Form->switch_layout( 'linespan' );
-
-			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
-
-			echo ' '; // allow wrapping!
-
-			// Load current blog members into cache:
-			$UserCache = & get_UserCache();
-			// Load only first 21 users to know when we should display an input box instead of full users list
-			$UserCache->load_blogmembers( $Blog->ID, 21, false );
-
-			if( count( $UserCache->cache ) > 20 )
-			{
-				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
-			}
-			else
-			{
-				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-														'', true, '', 'get_assigned_user_options' );
-			}
-
-			echo ' '; // allow wrapping!
-
-			$ItemStatusCache = & get_ItemStatusCache();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
-
-			echo ' '; // allow wrapping!
-
-			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
-
-			$Form->switch_layout( NULL );
-			echo '</div>';
-
-		$Form->end_fieldset();
-	}
-
-
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
@@ -488,6 +443,49 @@ $Form->begin_form( '', '', $params );
 
 	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item, 'edit_layout' => 'expert', 'fold' => true ) );
 
+	// ############################ WORKFLOW #############################
+
+	if( $Blog->get_setting( 'use_workflow' ) )
+	{	// We want to use workflow properties for this blog:
+		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
+
+			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
+			$Form->switch_layout( 'linespan' );
+
+			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+			echo ' '; // allow wrapping!
+
+			// Load current blog members into cache:
+			$UserCache = & get_UserCache();
+			// Load only first 21 users to know when we should display an input box instead of full users list
+			$UserCache->load_blogmembers( $Blog->ID, 21, false );
+
+			if( count( $UserCache->cache ) > 20 )
+			{
+				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+			}
+			else
+			{
+				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
+														'', true, '', 'get_assigned_user_options' );
+			}
+
+			echo ' '; // allow wrapping!
+
+			$ItemStatusCache = & get_ItemStatusCache();
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+
+			echo ' '; // allow wrapping!
+
+			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+
+			$Form->switch_layout( NULL );
+			echo '</div>';
+
+		$Form->end_fieldset();
+	}
 	// ################### CATEGORIES ###################
 
 	cat_select( $Form, true, true, array( 'fold' => true ) );
