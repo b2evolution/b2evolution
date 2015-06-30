@@ -59,7 +59,8 @@ if( $cat > 0 )
 if( !empty( $cat ) && ( $cat > 0 ) )
 { // Display sub-chapters
 
-$chapters = $Skin->get_chapters( $cat );
+$ChapterCache = & get_ChapterCache();
+$chapters = $ChapterCache->get_chapters( $Blog->ID, $cat, true );
 
 if( count( $chapters ) > 0 )
 {
@@ -71,7 +72,7 @@ if( count( $chapters ) > 0 )
 	{ // Loop through categories:
 		if( $Chapter->meta )
 		{ // Meta category
-			$chapters_children = $Chapter->children;
+			$chapters_children = $Chapter->get_children( true );
 			if( $section_is_started )
 			{ // Close previous opened table
 ?>
@@ -111,7 +112,7 @@ if( count( $chapters ) > 0 )
 			}
 
 ?>
-	<article class="container group_row">		
+		<article class="container group_row">
 			<div class="ft_status__ft_title col-lg-8 col-md-7 col-sm-7 col-xs-6">
 				<div class="ft_status"><i class="icon fa <?php echo $chapter_icon; ?>" title="<?php echo $chapter_icon_title; ?>"></i></div>
 				<div class="ft_title ellipsis">
@@ -121,15 +122,17 @@ if( count( $chapters ) > 0 )
 				{
 					echo '<br /><span class="ft_desc">'.$Chapter->dget( 'description' ).'</span>';
 				}
-				if( count( $Chapter->children ) > 0 )
+
+				$sorted_sub_chapters = $Chapter->get_children( true );
+				if( count( $sorted_sub_chapters ) > 0 )
 				{ // Subforums exist
 					echo '<div class="subcats">';
 					echo T_('Subforums').': ';
 					$cc = 0;
-					foreach( $Chapter->children as $child_Chapter )
+					foreach( $sorted_sub_chapters as $child_Chapter )
 					{ // Display subforum
 						echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
-						echo $cc < count( $Chapter->children ) - 1 ? ', ' : '';
+						echo $cc < count( $sorted_sub_chapters ) - 1 ? ', ' : '';
 						$cc++;
 					}
 					echo '</div>';

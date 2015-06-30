@@ -80,7 +80,8 @@ if( $Item = get_featured_Item( 'front' ) )
 // ------------------------------- END OF INTRO-FRONT POST -------------------------------
 }
 
-$chapters = $Skin->get_chapters( $cat );
+$ChapterCache = & get_ChapterCache();
+$chapters = $ChapterCache->get_chapters( $Blog->ID, $cat, true );
 
 if( count( $chapters ) > 0 )
 {
@@ -91,8 +92,7 @@ if( count( $chapters ) > 0 )
 	{ // Loop through categories:
 		if( $root_Chapter->meta )
 		{ // Meta category
-			$root_Chapter->sort_children();
-			$chapters_children = $root_Chapter->children;
+			$chapters_children = $root_Chapter->get_children( true );
 ?>
 		<header class="panel-heading meta_category"><a href="<?php echo $root_Chapter->get_permanent_url(); ?>" class="forumlink"><?php echo $root_Chapter->dget( 'name' ); ?></a></header>
 <?php
@@ -129,16 +129,17 @@ if( count( $chapters ) > 0 )
 					{
 						echo '<br /><span class="ft_desc ellipsis">'.$Chapter->dget( 'description' ).'</span>';
 					}
-					if( count( $Chapter->children ) > 0 )
+
+					$sorted_sub_chapters = $Chapter->get_children( true );
+					if( count( $sorted_sub_chapters ) > 0 )
 					{ // Subforums exist
 						echo '<div class="subcats ellipsis">';
 						echo T_('Subforums').': ';
 						$cc = 0;
-						$Chapter->sort_children();
-						foreach( $Chapter->children as $child_Chapter )
+						foreach( $sorted_sub_chapters as $child_Chapter )
 						{ // Display subforum
 							echo '<a href="'.$child_Chapter->get_permanent_url().'" class="forumlink">'.$child_Chapter->get('name').'</a>';
-							echo $cc < count( $Chapter->children ) - 1 ? ', ' : '';
+							echo $cc < count( $sorted_sub_chapters ) - 1 ? ', ' : '';
 							$cc++;
 						}
 						echo '</div>';

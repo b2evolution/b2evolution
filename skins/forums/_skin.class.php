@@ -317,46 +317,6 @@ class forums_Skin extends Skin
 		}
 	}
 
-	/**
-	 * Get chapters
-	 *
-	 * @param integer Chapter parent ID
-	 */
-	function get_chapters( $parent_ID = 0 )
-	{
-		global $Blog, $skin_chapters_cache;
-
-		if( isset( $skin_chapters_cache ) )
-		{	// Get chapters from cache
-			return $skin_chapters_cache;
-		}
-
-		$ChapterCache = & get_ChapterCache();
-		$ChapterCache->reveal_children( $Blog->ID, true );
-
-		$skin_chapters_cache = array();
-		if( $parent_ID > 0 )
-		{ // Get children of selected chapter
-			$ChapterCache = & get_ChapterCache();
-			$parent_Chapter = $ChapterCache->get_by_ID( $parent_ID );
-			$parent_Chapter->sort_children();
-			foreach( $parent_Chapter->children as $Chapter )
-			{ // Iterate through childrens or the given parent Chapter
-				$skin_chapters_cache[$Chapter->ID] = $ChapterCache->get_by_ID( $Chapter->ID );
-				$Chapter->sort_children();
-			}
-		}
-		else
-		{ // Get the current blog root chapters
-			foreach( $ChapterCache->subset_root_cats[ $Blog->ID] as $Chapter )
-			{
-				$skin_chapters_cache[$Chapter->ID] = $Chapter;
-			}
-		}
-
-		return $skin_chapters_cache;
-	}
-
 
 	/**
 	 * Determine to display status banner or to don't display

@@ -245,6 +245,23 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Get children/sub-chapters of this category
+	 *
+	 * @param boolean set to true to sort children, leave false otherwise
+	 * @return array of Chapter - children of this Chapter
+	 */
+	function get_children( $sorted = false )
+	{
+		if( $sorted )
+		{ // sort childrens if required
+			$this->sort_children();
+		}
+
+		return $this->children;
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
