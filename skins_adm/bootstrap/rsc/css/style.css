@@ -978,6 +978,9 @@ table.table tbody tr.group td {
 table.table tbody tr.group td a {
   color: #337ab7;
 }
+#items_type_ajax_content {
+  min-height: 500px;
+}
 #items_type_ajax_content div.table_scroll {
   min-height: 500px;
 }
