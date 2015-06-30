@@ -70,80 +70,12 @@ items_results( $ItemList, array(
 	) );
 
 if( $ItemList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
+{ // List is filtered, offer option to reset filters:
 	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
-if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-{	// We have permission to add a post with at least one status:
-	$selected_tab = ( $tab == 'type' ) ? strtolower( $tab_type ) : $tab;
-	switch( $selected_tab )
-	{
-		case 'pages':
-			$label = T_('New page');
-			$title = T_('Create a new page...');
-			$new_ityp_ID = 1000;
-			$perm = 'page';
-			break;
-
-		case 'intros':
-			$label = T_('New intro');
-			$title = T_('Write a new intro text...');
-			$new_ityp_ID = 1600;
-			$perm = 'intro';
-			break;
-
-		case 'podcasts':
-			$label = T_('New episode');
-			$title = T_('Package a new podcast episode...');
-			$new_ityp_ID = 2000;
-			$perm = 'podcast';
-			break;
-
-		case 'links':
-			$label = T_('New link');
-			$title = T_('Add a sidebar link...');
-			$new_ityp_ID = 3000;
-			$perm = 'sidebar';
-			break;
-
-		case 'ads':
-			$label = T_('New advertisement');
-			$title = T_('Add an advertisement...');
-			$new_ityp_ID = 4000;
-			$perm = 'sidebar';
-			break;
-
-		default:
-			$label = T_('New post');
-			$title = T_('Write a new post...');
-			
-			$SQL = new SQL( 'Get ID of current post type' );
-			$SQL->SELECT( 'ityp_ID' );
-			$SQL->FROM( 'T_items__type' );
-			$SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_type ) );
-			$SQL->LIMIT( '1' );
-					
-			$new_ityp_ID = $DB->get_var( $SQL->get() );
-			if(! $new_ityp_ID ) {
-				$new_ityp_ID = 1;
-			}
-			
-			$perm = ''; // No need to check
-
-			if($new_ityp_ID == 1) {
-				$ItemList->global_icon( T_( 'Create multiple posts...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ityp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
-			}
-			break;
-	}
-
-	if( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) )
-	{	// We have the permission to create and edit posts with this post type:
-		$ItemList->global_icon( T_('Mass edit the current post list...'), 'edit', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
-		$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ityp_ID, $label.' &raquo;', 3, 4 );
-	}
-}
-
+// Generate global icons depending on seleted tab with item type
+item_type_global_icons( $ItemList );
 
 // EXECUTE the query now:
 $ItemList->restart();

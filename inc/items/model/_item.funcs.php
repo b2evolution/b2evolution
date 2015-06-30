@@ -3910,6 +3910,105 @@ function items_results( & $items_Results, $params = array() )
 
 
 /**
+ * Check if current user has a permission to edit post on the given back-officetab
+ *
+ * @param string Back-office tab
+ * @return boolean
+ */
+function check_perm_item_type_by_tab( $backoffice_tab )
+{
+	global $Blog, $current_User;
+
+	switch( $backoffice_tab )
+	{
+		case 'Pages':
+			$perm = 'page';
+			break;
+		case 'Intros':
+			$perm = 'intro';
+			break;
+		case 'Podcasts':
+			$perm = 'podcast';
+			break;
+		case 'Sidebar links':
+		case 'Advertisement':
+			$perm = 'sidebar';
+			break;
+		default:
+			$perm = ''; // No need to check
+			break;
+	}
+
+	if( is_logged_in() && ! empty( $Blog ) &&
+	    ( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) ) )
+	{ // Current user can edit a post with item types from the selected back-office tab
+		return true;
+	}
+	else
+	{ // No perm
+		return false;
+	}
+}
+
+
+/**
+ * Generate global icons depending on seleted tab with item type
+ */
+function item_type_global_icons( $object_Widget )
+{
+	global $current_User, $admin_url, $DB, $Blog;
+
+	if( is_logged_in() && ! empty( $Blog ) && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	{ // We have permission to add a post with at least one status:
+		$tab_type = ( get_param( 'tab' ) == 'type' ) ? get_param( 'tab_type' ) : '';
+
+		$item_types_SQL = new SQL();
+		$item_types_SQL->SELECT( 'ityp_ID AS ID, ityp_name AS name, ityp_backoffice_tab AS tab, IF( ityp_ID = "'.$Blog->get_setting( 'default_post_type' ).'", 0, 1 ) AS fix_order' );
+		$item_types_SQL->FROM( 'T_items__type' );
+		if( ! empty( $tab_type ) )
+		{ // Get item types only by selected back-office tab
+			$item_types_SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_type ) );
+		}
+		$item_types_SQL->ORDER_BY( 'fix_order, ityp_ID' );
+		$item_types = $DB->get_results( $item_types_SQL->get() );
+
+		$count_item_types = count( $item_types );
+		if( $count_item_types > 0 )
+		{
+			if( $count_item_types > 1 )
+			{ // Group only if moer than one item type for selected back-office tab
+				$icon_group_create_type = 'type_create';
+				$icon_group_create_mass = 'mass_create';
+			}
+			else
+			{ // No group
+				$icon_group_create_type = NULL;
+				$icon_group_create_mass = NULL;
+			}
+
+			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&' ), T_('Mass edit'), 3, 4 );
+
+			foreach( $item_types as $item_type )
+			{
+				if( check_perm_item_type_by_tab( $item_type->tab ) )
+				{ // We have the permission to create posts with this post type:
+					$object_Widget->global_icon( T_('Create multiple posts...'), 'new', $admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, sprintf( T_('Mass create "%s"'), $item_type->name ), 3, 4, array(), $icon_group_create_mass );
+				}
+			}
+
+			foreach( $item_types as $item_type )
+			{
+				if( check_perm_item_type_by_tab( $item_type->tab ) )
+				{ // We have the permission to create posts with this post type:
+					$object_Widget->global_icon( T_('Write a new post...'), 'new', $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, $item_type->name, 3, 4, array(), $icon_group_create_type );
+				}
+			}
+		}
+	}
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */

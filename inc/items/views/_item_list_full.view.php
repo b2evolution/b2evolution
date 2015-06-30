@@ -75,12 +75,8 @@ else
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 	}
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-	{
-		$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
-		$block_item_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
-		$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
-	}
+	// Generate global icons depending on seleted tab with item type
+	item_type_global_icons( $block_item_Widget );
 
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
