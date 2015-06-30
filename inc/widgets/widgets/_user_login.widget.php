@@ -199,7 +199,7 @@ class user_login_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $redirect_to;
+		global $Blog;
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// No display a duplicate form for inskin login mode
@@ -220,7 +220,11 @@ class user_login_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{ // Login form:
+			global $Settings;
+
 			$source = 'user_login_widget';
+
+			$redirect_to = $Settings->get( 'redirect_to_after_login' );
 			if( empty( $redirect_to ) )
 			{
 				$redirect_to = regenerate_url( '', '', '', '&' );

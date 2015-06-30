@@ -19,7 +19,9 @@ switch ( $action )
 		// Check permission:
 		$current_User->check_perm( 'users', 'edit', true );
 
-		// Session timeout
+		// Session settings
+		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'string', '' ) );
+
 		$timeout_sessions = param_duration( 'timeout_sessions' );
 
 		if( $timeout_sessions < $crumb_expires )

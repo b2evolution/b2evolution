@@ -21,7 +21,9 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'ctrl', 'usersettings' );
 	$Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Session Timeouts').get_manual_link('session-timeouts') );
+$Form->begin_fieldset( T_('Session Settings').get_manual_link('session-settings') );
+
+	$Form->text_input( 'redirect_to_after_login', $Settings->get( 'redirect_to_after_login' ), 60, T_('After login, redirect to'), T_('Users will be redirected there upon successful login, unless they are in process of doing something.'), array( 'maxlength' => NULL ) );
 
 	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
 
