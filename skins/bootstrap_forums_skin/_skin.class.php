@@ -206,7 +206,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('When access requires login...')
 				),
-					'access_login' => array(
+					'access_login_containers' => array(
 						'label' => T_('Display on login screen'),
 						'note' => '',
 						'type' => 'checklist',
@@ -705,7 +705,7 @@ class bootstrap_forums_Skin extends Skin
 	 * @param string Skin setting name
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key, $setting_name = 'access_login' )
+	function is_visible_container( $container_key, $setting_name = 'access_login_containers' )
 	{
 		$access = $this->get_setting( $setting_name );
 

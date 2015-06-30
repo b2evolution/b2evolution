@@ -18,6 +18,47 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Item;
 
+// ------------------------------- START OF INTRO POST -------------------------------
+if( $Item = get_featured_Item() )
+{ // We have a intro-front post to display:
+?>
+<div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( array( 'item_class' => 'jumbotron evo_content_block evo_post' ) ) ?>" lang="<?php $Item->lang() ?>">
+
+	<?php
+	$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
+
+	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
+			'before' => '',
+			'after'  => '',
+			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+			'class'  => button_class( 'text' ),
+		) );
+	if( $Item->status != 'published' )
+	{
+		$Item->format_status( array(
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+			) );
+	}
+	$Item->title( array(
+			'link_type'  => 'none',
+			'before'     => '<div class="evo_post_title"><h1>',
+			'after'      => '</h1><div class="'.button_class( 'group' ).'">'.$action_links.'</div></div>',
+			'nav_target' => false,
+		) );
+
+	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+	skin_include( '_item_content.inc.php', $params );
+	// Note: You can customize the default item content by copying the generic
+	// /skins/_item_content.inc.php file into the current skin folder.
+	// -------------------------- END OF POST CONTENT -------------------------
+
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+	?>
+</div>
+<?php
+// ------------------------------- END OF INTRO-FRONT POST -------------------------------
+}
+
 // --------------------------------- START OF POSTS -------------------------------------
 // Display message if no post:
 $params_no_content = array(
