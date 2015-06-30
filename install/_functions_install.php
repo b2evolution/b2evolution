@@ -209,12 +209,6 @@ function install_newdb()
 		 */
 		$Settings = new GeneralSettings();
 
-		if( $test_install_all_features )
-		{	// Set manual ordering of categories
-			$Settings->set( 'chapter_ordering', 'manual' );
-			$Settings->dbupdate();
-		}
-
 		/**
 		 * @var UserCache
 		 */
@@ -1440,7 +1434,7 @@ jQuery( document ).ready( function()
 
 /**
  * Check if current installation is local
- * 
+ *
  * @return boolean
  */
 function check_local_installation()

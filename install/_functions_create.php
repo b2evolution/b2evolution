@@ -261,6 +261,19 @@ function create_default_data()
 	task_end();
 
 
+	task_begin( 'Creating default Post Statuses... ' );
+	$DB->query( "
+		INSERT INTO T_items__status ( pst_name )
+		VALUES ( 'New' ),
+					 ( 'In Progress' ),
+					 ( 'Duplicate' ),
+					 ( 'Not A Bug' ),
+					 ( 'In Review' ),
+					 ( 'Fixed' ),
+					 ( 'Closed' )" );
+	task_end();
+
+
 	// added in Phoenix-Beta
 	task_begin( 'Creating default file types... ' );
 	// Contribs: feel free to add more types here...
@@ -2708,7 +2721,10 @@ Hello
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
 						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
 					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
-						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi, this is my comment.') ).', "default", "finished" )' );
+						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
+
+This is a sample comment that has been approved by default!
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
 			}
 		}
 	}
@@ -2870,11 +2886,17 @@ function create_demo_comment( $item_ID, $status )
 	// Set demo content depending on status
 	if( $status == 'published' )
 	{
-		$content = T_('Hi!<br />This is a sample comment that has been approved by default!<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
+		$content = T_('Hi!
+
+This is a sample comment that has been approved by default!
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
 	}
 	else
 	{ // draft
-		$content = T_('Hi!<br />This is a sample comment that has not been approved by default.<br />Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
+		$content = T_('Hi!
+
+This is a sample comment that has **not** been approved by default!
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
 	}
 
 	$now = date( 'Y-m-d H:i:s' );
