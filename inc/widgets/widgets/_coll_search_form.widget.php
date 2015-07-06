@@ -93,18 +93,6 @@ class coll_search_form_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => T_('Go'),
 				),
-				'disp_search_options' => array(
-					'label' => T_( 'Search options' ),
-					'note' => T_( 'Display radio buttons for "All Words", "Some Word" and "Entire Phrase"' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-				),
-				'use_search_disp' => array(
-					'label' => T_( 'Results on search page' ),
-					'note' => T_( 'Use advanced search page to display results (disp=search)' ),
-					'type' => 'checkbox',
-					'defaultvalue' => true,
-				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
 					'note' => T_('Leave empty for current collection.'),
@@ -169,7 +157,7 @@ class coll_search_form_Widget extends ComponentWidget
 
 		if( empty( $this->disp_params['search_class'] ) )
 		{ // Class name is not defined, Use class depend on serach options
-			$search_form_class = $this->disp_params[ 'disp_search_options' ] ? 'extended_search_form' : 'compact_search_form';
+			$search_form_class = 'compact_search_form';
 		}
 		else
 		{ // Use class from params
@@ -186,22 +174,10 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
 		echo $this->disp_params['search_submit_after'];
 
-		if( $this->disp_params['disp_search_options'] )
-		{ // Display the search options
-			$sentence = get_param( 'sentence' );
-			echo '<div class="search_options">';
-			echo '<div class="search_option"><input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All words').'</label></div>';
-			echo '<div class="search_option"><input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some word').'</label></div>';
-			echo '<div class="search_option"><input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label></div>';
-			echo '</div>';
-		}
-
 		echo '</div>';
 
-		if( $this->disp_params['use_search_disp'] )
-		{
-			echo '<input type="hidden" name="disp" value="search" />';
-		}
+		echo '<input type="hidden" name="disp" value="search" />';
+
 		echo '</form>';
 
 		echo $this->disp_params['block_body_end'];
