@@ -215,6 +215,11 @@ class bootstrap_manual_Skin extends Skin
 				}
 				break;
 		}
+
+		if( $this->is_left_navigation_visible() )
+		{ // Include JS code for left navigation panel only when it is displayed:
+			require_js( $this->get_url().'left_navigation.js' );
+		}
 	}
 
 
@@ -642,8 +647,13 @@ class bootstrap_manual_Skin extends Skin
 	{
 		global $disp;
 
-		// Display left navigation column only on these pages
-		return in_array( $disp, array( 'front', 'posts', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404', 'access_requires_login' ) );
+		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		{ // Display left navigation column on this page when at least one sidebar container is visible:
+			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+		}
+
+		// Display left navigation column only on these pages:
+		return in_array( $disp, array( 'front', 'posts', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
 
 
