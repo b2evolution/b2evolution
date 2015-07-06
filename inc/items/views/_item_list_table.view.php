@@ -43,8 +43,10 @@ else
 }
 
 
-// Display title depending on selection params:
-echo $ItemList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
+$ItemList->filter_area = array(
+		'callback' => 'callback_filter_item_list_table',
+		'hide_filter_button' => true,
+	);
 
 
 /*

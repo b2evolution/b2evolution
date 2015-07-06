@@ -370,6 +370,41 @@ switch( $action )
 		$selected_Filelist = new Filelist( $fm_Filelist->get_FileRoot(), false );
 		break;
 
+	case 'hide_quick_button':
+	case 'show_quick_button':
+		// Show/Hide quick button to publish a post
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Update setting:
+		$UserSettings->set( 'show_quick_publish', ( $action == 'show_quick_button' ? 1 : 0 ) );
+		$UserSettings->dbupdate();
+
+		$prev_action = param( 'prev_action', 'string', '' );
+		$item_ID = param( 'p', 'integer', 0 );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
+		break;
+
+	case 'reset_quick_settings':
+		// Reset quick default settings for current user on the edit item screen:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Reset settings to default values
+		$DB->query( 'DELETE FROM T_users__usersettings
+			WHERE uset_name LIKE "fold_itemform_%"
+			   OR uset_name = "show_quick_publish"' );
+
+		$prev_action = param( 'prev_action', 'string', '' );
+		$item_ID = param( 'p', 'integer', 0 );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
+		break;
 
 	default:
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );

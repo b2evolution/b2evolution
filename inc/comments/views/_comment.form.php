@@ -61,8 +61,6 @@ $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
 
-<div class="clear"></div>
-
 <div class="row">
 
 <div class="left_col col-md-9">

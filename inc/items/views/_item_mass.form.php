@@ -117,17 +117,23 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'post_title', 'None' );
 	$Form->hidden( 'mass_create', '1' );
 
+	$Form->switch_layout( 'none' );
+
 	// ---------------------------- TEXTAREA -------------------------------------
-	$Form->fieldstart = '<div>';
-	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width:99%;', 'note' => T_('Separate posts with a blank line. The first line of each post becomes a title.'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
-	$Form->fieldstart = '<div class="tile">';
-	$Form->fieldend = '</div>';
-	echo '<div style="height:6px"></div>';
+	$Form->textarea_input( 'content', $item_content, 16, '', array(
+			'style' => 'width:100%',
+			'note'  => T_('Separate posts with a blank line. The first line of each post becomes a title.'),
+			'cols'  => 40 ,
+			'rows'  => 33,
+			'id'    => 'itemform_post_content',
+		) );
+
+	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-
 	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
+
+	$Form->switch_layout( NULL );
 
 	// ------------------------------- ACTIONS ----------------------------------
 

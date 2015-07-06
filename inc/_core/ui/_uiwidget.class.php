@@ -258,7 +258,7 @@ class Widget
 			{ // Grouped icons
 				$first_icon = $icon[0];
 				$r .= '<div class="btn-group dropdown">';
-				$r .= '<a href="'.$first_icon['url'].'" class="btn btn-sm btn-default" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
+				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
 				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
 							.' <span class="caret"></span></button>';
 				$r .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
@@ -520,15 +520,18 @@ class Table extends Widget
 				$this->Form->begin_form( '' );
 			}
 
-			echo $this->params['filter_button_before'];
-			$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
-			$this->Form->button_input( array(
-					'tag'   => 'button',
-					'name'  => $submit_name,
-					'value' => get_icon( 'filter' ).' '.$submit_title,
-					'class' => $this->params['filter_button_class']
-				) );
-			echo $this->params['filter_button_after'];
+			if( empty( $this->filter_area['hide_filter_button'] ) )
+			{ // Display a filter button only when it is not hidden by param:
+				echo $this->params['filter_button_before'];
+				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$this->Form->button_input( array(
+						'tag'   => 'button',
+						'name'  => $submit_name,
+						'value' => get_icon( 'filter' ).' '.$submit_title,
+						'class' => $this->params['filter_button_class']
+					) );
+				echo $this->params['filter_button_after'];
+			}
 
 			if( ! empty( $this->force_checkboxes_to_inline ) )
 			{ // Set this to TRUE in order to display all checkboxes before labels

@@ -6944,7 +6944,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
 	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
-	var style_body_height = height.match( /px/i ) ? ' style="height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
+	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
 	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
 
 	if( typeof( buttons ) != 'undefined' && buttons != '' )

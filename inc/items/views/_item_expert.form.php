@@ -667,6 +667,40 @@ $Form->begin_form( '', '', $params );
 
 	$Form->end_fieldset();
 
+
+	// ################### QUICK SETTINGS ###################
+
+	$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
+	if( $action == 'copy' )
+	{
+		$prev_action = $action;
+	}
+	else
+	{
+		$prev_action = $item_ID > 0 ? 'edit' : 'new';
+	}
+	$quick_setting_url = $admin_url.'?ctrl=items&amp;prev_action='.$prev_action.( $item_ID > 0 ? '&amp;p='.$item_ID : '' )
+		.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'item' ).'&amp;action=';
+
+	if( $current_User->check_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
+	{ // Display a link to show/hide quick button to publish the post ONLY if current user has a permission:
+		echo '<p>';
+		if( $UserSettings->get( 'show_quick_publish' ) )
+		{ // The quick button is displayed
+			echo action_icon( '', 'activate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
+		}
+		else
+		{ // The quick button is hidden
+			echo action_icon( '', 'deactivate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
+		}
+		echo '</p>';
+	}
+
+	// Display a link to reset default settings for current user on this screen:
+	echo '<p>';
+	echo action_icon( '', 'refresh', $quick_setting_url.'reset_quick_settings', T_('Reset defaults for this screen.'), 3, 4 );
+	echo '</p>';
+
 	?>
 
 </div>

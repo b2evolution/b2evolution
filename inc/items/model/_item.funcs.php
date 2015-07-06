@@ -1772,13 +1772,20 @@ function load_publish_status( $creating = false )
  */
 function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
-	global $Blog, $current_User;
+	global $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
 	if( ! isset( $edited_Item->status ) )
 	{
 		$edited_Item->status = $highest_publish_status;
+	}
+
+	// ---------- PREVIEW ----------
+	if( ! $inskin || $display_preview )
+	{
+		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- VISIBILITY ----------
@@ -1791,7 +1798,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
 		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
 		// Get allowed visibility statuses
-		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
@@ -1823,13 +1830,6 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		}
 	}
 
-	// ---------- PREVIEW ----------
-	if( ! $inskin || $display_preview )
-	{
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
-
 	echo '<span class="btn-group">';
 
 	// ---------- SAVE ----------
@@ -1854,16 +1854,16 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 	$Form->hidden( 'publish_status', $highest_publish_status );
 
-	if( $inskin )
-	{ // Display this button only on front-office
+	if( $highest_publish_status == 'published' && $UserSettings->get( 'show_quick_publish' ) )
+	{ // Display this button to make a post published
 
 		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
 		$publish_style = ( $edited_Item->status == $highest_publish_status ) ? 'display: none' : 'display: inline';
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ $publish_text,
-			'SaveButton btn-status-published',
+			/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+			'SaveButton btn-status-published quick-publish',
 			'',
 			$publish_style
 		) );
@@ -1994,7 +1994,16 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			var status = item.attr( 'rel' );
 			var dropdown_buttons = item.parent().parent().find( 'button' );
 			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = jQuery( '.edit_actions input[type="submit"]' ).add( dropdown_buttons );
+			var save_buttons = jQuery( '.edit_actions input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+
+			if( status == 'published' )
+			{ // Hide button "Publish!" if current status is already the "published":
+				jQuery( '.edit_actions .quick-publish' ).hide();
+			}
+			else
+			{ // Show button "Publish!" only when another status is selected:
+				jQuery( '.edit_actions .quick-publish' ).show();
+			}
 
 			save_buttons.each( function()
 			{ // Change status class name to new changed for all buttons
@@ -3446,7 +3455,7 @@ function items_manual_results_block( $params = array() )
 
 	load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 
-	$Table = new Table( NULL, $params['results_param_prefix'] );
+	$Table = new Table( 'Results', $params['results_param_prefix'] );
 
 	$Table->title = T_('Manual view');
 
@@ -3479,6 +3488,8 @@ function items_manual_results_block( $params = array() )
 
 	$Table->display_init( NULL, $result_fadeout );
 
+	echo $Table->params['before'];
+
 	$Table->display_head();
 
 	echo $Table->replace_vars( $Table->params['content_start'] );
@@ -3499,6 +3510,8 @@ function items_manual_results_block( $params = array() )
 	$Session->delete( 'fadeout_array');
 
 	echo $Table->params['content_end'];
+
+	echo $Table->params['after'];
 
 	if( !is_ajax_content() )
 	{ // Create this hidden div to get a function name for AJAX request
@@ -3944,9 +3957,35 @@ function item_type_global_icons( $object_Widget )
 					$object_Widget->global_icon( T_('Write a new post...'), 'new', $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, ' '.$item_type->name, 3, 4, array( 'class' => 'btn-primary' ), $icon_group_create_type );
 				}
 			}
-
 		}
 	}
+}
+
+
+/**
+ * Callback to add filters on top of the items list
+ *
+ * @param Form
+ */
+function callback_filter_item_list_table( & $Form )
+{
+	global $ItemList;
+
+	// --------------------------------- START OF CURRENT FILTERS --------------------------------
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'coll_current_filters',
+			// Optional display params
+			'ItemList'             => $ItemList,
+			'block_start'          => '<div class="filters_item_list_table">',
+			'block_end'            => '</div>',
+			'block_title_start'    => '<b>',
+			'block_title_end'      => ':</b> ',
+			'show_filters'         => array( 'time' => 1 ),
+			'display_button_reset' => false,
+			'display_empty_filter' => true,
+		) );
+	// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
 }
 
 
@@ -4097,12 +4136,6 @@ function item_edit_actions( $Item )
 {
 	$r = '';
 
-	if( isset($GLOBALS['files_Module']) )
-	{
-		$r .= action_icon( T_('Edit linked files...'), 'folder',
-					url_add_param( $Item->get_Blog()->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID ), T_('Files') );
-	}
-
 	// Display edit button if current user has the rights:
 	$r .= $Item->get_edit_link( array(
 		'before' => ' ',
@@ -4215,15 +4248,11 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	}
 	$r .= '<td class="firstcol">'
 					.'<strong style="padding-left: '.($level).'em;">'
-						.'<a href="'.$open_url.'">'.$cat_icon.'</a> ';
+						.'<a href="'.$open_url.'">'.$cat_icon.' '.$Chapter->dget('name').'</a> ';
 	if( $perm_edit )
 	{ // Current user can edit the chapters of the blog
 		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
-		$r .= '<a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a>';
-	}
-	else
-	{
-		$r .= $Chapter->dget('name');
+		$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
 	}
 	$r .= '</strong></td>';
 
@@ -4304,7 +4333,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Title
 	$edit_url = $Item->ID;
-	$item_icon = get_icon( 'post', 'imgtag', array( 'title' => '' ) );
+	$item_icon = get_icon( 'file_message', 'imgtag', array( 'title' => '' ) );
 	$item_edit_url = $Item->get_edit_url();
 	$r .= '<td class="firstcol"><strong style="padding-left: '.($level).'em;">';
 	if( !empty( $item_edit_url ) )
