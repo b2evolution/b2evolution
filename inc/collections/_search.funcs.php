@@ -21,18 +21,35 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string the search keywords to score by
  * @return integer the result score
  */
-function score_text( $text, $search_keywords )
+function score_text( $text, $search_term, $words = array(), $quoted_terms = array() )
 {
 	$score = 0;
 
-	if( !empty( $search_keywords ) && strpos( $text, $search_keywords ) !== false )
+	if( !empty( $search_term ) && strpos( $text, $search_term ) !== false )
 	{
 		$score += 10;
 	}
 
-	$words_list = explode( ' ', $search_keywords );
 	$all_found = true;
-	foreach( $words_list as $word )
+	foreach( $quoted_terms as $quoted_term )
+	{ // find quoted keywords
+		$count = empty( $quoted_term ) ? 0 : substr_count( $text, $quoted_term );
+		if( $count == 0 )
+		{
+			$all_found = false;
+		}
+		else
+		{
+			$score += ( ( $count > 1 ) ? 8 : 6 );
+		}
+	}
+	if( $all_found && count( $quoted_terms ) > 0 )
+	{
+		$score += 4;
+	}
+
+	$all_found = true;
+	foreach( $words as $word )
 	{
 		$count = empty( $word ) ? 0 : substr_count( $text, $word );
 		if( $count == 0 )
@@ -42,6 +59,11 @@ function score_text( $text, $search_keywords )
 		else
 		{
 			$score += ( ( $count > 1 ) ? 2 : 1 );
+		}
+
+		if( $word_match_count = preg_match_all( '/\b'.$word.'\b/i', $text, $matches ) )
+		{ // Every word match gives one more score
+			$score += $word_match_count;
 		}
 	}
 	if( $all_found )
@@ -93,11 +115,26 @@ function score_search_result( $search_keywords )
 {
 	global $Blog, $DB, $posttypes_perms;
 
+	// Get quoted parts
+	$quoted_parts = array();
+	if( preg_match_all( '/(["\'])(?:(?=(\\\\?))\\2.)*?\\1/', $search_keywords, $matches ) )
+	{ // There are quoted search terms
+		$quoted_parts = $matches[0];
+		for( $index = 0; $index < count( $quoted_parts ); $index++ )
+		{ // Remove douple quotes around the parts
+			$quoted_part_length = utf8_strlen( $quoted_parts[$index] );
+			if( $quoted_part_length > 2 )
+			{ // The quoted part is not an empty string
+				$quoted_parts[$index] = utf8_substr( $quoted_parts[$index], 1, $quoted_part_length - 2 );
+			}
+		}
+	};
+
 	$keywords = preg_replace( '/, +/', '', $search_keywords );
 	$keywords = str_replace( ',', ' ', $keywords );
 	$keywords = str_replace( '"', ' ', $keywords );
 	$keywords = trim( $keywords );
-	$keywords = explode( ' ', $keywords );
+	$keywords = preg_split( '/\s+/', $keywords );
 
 	// Exclude search from 'sidebar' type posts and from reserved type with ID 5000
 	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
@@ -116,8 +153,8 @@ function score_search_result( $search_keywords )
 	$score_result = array();
 	while( $Item = & $search_ItemList->get_next() )
 	{
-		$score = score_text( $Item->get( 'title' ), $search_keywords );
-		$score += score_text( $Item->content, $search_keywords );
+		$score = score_text( $Item->get( 'title' ), $search_keywords, $keywords, $quoted_parts );
+		$score += score_text( $Item->content, $search_keywords, $keywords, $quoted_parts );
 		$item_creator_login = $Item->get_creator_login();
 		if( !empty( $search_keywords ) && !empty( $item_creator_login ) && strpos( $item_creator_login, $search_keywords ) !== false )
 		{
@@ -137,8 +174,8 @@ function score_search_result( $search_keywords )
 	while( $Comment = & $search_CommentList->get_next() )
 	{
 		$comment_Item = & $Comment->get_Item();
-		$score = score_text( $comment_Item->get( 'title' ), $search_keywords );
-		$score += score_text( $Comment->get( 'content' ), $search_keywords );
+		$score = score_text( $comment_Item->get( 'title' ), $search_keywords, $keywords, $quoted_parts );
+		$score += score_text( $Comment->get( 'content' ), $search_keywords, $keywords, $quoted_parts );
 		$comment_author_name = $Comment->get_author_name();
 		if( !empty( $comment_author_name ) && !empty( $search_keywords ) && strpos( $comment_author_name, $search_keywords ) !== false )
 		{
@@ -167,8 +204,8 @@ function score_search_result( $search_keywords )
 	$ChapterCache->load_where( $cat_where_condition );
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
 	{
-		$score = score_text( $iterator_Chapter->get( 'name' ), $search_keywords );
-		$score += score_text( $iterator_Chapter->get( 'description' ), $search_keywords );
+		$score = score_text( $iterator_Chapter->get( 'name' ), $search_keywords, $keywords, $quoted_parts );
+		$score += score_text( $iterator_Chapter->get( 'description' ), $search_keywords, $keywords, $quoted_parts );
 		$post_count = get_postcount_in_category( $iterator_Chapter->ID, $Blog->ID );
 		$post_score = intval( $post_count / 3 );
 		$post_score = ( $post_score > 10 ) ? 10 : $post_score;
@@ -196,7 +233,7 @@ function score_search_result( $search_keywords )
 		{
 			continue;
 		}
-		$score = score_text( $tag_name, $search_keywords );
+		$score = score_text( $tag_name, $search_keywords, $keywords, $quoted_parts );
 		$score = ( $score * $post_count );
 		$search_result[] = array( 'type' => 'tag', 'score' => $score, 'ID' => $tag_name.':'.$post_count );
 		$score_result[] = $score;
@@ -298,15 +335,15 @@ function search_result_block( $params = array() )
 				case 'item':
 					$ItemCache->load_list( $object_ids );
 					break;
-	
+
 				case 'comment':
 					$CommentCache->load_list( $object_ids );
 					break;
-	
+
 				case 'category':
 					$ChapterCache->load_list( $object_ids );
 					break;
-	
+
 				default: // Not handled search result type
 					break;
 			}
