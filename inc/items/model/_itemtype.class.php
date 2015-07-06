@@ -543,7 +543,7 @@ class ItemType extends DataObject
 	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
 	 */
-	function is_reserved( $ID = NULL )
+	static function is_reserved( $ID = NULL )
 	{
 		global $posttypes_reserved_IDs;
 
