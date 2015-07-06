@@ -2072,6 +2072,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_ismember' => '0',
 				'blog_can_be_assignee' => '0',
 				'blog_post_statuses' => 0,
+				'blog_item_type' => 'standard',
 				'blog_edit' => 'no',
 				'blog_del_post' => '0',
 				'blog_edit_ts' => '0',
@@ -2083,10 +2084,6 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_cats' => '0',
 				'blog_properties' => '0',
 				'blog_admin' => '0',
-				'blog_page' => '0',
-				'blog_intro' => '0',
-				'blog_podcast' => '0',
-				'blog_sidebar' => '0',
 				'blog_media_upload' => '0',
 				'blog_media_browse' => '0',
 				'blog_media_change' => '0',
@@ -2100,6 +2097,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		$blog_perms['blog_post_statuses'] = $row['perm_poststatuses_bin'];
 		$blog_perms['blog_cmt_statuses'] = $row['perm_cmtstatuses_bin'];
 
+		$blog_perms['blog_item_type'] = $row[$prefix.'_perm_item_type'];
 		$blog_perms['blog_edit'] = $row[$prefix.'_perm_edit'];
 		$blog_perms['blog_del_post'] = $row[$prefix.'_perm_delpost'];
 		$blog_perms['blog_edit_ts'] = $row[$prefix.'_perm_edit_ts'];
@@ -2110,10 +2108,6 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		$blog_perms['blog_cats'] = $row[$prefix.'_perm_cats'];
 		$blog_perms['blog_properties'] = $row[$prefix.'_perm_properties'];
 		$blog_perms['blog_admin'] = $row[$prefix.'_perm_admin'];
-		$blog_perms['blog_page'] = $row[$prefix.'_perm_page'];
-		$blog_perms['blog_intro'] = $row[$prefix.'_perm_intro'];
-		$blog_perms['blog_podcast'] = $row[$prefix.'_perm_podcast'];
-		$blog_perms['blog_sidebar'] = $row[$prefix.'_perm_sidebar'];
 		$blog_perms['blog_media_upload'] = $row[$prefix.'_perm_media_upload'];
 		$blog_perms['blog_media_browse'] = $row[$prefix.'_perm_media_browse'];
 		$blog_perms['blog_media_change'] = $row[$prefix.'_perm_media_change'];
@@ -2250,6 +2244,16 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 				default:
 					return false;
 			}
+
+		case 'blog_item_type_standard':
+			// Standard item types are allowed for all
+			return true;
+		case 'blog_item_type_restricted':
+			// Restricted item types - ONLY for admin and restricted permissions
+			return ( $blog_perms['blog_item_type'] == 'admin' || $blog_perms['blog_item_type'] == 'restricted' );
+		case 'blog_item_type_admin':
+			// Admin item types - ONLY for admin permissions
+			return ( $blog_perms['blog_item_type'] == 'admin' );
 
 		default:
 			return $blog_perms[$permname];

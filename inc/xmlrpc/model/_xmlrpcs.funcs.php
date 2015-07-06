@@ -1297,7 +1297,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
  */
 function xmlrpcs_new_item( $params, & $Blog = NULL )
 {
-	global $current_User, $Settings, $Messages, $DB, $posttypes_perms;
+	global $current_User, $Settings, $Messages, $DB;
 
 	$params = array_merge( array(
 			'title'				=> '',
@@ -1379,27 +1379,20 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
-	if( !empty($params['item_typ_ID']) )
+	if( ! empty( $params['item_typ_ID'] ) )
 	{
-		if( ! preg_match('~^[0-9]+$~', $params['item_typ_ID']) )
-		{	// Only accept numeric values, switch to default value
+		if( ! preg_match( '~^[0-9]+$~', $params['item_typ_ID'] ) )
+		{ // Only accept numeric values, switch to default value
 			$params['item_typ_ID'] = 1;
 		}
 
-		foreach( $posttypes_perms as $l_permname => $l_posttypes )
-		{	// "Reverse" the $posttypes_perms array:
-			foreach( $l_posttypes as $ll_posttype )
-			{
-				$posttype2perm[$ll_posttype] = $l_permname;
-			}
-		}
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemType = & $ItemTypeCache->get_by_ID( $params['item_typ_ID'], false, false );
 
-		if( isset( $posttype2perm[ $params['item_typ_ID'] ] ) )
-		{	// Check permission for this post type
-			if( ! $current_User->check_perm( 'cats_'.$posttype2perm[ $params['item_typ_ID'] ], 'edit', false, $params['extra_cat_IDs'] ) )
-			{	// Permission denied
-				return xmlrpcs_resperror( 3 );	// User error 3
-			}
+		// Check permission for this post type
+		if( $ItemType && ! $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
+		{ // Permission denied
+			return xmlrpcs_resperror( 3 );	// User error 3
 		}
 	}
 	logIO( 'Post type: '.$params['item_typ_ID'] );
@@ -1480,7 +1473,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
  */
 function xmlrpcs_edit_item( & $edited_Item, $params )
 {
-	global $current_User, $Messages, $DB, $posttypes_perms;
+	global $current_User, $Messages, $DB;
 
 	$params = array_merge( array(
 			'title'				=> NULL,
@@ -1537,27 +1530,20 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 		}
 	}
 
-	if( !is_null($params['item_typ_ID']) )
+	if( ! is_null( $params['item_typ_ID'] ) )
 	{
-		if( ! preg_match('~^[0-9]+$~', $params['item_typ_ID']) )
-		{	// Only accept numeric values, switch to default value
+		if( ! preg_match( '~^[0-9]+$~', $params['item_typ_ID'] ) )
+		{ // Only accept numeric values, switch to default value
 			$params['item_typ_ID'] = NULL;
 		}
 
-		foreach( $posttypes_perms as $l_permname => $l_posttypes )
-		{	// "Reverse" the $posttypes_perms array:
-			foreach( $l_posttypes as $ll_posttype )
-			{
-				$posttype2perm[$ll_posttype] = $l_permname;
-			}
-		}
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemType = & $ItemTypeCache->get_by_ID( $params['item_typ_ID'], false, false );
 
-		if( isset( $posttype2perm[ $params['item_typ_ID'] ] ) )
-		{	// Check permission for this post type
-			if( ! $current_User->check_perm( 'cats_'.$posttype2perm[ $params['item_typ_ID'] ], 'edit', false, $params['extra_cat_IDs'] ) )
-			{	// Permission denied
-				return xmlrpcs_resperror( 3 );	// User error 3
-			}
+		// Check permission for this post type
+		if( $ItemType && ! $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
+		{ // Permission denied
+			return xmlrpcs_resperror( 3 );	// User error 3
 		}
 	}
 	logIO( 'Post type: '.$params['item_typ_ID'] );

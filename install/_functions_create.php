@@ -243,21 +243,21 @@ function create_default_data()
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
 	$DB->query( "
-		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html )
-		VALUES ( 1,    'Post',          'Posts',         'single', 1 ),
-					 ( 100,  'Manual Page',   'Posts',         'single', 0 ),
-					 ( 200,  'Forum Topic',   'Posts',         'single', 0 ),
-					 ( 1000, 'Page',          'Pages',         'page',   1 ),
-					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1 ),
-					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1 ),
-					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1 ),
-					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1 ),
-					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1 ),
-					 ( 1600, 'Intro-All',     'Intros',        NULL,     1 ),
-					 ( 2000, 'Podcast',       'Podcasts',      'single', 1 ),
-					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1 ),
-					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1 ),
-					 ( 5000, 'Reserved',      NULL,            NULL,     1 )" );
+		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html, ityp_perm_level )
+		VALUES ( 1,    'Post',          'Posts',         'single', 1, 'standard' ),
+					 ( 100,  'Manual Page',   'Posts',         'single', 0, 'standard' ),
+					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 'standard' ),
+					 ( 1000, 'Page',          'Pages',         'page',   1, 'restricted' ),
+					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1, 'restricted' ),
+					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1, 'restricted' ),
+					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1, 'restricted' ),
+					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1, 'restricted' ),
+					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1, 'restricted' ),
+					 ( 1600, 'Intro-All',     'Intros',        NULL,     1, 'restricted' ),
+					 ( 2000, 'Podcast',       'Podcasts',      'single', 1, 'standard' ),
+					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 'admin' ),
+					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 'admin' ),
+					 ( 5000, 'Reserved',      NULL,            NULL,     1, 'standard' )" );
 	task_end();
 
 
@@ -1536,6 +1536,9 @@ function create_demo_contents()
 			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 				VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
 		}
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_home_ID, array( 100, 200, 2000, 5000 ) );
 	}
 
 	if( $install_collection_bloga )
@@ -1564,6 +1567,9 @@ function create_demo_contents()
 			$a_Blog->set_setting( 'skin2_layout', 'single_column' );
 			$a_Blog->dbupdate();
 		}
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_a_ID, array( 100, 200, 5000 ) );
 	}
 
 	if( $install_collection_blogb )
@@ -1585,6 +1591,9 @@ function create_demo_contents()
 			true,
 			'public',
 			$paul_blogger_ID );
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_b_ID, array( 100, 200, 5000 ) );
 	}
 
 	if( $install_collection_photos )
@@ -1603,6 +1612,9 @@ function create_demo_contents()
 			3, // Skin ID
 			'photo', '', 0, 'relative', true, 'public',
 			$dave_blogger_ID );
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_photoblog_ID, array( 100, 200, 2000, 5000 ) );
 	}
 
 	if( $install_collection_forums )
@@ -1618,6 +1630,9 @@ function create_demo_contents()
 			4, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
 			$paul_blogger_ID );
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_forums_ID, array( 1, 100, 2000, 5000 ) );
 	}
 
 	if( $install_collection_manual )
@@ -1633,6 +1648,9 @@ function create_demo_contents()
 			5, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
 			$dave_blogger_ID );
+
+		// Enable item types for blog:
+		enable_item_types_for_blog( $blog_manual_ID, array( 1, 200, 2000, 5000 ) );
 	}
 
 	$BlogCache = & get_BlogCache();
@@ -2745,7 +2763,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	task_begin( 'Creating default group/blog permissions... ' );
 	$query = '
 		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember, bloggroup_can_be_assignee,
-			bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
+			bloggroup_perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
 			bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses, bloggroup_perm_edit_cmt,
 			bloggroup_perm_cats, bloggroup_perm_properties,
 			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
@@ -2754,9 +2772,9 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	// Init the permissions for all blogs
 	$all_statuses = "'published,community,deprecated,protected,private,review,draft'";
 	$gp_user_groups = array(
-			'admins'     => $Group_Admins->ID.",     1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1",
-			'privileged' => $Group_Privileged->ID.", 1, 1, $all_statuses, 'le', 1, 0, 1, 1, 1, $all_statuses, 'le', 0, 0, 1, 1, 1",
-			'bloggers'   => $Group_Bloggers->ID.",   1, 0, '', 'no', 0, 0, 0, 0, 1, '', 'no', 0, 0, 1, 1, 0",
+			'admins'     => $Group_Admins->ID.",     1, 1, $all_statuses, 'admin', 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1",
+			'privileged' => $Group_Privileged->ID.", 1, 1, $all_statuses, 'restricted', 'le', 1, 0, 1, 1, 1, $all_statuses, 'le', 0, 0, 1, 1, 1",
+			'bloggers'   => $Group_Bloggers->ID.",   1, 0, '', 'standard', 'no', 0, 0, 0, 0, 1, '', 'no', 0, 0, 1, 1, 0",
 		);
 
 	$gp_blogs_IDs = array();
@@ -2781,9 +2799,9 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		$gp_blogs_IDs[] = $blog_forums_ID;
 		// Init the special permissions for Forums
 		$gp_user_groups_forums = array(
-				'bloggers'   => $Group_Bloggers->ID.",   1, 0, 'community,draft', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
-				'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 0, 0",
-				'suspect'    => $Group_Suspect->ID.",    1, 0, 'review,draft', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
+				'bloggers'   => $Group_Bloggers->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
+				'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 0, 0",
+				'suspect'    => $Group_Suspect->ID.",    1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
 			);
 		$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
 	}
@@ -2925,6 +2943,47 @@ function create_default_posts_location()
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
 			post_rgn_ID = '.$DB->quote( '60'/* �le-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+	}
+}
+
+
+/**
+ * Enable item types for blog
+ *
+ * @param integer Blog ID
+ * @param array Exclude item types (Make these types disabled)
+ */
+function enable_item_types_for_blog( $blog_ID, $exclude_ityp_IDs = array() )
+{
+	if( empty( $blog_ID ) )
+	{ // Wrong function calling
+		return;
+	}
+
+	global $DB, $cache_all_item_type_IDs;
+
+	if( ! isset( $cache_all_item_type_IDs ) )
+	{ // Get all item type IDs only first time to save execution time
+		$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
+	}
+
+	$insert_sql = 'INSERT INTO T_items__type_blog ( itbl_ityp_ID, itbl_blog_ID ) VALUES ';
+	$i = 0;
+	foreach( $cache_all_item_type_IDs as $item_type_ID )
+	{
+		if( ! in_array( $item_type_ID, $exclude_ityp_IDs ) )
+		{ // Item type is not excluded
+			if( $i > 0 )
+			{ // Serator between rows
+				$insert_sql .= ', ';
+			}
+			$insert_sql .= '( '.$item_type_ID.', '.$blog_ID.' )';
+			$i++;
+		}
+	}
+	if( $i > 0 )
+	{ // Insert records to enable the item types for the blog:
+		$DB->query( $insert_sql );
 	}
 }
 

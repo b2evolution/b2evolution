@@ -52,6 +52,8 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_goals' => 1,
 		'fold_upgrade_backup_options' => 1,
 
+		'show_quick_publish' => 1, // Show the quick "Publish!" button on item form edit screen in back-office
+
 		'fm_imglistpreview' => 1,
 		'fm_showdate'       => 'compact',
 		'fm_allowfiltering' => 'simple',

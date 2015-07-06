@@ -6273,14 +6273,58 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11440 )
-	{ // part 18.n trunk aka 14th part of "i7"
+	{ // part 18.n trunk aka 16th part of "i7"
 
 		task_begin( 'Upgrading base domains table...' );
 		$DB->query( "ALTER TABLE T_basedomains
 			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11440' );
+		set_upgrade_checkpoint( '11440' );
+	}
+
+	if( $old_db_version < 11450 )
+	{ // part 18.o trunk aka 17th part of "i7"
+
+		task_begin( 'Upgrading blog-group permissions table...' );
+		$DB->query( "ALTER TABLE T_coll_group_perms
+			ADD COLUMN bloggroup_perm_item_type ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard' AFTER bloggroup_perm_poststatuses,
+			DROP COLUMN bloggroup_perm_page,
+			DROP COLUMN bloggroup_perm_intro,
+			DROP COLUMN bloggroup_perm_podcast,
+			DROP COLUMN bloggroup_perm_sidebar" );
+		task_end();
+
+		task_begin( 'Upgrading blog-user permissions table...' );
+		$DB->query( "ALTER TABLE T_coll_user_perms
+			ADD COLUMN bloguser_perm_item_type ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard' AFTER bloguser_perm_poststatuses,
+			DROP COLUMN bloguser_perm_page,
+			DROP COLUMN bloguser_perm_intro,
+			DROP COLUMN bloguser_perm_podcast,
+			DROP COLUMN bloguser_perm_sidebar" );
+		task_end();
+
+		task_begin( 'Upgrade post types table... ' );
+		$DB->query( "ALTER TABLE T_items__type
+			ADD COLUMN ityp_perm_level ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard'" );
+		task_end();
+
+		set_upgrade_checkpoint( '11450' );
+	}
+
+	if( $old_db_version < 11460 )
+	{ // part 18.p trunk aka 18th part of "i7"
+
+		task_begin( 'Creating table for PostType-to-Blog relationships...' );
+		$DB->query( "CREATE TABLE T_items__type_blog (
+			itbl_ityp_ID int(11) unsigned NOT NULL,
+			itbl_blog_ID int(11) unsigned NOT NULL,
+			PRIMARY KEY (itbl_ityp_ID, itbl_blog_ID),
+			UNIQUE itemtypeblog ( itbl_ityp_ID, itbl_blog_ID )
+		) ENGINE = innodb" );
+		task_end();
+
+		// set_upgrade_checkpoint( '11460' );
 	}
 
 	/*
