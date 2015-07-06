@@ -4218,10 +4218,19 @@ echo_modalwindow_js();
 		{
 			user_tab_from = 'avatar';
 		}
+		var max_size = 750;
+		var min_size = 320;
+		var preview_size = 135;
+		var margin_size = 35;
 		var width = jQuery( window ).width();
-		width = ( width > 750 ) ? 750 : ( ( width < 320 ) ? 320 : width );
-		var height = jQuery( window ).height() - 35;
-		height = ( height > 750 ) ? 750 : ( ( height < 320 ) ? 320 : height );
+		var height = jQuery( window ).height() - margin_size;
+		height = ( height > max_size ) ? max_size : ( ( height < min_size ) ? min_size : height );
+		width = ( width > max_size ) ? max_size : ( ( width < min_size ) ? min_size : width );
+		if( ( height > max_size - preview_size || width > height + preview_size ) &&
+		    height + preview_size < jQuery( window ).width() )
+		{
+			width = height + preview_size;
+		}
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 			width+'px', height+'px', true,
 			'<?php echo TS_('Crop profile picture'); ?>',
@@ -4235,8 +4244,8 @@ echo_modalwindow_js();
 				<?php echo $ajax_params; ?>
 				'user_ID': user_ID,
 				'file_ID': file_ID,
-				'window_width'  : width - 187,
-				'window_height' : height - 187,
+				'window_width'  : width - margin_size,
+				'window_height' : height - margin_size,
 				'display_mode': 'js',
 				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 			},

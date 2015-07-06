@@ -132,11 +132,20 @@ echo '<div id="target_cropped_image">'.$cropped_image_tag.'</div>';
 
 echo '</div><div>';
 
+// Check if we should display big preview images, Hide them on small screens:
+$display_big_preview = ( empty( $window_width ) || $window_width > 400 ) && ( empty( $window_height ) || $window_height > 400 );
+
 // Preview thumbnails
-echo '<div class="preview_cropped_images" style="display:none">';
-	echo '<div class="preview_cropped_image" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
+echo '<div class="preview_cropped_images'.( ! $display_big_preview ? ' only_small_preview' : '' ).'" style="display:none">';
+	if( $display_big_preview )
+	{
+		echo '<div class="preview_cropped_image" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
+	}
 	echo '<div class="preview_cropped_image" style="width:64px;height:64px">'.$cropped_image_tag.'</div>';
-	echo '<div class="preview_cropped_image circle" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
+	if( $display_big_preview )
+	{
+		echo '<div class="preview_cropped_image circle" style="width:128px;height:128px">'.$cropped_image_tag.'</div>';
+	}
 	echo '<div class="preview_cropped_image circle" style="width:64px;height:64px">'.$cropped_image_tag.'</div>';
 echo '</div>';
 
