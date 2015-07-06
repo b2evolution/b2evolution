@@ -47,8 +47,8 @@ $AdminUI->set_path( 'collections', $tab, $tab3 );
 // Get action parameter from request:
 param_action();
 
-if( param( 'ityp_ID', 'integer', '', true) )
-{// Load itemtype from cache:
+if( param( 'ityp_ID', 'integer', '', true ) )
+{ // Load itemtype from cache:
 	$ItemtypeCache = & get_ItemTypeCache();
 	if( ($edited_Itemtype = & $ItemtypeCache->get_by_ID( $ityp_ID, false )) === false )
 	{	// We could not find the post type to edit:
@@ -182,7 +182,7 @@ switch( $action )
 		if( $edited_Itemtype->load_from_Request() )
 		{	// We could load data from form without errors:
 
-			if( $edited_Itemtype->is_reserved() )
+			if( ItemType::is_reserved( $edited_Itemtype->ID ) )
 			{ // is reserved post type
 				param_error( 'ityp_ID',
 					sprintf( T_('Post types with IDs = ( %d ) are reserved. You can not edit this post type.' ), implode( ', ', $posttypes_reserved_IDs ) ) );
@@ -269,6 +269,38 @@ switch( $action )
 		}
 		break;
 
+	case 'enable':
+	case 'disable':
+		// Enable/Disable item type for the selected blog:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemtype' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		if( $edited_Itemtype && ! ItemType::is_reserved( $edited_Itemtype->ID ) )
+		{ // Do only when item type exists in DB
+			if( $action == 'enable' )
+			{ // Enable item type for the blog
+				$DB->query( 'REPLACE INTO T_items__type_blog
+								 ( itbl_ityp_ID, itbl_blog_ID )
+					VALUES ( '.$DB->quote( $edited_Itemtype->ID ).', '.$DB->quote( $blog ).' )' );
+				$Messages->add( T_('Post type has been enabled for this blog.'), 'success' );
+			}
+			else
+			{ // Disable item type for the blog
+				$DB->query( 'DELETE FROM T_items__type_blog
+					WHERE itbl_ityp_ID = '.$DB->quote( $edited_Itemtype->ID ).'
+					  AND itbl_blog_ID = '.$DB->quote( $blog ) );
+				$Messages->add( T_('Post type has been disabled for this blog.'), 'success' );
+			}
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3.'', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 // Generate available blogs list:

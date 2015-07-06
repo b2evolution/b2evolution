@@ -8,7 +8,7 @@
  * 
  * @package evocore
  * 
- * @version $Id: _coll_perm_view.funcs.php 8373 2015-02-28 21:44:37Z fplanque $
+ * @version $Id: _coll_perm_view.funcs.php 9699 2015-07-01 11:44:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -239,6 +239,33 @@ function coll_perm_edit_cmt( $row, $prefix )
 	$r .= '<option value="lt" '.( $perm_edit_cmt_value == 'lt' ? 'selected="selected"' : '' ).'>&lt; own level</option>';
 	$r .= '<option value="le" '.( $perm_edit_cmt_value == 'le' ? 'selected="selected"' : '' ).'>&le; own level</option>';
 	$r .= '<option value="all" '.( $perm_edit_cmt_value == 'all' ? 'selected="selected"' : '' ).'>All cmts</option>';
+	$r .= '</select>';
+	return $r;
+}
+
+
+/**
+ * Get the post type edit permission select input for user/group
+ * 
+ * @param object db row
+ * @param string the prefix of the db row: 'bloguser_' or 'bloggroup_'
+ */
+function coll_perm_item_type( $row, $prefix )
+{
+	global $permission_to_change_admin;
+
+	$row_id_coll = get_id_coll_from_prefix( $prefix );
+
+	$r = '<select id="blog_perm_item_type_'.$row->{$row_id_coll}.'" name="blog_perm_item_type_'.$row->{$row_id_coll}.'"';
+	if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
+	{
+	 	$r .= ' disabled="disabled"';
+	}
+	$r .= ' >';
+	$perm_edit_value = $row->{$prefix.'perm_item_type'};
+	$r .= '<option value="standard" '.( $perm_edit_value == 'standard' ? 'selected="selected"' : '' ).'>'.T_('Standard').'</option>';
+	$r .= '<option value="restricted" '.( $perm_edit_value == 'restricted' ? 'selected="selected"' : '' ).'>'.T_('Restricted').'</option>';
+	$r .= '<option value="admin" '.( $perm_edit_value == 'admin' ? 'selected="selected"' : '' ).'>'.T_('Admin').'</option>';
 	$r .= '</select>';
 	return $r;
 }

@@ -1000,8 +1000,10 @@ switch( $action )
 		// Load post from Session
 		$edited_Item = get_session_Item( $post_ID );
 
-		// Set new post type
-		$edited_Item->set( 'ityp_ID', $ityp_ID );
+		if( $Blog->is_item_type_enabled( $ityp_ID ) )
+		{ // Set new post type only if it is enabled for the Blog:
+			$edited_Item->set( 'ityp_ID', $ityp_ID );
+		}
 
 		// Unset old object of Post Type to reload it on next page
 		unset( $edited_Item->ItemType );
@@ -1012,17 +1014,21 @@ switch( $action )
 		set_session_Item( $edited_Item );
 
 		if( ! empty( $from_tab ) && $from_tab == 'type' )
-		{ // It goes from items lists to update item type immediately
-			$Messages->add( T_('Post type has been updated.'), 'success' );
+		{ // It goes from items lists to update item type immediately:
 
-			// Update item to set new type right now
-			$edited_Item->dbupdate();
+			if( $Blog->is_item_type_enabled( $ityp_ID ) )
+			{ // Update only when the selected item type is enabled for the Blog:
+				$Messages->add( T_('Post type has been updated.'), 'success' );
+
+				// Update item to set new type right now
+				$edited_Item->dbupdate();
+
+				// Highlight the updated item in list
+				$Session->set( 'highlight_id', $edited_Item->ID );
+			}
 
 			// Set redirect back to items list with new item type tab
 			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
-
-			// Highlight the updated item in list
-			$Session->set( 'highlight_id', $edited_Item->ID );
 		}
 		else
 		{ // Set default redirect urls (It goes from the item edit form)
@@ -1318,7 +1324,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $posttypes_perms;
+	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';

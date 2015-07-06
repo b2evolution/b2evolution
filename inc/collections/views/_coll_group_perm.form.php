@@ -23,7 +23,7 @@ global $current_User;
 
 global $debug;
 global $UserSettings;
-global $rsc_url, $htsrv_url;
+global $rsc_url, $htsrv_url, $admin_url;
 
 global $Blog, $permission_to_change_admin;
 
@@ -34,7 +34,8 @@ echo '
 <script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>';
 require_js( 'collectionperms.js', 'rsc_url', false, true );
 
-$Form = new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
+$Form = new Form( NULL, 'blogperm_checkchanges', 'post' );
+$Form->formclass = 'form-inline';
 
 $Form->begin_form( 'fform' );
 
@@ -42,9 +43,6 @@ $Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'permgroup' );
 $Form->hidden( 'blog', $edited_Blog->ID );
-
-$Form->begin_fieldset( T_('Group permissions').get_manual_link('advanced-user-permissions') );
-
 
 /*
  * Query user list:
@@ -62,12 +60,11 @@ else
 
 
 $SQL = new SQL();
-$SQL->SELECT( 'grp_ID, grp_name, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember, bloggroup_can_be_assignee,'
+$SQL->SELECT( 'grp_ID, grp_name, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_ismember, bloggroup_can_be_assignee,'
 	. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
-	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
-	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar' );
+	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change' );
 $SQL->FROM( 'T_groups LEFT JOIN T_coll_group_perms ON
 			( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );
 $SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
@@ -87,10 +84,15 @@ if( !empty( $keywords ) )
 
 $Results = new Results( $SQL->get(), 'collgroup_' );
 
+if( ! empty( $keywords ) )
+{ // Display a button to reset the filters
+	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$Blog->ID, T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+}
+
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
 
-$Results->title = T_('Group permissions');
+$Results->title = T_('Group permissions').get_manual_link('advanced-user-permissions');
 
 $Results->filter_area = array(
 	'submit' => 'actionArray[filter1]',
@@ -157,10 +159,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Post Types'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_page\', \''.format_to_output( TS_('Permission to create pages'), 'htmlattr' ).'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_intro\', \''.format_to_output( TS_('Permission to create intro posts (Intro-* post types)'), 'htmlattr' ).'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_podcast\', \''.format_to_output( TS_('Permission to create podcast episodes'), 'htmlattr' ).'\' )%'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_sidebar\', \''.format_to_output( TS_('Permission to create sidebar links'), 'htmlattr' ).'\' )%',
+						'td' => '%coll_perm_item_type( {row}, \'bloggroup_\' )%',
 						'td_class' => 'center',
 					);
 
@@ -280,8 +279,6 @@ echo '</div>';
 // Permission note:
 // fp> TODO: link
 echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
-
-$Form->end_fieldset();
 
 // Make a hidden list of all displayed users:
 $grp_IDs = array();

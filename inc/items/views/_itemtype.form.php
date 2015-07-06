@@ -63,6 +63,11 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type') : T_('Post type').get_ma
 	}
 
 	$Form->textarea_input( 'ityp_description', $edited_Itemtype->description, 2, T_('Description'), array( 'cols' => 47 ) );
+	$Form->radio( 'ityp_perm_level', $edited_Itemtype->perm_level, array(
+			array( 'standard',   T_('Standard') ),
+			array( 'restricted', T_('Restricted') ),
+			array( 'admin',      T_('Admin') )
+		), T_('Permission level') );
 	$Form->text_input( 'ityp_backoffice_tab', $edited_Itemtype->backoffice_tab, 25, T_('Back-office tab'), T_('Items of this type will be listed in this back-office tab. If empty, item will be found only in the "All" tab.'), array( 'maxlength' => 30 ) );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
 

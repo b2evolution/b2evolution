@@ -18,12 +18,24 @@ global $admin_url, $posttypes_reserved_IDs, $Blog, $edited_Item;
 
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( '*' );
-$SQL->FROM( 'T_items__type' );
+$SQL->SELECT( 'it.*' );
+$SQL->FROM( 'T_items__type AS it' );
+$SQL->FROM_add( 'INNER JOIN T_items__type_blog ON itbl_ityp_ID = ityp_ID AND itbl_blog_ID = '.$Blog->ID );
 if( ! empty( $posttypes_reserved_IDs ) )
 { // Exclude the reserved post types
 	$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $posttypes_reserved_IDs ).' )' );
 }
+// Check what item types are allowed for current user and selected blog
+$item_type_perm_levels = array( 'standard', 'restricted', 'admin' );
+foreach( $item_type_perm_levels as $i => $item_type_perm_level )
+{
+	if( ! $current_User->check_perm( 'blog_item_type_'.$item_type_perm_level, 'edit', false, $Blog->ID ) )
+	{
+		unset( $item_type_perm_levels[ $i ] );
+	}
+}
+$item_type_perm_levels[] = '-1'; // to restrict all item types if no one is allowed
+$SQL->WHERE( 'ityp_perm_level IN ( '.$DB->quote( $item_type_perm_levels ).' )' );
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'editityp_' );

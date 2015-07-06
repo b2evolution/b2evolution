@@ -14,10 +14,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+global $Blog;
+
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( '*' );
-$SQL->FROM( 'T_items__type' );
+$SQL->SELECT( 't.*, IF( tb.itbl_ityp_ID > 0, 1, 0 ) AS type_enabled' );
+$SQL->FROM( 'T_items__type AS t' );
+$SQL->FROM_add( 'LEFT JOIN T_items__type_blog AS tb ON itbl_ityp_ID = ityp_ID AND itbl_blog_ID = '.$Blog->ID );
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'ityp_' );
@@ -82,10 +85,78 @@ $Results->cols[] = array(
 		'td' => '$ityp_ID$',
 	);
 
+function ityp_row_enabled( $enabled, $item_type_ID )
+{
+	if( ItemType::is_reserved( $item_type_ID ) )
+	{ // It is reserved item type, Don't allow to enable this
+		return '';
+	}
+
+	global $current_User, $admin_url, $Blog;
+
+	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
+
+	if( $enabled )
+	{ // Enabled
+		if( $perm_edit )
+		{ // URL to disable the item type
+			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=disable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
+		}
+		$status_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The item type is enabled.') ) );
+	}
+	else
+	{ // Disabled
+		if( $perm_edit )
+		{ // URL to enable the item type
+			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=enable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
+		}
+		$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The item type is disabled.') ) );
+	}
+
+	if( isset( $status_url ) )
+	{
+		return '<a href="'.$status_url.'">'.$status_icon.'</a>';
+	}
+	else
+	{
+		return $status_icon;
+	}
+}
+$Results->cols[] = array(
+		'th' => sprintf( T_('Enabled in %s'), $Blog->get( 'shortname' ) ),
+		'order' => 'ityp_perm_level',
+		'td' => '%ityp_row_enabled( #type_enabled#, #ityp_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
+	);
+
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ityp_name',
 		'td' => '%get_name_for_itemtype(#ityp_ID#, #ityp_name#)%',
+	);
+
+function ityp_row_perm_level( $level, $id )
+{
+	if( ItemType::is_reserved( $id ) )
+	{ // It is reserved item type, Don't display perm level
+		return '';
+	}
+
+	$perm_levels = array(
+			'standard'   => T_('Standard'),
+			'restricted' => T_('Restricted'),
+			'admin'      => T_('Admin')
+		);
+
+	return isset( $perm_levels[ $level ] ) ? $perm_levels[ $level ] : $level;
+}
+$Results->cols[] = array(
+		'th' => T_('Perm Level'),
+		'order' => 'ityp_perm_level',
+		'td' => '%ityp_row_perm_level( #ityp_perm_level#, #ityp_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
 	);
 
 $Results->cols[] = array(

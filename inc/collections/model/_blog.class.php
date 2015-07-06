@@ -3287,6 +3287,35 @@ class Blog extends DataObject
 		$Messages->add( T_('The media directory and all of its content were successfully moved to the new location.'), 'note' );
 		return true;
 	}
+
+
+	/**
+	 * Check if item type is enabled for this blog
+	 *
+	 * @param integer Item type ID
+	 * @return boolean TRUE if enabled
+	 */
+	function is_item_type_enabled( $item_type_ID )
+	{
+		if( empty( $this->ID ) )
+		{ // This is new blog, it doesn't have the enabled item types
+			return false;
+		}
+
+		if( ! isset( $this->enabled_item_types ) )
+		{ // Get all enabled item types by one sql query and only first time to cache result
+			global $DB;
+
+			$SQL = new SQL();
+			$SQL->SELECT( 'itbl_ityp_ID' );
+			$SQL->FROM( 'T_items__type_blog' );
+			$SQL->WHERE( 'itbl_blog_ID = '.$this->ID );
+
+			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+		}
+
+		return in_array( $item_type_ID, $this->enabled_item_types );
+	}
 }
 
 ?>

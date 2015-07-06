@@ -305,6 +305,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_closing_comments   TINYINT DEFAULT 1,
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
 			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -319,6 +320,15 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_order   INT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__type_blog' => array(
+		'Creating table for PostType-to-Blog relationships',
+		"CREATE TABLE T_items__type_blog (
+			itbl_ityp_ID int(11) unsigned NOT NULL,
+			itbl_blog_ID int(11) unsigned NOT NULL,
+			PRIMARY KEY (itbl_ityp_ID, itbl_blog_ID),
+			UNIQUE itemtypeblog ( itbl_ityp_ID, itbl_blog_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__tag' => array(
@@ -376,6 +386,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_ismember             tinyint NOT NULL default 0,
 			bloguser_can_be_assignee      tinyint NOT NULL default 0,
 			bloguser_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			bloguser_perm_item_type       ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard',
 			bloguser_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
 			bloguser_perm_delpost         tinyint NOT NULL default 0,
 			bloguser_perm_edit_ts         tinyint NOT NULL default 0,
@@ -390,10 +401,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_media_upload    tinyint NOT NULL default 0,
 			bloguser_perm_media_browse    tinyint NOT NULL default 0,
 			bloguser_perm_media_change    tinyint NOT NULL default 0,
-			bloguser_perm_page            tinyint NOT NULL default 0,
-			bloguser_perm_intro           tinyint NOT NULL default 0,
-			bloguser_perm_podcast         tinyint NOT NULL default 0,
-			bloguser_perm_sidebar         tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -406,6 +413,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_ismember             tinyint NOT NULL default 0,
 			bloggroup_can_be_assignee      tinyint NOT NULL default 0,
 			bloggroup_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
+			bloggroup_perm_item_type       ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard',
 			bloggroup_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
 			bloggroup_perm_delpost         tinyint NOT NULL default 0,
 			bloggroup_perm_edit_ts         tinyint NOT NULL default 0,
@@ -420,10 +428,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_upload    tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
-			bloggroup_perm_page            tinyint NOT NULL default 0,
-			bloggroup_perm_intro           tinyint NOT NULL default 0,
-			bloggroup_perm_podcast         tinyint NOT NULL default 0,
-			bloggroup_perm_sidebar         tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

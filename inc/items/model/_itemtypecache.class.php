@@ -56,6 +56,8 @@ class ItemTypeCache extends DataObjectCache
 	 * blog_podcast and blog_sidebar permission, respectively (see blog
 	 * user/group permissions).
 	 * 
+	 * @deprecated
+	 * 
 	 * @param integer The selected ID.
 	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
@@ -63,18 +65,10 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	function get_option_list_usable_only( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
-		global $posttypes_reserved_IDs, $posttypes_perms, $current_User, $Blog;
+		global $posttypes_reserved_IDs;
 
 		// Compile an array of post type IDs to exclude:
 		$exclude_posttype_IDs = $posttypes_reserved_IDs;
-
-		foreach( $posttypes_perms as $l_permname => $l_posttype_IDs )
-		{
-			if( ! $current_User->check_perm( 'blog_'.$l_permname, 'edit', false, $Blog->ID ) )
-			{	// No permission to use this post type(s):
-				$exclude_posttype_IDs = array_merge( $exclude_posttype_IDs, $l_posttype_IDs );
-			}
-		}
 
 		return $this->get_option_list( $default, $allow_none, $method, $exclude_posttype_IDs );
 	}

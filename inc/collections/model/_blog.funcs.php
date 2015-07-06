@@ -106,11 +106,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_redirected = param( 'blog_perm_redirected_'.$loop_ID, 'string', '' );
 		if( !empty($perm_redirected) ) $perm_post[] = 'redirected';
 
-		$perm_page    = param( 'blog_perm_page_'.$loop_ID, 'integer', 0 );
-		$perm_intro   = param( 'blog_perm_intro_'.$loop_ID, 'integer', 0 );
-		$perm_podcast = param( 'blog_perm_podcast_'.$loop_ID, 'integer', 0 );
-		$perm_sidebar = param( 'blog_perm_sidebar_'.$loop_ID, 'integer', 0 );
-
+		$perm_item_type = param( 'blog_perm_item_type_'.$loop_ID, 'string', 'standard' );
 		$perm_edit = param( 'blog_perm_edit_'.$loop_ID, 'string', 'no' );
 
 		$perm_delpost = param( 'blog_perm_delpost_'.$loop_ID, 'integer', 0 );
@@ -153,13 +149,12 @@ function blog_update_perms( $blog, $context = 'user' )
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote(implode(',',$perm_post)).",
-																".$DB->quote($perm_edit).",
+			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
 																$perm_cats, $perm_properties, $perm_admin, $perm_media_upload,
-																$perm_media_browse, $perm_media_change, $perm_page,	$perm_intro, $perm_podcast,
-																$perm_sidebar )";
+																$perm_media_browse, $perm_media_change )";
 		}
 	}
 
@@ -167,11 +162,10 @@ function blog_update_perms( $blog, $context = 'user' )
 	if( count( $inserted_values ) )
 	{
 		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
-											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
+											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
-											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change,
-											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
+											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
