@@ -142,21 +142,9 @@ siteskin_include( '_site_body_header.inc.php' );
 							'after'     => '',
 						) );
 				?>
-				<div class="nav_album_number hidden-xs">
-					<?php printf( T_('%s photos'), $single_Item->get_number_of_images() ); ?>
-				</div>
 				<?php 	
 					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
-/* OLD:						
-						$single_Item->status( array(
-								'before' => '<div class="post_status">',							
-								'class' => 'badge',
-								'after'  => '</div>',
-								'format' => 'styled',
-							) );
-NEW:
-*/
 						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
@@ -247,18 +235,6 @@ NEW:
 				// Note: You can customize the default item content by copying the generic
 				// /skins/_item_content.inc.php file into the current skin folder.
 				// -------------------------- END OF POST CONTENT -------------------------
-			?>
-
-			<?php
-				// URL link, if the post has one:
-				$Item->url_link( array(
-						'before'        => '<div class="small evo_print">'.T_('Link').': ',
-						'after'         => '</div>',
-						'text_template' => '$url$',
-						'url_template'  => '$url$',
-						'target'        => '',
-						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-					) );
 			?>
 
 			<div class="item_comments">

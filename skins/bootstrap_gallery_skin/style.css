@@ -230,6 +230,9 @@ textarea.message_text {
 .evo_post .small.text-muted a .glyphicon {
   color: inherit;
 }
+.evo_post .evo_details .panel .nav_album_number {
+  display: inline;
+}
 div.bSideItem {
   background: #F7F5FA;
   border-radius: 5px;
@@ -438,7 +441,7 @@ div.evo_image_index div:hover {
 }
 .nav_album {
   text-align: center;
-  margin: 0px 0px 40px 0px;
+  margin: 0px 0px 20px 0px;
   padding: 10px;
   border-radius: 3px;
   border: 1px solid #ddd;
