@@ -111,7 +111,6 @@ class GeneralSettings extends AbstractSettings
 
 		'allow_avatars' => 1,
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
-		'messages_link_to' => 'admin',		// message link on the notification email should link to the admin or to a blog
 		'allow_html_message' => 0, // Allow HTML in messages
 
 		// Welcome private message

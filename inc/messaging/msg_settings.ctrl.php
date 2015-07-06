@@ -34,7 +34,6 @@ switch ( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'msgsettings' );
 
-		$Settings->set( 'messages_link_to', param( 'messages_link_to', 'string', true ) );
 		$Settings->set( 'allow_html_message', param( 'allow_html_message', 'integer', 0 ) );
 
 		$UserCache = & get_UserCache();

@@ -323,25 +323,17 @@ function get_messages_link_to( $thread_ID = NULL )
 	{
 		$link_tail = 'messages&thrd_ID='.$thread_ID;
 	}
-	$messages_link_to = $Settings->get( 'messages_link_to' );
-	if( $messages_link_to != 'admin' )
-	{
-		$BlogCache = & get_BlogCache();
-		/*
-		 * @var Blog
-		 */
-		$link_to_Blog = $BlogCache->get_by_ID( $messages_link_to, false, false );
-		if( $link_to_Blog )
-		{
-			$message_link = url_add_param( $link_to_Blog->gen_blogurl(), 'disp='.$link_tail );
-			$prefs_link = $link_to_Blog->get( 'userprefsurl' );
-			return array( $message_link, $prefs_link );
-		}
-	}
 
-	// link to admin
-	$message_link = $admin_url.'?ctrl='.$link_tail;
-	$prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs';
+	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
+	{ // Link to blog that is used for messaging
+		$message_link = url_add_param( $msg_Blog->gen_blogurl(), 'disp='.$link_tail );
+		$prefs_link = $msg_Blog->get( 'userprefsurl' );
+	}
+	else
+	{ // Link to admin messaging managment
+		$message_link = $admin_url.'?ctrl='.$link_tail;
+		$prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs';
+	}
 
 	return array( $message_link, $prefs_link );
 }
@@ -1716,6 +1708,7 @@ function delete_orphan_threads( $user_ids = NULL )
 
 	if( empty( $affected_threads_ids ) )
 	{ // There are no affected thread ids, nothing to delete
+		$DB->commit();
 		return true;
 	}
 

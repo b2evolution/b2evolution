@@ -35,13 +35,6 @@ $Form->begin_form( 'fform', '' );
 
 $Form->begin_fieldset( T_( 'General settings' ) );
 
-	// set link to options 
-	$messages_link_to = $Settings->get( 'messages_link_to' );
-	$admin_selected = ( $messages_link_to == 'admin' ) ? 'selected="selected"' : '';
-	$link_to_options = '<option value="admin" '.$admin_selected.'>admin</option>';
-	$link_to_options .= $BlogCache->get_option_list( $messages_link_to );
-	$Form->select_input_options( 'messages_link_to', $link_to_options, T_( 'Messaging emails link to' ) );
-
 	$Form->checkbox( 'allow_html_message', $Settings->get( 'allow_html_message' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in messages.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
 
