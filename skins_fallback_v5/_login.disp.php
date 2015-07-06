@@ -23,6 +23,7 @@ if( is_logged_in() )
 $login = utf8_strtolower( param( $dummy_fields[ 'login' ], 'string', '' ) );
 $action = param( 'action', 'string', '' );
 $redirect_to = param( 'redirect_to', 'url', '' );
+$return_to = param( 'return_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );
 $login_required = ( $action == 'req_login' );
 
@@ -52,6 +53,7 @@ $params = array_merge( array(
 		'login_form_required'      => $login_required,
 		'login_validate_required'  => NULL,
 		'login_form_redirect_to'   => $redirect_to,
+		'login_form_return_to'     => $return_to,
 		'login_form_login'         => $login,
 		'login_action_value'       => '',
 		'login_form_reqID'         => '',
@@ -79,6 +81,7 @@ $login_form_params = array(
 	'login_required'           => $params['login_form_required'],
 	'validate_required'        => $params['login_validate_required'],
 	'redirect_to'              => $params['login_form_redirect_to'],
+	'return_to'                => $params['login_form_return_to'],
 	'login'                    => $params['login_form_login'],
 	'action'                   => $params['login_action_value'],
 	'reqID'                    => $params['login_form_reqID'],
@@ -104,7 +107,7 @@ display_login_form( $login_form_params );
 
 if( $params['login_form_footer'] )
 { // Display login form footer
-	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 

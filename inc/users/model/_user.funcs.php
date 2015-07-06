@@ -189,13 +189,14 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 {
 	global $secure_htsrv_url;
 
-	if( ! empty( $redirect_to ) )
+	// This URL is used to redirect after SUCCESS login action
+	$redirect_url = empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to;
+
+	// This URL is used to redirect after ABORT login action
+	$return_url = param( 'return_to', 'url', '' );
+	if( empty( $return_url ) )
 	{
-		$redirect = $redirect_to;
-	}
-	else
-	{
-		$redirect = regenerate_url( '', '', '', '&' );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -207,22 +208,32 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		}
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
-		if( ! empty( $redirect ) )
+		if( ! empty( $redirect_url ) )
 		{
-			$redirect = url_rel_to_same_host( $redirect, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
+			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
+		}
+		if( ! empty( $redirect_url ) )
+		{
+			$return_url = url_rel_to_same_host( $return_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
 		}
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
 	}
 	else
 	{ // Use normal/standard login form (without blog skin)
-		if( ! empty( $redirect ) )
+		if( ! empty( $redirect_url ) )
 		{
-			$redirect = url_rel_to_same_host( $redirect, $secure_htsrv_url );
+			$redirect_url = url_rel_to_same_host( $redirect_url, $secure_htsrv_url );
+		}
+		if( ! empty( $redirect_url ) )
+		{
+			$return_url = url_rel_to_same_host( $return_url, $secure_htsrv_url );
 		}
 		$url = $secure_htsrv_url.'login.php';
 	}
 
-	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect ).'&source='.rawurlencode( $source ), '&' );
+	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
+			.'&return_to='.rawurlencode( $return_url )
+			.'&source='.rawurlencode( $source ), '&' );
 }
 
 
@@ -242,6 +253,13 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
 		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
 	}
 
+	// This URL is used to redirect after ABORT login action:
+	$return_url = param( 'return_to', 'url', '' );
+	if( empty( $return_url ) )
+	{
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+	}
+
 	if( use_in_skin_login() )
 	{ // Use in-skin lostpassword form of the current blog or of the special blog for login/register actions
 		$lostpassword_url = $Blog->get( 'lostpasswordurl', array( 'glue' => $glue ) );
@@ -254,6 +272,11 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
 	if( $redirect_to !== false )
 	{ // Append redirect URL only when it is not restricted
 		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
+	}
+
+	if( ! empty( $return_url ) )
+	{ // Append return URL
+		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_url ), $glue );
 	}
 
 	return $lostpassword_url;
@@ -673,6 +696,15 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 	{
 		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) ), $glue );
 	}
+
+	// This URL is used to redirect after ABORT login action
+	$return_url = param( 'return_to', 'url', '' );
+	if( empty( $return_url ) )
+	{
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
+	}
+
+	$register_url = url_add_param( $register_url, 'return_to='.$return_url, $glue );
 
 	return $register_url;
 }

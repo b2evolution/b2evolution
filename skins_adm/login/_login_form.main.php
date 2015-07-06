@@ -85,6 +85,7 @@ $params = array(
 	'login_form_required'      => $login_required,
 	'login_validate_required'  => $validate_required,
 	'login_form_redirect_to'   => $redirect_to,
+	'login_form_return_to'     => $return_to,
 	'login_form_login'         => utf8_strtolower( $login ),
 	'login_action_value'       => $action,
 	'login_form_reqID'         => isset( $reqID ) ? $reqID : NULL,

@@ -40,6 +40,7 @@ $form_params = array(
 );
 
 $redirect_to = param( 'redirect_to', 'url', '' );
+$return_to = param( 'return_to', 'url', '' );
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $params_hidden = array(
 	'inskin' => true,
@@ -62,7 +63,7 @@ display_lostpassword_form( $login, $params_hidden, $form_params );
 
 if( $params['lostpass_form_footer'] )
 { // Display lost password form footer
-	echo '<div class="evo_login_dialog_standard_link"><a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard password recovery form instead').' &raquo;</a></div>';
+	echo '<div class="evo_login_dialog_standard_link"><a href="'.$secure_htsrv_url.'login.php?action=lostpassword&amp;source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard password recovery form instead').' &raquo;</a></div>';
 
 	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }

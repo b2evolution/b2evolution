@@ -87,6 +87,7 @@ $firstname = param( 'firstname', 'string', '' );
 $gender = param( 'gender', 'string', false );
 $source = param( 'source', 'string', 'register form' );
 $redirect_to = param( 'redirect_to', 'url', '' );
+$return_to = param( 'return_to', 'url', '' );
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
@@ -239,7 +240,7 @@ echo '</div>';
 
 if( $params['register_form_footer'] )
 { // Display register form footer
-	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
