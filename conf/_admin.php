@@ -33,9 +33,6 @@ $posttypes_reserved_IDs = array( 5000 );
  * The value of each array element is an array containing the post type
  * IDs whose usage is controlled by the respective permission.
  *
- * @see check_perm_posttype()
- * @see ItemTypeCache::get_option_list_usable_only()
- *
  * @global array $posttypes_perms
  */
 $posttypes_perms = array(
