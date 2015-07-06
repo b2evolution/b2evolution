@@ -576,13 +576,26 @@ class bootstrap_blog_Skin extends Skin
 	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
+	 * @param boolean TRUE to check if at least one sidebar container is visible
 	 * @return boolean TRUE to display a sidebar
 	 */
-	function is_visible_sidebar()
+	function is_visible_sidebar( $check_containers = false )
 	{
 		$layout = $this->get_setting( 'layout' );
 
-		return ( $layout == 'left_sidebar' || $layout == 'right_sidebar' );
+		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
+		{ // Sidebar is not displayed for selected skin layout
+			return false;
+		}
+
+		if( $check_containers )
+		{ // Check if at least one sidebar container is visible
+			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+		}
+		else
+		{ // We should not check the visibility of the sidebar containers for this case
+			return true;
+		}
 	}
 
 

@@ -126,8 +126,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 
 <div class="row">
-	<div class="<?php echo ( $Skin->is_visible_container( 'sidebar' ) ||  $Skin->is_visible_container( 'sidebar' ) ) ?
-			$Skin->get_column_class() : 'col-md-12'; ?>">
+	<div class="<?php echo $Skin->is_visible_sidebar( true ) ? $Skin->get_column_class() : 'col-md-12'; ?>">
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
@@ -164,9 +163,8 @@ if( $Skin->is_visible_container( 'menu' ) )
 	</div><!-- .col -->
 
 	<?php
-	if( $Skin->is_visible_sidebar() &&
-	    ( $Skin->is_visible_container( 'sidebar' ) ||  $Skin->is_visible_container( 'sidebar' ) ) )
-	{
+	if( $Skin->is_visible_sidebar( true ) )
+	{ // Display sidebar:
 	?>
 	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
 		<?php
