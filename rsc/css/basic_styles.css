@@ -543,7 +543,6 @@ span.loader_img.loader_user_deldata {
   display: inline-block;
   vertical-align: middle;
   margin: 1px;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000000;
 }
 .filter_item div {
   margin: 0;

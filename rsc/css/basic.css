@@ -290,7 +290,7 @@ div.avatartag.main .avatar_actions {
 #image_crop_block.short_width .preview_cropped_image {
   margin-right: 10px;
 }
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 900px) {
   #fieldset_wrapper_image_crop fieldset,
   #overlay_page form.bComment {
     padding: 0 !important;
