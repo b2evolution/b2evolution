@@ -136,16 +136,6 @@ function skin_init( $disp )
 				debug_die( 'Invalid page URL!' );
 			}
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-			init_ratings_js( 'blog' );
-			init_voting_comment_js( 'blog' );
-			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
-			init_autocomplete_usernames_js( 'blog' );
-			if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
-			{ // Load jquery UI to animate background color on change comment status or on vote
-				require_js( '#jqueryUI#', 'blog' );
-			}
-
 			if( $disp == 'single' )
 			{
 				$seo_page_type = 'Single post page';
@@ -757,10 +747,6 @@ var downloadInterval = setInterval( function()
 						$edited_Message->thread_ID = $thrd_ID;
 						$action = $unsaved_message_params[ 'action' ];
 					}
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'contacts':
@@ -935,10 +921,6 @@ var downloadInterval = setInterval( function()
 					}
 
 					modules_call_method( 'switch_contacts_actions', array( 'action' => $action ) );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'threads':
@@ -1048,10 +1030,6 @@ var downloadInterval = setInterval( function()
 							$current_User->check_perm( 'perm_messaging', 'reply', true );
 							break;
 					}
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 			}
 
@@ -1059,7 +1037,12 @@ var downloadInterval = setInterval( function()
 
 			if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 			{ // Redirect to special blog for messaging actions if it is defined in general settings
-				header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
+				$blog_url_params = array( 'glue' => '&' );
+				if( ! empty( $thrd_ID ) )
+				{ // Don't forget the important param on redirect
+					$blog_url_params['url_suffix'] = 'thrd_ID='.$thrd_ID;
+				}
+				header_redirect( $msg_Blog->get( $disp.'url', $blog_url_params ) );
 			}
 
 			// just in case some robot would be logged in:
@@ -1187,11 +1170,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'profile':
-			init_userfields_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
 		case 'avatar':
-			require_js( '#jquery#', 'blog' );
-			require_js( '#jcrop#', 'blog' );
-			require_css( '#jcrop_css#', 'blog' );
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
 			{ // Check data for crop action:
@@ -1245,10 +1224,6 @@ var downloadInterval = setInterval( function()
 				$Messages->add( T_('Please specify your country before attempting to contact other users.') );
 				header_redirect( get_user_profile_url() );
 			}
-
-			// Include this file to expand/collapse the filters panel when JavaScript is disabled
-			global $inc_path;
-			require_once $inc_path.'_filters.inc.php';
 
 			$seo_page_type = 'Users list';
 			$robots_index = false;
@@ -1389,16 +1364,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), 302 );
 			}
 
-			// Require results.css to display attachments as a result table
-			require_css( 'results.css' );
-
-			init_tokeninput_js( 'blog' );
-			init_datepicker_js( 'blog' );
-			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
-			require_js( 'backoffice.js', 'blog' );
-			require_js( 'extracats.js', 'blog' );
-			init_autocomplete_usernames_js( 'blog' );
-
+			// Prepare the 'In-skin editing':
 			init_inskin_editing();
 			break;
 
@@ -1461,19 +1427,11 @@ var downloadInterval = setInterval( function()
 			$Item = $comment_Item;
 
 			$display_params = array();
-
-			// Require results.css to display attachments as a result table
-			require_css( 'results.css' );
-
-			init_ratings_js( 'blog' );
-			init_datepicker_js( 'blog' );
-			init_plugins_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) );
-			init_autocomplete_usernames_js( 'blog' );
 			break;
 
 		case 'useritems':
 		case 'usercomments':
-			global $inc_path, $display_params, $viewed_User;
+			global $display_params, $viewed_User;
 
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
 			$user_ID = param( 'user_ID', 'integer', true, true );
@@ -1525,14 +1483,6 @@ var downloadInterval = setInterval( function()
 					// will have exited
 				}
 			}
-
-			// Require results.css to display thread query results in a table
-			require_css( 'results.css' ); // Results/tables styles
-
-			// Require functions.js to show/hide a panel with filters
-			require_js( 'functions.js', 'blog' );
-			// Include this file to expand/collapse the filters panel when JavaScript is disabled
-			require_once $inc_path.'_filters.inc.php';
 
 			$display_params = !empty( $Skin ) ? $Skin->get_template( 'Results' ) : NULL;
 
