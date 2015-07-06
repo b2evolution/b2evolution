@@ -177,14 +177,15 @@ class bootstrap_manual_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery', 							// Load jQuery
-				'font_awesome', 					// Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap', 						// Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css', 			// Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
-				'bootstrap_messages',			// Initialize $Messages Class to use Bootstrap styles
-				'style_css', 						// Load the style.css file of the current skin
-				'colorbox',							// Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', 	// Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
+				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
+				'jquery',                  // Load jQuery
+				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
+				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
+				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
+				'style_css',               // Load the style.css file of the current skin
+				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
+				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 			) );
 
 		// Skin specific initializations:
@@ -193,19 +194,19 @@ class bootstrap_manual_Skin extends Skin
 		switch( $disp )
 		{
 			case 'front':
-				// Init star rating for intro posts
+				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
 				break;
 
 			case 'posts':
 				global $cat, $bootstrap_manual_posts_text;
 
-				// Init star rating for intro posts
+				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
 
 				$bootstrap_manual_posts_text = T_('Posts');
 				if( ! empty( $cat ) )
-				{ // Init the <title> for categories page
+				{ // Init the <title> for categories page:
 					$ChapterCache = & get_ChapterCache();
 					if( $Chapter = & $ChapterCache->get_by_ID( $cat, false ) )
 					{

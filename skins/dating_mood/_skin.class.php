@@ -125,7 +125,9 @@ class dating_mood_Skin extends Skin
 	function display_init()
 	{
 		// call parent:
-		parent::display_init();
+		parent::display_init( array(
+				'disp_auto', // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
+			) );
 
 		// Add custom CSS:
 		$custom_css = '';
