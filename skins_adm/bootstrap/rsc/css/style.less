@@ -1367,12 +1367,25 @@ form#thread_checkchanges ul.token-input-list-facebook {
 	text-align: center;
 }
 
-// Edit comment form
-#comment_checkchanges > .pull-right {
-	margin-bottom: 22px;
+// Global icons above form
+.global_icons {
+	float: right;
+	&.no_title {
+		margin-bottom: 22px;
+	}
 }
 
 // Input field to edit order in table column by ajax
 input[name=new_cat_order] {
 	width: 100%;
+}
+
+// Revert font size to normal from 84% on posts filters
+.filters_item_list_table {
+	font-size: 14px;
+}
+
+// Fix space under submit button on blog permission pages
+form#blogperm_checkchanges {
+	padding-bottom: 20px;
 }

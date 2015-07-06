@@ -1313,9 +1313,18 @@ form#thread_checkchanges ul.token-input-list-facebook {
   display: inline-block;
   text-align: center;
 }
-#comment_checkchanges > .pull-right {
+.global_icons {
+  float: right;
+}
+.global_icons.no_title {
   margin-bottom: 22px;
 }
 input[name=new_cat_order] {
   width: 100%;
+}
+.filters_item_list_table {
+  font-size: 14px;
+}
+form#blogperm_checkchanges {
+  padding-bottom: 20px;
 }
