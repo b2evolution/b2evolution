@@ -201,7 +201,6 @@ class bootstrap_blog_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 				'jquery',                  // Load jQuery
 				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
 				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
@@ -210,6 +209,7 @@ class bootstrap_blog_Skin extends Skin
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
 				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
+				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
 		// Skin specific initializations:
