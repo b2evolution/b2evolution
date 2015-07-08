@@ -166,9 +166,7 @@ class photoblog_Skin extends Skin
 	function display_init()
 	{
 		// call parent:
-		parent::display_init( array(
-				'disp_auto', // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
-			) );
+		parent::display_init();		// We pass NO params. This gives up the default Skins API v5 behavior.
 
 		// Add custom CSS:
 		$custom_css = '';
