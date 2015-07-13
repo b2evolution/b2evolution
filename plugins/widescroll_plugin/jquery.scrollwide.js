@@ -88,6 +88,8 @@
 			marginRight: options.width + options.margin + 2
 		} );
 
+		obj.parent().css( 'position', 'relative' );
+
 		var scroll_right = create_control( obj, 'right' );
 		var scroll_left = create_control( obj, 'left' );
 
@@ -174,7 +176,7 @@
 
 		var scroll_control_obj = $( '#' + control_id );
 
-		var control_css_left = obj.offset().left;
+		var control_css_left = 0;
 		if( type == 'right' )
 		{
 			control_css_left += obj.outerWidth() + options.margin;
@@ -190,7 +192,7 @@
 		scroll_control_obj.css( { // Set position and sizes for new created scroll control element
 			position: 'absolute',
 			left: control_css_left,
-			top: obj.offset().top,
+			top: 0,
 			width: options.width,
 			height: obj.outerHeight() - 2
 		} );
