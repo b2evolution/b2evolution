@@ -578,7 +578,7 @@ class DB
 		{
 			if( is_object($this->dbhandle) )
 			{ // use mysqli_error:
-				$this->last_error = mysqli_error($this->dbhandle).'(Errno='.mysqli_errno($this->dbhandle).')';
+				$this->last_error = $this->dbhandle->error.'(Errno='.$this->dbhandle->errno.')';
 			}
 			else
 			{
@@ -860,13 +860,13 @@ class DB
 		}
 
 		// If there is an error then take note of it..
-		if( is_object($this->dbhandle) && mysqli_error($this->dbhandle) )
+		if( is_object( $this->dbhandle ) && $this->dbhandle->errno != 0 )
 		{
-			if( is_object($this->result) )
+			if( is_object( $this->result ) )
 			{
 				mysqli_free_result($this->result);
 			}
-			$last_errno = mysqli_errno($this->dbhandle);
+			$last_errno = $this->dbhandle->errno;
 			if( $this->use_transactions && ( $this->transaction_isolation_level == 'SERIALIZABLE' ) && ( 1213 == $last_errno ) )
 			{ // deadlock exception occured, transaction must be rolled back
 				$this->rollback_nested_transaction = true;
@@ -1744,7 +1744,7 @@ class DB
 			$this->halt_on_error = false;
 			$last_error = $this->last_error;
 			$error = $this->error;
-			if( $this->dbhandle->set_charset($charset) === false )
+			if( $this->dbhandle->errno != 0 || $this->dbhandle->set_charset($charset) === false )
 			{
 				$Debuglog->add( 'Could not set DB connection charset: '.$charset.'"! (MySQL error: '.strip_tags($this->last_error).')', 'locale' );
 
