@@ -60,6 +60,23 @@ $Debuglog = new Log();
 load_class( '_core/model/_messages.class.php', 'Messages' );
 $Messages = new Messages();
 
+// Set bootstrap css classes for messages
+$Messages->set_params( array(
+		'class_outerdiv' => 'action_messages',
+		'class_success'  => 'alert alert-dismissible alert-success fade in',
+		'class_warning'  => 'alert alert-dismissible alert-warning fade in',
+		'class_error'    => 'alert alert-dismissible alert-danger fade in',
+		'class_note'     => 'alert alert-dismissible alert-info fade in',
+		'before_success' => '<evo:success>',
+		'after_success'  => '</evo:success>',
+		'before_warning' => '<evo:warning>',
+		'after_warning'  => '</evo:warning>',
+		'before_error'   => '<evo:error>',
+		'after_error'    => '</evo:error>',
+		'before_note'    => '<evo:note>',
+		'after_note'     => '</evo:note>',
+	) );
+
 /**
  * System log
  */
@@ -112,6 +129,11 @@ init_charsets( $current_charset );
 param( 'action', 'string', 'default' );
 // echo "action=*$action*<br>\n ";
 
+// Display mode:
+// - 'normal' - Normal mode; Used for normal installation.
+// - 'compact' - Compact mode; Hide header, footer and progress bar; Used for automated installation.
+param( 'display', 'string', 'normal' );
+
 // check if we should try to connect to db if config is not done
 switch( $action )
 {
@@ -155,6 +177,11 @@ if( preg_match( '/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale ) )
 if( ! empty( $default_locale ) && ! empty( $locales ) && isset( $locales[ $default_locale ] ) )
 { // Set correct charset, The main using is for DB connection
 	$evo_charset = $locales[ $default_locale ]['charset'];
+}
+
+if( $action == 'newdb' )
+{ // Check request for quick installation AND Update basic config file from url params:
+	$basic_config_file_result = check_quick_install_request();
 }
 
 if( $config_is_done || $try_db_connect )
@@ -304,6 +331,10 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
+			<?php
+			if( $display == 'normal' )
+			{ // Display header only on normal mode:
+			?>
 			<div class="header">
 				<nav>
 					<ul class="nav nav-pills pull-right">
@@ -312,8 +343,9 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img src="../rsc/img/b2evolution8.png" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="../rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
 			</div>
+		<?php } ?>
 
 		<!-- InstanceBeginEditable name="Main" -->
 
@@ -337,7 +369,7 @@ if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 // TODO: Non-install/upgrade-actions should be allowed (e.g. "deletedb")
 if( $req_errors = install_validate_requirements() )
 {
-	echo '<p class="text-danger"><strong>'.T_('b2evolution cannot be installed, because of the following errors:').'</strong></p>';
+	echo '<p class="text-danger"><strong><evo:error>'.T_('b2evolution cannot be installed, because of the following errors:').'</evo:error></strong></p>';
 	display_install_messages( $req_errors );
 	die;
 }
@@ -361,110 +393,19 @@ switch( $action )
 		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ).'/'; // force trailing slash
 		param( 'conf_admin_email', 'string', true );
 
-		// Connect to DB:
-		$DB = new DB( array(
-			'user' => $conf_db_user,
-			'password' => $conf_db_password,
-			'name' => $conf_db_name,
-			'host' => $conf_db_host,
-			'aliases' => $db_config['aliases'],
-			'use_transactions' => $db_config['use_transactions'],
-			'table_options' => $db_config['table_options'],
-			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
-			'halt_on_error' => false ) );
-		if( $DB->error )
-		{ // restart conf
-			display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
-			$action = 'start';
-		}
-		else
-		{
-			$conf_template_filepath = $conf_path.'_basic_config.template.php';
-			$conf_filepath = $conf_path.'_basic_config.php';
-
-			// Read original:
-			$file_loaded = @file( $conf_template_filepath );
-
-			if( empty( $file_loaded ) )
-			{ // This should actually never happen, just in case...
-				display_install_messages( sprintf( T_('Could not load original conf file [%s]. Is it missing?'), $conf_filepath ) );
-				break;
-			}
-
-			// File loaded...
-			$conf = implode( '', $file_loaded );
-			// Update conf:
-			$conf = preg_replace(
-				array(
-					'#\$db_config\s*=\s*array\(
-						\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-						\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
-						\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-						\s*[\'"]host[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
-						#ixs',
-					"#tableprefix\s*=\s*'.*?';#",
-					"#baseurl\s*=\s*'.*?';#",
-					"#admin_email\s*=\s*'.*?';#",
-					"#config_is_done\s*=.*?;#",
-				),
-				array(
-					"\$db_config = array(\n"
-						."\t'user'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_user )."',\$1"
-						."\t'password' => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_password )."',\$2"
-						."\t'name'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_name )."',\$3"
-						."\t'host'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_host )."',\$4",
-					"tableprefix = '".str_replace( "'", "\'", $conf_db_tableprefix )."';",
-					"baseurl = '".str_replace( "'", "\'", $conf_baseurl )."';",
-					"admin_email = '".str_replace( "'", "\'", $conf_admin_email )."';",
-					'config_is_done = 1;',
-				), $conf );
-
-			// Write new contents:
-			if( save_to_file( $conf, $conf_filepath, 'w' ) )
-			{
-				display_install_messages( sprintf( T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath ), 'success' );
-
-				$tableprefix = $conf_db_tableprefix;
-				$baseurl = $conf_baseurl;
-				$admin_email = $conf_admin_email;
-				$config_is_done = 1;
-				$action = 'menu';
-			}
-			else
-			{
-				?>
-				<h1><?php echo T_('Config file update') ?></h1>
-				<p><strong><?php printf( T_('We cannot automatically create or update your config file [%s]!'), $conf_filepath ); ?></strong></p>
-				<p><?php echo T_('There are two ways to deal with this:') ?></p>
-				<ul>
-					<li><strong><?php echo T_('You can allow the installer to create the config file by changing permissions for the /conf directory:') ?></strong>
-						<ol>
-							<li><?php printf( T_('Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it.'), $conf_filepath ); ?></li>
-							<li><?php printf( T_('<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="'.get_manual_url( 'directory-and-file-permissions' ).'" target="_blank"' ); ?></li>
-							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
-						</ol>
-						<br />
-					</li>
-					<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
-						<ol>
-							<li><?php echo T_('Create a new text file with a text editor.') ?></li>
-							<li><?php echo T_('Copy the contents from the box below.') ?></li>
-							<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
-							<li><?php echo T_('Save the file locally under the name <code>_basic_config.php</code>') ?></li>
-							<li><?php echo T_('Upload the file to your server, into the <code>/_conf</code> folder.') ?></li>
-							<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
-						</ol>
-					</li>
-				</ul>
-				<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
-				<blockquote>
-				<pre><?php
-					echo htmlspecialchars( $conf );
-				?></pre>
-				</blockquote>
-				<?php
-				break;
-			}
+		// Try to create/update basic config file:
+		$basic_config_params = array(
+				'db_user'        => $conf_db_user,
+				'db_password'    => $conf_db_password,
+				'db_name'        => $conf_db_name,
+				'db_host'        => $conf_db_host,
+				'db_tableprefix' => $conf_db_tableprefix,
+				'baseurl'        => $conf_baseurl,
+				'admin_email'    => $conf_admin_email,
+			);
+		if( ! update_basic_config_file( $basic_config_params ) )
+		{ // Break here if some error on creating/updating basic config file
+			break;
 		}
 		// ATTENTION: we continue here...
 
@@ -703,7 +644,7 @@ switch( $action )
 			<input type="hidden" name="action" value="menu-options" />
 			<p><?php echo T_('Would you like to DELETE ALL before RE-INSTALL?'); ?></p>
 
-			<p class="text-danger"><?php echo T_('ATTENTION: all your b2evolution data will be lost and reset to its original state.'); ?></p>
+			<p class="text-danger"><evo:error><?php echo T_('ATTENTION: all your b2evolution data will be lost and reset to its original state.'); ?></evo:error></p>
 
 			<p class="evo_form__install_buttons">
 				<button id="delete_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & Continue')?> &raquo;</button><?php
@@ -882,7 +823,7 @@ switch( $action )
 		$config_test_install_all_features = $test_install_all_features;
 		if( $test_install_all_features )
 		{ // Allow to use $test_install_all_features from request only when it is enabled in config
-			$test_install_all_features = param( 'install_all_features', 'boolean', ( $create_sample_contents == 'all' ? intval( $config_test_install_all_features ) : false ) );
+			$test_install_all_features = param( 'install_all_features', 'boolean', false );
 		}
 		else
 		{
@@ -903,6 +844,13 @@ switch( $action )
 		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
 		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
+
+		// Try to display the messages here because they can be created during checking params of quick installation:
+		$Messages->display();
+		if( ! empty( $basic_config_file_result_messages ) )
+		{ // Display messages that were generated on creating basic config file on quick installation:
+			echo $basic_config_file_result_messages;
+		}
 
 		if( $config_test_install_all_features && $allow_evodb_reset )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
@@ -925,7 +873,7 @@ switch( $action )
 
 		if( $old_db_version = get_db_version() )
 		{
-			echo '<p><strong>'.T_('OOPS! It seems b2evolution is already installed!').'</strong></p>';
+			echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
 
 			if( $old_db_version < $new_db_version )
 			{
@@ -990,7 +938,7 @@ switch( $action )
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="text-warning">'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</div>';
+			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
@@ -1013,7 +961,7 @@ switch( $action )
 			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
 
 			?>
-			<p class="text-success"><?php echo $upgrade_result_title; ?></p>
+			<p class="text-success"><evo:success><?php echo $upgrade_result_title; ?></evo:success></p>
 			<p><?php echo $upgrade_result_body; ?></p>
 			<?php
 
@@ -1027,7 +975,7 @@ switch( $action )
 				switch_maintenance_mode( false, 'upgrade' );
 			}
 			?>
-			<p class="text-danger"><?php echo T_('Upgrade failed!')?></p>
+			<p class="text-danger"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
 			<?php
 			// A link to back to install menu
 			display_install_back_link();
@@ -1186,6 +1134,10 @@ block_close();
 
 <!-- InstanceEndEditable -->
 
+			<?php
+			if( $display == 'normal' )
+			{ // Display footer only on normal mode:
+			?>
 			<footer class="footer" id="sticky_footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
@@ -1194,6 +1146,7 @@ block_close();
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>
 			</footer>
+			<?php } ?>
 
 		</div><!-- /container -->
 

@@ -154,7 +154,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $random_password, $create_sample_contents;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $create_sample_contents;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ function install_newdb()
 
 	if( $old_db_version = get_db_version() )
 	{
-		echo '<p><strong>'.T_('OOPS! It seems b2evolution is already installed!').'</strong></p>';
+		echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
 
 		if( $old_db_version < $new_db_version )
 		{
@@ -230,7 +230,7 @@ function install_newdb()
 		.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
 		.'</strong></p>'
 		.'<table>'
-			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>'
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>'
 			.'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
 		.'</table>'
 		.'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
@@ -423,11 +423,13 @@ function create_default_settings( $override = array() )
 		'default_locale' => $default_locale,
 		'newusers_grp_ID' => $Group_Users->ID,
 		'evocache_foldername' => '_evocache',
+		'newusers_canregister' => 'yes',
+		'registration_is_public' => 1,
+		'quick_registration' => 1,
 	);
 	if( $test_install_all_features )
 	{
 		$defaults['gender_colored'] = 1;
-		$defaults['newusers_canregister'] = 'yes';
 		$defaults['registration_require_country'] = 1;
 		$defaults['registration_require_gender'] = 'required';
 		$defaults['location_country'] = 'required';
@@ -691,7 +693,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! is_a( $edit_Plugin, 'Plugin' ) )
 	{ // Broken plugin
-		echo '<span class="text-danger">'.$edit_Plugin.'</span><br />'."\n";
+		echo '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n";
 		return false;
 	}
 
@@ -712,8 +714,11 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return !== true )
 		{ // Warning on enable a plugin
-			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
-			echo '<span class="text-warning">'.$enable_return.'</span><br />'."\n";
+			echo '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n";
+
+			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'needs_config' );
+
 			return false;
 		}
 
@@ -963,7 +968,7 @@ function install_htaccess( $upgrade = false )
 	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
 	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
 	{ // Skip installation if this is not an Apache server
-		echo '<br /><b class="text-warning">'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</b></p>';
+		echo '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>';
 		return true;
 	}
 
@@ -973,7 +978,7 @@ function install_htaccess( $upgrade = false )
 	{
 		$htignore = param( 'htignore', 'integer', 0 );
 
-		echo '<span class="text-danger">'.T_('ERROR!').'<br/><b>'.$error_message.'</b></span>';
+		echo '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br/><b>'.$error_message.'</b></evo:error></span>';
 
 		if( $htignore )
 		{ // Ignore errors with .htaccess file
@@ -1006,7 +1011,7 @@ function do_install_htaccess( $upgrade = false )
 	{
 		if( $upgrade )
 		{
-			echo '<span class="text-warning">'.T_('Already installed.').'</span>';
+			echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
 			return ''; // all is well :)
 		}
 
@@ -1017,15 +1022,14 @@ function do_install_htaccess( $upgrade = false )
 
 			if( $content_htaccess != $content_sample_htaccess )
 			{ // The .htaccess file has content that different from a sample file
-				$error_message = '<p class="text-danger">'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</p>';
-				$error_message .= T_('Here are the contents of the current .htaccess file:');
-				$error_message .= '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
-				$error_message .= sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
-				return $error_message;
+				echo '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>';
+				echo T_('Here are the contents of the current .htaccess file:');
+				echo '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
+				return sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
 			}
 			else
 			{
-				echo '<span class="text-warning">'.T_('Already installed.').'</span>';
+				echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
 				return '';
 			}
 		}
@@ -1061,7 +1065,7 @@ function do_install_htaccess( $upgrade = false )
 		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo '<span class="text-success">'.T_('Installation successful!').'</span>';
+	echo '<span class="text-success"><evo:success>'.T_('Installation successful!').'</evo:success></span>';
 	return '';
 }
 
@@ -1114,7 +1118,12 @@ function display_install_back_link()
  */
 function start_install_progress_bar( $title, $steps = NULL )
 {
-	global $install_progress_bar_counter, $install_progress_bar_total;
+	global $install_progress_bar_counter, $install_progress_bar_total, $display;
+
+	if( ! empty( $display ) && $display != 'normal' )
+	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
+		return;
+	}
 
 	if( $steps !== NULL )
 	{ // Progress bar with steps
@@ -1150,6 +1159,13 @@ function start_install_progress_bar( $title, $steps = NULL )
  */
 function stop_install_progress_bar()
 {
+	global $display;
+
+	if( ! empty( $display ) && $display != 'normal' )
+	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
+		return;
+	}
+
 	echo '<script type="text/javascript">'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
 		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-success" ); }, 600 );'
@@ -1162,7 +1178,12 @@ function stop_install_progress_bar()
  */
 function update_install_progress_bar()
 {
-	global $install_progress_bar_counter, $install_progress_bar_total;
+	global $install_progress_bar_counter, $install_progress_bar_total, $display;
+
+	if( ! empty( $display ) && $display != 'normal' )
+	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
+		return;
+	}
 
 	if( empty( $install_progress_bar_total ) )
 	{ // No a number of the steps, Exit here
@@ -1331,6 +1352,7 @@ function get_upgrade_steps_count()
  * Display the messages on install pages
  *
  * @param string|array Messages
+ * @param string Message type: 'error', 'warning', 'success', 'info'
  */
 function display_install_messages( $messages, $type = 'error' )
 {
@@ -1344,12 +1366,43 @@ function display_install_messages( $messages, $type = 'error' )
 		$messages = array( $messages );
 	}
 
-	$type = ( $type == 'error' )? 'danger' : $type;
+	switch( $type )
+	{
+		case 'error':
+			$before_message = '<evo:error>';
+			$after_message = '</evo:error>';
+			break;
+
+		case 'warning':
+			$before_message = '<evo:warning>';
+			$after_message = '</evo:warning>';
+			break;
+
+		case 'success':
+			$before_message = '<evo:success>';
+			$after_message = '</evo:success>';
+			break;
+
+		case 'info':
+			$before_message = '<evo:note>';
+			$after_message = '</evo:note>';
+			break;
+
+		default:
+			$before_message = '';
+			$after_message = '';
+			break;
+	}
+
+	if( $type == 'error' )
+	{ // Fix to correct bootstrap class name "alert-danger"
+		$type = 'danger';
+	}
 
 	$r = '';
 	foreach( $messages as $message )
 	{
-		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$message.'</div>'."\n";
+		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$before_message.$message.$after_message.'</div>'."\n";
 	}
 
 	echo $r;
@@ -1471,9 +1524,17 @@ function check_local_installation()
  */
 function display_install_result_window( $title, $body )
 {
-	global $baseurl, $admin_url;
+	global $baseurl, $dispatcher, $display;
 
-	// Modal window with info
+	if( ! empty( $display ) && $display != 'normal' )
+	{ // Exit here, because we can use the modal window ONLY on normal mode (Hide on compact mode)
+		return;
+	}
+
+	// Remove a link to log in from body text:
+	$body = preg_replace( '~</?a[^>]*>~i', '', $body );
+
+	// Modal window with info:
 	echo '<div class="modal modal-success fade" id="evo_modal__install" tabindex="-1" role="dialog" aria-labelledby="evo_modal__label_install" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -1484,15 +1545,277 @@ function display_install_result_window( $title, $body )
 				<div class="modal-body">'.$body.'</div>
 				<div class="modal-footer" style="text-align:center">
 					<a href="'.$baseurl.'" class="btn btn-primary">'.T_('Go to Front-office').'</a>
-					<a href="'.$admin_url.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
+					<a href="'.$baseurl.$dispatcher.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
 				</div>
 			</div>
 		</div>
 	</div>';
 
-	// JavaScript to open modal window with info
+	// JavaScript to open modal window with info:
 	echo '<script type="text/javascript">'
-		.'jQuery( "#evo_modal__install" ).modal();'
+		.'setTimeout( function() { jQuery( "#evo_modal__install" ).modal(); }, 1000 );'
 	.'</script>';
+}
+
+
+/**
+ * Check request for quick installation
+ * Update basic config file from url params
+ *
+ * @return boolean|string TRUE on success, OR error messages
+ */
+function check_quick_install_request()
+{
+	global $config_is_done, $db_config, $install_login, $install_password, $Messages;
+
+	$admin_login = param( 'admin_login', 'string', '' );
+	$admin_password = param( 'admin_password', 'string', '' );
+
+	if( ! empty( $admin_login ) )
+	{ // Try to use an admin login from request:
+		if( param_check_valid_login( 'admin_login' ) )
+		{ // We can use this login name
+			$install_login = $admin_login;
+		}
+		else
+		{ // Display an error message for impossible login name:
+			$Messages->add( sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $admin_login ) );
+		}
+	}
+
+	if( ! empty( $admin_password ) && param_check_passwords( 'admin_password', 'admin_password', false, 5 ) )
+	{ // Set admin password from request:
+		$install_password = $admin_password;
+	}
+
+	if( $config_is_done )
+	{ // Config is already done, Don't use url params to update basic config file
+		return true;
+	}
+
+	// DB Access:
+	$db_user = param( 'db_user', 'string', '' );
+	$db_password = param( 'db_password', 'raw', '' );
+	$db_name = param( 'db_name', 'string', '' );
+	$db_host = param( 'db_host', 'string', '' );
+
+	// Admin e-mail:
+	global $admin_email;
+	$default_admin_email = $admin_email;
+	$conf_admin_email = param( 'admin_email', 'string', '', false, true );
+	$admin_email = $default_admin_email;
+
+	if( ! empty( $conf_admin_email ) ||
+	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) )
+	{ // Try to update basic config file ONLY when at least one of these params are defined
+
+		if( empty( $conf_admin_email ) || ! param_check_email( 'admin_email' ) )
+		{ // Use default admin email if it is empty from request
+			$conf_admin_email = $default_admin_email;
+		}
+
+		// Base URL:
+		global $baseurl;
+		$baseurl = param( 'baseurl', 'string', '', false, true );
+		if( empty( $baseurl ) || ! preg_match( '~https?://~', $baseurl ) )
+		{ // Try to autogenerate base url if it is empty or wrong from request
+			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
+			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
+				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
+			list( $ReqPath, $ReqURI ) = get_ReqURI();
+			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
+		}
+		// Add a slash at the end if it is missed
+		$baseurl = trim( $baseurl, '/' ).'/';
+
+		// Try to create basic config file:
+		$basic_config_params = array(
+				'db_user'        => $db_user,
+				'db_password'    => $db_password,
+				'db_name'        => $db_name,
+				'db_host'        => $db_host,
+				'baseurl'        => $baseurl,
+				'admin_email'    => $conf_admin_email,
+				'print_messages' => false,
+				'quick_install'  => true,
+			);
+		if( update_basic_config_file( $basic_config_params ) )
+		{ // Basic config file has been created successfully
+			// Update DB config to connect to DB correctly
+			$db_config['user'] = $db_user;
+			$db_config['password'] = $db_password;
+			$db_config['name'] = $db_name;
+			$db_config['host'] = $db_host;
+		}
+		else
+		{ // Failed on createing of basic config file
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+ * Update file /conf/_basic_config.php
+ *
+ * @param string Current action, updated by reference
+ * @param array Params
+ * @return boolean TRUE on success
+ */
+function update_basic_config_file( $params = array() )
+{
+	global $DB, $db_config, $evo_charset, $conf_path, $default_locale;
+
+	// These global params should be rewritten by this function on success result
+	global $tableprefix, $baseurl, $admin_email, $config_is_done, $action;
+
+	$params = array_merge( array(
+			'db_user'        => '',
+			'db_password'    => '',
+			'db_name'        => '',
+			'db_host'        => '',
+			'db_tableprefix' => $tableprefix,
+			'baseurl'        => '',
+			'admin_email'    => '',
+			'print_messages' => true, // TRUE - to print out all messages on screen, FALSE - to return
+			'quick_install'  => false, // TRUE - to mark this call as request to quick installation
+		), $params );
+
+	if( ! $params['print_messages'] )
+	{ // Start to get all messages instead of printing on screen:
+		ob_start();
+		// Use this global var to store all messages
+		global $basic_config_file_result_messages;
+	}
+
+	// Connect to DB:
+	$DB = new DB( array(
+			'user'     => $params['db_user'],
+			'password' => $params['db_password'],
+			'name'     => $params['db_name'],
+			'host'     => $params['db_host'],
+			'aliases'          => $db_config['aliases'],
+			'use_transactions' => $db_config['use_transactions'],
+			'table_options'    => $db_config['table_options'],
+			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
+			'halt_on_error'      => false
+		) );
+
+	if( $DB->error )
+	{ // restart conf
+		display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
+		$action = 'start';
+	}
+	else
+	{
+		$conf_template_filepath = $conf_path.'_basic_config.template.php';
+		$conf_filepath = $conf_path.'_basic_config.php';
+
+		// Read original:
+		$file_loaded = @file( $conf_template_filepath );
+
+		if( empty( $file_loaded ) )
+		{ // This should actually never happen, just in case...
+			display_install_messages( sprintf( T_('Could not load original conf file [%s]. Is it missing?'), $conf_filepath ) );
+			if( ! $params['print_messages'] )
+			{ // Return all messages instead of printing on screen
+				$basic_config_file_result_messages = ob_get_clean();
+			}
+			return false;
+		}
+
+		// File loaded...
+		$conf = implode( '', $file_loaded );
+		// Update conf:
+		$conf = preg_replace(
+			array(
+				'#\$db_config\s*=\s*array\(
+					\s*[\'"]user[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+					\s*[\'"]password[\'"]\s*=>\s*[\'"].*?[\'"], ([^\n\r]*\r?\n)
+					\s*[\'"]name[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+					\s*[\'"]host[\'"]\s*=>\s*[\'"].*?[\'"],     ([^\n\r]*\r?\n)
+					#ixs',
+				"#tableprefix\s*=\s*'.*?';#",
+				"#baseurl\s*=\s*'.*?';#",
+				"#admin_email\s*=\s*'.*?';#",
+				"#config_is_done\s*=.*?;#",
+			),
+			array(
+				"\$db_config = array(\n"
+					."\t'user'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_user'] )."',\$1"
+					."\t'password' => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_password'] )."',\$2"
+					."\t'name'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_name'] )."',\$3"
+					."\t'host'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $params['db_host'] )."',\$4",
+				"tableprefix = '".str_replace( "'", "\'", $params['db_tableprefix'] )."';",
+				"baseurl = '".str_replace( "'", "\'", $params['baseurl'] )."';",
+				"admin_email = '".str_replace( "'", "\'", $params['admin_email'] )."';",
+				'config_is_done = 1;',
+			), $conf );
+
+		// Write new contents:
+		if( save_to_file( $conf, $conf_filepath, 'w' ) )
+		{
+			display_install_messages( sprintf( T_('Your configuration file <code>%s</code> has been successfully created.').'</p>', $conf_filepath ), 'success' );
+
+			$tableprefix = $params['db_tableprefix'];
+			$baseurl = $params['baseurl'];
+			$admin_email = $params['admin_email'];
+			$config_is_done = 1;
+			if( ! $params['quick_install'] )
+			{ // Switch to menu only on standard installation:
+				$action = 'menu';
+			}
+		}
+		else
+		{
+			?>
+			<h1><?php echo T_('Config file update') ?></h1>
+			<p><strong><?php printf( T_('We cannot automatically create or update your config file [%s]!'), $conf_filepath ); ?></strong></p>
+			<p><?php echo T_('There are two ways to deal with this:') ?></p>
+			<ul>
+				<li><strong><?php echo T_('You can allow the installer to create the config file by changing permissions for the /conf directory:') ?></strong>
+					<ol>
+						<li><?php printf( T_('Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it.'), $conf_filepath ); ?></li>
+						<li><?php printf( T_('<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="'.get_manual_url( 'directory-and-file-permissions' ).'" target="_blank"' ); ?></li>
+						<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
+					</ol>
+					<br />
+				</li>
+				<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
+					<ol>
+						<li><?php echo T_('Create a new text file with a text editor.') ?></li>
+						<li><?php echo T_('Copy the contents from the box below.') ?></li>
+						<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
+						<li><?php echo T_('Save the file locally under the name <code>_basic_config.php</code>') ?></li>
+						<li><?php echo T_('Upload the file to your server, into the <code>/_conf</code> folder.') ?></li>
+						<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
+					</ol>
+				</li>
+			</ul>
+			<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
+			<blockquote>
+			<pre><?php
+				echo htmlspecialchars( $conf );
+			?></pre>
+			</blockquote>
+			<?php
+
+			if( ! $params['print_messages'] )
+			{ // Return all messages instead of printing on screen
+				$basic_config_file_result_messages = ob_get_clean();
+			}
+
+			return false;
+		}
+	}
+
+	if( ! $params['print_messages'] )
+	{ // Return all messages instead of printing on screen
+		$basic_config_file_result_messages = ob_get_clean();
+	}
+
+	return true;
 }
 ?>

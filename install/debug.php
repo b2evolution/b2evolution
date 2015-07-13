@@ -282,7 +282,7 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img src="../rsc/img/b2evolution8.png" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
 			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->
