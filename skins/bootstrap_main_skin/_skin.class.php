@@ -237,17 +237,17 @@ class bootstrap_main_Skin extends Skin
 
 				'section_access_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('When access requires login...')
+					'label'  => T_('When access is denied or requires login...')
 				),
 					'access_login_containers' => array(
 						'label' => T_('Display on login screen'),
 						'note' => '',
 						'type' => 'checklist',
 						'options' => array(
-							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),    1 ),
-							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
-// missing menu container , default 0
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) 
+							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),   1 ),
+							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ), 1 ),
+							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),     0 ),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),   1 )
 							),
 						),
 				'section_access_end' => array(
