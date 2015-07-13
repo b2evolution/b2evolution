@@ -378,7 +378,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Update setting:
-		$UserSettings->set( 'show_quick_publish', ( $action == 'show_quick_button' ? 1 : 0 ) );
+		$UserSettings->set( 'show_quick_publish_'.$blog, ( $action == 'show_quick_button' ? 1 : 0 ) );
 		$UserSettings->dbupdate();
 
 		$prev_action = param( 'prev_action', 'string', '' );
@@ -396,8 +396,8 @@ switch( $action )
 
 		// Reset settings to default values
 		$DB->query( 'DELETE FROM T_users__usersettings
-			WHERE uset_name LIKE "fold_itemform_%"
-			   OR uset_name = "show_quick_publish"' );
+			WHERE uset_name LIKE "fold_itemform_%_'.$blog.'"
+			   OR uset_name = "show_quick_publish_'.$blog.'"' );
 
 		$prev_action = param( 'prev_action', 'string', '' );
 		$item_ID = param( 'p', 'integer', 0 );
@@ -749,7 +749,7 @@ switch( $action )
 		check_perm_posttype( $post_extracats );
 
 		// Update the folding positions for current user
-		save_fieldset_folding_values();
+		save_fieldset_folding_values( $Blog->ID );
 
 		// CREATE NEW POST:
 		load_class( 'items/model/_item.class.php', 'Item' );
@@ -892,7 +892,7 @@ switch( $action )
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Update the folding positions for current user
-		save_fieldset_folding_values();
+		save_fieldset_folding_values( $Blog->ID );
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );

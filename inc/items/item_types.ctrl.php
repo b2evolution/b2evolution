@@ -283,17 +283,17 @@ switch( $action )
 		{ // Do only when item type exists in DB
 			if( $action == 'enable' )
 			{ // Enable item type for the blog
-				$DB->query( 'REPLACE INTO T_items__type_blog
-								 ( itbl_ityp_ID, itbl_blog_ID )
+				$DB->query( 'REPLACE INTO T_items__type_coll
+								 ( itc_ityp_ID, itc_coll_ID )
 					VALUES ( '.$DB->quote( $edited_Itemtype->ID ).', '.$DB->quote( $blog ).' )' );
-				$Messages->add( T_('Post type has been enabled for this blog.'), 'success' );
+				$Messages->add( T_('Post type has been enabled for this collection.'), 'success' );
 			}
 			else
 			{ // Disable item type for the blog
-				$DB->query( 'DELETE FROM T_items__type_blog
-					WHERE itbl_ityp_ID = '.$DB->quote( $edited_Itemtype->ID ).'
-					  AND itbl_blog_ID = '.$DB->quote( $blog ) );
-				$Messages->add( T_('Post type has been disabled for this blog.'), 'success' );
+				$DB->query( 'DELETE FROM T_items__type_coll
+					WHERE itc_ityp_ID = '.$DB->quote( $edited_Itemtype->ID ).'
+					  AND itc_coll_ID = '.$DB->quote( $blog ) );
+				$Messages->add( T_('Post type has been disabled for this collection.'), 'success' );
 			}
 		}
 

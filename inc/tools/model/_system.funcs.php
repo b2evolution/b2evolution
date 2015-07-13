@@ -178,7 +178,7 @@ function system_create_cache_folder( $verbose = false )
 			}
 			if( $verbose )
 			{ // Display error message
-				echo '<span class="error">'.sprintf( T_('You should rename your "%s" folder to "%s" for page caching to continue working without interruption.'), $basepath.'cache/', $cache_path )."</span>";
+				echo '<span class="error text-warning">'.sprintf( T_('You should rename your "%s" folder to "%s" for page caching to continue working without interruption.'), $basepath.'cache/', $cache_path )."</span>";
 			}
 			return false;
 		}
@@ -190,7 +190,7 @@ function system_create_cache_folder( $verbose = false )
 	{
 		if( $verbose )
 		{ // The cache folder is not readable/writable or doesn't exist
-			echo '<span class="error">'.T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.').'</span>';
+			echo '<span class="error text-warning">'.T_('The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.').'</span>';
 		}
 		return false;
 	}

@@ -3307,9 +3307,9 @@ class Blog extends DataObject
 			global $DB;
 
 			$SQL = new SQL();
-			$SQL->SELECT( 'itbl_ityp_ID' );
-			$SQL->FROM( 'T_items__type_blog' );
-			$SQL->WHERE( 'itbl_blog_ID = '.$this->ID );
+			$SQL->SELECT( 'itc_ityp_ID' );
+			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
 			$this->enabled_item_types = $DB->get_col( $SQL->get() );
 		}

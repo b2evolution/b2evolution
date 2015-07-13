@@ -1797,7 +1797,7 @@ function db_upgrade_to_utf8_ascii()
 	evo_flush();
 
 	// Load db schema to be able to check the original charset definition
-	load_db_schema();
+	load_db_schema( true );
 
 	$db_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
 	foreach( $db_tables as $table )

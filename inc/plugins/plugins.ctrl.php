@@ -219,6 +219,9 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+
+			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+			$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
 		}
 
 		//save fadeout item
@@ -336,7 +339,9 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
-			$Plugins->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
+
+			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+			$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
 		}
 
 		if( ! empty( $edit_Plugin->install_dep_notes ) )
@@ -594,8 +599,10 @@ switch( $action )
 			$enable_return = $edit_Plugin->BeforeEnable();
 			if( $enable_return !== true )
 			{
-				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
 				$Messages->add( T_('The plugin has been disabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+
+				// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
 			}
 		}
 
@@ -738,14 +745,16 @@ switch( $action )
 		}
 
 		// Check if we should change plugin status to 'needs_config'
-		// to view this plugin in list with orange "question" icon
+		// to view this plugin in list with orange "question" icon:
 		if( $edit_Plugin->status == 'enabled' || $edit_Plugin->status == 'disabled' )
 		{
 			$enable_return = $edit_Plugin->BeforeEnable();
 			if( $enable_return !== true )
-			{
-				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
+			{ // Plugin cannot be enabled
 				$Messages->add( T_('The plugin has been disabled.').( empty( $enable_return ) ? '' : '<br />'.$enable_return ), 'error' );
+
+				// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
 			}
 		}
 

@@ -186,9 +186,10 @@ if( !$Messages->has_errors() )
 					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
 				}
 
-				$send_reportpm = param( 'send_reportpm', 'integer' );
-				if( $send_reportpm )
-				{ // Get all user IDs who reported for the deleted user
+				$send_reportpm = param( 'send_reportpm', 'integer', 0 );
+				$increase_spam_score = param( 'increase_spam_score', 'integer', 0 );
+				if( $send_reportpm || $increase_spam_score )
+				{ // Get all user IDs who reported for the deleted user:
 					$report_user_IDs = get_user_reported_user_IDs( $edited_User->ID );
 				}
 
@@ -201,7 +202,7 @@ if( !$Messages->has_errors() )
 					forget_param( 'user_ID' );
 					$Messages->add( $msg, 'success' );
 
-					// Find other users with the same email address
+					// Find other users with the same email address:
 					$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );
 					if( $message_same_email_users !== false )
 					{
@@ -209,8 +210,13 @@ if( !$Messages->has_errors() )
 					}
 
 					if( $send_reportpm )
-					{ // Send an info message to users who reported this deleted user
+					{ // Send an info message to users who reported this deleted user:
 						user_send_report_message( $report_user_IDs, $deleted_user_login );
+					}
+
+					if( $increase_spam_score )
+					{ // Increase spam fighter score for the users who reported the deleted account:
+						user_increase_spam_score( $report_user_IDs );
 					}
 				}
 
@@ -337,6 +343,26 @@ if( !$Messages->has_errors() )
 			header_redirect( $redirect_to );
 			/* EXITED */
 			break;
+
+		case 'remove_report':
+			// Remove one report on user:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			$reporter_ID = param( 'reporter_ID', 'integer', true );
+
+			// Remove the report from DB:
+			$DB->query( 'DELETE FROM T_users__reports
+					WHERE urep_target_user_ID = '.$DB->quote( $edited_User->ID ).'
+					  AND urep_reporter_ID = '.$DB->quote( $reporter_ID ) );
+
+			$Messages->add( T_('The report has been removed!'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=user&user_tab=activity&user_ID='.$edited_User->ID );
+			/* EXITED */
+			break;
 	}
 }
 
@@ -427,6 +453,10 @@ switch( $action )
 				$delete_form_params['before_submit_button'] = '<p><label>'
 						.'<input type="checkbox" id="send_reportpm" name="send_reportpm" value="1"'.( $deltype == 'spammer' ? ' checked="checked"' : '' ).' /> '
 						.sprintf( T_('Send an info message to %s users who reported this account.'), $user_count_reports )
+					.'</label></p>'
+					.'<p><label>'
+						.'<input type="checkbox" id="increase_spam_score" name="increase_spam_score" value="1"'.( $deltype == 'spammer' ? ' checked="checked"' : '' ).' /> '
+						.sprintf( T_('Increase spam fighter score for the %s users who reported this account.'), $user_count_reports )
 					.'</label></p>';
 			}
 		}
@@ -436,6 +466,9 @@ switch( $action )
 		// Display user identity form:
 		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
 		$AdminUI->disp_payload_end();
+
+		// Init JS for user reporting
+		echo_user_report_window();
 		break;
 
 	case 'promote':

@@ -18,9 +18,9 @@ global $Blog;
 
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( 't.*, IF( tb.itbl_ityp_ID > 0, 1, 0 ) AS type_enabled' );
+$SQL->SELECT( 't.*, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled' );
 $SQL->FROM( 'T_items__type AS t' );
-$SQL->FROM_add( 'LEFT JOIN T_items__type_blog AS tb ON itbl_ityp_ID = ityp_ID AND itbl_blog_ID = '.$Blog->ID );
+$SQL->FROM_add( 'LEFT JOIN T_items__type_coll AS tb ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'ityp_' );

@@ -196,13 +196,13 @@ class coll_current_filters_Widget extends ComponentWidget
 			{
 				if( is_admin_page() && get_param( 'tab' ) == 'type' )
 				{ // Try to get a title for current selected post type on back-office pages:
-					$current_post_type_title = get_param( 'tab_type' );
+					$current_post_type_title = '"'.get_param( 'tab_type' ).'"';
 				}
 				if( empty( $current_post_type_title ) )
 				{ // Use this title by default for unknown selected post type:
-					$current_post_type_title = T_('Posts');
+					$current_post_type_title = T_('items');
 				}
-				echo sprintf( T_('No filters - Showing all "%s"'), $current_post_type_title );
+				echo sprintf( T_('No filters - Showing all %s'), $current_post_type_title );
 			}
 		}
 		else

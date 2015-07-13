@@ -1576,7 +1576,7 @@ function get_item_type_tabs()
 	$SQL = new SQL();
 	$SQL->SELECT( 'DISTINCT( ityp_backoffice_tab )' );
 	$SQL->FROM( 'T_items__type' );
-	$SQL->FROM_add( 'INNER JOIN T_items__type_blog ON itbl_ityp_ID = ityp_ID AND itbl_blog_ID = '.$Blog->ID );
+	$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 	$SQL->WHERE( 'ityp_backoffice_tab IS NOT NULL' );
 	$SQL->ORDER_BY( 'ityp_ID' );
 
@@ -1854,7 +1854,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 	$Form->hidden( 'publish_status', $highest_publish_status );
 
-	if( $highest_publish_status == 'published' && $UserSettings->get( 'show_quick_publish' ) )
+	if( $highest_publish_status == 'published' && $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
 	{ // Display this button to make a post published
 
 		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
@@ -3925,7 +3925,7 @@ function item_type_global_icons( $object_Widget )
 		$item_types_SQL->SELECT( 'ityp_ID AS ID, ityp_name AS name, ityp_perm_level AS perm_level,
 			IF( ityp_ID = "'.$Blog->get_setting( 'default_post_type' ).'", 0, 1 ) AS fix_order' );
 		$item_types_SQL->FROM( 'T_items__type' );
-		$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_blog ON itbl_ityp_ID = ityp_ID AND itbl_blog_ID = '.$Blog->ID );
+		$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 		if( ! empty( $tab_type ) )
 		{ // Get item types only by selected back-office tab
 			$item_types_SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_type ) );

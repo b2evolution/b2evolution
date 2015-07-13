@@ -761,7 +761,7 @@ function param_check_valid_login( $var )
 		{	// Special case, the login is valid however we forbid it's usage.
 			$msg = T_('Logins cannot start with "usr_", this prefix is reserved for system use.');
 		}
-		elseif( $Settings->get('strict_logins') )
+		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
 			$msg = T_('Logins can only contain letters, digits and the following characters: _ .');
 		}
@@ -1452,7 +1452,7 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 		return false;
 	}
 
-	if( preg_match( '/[<>&]/', $_POST[ $var1 ] ) )
+	if( preg_match( '/[<>&]/', isset( $_POST[ $var1 ] ) ? $_POST[ $var1 ] : $_GET[ $var1 ] ) )
 	{ // Checking the not allowed chars
 		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_wrong'] );
 		return false;

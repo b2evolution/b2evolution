@@ -1559,18 +1559,19 @@ function profile_check_params( $params, $User = NULL )
 /**
  * Get avatar <img> tag by user login
  *
- * @param user login
- * @param if true show user preferred name after avatar, if 'login' show user login
- * @param if true link to user profile
- * @param avatar size
- * @param style class of image
- * @param image align
- * @param avatar overlay text
- * @param style class of link
- * @param if true show user avatar
+ * @param string user login
+ * @param boolean if true show user preferred name after avatar, if 'login' show user login
+ * @param boolean if true link to user profile
+ * @param string avatar size
+ * @param string style class of image
+ * @param string image align
+ * @param string avatar overlay text
+ * @param string style class of link
+ * @param boolean if true show user avatar
+ * @param string Value for html attribute, NULL - to use default to init bubbletip on mouseover
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-top-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true )
+function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-top-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true, $rel = NULL )
 {
 	global $current_User;
 
@@ -1597,15 +1598,25 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 		$img_tag = '<span class="nowrap">'.$img_tag.'<b>'.$login.'</b></span>';
 	}
 
+	if( is_null( $rel ) )
+	{ // Set default rel:
+		$rel = 'bubbletip_user_'.$User->ID;
+	}
+
+	if( ! empty( $rel ) )
+	{ // Initialize attribure "rel"
+		$rel = ' rel="'.$rel.'"';
+	}
+
 	$identity_url = get_user_identity_url( $User->ID );
 	if( empty( $identity_url ) )
 	{ // Current user has not permissions to view other user profile
-		$img_tag = '<span class="'.$login_class.$User->get_gender_class().'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</span>';
+		$img_tag = '<span class="'.$login_class.$User->get_gender_class().'"'.$rel.'>'.$img_tag.'</span>';
 	}
 	else if( !empty( $img_tag ) )
 	{ // Show avatar & user login as link to the profile page
 		$link_class = ( $link_class != '' ) ? ' '.$link_class : '';
-		$img_tag = '<a href="'.$identity_url.'" class="'.$login_class.$User->get_gender_class().$link_class.'" rel="bubbletip_user_'.$User->ID.'">'.$img_tag.'</a>';
+		$img_tag = '<a href="'.$identity_url.'" class="'.$login_class.$User->get_gender_class().$link_class.'"'.$rel.'>'.$img_tag.'</a>';
 	}
 
 	return $img_tag;
@@ -2335,7 +2346,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 				$report_text_title = $report_text = T_('You have reported this user');
 				$report_text = '<span class="red">'.$report_text.'</span>';
 			}
-			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.$user_tab.'\')' ) );
+			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
 		}
 		if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
 			&& ( $edited_User->ID != 1 ) )
@@ -3631,6 +3642,30 @@ function user_send_report_message( $report_user_IDs, $reported_user_login )
 
 
 /**
+ * Increase spam fighter score for the users who reported the deleted account
+ *
+ * @param array User IDs who reported for the deleted user
+ */
+function user_increase_spam_score( $report_user_IDs )
+{
+	global $UserSettings;
+
+	if( empty( $report_user_IDs ) )
+	{ // No users to update spam score
+		return false;
+	}
+
+	foreach( $report_user_IDs as $report_user_ID )
+	{
+		$score = intval( $UserSettings->get( 'spam_fighter_score', $report_user_ID ) ) + 1;
+		$UserSettings->set( 'spam_fighter_score', $score, $report_user_ID );
+	}
+
+	$UserSettings->dbupdate();
+}
+
+
+/**
  * Get form to quick users search
  *
  * @param array Params
@@ -4245,7 +4280,7 @@ echo_modalwindow_js();
 				'user_ID': user_ID,
 				'file_ID': file_ID,
 				'window_width'  : width - margin_size,
-				'window_height' : height - margin_size,
+				'window_height' : height - margin_size - ( width <= 900 ? preview_size + 60 : 0 ),
 				'display_mode': 'js',
 				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 			},
@@ -4593,7 +4628,7 @@ function user_reports_results_block( $params = array() )
 
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'user_login, urep_datetime, urep_status, urep_info' );
+	$SQL->SELECT( 'user_login, urep_datetime, urep_status, urep_info, urep_reporter_ID, urep_target_user_ID' );
 	$SQL->FROM( 'T_users__reports' );
 	$SQL->FROM_add( 'LEFT JOIN T_users ON user_ID = urep_reporter_ID' );
 	$SQL->WHERE( 'urep_target_user_ID = '.$DB->quote( $edited_User->ID ) );
@@ -4642,6 +4677,8 @@ function user_reports_results_block( $params = array() )
  */
 function user_reports_results( & $reports_Results, $params = array() )
 {
+	global $admin_url, $current_User;
+
 	$reports_Results->cols[] = array(
 		'th' => T_('Date and time'),
 		'order' => 'urep_datetime',
@@ -4671,6 +4708,16 @@ function user_reports_results( & $reports_Results, $params = array() )
 		'td_class' => 'left',
 		'td' => '$urep_info$',
 	);
+
+	if( $current_User->check_perm( 'users', 'edit', false ) )
+	{ // Allow actions if current user has a permission to edit the users
+		$reports_Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => action_icon( T_('Remove this report!'), 'remove', $admin_url.'?ctrl=users&amp;action=remove_report&amp;user_ID=$urep_target_user_ID$&amp;reporter_ID=$urep_reporter_ID$&amp;'.url_crumb( 'users' ) ),
+		);
+	}
 }
 
 

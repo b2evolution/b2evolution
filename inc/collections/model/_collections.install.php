@@ -322,13 +322,13 @@ $schema_queries = array_merge( $schema_queries, array(
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_items__type_blog' => array(
-		'Creating table for PostType-to-Blog relationships',
-		"CREATE TABLE T_items__type_blog (
-			itbl_ityp_ID int(11) unsigned NOT NULL,
-			itbl_blog_ID int(11) unsigned NOT NULL,
-			PRIMARY KEY (itbl_ityp_ID, itbl_blog_ID),
-			UNIQUE itemtypeblog ( itbl_ityp_ID, itbl_blog_ID )
+	'T_items__type_coll' => array(
+		'Creating table for PostType-to-Collection relationships',
+		"CREATE TABLE T_items__type_coll (
+			itc_ityp_ID int(11) unsigned NOT NULL,
+			itc_coll_ID int(11) unsigned NOT NULL,
+			PRIMARY KEY (itc_ityp_ID, itc_coll_ID),
+			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__tag' => array(

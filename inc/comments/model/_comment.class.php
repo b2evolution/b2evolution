@@ -774,6 +774,7 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'before' => '',
 				'after'  => '',
+				'rel'    => NULL,
 			), $params );
 
 		$gender_class = '';
@@ -784,7 +785,17 @@ class Comment extends DataObject
 
 		$author_name = $this->dget( 'author', $format );
 
-		$author_name = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$this->ID.'">'
+		if( is_null( $params['rel'] ) )
+		{ // Set default rel:
+			$params['rel'] = 'bubbletip_comment_'.$this->ID;
+		}
+
+		if( ! empty( $params['rel'] ) )
+		{ // Initialize attribure "rel"
+			$params['rel'] = ' rel="'.$params['rel'].'"';
+		}
+
+		$author_name = '<span class="user anonymous'.$gender_class.'"'.$params['rel'].'>'
 			.$params['before']
 			.$author_name
 			.$params['after']

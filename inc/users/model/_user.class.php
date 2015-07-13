@@ -5791,10 +5791,10 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'text' => T_( '%s successfully reported %s spams!' ),
+				'text' => T_( '%s successfully reported %s spams and/or spammers!' ),
 			), $params );
 
-		global $DB;
+		global $DB, $UserSettings;
 
 		$comments_SQL = new SQL( 'Get number of spam votes on comments by this user' );
 		$comments_SQL->SELECT( 'COUNT(*) AS cnt' );
@@ -5810,6 +5810,9 @@ class User extends DataObject
 
 		$votes = $DB->get_var( 'SELECT SUM( cnt )
 			FROM ('.$comments_SQL->get().' UNION ALL '.$links_SQL->get().') AS tbl' );
+
+		// Get spam fighter score for the users that were reported and deleted
+		$votes += intval( $UserSettings->get( 'spam_fighter_score', $this->ID ) );
 
 		return sprintf( $params['text'], $this->login, '<b>'.$votes.'</b>' );
 	}

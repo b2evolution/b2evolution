@@ -94,51 +94,53 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Menu */
-	$widgets_insert_sql = 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) VALUES';
-	// Home page
-	add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 5, array( 'link_type' => 'home' ) );
-	if( $blog_id == $blog_a_ID )
-	{ // Recent Posts
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 10, array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
-	}
-	if( $kind == 'forum' )
-	{ // Latest Topics and Replies ONLY for forum
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
-	}
-	if( $kind == 'manual' )
-	{ // Latest Topics and Replies ONLY for forum
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
-	}
-	if( $kind == 'photo' )
-	{ // Add menu with Photo index
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
-	}
-	if( $kind == 'forum' )
-	{ // Add menu with User Directory
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 20, array( 'link_type' => 'users' ) );
-	}
-	// Pages list:
-	add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );
-	if( $kind == 'forum' )
-	{ // My Profile
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 30, array( 'link_type' => 'myprofile' ), 0 );
-	}
-	if( $kind == 'std' )
-	{ // Categories
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 33, array( 'link_type' => 'catdir' ) );
-		// Archives
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 35, array( 'link_type' => 'arcdir' ) );
-		// Latest comments
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
-	}
-	add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 50, array( 'link_type' => 'messages' ), 0 );
-	add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), 0 );
-	add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
-	if( $kind == 'forum' )
-	{ // Register
-		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 80, array( 'link_type' => 'register' ) );
+	if( $kind != 'main' )
+	{ // Don't add widgets to Menu container for Main collections
+		// Home page
+		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 5, array( 'link_type' => 'home' ) );
+		if( $blog_id == $blog_b_ID )
+		{ // Recent Posts
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 10, array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
+		}
+		if( $kind == 'forum' )
+		{ // Latest Topics and Replies ONLY for forum
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
+		}
+		if( $kind == 'manual' )
+		{ // Latest Topics and Replies ONLY for forum
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
+		}
+		if( $kind == 'photo' )
+		{ // Add menu with Photo index
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
+		}
+		if( $kind == 'forum' )
+		{ // Add menu with User Directory
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 20, array( 'link_type' => 'users' ) );
+		}
+		// Pages list:
+		add_basic_widget( $blog_id, 'Menu', 'coll_page_list', 'core', 25 );
+		if( $kind == 'forum' )
+		{ // My Profile
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 30, array( 'link_type' => 'myprofile' ), 0 );
+		}
+		if( $kind == 'std' )
+		{ // Categories
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 33, array( 'link_type' => 'catdir' ) );
+			// Archives
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 35, array( 'link_type' => 'arcdir' ) );
+			// Latest comments
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
+		}
+		add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 50, array( 'link_type' => 'messages' ), 0 );
+		add_basic_widget( $blog_id, 'Menu', 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), 0 );
+		add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
+		if( $kind == 'forum' )
+		{ // Register
+			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 80, array( 'link_type' => 'register' ) );
+		}
 	}
 
 

@@ -639,6 +639,8 @@ var downloadInterval = setInterval( function()
 				// Get the suggested subject for the email:
 				if( empty($subject) )
 				{ // no subject provided by param:
+					global $DB;
+
 					if( ! empty($comment_id) )
 					{
 						// fp>TODO there should be NO SQL in this file. Make a $ItemCache->get_by_comment_ID().

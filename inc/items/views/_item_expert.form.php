@@ -685,7 +685,7 @@ $Form->begin_form( '', '', $params );
 	if( $current_User->check_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
 	{ // Display a link to show/hide quick button to publish the post ONLY if current user has a permission:
 		echo '<p>';
-		if( $UserSettings->get( 'show_quick_publish' ) )
+		if( $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
 		{ // The quick button is displayed
 			echo action_icon( '', 'activate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
 		}
