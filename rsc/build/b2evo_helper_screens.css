@@ -133,3 +133,16 @@ span.flag {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
+div.action_messages ul {
+  list-style: none;
+  margin: 1ex 0;
+  padding-left: 0;
+}
+.b2evolution_plane_logo {
+  width: 254px;
+  height: 52px;
+  margin-top: 13px;
+}
+.modal-dialog {
+  margin-top: 175px;
+}
