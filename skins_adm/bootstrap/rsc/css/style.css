@@ -138,6 +138,9 @@ h2 .glyphicon {
   clear: both;
   padding-top: 7px;
 }
+.edit_actions .PreviewButton {
+  margin-right: 10px;
+}
 .compose_layout {
   margin-bottom: 15px;
 }
