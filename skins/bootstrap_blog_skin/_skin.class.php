@@ -166,7 +166,7 @@ class bootstrap_blog_Skin extends Skin
 
 				'section_access_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('When access requires login...')
+					'label'  => T_('When access is denied or requires login...')
 				),
 					'access_login_containers' => array(
 						'label' => T_('Display on login screen'),
