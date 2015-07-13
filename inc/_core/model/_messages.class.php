@@ -88,6 +88,14 @@ class Messages
 				'class_error'    => 'log_error',
 				'class_note'     => 'log_note',
 				'before_message' => '',
+				'before_success' => '',
+				'after_success'  => '',
+				'before_warning' => '',
+				'after_warning'  => '',
+				'before_error'   => '',
+				'after_error'    => '',
+				'before_note'    => '',
+				'after_note'     => '',
 			), $params );
 	}
 
@@ -220,8 +228,11 @@ class Messages
 					$this->params['class_'.$this->messages_type[$i]] :
 					$this->params['class_note'];
 			$disp .= "<li>\t<div class=\"{$class}\"".'>'
+					.$this->params['before_'.$this->messages_type[$i]]
 					.$this->params['before_message']
-					.$this->messages_text[$i]."</div></li>\n";
+					.$this->messages_text[$i]
+					.$this->params['after_'.$this->messages_type[$i]]
+				."</div></li>\n";
 		}
 		$disp .= '</ul>';
 
