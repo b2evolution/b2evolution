@@ -248,12 +248,22 @@ echo '<div class="profile_column_left">';
 		}
 	}
 
-	// - Edit in back-office:
 	if( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) )
 	{ // Current user can edit other user's profiles
 		global $admin_url;
+
+		// - Edit in back-office:
 		$buttons[] = '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'">'
 				.'<button type="button" class="btn btn-default">'.$params['edit_user_admin_link_text'].'</button>'
+			.'</a>';
+
+		// - Delete in back-office:
+		$buttons['del'] = array();
+		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+				.'<button type="button">'.T_('Delete').'</button>'
+			.'</a>';
+		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+				.'<button type="button">'.T_('Delete Spammer').'</button>'
 			.'</a>';
 	}
 

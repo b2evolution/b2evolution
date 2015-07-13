@@ -183,6 +183,9 @@ echo '<div class="profile_column_left">';
 			.'</a>';
 	}
 
+	// Check if current user can edit other users from back-office:
+	$user_perms_edit = ( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) );
+
 	// - Message:
 	if( ! $is_logged_in || $current_User->ID != $User->ID )
 	{ // Display a message to send a button only for other users
@@ -190,7 +193,7 @@ echo '<div class="profile_column_left">';
 		if( ! empty( $msgform_url ) )
 		{
 			$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
-			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn btn-primary">'.T_('Send Message').'</button></a>';
+			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn '.( $user_perms_edit ? 'btn-default' : 'btn-primary' ).'">'.T_('Send Message').'</button></a>';
 		}
 	}
 
@@ -249,12 +252,22 @@ echo '<div class="profile_column_left">';
 		}
 	}
 
-	// - Edit in back-office:
-	if( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) )
+	if( $user_perms_edit )
 	{ // Current user can edit other user's profiles
 		global $admin_url;
+
+		// - Edit in back-office:
 		$buttons[] = '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'">'
-				.'<button type="button" class="btn btn-default">'.$params['edit_user_admin_link_text'].'</button>'
+				.'<button type="button" class="btn btn-primary">'.$params['edit_user_admin_link_text'].'</button>'
+			.'</a>';
+
+		// - Delete in back-office:
+		$buttons['del'] = array();
+		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+				.'<button type="button">'.T_('Delete').'</button>'
+			.'</a>';
+		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+				.'<button type="button">'.T_('Delete Spammer').'</button>'
 			.'</a>';
 	}
 
