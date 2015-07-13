@@ -233,12 +233,6 @@ textarea.message_text {
 .evo_post .evo_details .panel .nav_album_number {
   display: inline;
 }
-div.evo_print a {
-  color: #777 !important;
-}
-div.evo_print a:hover {
-  color: #337ab7 !important;
-}
 div.bSideItem {
   background: #F7F5FA;
   border-radius: 5px;
@@ -410,8 +404,8 @@ body {
 }
 .single-image {
   display: inline-block;
+  margin: 42px;
   padding-bottom: 10px;
-  float: none !important;
 }
 .single-image .img-responsive {
   width: 100%;
@@ -443,11 +437,11 @@ div.evo_image_index div:hover {
   background: none;
 }
 .post_images {
-  margin-top: 25px;
+  text-align: center;
 }
 .nav_album {
   text-align: center;
-  margin: 0px 0px 5px 0px;
+  margin: 0px 0px 20px 0px;
   padding: 10px;
   border-radius: 3px;
   border: 1px solid #ddd;
@@ -497,9 +491,9 @@ div.evo_image_index div:hover {
   font-size: 16px;
   margin-left: 5px;
 }
-.nav_album .nav_album_title .evo_status {
+.nav_album .evo_status {
   position: relative;
-  top: -3px;
+  top: -1px;
 }
 .nav_album .pager {
   float: right;
@@ -600,9 +594,12 @@ div.evo_image_index div:hover {
     padding-left: 0px;
     padding-right: 0px;
   }
-  .post_images {
-    display: inline-block;
-    text-align: center;
+  .single-image {
+    margin-left: 42px;
+    margin-right: 42px;
+  }
+  .evo_details {
+    padding: 0px 15px;
   }
 }
 @media screen and (max-width: 500px) {
@@ -619,7 +616,7 @@ div.evo_image_index div:hover {
     height: auto !important;
   }
   .single-image {
-    margin: 0px 0px 25px 0px;
+    margin: 0px 0px 40px 0px;
   }
   .nav_album .nav_album_title {
     margin-top: 6px;
@@ -629,9 +626,6 @@ div.evo_image_index div:hover {
     margin-right: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
-  }
-  .nav_album .nav_album_title .evo_status {
-    top: -1px;
   }
 }
 .bt-content {
@@ -664,6 +658,9 @@ div.evo_image_index div:hover {
 @media (min-width: 1440px) {
   .container {
     width: 1410px;
+  }
+  .single-image:first-child {
+    margin: 42px 42px 42px 0px;
   }
   .col-xl-1,
   .col-xl-2,

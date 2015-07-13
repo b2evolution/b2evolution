@@ -28,7 +28,7 @@ class bootstrap_gallery_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Gallery';
+		return 'Bootstrap Gallery Skin';
 	}
 
 
@@ -80,7 +80,7 @@ class bootstrap_gallery_Skin extends Skin
 					'single_thumb_size' => array(
 						'label' => T_('Thumbnail size inside Album'),
 						'note' => '',
-						'defaultvalue' => 'fit-256x256',
+						'defaultvalue' => 'fit-640x480',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
@@ -222,7 +222,7 @@ class bootstrap_gallery_Skin extends Skin
 
 				'section_access_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('When access requires login...')
+					'label'  => T_('When access is denied or requires login...')
 				),
 					'access_login_containers' => array(
 						'label' => T_('Display on login screen'),
@@ -344,7 +344,7 @@ class bootstrap_gallery_Skin extends Skin
 		if( isset( $thumbnail_sizes[ $single_thumb_size ] ) )
 		{
 			// Make the width of image block as fixed to don't expand it by long post title text
-			$custom_css .= '	.post_images .single-image .evo_image_legend { width:'.$thumbnail_sizes[ $single_thumb_size ][1].'px; max-width:'.$thumbnail_sizes[ $single_thumb_size ][1]."px }\n";
+			$custom_css .= '.post_images .single-image .evo_image_legend { width: 100%; }\n';
 			// Set width & height for block with text "No pictures yet"
 			/*$custom_css .= '	.posts_list .evo_post b { width:'.( $thumbnail_sizes[ $single_thumb_size ][1] - 20 ).'px;'
 				.'height:'.( $thumbnail_sizes[ $single_thumb_size ][2] - 20 ).'px'." }\n";*/

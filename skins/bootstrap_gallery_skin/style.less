@@ -278,10 +278,19 @@ textarea.message_text {
 			color: inherit;
 		}
 	}
-	.evo_details .panel {
-		.nav_album_number {
-			display: inline;
+	.evo_details {
+		.panel {
+			.nav_album_number {
+				display: inline;
+			}
 		}
+	}
+}
+// On disp=single, colors links in post to grey
+div.evo_print a {
+	color: #777 !important;
+	&:hover {
+		color: #337ab7 !important;
 	}
 }
 
@@ -462,8 +471,8 @@ text-align: center;
 }
 .single-image {
 	display: inline-block;
-	margin: 42px;
 	padding-bottom: 10px;
+	float: none !important;
 	.img-responsive {
 		width: 100%;
 		text-align: center;
@@ -493,11 +502,11 @@ div.evo_image_index div {
 	}
 }
 .post_images {
-	text-align: center;
+	margin-top: 25px;
 }
 .nav_album {
 	text-align: center;
-	margin: 0px 0px 20px 0px;
+	margin: 0px 0px 5px 0px;
 	padding: 10px;
 	border-radius: 3px;
 	border: 1px solid #ddd;
@@ -545,9 +554,9 @@ div.evo_image_index div {
 		font-size: 16px;
 		margin-left: 5px;
 	}
-	.evo_status {
+	.nav_album_title .evo_status {
 		position: relative;
-		top: -1px;
+		top: -3px;
 	}
 	.pager {
 		float: right;
@@ -624,6 +633,8 @@ div.evo_image_index div {
 }
 
 // Responsive styles
+@media (min-width: 992px) and (max-width: 1199px) {
+}
 @media screen and (max-width: 1199px) {
 	.float-right {
 		float: none !important;
@@ -650,13 +661,10 @@ div.evo_image_index div {
 	.evo_details, .col-lg-12 {
 		padding-left: 0px;
 		padding-right: 0px;
-	}	
-	.single-image {
-		margin-left: 42px;
-		margin-right: 42px;
 	}
-	.evo_details {
-	padding: 0px 15px;
+	.post_images {
+		display: inline-block;
+		text-align: center;
 	}
 }
 @media screen and (max-width: 500px) {
@@ -673,7 +681,7 @@ div.evo_image_index div {
 		}
 	}
 	.single-image {
-		margin: 0px 0px 40px 0px;
+		margin: 0px 0px 25px 0px;
 	}
 	.nav_album {
 		.nav_album_title {
@@ -684,6 +692,9 @@ div.evo_image_index div {
 				margin-top: 0px;
 				margin-bottom: 0px;
 			}
+		}	
+		.nav_album_title .evo_status {
+			top: -1px;
 		}
 	}
 }
@@ -727,9 +738,6 @@ div.evo_image_index div {
     .container {
         width: 1410px;
     }
-	.single-image:first-child {
-		margin: 42px 42px 42px 0px;
-	}
 
     .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {
         float: left;
@@ -964,6 +972,7 @@ div.evo_image_index div {
     }
 
     .visible-xl-inline-block {
+        display: inline-block !important;
         display: inline-block !important;
     }
 

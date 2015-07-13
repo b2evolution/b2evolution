@@ -200,24 +200,23 @@ siteskin_include( '_site_body_header.inc.php' );
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
 
-	<div class="post_images col-xl-9 col-lg-9 col-md-8 col-sm-7">
+	<div class="post_images col-xl-9 col-lg-8 col-md-6 col-sm-6">
 		<?php
 			// Display images that are linked to this post:
 			$Item->images( array(
 					'before'              => '',
-					'before_image'        => '<figure class="single-image col-xl-4 col-lg-4 col-md-6 col-sm-12">',
+					'before_image'        => '<figure class="single-image">',
 					'before_image_legend' => '<figcaption class="evo_image_legend">',
 					'after_image_legend'  => '</figcaption>',
 					'after_image'         => '</figure>',
 					'after'               => '<div class="clear"></div>',
 					'image_size'          => $Skin->get_setting( 'single_thumb_size' ),
 					'image_align'         => 'middle',
-					'image_class'		  => 'img-responsive',
 				) );
 		?>
 	</div>
 
-	<div class="evo_post_content col-xl-3 col-lg-3 col-md-4 col-sm-5">
+	<div class="evo_post_content col-xl-3 col-lg-4 col-md-6 col-sm-6">
 
 		<div class="evo_details">
 

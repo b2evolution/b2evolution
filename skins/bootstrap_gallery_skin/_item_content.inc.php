@@ -215,7 +215,7 @@ switch( $content_mode )
 			echo $params['content_title_start'];
 				$Item->title( array(
 						'link_type' => 'permalink',
-						'before'    => '<h4>',
+						'before'    => '<h4 class="panel-title">',
 						'after'     => '',
 					) );
 					// Writes the number of photos in the current gallery
