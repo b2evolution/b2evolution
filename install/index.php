@@ -360,9 +360,17 @@ if( empty( $date_timezone ) && empty( $date_default_timezone ) )
 
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 { // DB connect was unsuccessful, restart conf
+	display_install_messages( T_('ERROR: Impossible to connect to Database.') );
 	display_install_messages( T_('Check your database config settings below and update them if necessary...') );
 	display_base_config_recap();
-	$action = 'start';
+	if( $display == 'normal' )
+	{ // Set action to display a start form of installation:
+		$action = 'start';
+	}
+	else // 'compact'
+	{ // Use fake action to don't provide a form to set db access data on compact mode:
+		$action = 'none';
+	}
 }
 
 // Check other dependencies:

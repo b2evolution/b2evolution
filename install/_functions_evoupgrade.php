@@ -6425,7 +6425,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{ // Display errors of the cache checking
 			foreach( $check_cache_messages as $check_cache_message )
 			{
-				echo '<br /><span class="text-warning"><evo:warning>'.$check_cache_message.'</evo:warning></span>';
+				echo '<br /><span class="text-danger"><evo:error>'.$check_cache_message.'</evo:error></span>';
 			}
 			echo '<br />';
 		}

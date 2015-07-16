@@ -1603,7 +1603,6 @@ function check_quick_install_request()
 	global $admin_email;
 	$default_admin_email = $admin_email;
 	$conf_admin_email = param( 'admin_email', 'string', '', false, true );
-	$admin_email = $default_admin_email;
 
 	if( ! empty( $conf_admin_email ) ||
 	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) )
@@ -1652,6 +1651,9 @@ function check_quick_install_request()
 			return false;
 		}
 	}
+
+	// Revert config admin email to original value:
+	$admin_email = $default_admin_email;
 
 	return true;
 }
