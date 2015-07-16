@@ -219,10 +219,10 @@ div.bPost {
 .bFeedback {
   margin: 1ex;
 }
-#comments_container.full_comment_list {
+#comments_container {
   border: none;
 }
-#comments_container.full_comment_list .bCommentAvatar {
+#comments_container .bCommentAvatar {
   border: 0;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
@@ -230,7 +230,8 @@ div.bPost {
   -o-border-radius: 50%;
   border-radius: 50%;
   padding: 0;
-  margin-top: 0;
+  margin: 4px 10px 10px 0;
+  float: left;
 }
 .bFeedback #comments_container {
   border: none;
@@ -662,6 +663,7 @@ fieldset ul {
 }
 #itemform_adv_props ul.token-input-list-facebook {
   width: 100%;
+  max-width: 100%;
 }
 #itemform_comments label {
   width: auto;

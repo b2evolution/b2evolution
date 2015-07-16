@@ -1106,12 +1106,16 @@ table.widget_grid {
   display: flex;
   flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  justify-content: space-around;
-  -webkit-justify-content: space-around;
+  justify-content: center;
+  -webkit-justify-content: center;
+  align-content: center;
+  -webkit-align-content: center;
+  align-items: center;
+  -webkit-align-items: center;
 }
 .widget_flow_blocks div,
 table.widget_grid div {
-  margin-bottom: 15px;
+  margin: 3px;
 }
 .widget_flow_blocks > div img {
   border-radius: 3px;
@@ -2042,6 +2046,13 @@ div.message_toolbars {
   padding-left: 5px;
   float: left;
   font-weight: bold;
+}
+.btn-toolbar[class*="_toolbar"].disabled span.btn {
+  opacity: 0.5;
+  cursor: default;
+}
+.btn-toolbar[class*="_toolbar"].disabled span.btn:hover {
+  background: #FFF;
 }
 .edit_plugin_actions {
   padding-top: 7px;
