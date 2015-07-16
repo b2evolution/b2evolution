@@ -72,7 +72,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Form->text_input( $dummy_fields[ 'email' ], $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'),
 		 array( 'maxlength'=>150, 'class'=>'wide_input', 'required'=>true ) );
 
-	$Form->text_input( $dummy_fields[ 'subject' ], $subject, 255, T_('Subject'), T_(''), array( 'maxlength'=>255, 'class'=>'', 'required'=>true ) );
+	$Form->text_input( $dummy_fields[ 'subject' ], $subject, 255, T_('Subject'), '', array( 'maxlength'=>255, 'class'=>'', 'required'=>true ) );
 
 	$Form->textarea( $dummy_fields[ 'content' ], $message, 15, T_('Message'), T_('Plain text only.'), 35, 'wide_textarea', true );
 
