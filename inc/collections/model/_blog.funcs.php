@@ -382,7 +382,7 @@ function get_collection_kinds( $kind = NULL )
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
 				'desc' => T_('A collection optimized to be used as a site homepage and/or for generic functions such as messaging, user profiles, etc.'),
-				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as provate messaging, user profile editing, etc.'),
+				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as private messaging, user profile editing, etc.'),
 			),
 		'std' => array(
 				'name' => T_('Blog'),

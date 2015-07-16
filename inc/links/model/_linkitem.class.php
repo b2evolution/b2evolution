@@ -41,7 +41,6 @@ class LinkItem extends LinkOwner
 			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your item.' ),
 			'View this xxx...' => NT_( 'View this item...' ),
 			'Edit this xxx...' => NT_( 'Edit this item...' ),
-			'Click on link %s icons below to link additional files to $xxx$.' => NT_( 'Click on link %s icons below to link additional files to <strong>item</strong>.' ),
 			'Link files to current xxx' => NT_( 'Link files to current item' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to item.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;item&raquo;.' ),

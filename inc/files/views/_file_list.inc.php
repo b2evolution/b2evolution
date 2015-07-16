@@ -283,12 +283,12 @@ $Form->begin_form();
 					if( $mode == 'upload' )
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
-						$link_attribs['class'] = 'action_icon link_file';
+						$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
 								regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-								NULL, NULL, NULL, $link_attribs );
+								' '.T_('Attach'), NULL, 5, $link_attribs );
 					echo ' ';
 				}
 
@@ -604,7 +604,7 @@ $Form->begin_form();
 				$field_options['make_posts_pre'] = T_('Make multiple posts (1 per image)');
 			}
 
-			if( $mode == 'upload' )
+			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )
 			{	// We are uploading in a popup opened by an edit screen
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
@@ -673,7 +673,13 @@ $Form->begin_form();
 				selected_value = jQuery('#group_action option:selected').attr('value');
 				if( selected_value == 'img_tag' )
 				{
-					insert_tag_for_selected_files();
+					if( insert_tag_for_selected_files() )
+					{ // If images have been inserted successfully
+						if( typeof( closeModalWindow ) == 'function' )
+						{ // Close modal window after images inserting:
+							closeModalWindow( window.parent.document );
+						}
+					}
 					return false;
 				}
 

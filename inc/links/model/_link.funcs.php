@@ -77,13 +77,26 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	}
 
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
+	{
 		return;
+	}
+
+	// Set title for modal window:
+	$window_title = TS_('Attach files');
+	if( $LinkOwner->type == 'item' )
+	{ // Item
+		$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+	}
+	elseif( $LinkOwner->type == 'comment' )
+	{ // Comment
+		$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), sprintf( T_('Comment #%s'), $LinkOwner->Comment->ID ) ) );
+	}
 
 	$fieldset_title = T_( 'Images &amp; Attachments' );
 
 	if( $creating )
 	{ // Creating new Item
-		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Link existing files').'</a>';
+		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Attach existing files').'</a>';
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
 
@@ -110,9 +123,9 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
 		$fieldset_title .= ' - '
-			.action_icon( T_('Link existing files'), 'folder',
+			.action_icon( T_('Attach existing files'), 'folder',
 				$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID(),
-				T_('Link existing files'), 3, 4,
+				T_('Attach existing files'), 3, 4,
 				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' )
 			);
 	}
@@ -141,7 +154,7 @@ echo_modalwindow_js();
 function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, root, path, fm_highlight )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '', true );
+		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
 	jQuery.ajax(
 	{
 		type: 'POST',
@@ -159,7 +172,7 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 		},
 		success: function(result)
 		{
-			openModalWindow( result, '90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '' );
+			openModalWindow( result, '90%', '80%', true, '<?php echo $window_title; ?>', '' );
 		}
 	} );
 	return false;
@@ -167,16 +180,32 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 
 jQuery( document ).ready( function()
 {
-	jQuery( '#attachmentframe' ).bind( 'load', function()
+	function update_attachment_frame_height()
 	{
 		var body_height = jQuery( '#attachmentframe' ).contents().find( 'body' ).height();
+		if( body_height == 0 )
+		{ // Some browsers cannot get iframe body height correctly, Use this default min value:
+			body_height = 91;
+		}
+
 		if( body_height > jQuery( '#attachmentframe_wrapper' ).height() )
-		{ // Expand the frame height if it is more than wrapper height (but max height is 320px)
+		{ // Expand the frame height if it is more than wrapper height (but max height is 320px):
 			jQuery( '#attachmentframe_wrapper' ).css( 'height', body_height < 320 ? body_height : 320 );
 		}
-		// Set max-height on each iframe reload in order to avoid a space after upload button
+		// Set max-height on each iframe reload in order to avoid a space after upload button:
 		jQuery( '#attachmentframe_wrapper' ).css( 'max-height', body_height );
+	}
+
+	jQuery( '#attachmentframe' ).bind( 'load', function()
+	{ // Set proper height on frame loading:
+		update_attachment_frame_height();
 	} );
+
+	jQuery( '#icon_folding_itemform_links, #title_folding_itemform_links' ).click( function()
+	{ // Use this hack to fix frame height on show attachments fieldset if it was hidden before:
+		update_attachment_frame_height();
+	} );
+
 	jQuery( '#attachmentframe_wrapper' ).resizable(
 	{ // Make the frame wrapper resizable
 		minHeight: 80,

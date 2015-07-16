@@ -2629,8 +2629,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param int comment id
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
+ * @param integer Comment index in the current list
  */
-function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
+function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL )
 {
 	global $current_User, $localtimenow;
 
@@ -2671,7 +2672,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 		if( $Comment->is_meta() )
 		{ // Display ID for each meta comment
-			echo '<span class="badge badge-info">'.$Comment->ID.'</span> ';
+			echo '<span class="badge badge-info">'.$comment_index.'</span> ';
 		}
 
 		echo '<div class="bSmallHeadRight">';

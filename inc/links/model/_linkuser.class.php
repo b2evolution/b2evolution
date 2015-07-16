@@ -39,7 +39,6 @@ class LinkUser extends LinkOwner
 			'Link this file to your xxx' => NT_( 'Link this file to the user.'),
 			'View this xxx...' => NT_( 'View this user...' ),
 			'Edit this xxx...' => NT_( 'Edit this user...' ),
-			'Click on link %s icons below to link additional files to $xxx$.' => NT_( 'Click on link %s icons below to link additional files to <strong>user</strong>.' ),
 			'Link files to current xxx' => NT_( 'Link files to current user' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;user&raquo;.' ),
 		);

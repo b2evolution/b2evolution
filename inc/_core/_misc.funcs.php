@@ -7101,6 +7101,23 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	modal_window_js_initialized = true;
 }
+
+/**
+ * Close modal window
+ *
+ * @param object Document object
+ */
+function closeModalWindow( document_obj )
+{
+	if( typeof( document_obj ) == 'undefined' )
+	{
+		document_obj = window.document;
+	}
+
+	jQuery( '#modal_window', document_obj ).remove();
+
+	return false;
+}
 <?php
 } // end of echo_modalwindow_js_bootstrap
 

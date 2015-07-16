@@ -457,7 +457,7 @@ switch( $action )
 		param( 'plugin_ID', 'integer', true );
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
-		if( empty($edit_Plugin) )
+		if( empty( $edit_Plugin ) )
 		{
 			$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 			$action = 'list';
@@ -473,7 +473,7 @@ switch( $action )
 		param( 'edited_plugin_displayed_events', 'array:string', array() );
 		param( 'edited_plugin_events', 'array:integer', array() );
 
-		$default_Plugin = & $admin_Plugins->register($edit_Plugin->classname);
+		$default_Plugin = & $admin_Plugins->register( $edit_Plugin->classname );
 
 		// Update plugin name:
 		// (Only if changed to preserve initial localization feature and therefor also priorize NULL)
@@ -483,7 +483,7 @@ switch( $action )
 			$edit_Plugin->name = $edited_plugin_name;
 			if( $DB->query( '
 				UPDATE T_plugins
-					 SET plug_name = '.$DB->quote($set_to).'
+					 SET plug_name = '.$DB->quote( $set_to ).'
 				 WHERE plug_ID = '.$plugin_ID ) )
 			{
 				$Messages->add( T_('Plugin name updated.'), 'success' );
@@ -534,7 +534,7 @@ switch( $action )
 
 		// Plugin code
 		// Check if a ping plugin has a code (which is required) (this has to go after event handling!):
-		if( $admin_Plugins->has_event($edit_Plugin->ID, 'ItemSendPing')
+		if( $admin_Plugins->has_event( $edit_Plugin->ID, 'ItemSendPing' )
 			&& empty($edited_plugin_code) )
 		{
 			param_error( 'edited_plugin_code', sprintf( T_('This ping plugin needs a non-empty code.'), $edit_Plugin->name ) );
@@ -593,17 +593,18 @@ switch( $action )
 			}
 		}
 
-		// Check if it can stay enabled, if it is
-		if( $edit_Plugin->status == 'enabled' )
+		// Check if plugin status should be changed to incomplete:
+		$enable_return = $edit_Plugin->BeforeEnable();
+		if( $enable_return !== true )
 		{
-			$enable_return = $edit_Plugin->BeforeEnable();
-			if( $enable_return !== true )
-			{
-				$Messages->add( T_('The plugin has been disabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
+			$Messages->add( T_('The plugin has been disabled.').( empty( $enable_return ) ? '' : '<br />'.$enable_return ), 'error' );
 
-				// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
-				$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
-			}
+			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
+			$Plugins->set_Plugin_status( $edit_Plugin, 'needs_config' );
+		}
+		elseif( $edit_Plugin->status != 'enabled' )
+		{ // Set plugin status to "enabled" if it is allowed for current plugin configuration:
+			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
 		}
 
 		if( ! $Messages->has_errors() )

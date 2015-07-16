@@ -983,8 +983,8 @@ switch( $action )
 					require_css( '#jcrop_css#', 'rsc_url' );
 					$AdminUI->disp_payload_begin();
 				}
-				$window_width = param( 'window_width', 'integer' );
-				$window_height = param( 'window_height', 'integer' );
+				$image_width = param( 'image_width', 'integer' );
+				$image_height = param( 'image_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

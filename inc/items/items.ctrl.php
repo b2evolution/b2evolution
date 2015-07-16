@@ -1097,7 +1097,9 @@ switch( $action )
 
 		if( $edited_Item->get( 'status' ) == 'redirected' && empty( $edited_Item->url ) )
 		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
-			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
+			param_error( 'post_url',
+				T_('If you want to redirect this post, you must specify an URL!').' ('.T_('Advanced properties panel').')',
+				T_('If you want to redirect this post, you must specify an URL!') );
 		}
 
 		if( param_errors_detected() )

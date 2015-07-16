@@ -431,16 +431,16 @@ while( $Item = & $ItemList->get_item() )
 				$expiry_statuses[] = 'expired';
 			}
 
-			global $CommentList;
+			global $CommentList, $UserSettings;
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
 			$CommentList->set_filters( array(
 				'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment','trackback','pingback' ),
 				'statuses' => $statuses,
-				'order' => 'ASC',
+				'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
 				'post_ID' => $Item->ID,
-				'comments' => 20,
+				'comments' => $UserSettings->get( 'results_per_page' ),
 				'page' => $currentpage,
 				'expiry_statuses' => $expiry_statuses,
 			) );

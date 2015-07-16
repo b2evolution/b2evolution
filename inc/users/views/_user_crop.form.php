@@ -41,7 +41,7 @@ global $current_User;
  */
 global $cropped_File;
 
-global $window_width, $window_height;
+global $image_width, $image_height;
 
 if( $display_mode != 'js' )
 {
@@ -133,7 +133,7 @@ echo '<div id="target_cropped_image">'.$cropped_image_tag.'</div>';
 echo '</div><div>';
 
 // Check if we should display big preview images, Hide them on small screens:
-$display_big_preview = ( empty( $window_width ) || $window_width > 400 ) && ( empty( $window_height ) || $window_height > 400 );
+$display_big_preview = ( empty( $image_width ) || $image_width > 400 ) && ( empty( $image_height ) || $image_height > 400 );
 
 // Preview thumbnails
 echo '<div class="preview_cropped_images'.( ! $display_big_preview ? ' only_small_preview' : '' ).'" style="display:none">';
@@ -163,13 +163,13 @@ $Form->end_form();
 $file_size = $cropped_File->get_image_size( 'widthheight' );
 $file_size = min( $file_size[0], $file_size[1] );
 
-if( ! empty( $window_width ) && ! empty( $window_height ) )
+if( ! empty( $image_width ) && ! empty( $image_height ) )
 { // Limit the cropping image with window size
 ?>
 <style>
 #target_cropped_image img {
-	max-width: <?php echo $window_width; ?>px !important;
-	max-height: <?php echo $window_height; ?>px !important;
+	max-width: <?php echo $image_width; ?>px !important;
+	max-height: <?php echo $image_height; ?>px !important;
 }
 </style>
 <?php

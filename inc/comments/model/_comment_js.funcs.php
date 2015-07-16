@@ -2,7 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList;
+global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
 
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );
@@ -196,12 +196,13 @@ function setCommentVote( id, type, vote )
 	type: 'POST',
 	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 	data:
-		{ 'blogid': '<?php echo $Blog->ID; ?>',
+		{ 'blog': '<?php echo $Blog->ID; ?>',
 			'commentid': id,
 			'type': type,
 			'vote': vote,
 			'action': 'set_comment_vote',
 			<?php echo is_admin_page() ? "'is_backoffice': 1,\n" : ''; ?>
+			'b2evo_icons_type': '<?php echo isset( $b2evo_icons_type ) ? $b2evo_icons_type : ''; ?>',
 			'crumb_comment': '<?php echo get_crumb('comment'); ?>',
 		},
 	success: function(result)

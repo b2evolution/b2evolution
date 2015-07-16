@@ -40,7 +40,6 @@ class LinkComment extends LinkOwner
 			'Insert the following code snippet into your xxx' => NT_( 'Insert the following code snippet into your comment.' ),
 			'View this xxx...' => NT_( 'View this comment...' ),
 			'Edit this xxx...' => NT_( 'Edit this comment...' ),
-			'Click on link %s icons below to link additional files to $xxx$.' => NT_( 'Click on link %s icons below to link additional files to <strong>Comment</strong>.' ),
 			'Link files to current xxx' => NT_( 'Link files to current comment' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to comment.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),

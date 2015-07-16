@@ -305,6 +305,9 @@ switch( $action )
 			break;
 		}
 
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
 		if( param( 'is_backoffice', 'integer', 0 ) )
 		{ // Set admin skin, used for buttons, @see button_class()
 			global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
@@ -313,9 +316,17 @@ switch( $action )
 			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 			$AdminUI = new AdminUI();
 		}
+		else
+		{
+			$BlogCache = &get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$skin_ID = $Blog->get_skin_ID();
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $skin_ID );
+		}
 
 		// Check permission for spam voting
-		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, param( 'blogid', 'integer' ) );
+		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $blog_ID );
 
 		$type = param( 'type', 'string' );
 		$commentid = param( 'commentid', 'integer' );

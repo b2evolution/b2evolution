@@ -990,7 +990,7 @@ function evo_mkdir( $dir_path, $chmod = NULL, $recursive = false )
 		return true;
 	}
 
-	if( mkdir( $dir_path, 0777, $recursive ) )
+	if( @mkdir( $dir_path, 0777, $recursive ) )
 	{ // Directory is created succesfully
 		if( $chmod === NULL )
 		{ // Get default permissions

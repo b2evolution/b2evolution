@@ -144,21 +144,6 @@ $Form->begin_form( '', '', $params );
 	// -- Language chooser END --
 	echo '</tr></table>';
 
-	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
-	{ // Display url
-		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
-		echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
-		echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Link to url').':</strong></td>';
-		echo '<td class="input" style="padding-right:2px">';
-		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td>';
-		echo '</tr></table>';
-	}
-	else
-	{ // Hide url
-		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
-	}
-
 	$Form->switch_layout( NULL );
 
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
@@ -286,7 +271,7 @@ $Form->begin_form( '', '', $params );
 		// Checkbox to suggest tags
 		$suggest_checkbox = '<label>'
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
-				.T_('Auto-suggest tags as you type (based on existing tag)').$link_to_tags_manager
+				.T_('Auto-suggest tags as you type (based on existing tags)').$link_to_tags_manager
 			.'</label>';
 		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		echo '</td></tr>';
@@ -313,6 +298,19 @@ $Form->begin_form( '', '', $params );
 	else
 	{ // Hide excerpt
 		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_Item_excerpt ) );
+	}
+
+	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
+	{ // Display url
+		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide url
+		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
@@ -392,21 +390,22 @@ $Form->begin_form( '', '', $params );
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		param( 'comments_number', 'integer', $total_comments_number );
+		param( 'comment_type', 'string', 'meta' );
 
 		$Form->begin_fieldset( T_('Meta comments')
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
-		global $CommentList;
+		global $CommentList, $UserSettings;
 		$CommentList = new CommentList2( $Blog );
 
 		// Filter list:
 		$CommentList->set_filters( array(
 			'types' => array( 'meta' ),
 			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-			'order' => 'ASC',
+			'order' => 'DESC',
 			'post_ID' => $edited_Item->ID,
-			'comments' => 20,
+			'comments' => $UserSettings->get( 'results_per_page' ),
 			'page' => $currentpage,
 			'expiry_statuses' => array( 'active' ),
 		) );
@@ -429,6 +428,9 @@ $Form->begin_form( '', '', $params );
 		{ // Display a link to add new meta comment if current user has a permission
 			echo action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 );
 		}
+
+		// Load JS functions to work with meta comments:
+		load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 		$Form->end_fieldset();
 	}
