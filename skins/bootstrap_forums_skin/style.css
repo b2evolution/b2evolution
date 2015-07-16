@@ -542,6 +542,7 @@ body.round_avatars .single_topic #styled_content_block .ft_avatar a > img {
 }
 .vote_spam {
   float: left;
+  line-height: 22px;
 }
 .vote_spam .action_icon {
   margin: 0;
@@ -553,6 +554,7 @@ a.btn + .vote_spam {
   float: left;
   display: block;
   margin-right: 10px;
+  line-height: 22px;
 }
 label.control-label[for=post_title] {
   width: auto;
