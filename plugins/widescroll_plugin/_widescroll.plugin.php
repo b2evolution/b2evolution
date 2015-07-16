@@ -123,7 +123,7 @@ class widescroll_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'widescroll_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?> ' );</script><?php
 		echo $this->get_template( 'toolbar_after' );
 

@@ -612,7 +612,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 			bbcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
 			bbcode_toolbar += '<input type="button" id="bb_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="bbCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" />';
 			bbcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
-			jQuery( '.bbcode_toolbar' ).html( bbcode_toolbar );
+			jQuery( '.<?php echo $this->code; ?>_toolbar' ).html( bbcode_toolbar );
 		}
 
 		/**
@@ -669,7 +669,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'bbcode_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		?><script type="text/javascript">bbToolbar();</script><?php
 		echo $this->get_template( 'toolbar_after' );
 

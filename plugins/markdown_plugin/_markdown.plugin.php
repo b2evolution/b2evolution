@@ -624,7 +624,7 @@ class markdown_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'markdown_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		?><script type="text/javascript">markdown_toolbar( '<?php echo T_('Markdown').': '; ?>' );</script><?php
 		echo $this->get_template( 'toolbar_after' );
 

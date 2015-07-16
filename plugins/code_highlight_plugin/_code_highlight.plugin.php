@@ -271,7 +271,7 @@ class code_highlight_plugin extends Plugin
 
 	function DisplayCodeToolbar()
 	{
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'code_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo $this->get_template( 'toolbar_title_before' ).T_('Code').': '.$this->get_template( 'toolbar_title_after' );

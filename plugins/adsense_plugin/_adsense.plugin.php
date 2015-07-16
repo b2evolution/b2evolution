@@ -230,7 +230,7 @@ class adsense_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'adsense_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).'AdSense: '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';

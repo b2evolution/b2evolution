@@ -340,7 +340,7 @@ class prism_plugin extends Plugin
 	 */
 	function display_toolbar()
 	{
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'prism_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 
 		// Codespan buttons:
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );

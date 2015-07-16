@@ -269,7 +269,7 @@ XX(      graydead.gif
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'smiley_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo $grins;
 		echo $this->get_template( 'toolbar_group_after' );

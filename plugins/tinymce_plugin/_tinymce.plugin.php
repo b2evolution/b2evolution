@@ -275,10 +275,10 @@ class tinymce_plugin extends Plugin
 		?>
 
 		<div class="btn-group">
-			<input id="tinymce_plugin_toggle_button_html" type="button" value="HTML" class="btn btn-default active" disabled="disabled"
-				title="<?php echo format_to_output( $this->T_('Toggle to plain HTML editor'), 'htmlattr' ); ?>" />
+			<input id="tinymce_plugin_toggle_button_html" type="button" value="<?php echo format_to_output( $this->T_('Markup'), 'htmlattr' ); ?>" class="btn btn-default active" disabled="disabled"
+				title="<?php echo format_to_output( $this->T_('Toggle to the markup/pro editor.'), 'htmlattr' ); ?>" />
 			<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
-				title="<?php echo format_to_output( $this->T_('Toggle to WYSIWYG editor'), 'htmlattr' ); ?>" />
+				title="<?php echo format_to_output( $this->T_('Toggle to the WYSIWYG editor.'), 'htmlattr' ); ?>" />
 		</div>
 
 		<script type="text/javascript">
@@ -315,9 +315,9 @@ class tinymce_plugin extends Plugin
 					jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 					// Hide the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .code_toolbar, .prism_toolbar' ).hide();
-					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism' ).addClass( 'disabled' );
-					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism' ).each( function()
+					jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).hide();
+					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).addClass( 'disabled' );
+					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
 					{
 						if( jQuery( this ).is( ':checked' ) )
 						{
@@ -334,9 +334,9 @@ class tinymce_plugin extends Plugin
 					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 					// Show the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .code_toolbar, #block_renderer_evo_code, .prism_toolbar, #block_renderer_evo_prism' ).show();
-					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism' ).removeClass( 'disabled' );
-					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism' ).each( function()
+					jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).show();
+					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).removeClass( 'disabled' );
+					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
 					{
 						if( jQuery( this ).hasClass( 'checked' ) )
 						{
