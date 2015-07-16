@@ -1851,7 +1851,7 @@ function create_demo_contents()
 
 <p>If needed, skins can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
 			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
-		$edit_File = new File( 'shared', 1, 'logos/b2evolution_272x54.png' );
+		$edit_File = new File( 'shared', 1, 'logos/b2evolution_272x64.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
@@ -1986,7 +1986,7 @@ function create_demo_contents()
 </ul>
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_ann_a );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x54.png' );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
@@ -2322,7 +2322,7 @@ The rain---not the reign---in Spain.');
 </ul>
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_forums_ann );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x54.png' );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
@@ -2714,7 +2714,7 @@ Hello
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_intro, array( $cat_manual_everyday ),
 			'published', '#', '', '', 'open', array('default'), 1, NULL, 30 );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x54.png' );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 

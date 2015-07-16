@@ -365,7 +365,7 @@ INSERT INTO `{{{EVO_TABLE_PREFIX}}}files` (`file_ID`, `file_root_type`, `file_ro
 (4, 'shared', 0, 'monument-valley/monuments.jpg', NULL, NULL, NULL),
 (5, 'shared', 0, 'monument-valley/monument-valley-road.jpg', NULL, NULL, NULL),
 (6, 'shared', 0, 'monument-valley/monument-valley.jpg', NULL, NULL, NULL),
-(7, 'shared', 0, 'logos/b2evolution_272x54.png', NULL, NULL, NULL);
+(7, 'shared', 0, 'logos/b2evolution_272x64.png', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -504,7 +504,7 @@ CREATE TABLE IF NOT EXISTS `{{{EVO_TABLE_PREFIX}}}hitlog` (
 INSERT INTO `{{{EVO_TABLE_PREFIX}}}hitlog` (`hit_ID`, `hit_sess_ID`, `hit_datetime`, `hit_uri`, `hit_referer_type`, `hit_referer`, `hit_referer_dom_ID`, `hit_keyphrase_keyp_ID`, `hit_serprank`, `hit_blog_ID`, `hit_remote_addr`, `hit_agnt_ID`) VALUES
 (1, 1, '2012-04-02 02:51:36', '/b2evolution/3.3/index.php', 'self', 'http://localhost/b2evolution/3.3/install/index.php?locale=en-US-utf8&confirmed=0&installer_version=10&action=newdb&create_sample_contents=1', 1, NULL, NULL, 1, '::1', 1),
 (2, 1, '2012-04-02 02:51:37', '/b2evolution/3.3/blog1.php', 'self', 'http://localhost/b2evolution/3.3/install/index.php?locale=en-US-utf8&confirmed=0&installer_version=10&action=newdb&create_sample_contents=1', 1, NULL, NULL, 1, '::1', 1),
-(3, 1, '2012-04-02 02:51:38', '/b2evolution/3.3/htsrv/getfile.php/b2evolution_272x54.png?root=shared_0&path=logos/b2evolution_272x54.png&mtime=1222178208&size=fit-400x320', 'self', 'http://localhost/b2evolution/3.3/blog1.php', 1, NULL, NULL, NULL, '::1', 1),
+(3, 1, '2012-04-02 02:51:38', '/b2evolution/3.3/htsrv/getfile.php/b2evolution_272x64.png?root=shared_0&path=logos/b2evolution_272x64.png&mtime=1222178208&size=fit-400x320', 'self', 'http://localhost/b2evolution/3.3/blog1.php', 1, NULL, NULL, NULL, '::1', 1),
 (4, 1, '2012-04-02 02:51:38', '/b2evolution/3.3/htsrv/getfile.php/john-ford-point.jpg?root=shared_0&path=monument-valley/john-ford-point.jpg&mtime=1222178208&size=fit-160x120', 'self', 'http://localhost/b2evolution/3.3/blog1.php', 1, NULL, NULL, NULL, '::1', 1),
 (5, 1, '2012-04-02 02:51:38', '/b2evolution/3.3/htsrv/getfile.php/monuments.jpg?root=shared_0&path=monument-valley/monuments.jpg&mtime=1222178208&size=fit-400x320', 'self', 'http://localhost/b2evolution/3.3/blog1.php', 1, NULL, NULL, NULL, '::1', 1);
 
