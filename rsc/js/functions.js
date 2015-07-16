@@ -443,10 +443,37 @@ jQuery( document ).ready( function()
 			}
 		}
 		jQuery( this ).bind( 'click', function()
-		{ // Bind function in click event
+		{ // Bind function on click event
+			if( jQuery( this ).closest( '.disabled[class*=_toolbar]' ).length > 0 )
+			{ // Deny action when toolbar is disabled
+				return false;
+			}
 			window[ func_name ].apply( null, func_args );
 		} );
 		// Remove attribute data-func
 		jQuery( this ).removeAttr( 'data-func' );
 	} );
+
+	// Enable/Disable plugin toolbars depending on selected plugins for current edit form:
+	function change_plugin_toolbar_activity( this_obj )
+	{
+		var toolbar_obj = jQuery( '.' + this_obj.val() + '_toolbar' );
+		if( toolbar_obj.length == 0 )
+		{ // Skip this function if plugin has no toolbar
+			return true;
+		}
+
+		if( this_obj.is( ':checked' ) )
+		{ // Enable toolbar:
+			toolbar_obj.removeClass( 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).removeAttr( 'disabled' );
+		}
+		else
+		{ // Disable toolbar:
+			toolbar_obj.addClass( 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).attr( 'disabled', 'disabled' );
+		}
+	}
+	jQuery( 'input[type=checkbox][name="renderers[]"]' ).each( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
+	jQuery( 'input[type=checkbox][name="renderers[]"]' ).click( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
 } );
