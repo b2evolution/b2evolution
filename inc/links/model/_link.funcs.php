@@ -89,7 +89,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	}
 	elseif( $LinkOwner->type == 'comment' )
 	{ // Comment
-		$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), sprintf( T_('Comment #%s'), $LinkOwner->Comment->ID ) ) );
+		$window_title = format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
 	}
 
 	$fieldset_title = T_( 'Images &amp; Attachments' );
