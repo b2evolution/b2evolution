@@ -154,12 +154,18 @@ class FileRootCache
 	 *
 	 * @deprecated since 1.9
 	 * @param boolean Create the directory, if it does not exist yet?
-	 * @return string
+	 * @return string|boolean
 	 */
 	function get_root_dir( $root_type, $root_in_type_ID, $create = false )
 	{
-		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID, $create );
-		return $tmp_FileRoot->ads_path;
+		if( $tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID, $create ) )
+		{ // Return  path only when file root is detected
+			return $tmp_FileRoot->ads_path;
+		}
+		else
+		{ // Impossible to get path by root type and ID
+			return false;
+		}
 	}
 
 

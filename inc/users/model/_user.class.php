@@ -3348,8 +3348,10 @@ class User extends DataObject
 			$FileRootCache = & get_FileRootCache();
 			foreach( $object_ids as $user_ID )
 			{
-				$root_directory = $FileRootCache->get_root_dir( 'user', $user_ID );
-				rmdir_r( $root_directory );
+				if( $root_directory = $FileRootCache->get_root_dir( 'user', $user_ID ) )
+				{ // Delete the folder only when it is detected:
+					rmdir_r( $root_directory );
+				}
 			}
 		}
 

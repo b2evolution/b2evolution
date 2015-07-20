@@ -343,7 +343,7 @@ class DataObjectCache
 	{
 		global $Debuglog;
 
-		if( is_null($Obj->ID) )	// value 0 is used by item preview
+		if( ! is_object( $Obj ) || ! isset( $Obj->ID ) || is_null( $Obj->ID ) ) // value 0 is used by item preview
 		{
 			$Debuglog->add( 'No object to add!', 'dataobjects' );
 			return false;

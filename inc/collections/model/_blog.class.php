@@ -2480,11 +2480,13 @@ class Blog extends DataObject
 		$PageCache = new PageCache( $this );
 		$PageCache->cache_delete();
 
-		// Delete blog's media folder recursively
+		// Delete blog's media folder recursively:
 		$FileRootCache = & get_FileRootCache();
-		$root_directory = $FileRootCache->get_root_dir( 'collection', $old_ID );
-		rmdir_r( $root_directory );
-		$Messages->add( T_('Deleted blog\'s files'), 'success' );
+		if( $root_directory = $FileRootCache->get_root_dir( 'collection', $old_ID ) )
+		{ // Delete the folder only when it is detected
+			rmdir_r( $root_directory );
+			$Messages->add( T_('Deleted blog\'s files'), 'success' );
+		}
 
 		// re-set the ID for the Plugin event
 		$this->ID = $old_ID;

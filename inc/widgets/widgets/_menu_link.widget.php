@@ -229,6 +229,11 @@ class menu_link_Widget extends ComponentWidget
 			$current_Blog = & $Blog;
 		}
 
+		if( empty( $current_Blog ) )
+		{ // We cannot use this widget without a current collection:
+			return false;
+		}
+
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
