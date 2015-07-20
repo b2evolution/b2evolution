@@ -465,25 +465,24 @@ if( empty( $max_execution_time ) )
 	disp_system_check( 'ok' );
 }
 else
-{
-	init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
-	if( $max_execution_time <= 5 * 60 )
+{	// Time is limited, can we request more?:
+	$can_force_time = ini_set( 'max_execution_time', 600 ); // Try to force max_execution_time to 10 minutes
+
+	if( $can_force_time !== false )
 	{
-		disp_system_check( 'error' );
+		$forced_max_execution_time = system_check_max_execution_time();
+		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $forced_max_execution_time ) );
+		disp_system_check( 'ok', sprintf( T_('b2evolution was able to request more time (than the default %s seconds) to execute complex tasks.'), $max_execution_time ) );
+	}	
+	elseif( $max_execution_time <= 5 * 60 )
+	{
+		init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
+		disp_system_check( 'error', T_('b2evolution may frequently run out of time to execute properly.') );
 	}
 	elseif( $max_execution_time > 5 * 60 )
 	{
-		disp_system_check( 'warning' );
-	}
-}
-if( $max_execution_time < 600 )
-{ // Force max_execution_time to 10 minutes
-	$result = ini_set( 'max_execution_time', 600 );
-	if( $result !== false )
-	{
-		$max_execution_time = system_check_max_execution_time();
-		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
-		disp_system_check( 'warning' );
+		init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
+		disp_system_check( 'warning', T_('b2evolution may sometimes run out of time to execute properly.' ) );
 	}
 }
 
