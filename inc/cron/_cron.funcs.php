@@ -251,30 +251,39 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 	global $DB, $time_difference, $cron_timeout_delay, $admin_url;
 
 	$SQL = new SQL( 'Find cron timeouts' );
-	$SQL->SELECT( 'ctsk_ID, ctsk_name' );
+	$SQL->SELECT( 'ctsk_ID, ctsk_name, ctsk_key' );
 	$SQL->FROM( 'T_cron__log' );
 	$SQL->FROM_add( 'INNER JOIN T_cron__task ON ctsk_ID = clog_ctsk_ID' );
 	$SQL->WHERE( 'clog_status = "started"' );
 	$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) ) );
 	$SQL->GROUP_BY( 'ctsk_ID' );
-	$timeouts = $DB->get_assoc( $SQL->get(), OBJECT, $SQL->title );
+	$timeout_tasks = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
 	$tasks = array();
 
-	if( count( $timeouts ) > 0 )
+	if( count( $timeout_tasks ) > 0 )
 	{
-		foreach( $timeouts as $task_ID => $task_name )
+		$cron_jobs_names = get_cron_jobs_config( 'name' );
+		foreach( $timeout_tasks as $timeout_task )
 		{
-			$tasks[ $task_ID ] = array(
+			if( ! empty( $timeout_task->ctsk_name ) )
+			{ // Task name is defined in DB
+				$task_name = $timeout_task->ctsk_name;
+			}
+			else
+			{ // Try to get default task name by key:
+				$task_name = ( isset( $cron_jobs_names[ $timeout_task->ctsk_key ] ) ? $cron_jobs_names[ $timeout_task->ctsk_key ] : $timeout_task->ctsk_key );
+			}
+			$tasks[ $timeout_task->ctsk_ID ] = array(
 					'name'    => $task_name,
-					'message' => T_('Cron job was timed out.'),
+					'message' => NT_('Cron job has timed out.'),	// Here is not a good place to translate! We don't know the language of the recipient here.
 				);
 		}
 
-		// Update timed out cron jobs
+		// Update timed out cron jobs:
 		$DB->query( 'UPDATE T_cron__log
 			  SET clog_status = "timeout"
-			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Detect cron timeouts.' );
+			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
 	if( !is_null( $error_task ) )
