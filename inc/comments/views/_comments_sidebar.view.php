@@ -188,7 +188,10 @@ $Form->begin_form( '' );
 	echo $Form->inputstart;
 	?>
 	<div><?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="20" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField form-control" style="width:85%" /></div>
-	<div class="note"><?php echo T_('use \'%\' for partial matches') ?></div>
+	<div class="note"><?php
+		// We use sprintf to avoid problems with a single % sign in transifex
+		echo sprintf( T_('use \'%%\' for partial matches') );
+	?></div>
 	<?php
 	echo $Form->inputend;
 
