@@ -1524,7 +1524,7 @@ function check_local_installation()
  */
 function display_install_result_window( $title, $body )
 {
-	global $baseurl, $dispatcher, $display;
+	global $baseurl, $admin_url, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use the modal window ONLY on normal mode (Hide on compact mode)
@@ -1545,7 +1545,7 @@ function display_install_result_window( $title, $body )
 				<div class="modal-body">'.$body.'</div>
 				<div class="modal-footer" style="text-align:center">
 					<a href="'.$baseurl.'" class="btn btn-primary">'.T_('Go to Front-office').'</a>
-					<a href="'.$baseurl.$dispatcher.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
+					<a href="'.$admin_url.'" class="btn btn-default">'.T_('Go to Back-office').'</a>
 				</div>
 			</div>
 		</div>
@@ -1614,18 +1614,20 @@ function check_quick_install_request()
 		}
 
 		// Base URL:
-		global $baseurl;
+		global $baseurl, $admin_url, $dispatcher;
 		$baseurl = param( 'baseurl', 'string', '', false, true );
 		if( empty( $baseurl ) || ! preg_match( '~https?://~', $baseurl ) )
-		{ // Try to autogenerate base url if it is empty or wrong from request
+		{ // Try to autogenerate base url if it is empty or wrong from request:
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
 				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
 			list( $ReqPath, $ReqURI ) = get_ReqURI();
 			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
 		}
-		// Add a slash at the end if it is missed
+		// Add a slash at the end if it is missed:
 		$baseurl = trim( $baseurl, '/' ).'/';
+		// Update $admin_url to new value because it depends on $baseurl:
+		$admin_url = $baseurl.$dispatcher;
 
 		// Try to create basic config file:
 		$basic_config_params = array(
