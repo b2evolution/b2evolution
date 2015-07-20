@@ -631,7 +631,29 @@ jQuery( document ).ready( function()
 				}
 
 				// Success message
-				$this->print_tool_log( '<br />'.sprintf( T_('GeoIP.dat file was downloaded successfully, you can go to <a %s>here</a> to enable the plugin.'), 'href="'.$admin_url.'?ctrl=plugins"' ) );
+				$this->print_tool_log( '<br /><span class="text-success">'.sprintf( T_('%s file was downloaded successfully.'), 'GeoIP.dat' ).'</span>' );
+
+				// Try to enable plugin automatically:
+				global $Plugins;
+				$enable_return = $this->BeforeEnable();
+				if( $enable_return === true )
+				{ // Success enabling
+					$this->print_tool_log( '<br /><span class="text-success">'.T_('The plugin has been enabled.').'</span>' );
+
+					if( $this->status != 'enabled' )
+					{ // Enable this plugin automatically:
+						$Plugins->set_Plugin_status( $this, 'enabled' );
+					}
+				}
+				else
+				{ // Some restriction for enabling
+					$this->print_tool_log( '<br /><span class="text-warning">'.T_('The plugin could not be automatically enabled.').'</span>' );
+
+					if( $this->status != 'needs_config' )
+					{ // Make this plugin incomplete because it cannot be enabled:
+						$Plugins->set_Plugin_status( $this, 'needs_config' );
+					}
+				}
 				break;
 
 			default:
