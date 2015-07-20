@@ -837,6 +837,10 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
+			if( ! empty( $this->is_lined_fields ) )
+			{ // Fix note format for fields that are used in one line
+				$this->_common_params['note_format'] = str_replace( 'class="', 'class="oneline ', $this->_common_params['note_format'] );
+			}
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
 		}
 
@@ -3421,6 +3425,8 @@ class Form extends Widget
 	/**
 	 * Builds an interval input fields.
 	 *
+	 * @deprecated Use $Form->begin_line(); ... $Form->end_line(); instead.
+	 *
 	 * @param string The name of the input field "From". This gets used for id also, if no id given in $field_params.
 	 * @param string Initial value "From"
 	 * @param string The name of the input field "To". This gets used for id also, if no id given in $field_params.
@@ -3607,6 +3613,11 @@ class Form extends Widget
 			unset( $field_params['inline'] );
 		}
 
+		if( isset( $field_params['hide_label'] ) )
+		{ // Delete 'hide_label' param from attributes list
+			unset( $field_params['hide_label'] );
+		}
+
 		if( isset( $field_params['input_required'] ) )
 		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
 			$field_params['required'] = $field_params['input_required'];
@@ -3736,6 +3747,11 @@ class Form extends Widget
 	{
 		$r = '';
 
+		if( isset( $this->_common_params['hide_label'] ) && $this->_common_params['hide_label'] )
+		{ // Hide label if it is required by param
+			return $r;
+		}
+
 		$label = $this->_common_params['label'];
 
 		if( strlen($label) )
@@ -3754,14 +3770,17 @@ class Form extends Widget
 			}
 			else
 			{
-				$r .= '<label'
-					.( ! empty( $this->labelclass )
-						? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
-						: '' )
-					.( ! empty( $this->_common_params['id'] )
-						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
-						: '' )
-					.'>';
+				if( empty( $this->is_lined_fields ) )
+				{ // Don't print a label tag for "lined" mode:
+					$r .= '<label'
+						.( ! empty( $this->labelclass )
+							? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
+							: '' )
+						.( ! empty( $this->_common_params['id'] )
+							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+							: '' )
+						.'>';
+				}
 
 					if( ! empty( $this->_common_params['required'] ) )
 					{
@@ -3770,9 +3789,12 @@ class Form extends Widget
 
 					$r .= format_to_output($label, 'htmlbody');
 
-				$r .= $this->label_suffix;
+				if( empty( $this->is_lined_fields ) )
+				{ // Don't print a label tag and suffix for "lined" mode:
+					$r .= $this->label_suffix;
 
-				$r .= '</label>';
+					$r .= '</label>';
+				}
 			}
 
 			$r .= $this->labelend;
@@ -3926,7 +3948,10 @@ class Form extends Widget
 
 			if( $this->disp_param_err_messages_with_fields )
 			{
-				$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
+				$this->_common_params['note'] .= ' <span class="field_error"'
+						.' rel="'.$field_params['name'].'"'.'>'// May be used by JS, for example, to display errors in tooltip on bootstrap skins
+						.param_get_error_msg( $field_params['name'] )
+					.'</span>';
 			}
 		}
 
@@ -3940,6 +3965,12 @@ class Form extends Widget
 		{
 			$this->_common_params['inline'] = $field_params['inline'];
 			unset( $field_params['inline'] );
+		}
+
+		if( isset( $field_params['hide_label'] ) && $field_params['hide_label'] )
+		{
+			$this->_common_params['hide_label'] = $field_params['hide_label'];
+			unset( $field_params['hide_label'] );
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -3980,6 +4011,53 @@ class Form extends Widget
 		return $this->display_or_return( $r );
 	}
 
+
+	/**
+	 * Begin line for several fields
+	 * Used to keep many fields on one line
+	 *
+	 * @param string Field title
+	 * @param string Field name (Used for attribute "for" af the label tag)
+	 * @param array Params
+	 */
+	function begin_line( $field_label = NULL, $field_name = NULL, $field_params = array() )
+	{
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		echo $this->begin_field( $field_name, $field_label );
+
+		// Switch layout to keep all fields in one line:
+		$this->switch_layout( 'none' );
+
+		// Set TRUE to mark all calls of the next fields as lined:
+		$this->is_lined_fields = true;
+	}
+
+
+	/**
+	 * End line of several fields
+	 *
+	 * @param string Suffix
+	 * @param array Params
+	 */
+	function end_line( $suffix_text = NULL, $field_params = array() )
+	{
+		$this->handle_common_params( $field_params );
+
+		if( !is_null( $suffix_text ) )
+		{ // Display a suffix:
+			echo $suffix_text;
+		}
+
+		// Stop "lined" mode:
+		$this->is_lined_fields = false;
+
+		// Switch layout back:
+		$this->switch_layout( NULL );
+
+		// End field:
+		echo $this->end_field();
+	}
 }
 
 ?>

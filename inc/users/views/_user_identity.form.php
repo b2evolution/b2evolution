@@ -332,7 +332,10 @@ if( $action != 'view' )
 			);
 	}
 
-	$Form->interval( 'edited_user_age_min', $edited_User->age_min, 'edited_user_age_max', $edited_User->age_max, 3, T_('My age group') );
+	$Form->begin_line( T_('My age group'), 'edited_user_age_min' );
+		$Form->text( 'edited_user_age_min', $edited_User->age_min, 3, '' );
+		$Form->text( 'edited_user_age_max', $edited_User->age_max, 3, T_('to') );
+	$Form->end_line();
 
 	// Organization select fields:
 	$OrganizationCache = & get_OrganizationCache();

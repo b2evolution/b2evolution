@@ -990,21 +990,17 @@ span.label_field_required {
   display: none;
 }
 span.field_error {
-  display: block;
   color: #f00;
+}
+span.notes span.field_error,
+span.help-inline span.field_error {
+  display: none;
 }
 input.field_error,
 select.field_error,
 textarea.field_error {
   background: #fbf2ee;
   border: 1px solid #d99;
-}
-span.checkbox_error {
-  background: #fbf2ee;
-  border: 1px solid #d99;
-}
-span.checkbox_error input.checkbox {
-  background: #fbf2ee;
 }
 span.checkbox_surround {
   background: #fbf2ee;
@@ -1975,6 +1971,9 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 }
 .panel-title a.help_plugin_icon:hover {
   color: #23527c;
+}
+.evo_confirm_delete__title {
+  margin-top: 0;
 }
 .form_add_contacts {
   display: block;

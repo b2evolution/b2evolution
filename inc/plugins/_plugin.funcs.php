@@ -230,6 +230,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 	switch( $parmeta['type'] )
 	{
+		case 'begin_line':
+			$Form->begin_line( $set_label );
+			break;
+
+		case 'end_line':
+			$Form->end_line( $set_label );
+			break;
+
+		case 'string':
+			echo $set_label;
+			break;
+
 		case 'checkbox':
 			$Form->checkbox_input( $input_name, $set_value, $set_label, $params );
 			break;
@@ -427,6 +439,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			else
 			{ // do not use size as maxlength, if not given!
 				$params['maxlength'] = '';
+			}
+
+			if( isset( $parmeta['hide_label'] ) )
+			{ // This param is used to hide a label
+				$params['hide_label'] = $parmeta['hide_label'];
 			}
 
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params

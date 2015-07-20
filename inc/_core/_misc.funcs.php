@@ -5318,10 +5318,21 @@ function generate_link_from_params( $link_params, $params = array() )
 function send_javascript_message( $methods = array(), $send_as_html = false, $target = '' )
 {
 	// lets spit out any messages
-	global $Messages;
+	global $Messages, $param_input_err_messages;
 	ob_start();
 	$Messages->display();
 	$output = ob_get_clean();
+
+	// Initialize JavaScript params to send what field should be marked are error
+	$js_error_params = array();
+	if( ! empty( $param_input_err_messages ) && is_array( $param_input_err_messages ) )
+	{
+		foreach( $param_input_err_messages as $param_name => $param_error )
+		{
+			$js_error_params[] = $param_name.': \''.format_to_js( $param_error ).'\'';
+		}
+	}
+	$js_error_params = '{'.implode( ', ', $js_error_params ).'}';
 
 	// set target
 	$target = ( $target ? $target : param( 'js_target', 'string' ) );
@@ -5338,7 +5349,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $output )
 	{	// we have some messages
-		$output = $target.'DisplayServerMessages( \''.format_to_js( $output ).'\');'."\n";
+		$output = $target.'DisplayServerMessages( \''.format_to_js( $output ).'\', '.$js_error_params.' );'."\n";
 	}
 
 	if( !empty( $methods ) )
@@ -6864,91 +6875,6 @@ function echo_modalwindow_js()
 		return;
 	}
 
-	echo <<< JS_CODE
-/*
- * Build and open modal window
- *
- * @param string HTML content
- * @param string Width value in css format
- * @param boolean TRUE - to use transparent template
- * @param string Title of modal window (Used in bootstrap)
- * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
- */
-function openModalWindow( body_html, width, height, transparent, title, button )
-{
-	var overlay_class = 'overlay_page_active';
-	if( typeof transparent != 'undefined' && transparent == true )
-	{
-		overlay_class = 'overlay_page_active_transparent';
-	}
-
-	if( typeof width == 'undefined' )
-	{
-		width = '560px';
-	}
-	var style_height = '';
-	if( typeof height != 'undefined' && ( height > 0 || height != '' ) )
-	{
-		style_height = ' style="height:' + height + '"';
-	}
-	if( jQuery( '#overlay_page' ).length > 0 )
-	{ // placeholder already exist
-		jQuery( '#overlay_page' ).html( body_html );
-		return;
-	}
-	// add placeholder for form:
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="overlay_wrap" style="width:' + width + '"><div id="overlay_layout"><div id="overlay_page"' + style_height + '></div></div></div>' );
-	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#overlay_page' ).html( body_html ).addClass( overlay_class );
-	jQuery( document ).on( 'click', '#close_button, #screen_mask, #overlay_page', function( e )
-	{
-		if( jQuery( this ).attr( 'id' ) == 'overlay_page' )
-		{
-			var form_obj = jQuery( '#overlay_page form' );
-			if( form_obj.length )
-			{
-				var top = form_obj.position().top + jQuery( '#overlay_wrap' ).position().top;
-				var bottom = top + form_obj.height();
-				if( ! ( e.clientY > top && e.clientY < bottom ) )
-				{
-					closeModalWindow();
-				}
-			}
-			return true;
-		}
-		closeModalWindow();
-		return false;
-	} );
-}
-
-/**
- * Close modal window
- */
-function closeModalWindow( document_obj )
-{
-	if( typeof( document_obj ) == 'undefined' )
-	{
-		document_obj = window.document;
-	}
-
-	jQuery( '#overlay_page', document_obj ).hide();
-	jQuery( '.action_messages', document_obj).remove();
-	jQuery( '#server_messages', document_obj ).insertBefore( '.first_payload_block' );
-	jQuery( '#overlay_wrap', document_obj ).remove();
-	jQuery( '#screen_mask', document_obj ).remove();
-	return false;
-}
-
-// Close ajax popup if Escape key is pressed:
-jQuery(document).keyup(function(e)
-{
-	if( e.keyCode == 27 )
-	{
-		closeModalWindow();
-	}
-} );
-JS_CODE;
-
 	$modal_window_js_initialized = true;
 }
 
@@ -6957,169 +6883,11 @@ JS_CODE;
  */
 function echo_modalwindow_js_bootstrap()
 {
-?>
-var modal_window_js_initialized = false;
-/*
- * Build and open madal window
- *
- * @param string HTML content
- * @param string Width value in css format
- * @param boolean TRUE - to use transparent template
- * @param string Title of modal window (Used in bootstrap)
- * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
- * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
- * @param boolean TRUE - to clear all previous windows
- */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels )
-{
-	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
-	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
-	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
-	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
-	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
-
-	if( typeof( buttons ) != 'undefined' && buttons != '' )
-	{
-		if( typeof( buttons ) == 'object' )
-		{ // Specific button with params
-			var button_title = buttons[0];
-			var button_class = buttons[1];
-			var button_form = typeof( buttons[2] ) == 'undefined' ? 'form' : buttons[2];
-		}
-		else
-		{ // Standard button to submit a single form
-			var button_title = buttons;
-			var button_class = 'btn-primary';
-			var button_form = 'form';
-		}
-	}
-
-	if( typeof( is_new_window ) != 'undefined' && is_new_window )
-	{ // Clear previous opened window
-		jQuery( '#modal_window' ).remove();
-	}
-
-	if( jQuery( '#modal_window' ).length == 0 )
-	{ // Build modal window
-		var modal_html = '<div id="modal_window" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content"' + style_height_fixed + '>';
-		if( typeof title != 'undefined' && title != '' )
-		{
-			modal_html += '<div class="modal-header">' +
-					'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-					'<h4 class="modal-title">' + title + '</h4>' +
-				'</div>';
-		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html + '</div>';
-
-		if( use_buttons )
-		{
-			modal_html += '<div class="modal-footer">';
-			if( typeof( buttons ) != 'undefined' && buttons != '' )
-			{
-				modal_html += '<button class="btn ' + button_class + '" type="submit" style="display:none">' + button_title + '</button>';
-			}
-			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Close' ) ?></button></div>';
-		}
-		modal_html += '</div></div></div>';
-		jQuery( 'body' ).append( modal_html );
-	}
-	else
-	{ // Use existing modal window
-		jQuery( '#modal_window .modal-body' ).html( body_html );
-	}
-
-	if( use_buttons )
-	{
-		if( typeof( keep_panels ) == 'undefined' || ! keep_panels )
-		{ // Remove these elements, they are displayed as title and button of modal window
-			jQuery( '#modal_window legend' ).remove();
-			jQuery( '#modal_window #close_button' ).remove();
-			jQuery( '#modal_window .panel, #modal_window .panel-body' ).removeClass( 'panel panel-default panel-body' );
-		}
-
-		if( jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).length == 0 )
-		{ // Hide a submit button in the footer if real submit input doesn't exist
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-		}
-		else
-		{
-			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).hide();
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-		}
-
-		jQuery( '#modal_window' + button_form ).change( function()
-		{ // Find the submit inputs when html is changed
-			var input_submit = jQuery( this ).find( 'input[type=submit]' )
-			if( input_submit.length > 0 )
-			{ // Hide a real submit input and Show button of footer
-				input_submit.hide();
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-			}
-			else
-			{ // Hide button of footer if real submit input doesn't exist
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-			}
-		} );
-
-		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
-		{ // Copy a click event from real submit input to button of footer
-			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).click();
-		} );
-	}
-
-	jQuery( '#modal_window ' + button_form + ' a.btn' ).each( function()
-	{ // Move all buttons to the footer
-		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
-			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
-			jQuery( this ).html() +
-			'</button></a>' );
-		jQuery( this ).remove();
-	} );
-
-	if( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).length > 0 )
-	{ // Change window title
-		jQuery( '#modal_window .modal-title' ).html( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).html() );
-	}
-
-	// Init modal window and show
-	var options = {};
-	if( modal_window_js_initialized )
-	{
-		options = 'show';
-	}
-	jQuery( '#modal_window' ).modal( options );
-	if( style_width == '' )
-	{
-		jQuery( '#modal_window .modal-dialog' ).css( { 'display': 'table', 'width': 'auto' } );
-		jQuery( '#modal_window .modal-dialog .modal-content' ).css( { 'display': 'table-cell' } );
-	}
-
-	jQuery( '#modal_window').on( 'hidden', function ()
-	{ // Remove modal window on hide event to draw new window in next time with new title and button
-		jQuery( this ).remove();
-	} );
-
-	modal_window_js_initialized = true;
+	// Initialize variables for the file "bootstrap-evo_modal_window.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_close = \''.TS_('Close').'\';
+	</script>';
 }
-
-/**
- * Close modal window
- *
- * @param object Document object
- */
-function closeModalWindow( document_obj )
-{
-	if( typeof( document_obj ) == 'undefined' )
-	{
-		document_obj = window.document;
-	}
-
-	jQuery( '#modal_window', document_obj ).remove();
-
-	return false;
-}
-<?php
-} // end of echo_modalwindow_js_bootstrap
 
 
 /**

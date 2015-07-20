@@ -3093,9 +3093,15 @@ function callback_filter_userlist( & $Form )
 		echo '</span>';
 	}
 
-	$Form->interval( 'age_min', get_param('age_min'), 'age_max', get_param('age_max'), 3, T_('Age group') );
+	$Form->begin_line( T_('Age group'), 'age_min' );
+		$Form->text( 'age_min', get_param('age_min'), 3, '' );
+		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
+	$Form->end_line();
 
-	$Form->interval( 'level_min', get_param('level_min'), 'level_max', get_param('level_max'), 3, T_('Level') );
+	$Form->begin_line( T_('Level'), 'level_min' );
+		$Form->text( 'level_min', get_param('level_min'), 3, '' );
+		$Form->text( 'level_max', get_param('level_max'), 3, T_('to') );
+	$Form->end_line();
 
 	$OrganizationCache = & get_OrganizationCache( T_('All') );
 	$OrganizationCache->load_all();

@@ -141,12 +141,15 @@ $Form->begin_fieldset( T_('Other permissions for anonymous users').get_manual_li
 
 	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
 
-	$user_level_params = array( 'input_prefix' => T_('from').' ' );
+	$user_level_params = array();
 	if( ! $Settings->get('allow_anonymous_user_list') && ! $Settings->get('allow_anonymous_user_profiles') )
 	{ // Disable the user groups levels interval because the users pages are not available for anonymous users
 		$user_level_params['disabled'] = 'disabled';
 	}
-	$Form->interval( 'allow_anonymous_user_level_min', $Settings->get('allow_anonymous_user_level_min'), 'allow_anonymous_user_level_max', $Settings->get('allow_anonymous_user_level_max'), 2, T_('Show only User Groups Levels'), '', $user_level_params );
+	$Form->begin_line( T_('Show only User Groups Levels'), 'allow_anonymous_user_level_min' );
+		$Form->text_input( 'allow_anonymous_user_level_min', $Settings->get('allow_anonymous_user_level_min'), 2, T_('from'), '', $user_level_params );
+		$Form->text_input( 'allow_anonymous_user_level_max', $Settings->get('allow_anonymous_user_level_max'), 2, T_('to'), '', $user_level_params );
+	$Form->end_line();
 
 $Form->end_fieldset();
 

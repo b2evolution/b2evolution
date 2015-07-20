@@ -477,21 +477,17 @@ span.label_field_required {
 }
 // Error fields
 span.field_error {
-	display: block;
 	color: #f00;
+	span.notes &, span.help-inline & {
+		// Hide errors inside of notes because they are displayed in popover/tooltip:
+		display: none;
+	}
 }
 input.field_error,
 select.field_error,
 textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
-}
-span.checkbox_error {
-	background: #fbf2ee;
-	border: 1px solid #d99;
-}
-span.checkbox_error input.checkbox {
-	background:#fbf2ee;
 }
 
 span.checkbox_surround {

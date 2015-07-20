@@ -211,14 +211,12 @@ $Form->begin_fieldset( T_('Image options').get_manual_link( 'image-options' ) );
 
 	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
 
-	$resize_input_suffix = ' '.T_('Fit to').' ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_width" name="fm_resize_width" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_width' ).'" />';
-	$resize_input_suffix .= ' x ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_height" name="fm_resize_height" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_height' ).'" />';
-	$resize_input_suffix .= ' '.T_('pixels').' ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_quality" name="fm_resize_quality" class="form_text_input" size="3" maxlength="3" style="margin-left:10px" value="'.$Settings->get( 'fm_resize_quality' ).'" />';
-	$resize_input_suffix .= ' % '.T_('quality').' ';
-	$Form->checkbox_input( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), T_('Resize large images after upload'), array( 'input_suffix' => $resize_input_suffix ) );
+	$Form->begin_line( T_('Resize large images after upload'), 'fm_resize_enable' );
+		$Form->checkbox( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), '' );
+		$Form->text( 'fm_resize_width', $Settings->get( 'fm_resize_width' ), 4, ' &nbsp; '.T_('Fit to') );
+		$Form->text( 'fm_resize_height', $Settings->get( 'fm_resize_height' ), 4, ' x ' );
+		$Form->text( 'fm_resize_quality', $Settings->get( 'fm_resize_quality' ), 3, T_('pixels').' &nbsp; ' );
+	$Form->end_line( ' % '.T_('quality') );
 
 $Form->end_fieldset();
 
