@@ -25,9 +25,9 @@ echo '<p'.emailskin_style( '.p' ).'>'.T_('The following scheduled tasks have end
 if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 {
 	echo '<p'.emailskin_style( '.p' ).'><ul>';
-	foreach( $params['tasks'] as $task )
+	foreach( $params['tasks'] as $task_ID => $task )
 	{
-		echo '<li>'.$task['name'].': '.$task['message'].'</li>';
+		echo '<li>'.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] ).'</li>';
 	}
 	echo "</ul></p>\n";
 }

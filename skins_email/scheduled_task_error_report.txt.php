@@ -24,9 +24,9 @@ $params = array_merge( array(
 echo T_('The following scheduled tasks have ended with error:')."\n";
 if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 {
-	foreach( $params['tasks'] as $task )
+	foreach( $params['tasks'] as $task_ID => $task )
 	{
-		echo '- '.$task['name'].': '.$task['message']."\n";
+		echo '- '.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] )."\n";
 	}
 }
 echo "\n";
