@@ -242,22 +242,22 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
  *
  * @param string URL to redirect, FALSE - don't use a redirect
  * @param string delimiter to use for more url params
+ * @param string URL to return after ABORT login action, FALSE - don't use a return url
  * @return string URL
  */
-function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
+function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to = NULL )
 {
-	global $Blog, $secure_htsrv_url;
+	global $Blog, $htsrv_url;
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $htsrv_url );
 	}
 
 	// This URL is used to redirect after ABORT login action:
-	$return_url = param( 'return_to', 'url', '' );
-	if( empty( $return_url ) )
+	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $htsrv_url );
 	}
 
 	if( use_in_skin_login() )
@@ -266,17 +266,17 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$lostpassword_url = $secure_htsrv_url.'login.php?action=lostpassword';
+		$lostpassword_url = $htsrv_url.'login.php?action=lostpassword';
 	}
 
 	if( $redirect_to !== false )
-	{ // Append redirect URL only when it is not restricted
+	{ // Append redirect URL only when it is not restricted:
 		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
 	}
 
-	if( ! empty( $return_url ) )
-	{ // Append return URL
-		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_url ), $glue );
+	if( $return_to !== false )
+	{ // Append return URL only when it is not restricted:
+		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_to ), $glue );
 	}
 
 	return $lostpassword_url;

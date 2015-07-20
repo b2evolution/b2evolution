@@ -2313,7 +2313,7 @@ function display_login_form( $params )
 					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	$lost_password_url = get_lostpassword_url( $redirect_to );
+	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
 	if( ! empty( $login ) )
 	{
 		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
