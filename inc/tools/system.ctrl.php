@@ -424,6 +424,10 @@ if( $post_max_size > $upload_max_filesize )
 {
 	disp_system_check( 'ok' );
 }
+elseif( $post_max_size == $upload_max_filesize )
+{
+	disp_system_check( 'warning', T_('post_max_size should be larger than upload_max_filesize') );
+}
 else
 {
 	disp_system_check( 'error', T_('post_max_size should be larger than upload_max_filesize') );
