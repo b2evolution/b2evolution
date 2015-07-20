@@ -1124,6 +1124,16 @@ class Skin extends DataObject
 					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
 			}
 		}
+
+		// Load general JS file:
+		if( $this->get_api_version() == 6 )
+		{ // Bootstrap skin
+			require_js( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+		}
+		else
+		{ // Standard skin
+			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+		}
 	}
 
 

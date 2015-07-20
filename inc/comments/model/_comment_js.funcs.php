@@ -7,6 +7,9 @@ global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );
 
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
+
 ?>
 <script type="text/javascript">
 
@@ -357,11 +360,6 @@ function deleteComment( commentId, request_from, comment_type )
 		}
 	});
 }
-
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
 
 // Ban comment url
 function ban_url( authorurl )

@@ -224,10 +224,10 @@ module.exports = function(grunt) {
 			// Popover (Analog of bubbletip on bootstrap skins)
 			popover: {
 				options: {
-					banner: '/* This includes 4 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js */\n'
+					banner: '/* This includes 5 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js, bootstrap/formfields.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js'],
+				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js', 'rsc/js/bootstrap/formfields.js'],
 				dest: 'rsc/js/build/popover.bmin.js'
 			},
 			// Textcomplete plugin to suggest user names in textareas with '@username'
@@ -238,6 +238,46 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
+			},
+			// JS files that are used on front-office standard skins:
+			evo_frontoffice: {
+				options: {
+					banner: '/* This includes 4 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on front-office bootstrap skins:
+			evo_frontoffice_bootstrap: {
+				options: {
+					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on back-office standard skins:
+			evo_backoffice: {
+				options: {
+					banner: '/* This includes 10 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
+							'rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js'],
+				dest: 'rsc/js/build/evo_backoffice.bmin.js'
+			},
+			// JS files that are used on back-office bootstrap skins:
+			evo_backoffice_bootstrap: {
+				options: {
+					banner: '/* This includes 10 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
+							'rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js'],
+				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},
 

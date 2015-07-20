@@ -144,13 +144,10 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	$Form->end_fieldset();
 
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
 ?>
 <script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-
 function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, root, path, fm_highlight )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',

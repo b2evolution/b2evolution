@@ -65,10 +65,8 @@ if( isset( $edited_User ) )
 
 	$close_link_params = array();
 	if( $ajax_request )
-	{ // Initialize JavaScript functions to work with modal window
-		echo '<script type="text/javascript">';
+	{ // Initialize JavaScript functions to work with modal window:
 		echo_modalwindow_js();
-		echo '</script>';
 		$close_link_params['onclick'] = 'return closeModalWindow( window.parent.document )';
 	}
 

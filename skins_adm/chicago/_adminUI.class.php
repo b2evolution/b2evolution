@@ -58,6 +58,9 @@ class AdminUI extends AdminUI_general
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
+		// Load general JS file:
+		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
+
 		// Set css classes for messages
 		$Messages->set_params( array(
 				'class_outerdiv' => 'action_messages',

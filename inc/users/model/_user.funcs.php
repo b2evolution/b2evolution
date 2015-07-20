@@ -4122,54 +4122,24 @@ function display_user_email_status_message( $user_ID = 0 )
 
 /**
  * Initialize JavaScript for AJAX loading of popup window to report user
- *
- * @param array Params
  */
 function echo_user_report_window()
 {
-	global $Blog;
-?>
-<script type="text/javascript">
-	//<![CDATA[
-	// User report window
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-function user_report( user_ID, user_tab )
-{
-	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'auto', '', true,
-		'<?php echo TS_('Report User'); ?>',
-		[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ], true );
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_secure_htsrv_url().'anon_async.php'; ?>',
-		data:
-		{
-			'action': 'get_user_report_form',
-			<?php if( is_admin_page() ) { ?>
-			'is_backoffice': 1,
-			'user_tab': user_tab,
-			<?php } else { ?>
-			'blog': <?php echo $Blog->ID; ?>,
-			<?php } ?>
-			'user_ID': user_ID,
-			'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
-		},
-		success: function( result )
-		{
-			openModalWindow( result, 'auto', '',true,
-				'<?php echo TS_('Report User'); ?>',
-				[ '<?php echo TS_('Report this user now!'); ?>', 'btn-danger' ] );
-		}
-	} );
-	return false;
-}
-	//]]>
-</script>
-<?php
+	global $blog;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_report.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_report_user = \''.TS_('Report User').'\';
+		var evo_js_lang_report_this_user_now = \''.TS_('Report this user now!').'\';
+		var evo_js_user_report_ajax_url = \''.get_secure_htsrv_url().'anon_async.php'.'\';
+		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
+		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
 }
 
 
@@ -4178,44 +4148,20 @@ function user_report( user_ID, user_tab )
  */
 function echo_user_contact_groups_window()
 {
-	global $Blog;
-?>
-<script type="text/javascript">
-	//<![CDATA[
-	// User Contact Groups
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-function user_contact_groups( user_ID )
-{
-	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'auto', '', true,
-		'<?php echo TS_('Contact Groups'); ?>',
-		'<?php echo TS_('Save'); ?>', true );
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_secure_htsrv_url().'anon_async.php'; ?>',
-		data:
-		{
-			'action': 'get_user_contact_form',
-			'blog': <?php echo $Blog->ID; ?>,
-			'user_ID': user_ID,
-			'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
-		},
-		success: function( result )
-		{
-			openModalWindow( result, 'auto', '', true,
-				'<?php echo TS_('Contact Groups'); ?>',
-				'<?php echo TS_('Save'); ?>', true );
-		}
-	} );
-	return false;
-}
-	//]]>
-</script>
-<?php
+	global $blog;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_contact_groups.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_contact_groups = \''.TS_('Contact Groups').'\';
+		var evo_js_lang_save = \''.TS_('Save').'\';
+		var evo_js_user_contact_groups_ajax_url = \''.get_secure_htsrv_url().'anon_async.php'.'\';
+		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
 }
 
 
@@ -4224,102 +4170,21 @@ function user_contact_groups( user_ID )
  */
 function echo_user_crop_avatar_window()
 {
-	global $admin_url;
+	global $admin_url, $blog;
 
-	if( is_admin_page() )
-	{ // Ajax params for backoffice
-		$ajax_url = $admin_url;
-		$ajax_params = "'ctrl': 'user',
-				'user_tab': 'crop',
-				'user_tab_from': user_tab_from,\r\n";
-	}
-	else
-	{ // Ajax params for frontoffice
-		global $blog;
-		$ajax_url = get_secure_htsrv_url().'anon_async.php';
-		$ajax_params = "'blog': '{$blog}',
-				'disp': 'avatar',
-				'action': 'crop',\r\n";
-	}
-?>
-<script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-	function user_crop_avatar( user_ID, file_ID, user_tab_from )
-	{
-		if( typeof( user_tab_from ) == 'undefined' )
-		{
-			user_tab_from = 'avatar';
-		}
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
 
-		var max_size = 750;
-		var min_size = 320;
-
-		var viewport_width = jQuery( window ).width();
-		var viewport_height = jQuery( window ).height();
-		//console.log( 'viewport', viewport_width, viewport_height );
-
-		// Set sizes for modal window:
-		var window_width = viewport_width;
-		var window_height = viewport_height;
-		// Limit window with max & min sizes:
-		window_height = ( window_height > max_size ) ? max_size : ( ( window_height < min_size ) ? min_size : window_height );
-		window_width = ( window_width > max_size ) ? max_size : ( ( window_width < min_size ) ? min_size : window_width );
-		//console.log( 'window', window_width, window_height );
-
-		// Set margins for normal view of wide screens:
-		var margin_size_width = 100;
-		var margin_size_height = viewport_height > max_size ? 170 : 205;
-		if( viewport_width <= 900 )
-		{ // When width is less than 900px then preview thumbnails are located under big picture, so height margin should be more
-			margin_size_width = 35;
-			margin_size_height = 325;
-		}
-		//console.log( 'margins', margin_size_width, margin_size_height );
-
-		// Set image sizes:
-		var image_width = window_width - margin_size_width;
-		var image_height = window_height - margin_size_height;
-		var image_min_size = 130;
-		// Limit image with min size:
-		image_width = ( image_width < image_min_size ) ? image_min_size : image_width;
-		image_height = ( image_height < image_min_size ) ? image_min_size : image_height;
-		//console.log( 'image', image_width, image_height );
-
-		// Open modal window with loading animation while ajax request is executing below:
-		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-			window_width+'px', window_height+'px', true,
-			'<?php echo TS_('Crop profile picture'); ?>',
-			[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ], true );
-
-		// Execute ajax request to load a crop tool:
-		jQuery.ajax(
-		{
-			type: 'POST',
-			url: '<?php echo $ajax_url; ?>',
-			data:
-			{
-				<?php echo $ajax_params; ?>
-				'user_ID': user_ID,
-				'file_ID': file_ID,
-				'image_width'  : image_width,
-				'image_height' : image_height,
-				'display_mode': 'js',
-				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
-			},
-			success: function( result )
-			{
-				openModalWindow( result, window_width+'px', window_height+'px', true,
-				'<?php echo TS_('Crop profile picture'); ?>',
-				[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ] );
-			}
-		} );
-		return false;
-	}
-</script>
-<?php
+	// Initialize variables for the file "evo_user_crop.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
+		var evo_js_lang_crop = \''.TS_('Crop').'\';
+		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_secure_htsrv_url().'anon_async.php' ).'\';
+		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
+		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
 }
 
 
@@ -4331,43 +4196,18 @@ echo_modalwindow_js();
 function echo_user_deldata_js( $params = array() )
 {
 	global $admin_url;
-?>
-<script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
 
-function user_deldata( user_ID, user_tab_from )
-{
-	openModalWindow( '<span class="loader_img loader_user_deldata absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'auto', '', true,
-		'<?php echo TS_('Delete user data').get_manual_link( 'delete-user-data' ); ?>',
-		[ '<?php echo TS_('Delete selected data'); ?>', 'btn-danger' ], true );
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo $admin_url; ?>',
-		data:
-		{
-			'ctrl': 'user',
-			'user_tab': 'deldata',
-			'user_tab_from': user_tab_from,
-			'user_ID': user_ID,
-			'display_mode': 'js',
-			'crumb_user': '<?php echo get_crumb('user'); ?>',
-		},
-		success: function(result)
-		{
-			openModalWindow( result, 'auto', '', true,
-			'<?php echo TS_('Delete user data').get_manual_link( 'delete-user-data' ); ?>',
-			[ '<?php echo TS_('Delete selected data'); ?>', 'btn-danger' ] );
-		}
-	} );
-	return false;
-}
-</script>
-<?php
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_delete_user_data = \''.TS_('Delete user data').get_manual_link( 'delete-user-data' ).'\';
+		var evo_js_lang_delete_selected_data = \''.TS_('Delete selected data').'\';
+		var evo_js_user_deldata_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+	</script>';
 }
 
 

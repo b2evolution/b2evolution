@@ -2739,13 +2739,12 @@ function open_temp_file( & $temp_file_name )
 function echo_file_properties()
 {
 	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
 ?>
 <script type="text/javascript">
 	//<![CDATA[
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
 	// Window to edit file
 	function file_properties( root, path, file )
 	{

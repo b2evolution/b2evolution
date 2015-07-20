@@ -157,6 +157,9 @@ class AdminUI_general extends Menu
 	{
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+
+		// Load general JS file:
+		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 	}
 
 	/**

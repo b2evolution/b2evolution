@@ -75,6 +75,9 @@ class AdminUI extends AdminUI_general
 			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
+		// Load general JS file:
+		require_js( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
+
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(
 				'class_outerdiv' => 'action_messages container-fluid',
