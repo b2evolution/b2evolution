@@ -443,13 +443,13 @@ if( empty($memory_limit) )
 else
 {
 	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
-	if( $memory_limit < get_php_bytes_size( '8M' ) )
+	if( $memory_limit < get_php_bytes_size( '256M' ) )
 	{
-		disp_system_check( 'error', T_('The memory_limit is very low. Some features of b2evolution will fail to work;') );
+		disp_system_check( 'error', T_('The memory_limit is too low. Some features like image manipulation will fail to work.') );
 	}
-	elseif( $memory_limit < get_php_bytes_size( '12M' ) )
+	elseif( $memory_limit < get_php_bytes_size( '384M' ) )
 	{
-		disp_system_check( 'warning', T_('The memory_limit is low. Some features of b2evolution may fail to work;') );
+		disp_system_check( 'warning', T_('The memory_limit is low. Some features like image manipulation of large files may fail to work.') );
 	}
 	else
 	{
