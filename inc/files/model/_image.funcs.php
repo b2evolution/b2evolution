@@ -331,6 +331,11 @@ function output_image( $imh, $mimetype )
  */
 function check_thumbnail_sizes( $thumb_type, & $thumb_width, & $thumb_height, $src_width, $src_height )
 {
+	if( empty( $src_width ) || empty( $src_height ) )
+	{ // We don't know how this case can happen but it has been reported, so division by zero:
+		return true;
+	}
+
 	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
 	{ // If original image sizes are less than thumbnail sizes
 		if( $thumb_type == 'fit' )
