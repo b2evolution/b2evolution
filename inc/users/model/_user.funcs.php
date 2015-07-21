@@ -247,17 +247,17 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
  */
 function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to = NULL )
 {
-	global $Blog, $htsrv_url;
+	global $Blog, $secure_htsrv_url;
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $htsrv_url );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $htsrv_url );
+		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
 	}
 
 	if( use_in_skin_login() )
@@ -266,7 +266,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$lostpassword_url = $htsrv_url.'login.php?action=lostpassword';
+		$lostpassword_url = $secure_htsrv_url.'login.php?action=lostpassword';
 	}
 
 	if( $redirect_to !== false )
