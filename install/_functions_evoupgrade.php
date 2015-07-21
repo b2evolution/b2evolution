@@ -6367,7 +6367,61 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			WHERE wi_sco_name = "Menu"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11470' );
+		set_upgrade_checkpoint( '11470' );
+	}
+
+	if( $old_db_version < 11480 )
+	{ // part 18.s trunk aka 20th part of "i7"
+
+		task_begin( 'Updating table for PostType-to-Collection relationships... ' );
+		// Get all collections:
+		$collections_SQL = new SQL();
+		$collections_SQL->SELECT( 'blog_ID, blog_type' );
+		$collections_SQL->FROM( 'T_blogs' );
+		$collections = $DB->get_assoc( $collections_SQL->get() );
+		// Get all post types:
+		$posttypes_SQL = new SQL();
+		$posttypes_SQL->SELECT( 'ityp_ID' );
+		$posttypes_SQL->FROM( 'T_items__type' );
+		$posttypes = $DB->get_col( $posttypes_SQL->get() );
+		// Enable post types for the collections:
+		$posttypes_collections = array();
+		foreach( $collections as $collection_ID => $collection_type )
+		{
+			switch( $collection_type )
+			{ // Set what post types should not be enabled depending on the collection type:
+				case 'main':
+				case 'photo':
+					$skip_posttypes = array( 100, 200, 2000, 5000 );
+					break;
+				case 'forum':
+					$skip_posttypes = array( 1, 100, 2000, 5000 );
+					break;
+				case 'manual':
+					$skip_posttypes = array( 1, 200, 2000, 5000 );
+					break;
+				default: // 'std'
+					$skip_posttypes = array( 100, 200, 5000 );
+					break;
+			}
+			foreach( $posttypes as $posttype_ID )
+			{
+				if( in_array( $posttype_ID, $skip_posttypes ) )
+				{ // Skip(Don't enable) this post type for the collection:
+					continue;
+				}
+				$posttypes_collections[] = '( '.$posttype_ID.', '.$collection_ID.' )';
+			}
+		}
+		if( count( $posttypes_collections ) )
+		{ // Update the relationships only when at least one is required:
+			$DB->query( 'REPLACE INTO T_items__type_coll
+				( itc_ityp_ID, itc_coll_ID )
+				VALUES '.implode( ', ', $posttypes_collections ) );
+		}
+		task_end();
+
+		// set_upgrade_checkpoint( '11480' );
 	}
 
 	/*
