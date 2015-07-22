@@ -198,6 +198,7 @@ function pbm_process_messages( & $mbox, $limit )
 
 			// TODO: handle type == "message" recursively
 			// sam2kb> For some reason imap_qprint() demages HTML text... needs more testing
+			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
 
 			if( $parsedMIME['Type'] == 'html' )
 			{	// Mail is HTML
@@ -219,7 +220,7 @@ function pbm_process_messages( & $mbox, $limit )
 					elseif( $alternative['Type'] == 'text' )
 					{	// Plain text
 						pbm_msg('Text alternative message part saved as '.$alternative['DataFile']);
-						$strbody = imap_qprint( file_get_contents($alternative['DataFile']) );
+						$strbody = quoted_printable_decode( file_get_contents($alternative['DataFile']) );
 						break; // stop after first alternative
 					}
 				}
@@ -227,7 +228,7 @@ function pbm_process_messages( & $mbox, $limit )
 			elseif( $parsedMIME['Type'] == 'text' )
 			{	// Mail is plain text
 				pbm_msg('Plain-text message part saved as '.$parsedMIME['DataFile']);
-				$strbody = imap_qprint( file_get_contents($parsedMIME['DataFile']) );
+				$strbody = quoted_printable_decode( file_get_contents($parsedMIME['DataFile']) );
 			}
 
 			// Check for attachments
