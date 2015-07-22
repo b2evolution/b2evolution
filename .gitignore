@@ -2,3 +2,4 @@
 _cache/c*
 conf/_basic_config.php
 _evocache
+node_modules
