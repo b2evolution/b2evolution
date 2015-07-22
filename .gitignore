@@ -1,0 +1,4 @@
+.htaccess
+_cache/c*
+conf/_basic_config.php
+_evocache
