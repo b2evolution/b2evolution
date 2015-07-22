@@ -1256,3 +1256,29 @@ span.note.status_draft span {
 span[id^=title_folding_] {
 	cursor: default;
 }
+
+/* Dropdown menu for global icons: */
+.btn-group.dropdown {
+	display: inline-block;
+	position: relative;
+}
+.btn-group.dropdown button {
+	display: none;
+}
+.btn-group.dropdown ul {
+	display: none;
+	border: 1px solid #becdd6;
+	background: #FFF;
+	z-index: 100000;
+	margin: 0;
+	padding: 2px;
+	list-style: none;
+}
+.btn-group.dropdown ul a {
+	white-space: nowrap;
+	font-size: 84%;
+}
+.btn-group.dropdown:hover ul {
+	display: block;
+	position: absolute;
+}

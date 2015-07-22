@@ -236,10 +236,10 @@ class Widget
 				}
 				$icon_params['link_attribs']['class'] = ( empty( $icon_params['link_attribs']['class'] ) ? '' : $icon_params['link_attribs']['class'].' ' ).$global_icons_class;
 			}
-			if( $icon_params['group'] != NULL && isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
-			{ // It is a groupped button for bootstrap skin
+			if( $icon_params['group'] != NULL )
+			{ // It is a groupped button
 				if( ! isset( $icons[ $icon_params['group'] ] ) )
-				{ // Initialize an array for grouped icons
+				{ // Initialize an array for grouped icons:
 					$icons[ $icon_params['group'] ] = array();
 				}
 				$icons[ $icon_params['group'] ][] = $icon_params;

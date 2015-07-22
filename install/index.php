@@ -108,6 +108,7 @@ load_class( '/_core/model/db/_db.class.php', 'DB' );
 load_class( '_core/model/_timer.class.php', 'Timer' );
 //load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 load_funcs( '_core/_url.funcs.php' );
+load_funcs( 'tools/model/_system.funcs.php' );
 
 
 require_once dirname(__FILE__).'/_functions_install.php';
@@ -128,6 +129,20 @@ init_charsets( $current_charset );
 // echo "utf8_substr('abc',0)=".utf8_substr('abc',0)."<br>\n";
 param( 'action', 'string', 'default' );
 // echo "action=*$action*<br>\n ";
+
+// Check minimum memory limit for successful using:
+if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
+{ // Deny to use on server with small memory limit size:
+	$install_memory_limit_allow = false;
+	if( $action != 'localeinfo' )
+	{ // Restrict all actions except of action to switch a language and view page of more languages:
+		$action = 'start';
+	}
+}
+else
+{ // Allow to use installer when memory limit is enough:
+	$install_memory_limit_allow = true;
+}
 
 // Display mode:
 // - 'normal' - Normal mode; Used for normal installation.
@@ -351,6 +366,12 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 
 <?php
 
+if( ! $install_memory_limit_allow )
+{ // Display error that current memory limit size is not enough for correct using:
+	display_install_messages( sprintf( T_('Your PHP configuration only allows us to use %s of RAM. The absolute minimum we need to install b2evolution is 48M. Please contact your web host or use a <a %s>compatible hosting provider</a>.'),
+		ini_get( 'memory_limit' ), 'href="http://b2evolution.net/web-hosting/"' ) );
+}
+
 // echo $action;
 $date_timezone = ini_get( "date.timezone" );
 if( empty( $date_timezone ) && empty( $date_default_timezone ) )
@@ -424,6 +445,15 @@ switch( $action )
 		 * Start of install procedure:
 		 * -----------------------------------------------------------------------------------
 		 */
+		if( ! $install_memory_limit_allow )
+		{ // Don't allow any action when minimum memory limit is not enough for using:
+
+			// Display only a locale selector:
+			display_locale_selector();
+
+			break;
+		}
+
 		if( $action == 'start' || !$config_is_done )
 		{
 			track_step( 'installer-startdb' );

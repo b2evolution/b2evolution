@@ -54,7 +54,8 @@ div.status_icon {
   margin: 0 2px;
 }
 .btn-group .action_icon {
-  margin: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 .btn-group.blogs-menu {
   margin-bottom: 10px;
