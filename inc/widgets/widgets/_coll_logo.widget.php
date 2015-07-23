@@ -140,9 +140,14 @@ class coll_logo_Widget extends ComponentWidget
 				),
 				'check_file' => array(
 					'label' => T_('Check file'),
-					'note' => T_('Check if file exists. If not, no IMG tag will be created.'),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
+					'note' => '',
+					'type' => 'radio',
+					'field_lines' => true,
+					'options' => array(
+							array( 'none', T_('Don\'t check. Assume image file exists.') ),
+							array( 'check', T_('Check -> if image doesn\'t exist, display nothing.') ),
+							array( 'title', T_('Check -> if image doesn\'t exist, display the collection title instead.') ) ),
+					'defaultvalue' => 'title',
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -182,8 +187,11 @@ class coll_logo_Widget extends ComponentWidget
 				break;
 		}
 
-		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
-		{ // Logo file doesn't exist, Exit here because of widget setting requires this
+		// Get a widget setting to know how we should check a file:
+		$check_file = $this->disp_params['check_file'];
+
+		if( ( $check_file == 'check' || $check_file === '1' ) && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		{ // Logo file doesn't exist, Exit here because widget setting requires this:
 			return true;
 		}
 
@@ -192,19 +200,28 @@ class coll_logo_Widget extends ComponentWidget
 		// Collection logo:
 		echo $this->disp_params['block_start'];
 
-		$image_attrs = '';
-		if( ! empty( $this->disp_params['width'] ) )
-		{ // Image width
-			$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
+		$title = '<a href="'.$Blog->get( 'url' ).'">';
+
+		if( $check_file == 'title' && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		{ // Logo file doesn't exist, Display a collection title because widget setting requires this:
+			$title .= $Blog->get( 'name' );
 		}
-		if( ! empty( $this->disp_params['height'] ) )
-		{ // Image height
-			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
+		else
+		{ // Initialize the image tag for logo:
+			$image_attrs = '';
+			if( ! empty( $this->disp_params['width'] ) )
+			{ // Image width
+				$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
+			}
+			if( ! empty( $this->disp_params['height'] ) )
+			{ // Image height
+				$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
+			}
+
+			$title .= '<img src="'.$image_url.$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'"'.$image_attrs.' />';
 		}
 
-		$title = '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'"'.$image_attrs.' />'
-							.'</a>';
+		$title .= '</a>';
 
 		// Display as a title:
 		$this->disp_title( $title );
