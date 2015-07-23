@@ -30,11 +30,13 @@ global $mode, $month, $tab, $redirect_to, $comment_content;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
 
-$link_attribs = array( 'style' => 'margin-right: 3ex;' ); // Avoid misclicks by all means!
+$link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
-	$Form->global_icon( T_( 'Elevate this comment into a post' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
-				T_( 'Elevate into a post' ), 4, 3, $link_attribs );
+	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
+				T_( 'Post as a quote' ), 4, 3, $link_attribs, 'elevate' );
+	$Form->global_icon( T_( 'Post as original user' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=original&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
+				T_( 'Post as original user' ), 4, 3, $link_attribs, 'elevate' );
 }
 
 $delete_url = '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment');
@@ -51,7 +53,7 @@ else
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1 );
+$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 

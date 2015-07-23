@@ -568,12 +568,43 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).': <blockquote>'.$edited_Comment->get_content().'</blockquote>';
+		$type = param( 'type', 'string', 'quote' );
+
 		$new_Item = new Item();
 		$new_Item->set( 'status', 'draft' );
-		$new_Item->set_creator_by_login( $current_User->login );
 		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
+
+		if( $type == 'quote' )
+		{ // Set a post data for a quote mode:
+			$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).':';
+			if( $new_Item->get_type_setting( 'allow_html' ) )
+			{ // Use html quote format if HTML is allowed for new creating post:
+				$item_content .= ' <blockquote>'.$edited_Comment->get_content( 'raw_text' ).'</blockquote>';
+			}
+			else
+			{ // Use markdown quote format if HTML is NOT allowed for new creating post:
+				$item_content .= "\n> ".str_replace( "\n", "\n> ", $edited_Comment->get_content( 'raw_text' ) );
+			}
+			// Set creator as current user:
+			$new_Item->set_creator_by_login( $current_User->login );
+		}
+		else // $type == 'original'
+		{ // Set a post data for an original mode:
+			// Use an original comment content for new creating post:
+			$item_content = $edited_Comment->get_content( 'raw_text' );
+
+			// Set a post creator:
+			$author_User = & $edited_Comment->get_author_User();
+			if( empty( $author_User ) )
+			{ // Use current user:
+				$new_Item->set_creator_by_login( $current_User->login );
+			}
+			else
+			{ // Use a comment author:
+				$new_Item->set_creator_by_login( $author_User->login );
+			}
+		}
 		$new_Item->set( 'content', $item_content );
 
 		if( ! $new_Item->dbinsert() )
