@@ -81,7 +81,7 @@ while( $Item = & mainlist_get_item() )
 						'time_format' => 'F jS, Y',
 					) );
 				$Item->issue_time( array(
-						'before'      => /* TRANS: time */ T_('at '),
+						'before'      => /* TRANS: at (time) */ T_('at').' ',
 						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
