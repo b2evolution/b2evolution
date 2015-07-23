@@ -671,6 +671,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.1.3-stable
 		install_plugin( 'shortcodes_plugin' );
 	}
+
+	if( $old_db_version < 11490 )
+	{ // Upgrade to 6.7.1-stable
+		install_plugin( 'adjust_headings_plugin' );
+	}
 }
 
 
