@@ -85,18 +85,6 @@ class markdown_plugin extends Plugin
 						'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
 						'defaultvalue' => 0,
 					),
-				'min_h_level' => array(
-						'label' => T_( 'Top Heading Level' ),
-						'type' => 'integer',
-						'size' => 1,
-						'maxlength' => 1,
-						'note' => T_( 'This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.' ),
-						'defaultvalue' => 1,
-						'valid_range' => array(
-							'min' => 1, // from <h1>
-							'max' => 6, // to <h6>
-						),
-					),
 			)
 		);
 	}
@@ -144,14 +132,12 @@ class markdown_plugin extends Plugin
 			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $item_Blog );
 			$links_enabled = $this->get_coll_setting( 'links', $item_Blog );
 			$images_enabled = $this->get_coll_setting( 'images', $item_Blog );
-			$min_h_level = $this->get_coll_setting( 'min_h_level', $item_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
 		{ // We are rendering Message now, Use FALSE by default because we don't have the settings
 			$text_styles_enabled = false;
 			$links_enabled = false;
 			$images_enabled = false;
-			$min_h_level = 1; // Use default value
 		}
 		else
 		{ // Unknown call, Don't render this case
@@ -163,7 +149,6 @@ class markdown_plugin extends Plugin
 		$Parsedown->parse_font_styles = $text_styles_enabled;
 		$Parsedown->parse_links = $links_enabled;
 		$Parsedown->parse_images = $images_enabled;
-		$Parsedown->min_h_level = $min_h_level;
 
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
