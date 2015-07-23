@@ -444,6 +444,7 @@ if( $upload )
 		{ // Send also the link data if it was created
 			$message['link_ID'] = $new_Link->ID;
 			$message['link_url'] = $newFile->get_view_link();
+			$message['link_preview'] = $new_Link->get_preview_thumb();
 			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
