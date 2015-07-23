@@ -548,7 +548,7 @@ qq.FileUploaderBasic.prototype = {
 			return false;
 
 		} else if (size && this._options.sizeLimit && size > this._options.sizeLimit){
-			this._error('sizeError', name);
+			this._error('sizeError', name, size);
 			return false;
 
 		} else if (size && size < this._options.minSizeLimit){
@@ -558,7 +558,7 @@ qq.FileUploaderBasic.prototype = {
 
 		return true;
 	},
-	_error: function(code, fileName){
+	_error: function(code, fileName, size){
 		var message = this._options.messages[code];
 		function r(name, replacement){ message = message.replace(name, replacement); }
 
@@ -566,6 +566,10 @@ qq.FileUploaderBasic.prototype = {
 		r('{extensions}', this._options.allowedExtensions.join(', '));
 		r('{sizeLimit}', this._formatSize(this._options.sizeLimit));
 		r('{minSizeLimit}', this._formatSize(this._options.minSizeLimit));
+		if( typeof( size ) != 'undefined' )
+		{
+			r('{fileSize}', this._formatSize(size));
+		}
 
 		this._options.showMessage(message);
 	},

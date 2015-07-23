@@ -113,7 +113,7 @@ switch( $action )
 			param( 'upload_enabled', 'integer', 0 );
 			$Settings->set( 'upload_enabled', $upload_enabled );
 
-			param_integer_range( 'upload_maxkb', 1, $upload_maxmaxkb, T_('Maximum allowed filesize must be between %d and %d KB.') );
+			param( 'upload_maxkb', 'integer', 0 );
 			$Settings->set( 'upload_maxkb', $upload_maxkb );
 
 			// Advanced settings

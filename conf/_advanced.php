@@ -649,11 +649,6 @@ $cross_post_nav_in_same_blog = true;
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
 
 /**
- * Admin can configure max file upload size, but he won't be able to set it higher than this "max max" value.
- */
-$upload_maxmaxkb = 32000;
-
-/**
  * The admin can configure the regexp for valid file names in the Settings interface
  * However if the following values are set to non empty, the admin will not be able to customize these values.
  */

@@ -2284,7 +2284,7 @@ function display_dragdrop_upload_button( $params = array() )
 				debug: true,
 				messages: {
 					typeError: '<?php echo TS_('{file} has invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo TS_('{file} is too large, maximum file size is {sizeLimit}.'); ?>',
+					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
 					minSizeError: '<?php echo TS_('{file} is too small, minimum file size is {minSizeLimit}.'); ?>',
 					emptyError: '<?php echo TS_('{file} is empty, please select files again without it.'); ?>',
 					onLeave: '<?php echo TS_('The files are being uploaded, if you leave now the upload will be cancelled.'); ?>'
