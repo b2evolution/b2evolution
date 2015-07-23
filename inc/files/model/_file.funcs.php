@@ -2198,7 +2198,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url, $blog;
+	global $htsrv_url, $blog, $Settings;
 
 	$params = array_merge( array(
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
@@ -2280,7 +2280,15 @@ function display_dragdrop_upload_button( $params = array() )
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
+				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: true,
+				messages: {
+					typeError: '<?php echo TS_('{file} has invalid extension. Only {extensions} are allowed.'); ?>',
+					sizeError: '<?php echo TS_('{file} is too large, maximum file size is {sizeLimit}.'); ?>',
+					minSizeError: '<?php echo TS_('{file} is too small, minimum file size is {minSizeLimit}.'); ?>',
+					emptyError: '<?php echo TS_('{file} is empty, please select files again without it.'); ?>',
+					onLeave: '<?php echo TS_('The files are being uploaded, if you leave now the upload will be cancelled.'); ?>'
+				},
 				onSubmit: function( id, fileName )
 				{
 					var noresults_row = jQuery( 'tr.noresults' );
