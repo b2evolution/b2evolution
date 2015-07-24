@@ -153,11 +153,11 @@ while( $Item = & mainlist_get_item() )
 					if( $Skin->get_setting( 'display_post_date' ) )
 					{	// We want to display the post date:
 						$Item->issue_time( array(
-								'before'      => /* TRANS: date */ T_('This entry was posted on '),
+								'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
 								'time_format' => 'F jS, Y',
 							) );
 						$Item->issue_time( array(
-								'before'      => /* TRANS: time */ T_('at '),
+								'before'      => /* TRANS: at (time) */ T_('at').' ',
 								'time_format' => '#short_time',
 							) );
 						$Item->author( array(
@@ -168,7 +168,7 @@ while( $Item = & mainlist_get_item() )
 					else
 					{
 						$Item->author( array(
-								'before'    => T_('This entry was posted by '),
+								'before'    => T_('This entry was posted by').' ',
 								'link_text' => 'preferredname',
 							) );
 					}
