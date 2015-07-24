@@ -805,14 +805,11 @@ $failed_logins_lockout = 600; // 10 minutes
 
 
 /**
- * Most of the time, teh best security practice is to NOT allow redirects from your current site to another domain.
- * That is, unless you specifically configured a redirected post.
- * If this doesn't work for you, you can change this security policy here.
- *
+ * Allow redirects to different domain. Usually it should not be allowed to redirect to an external URL.
  * Possible values:
- *  - 'always' : Always allow redirects to a different domain
+ *  - 'always' : Always allow redirect to a different domain
  *  - 'only_redirected_posts' ( Default ): Allow redirects to a different domain only in case of posts with redirected status
- *  - 'never' : Force redirects to the current domain in all case, and never allow redirects to a different domain
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'only_redirected_posts';
 
