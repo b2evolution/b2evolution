@@ -10,6 +10,9 @@
 div.widget_core_coll_tagline {
   margin-bottom: 30px;
 }
+.evo_container__front_page_secondary {
+  padding-top: 30px;
+}
 .secondary_area {
   background-color: #FFF;
   width: 100%;
@@ -494,4 +497,27 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
     font-size: 20px;
     line-height: 45px;
   }
+  .slide_button_wrap {
+    display: none !important;
+  }
+}
+.slide_button_wrap {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+}
+.slide_button_wrap #slide_button {
+  display: inline-block;
+  width: 40px;
+  color: #ffffff;
+  text-align: center;
+  opacity: 0.5;
+  transition: 0.1s all;
+  position: relative;
+  left: -50%;
+}
+.slide_button_wrap #slide_button:hover {
+  cursor: pointer;
+  opacity: 0.9;
+  transform: scale(0.8);
 }
