@@ -193,9 +193,14 @@ jQuery( document ).ready( function()
 		jQuery( '#attachmentframe_wrapper' ).css( 'max-height', body_height );
 	}
 
+	var attachmentframe_is_loaded = false;
 	jQuery( '#attachmentframe' ).bind( 'load', function()
 	{ // Set proper height on frame loading:
-		update_attachment_frame_height();
+		if( ! attachmentframe_is_loaded )
+		{ // Only on first loading
+			update_attachment_frame_height();
+			attachmentframe_is_loaded = true;
+		}
 	} );
 
 	jQuery( '#icon_folding_itemform_links, #title_folding_itemform_links' ).click( function()

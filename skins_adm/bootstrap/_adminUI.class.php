@@ -164,8 +164,12 @@ class AdminUI extends AdminUI_general
 
 		parent::disp_payload_begin();
 
-		// Display info & error messages
-		$Messages->display();
+		if( $display_messages )
+		{ // Display info & error messages:
+			$Messages->display();
+			// Clear the messages to avoid double displaying:
+			$Messages->clear();
+		}
 
 		echo '<div class="container-fluid page-content">'."\n\t"
 				.'<div class="row">'."\n\t\t"
