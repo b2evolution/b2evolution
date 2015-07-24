@@ -157,7 +157,7 @@ while( $Item = & mainlist_get_item() )
 								'time_format' => 'F jS, Y',
 							) );
 						$Item->issue_time( array(
-								'before'      => /* TRANS: at (time) */ T_('at').' ',
+								'before'      => /* TRANS: time */ T_('at '),
 								'time_format' => '#short_time',
 							) );
 						$Item->author( array(
@@ -168,7 +168,7 @@ while( $Item = & mainlist_get_item() )
 					else
 					{
 						$Item->author( array(
-								'before'    => T_('This entry was posted by').' ',
+								'before'    => T_('This entry was posted by '),
 								'link_text' => 'preferredname',
 							) );
 					}
