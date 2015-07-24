@@ -110,7 +110,7 @@ skin_include( '_body_header.inc.php' );
 							if( $Skin->get_setting( 'display_post_date' ) )
 							{	// We want to display the post date:
 								$Item->issue_time( array(
-										'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
+										'before'      => /* TRANS: date */ T_('This entry was posted on '),
 										'time_format' => 'F jS, Y',
 									) );
 								$Item->issue_time( array(
