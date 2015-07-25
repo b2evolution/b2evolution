@@ -85,7 +85,58 @@ class bootstrap_blog_Skin extends Skin
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
+				
+				
+				'section_color_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Custom Settings')
+				),
+					'page_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),					
+					'page_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'page_hover_link_color' => array(
+						'label' => T_('Hover link color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'current_tab_text_color' => array(
+						'label' => T_('Current tab text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),	
+					/*'page_font_size' => array(
+						'label' => T_('Font size'),
+						'note' => T_('Default value is Normal.'),
+						'defaultvalue' => '100%',
+						'options' => array(
+								'85%' => T_('Small'),
+								'100%' => T_('Normal'),
+								'115%' => T_('Big'),
+							),
+						'type' => 'select',
+					),	*/				
+				'section_color_end' => array(
+					'layout' => 'end_fieldset',
+				),
 
+				
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
@@ -197,7 +248,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $debug;
+		global $Messages, $disp, $debug;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -213,6 +264,51 @@ class bootstrap_blog_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
+		global $media_url, $media_path;
+			
+		// Add custom CSS:
+		$custom_css = '';
+			
+		if( $color = $this->get_setting( 'page_bg_color' ) )
+		{ // Custom page background color:
+			$custom_css .= 'body { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_text_color' ) )
+		{ // Custom page text color:
+			$custom_css .= 'body { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'page_link_color' ) )
+		{ // Custom page link color:
+			$custom_css .= 'a { color: '.$color." }\n";
+			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li a, .pagination li span { color: '.$color." !important }\n";
+			if( ['gender_colored'] !== 1 ) { 
+				// If gender option is not enabled, chose custom link color. Otherwise, chose gender link colors:
+				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
+			}
+		}
+		/* @MILOS > STILL A WORK IN PROGRESS
+		if( $font_size = $this->get_setting( 'page_font_size' ) )
+		{ // Custom page text size:
+			$custom_css .= '#skin_wrapper p, #skin_wrapper ul li, #skin_wrapper h4.panel-title, #skin_wrapper div.evo_widget, #skin_wrapper form, #skin_wrapper form input { font-size: '.$font_size." }\n";
+		}*/
+		if( $color = $this->get_setting( 'page_hover_link_color' ) )
+		{ // Custom page link color on hover:
+			$custom_css .= 'a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_text_color' ) )
+		{ // Custom current tab text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
+		}
+		
+		if( ! empty( $custom_css ) )
+		{ // Function for custom_css:
+		$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+		add_headline( $custom_css );
+		}			
 	}
 
 
