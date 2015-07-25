@@ -508,7 +508,7 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
 }
 .slide_button_wrap #slide_button {
   display: inline-block;
-  width: 40px;
+  font-size: 55px;
   color: #ffffff;
   text-align: center;
   opacity: 0.5;

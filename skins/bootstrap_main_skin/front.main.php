@@ -201,7 +201,7 @@ echo '</div>';
 	</div><!-- .col -->
 
 	<!-- "Slide down" button -->
-	<div class="slide_button_wrap"><img id="slide_button" src="../../rsc/icons/slide_down_icon.svg"/></div>
+	<div class="slide_button_wrap"><i class="fa fa-angle-down" id="slide_button"></i></div>
 
 </div><!-- .row -->
 
