@@ -96,8 +96,10 @@ class whosonline_plugin extends Plugin
 		echo T_('Who\'s Online?');
 		echo $params['block_title_end'];
 
+		echo $params['block_body_start'];
 		$OnlineSessions = new OnlineSessions( $params['timeout_online_user'] );
 		$OnlineSessions->display_onliners( $params );
+		echo $params['block_body_end'];
 
 		echo $params['block_end'];
 
