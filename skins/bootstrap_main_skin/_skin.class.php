@@ -400,11 +400,7 @@ jQuery( document ).ready( function()
 		jQuery( "html, body" ).animate(
 		{
 			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
-		}, 1500, function()
-		{
-			jQuery( "#slide_button" ).show( 500 );
-		} );
-		jQuery( this ).hide( 500 );
+		}, 1500);
 	} );
 } );' );
 		}
