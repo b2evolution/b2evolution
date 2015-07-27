@@ -3767,6 +3767,11 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = str_replace( '$login$', $user_login, $formated_message );
 		}
 
+		if( $format == 'html' )
+		{ // Use "http://" for protocol-relative urls because email browsers cannot load such urls:
+			$formated_message = preg_replace( '~(src|href)="//~', '$1="http://', $formated_message );
+		}
+
 		$template_message .= $formated_message;
 		if( isset( $template_contents ) )
 		{ // Multipart content
