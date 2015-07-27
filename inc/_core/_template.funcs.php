@@ -870,7 +870,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
-	global $Blog, $baseurl, $assets_baseurl;
+	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
 	// Check if we have a public CDN we want to use for this library file:
 	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
@@ -901,7 +901,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Make the file relative to current page <base>:
 		$lib_url = $lib_file;
 	}
-	elseif( preg_match('~^(https?:)?//~', $lib_file ) )
+	elseif( preg_match( '~^(https?:)?//~', $lib_file ) )
 	{ // It's already an absolute url, keep it as is:
 		$lib_url = $lib_file;
 	}
@@ -929,6 +929,11 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 			$version = $app_version_long;
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
+	}
+
+	if( preg_match( '~^https://~', $ReqURL ) )
+	{ // If base url is safe then fix all media urls to protocol-relative format:
+		$lib_url = preg_replace( '~^http://~', '//', $lib_url );
 	}
 
 	return $lib_url;
