@@ -68,6 +68,9 @@ div.front_main_area div.widget_core_coll_item_list div.item_title {
 div.front_main_area div.widget_core_coll_item_list img {
   border-radius: 3px;
 }
+body.pictured {
+  height: 100%;
+}
 body.pictured #skin_wrapper {
   width: 100%;
   height: 100%;
