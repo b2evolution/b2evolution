@@ -92,7 +92,6 @@ body.pictured .container.main_page_wrapper .panel input {
   -webkit-font-smoothing: subpixel-antialiased;
 }
 #bg_picture {
-  background: url() no-repeat center center fixed;
   position: fixed;
   top: 0;
   left: 0;
