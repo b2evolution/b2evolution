@@ -275,7 +275,7 @@ echo '<div class="profile_column_left">';
 		{
 			if( is_array( $button ) )
 			{ // The grouped buttons
-				echo '<p'.( count( $button ) > 1 ? ' class="btn-group' : '' ).'">'.implode( "\n", $button ).'</p>';
+				echo '<p'.( count( $button ) > 1 ? ' class="btn-group' : '' ).'">'.implode( '', $button ).'</p>';
 			}
 			else
 			{ // Single button
