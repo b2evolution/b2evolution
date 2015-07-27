@@ -939,6 +939,43 @@ class Blog extends DataObject
 			}
 
 
+			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{ // Assets URLs / CDN:
+
+				// Check all assets types url settings:
+				$assets_url_data = array(
+					'rsc_assets_url_type'   => array( 'url' => 'rsc_assets_absolute_url', 'folder' => '/rsc/' ),
+					'media_assets_url_type' => array( 'url' => 'media_assets_absolute_url', 'folder' => '/media/' ),
+					'skins_assets_url_type' => array( 'url' => 'skins_assets_absolute_url', 'folder' => '/skins/' ),
+				);
+
+				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
+				{
+					$asset_url_type_value = param( $asset_url_type, 'string', NULL );
+					if( $asset_url_type_value === NULL )
+					{ // Skip this setting to don't save when it doesn't exist on form
+						continue;
+					}
+					$this->set_setting( $asset_url_type, $asset_url_type_value );
+
+					$assets_absolute_url_value = param( $asset_url_data['url'], 'string', NULL );
+					if( ( get_param( $asset_url_type ) == 'absolute' ) && empty( $assets_absolute_url_value ) )
+					{ // Absolute URL cannot be empty
+						$Messages->add( sprintf( T_('Absolute URL for %s cannot be empty!'), $asset_url_data['folder'] ) );
+					}
+					elseif( empty( $assets_absolute_url_value ) || preg_match( '#^(https?:)?//.+/$#', $assets_absolute_url_value ) )
+					{ // It looks like valid absolute URL, so we may update it
+						$this->set_setting( $asset_url_data['url'], $assets_absolute_url_value, true );
+					}
+					else
+					{ // It is not valid absolute URL, don't update it to avoid errors
+						$Messages->add( sprintf( T_('Absolute URL for %s'), $asset_url_data['folder'] ).': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $assets_absolute_url_value ).'&raquo;' )
+							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with \'/\' sign!'), 'error' );
+					}
+				}
+			}
+
+
 			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
 			{ // Aggregate list: (can be '*')
 				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
@@ -1238,20 +1275,21 @@ class Blog extends DataObject
 	/**
 	 * Get the URL to the basepath of that blog.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
-	 *
-	 * @todo The current implementation may not work in all situations. See TODO below.
 	 */
 	function get_basepath_url()
 	{
-		global $basesubpath;
-
-		// fp> TODO: this may be very borked and may need some tweaking for non standard multiblog situations:
-		// One way to fix this, if neede, may be to add a settinf to Blog Settings > URLs
-		// -- Create a block for "System URLs" and give a radio option between default and custom with input field
-
-		if( empty($this->basepath_url) )
+		if( empty( $this->basepath_url ) )
 		{
-			$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+			if( $this->access_type == 'absolute' )
+			{ // Use whole url when it is absolute
+				// Remove text like 'index.php' at the end
+				$this->basepath_url = preg_replace( '/^(.+\/)([^\/]+\.[^\/]+)?$/', '$1', $this->get( 'siteurl' ) );
+			}
+			else
+			{ // Build url from base and sub path
+				global $basesubpath;
+				$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+			}
 		}
 
 		return $this->basepath_url;
@@ -1271,34 +1309,82 @@ class Blog extends DataObject
 
 	/**
 	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current media_assets_url_type setting.  Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /media/ folder
 	 */
-	function get_local_media_url()
+	function get_local_media_url( $url_type = NULL )
 	{
-		global $media_subdir;
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
-		return $this->get_basepath_url().$media_subdir;
+		if( $url_type == 'relative' )
+		{ // Relative URL
+			global $media_subdir;
+			return $this->get_basepath_url().$media_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{ // Absolute URL
+			return $this->get_setting( 'media_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{ // Basic URL from config
+			global $media_url;
+			return $media_url;
+		}
 	}
 
 
 	/**
 	 * Get the URL of the rsc folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current rsc_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /rsc/ folder
 	 */
-	function get_local_rsc_url()
+	function get_local_rsc_url( $url_type = NULL )
 	{
-		global $rsc_subdir;
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'rsc_assets_url_type' ) : $url_type;
 
-		return $this->get_basepath_url().$rsc_subdir;
+		if( $url_type == 'relative' )
+		{ // Relative URL
+			global $rsc_subdir;
+			return $this->get_basepath_url().$rsc_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{ // Absolute URL
+			return $this->get_setting( 'rsc_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{ // Basic URL from config
+			global $rsc_url;
+			return $rsc_url;
+		}
 	}
 
 
 	/**
 	 * Get the URL of the skins folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current skins_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /skins/ folder
 	 */
-	function get_local_skins_url()
+	function get_local_skins_url( $url_type = NULL )
 	{
-		global $skins_subdir;
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'skins_assets_url_type' ) : $url_type;
 
-		return $this->get_basepath_url().$skins_subdir;
+		if( $url_type == 'relative' )
+		{ // Relative URL
+			global $skins_subdir;
+			return $this->get_basepath_url().$skins_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{ // Absolute URL
+			return $this->get_setting( 'skins_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{ // Basic URL from config
+			global $skins_url;
+			return $skins_url;
+		}
 	}
 
 

@@ -6421,7 +6421,39 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		// set_upgrade_checkpoint( '11480' );
+		set_upgrade_checkpoint( '11480' );
+	}
+
+	if( $old_db_version < 11490 )
+	{ // part 18.t trunk aka 21th part of "i7"
+
+		// Update the assets urls to 'relative' type of the blogs that have absolute base url:
+		// (All other blogs will have the 'basic' url type by default)
+		task_begin( 'Updating blogs settings...' );
+		$blogs_abs_url_SQL = new SQL();
+		$blogs_abs_url_SQL->SELECT( 'blog_ID' );
+		$blogs_abs_url_SQL->FROM( 'T_blogs' );
+		$blogs_abs_url_SQL->WHERE( 'blog_access_type = "absolute"' );
+		$blogs_abs_url = $DB->get_col( $blogs_abs_url_SQL->get() );
+		if( count( $blogs_abs_url ) )
+		{ // Update only when at least one blog has an absolute base url
+			$blogs_abs_url_values = '';
+			foreach( $blogs_abs_url as $b => $blog_abs_url_ID )
+			{
+				if( $b != 0 )
+				{
+					$blogs_abs_url_values .= ', ';
+				}
+				$blogs_abs_url_values .= '( '.$blog_abs_url_ID.', "rsc_assets_url_type", "relative" ), '
+					.'( '.$blog_abs_url_ID.', "media_assets_url_type", "relative" ), '
+					.'( '.$blog_abs_url_ID.', "skins_assets_url_type", "relative" )';
+			}
+			$DB->query( 'REPLACE INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
+				VALUES '.$blogs_abs_url_values );
+		}
+		task_end();
+
+		// set_upgrade_checkpoint( '11490' );
 	}
 
 	/*

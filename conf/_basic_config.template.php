@@ -114,6 +114,16 @@ if( isset($_SERVER['HTTP_HOST']) )
 }
 */
 
+
+/**
+ * $assets_baseurl could be used to load assets from a different domain, like a cookie-less domain or a CDN.
+ * Assets can be all kinds of static contents: CSS, JS, media images, skin specific CSS, etc.
+ *
+ * @global string $assets_baseurl
+ */
+$assets_baseurl = $baseurl;
+
+
 /**
  * This is used to create the Admin and the demo accounts at install time (not used after install).
  * @todo move to installer.
