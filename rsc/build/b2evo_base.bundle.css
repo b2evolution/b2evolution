@@ -2690,6 +2690,10 @@ input.btn-lg {
   max-width: 300px;
   margin: 0 auto;
 }
+.profile_separator {
+  border: none;
+  border-top: 1px solid #000;
+}
 .profile_buttons a.btn {
   display: inline-block;
 }
@@ -2704,7 +2708,10 @@ input.btn-lg {
   white-space: nowrap;
 }
 .profile_buttons .btn-group .btn {
-  width: 50%;
+  width: 49.5%;
+}
+.profile_buttons .btn-group .btn:first-child {
+  margin-right: 1%;
 }
 .bComment .other_profile_pictures div.avatartag {
   float: none;
