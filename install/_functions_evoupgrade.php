@@ -6453,6 +6453,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
+		task_begin( 'Upgrading cron logs table... ' );
+		$DB->query( "ALTER TABLE T_cron__log
+			CHANGE clog_status clog_status enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started'" );
+		task_end();
+
 		// set_upgrade_checkpoint( '11490' );
 	}
 

@@ -286,22 +286,6 @@ span.legend_element {
 
 
 /*
- * Cron statuses
- */
-.cron_started {
-	font-weight: bold;
-}
-.cron_finished {
-	color: #009900;
-}
-.cron_error,
-.cron_timeout {
-	font-weight: bold;
-	color: #FF0000;
-}
-
-
-/*
  * Grouping of plugins:
  */
 table.grouped tr.PluginsSubGroup {

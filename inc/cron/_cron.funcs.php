@@ -147,10 +147,11 @@ function cron_status_color( $status )
 {
 	$colors = array(
 			'pending'  => '808080',
-			'started'  => 'FFFF00',
-			'finished' => '008000',
-			'error'    => 'FF0000',
-			'timeout'  => 'FFA500',
+			'started'  => '4d77cb',
+			'warning'  => 'dbdb57',
+			'timeout'  => 'e09952',
+			'error'    => 'cb4d4d',
+			'finished' => '34b27d',
 		);
 
 	return isset( $colors[ $status ] ) ? '#'.$colors[ $status ] : 'none';

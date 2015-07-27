@@ -59,10 +59,13 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		}
 		else
 		{
-			$Form->info( T_('Status'), '<span class="cron_'.$cjob_row->clog_status.'">'.$cjob_row->clog_status.'</span>' );
-			$Form->info( T_('Real start time'), mysql2localedatetime($cjob_row->clog_realstart_datetime) );
-			$Form->info( T_('Real stop time'), mysql2localedatetime($cjob_row->clog_realstop_datetime) );
-			$Form->info( T_('Duration'), seconds_to_period( strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime ) ) );
+			$duration_seconds = strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime );
+			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('Execution time is more than 60 seconds!') ) ) : '';
+
+			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color ( $cjob_row->clog_status ).';padding:0 5px;">'.$cjob_row->clog_status.'</span>'.$duration_icon );
+			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );
+			$Form->info( T_('Real stop time'), mysql2localedatetime( $cjob_row->clog_realstop_datetime ) );
+			$Form->info( T_('Duration'), seconds_to_period( $duration_seconds ) );
 			$cron_messages_data = @unserialize( $cjob_row->clog_messages );
 			if( !is_array( $cron_messages_data ) )
 			{	// Simple messages

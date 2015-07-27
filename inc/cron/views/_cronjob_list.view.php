@@ -15,8 +15,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Get filters:
-global $ctst_pending, $ctst_started, $ctst_timeout, $ctst_error, $ctst_finished;
+global $ctst_pending, $ctst_started, $ctst_warning, $ctst_timeout, $ctst_error, $ctst_finished, $cjob_type;
 global $datestartinput, $datestart, $timestart, $datestopinput, $datestop, $timestop;
+
+// We want to remember these params from page to page:
+$ctst_status = param( 'ctst_status', 'array:string', NULL, true );
+$cjob_type = param( 'cjob_type', 'string', NULL, true );
+param( 'results_crontab_order', 'string', '-D', true );
+param( 'results_crontab_page', 'integer', 1, true );
 
 // Name filter:
 $s = param( 's', 'string', '', true );
@@ -43,10 +49,48 @@ else
 	param( 'datestop', 'string', '', true );
 }
 
-if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst_finished )
-{	// Set default status filters:
+global $Session;
+$cronjob_filters = $Session->get( 'cronjob_filters' );
+if( empty( $cronjob_filters ) )
+{ // No saved filter yet
+	$cronjob_filters = array();
+}
+if( $ctst_status === NULL )
+{ // Get a param values from Session
+	$ctst_pending  = empty( $cronjob_filters['pending'] ) ? 0 : 1;
+	$ctst_started  = empty( $cronjob_filters['started'] ) ? 0 : 1;
+	$ctst_warning  = empty( $cronjob_filters['warning'] ) ? 0 : 1;
+	$ctst_timeout  = empty( $cronjob_filters['timeout'] ) ? 0 : 1;
+	$ctst_error    = empty( $cronjob_filters['error'] ) ? 0 : 1;
+	$ctst_finished = empty( $cronjob_filters['finished'] ) ? 0 : 1;
+}
+else
+{ // Save new values to Session
+	$cronjob_filters['pending']  = $ctst_pending  = intval( in_array( 'pending', $ctst_status ) );
+	$cronjob_filters['started']  = $ctst_started  = intval( in_array( 'started', $ctst_status ) );
+	$cronjob_filters['warning']  = $ctst_warning  = intval( in_array( 'warning', $ctst_status ) );
+	$cronjob_filters['timeout']  = $ctst_timeout  = intval( in_array( 'timeout', $ctst_status ) );
+	$cronjob_filters['error']    = $ctst_error    = intval( in_array( 'error', $ctst_status ) );
+	$cronjob_filters['finished'] = $ctst_finished = intval( in_array( 'finished', $ctst_status ) );
+}
+if( $cjob_type === NULL )
+{ // Get a param values from Session
+	$cjob_type = empty( $cronjob_filters['type'] ) ? '' : $cronjob_filters['type'];
+}
+else
+{ // Save new values to Session
+	$cronjob_filters['type'] = $cjob_type;
+}
+// Save new filters
+$Session->set( 'cronjob_filters', $cronjob_filters );
+$Session->dbsave();
+
+
+if( !$ctst_pending && !$ctst_started && !$ctst_warning && !$ctst_timeout && !$ctst_error && !$ctst_finished )
+{ // Set default status filters:
 	$ctst_pending = 1;
 	$ctst_started = 1;
+	$ctst_warning = 1;
 	$ctst_timeout = 1;
 	$ctst_error = 1;
 }
@@ -65,17 +109,22 @@ $SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_key, ctsk_name, ctsk_params, c
 $SQL->FROM( 'T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
 if( !empty( $cron_job_name_query ) )
 { // left join with the predefined cron job names, to be able to order correctly after the after the localized Name fields
-	// Note: ctsk_key field always has ascii_bin encoding, so make sure we convert the temp table field to ascii also, to prevent illegal mix of collation issues
-	$SQL->FROM_add( 'LEFT JOIN ( '.$cron_job_name_query. ' ) AS temp ON ctsk_key = CONVERT( temp.task_key USING ascii )');
+	$SQL->FROM_add( 'LEFT JOIN ( '.$cron_job_name_query. ' ) AS temp ON ctsk_key = temp.task_key');
 }
-// Filter by statuses
-$clog_statuses = array();
+if( ! empty( $cjob_type ) )
+{ // Filter by job type:
+	$SQL->WHERE( 'ctsk_key = '.$DB->quote( $cjob_type ) );
+}
 if( $ctst_started )
 { // Started
 	$clog_statuses[] = 'started';
 }
+if( $ctst_warning )
+{ // Warning
+	$clog_statuses[] = 'warning';
+}
 if( $ctst_timeout )
-{ // Timeout
+{ // Timed out
 	$clog_statuses[] = 'timeout';
 }
 if( $ctst_error )
@@ -86,14 +135,14 @@ if( $ctst_finished )
 { // Finished
 	$clog_statuses[] = 'finished';
 }
-$clog_statuses = empty( $clog_statuses ) ? array() : array( 'clog_status IN ( '.$DB->quote( $clog_statuses ).' )' );
-if( $ctst_pending )
-{ // Pending
-	$clog_statuses[] = 'clog_status IS NULL';
-}
-if( ! empty( $clog_statuses ) )
-{
-	$SQL->WHERE( '( '.implode( ' OR ', $clog_statuses ).' )' );
+if( $ctst_pending || ! empty( $clog_statuses ) )
+{ // Filter by statuses:
+	$clog_statuses = empty( $clog_statuses ) ? array() : array( 'clog_status IN ( "'.implode( '", "', $clog_statuses ).'" )' );
+	if( $ctst_pending )
+	{ // Pending
+		$clog_statuses[] = 'clog_status IS NULL';
+	}
+	$SQL->WHERE_and( implode( ' OR ', $clog_statuses ) );
 }
 if( ! empty( $s ) )
 { // Filter by name
@@ -132,14 +181,23 @@ if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
  */
 function filter_crontab( & $Form )
 {
-	global $ctst_pending, $ctst_started, $ctst_timeout, $ctst_error, $ctst_finished;
+	global $ctst_pending, $ctst_started, $ctst_warning, $ctst_timeout, $ctst_error, $ctst_finished, $cjob_type;
 	global $datestart, $timestart, $datestop, $timestop;
 
-	$Form->checkbox( 'ctst_pending', $ctst_pending, T_('Pending') );
-	$Form->checkbox( 'ctst_started', $ctst_started, T_('Started') );
-	$Form->checkbox( 'ctst_timeout', $ctst_timeout, T_('Timed out') );
-	$Form->checkbox( 'ctst_error', $ctst_error, T_('Error') );
-	$Form->checkbox( 'ctst_finished', $ctst_finished, T_('Finished') );
+	// Job statuses:
+	$Form->checkbox( 'ctst_status[]', $ctst_pending,  T_('Pending'), '', '',   'pending' );
+	$Form->checkbox( 'ctst_status[]', $ctst_started,  T_('Started'), '', '',   'started' );
+	$Form->checkbox( 'ctst_status[]', $ctst_warning,  T_('Warning'), '', '',   'warning' );
+	$Form->checkbox( 'ctst_status[]', $ctst_timeout,  T_('Timed out'), '', '', 'timeout' );
+	$Form->checkbox( 'ctst_status[]', $ctst_error,    T_('Error'), '', '',     'error' );
+	$Form->checkbox( 'ctst_status[]', $ctst_finished, T_('Finished'), '', '',  'finished' );
+
+	// Job types:
+	$cron_jobs_names = array_merge( array(
+			'' => T_('All') ),
+			get_cron_jobs_config( 'name' )
+		);
+	$Form->select_input_array( 'cjob_type', $cjob_type, $cron_jobs_names, T_('Job type') );
 
 	// New line separator
 	echo '<div class="clear"></div>';
@@ -160,10 +218,10 @@ $Results->filter_area = array(
 	'callback' => 'filter_crontab',
 	'url_ignore' => 'results_crontab_page,ctst_pending,ctst_started,ctst_timeout,ctst_error,ctst_finished',	// ignor epage param and checkboxes
 	'presets' => array(
-			'schedule' => array( T_('Schedule'), '?ctrl=crontab&amp;ctst_pending=1&amp;ctst_started=1&amp;ctst_timeout=1&amp;ctst_error=1' ),
-			'finished' => array( T_('Finished'), '?ctrl=crontab&amp;ctst_finished=1' ),
-			'attention' => array( T_('Attention'), '?ctrl=crontab&amp;ctst_timeout=1&amp;ctst_error=1' ),
-			'all' => array( T_('All'), '?ctrl=crontab&amp;ctst_pending=1&amp;ctst_started=1&amp;ctst_timeout=1&amp;ctst_error=1&amp;ctst_finished=1' ),
+			'schedule' => array( T_('Schedule'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;cjob_type=' ),
+			'finished' => array( T_('Finished'), '?ctrl=crontab&amp;ctst_status[]=finished&amp;cjob_type=' ),
+			'attention' => array( T_('Attention'), '?ctrl=crontab&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;cjob_type=' ),
+			'all' => array( T_('All'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=finished&amp;cjob_type=' ),
 		)
 	);
 
@@ -192,7 +250,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'status',
-						'td_class' => 'shrinkwrap cron_$status$',
+						'td_class' => 'shrinkwrap',
 						'td' => '$status$',
 						'extra' => array ( 'style' => 'background-color: %cron_status_color( "#status#" )%;', 'format_to_output' => false )
 					);

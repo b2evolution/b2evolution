@@ -22,16 +22,6 @@ $AdminUI->set_path( 'options', 'cron' );
 
 param( 'action', 'string', 'list' );
 
-// We want to remember these params from page to page:
-param( 'ctst_pending', 'integer', 0, true );
-param( 'ctst_started', 'integer', 0, true );
-param( 'ctst_timeout', 'integer', 0, true );
-param( 'ctst_error', 'integer', 0, true );
-param( 'ctst_finished', 'integer', 0, true );
-param( 'results_crontab_order', 'string', '-D', true );
-param( 'results_crontab_page', 'integer', 1, true );
-
-
 if( param( 'ctsk_ID', 'integer', '', true) )
 {// Load cronjob from cache:
 	$CronjobCache = & get_CronjobCache();
