@@ -59,6 +59,11 @@ if( file_exists(dirname(__FILE__).'/_config_TEST.php') )
 	include_once dirname(__FILE__).'/_config_TEST.php';   	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
 
+if( empty($assets_baseurl) )
+{	// We need to set this var before we continue:
+	$assets_baseurl = $baseurl;
+}
+
 require_once  dirname(__FILE__).'/_advanced.php';       	// advanced settings
 require_once  dirname(__FILE__).'/_locales.php';        	// locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     	// formatting settings

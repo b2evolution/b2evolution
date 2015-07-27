@@ -133,7 +133,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']'.get_manual_link('media_directory_location') );
+	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']'.get_manual_link('media_directory_location'), array( 'id' => 'media_dir_location' ) );
 	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
@@ -160,6 +160,8 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 						value="'.$edited_Blog->dget( 'media_url', 'formvalue' ).'" /></div></fieldset>' )
 			), T_('Media directory'), true
 		);
+	$Form->info( T_('URL preview'), '<span id="blog_media_url_preview">'.$edited_Blog->get_media_url().'</span>'
+		.' <a href="'.$admin_url.'?ctrl=coll_settings&tab=urls&blog='.$edited_Blog->ID.'" class="small">'.T_('CDN configuration').'</a>' );
 	$Form->end_fieldset();
 
 }
@@ -244,4 +246,24 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 			jQuery( '#advanced_perms' ).attr( 'checked', true );
 		}
 	} );
+
+	function update_blog_media_url_preview()
+	{
+		var url_preview = '';
+		switch( jQuery( 'input[name=blog_media_location]:checked' ).val() )
+		{
+			case 'default':
+				url_preview = '<?php echo $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/'; ?>';
+				break;
+			case 'subdir':
+				url_preview = '<?php echo $edited_Blog->get_local_media_url(); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
+				break;
+			case 'custom':
+				url_preview = jQuery( 'input[name=blog_media_url]' ).val();
+				break;
+		}
+		jQuery( '#blog_media_url_preview' ).html( url_preview );
+	}
+	jQuery( 'input[name=blog_media_location]' ).click( function() { update_blog_media_url_preview(); } );
+	jQuery( 'input[name=blog_media_subdir], input[name=blog_media_url]' ).keyup( function() { update_blog_media_url_preview(); } );
 </script>
