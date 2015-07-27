@@ -46,10 +46,15 @@ var form_error_fields_selector = 'input.field_error[type=text], input.field_erro
 jQuery( document ).on( 'mouseover focus', form_error_fields_selector, function()
 { // Initialize popover only on first event calling:
 	form_error_field_popover( this );
-	// Show popover:
-	jQuery( this ).popover( 'show' );
+	if( jQuery( this ).next( 'div.popover:visible' ).length == 0 )
+	{ // Show popover only if is not visible yet:
+		jQuery( this ).popover( 'show' );
+	}
 } )
 .on( 'mouseout mouseleave blur', form_error_fields_selector, function()
-{ // Hide popover:
-	jQuery( this ).popover( 'hide' );
+{
+	if( ! jQuery( this ).is( ':focus' ) )
+	{ // Hide popover only if this field is not focused now:
+		jQuery( this ).popover( 'hide' );
+	}
 } );
