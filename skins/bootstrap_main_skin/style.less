@@ -110,6 +110,7 @@ body.pictured {
 	}
 }
 #bg_picture {
+	background: url() no-repeat center center fixed;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -117,13 +118,11 @@ body.pictured {
 	bottom: 0;
 	width: 100%;
 	height: 100%;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
 	background-size: cover;
-	background-position: center center;
 	z-index: -999999;
-	img {
-		display: none;
-		width: 100%;
-	}
 }
 @media only screen and (max-width: 640px) {
 	body.disp_front {
