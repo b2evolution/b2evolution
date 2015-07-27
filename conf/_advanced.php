@@ -482,38 +482,47 @@ $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 /**
  * Location of the RSC folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP.
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
-$rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
+$rsc_url = $assets_baseurl.$rsc_subdir;  // You should not need to change this
 $rsc_uri = $basesubpath.$rsc_subdir;
 
 /**
  * Location of the skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $skins_subdir
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
-$skins_url = $baseurl.$skins_subdir;     // You should not need to change this
+$skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
 
 /**
  * Location of the site skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $siteskins_subdir
  */
 $siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
 $siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $baseurl.$siteskins_subdir;    // You should not need to change this
+$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
 
 /**
  * Location of the email skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $emailskins_subdir
  */
 $emailskins_subdir = 'skins_email/';               // Subdirectory relative to base
 $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to change this
-$emailskins_url = $baseurl.$emailskins_subdir;     // You should not need to change this
+$emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need to change this
 
 /**
  * Location of the admin interface dispatcher
@@ -524,13 +533,13 @@ $admin_url = $baseurl.$dispatcher;
 /**
  * Location of the admin skins folder.
  *
- * Note: This folder NEEDS to by accessible by both PHP AND through HTTP.
+ * Note: This folder NEEDS to by accessible by both PHP AND through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $adminskins_subdir
  */
 $adminskins_subdir = 'skins_adm/';         // Subdirectory relative to ADMIN
 $adminskins_path = $basepath.$adminskins_subdir; // You should not need to change this
-$adminskins_url = $baseurl.$adminskins_subdir;   // You should not need to change this
+$adminskins_url = $assets_baseurl.$adminskins_subdir;   // You should not need to change this
 
 /**
  * Location of the locales folder.
@@ -562,15 +571,15 @@ $plugins_url = $baseurl.$plugins_subdir;    // You should not need to change thi
  *
  * @global string $cron_subdir
  */
-$cron_subdir = 'cron/';   		             	// Subdirectory relative to base
-$cron_url = $baseurl.$cron_subdir;    // You should not need to change this
+$cron_subdir = 'cron/';            // Subdirectory relative to base
+$cron_url = $baseurl.$cron_subdir; // You should not need to change this
 
 /**
  * Location of the install folder.
  * @global string $install_subdir
  */
-$install_subdir = 'install/';            	  // Subdirectory relative to base
-$install_path = $basepath.$install_subdir;  // You should not need to change this
+$install_subdir = 'install/';            	 // Subdirectory relative to base
+$install_path = $basepath.$install_subdir; // You should not need to change this
 
 /**
  * Location of the rendered page cache folder.
@@ -580,8 +589,9 @@ $install_path = $basepath.$install_subdir;  // You should not need to change thi
  *
  * @global string $cache_subdir
  */
-$cache_subdir = '_cache/';             // Subdirectory relative to base
+$cache_subdir = '_cache/';              // Subdirectory relative to base
 $cache_path = $basepath.$cache_subdir; // You should not need to change this
+
 
 /**
  * Location of the root media folder.
@@ -591,9 +601,9 @@ $cache_path = $basepath.$cache_subdir; // You should not need to change this
  *
  * @global string $media_subdir
  */
-$media_subdir = 'media/';                // Subdirectory relative to base
-$media_path = $basepath.$media_subdir;   // You should not need to change this
-$media_url = $baseurl.$media_subdir;     // You should not need to change this
+$media_subdir = 'media/';                   // Subdirectory relative to base
+$media_path = $basepath.$media_subdir;      // You should not need to change this
+$media_url = $assets_baseurl.$media_subdir; // You should not need to change this
 
 
 /**
@@ -604,8 +614,8 @@ $media_url = $baseurl.$media_subdir;     // You should not need to change this
  *
  * @global string $backup_subdir
  */
-$backup_subdir = '_backup/';				// Subdirectory relative to base
-$backup_path = $basepath.$backup_subdir;	// You should not need to change this
+$backup_subdir = '_backup/';             // Subdirectory relative to base
+$backup_path = $basepath.$backup_subdir; // You should not need to change this
 
 
 /**
