@@ -7107,7 +7107,7 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 
 /**
- * Get base url depending on current called script
+ * Get baseurl depending on current called script
  *
  * @return string URL
  */
@@ -7115,11 +7115,21 @@ function get_script_baseurl()
 {
 	if( isset( $_SERVER['SERVER_NAME'] ) )
 	{ // Set baseurl from current server name
+
 		$temp_baseurl = 'http://'.$_SERVER['SERVER_NAME'];
-		if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
-		{ // Get also a port number
-			$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
+
+		if( isset( $_SERVER['SERVER_PORT'] ) )
+		{
+			if( $_SERVER['SERVER_PORT'] == '443' )
+			{	// Rewrite that as hhtps:
+				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
+			}	// Add port name
+			elseif( $_SERVER['SERVER_PORT'] != '80' )
+			{ // Get also a port number
+				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
+			}
 		}
+
 		if( isset( $_SERVER['SCRIPT_NAME'] ) )
 		{ // Get also the subfolders, when script is called e.g. from http://localhost/blogs/b2evolution/
 			$temp_baseurl .= preg_replace( '~(.*/)[^/]*$~', '$1', $_SERVER['SCRIPT_NAME'] );
