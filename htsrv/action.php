@@ -26,6 +26,12 @@ $module_name = param( 'mname', 'string', true );
 $blog = param( 'blog', 'integer', 0 );
 activate_blog_locale( $blog );
 
+if( ! empty( $blog ) )
+{ // Initialize collection object because it can be used in some function:
+	$BlogCache = & get_BlogCache();
+	$Blog = & $BlogCache->get_by_ID( $blog );
+}
+
 foreach( $modules as $module )
 {
 	if( $module == $module_name )
