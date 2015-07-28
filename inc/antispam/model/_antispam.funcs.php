@@ -501,8 +501,7 @@ function antispam_block_request()
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
 			$debug_message = sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain );
-			syslog_insert( $debug_message, 'warning' );
-			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
+			exit_blocked_request( 'Domain', $debug_message ); // WILL exit();
 		}
 
 		load_funcs('sessions/model/_hitlog.funcs.php');
@@ -512,8 +511,7 @@ function antispam_block_request()
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
 			$debug_message = sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer );
-			syslog_insert( $debug_message, 'warning' );
-			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
+			exit_blocked_request( 'Domain', $debug_message ); // WILL exit();
 		}
 	}
 
@@ -560,8 +558,7 @@ function antispam_block_by_ip()
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
 		$debug_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
-		syslog_insert( $debug_message, 'warning' );
-		debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
+		exit_blocked_request( 'IP', $debug_message ); // WILL exit();
 	}
 }
 
@@ -585,8 +582,7 @@ function antispam_block_by_country( $country_ID, $assert = true )
 		if( $assert )
 		{ // block the request
 			$debug_message = sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() );
-			syslog_insert( $debug_message, 'warning' );
-			debug_die( 'This request has been blocked.', array( 'debug_info' => $debug_message ) );
+			exit_blocked_request( 'Country', $debug_message ); // WILL exit();
 		}
 		// Update the number of requests from blocked countries
 		$DB->query( 'UPDATE T_regional__country
