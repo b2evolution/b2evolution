@@ -3224,6 +3224,34 @@ function debug_info( $force = false, $force_clean = false )
 
 
 /**
+ * Exit when request is blocked
+ *
+ * @param string Block type: 'IP', 'Domain', 'Country'
+ * @param string Debug message
+ * @param string Syslog origin type: 'core', 'plugin'
+ * @param integer Syslog origin ID
+ */
+function exit_blocked_request( $block_type, $debug_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
+{
+	global $debug;
+
+	// Write system log for the request:
+	syslog_insert( $debug_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
+
+	// Print out this text to inform an user:
+	echo 'Blocked.';
+
+	if( $debug )
+	{ // Display additional info on debug mode:
+		echo ' ('.$block_type.')';
+	}
+
+	// EXIT:
+	exit( 0 );
+}
+
+
+/**
  * Check if the current request exceed the post max size limit.
  * If too much data was sent add an error message and call header redirect.
  */
