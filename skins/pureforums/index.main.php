@@ -153,10 +153,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					// CODE for the widget:
 					'widget' => 'coll_search_form',
 					// Optional display params
-					'block_start'         => '<li><div class="widget $wi_class$">',
-					'block_end'           => '</div></li>',
+					'block_start'         => '<li class="widget $wi_class$">',
+					'block_end'           => '</li>',
 					'block_display_title' => false,
-					'button'              => T_('Search')
+					'button'              => ('&#xf002;')
 				) );
 		?>
 				</ul>
