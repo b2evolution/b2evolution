@@ -330,8 +330,8 @@ if( $Skin->is_visible_container( 'menu' ) )
 					'block_start' => '<div class="powered_by">',
 					'block_end'   => '</div>',
 					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-					'img_width'   => 120,
+					'img_url'     => '$rsc$img/powered-by-b2evolution.svg',
+					'img_width'   => 132,
 					'img_height'  => 32,
 				) );
 		?>
