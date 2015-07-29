@@ -59,6 +59,7 @@ table.bCalendarTable caption {
   margin: auto;
   padding: 3px 0;
   white-space: nowrap;
+  text-align: center;
 }
 table.bCalendarTable {
   margin: 15px auto;
@@ -200,6 +201,14 @@ textarea.form_textarea_input {
 }
 div.widget_core_coll_avatar {
   text-align: center;
+}
+.widget_core_profile_menu_link ul li a img {
+  vertical-align: middle;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
 }
 div.compact_search_form {
   white-space: nowrap;

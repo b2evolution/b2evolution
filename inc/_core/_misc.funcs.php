@@ -3224,6 +3224,34 @@ function debug_info( $force = false, $force_clean = false )
 
 
 /**
+ * Exit when request is blocked
+ *
+ * @param string Block type: 'IP', 'Domain', 'Country'
+ * @param string Debug message
+ * @param string Syslog origin type: 'core', 'plugin'
+ * @param integer Syslog origin ID
+ */
+function exit_blocked_request( $block_type, $debug_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
+{
+	global $debug;
+
+	// Write system log for the request:
+	syslog_insert( $debug_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
+
+	// Print out this text to inform an user:
+	echo 'Blocked.';
+
+	if( $debug )
+	{ // Display additional info on debug mode:
+		echo ' ('.$block_type.')';
+	}
+
+	// EXIT:
+	exit( 0 );
+}
+
+
+/**
  * Check if the current request exceed the post max size limit.
  * If too much data was sent add an error message and call header redirect.
  */
@@ -6538,12 +6566,12 @@ function is_ajax_content( $template_name = '' )
  *
  * @param string Message text
  * @param string Log type: 'info', 'warning', 'error', 'critical_error'
- * @param string Object type: 'comment', 'item', 'user', 'file'
+ * @param string Object type: 'comment', 'item', 'user', 'file' or leave default NULL if none of them
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID
  */
-function syslog_insert( $message, $log_type, $object_type, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL )
+function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL )
 {
 	$Syslog = new Syslog();
 	$Syslog->set_user();
@@ -7113,7 +7141,7 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 
 /**
- * Get base url depending on current called script
+ * Get baseurl depending on current called script
  *
  * @return string URL
  */
@@ -7121,11 +7149,21 @@ function get_script_baseurl()
 {
 	if( isset( $_SERVER['SERVER_NAME'] ) )
 	{ // Set baseurl from current server name
+
 		$temp_baseurl = 'http://'.$_SERVER['SERVER_NAME'];
-		if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
-		{ // Get also a port number
-			$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
+
+		if( isset( $_SERVER['SERVER_PORT'] ) )
+		{
+			if( $_SERVER['SERVER_PORT'] == '443' )
+			{	// Rewrite that as hhtps:
+				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
+			}	// Add port name
+			elseif( $_SERVER['SERVER_PORT'] != '80' )
+			{ // Get also a port number
+				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
+			}
 		}
+
 		if( isset( $_SERVER['SCRIPT_NAME'] ) )
 		{ // Get also the subfolders, when script is called e.g. from http://localhost/blogs/b2evolution/
 			$temp_baseurl .= preg_replace( '~(.*/)[^/]*$~', '$1', $_SERVER['SCRIPT_NAME'] );

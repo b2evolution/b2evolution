@@ -155,8 +155,9 @@ else
 
 	$DB->halt_on_error = false;
 	$DB->show_errors = false;
+	$cron_timestart = $localtimenow;
 	$sql = 'INSERT INTO T_cron__log( clog_ctsk_ID, clog_realstart_datetime, clog_status)
-					VALUES( '.$ctsk_ID.', '.$DB->quote( date2mysql($localtimenow) ).', "started" )';
+					VALUES( '.$ctsk_ID.', '.$DB->quote( date2mysql( $cron_timestart ) ).', "started" )';
 	// Duplicate query for tests!
 	// $DB->query( $sql, 'Request lock' );
 	if( $DB->query( $sql, 'Request lock' ) != 1 )
@@ -203,6 +204,7 @@ else
 
 		// EXECUTE
 		$error_message = call_job( $task->ctsk_key, $cron_params );
+
 		if( !empty( $error_message ) )
 		{
 			$error_task = array(
@@ -213,9 +215,14 @@ else
 		}
 
 		// Record task as finished:
-		if( empty($timestop) )
+		if( empty( $timestop ) )
 		{
 			$timestop = time() + $time_difference;
+		}
+
+		if( $result_status == 'finished' && $timestop - $cron_timestart > 60 )
+		{ // Record a finished task as warning if it has run for more than 60 seconds
+			$result_status = 'warning';
 		}
 
 		if( is_array( $result_message ) )
@@ -224,7 +231,7 @@ else
 		}
 
 		$sql = ' UPDATE T_cron__log
-								SET clog_status = '.$DB->quote($result_status).',
+								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
 										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;

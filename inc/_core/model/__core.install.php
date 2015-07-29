@@ -333,7 +333,7 @@ $schema_queries = array(
 			clog_ctsk_ID              int(10) unsigned   not null,
 			clog_realstart_datetime   datetime           not null DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    datetime,
-			clog_status               enum('started','finished','error','timeout') COLLATE ascii_general_ci not null default 'started',
+			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
