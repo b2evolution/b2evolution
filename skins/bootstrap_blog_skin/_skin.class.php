@@ -121,17 +121,17 @@ class bootstrap_blog_Skin extends Skin
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),	
-					/*'page_font_size' => array(
+					'page_font_size' => array(
 						'label' => T_('Font size'),
 						'note' => T_('Default value is Normal.'),
-						'defaultvalue' => '100%',
+						'defaultvalue' => 'normal',
 						'options' => array(
 								'85%' => T_('Small'),
-								'100%' => T_('Normal'),
-								'115%' => T_('Big'),
+								'normal' => T_('Normal'),
+								'115%' => T_('Large'),
 							),
 						'type' => 'select',
-					),	*/				
+					),
 				'section_color_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -281,16 +281,23 @@ class bootstrap_blog_Skin extends Skin
 		{ // Custom page link color:
 			$custom_css .= 'a { color: '.$color." }\n";
 			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li a, .pagination li span { color: '.$color." !important }\n";
-			if( ['gender_colored'] !== 1 ) { 
-				// If gender option is not enabled, chose custom link color. Otherwise, chose gender link colors:
+			if( ['gender_colored'] !== 1 ) 
+			{ // If gender option is not enabled, chose custom link color. Otherwise, chose gender link colors:				
 				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
 			}
 		}
-		/* @MILOS > STILL A WORK IN PROGRESS
+		/* @MILOS > STILL A WORK IN PROGRESS */
 		if( $font_size = $this->get_setting( 'page_font_size' ) )
 		{ // Custom page text size:
-			$custom_css .= '#skin_wrapper p, #skin_wrapper ul li, #skin_wrapper h4.panel-title, #skin_wrapper div.evo_widget, #skin_wrapper form, #skin_wrapper form input { font-size: '.$font_size." }\n";
-		}*/
+			if( ['page_font_size'] == 'normal' )
+			{ // If default value is chosen, no additional CSS is needed
+				echo '';
+			} else
+			{ // If "small" or "large" is choesen, apply this CSS
+				$custom_css .= '#skin_wrapper, .evo_post_title h2 a { font-size: '.$font_size." !important }\n";
+				$custom_css .= '.panel-heading h4.panel-title { font-size: '.$font_size." !important}";
+			}
+		}
 		if( $color = $this->get_setting( 'page_hover_link_color' ) )
 		{ // Custom page link color on hover:
 			$custom_css .= 'a:hover { color: '.$color." }\n";
