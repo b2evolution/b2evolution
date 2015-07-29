@@ -104,8 +104,8 @@ if( empty( $users_to_remind_ids ) )
 global $is_admin_page;
 $is_admin_page = true;
 
-// Get all those user threads and their recipients where the corresponding users have unread messages
-$unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array', 'html' );
+// Get all those user threads and their recipients where the corresponding users have unread messages:
+$unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array', 'html', 'http:' );
 
 // Get unread thread urls
 list( $threads_link ) = get_messages_link_to();

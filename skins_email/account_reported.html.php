@@ -26,9 +26,9 @@ $params = array_merge( array(
 		'reported_by'    => '', // Login of user who has reported this user account
 	), $params );
 
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('A user account was reported by %s'), get_user_colored_login_link( $params['reported_by'], array( 'use_style' => true ) ) )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('A user account was reported by %s'), get_user_colored_login_link( $params['reported_by'], array( 'use_style' => true, 'protocol' => 'http:' ) ) )."</p>\n";
 
-echo '<p'.emailskin_style( '.p' ).'>'.T_('Login').": ".get_user_colored_login_link( $params['login'], array( 'use_style' => true ) )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_('Login').": ".get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) )."</p>\n";
 echo '<p'.emailskin_style( '.p' ).'>'.T_('Email').": ".$params['email']."</p>\n";
 echo '<p'.emailskin_style( '.p' ).'>'.T_('Reported as').": ".$params['report_status']."</p>\n";
 echo '<p'.emailskin_style( '.p' ).'>'.T_('Extra info').": ".nl2br( $params['report_info'] )."</p>\n";

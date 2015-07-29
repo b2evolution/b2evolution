@@ -3760,16 +3760,22 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		emailskin_include( $template_name.$ext, $params );
 		$formated_message .= ob_get_clean();
 
-		if( !empty( $User ) )
+		if( ! empty( $User ) )
 		{ // Replace $login$ with gender colored link + icon in HTML format,
 		  //   and with simple login text in PLAIN TEXT format
-			$user_login = $format == 'html' ? $User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'use_style' => true ) ) : $User->login;
+			if( $format == 'html' )
+			{
+				$user_login = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+			}
+			else
+			{
+				$user_login = $User->login;
+			}
 			$formated_message = str_replace( '$login$', $user_login, $formated_message );
-		}
-
-		if( $format == 'html' )
-		{ // Use "http://" for protocol-relative urls because email browsers cannot load such urls:
-			$formated_message = preg_replace( '~(src|href)="//~', '$1="http://', $formated_message );
 		}
 
 		$template_message .= $formated_message;

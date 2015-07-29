@@ -33,7 +33,7 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Blog').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true ) ).' ('.$Item->creator_User->get('login').")</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true, 'protocol' => 'http:' ) ).' ('.$Item->creator_User->get('login').")</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Title').': '.$Item->get('title')."</p>\n";
 
@@ -73,7 +73,7 @@ if( $params['notify_full'] )
 }
 else
 { /* Short notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
 	if( $params['notify_type'] == 'moderator' )
 	{

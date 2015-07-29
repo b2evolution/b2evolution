@@ -1378,6 +1378,7 @@ class User extends DataObject
 				'avatar_size'  => 'crop-top-15x15',
 				'login_text'   => 'login', // name | login
 				'use_style'    => false, // true - to use attr "style", e.g. on email templates
+				'protocol'     => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
 
 		$avatar = '';
@@ -1399,8 +1400,8 @@ class User extends DataObject
 		}
 
 		if( strpos( $params['mask'], '$avatar$' ) !== false )
-		{ // Display avatar
-			$avatar = $this->get_avatar_imgtag( $params['avatar_size'], '' );
+		{ // Display avatar:
+			$avatar = $this->get_avatar_imgtag( $params['avatar_size'], '', '', false, '', '', NULL, $params['protocol'] );
 		}
 
 		$mask = array( '$login$', '$avatar$' );
@@ -1436,6 +1437,7 @@ class User extends DataObject
 				'user_tab'       => 'profile',
 				'use_style'      => false, // true - to use attr "style" instead of "class", e.g. on email templates
 				'blog_ID'        => NULL,
+				'protocol'       => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
 
 		$identity_url = get_user_identity_url( $this->ID, $params['user_tab'], $params['blog_ID'] );
@@ -1449,7 +1451,7 @@ class User extends DataObject
 		$avatar_tag = '';
 		if( strpos( $params['link_text'], 'avatar' ) !== false )
 		{ // Avatar must be displayed in this link
-			$avatar_tag = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'], '', $params['thumb_zoomable'] );
+			$avatar_tag = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'], '', $params['thumb_zoomable'], '', '', NULL, $params['protocol'] );
 			if( $params['thumb_zoomable'] )
 			{ // User avatar is zoomable
 				// Add tag param to init bubbletip
@@ -3926,9 +3928,10 @@ class User extends DataObject
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
+	 * @param string Protocol is used for gravatar, example: 'http:' or 'https:'
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = NULL )
+	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = NULL, $protocol = '' )
 	{
 		global $current_User;
 
@@ -3946,6 +3949,7 @@ class User extends DataObject
 					'email'    => $this->get( 'email' ),
 					'gender'   => $this->get( 'gender' ),
 					'tag_size' => $tag_size,
+					'protocol' => $protocol,
 				) );
 		}
 
@@ -3955,6 +3959,7 @@ class User extends DataObject
 					'email'    => $this->get( 'email' ),
 					'gender'   => $this->get( 'gender' ),
 					'tag_size' => $tag_size,
+					'protocol' => $protocol,
 				) );
 		}
 

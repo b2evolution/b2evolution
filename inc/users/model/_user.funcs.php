@@ -136,8 +136,9 @@ function get_user_login_link( $before = '', $after = '', $link_text = '', $link_
 function get_user_colored_login( $login, $params = array() )
 {
 	$params = array_merge( array(
-			'mask' => '$avatar$ $login$'
-		) );
+			'mask' => '$avatar$ $login$',
+			'protocol' => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
+		), $params );
 
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $login );
@@ -165,7 +166,8 @@ function get_user_colored_login_link( $login, $params = array() )
 	{ // Get a link to user page in front office
 		return $User->get_identity_link( array(
 				'user_tab'  => 'userpage',
-				'use_style' => ! empty( $params['use_style'] )
+				'use_style' => ! empty( $params['use_style'] ),
+				'protocol'  => empty( $params['protocol'] ) ? '' : $params['protocol'],
 			) );
 	}
 	else
@@ -1758,6 +1760,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 			                    // Example: ( $tag_size = '160' ) => width="160" height="160"
 			                    //          ( $tag_size = '160x320' ) => width="160" height="320"
 			                    //          NULL - use real size
+			'protocol' => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 		), $params );
 
 	if( ! $Settings->get('use_gravatar') )
@@ -1784,7 +1787,7 @@ function get_avatar_imgtag_default( $size = 'crop-top-15x15', $class = '', $alig
 
 		if( empty( $img_url ) )
 		{
-			$img_url = '//www.gravatar.com/avatar/'.md5( $params['email'] );
+			$img_url = $params['protocol'].'//www.gravatar.com/avatar/'.md5( $params['email'] );
 			$gravatar_width = isset( $thumbnail_sizes[$size] ) ? $thumbnail_sizes[$size][1] : '15';
 			$gravatar_height = $gravatar_width;
 
@@ -2606,9 +2609,9 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 
 	$UserCache = & get_UserCache();
 
-	if( isset($GLOBALS['messaging_Module']) )
-	{	// Get already received messages for each recepient user
-		$already_received_messages = get_users_unread_threads( $user_ids );
+	if( isset( $GLOBALS['messaging_Module'] ) )
+	{ // Get already received messages for each recepient user:
+		$already_received_messages = get_users_unread_threads( $user_ids, NULL, 'string', 'text', 'http:' );
 	}
 
 	$cache_by_locale = array();

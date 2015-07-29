@@ -483,9 +483,10 @@ function get_threads_recipients_sql( $thread_ID = 0 )
  * @param integer a thread ID that should be skipped from the result list. Leave it to NULL if you don't want to skip any thread.
  * @param string Threads format ( string | array )
  * @param string User logins format ( text | html )
+ * @param string Protocol is used for gravatar, example: 'http:' or 'https:'
  * @return array ( user_ID -> (string or array) ) pairs, the string contains the users unread threads titles and their recipients list
  */
-function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $threads_format = 'string', $login_format = 'text' )
+function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $threads_format = 'string', $login_format = 'text', $protocol = '' )
 {
 	global $DB;
 	$result = array();
@@ -545,7 +546,7 @@ function get_users_unread_threads( $userid_list, $skip_thread_ID = NULL, $thread
 			}
 			else // 'html'
 			{ // Use a colored login with avatar
-				$thread_recipients[$row->thread_ID][] = get_user_colored_login( $row->user_login );
+				$thread_recipients[$row->thread_ID][] = get_user_colored_login( $row->user_login, array( 'protocol' => $protocol ) );
 			}
 		}
 		if( !isset( $thread_titles[ $row->thread_ID ] ) )

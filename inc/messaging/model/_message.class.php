@@ -648,7 +648,7 @@ class Message extends DataObject
 		}
 
 		// Get other unread threads
-		$other_unread_threads = get_users_unread_threads( array_keys( $thrd_recipients ), $this->thread_ID, 'array', 'html' );
+		$other_unread_threads = get_users_unread_threads( array_keys( $thrd_recipients ), $this->thread_ID, 'array', 'html', 'http:' );
 
 		// Load all users who will be notified
 		$UserCache = & get_UserCache();
