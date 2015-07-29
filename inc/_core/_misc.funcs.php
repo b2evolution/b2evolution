@@ -3227,16 +3227,16 @@ function debug_info( $force = false, $force_clean = false )
  * Exit when request is blocked
  *
  * @param string Block type: 'IP', 'Domain', 'Country'
- * @param string Debug message
+ * @param string Log message
  * @param string Syslog origin type: 'core', 'plugin'
  * @param integer Syslog origin ID
  */
-function exit_blocked_request( $block_type, $debug_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
+function exit_blocked_request( $block_type, $log_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
 {
 	global $debug;
 
 	// Write system log for the request:
-	syslog_insert( $debug_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
+	syslog_insert( $log_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
 
 	// Print out this text to inform an user:
 	echo 'Blocked.';
