@@ -2366,6 +2366,8 @@ function display_dragdrop_upload_button( $params = array() )
 						// File name or url to view file
 						var file_name = ( typeof( responseJSON.success.link_url ) != 'undefined' ) ? responseJSON.success.link_url : responseJSON.success.newname;
 
+						this_row.find( '.qq-upload-checkbox' ).html( responseJSON.success.checkbox );
+
 						if( responseJSON.success.status == 'success' )
 						{ // Success upload
 							<?php

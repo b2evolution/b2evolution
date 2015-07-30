@@ -503,12 +503,12 @@ $Form->begin_form();
 				if( $mode == 'upload' )
 				{ // We want the action to happen in the post attachments iframe:
 					$link_attribs['target'] = $iframe_name;
-					$link_attribs['class'] = 'action_icon link_file';
+					$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
 					$link_action = 'link_inpost';
 				}
 				$icon_to_link_files = action_icon( T_('Link this file!'), 'link',
 							regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]=$file_path$&amp;'.url_crumb('file') ),
-							NULL, NULL, NULL, $link_attribs ).' ';
+							' '.T_('Attach'), NULL, 5, $link_attribs ).' ';
 			}
 			else
 			{ // No icon to link files
@@ -516,7 +516,7 @@ $Form->begin_form();
 			}
 
 			$template_filerow = '<table><tr>'
-				.'<td class="checkbox firstcol">&nbsp;</td>'
+				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
 				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{

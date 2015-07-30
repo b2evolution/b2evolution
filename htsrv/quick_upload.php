@@ -439,6 +439,12 @@ if( $upload )
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['warning'] = $warning;
 		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
+		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
+				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
+					.' name="fm_selected[]" value="'.rawurlencode( $newFile->get_rdfp_rel_path() ).'" id="cb_filename_u'.$newFile->ID.'" />'
+			.'</span>'
+			.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
+				.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
 
 		if( ! empty( $new_Link ) )
 		{ // Send also the link data if it was created
