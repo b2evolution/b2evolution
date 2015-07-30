@@ -6458,7 +6458,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE clog_status clog_status enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started'" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11490' );
+		set_upgrade_checkpoint( '11490' );
+	}
+
+	if( $old_db_version < 11500 )
+	{ // part 18.u trunk aka 22th part of "i7"
+
+		task_begin( 'Upgrading cron tasks table...' );
+		$DB->query( 'ALTER TABLE T_cron__task
+			ADD COLUMN ctsk_repeat_variation int(10) unsigned DEFAULT 0 AFTER ctsk_repeat_after' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11500' );
 	}
 
 	/*

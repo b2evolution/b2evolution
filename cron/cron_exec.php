@@ -169,20 +169,24 @@ else
 	else
 	{
 		if( !empty( $task->ctsk_repeat_after ) )
-		{	// This task wants to be repeated:
+		{ // This task wants to be repeated:
 			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
 			if( $task->ctsk_key == 'poll-antispam-blacklist' )
-			{	// THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
+			{ // THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
 				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
 			}
 			else
-			{	// Normal
+			{ // Normal
 				$new_start_datetime = $localtimenow + $task->ctsk_repeat_after;
+				if( ! empty( $task->ctsk_repeat_variation ) )
+				{ // Include variation param as random +/- time value
+					$new_start_datetime += rand( 0, 2 * $task->ctsk_repeat_variation ) - $task->ctsk_repeat_variation;
+				}
 			}
 			$ctsk_name_insert = empty( $task->ctsk_name ) ? 'NULL' : $DB->quote( $task->ctsk_name );
-			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_key, ctsk_params )
-							VALUES( '.$DB->quote(date2mysql($new_start_datetime)).', '.$DB->quote($task->ctsk_repeat_after).', '
-												.$ctsk_name_insert.', '.$DB->quote($task->ctsk_key).', '.$DB->quote($task->ctsk_params).' )';
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_name, ctsk_key, ctsk_params )
+							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '
+												.$ctsk_name_insert.', '.$DB->quote( $task->ctsk_key ).', '.$DB->quote( $task->ctsk_params ).' )';
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
 

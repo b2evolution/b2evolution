@@ -33,21 +33,8 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
 		$Form->info( T_('Job name'), cron_job_name( $cjob_row->ctsk_key, $cjob_row->ctsk_name, $cjob_row->ctsk_params ).$manual_link );
 		$Form->info( T_('Scheduled at'), mysql2localedatetime($cjob_row->ctsk_start_datetime) );
-		$cjob_repeat_after = '';
-		if( $cjob_repeat_after_days = floor( $cjob_row->ctsk_repeat_after / 86400 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_days.' '.T_('days').' ';
-		}
-		if( $cjob_repeat_after_hours = floor( ($cjob_row->ctsk_repeat_after % 86400 ) / 3600 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_hours.' '.T_('hours').' ';
-		}
-		if( $cjob_repeat_after_minutes = floor( ($cjob_row->ctsk_repeat_after % 3600 ) / 60 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_minutes.' '.T_('minutes');
-		}
-
-		$Form->info( T_('Repeat every'), $cjob_repeat_after );
+		$Form->info( T_('Repeat every'), seconds_to_period( $cjob_row->ctsk_repeat_after ) );
+		$Form->info( T_('Repeat variation'), seconds_to_period( $cjob_row->ctsk_repeat_variation ) );
 
 	$Form->end_fieldset();
 

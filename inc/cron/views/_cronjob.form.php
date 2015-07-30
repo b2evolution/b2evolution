@@ -59,6 +59,15 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 
 		$Form->duration_input( 'cjob_repeat_after', $edited_Cronjob->repeat_after, T_('Repeat every'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
 
+		if( $edited_Cronjob->key == 'poll-antispam-blacklist' )
+		{ // Don't allow to edit this param for cron job "Poll the antispam blacklist"
+			$Form->info( T_('Repeat variation'), T_('Auto') );
+		}
+		else
+		{
+			$Form->duration_input( 'cjob_repeat_variation', $edited_Cronjob->repeat_variation, T_('Repeat variation'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
+		}
+
 	$Form->end_fieldset();
 
 	if( !$creating )

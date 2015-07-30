@@ -318,12 +318,13 @@ $schema_queries = array(
 	'T_cron__task' => array(
 		'Creating cron tasks table',
 		"CREATE TABLE T_cron__task(
-			ctsk_ID              int(10) unsigned not null AUTO_INCREMENT,
-			ctsk_start_datetime  datetime not null DEFAULT '2000-01-01 00:00:00',
-			ctsk_repeat_after    int(10) unsigned,
-			ctsk_key             varchar(50) COLLATE ascii_general_ci not null,
-			ctsk_name            varchar(255) null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
-			ctsk_params          varchar(255),
+			ctsk_ID               int(10) unsigned not null AUTO_INCREMENT,
+			ctsk_start_datetime   datetime not null DEFAULT '2000-01-01 00:00:00',
+			ctsk_repeat_after     int(10) unsigned,
+			ctsk_repeat_variation int(10) unsigned DEFAULT 0,
+			ctsk_key              varchar(50) COLLATE ascii_general_ci not null,
+			ctsk_name             varchar(255) null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
+			ctsk_params           varchar(255),
 			PRIMARY KEY (ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
