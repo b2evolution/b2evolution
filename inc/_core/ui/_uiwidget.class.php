@@ -382,14 +382,16 @@ class Table extends Widget
 			}
 		}
 
-		if( ! empty( $this->params ) )
-		{ // Initialize default params
-			$this->params = array_merge( array(
-					'filter_button_class'  => 'filter',
-					'filter_button_before' => '',
-					'filter_button_after'  => '',
-				), $this->params );
+		if( empty( $this->params ) )
+		{
+			$this->params = array();
 		}
+		// Initialize default params
+		$this->params = array_merge( array(
+				'filter_button_class'  => 'filter',
+				'filter_button_before' => '',
+				'filter_button_after'  => '',
+			), $this->params );
 
 		if( $fadeout == 'session' )
 		{	// Get fadeout_array from session:
