@@ -66,6 +66,25 @@ div.messages {
 table.grouped tr {
 	background-color: #eee;
 }
+table.grouped tr.placeholder {
+	display: block;
+	background: red;
+	position: relative;
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+table.grouped tr.placeholder:before {
+	content: "";
+	position: absolute;
+	width: 0;
+	height: 0;
+	border: 5px solid transparent;
+	border-left-color: red;
+	margin-top: -5px;
+	left: 0;
+	border-right: none;
+}
 table.grouped tr.odd {
 	background-color: #ddd;
 }

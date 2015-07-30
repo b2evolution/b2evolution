@@ -216,6 +216,11 @@ require_js_helper( 'colorbox' );
 // require File Uploader js and css
 require_js( 'multiupload/fileuploader.js' );
 require_css( 'fileuploader.css' );
+if( $action == 'edit_links' )
+{ // Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
+}
 
 $AdminUI->disp_html_head();
 $AdminUI->disp_body_top( false );

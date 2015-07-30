@@ -423,6 +423,58 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 
 
 /**
+ * Print out JavaScript to make the links table sortable
+ */
+function echo_link_sortable_js()
+{
+	global $htsrv_url;
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#link_ajax_content table' ).sortable(
+	{
+		containerSelector: 'table',
+		itemPath: '> tbody',
+		itemSelector: 'tr',
+		placeholder: '<tr class="placeholder"/>',
+		onDrop: function( $item, container, _super )
+		{
+			jQuery( '#link_ajax_content table tr' ).removeClass( 'odd even' );
+			jQuery( '#link_ajax_content table tr:odd' ).addClass( 'even' );
+			jQuery( '#link_ajax_content table tr:even' ).addClass( 'odd' );
+
+			var link_IDs = '';
+			jQuery( '#link_ajax_content table tr' ).each( function()
+			{
+				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
+				if( link_ID_cell.length > 0 )
+				{
+					link_IDs += link_ID_cell.html() + ',';
+				}
+			} );
+			link_IDs = link_IDs.slice( 0, -1 );
+
+			jQuery.ajax(
+			{
+				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				type: 'POST',
+				data:
+				{
+					'action': 'update_links_order',
+					'links': link_IDs,
+					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+				}
+			} );
+		}
+	} );
+} );
+</script>
+<?php
+}
+
+
+/**
  * Get all links where file is used
  *
  * @param integer File ID

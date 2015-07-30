@@ -118,7 +118,7 @@ $Results->cols[] = array(
 						'th' => T_('Link ID'),
 						'td' => '$link_ID$',
 						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap link_id_cell',
 					);
 
 if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
@@ -143,8 +143,10 @@ $compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id=
 
 $Results->display( $compact_results_params );
 
-// Print out JavaScript to change a link position
+// Print out JavaScript to change a link position:
 echo_link_position_js();
+// Print out JavaScript to make links table sortable:
+echo_link_sortable_js();
 
 if( $Results->total_pages == 0 )
 { // If no results we should get a template of headers in order to add it on first quick upload
@@ -166,7 +168,7 @@ display_dragdrop_upload_button( array(
 		'template_filerow' => '<table><tr>'
 					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
 					.'<td class="qq-upload-file fm_filename">&nbsp;</td>'
-					.'<td class="qq-upload-link-id shrinkwrap">&nbsp;</td>'
+					.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
 					.'<td class="qq-upload-link-actions shrinkwrap">'
 						.'<div class="qq-upload-status">'
 							.TS_('Uploading...')

@@ -155,6 +155,62 @@ switch( $action )
 		}
 		break;
 
+	case 'update_links_order':
+		// Update the order of all links at one time:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
+
+		$link_IDs = param( 'links', 'string' );
+
+		if( empty( $link_IDs ) )
+		{ // No links to update, wrong request, exit here:
+			break;
+		}
+
+		$link_IDs = explode( ',', $link_IDs );
+
+		// Check permission by first link:
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_IDs[0] ) ) === false )
+		{ // Bad request with incorrect link ID
+			exit(0);
+		}
+		$LinkOwner = & $Link->get_LinkOwner();
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Get max order value of the links:
+		$max_link_order = intval( $DB->get_var( 'SELECT MAX( link_order )
+			 FROM T_links
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' ) );
+
+		// Initialize parts of sql queries to update the links order:
+		$fake_sql_update_strings = '';
+		$real_sql_update_strings = '';
+		$real_link_order = 0;
+		foreach( $link_IDs as $link_ID )
+		{
+			$max_link_order++;
+			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
+			$real_link_order++;
+			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
+		}
+
+		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+		// Do real ordering start with number 1:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
+		$DB->commit();
+		break;
+
 	case 'get_login_list':
 		// Get users login list for username form field hintbox.
 
