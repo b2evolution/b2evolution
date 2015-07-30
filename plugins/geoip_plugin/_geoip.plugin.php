@@ -795,8 +795,8 @@ jQuery( document ).ready( function()
 
 			if( antispam_block_by_country( $Country->ID, false ) )
 			{ // Block the action if the country is blocked
-				$debug_message = sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() );
-				exit_blocked_request( 'Country', $debug_message, 'plugin', $this->ID ); // WILL exit();
+				$log_message = sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() );
+				exit_blocked_request( 'Country', $log_message, 'plugin', $this->ID ); // WILL exit();
 			}
 		}
 	}

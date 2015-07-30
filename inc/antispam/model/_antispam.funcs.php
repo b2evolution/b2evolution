@@ -500,8 +500,8 @@ function antispam_block_request()
 		    $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			$debug_message = sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain );
-			exit_blocked_request( 'Domain', $debug_message ); // WILL exit();
+			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain );
+			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
 		}
 
 		load_funcs('sessions/model/_hitlog.funcs.php');
@@ -510,8 +510,8 @@ function antispam_block_request()
 		    $Domain = & get_Domain_by_url( $initial_referer ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			$debug_message = sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer );
-			exit_blocked_request( 'Domain', $debug_message ); // WILL exit();
+			$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer );
+			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
 		}
 	}
 
@@ -557,8 +557,8 @@ function antispam_block_by_ip()
 			SET aipr_block_count = aipr_block_count + 1
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
-		$debug_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
-		exit_blocked_request( 'IP', $debug_message ); // WILL exit();
+		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
+		exit_blocked_request( 'IP', $log_message ); // WILL exit();
 	}
 }
 
@@ -581,8 +581,8 @@ function antispam_block_by_country( $country_ID, $assert = true )
 	{ // The country exists in the database and has blocked status
 		if( $assert )
 		{ // block the request
-			$debug_message = sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() );
-			exit_blocked_request( 'Country', $debug_message ); // WILL exit();
+			$log_message = sprintf( 'A request from \'%s\' was blocked because of this country is blocked.', $Country->get_name() );
+			exit_blocked_request( 'Country', $log_message ); // WILL exit();
 		}
 		// Update the number of requests from blocked countries
 		$DB->query( 'UPDATE T_regional__country
