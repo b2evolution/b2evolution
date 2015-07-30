@@ -69,7 +69,7 @@ class BlockCache
 	/**
 	 * Invalidate a special key
 	 *
-	 * All we do is store the timestamp of teh invalidation
+	 * All we do is store the timestamp of the invalidation
 	 *
 	 * @see http://b2evolution.net/man/widget-caching
 	 */
