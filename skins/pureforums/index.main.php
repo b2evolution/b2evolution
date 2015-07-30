@@ -303,7 +303,7 @@ $switcher_layout_top = is_logged_in() ? 26 : 3;
 $switcher_layout_top += $Settings->get( 'site_skins_enabled' ) ? 89 : 3; // 153 -> 106
 
 $switcher_top = is_logged_in() ? 26 : 10;
-$switcher_top += $Settings->get( 'site_skins_enabled' ) ? 54 : 0;
+$switcher_top += $Settings->get( 'site_skins_enabled' ) ? 54 : 47;
 
 $switcher_class = !$Settings->get( 'site_skins_enabled' ) ? ' fixed' : '';
 ?>
