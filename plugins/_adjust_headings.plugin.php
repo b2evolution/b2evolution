@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class adjust_headings_plugin extends Plugin
 {
-	var $code = 'adjshead';
+	var $code = 'h_levels';
 	var $name = 'Adjust headings';
 	var $priority = 105;
 	var $version = '5.0.0';
@@ -38,7 +38,7 @@ class adjust_headings_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Adjust headings to limit with highest level.');
+		$this->short_desc = T_('Adjust heading levels so they are consistent for all posts.');
 		$this->long_desc = T_('This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.');
 	}
 

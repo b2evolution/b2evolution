@@ -674,7 +674,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11490 )
 	{ // Upgrade to 6.7.1-stable
-		install_plugin( 'adjust_headings_plugin' );
+		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
 	}
 }
 
