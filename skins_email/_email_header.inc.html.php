@@ -50,7 +50,7 @@ else
 </div>
 <?php } ?>
 
-<div<?php echo emailskin_style( 'div.email_payload' ); ?>>
+<div class="email_payload"<?php echo emailskin_style( 'div.email_payload' ); ?>>
 <?php
 if( $params['include_greeting'] )
 { // Display the greeting message
