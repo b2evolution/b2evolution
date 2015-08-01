@@ -58,13 +58,13 @@ function dbm_delete_messageprecache()
  *
  * @param boolean Display messages
  */
-function dbm_delete_pagecache( $display_messages = true )
+function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
 	// Clear general cache directory:
 	$result = cleardir_r( $cache_path.'general' );
-	if( $display_messages )
+	if( $display_details )
 	{ // Display message only when it is required:
 		if( $result )
 		{
@@ -87,7 +87,7 @@ function dbm_delete_pagecache( $display_messages = true )
 		foreach( $blog_array as $l_blog )
 		{ // Clear blog cache:
 			$result = cleardir_r( $cache_path.'c'.$l_blog );
-			if( $display_messages )
+			if( $display_details )
 			{ // Display message only when it is required:
 				if( $result )
 				{
@@ -103,10 +103,7 @@ function dbm_delete_pagecache( $display_messages = true )
 		}
 	}
 
-	if( $display_messages )
-	{ // Display message only when it is required:
-		$Messages->add( T_('Page cache deleted.'), 'success' );
-	}
+	$Messages->add( T_('Page caches deleted.'), 'success' );
 }
 
 
