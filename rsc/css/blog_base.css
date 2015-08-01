@@ -866,6 +866,10 @@ input.btn-lg {
 }
 .profile_buttons a.btn button {
   width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
 }
 .profile_buttons .btn,
 .profile_buttons .btn-group {

@@ -448,6 +448,111 @@ span.roundbutton.rbtn_black:hover,
     top: 0;
   }
 }
+.btn {
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.btn:hover,
+.btn:focus {
+  color: #333;
+  text-decoration: none;
+}
+.btn:link,
+.btn:active {
+  color: #333;
+}
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-default:hover,
+.btn-default:focus {
+  color: 333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+.btn-default:link,
+.btn-default:active {
+  color: #333;
+}
+.btn-primary {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  color: #fff;
+  background-color: #286090;
+  border-color: #204d74;
+}
+.btn-primary:link,
+.btn-primary:active {
+  color: #fff;
+}
+.btn-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+.btn-success:hover,
+.btn-success:focus {
+  color: #fff;
+  background-color: #449d44;
+  border-color: #398439;
+}
+.btn-success:link,
+.btn-success:active {
+  color: #fff;
+}
+.btn-info {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+.btn-info:hover,
+.btn-info:focus {
+  color: #fff;
+  background-color: #31b0d5;
+  border-color: #269abc;
+}
+.btn-info:link,
+.btn-info:active {
+  color: #fff;
+}
+.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+.btn-warning:hover,
+.btn-warning:focus {
+  color: #fff;
+  background-color: #ec971f;
+  border-color: #d58512;
+}
+.btn-warning:link,
+.btn-warning:active {
+  color: #fff;
+}
+.btn-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+.btn-danger:hover,
+.btn-danger:focus {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
+.btn-danger:link,
+.btn-danger:active {
+  color: #fff;
+}
 span.fa {
   line-height: inherit;
   font-size: 14px;
@@ -2708,6 +2813,10 @@ input.btn-lg {
 }
 .profile_buttons a.btn button {
   width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
 }
 .profile_buttons .btn,
 .profile_buttons .btn-group {
