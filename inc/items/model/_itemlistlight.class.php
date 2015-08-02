@@ -966,19 +966,24 @@ class ItemListLight extends DataObjectList2
 		// CATEGORIES:
 		if( $params['display_category'] )
 		{
+			$catlist = NULL;
 			if( $params['categories_display'] == 'toplevel' // We'd like to minimize display if possible
-				)
-			{
-				pre_dump( $this->filters );
+				&& !empty($this->filters['cat_single']) )	// ... AND we are on a "single cat" page
+			{	// We want to show only the top cat (and not its children)
+				$catlist = array($this->filters['cat_single']);
 
 			}
-
-			if( ! empty( $this->filters['cat_array'] ) )
+			elseif( ! empty( $this->filters['cat_array'] ) )
 			{ // We have requested specific categories...
+				$catlist = $this->filters['cat_array'];
+			}
+
+			if( !empty($catlist))
+			{	// We want to show some category names:
 				$cat_names = array();
 				$ChapterCache = & get_ChapterCache();
 				$catsel_param = get_param( 'catsel' );
-				foreach( $this->filters['cat_array'] as $cat_ID )
+				foreach( $catlist as $cat_ID )
 				{
 					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
 					{ // It is almost never meaningful to die over an invalid cat when generating title
