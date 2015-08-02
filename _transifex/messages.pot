@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-08-02 18:48+0200\n"
+"POT-Creation-Date: 2015-08-02 19:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13139,7 +13139,7 @@ msgid "This post type is reserved and cannot be used. Please choose another one.
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:601
-msgid "Please provide a link to url."
+msgid "Please provide a \"Link To\" URL."
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:624
@@ -13180,7 +13180,7 @@ msgid "Please provide a longitude."
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:785
-msgid "Please provide a comment expiration."
+msgid "Please provide a comment expiration delay."
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:839
@@ -13192,7 +13192,7 @@ msgid "Invalid content."
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:852
-msgid "Please provide a text."
+msgid "Please enter some text."
 msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:864
@@ -14079,6 +14079,7 @@ msgstr ""
 msgid "Limited to %d days"
 msgstr ""
 
+#. TRANS: cascade delete
 #: ../../../inc/items/model/_itemtag.class.php:56
 #, php-format
 msgid "%d tags from the posts"
@@ -14096,12 +14097,12 @@ msgstr ""
 
 #: ../../../inc/items/model/_itemtype.class.php:138
 #, php-format
-msgid "%d item type to collection relationships"
+msgid "%d Post type associations with collections"
 msgstr ""
 
 #: ../../../inc/items/model/_itemtype.class.php:139
 #, php-format
-msgid "%d item type custom fields"
+msgid "%d Custom field definitions"
 msgstr ""
 
 #: ../../../inc/items/model/_itemtype.class.php:154
@@ -14728,7 +14729,7 @@ msgid "Back-office tab"
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:71
-msgid "Items of this type will be listed in this back-office tab. If empty, item will be found only in the \"All\" tab."
+msgid "Items of this type will be listed in this back-office tab. If empty, items will be found only in the \"All\" tab."
 msgstr ""
 
 #: ../../../inc/items/views/_itemtype.form.php:72
@@ -25773,7 +25774,7 @@ msgstr ""
 
 #: ../../../inc/widgets/views/_widget.form.php:67
 #, php-format
-msgid "This widget could be cached but the block cache is OFF. Click to <a %s>here</a> enable."
+msgid "This widget could be cached but the block cache is OFF. Click <a %s>here</a> to enable."
 msgstr ""
 
 #: ../../../inc/widgets/views/_widget.form.php:88
