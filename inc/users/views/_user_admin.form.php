@@ -147,7 +147,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 
 	// Display last unread messages reminder info
 	$last_unread_messages_reminder = $UserSettings->get( 'last_unread_messages_reminder', $edited_User->ID );
-	$Form->info_field( T_('Latest unread messages reminder'), empty( $last_unread_messages_reminder ) ? T_('None yet') : format_to_output( $last_unread_messages_reminder ), array( 'note' => T_('Responsable schedule job is "Send reminders about unread messages".') ) );
+	$Form->info_field( T_('Latest unread messages reminder'), empty( $last_unread_messages_reminder ) ? T_('None yet') : format_to_output( $last_unread_messages_reminder ), array( 'note' => T_(' Scheduled job responsible for reminders is "Send reminders about unread messages".') ) );
 	// Display next unread message reminder info
 	$reminder_info = get_next_reminder_info( $edited_User->ID );
 	if( is_array( $reminder_info ) )
