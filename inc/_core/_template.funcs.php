@@ -366,7 +366,7 @@ function get_request_title( $params = array() )
 	$r = array();
 
 	$params = array_merge( array(
-			'auto_pilot'          => 'none',
+			'auto_pilot'          => 'none', // This can be used to override several params at once. Possible value: 'seo_title'
 			'title_before'        => '',
 			'title_after'         => '',
 			'title_none'          => '',
@@ -378,6 +378,8 @@ function get_request_title( $params = array() )
 			'title_page_after'    => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
+			// Title for each disp:
+			// fp> TODO: Make a global array of $disp => Clear text disp
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
@@ -407,13 +409,14 @@ function get_request_title( $params = array() )
 			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
-			'posts_text'          => '#',
+			'posts_text'          => '#',		// Automatic - display filters
 			'useritems_text'      => T_('User posts'),
 			'usercomments_text'   => T_('User comments'),
 			'download_head_text'  => T_('Download').' - $file_title$ - $post_title$',
 			'download_body_text'  => '',
+			// fp> TODO: verify if we really want this:
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
-			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
+			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -735,7 +738,6 @@ function get_request_title( $params = array() )
 				break;
 			}
 			// No break if empty, Use title from default case
-
 		default:
 			if( isset( $MainList ) )
 			{

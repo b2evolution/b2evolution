@@ -866,42 +866,53 @@ class ItemListLight extends DataObjectList2
 		global $month, $disp_detail;
 
 		$params = array_merge( array(
+				'display_category'    => true,
 				'category_text'       => T_('Category').': ',
 				'categories_text'     => T_('Categories').': ',
 				'categories_nor_text' => T_('All but '),
+
+				'display_tag'         => true,
 				'tag_text'            => T_('Tag').': ',
 				'tags_text'           => T_('Tags').': ',
+
+				'display_author'      => true,
 				'author_text'         => T_('Author').': ',
 				'authors_text'        => T_('Authors').': ',
 				'authors_nor_text'    => T_('All authors except').': ',
+
+				'display_visibility'  => true,
 				'visibility_text'     => T_('Visibility').': ',
+
+				'display_keyword'     => true,
 				'keyword_text'        => T_('Keyword').': ',
 				'keywords_text'       => T_('Keywords').': ',
 				'keywords_exact_text' => T_('Exact match').' ',
+
+				'display_status'      => true,
 				'status_text'         => T_('Status').': ',
 				'statuses_text'       => T_('Statuses').': ',
+
+				'display_archive'     => true,
 				'archives_text'       => T_('Archives for').': ',
+
+				'display_assignee'    => true,
 				'assignes_text'       => T_('Assigned to').': ',
+
+				'display_locale'      => true,
+				'display_time'        => true,
+				'display_limit'       => true,
+
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
 				'filter_mask_nogroup' => '"$filter_name$"', // $filter_name$, $clear_icon$
+
 				'before_items'        => '',
 				'after_items'         => '',
+
 				'separator_and'       => ' '.T_('and').' ',
 				'separator_or'        => ' '.T_('or').' ',
 				'separator_nor'       => ' '.T_('or').' ',
 				'separator_comma'     => ', ',
-				'display_category'    => true,
-				'display_archive'     => true,
-				'display_keyword'     => true,
-				'display_tag'         => true,
-				'display_author'      => true,
-				'display_assignee'    => true,
-				'display_locale'      => true,
-				'display_status'      => true,
-				'display_visibility'  => true,
-				'display_time'        => true,
-				'display_limit'       => true,
 			), $params );
 
 		if( empty( $this->filters ) )
