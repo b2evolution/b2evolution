@@ -5,3 +5,5 @@ _evocache
 node_modules
 conf/_overrides_TEST.php
 .sass-cache
+_transifex/files.txt
+_transifex/messages.pot.bak
