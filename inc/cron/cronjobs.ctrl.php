@@ -42,6 +42,9 @@ switch( $action )
 
 		load_class( 'cron/model/_cronjob.class.php', 'Cronjob' );
 		$edited_Cronjob = new Cronjob();
+
+		// Get this param to preselect job type by url param:
+		param( 'cjob_type', 'string' );
 		break;
 
 	case 'edit':

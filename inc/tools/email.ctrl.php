@@ -410,6 +410,24 @@ switch( $tab )
 
 			case 'returned':
 				$AdminUI->breadcrumbpath_add( T_('Returned emails'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				if( $Settings->get( 'repath_enabled' ) )
+				{ // If the decoding the returned emails is enabled
+					$repath_cron_SQL = new SQL();
+					$repath_cron_SQL->SELECT( 'ctsk_ID' );
+					$repath_cron_SQL->FROM( 'T_cron__task' );
+					$repath_cron_SQL->WHERE( 'ctsk_key = "process-return-path-inbox"' );
+					$repath_cron = $DB->get_var( $repath_cron_SQL->get() );
+					if( empty( $repath_cron ) )
+					{ // Display a warning if cron job "Process the return path inbox" doesn't exist:
+						$repath_warning = T_('There is no scheduled job configured to process your Return Path inbox.');
+						if( $current_User->check_perm( 'options', 'edit' ) )
+						{ // Suggest a link to create a job if current user has a permission:
+							$repath_warning .= ' '.sprintf( T_('<a %s>Click here</a> to create such a job.'), ' href="'.$admin_url.'?ctrl=crontab&amp;action=new&amp;cjob_type=process-return-path-inbox"' );
+						}
+						$Messages->add( $repath_warning, 'warning' );
+					}
+				}
 				break;
 
 			case 'smtp':

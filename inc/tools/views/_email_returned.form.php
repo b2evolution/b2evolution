@@ -51,8 +51,8 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 		if( $action == 'test_3' )
 		{ // Display a textarea to fill a sample error message
-			$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), '', 50 );
-			$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Test'), 'SaveButton' ) ) );
+			$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), T_('Use this to paste an email returned with an error message to check if b2evolution can decode it.'), 50 );
+			$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Process the contents as if it were a returned email'), 'SaveButton' ) ) );
 		}
 
 		if( !empty( $repath_test_output ) )
