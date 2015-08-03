@@ -699,7 +699,7 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'comments', $groups ) )
-		{ // we want to load the workflow checkboxes:
+		{ // we want to load the comments settings:
 			// load moderation statuses
 			$moderation_statuses = get_visibility_statuses( 'moderation' );
 			$blog_moderation_statuses = array();
@@ -719,19 +719,38 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'other', $groups ) )
-		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
+		{ // we want to load the other settings:
 
+			// Search results:
+			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
+			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
+
+			// Latest comments :
+			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
+			$this->set_setting( 'latest_comments_num', get_param( 'latest_comments_num' ) );
+
+			// User directory:
+			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
+
+			// Messaging pages:
+			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
+
+			// Archive pages:
+			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+		}
+
+		if( in_array( 'more', $groups ) )
+		{ // we want to load more settings:
+
+			// Tracking:
+			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
+
+			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
-			// Tracking unread content
-			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
-
-			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
-			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
-
-			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+			// Sitemaps:
+			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
 		}
 
 		if( param( 'allow_comments', 'string', NULL ) !== NULL )

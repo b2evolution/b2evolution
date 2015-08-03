@@ -174,6 +174,8 @@ class CollectionSettings extends AbstractSettings
 		// Other settings:
 			'image_size_user_list' => 'crop-top-48x48', // Used in disp = users
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_per_page'      => 20, // Number of results per page on disp=search
+			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',

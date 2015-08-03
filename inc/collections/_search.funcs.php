@@ -481,7 +481,7 @@ function search_result_block( $params = array() )
 	}
 
 	$result_count = count( $search_result );
-	$result_per_page = $Blog->get_setting( 'posts_per_page' );
+	$result_per_page = $Blog->get_setting( 'search_per_page' );
 	if( $result_count > $result_per_page )
 	{
 		$current_page = param( 'page', 'integer', 1 );
@@ -493,7 +493,6 @@ function search_result_block( $params = array() )
 
 		$page_params = array_merge( array(
 			'total' => $result_count,
-			'result_per_page' => $result_per_page,
 			'current_page' => $current_page,
 			'total_pages' => $total_pages,
 		), $params['pagination'] );

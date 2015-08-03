@@ -46,10 +46,10 @@ $CommentList = new CommentList2( $Blog );
 
 // Filter list:
 $CommentList->set_filters( array(
-		'types' => array( 'comment', 'trackback', 'pingback' ),
+		'types'    => array( 'comment', 'trackback', 'pingback' ),
 		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
-		'order' => 'DESC',
-		'comments' => 50,
+		'order'    => 'DESC',
+		'comments' => $Blog->get_setting( 'latest_comments_num' ),
 	) );
 
 // Get ready for display (runs the query):
