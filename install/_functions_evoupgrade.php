@@ -4757,7 +4757,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part 16.f trunk aka ninth part of "i6"
 
 		// Convert item content separators to new format
-		load_funcs('tools/model/_dbmaintenance.funcs.php');
+		load_funcs('tools/model/_maintenance.funcs.php');
 		dbm_convert_item_content_separators();
 		set_upgrade_checkpoint( '11250' );
 	}

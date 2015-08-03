@@ -284,7 +284,7 @@ switch( $action )
 		$Settings->set( 'site_skins_enabled', param( 'site_skins_enabled', 'integer', 0 ) );
 		if( $old_site_skins_enabled != $Settings->get( 'site_skins_enabled' ) )
 		{ // If this setting has been changed we should clear all page caches:
-			load_funcs( 'tools/model/_dbmaintenance.funcs.php' );
+			load_funcs( 'tools/model/_maintenance.funcs.php' );
 			dbm_delete_pagecache( false );
 		}
 

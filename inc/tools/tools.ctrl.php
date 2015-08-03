@@ -13,7 +13,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 load_funcs('plugins/_plugin.funcs.php');
-load_funcs('tools/model/_dbmaintenance.funcs.php');
+load_funcs('tools/model/_maintenance.funcs.php');
 load_funcs('tools/model/_tool.funcs.php');
 load_funcs( 'tools/model/_system.funcs.php' );
 
