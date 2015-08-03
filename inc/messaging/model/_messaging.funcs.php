@@ -1884,6 +1884,11 @@ function threads_results_block( $params = array() )
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
 
+	$results_params = $AdminUI->get_template( 'Results' );
+	$display_params = array(
+		'before' => str_replace( '>', ' style="margin-top:25px" id="threads_result">', $results_params['before'] ),
+		'after'  => $results_params['after'],
+	);
 
 	// Check permission:
 	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
@@ -1921,10 +1926,6 @@ function threads_results_block( $params = array() )
 			$threads_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 		}
 
-		$results_params = $AdminUI->get_template( 'Results' );
-		$display_params = array(
-			'before' => str_replace( '>', ' style="margin-top:25px" id="threads_result">', $results_params['before'] ),
-		);
 		$threads_Results->display( $display_params );
 
 		if( !is_ajax_content() )
@@ -1933,8 +1934,28 @@ function threads_results_block( $params = array() )
 		}
 	}
 	else
-	{	// No permission for abuse management
-		echo '<div style="margin-top:25px;font-weight:bold">'.sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) ).'</div>';
+	{ // No permission for abuse management
+		$Table = new Table();
+
+		$Table->title = T_('Messaging');
+		$Table->no_results_text = sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) );
+
+		$Table->display_init();
+		$Table->total_pages = 0;
+
+		echo $display_params['before'];
+
+		$Table->display_head();
+
+		echo $Table->params['content_start'];
+
+		$Table->display_list_start();
+
+		$Table->display_list_end();
+
+		echo $Table->params['content_end'];
+
+		echo $display_params['after'];
 	}
 }
 
