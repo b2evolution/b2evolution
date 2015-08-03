@@ -284,7 +284,8 @@ div.pageTop a.selected:hover {
 	background-color: #D1D7DC;
 	font-size: 12px;
 }
-.bForums td.row2 a, .bForums td.row3 a{
+.bForums td.row2 a, .bForums td.row3 a,
+.bForums td.row2 .user, .bForums td.row3 .user{
 	font-weight: normal;
 }
 .bForums td.left{
