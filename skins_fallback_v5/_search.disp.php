@@ -22,7 +22,7 @@ $params = array_merge( array(
 		'search_submit_after'      => '',
 		'search_use_editor'        => false,
 		'search_author_format'     => 'avatar_name',
-		'search_cell_author_start' => '<div class="search_info">',
+		'search_cell_author_start' => '<div class="search_info dimmed">',
 		'search_cell_author_end'   => '</div>',
 		'search_date_format'       => locale_datefmt(),
 	), $params );
