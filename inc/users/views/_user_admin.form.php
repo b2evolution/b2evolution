@@ -76,7 +76,7 @@ if( $edited_User->ID == 1 )
 else
 {
 	$status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
-	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'field_suffix' => $status_icon ) );
+	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
 	$GroupCache = & get_GroupCache();
 	if( ! $current_User->check_perm( 'users', 'edit' ) )
 	{ // Show the limited list for moderators
@@ -92,20 +92,23 @@ else
 $Form->end_fieldset(); // user permissions
 
 $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
-	$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-	$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
 
-	$email_status = $edited_User->get_email_status();
-	$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $email_status ).'</div>';
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{
-		$Form->select_input_array( 'edited_email_status', $email_status, emadr_get_status_titles(), T_('Email status'), '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors(), 'field_suffix' => $email_status_icon ) );
-	}
-	else
-	{ // Moderators can only view the email status
-		$email_status_titles = emadr_get_status_titles();
-		$Form->info( T_('Email status'), $email_status_icon.$email_status_titles[ $email_status ] );
-	}
+	$Form->begin_line( T_('Email') );
+		$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
+		$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, '', $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+
+		$email_status = $edited_User->get_email_status();
+		$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $email_status ).'</div>';
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{
+			$Form->select_input_array( 'edited_email_status', $email_status, emadr_get_status_titles(), T_('Status').': '.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors() ) );
+		}
+		else
+		{ // Moderators can only view the email status
+			$email_status_titles = emadr_get_status_titles();
+			$Form->info( T_('Email status'), $email_status_icon.$email_status_titles[ $email_status ] );
+		}
+	$Form->end_line();
 
 	global $UserSettings;
 
@@ -213,23 +216,25 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	}
 	$Form->info_field( T_('Blogs owned'), $blogs_owned );
 
-	// Number of post created by the edited User
-	$posts_created = $edited_User->get_num_posts();
-	if( $posts_created > 0 )
-	{
-		$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-		$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-		$posts_created .= get_manual_link( 'delete-user-data' );
-	}
-	$Form->info_field( T_('Posts created'), $posts_created );
+	$Form->begin_line( T_('Posts created'), NULL, 'info' );
+		// Number of post created by the edited User
+		$posts_created = $edited_User->get_num_posts();
+		if( $posts_created > 0 )
+		{
+			$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+			$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+			$posts_created .= get_manual_link( 'delete-user-data' );
+		}
+		$Form->info_field( '', $posts_created );
 
-	// Number of other users post edited by the edited User
-	$posts_edited = $edited_User->get_num_edited_posts();
-	if( $posts_edited > 0 )
-	{
-		$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-	}
-	$Form->info_field( T_('Posts edited'), $posts_edited );
+		// Number of other users post edited by the edited User
+		$posts_edited = $edited_User->get_num_edited_posts();
+		if( $posts_edited > 0 )
+		{
+			$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		}
+		$Form->info_field( T_('Edited').': ', $posts_edited );
+	$Form->end_line( NULL, 'info' );
 
 	// Number of comments created by the edited User
 	evo_flush(); // The following might take a while on systems with many comments
@@ -246,29 +251,33 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	// Number of edited User's sessions
 	$Form->info_field( T_('# of sessions'), $edited_User->get_num_sessions( true ) );
 
-	// Number of sent and received private messages
-	$messages_sent = $edited_User->get_num_messages( 'sent' );
-	if( $messages_sent > 0 )
-	{
-		$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-		if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+	$Form->begin_line( T_('# of private messages sent'), NULL, 'info' );
+		// Number of sent and received private messages
+		$messages_sent = $edited_User->get_num_messages( 'sent' );
+		if( $messages_sent > 0 )
 		{
-			$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
+			$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+			if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+			{
+				$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
+			}
+			$messages_sent .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+			$messages_sent .= get_manual_link( 'delete-user-data' );
 		}
-		$messages_sent .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-		$messages_sent .= get_manual_link( 'delete-user-data' );
-	}
-	$Form->info_field( T_('# of private messages sent'), $messages_sent );
-	$messages_received = $edited_User->get_num_messages( 'received' );
-	if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
-	{
-		$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
-	}
-	$Form->info_field( T_('# of private messages received'), $messages_received );
+		$Form->info_field( '', $messages_sent );
+		$messages_received = $edited_User->get_num_messages( 'received' );
+		if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+		{
+			$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
+		}
+		$Form->info_field( T_('Received').': ', $messages_received );
+	$Form->end_line( NULL, 'info' );
 
-	$edited_user_lastseen = $edited_User->get( 'lastseen_ts' );
-	$Form->info_field( T_('Last seen on'), ( empty( $edited_user_lastseen ) ? '' : mysql2localedatetime( $edited_user_lastseen ) ) );
-	$Form->info_field( T_('On IP'), $edited_User->get_last_session_param('ipaddress') );
+	$Form->begin_line( T_('Last seen on'), NULL, 'info' );
+		$edited_user_lastseen = $edited_User->get( 'lastseen_ts' );
+		$Form->info_field( '', ( empty( $edited_user_lastseen ) ? '' : mysql2localedatetime( $edited_user_lastseen ) ) );
+		$Form->info_field( T_('On IP').': ', $edited_User->get_last_session_param('ipaddress') );
+	$Form->end_line( NULL, 'info' );
 $Form->end_fieldset(); // Usage info
 
 $Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
@@ -306,8 +315,10 @@ while( $loop_Plugin = & $Plugins->get_next() )
 }
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
-	$Form->info_field( T_('Account registered on'), $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
-	$Form->info_field( T_('From IP'), format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
+	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
+		$Form->info_field( '', $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
+		$Form->info_field( T_('From IP').': ', format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
+	$Form->end_line( NULL, 'info' );
 
 	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 	{ // User can view IP ranges
@@ -323,38 +334,45 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 			$iprange_status = '';
 			$iprange_name = '';
 		}
-		$Form->info_field( T_('IP range'), $iprange_name );
-		$email_status_icon = '<div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
-		if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-		{ // User can edit IP ranges
-			$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( true ), T_( 'IP range status' ), '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors(), 'field_suffix' => $email_status_icon ) );
-		}
-		else
-		{ // Only view status of IP range
-			$Form->info( T_( 'IP range status' ), $email_status_icon.aipr_status_title( $iprange_status ) );
-		}
+		$perm_spamblacklist = $current_User->check_perm( 'spamblacklist', 'edit' );
+		$Form->begin_line( T_('IP range'), NULL, ( $perm_spamblacklist ? '' : 'info' ) );
+			$Form->info_field( T_('IP range'), $iprange_name );
+			$email_status_icon = '<div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
+			if( $perm_spamblacklist )
+			{ // User can edit IP ranges
+				$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( true ), T_( 'Status' ).': '.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors() ) );
+			}
+			else
+			{ // Only view status of IP range
+				$Form->info( T_( 'Status' ).': ', $email_status_icon.aipr_status_title( $iprange_status ) );
+			}
+		$Form->end_line( NULL, ( $perm_spamblacklist ? '' : 'info' ) );
 	}
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
 	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
-	$Form->info_field( T_('From Domain'), format_to_output( $user_domain ) );
-	if( ! empty( $user_domain ) && $current_User->check_perm( 'stats', 'list' ) )
-	{ // User can view Domains
-		// Get status of Domain
-		$DomainCache = & get_DomainCache();
-		$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
-		$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
-		$domain_status_icon = '<div id="domain_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
-		if( $current_User->check_perm( 'stats', 'edit' ) )
-		{ // User can edit Domain
-			$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), T_( 'Domain status' ), '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_icon ) );
+	$display_user_domain = ( ! empty( $user_domain ) && $current_User->check_perm( 'stats', 'list' ) );
+	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+		$Form->info_field( '', format_to_output( $user_domain ) );
+		if( $display_user_domain )
+		{ // User can view Domains
+			// Get status of Domain
+			$DomainCache = & get_DomainCache();
+			$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
+			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
+			$domain_status_icon = '<div id="domain_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
+			if( $perm_stat_edit )
+			{ // User can edit Domain
+				$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), T_( 'Status' ).': '.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors() ) );
+			}
+			else
+			{ // Only view status of Domain
+				$Form->info( T_( 'Status' ).': '.$domain_status_icon, stats_dom_status_title( $domain_status ) );
+			}
 		}
-		else
-		{ // Only view status of Domain
-			$Form->info( T_( 'Domain status' ), $domain_status_icon.stats_dom_status_title( $domain_status ) );
-		}
-	}
+	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
 
 	$Form->info_field( T_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
 
@@ -362,36 +380,41 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('Registration trigger Page'), $UserSettings->get( 'registration_trigger_url', $edited_User->ID ) );
 
-	$Form->info_field( T_('Initial Blog ID'), $UserSettings->get( 'initial_blog_ID', $edited_User->ID ) );
-	$Form->info_field( T_('Initial URI'), $UserSettings->get( 'initial_URI', $edited_User->ID ) );
+	$Form->begin_line( T_('Initial Blog ID'), NULL, 'info' );
+		$Form->info_field( '', $UserSettings->get( 'initial_blog_ID', $edited_User->ID ) );
+		$Form->info_field( T_('Initial URI').': ', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
+	$Form->end_line( NULL, 'info' );
 
-	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
-	$Form->info_field( T_('Initial referer'), $initial_referer );
-	if( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) )
-	{ // User can view Domains
-		$Domain = & get_Domain_by_url( $initial_referer );
-		$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
-		$domain_status_icon = '<div id="initial_referer_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
-		if( $current_User->check_perm( 'stats', 'edit' ) )
-		{ // User can edit Domain
-			global $admin_url;
-			$initial_referer_domain = $domain_name = url_part( $initial_referer, 'host' );
-			$domain_status_action = '';
-			if( !$Domain || $initial_referer_domain != $Domain->get( 'name' ) )
-			{ // Link to create a new domain
-				$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked' );
+	$initial_referer = 'http://sdfsdf.sdf'; $UserSettings->get( 'initial_referer', $edited_User->ID );
+	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
+	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
+		$Form->info_field( '', $initial_referer );
+		if( $display_initial_referer )
+		{ // User can view Domains
+			$Domain = & get_Domain_by_url( $initial_referer );
+			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
+			$domain_status_icon = '<div id="initial_referer_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
+			if( $perm_stat_edit )
+			{ // User can edit Domain
+				global $admin_url;
+				$initial_referer_domain = $domain_name = url_part( $initial_referer, 'host' );
+				$domain_status_action = '';
+				if( !$Domain || $initial_referer_domain != $Domain->get( 'name' ) )
+				{ // Link to create a new domain
+					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked' );
+				}
+				if( $Domain )
+				{ // Link to edit existing domain
+					$domain_status_action .= action_icon( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'edit', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID );
+				}
+				$Form->select_input_array( 'edited_initial_referer_status', $domain_status, stats_dom_status_titles(), T_( 'Status' ).': '.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
 			}
-			if( $Domain )
-			{ // Link to edit existing domain
-				$domain_status_action .= action_icon( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'edit', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID );
+			else
+			{ // Only view status of Domain
+				$Form->info( T_( 'Status' ).': ', $domain_status_icon.stats_dom_status_title( $domain_status ) );
 			}
-			$Form->select_input_array( 'edited_initial_referer_status', $domain_status, stats_dom_status_titles(), T_( 'Initial referer status' ), '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_icon.$domain_status_action ) );
 		}
-		else
-		{ // Only view status of Domain
-			$Form->info( T_( 'Initial referer status' ), $domain_status_icon.stats_dom_status_title( $domain_status ) );
-		}
-	}
+	$Form->end_line( NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
 
 	//$registration_ts = strtotime( $edited_User->get( 'datecreated' ) );
 	if( $edited_User->check_status( 'is_closed' ) )
@@ -540,11 +563,11 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( functi
 { // Change icon of the domain status
 	if( typeof domain_status_icons[ jQuery( this ).val() ] != 'undefined' )
 	{
-		jQuery( this ).next().html( domain_status_icons[ jQuery( this ).val() ] );
+		jQuery( this ).prev().html( domain_status_icons[ jQuery( this ).val() ] );
 	}
 	else
 	{
-		jQuery( this ).next().html( '' );
+		jQuery( this ).prev().html( '' );
 	}
 } );
 <?php } ?>

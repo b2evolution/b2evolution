@@ -772,7 +772,7 @@ pre.email_log_scroll span {
 }
 
 div.status_icon {
-	float: left;
+	display: inline-block;
 	padding: 4px 5px 0 0;
 }
 

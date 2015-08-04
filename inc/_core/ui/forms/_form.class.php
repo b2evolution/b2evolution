@@ -737,7 +737,7 @@ class Form extends Widget
 	 * @param string Field type
 	 * @return The generated HTML
 	 */
-	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false, $type = NULL )
+	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false, $type = '' )
 	{
 		if( $reset_common_params )
 		{
@@ -810,13 +810,22 @@ class Form extends Widget
 
 		$r .= $this->get_label();
 
-		if( isset( $this->{'inputstart_'.$type} ) )
-		{ // Use special input start for element with type
+		if( $type == 'info' )
+		{ // Use info start:
+			$r .= $this->infostart;
+		}
+		elseif( isset( $this->{'inputstart_'.$type} ) )
+		{ // Use special input start for element with type:
 			$r .= $this->{'inputstart_'.$type};
 		}
 		else
-		{ // Use default input start
+		{ // Use default input start:
 			$r .= $this->inputstart;
+		}
+
+		if( isset( $this->_common_params['input_prefix'] ) )
+		{
+			$r .= $this->_common_params['input_prefix'];
 		}
 
 		return $r;
@@ -849,12 +858,16 @@ class Form extends Widget
 			$r .= $this->_common_params['field_suffix'];
 		}
 
-		if( isset( $this->{'inputend_'.$type} ) )
-		{ // Use special input end for element with type
+		if( $type == 'info' )
+		{ // Use info end:
+			$r .= $this->infoend;
+		}
+		elseif( isset( $this->{'inputend_'.$type} ) )
+		{ // Use special input end for element with type:
 			$r .= $this->{'inputend_'.$type};
 		}
 		else
-		{ // Use default input end
+		{ // Use default input end:
 			$r .= $this->inputend;
 		}
 
@@ -3890,6 +3903,12 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
+		if( isset($field_params['input_prefix']) )
+		{
+			$this->_common_params['input_prefix'] = $field_params['input_prefix'];
+			unset( $field_params['input_prefix'] );
+		}
+
 		if( isset($field_params['required']) )
 		{
 			$this->_common_params['required'] = $field_params['required'];
@@ -4018,13 +4037,14 @@ class Form extends Widget
 	 *
 	 * @param string Field title
 	 * @param string Field name (Used for attribute "for" af the label tag)
+	 * @param string Field type
 	 * @param array Params
 	 */
-	function begin_line( $field_label = NULL, $field_name = NULL, $field_params = array() )
+	function begin_line( $field_label = NULL, $field_name = NULL, $field_type = '', $field_params = array() )
 	{
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		echo $this->begin_field( $field_name, $field_label );
+		echo $this->begin_field( $field_name, $field_label, false, $field_type );
 
 		// Switch layout to keep all fields in one line:
 		$this->switch_layout( 'none' );
@@ -4038,9 +4058,10 @@ class Form extends Widget
 	 * End line of several fields
 	 *
 	 * @param string Suffix
+	 * @param string Field type
 	 * @param array Params
 	 */
-	function end_line( $suffix_text = NULL, $field_params = array() )
+	function end_line( $suffix_text = NULL, $field_type = '', $field_params = array() )
 	{
 		$this->handle_common_params( $field_params );
 
@@ -4056,7 +4077,7 @@ class Form extends Widget
 		$this->switch_layout( NULL );
 
 		// End field:
-		echo $this->end_field();
+		echo $this->end_field( $field_type );
 	}
 }
 
