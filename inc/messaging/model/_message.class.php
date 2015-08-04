@@ -560,10 +560,11 @@ class Message extends DataObject
 		{ // Delete those threads where all of the messages were deleted
 			load_class( 'messaging/model/_thread.class.php', 'Thread' );
 			$orphan_thread_ids = $DB->get_col( '
-				SELECT msg_thread_ID FROM T_messaging__message
-				WHERE msg_thread_ID IN ( '.implode( ', ', $thread_ids_to_delete ).' )
-				GROUP BY msg_thread_ID
-					HAVING COUNT(*) < 1' );
+				SELECT thrd_ID FROM T_messaging__thread
+				LEFT JOIN T_messaging__message ON thrd_ID = msg_thread_ID
+				WHERE thrd_ID IN ( '.implode( ', ', $thread_ids_to_delete ).' )
+				GROUP BY thrd_ID
+				HAVING COUNT(msg_ID) = 0' );
 
 			// Delete orphan threads if there are any
 			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids ) === false ) )
