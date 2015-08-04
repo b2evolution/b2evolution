@@ -172,18 +172,21 @@ if( !$Messages->has_errors() )
 			}
 
 			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
-			$edited_User->init_relations( param( 'deltype', 'string', '', true ) == 'spammer' );
+			$is_spammer = ( param( 'deltype', 'string', '', true ) == 'spammer' );
+			$edited_User->init_relations( $is_spammer );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
 				if ( ! empty( $fullname ) )
 				{
-					$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $fullname, $edited_User->dget( 'login' ) );
+					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; [%s] deleted.') : T_('User &laquo;%s&raquo; [%s] deleted.');
+					$msg = sprintf( $msg_format, $fullname, $edited_User->dget( 'login' ) );
 				}
 				else
 				{
-					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
+					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; deleted.') : T_('User &laquo;%s&raquo; deleted.');
+					$msg = sprintf( $msg_format, $edited_User->dget( 'login' ) );
 				}
 
 				$send_reportpm = param( 'send_reportpm', 'integer', 0 );
