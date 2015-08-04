@@ -1005,7 +1005,7 @@ class Skin extends DataObject
 				case 'disp_threads':
 					// Specific features for disp=threads:
 
-					if( get_param( 'action' ) == 'new' )
+					if( in_array( get_param( 'action' ), array( 'new', 'create', 'preview' ) ) )
 					{ // Used to suggest usernames for the field "Recipients":
 						init_tokeninput_js( 'blog' );
 					}
