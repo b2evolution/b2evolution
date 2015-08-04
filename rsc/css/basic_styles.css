@@ -329,6 +329,98 @@ a:hover .fa-x-rollover-black {
 .ufld_pinterest.ufld__hoverbgcolor:hover {
   background-color: #cb2027;
 }
+.filter_item {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 1px;
+}
+.filter_item div {
+  margin: 0;
+  padding: 3px 5px;
+  color: #FFF;
+  float: left;
+  height: 16px;
+  line-height: 16px;
+}
+.filter_item div:first-child {
+  border-radius: 5px 0 0 5px;
+}
+.filter_item div.icon {
+  border-radius: 0 5px 5px 0;
+  float: right;
+  padding: 0;
+}
+.filter_item div.icon a {
+  display: block;
+  padding: 4px 5px 5px;
+  margin: 0;
+}
+.filter_item .name {
+  background: #3d8f3d;
+}
+.filter_item:hover .name,
+.filter_item div.group,
+.filter_item div.icon {
+  background: #45a145;
+}
+.filter_item div.icon:hover {
+  background: #4db34d;
+}
+.filter_item.yellow .name {
+  background: #caca3f;
+}
+.filter_item.yellow:hover .name,
+.filter_item.yellow div.group,
+.filter_item.yellow div.icon {
+  background: #dbdb57;
+}
+.filter_item.yellow div.icon:hover {
+  background: #ecec73;
+}
+.filter_item.orange .name {
+  background: #d18335;
+}
+.filter_item.orange:hover .name,
+.filter_item.orange div.group,
+.filter_item.orange div.icon {
+  background: #e09952;
+}
+.filter_item.orange div.icon:hover {
+  background: #edac6b;
+}
+.filter_item.red .name {
+  background: #c12d2d;
+}
+.filter_item.red:hover .name,
+.filter_item.red div.group,
+.filter_item.red div.icon {
+  background: #cb4d4d;
+}
+.filter_item.red div.icon:hover {
+  background: #e57373;
+}
+.filter_item.magenta .name {
+  background: #8618bd;
+}
+.filter_item.magenta:hover .name,
+.filter_item.magenta div.group,
+.filter_item.magenta div.icon {
+  background: #9933cc;
+}
+.filter_item.magenta div.icon:hover {
+  background: #b053df;
+}
+.filter_item.blue .name {
+  background: #2f60c0;
+}
+.filter_item.blue:hover .name,
+.filter_item.blue div.group,
+.filter_item.blue div.icon {
+  background: #4d77cb;
+}
+.filter_item.blue div.icon:hover {
+  background: #6a91df;
+}
 code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -851,96 +943,6 @@ span.loader_img.loader_user_deldata {
 .widget_core_coll_category_list .meta input[disabled="disabled"] {
   visibility: hidden;
 }
-.filter_item {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 1px;
-}
-.filter_item div {
-  margin: 0;
-  padding: 3px 5px;
-  color: #FFF;
-  float: left;
-  height: 16px;
-  line-height: 16px;
-}
-.filter_item div:first-child {
-  border-radius: 5px 0 0 5px;
-}
 .filter_item div.icon {
-  border-radius: 0 5px 5px 0;
-  float: right;
-  padding: 0;
   height: 22px;
-}
-.filter_item div.icon a {
-  display: block;
-  padding: 4px 5px 5px;
-  margin: 0;
-}
-.filter_item .name {
-  background: #3d8f3d;
-}
-.filter_item:hover .name,
-.filter_item div.group,
-.filter_item div.icon {
-  background: #45a145;
-}
-.filter_item div.icon:hover {
-  background: #4db34d;
-}
-.filter_item.yellow .name {
-  background: #caca3f;
-}
-.filter_item.yellow:hover .name,
-.filter_item.yellow div.group,
-.filter_item.yellow div.icon {
-  background: #dbdb57;
-}
-.filter_item.yellow div.icon:hover {
-  background: #ecec73;
-}
-.filter_item.orange .name {
-  background: #d18335;
-}
-.filter_item.orange:hover .name,
-.filter_item.orange div.group,
-.filter_item.orange div.icon {
-  background: #e09952;
-}
-.filter_item.orange div.icon:hover {
-  background: #edac6b;
-}
-.filter_item.red .name {
-  background: #c12d2d;
-}
-.filter_item.red:hover .name,
-.filter_item.red div.group,
-.filter_item.red div.icon {
-  background: #cb4d4d;
-}
-.filter_item.red div.icon:hover {
-  background: #e57373;
-}
-.filter_item.magenta .name {
-  background: #8618bd;
-}
-.filter_item.magenta:hover .name,
-.filter_item.magenta div.group,
-.filter_item.magenta div.icon {
-  background: #9933cc;
-}
-.filter_item.magenta div.icon:hover {
-  background: #b053df;
-}
-.filter_item.blue .name {
-  background: #2f60c0;
-}
-.filter_item.blue:hover .name,
-.filter_item.blue div.group,
-.filter_item.blue div.icon {
-  background: #4d77cb;
-}
-.filter_item.blue div.icon:hover {
-  background: #6a91df;
 }

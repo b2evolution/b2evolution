@@ -1,0 +1,64 @@
+// Styles of filters for current selection of the posts (widget "Current filters"):
+.filter_item {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 1px;
+	// text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000;
+	div {
+		margin: 0;
+		padding: 3px 5px;
+		color: #FFF;
+		float: left;
+		height: 16px;
+		line-height: 16px;
+		&:first-child {
+			border-radius: 5px 0 0 5px;
+		}
+		&.icon {
+			border-radius: 0 5px 5px 0;
+			float: right;
+			padding: 0;
+			a {
+				display: block;
+				padding: 4px 5px 5px;
+				margin: 0;
+			}
+		}
+	}
+}
+// green
+.filter_item .name { background: #3d8f3d; }
+.filter_item:hover .name,
+.filter_item div.group,
+.filter_item div.icon { background: #45a145; }
+.filter_item div.icon:hover { background: #4db34d; }
+// yellow
+.filter_item.yellow .name { background: #caca3f; }
+.filter_item.yellow:hover .name,
+.filter_item.yellow div.group,
+.filter_item.yellow div.icon { background: #dbdb57; }
+.filter_item.yellow div.icon:hover { background: #ecec73; }
+// orange
+.filter_item.orange .name { background: #d18335; }
+.filter_item.orange:hover .name,
+.filter_item.orange div.group,
+.filter_item.orange div.icon { background: #e09952; }
+.filter_item.orange div.icon:hover { background: #edac6b; }
+// red
+.filter_item.red .name { background: #c12d2d; }
+.filter_item.red:hover .name,
+.filter_item.red div.group,
+.filter_item.red div.icon { background: #cb4d4d; }
+.filter_item.red div.icon:hover { background: #e57373; }
+// magenta
+.filter_item.magenta .name { background: #8618bd; }
+.filter_item.magenta:hover .name,
+.filter_item.magenta div.group,
+.filter_item.magenta div.icon { background: #9933cc; }
+.filter_item.magenta div.icon:hover { background: #b053df; }
+// blue
+.filter_item.blue .name { background: #2f60c0; }
+.filter_item.blue:hover .name,
+.filter_item.blue div.group,
+.filter_item.blue div.icon { background: #4d77cb; }
+.filter_item.blue div.icon:hover { background: #6a91df; }
