@@ -3,6 +3,7 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
+@import "sprite_styles.less";
 @import "visibility_status_colors.less";
 
 // Use special font for code blocks in order to have the same width for each char
@@ -170,90 +171,6 @@ img.rightmargin, div.rightmargin {
 	margin-bottom:.2ex;
 }
 
-/* Sprite style for the all flags */
-
-/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
- * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
- * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
- * **** Also don't forget to save the "flags.PSD"
- *
- * NEW ADDED FLAGS:
- *   aq - Antarctica
- *   ax - Aland Islands
- *   bl - Saint Barthelemy
- *   cc - Cocos Islands
- *   cx - Christmas Island
- *   sj - Svalbard And Jan Mayen
- *
- * CHANGED FLAGS TO 16px WIDTH:
- *   np - Nepal
- *   ch - Switzerland
- */
-span.flag {
-	border: 1px solid #000000;
-	background: url(../icons/flags_sprite.png) no-repeat;
-	width: 16px;
-	height: 11px;
-	line-height: 11px;
-	padding: 0 !important;
-	font-size: 6px;
-	display: inline-block !important;
-	margin-bottom: -2px;
-}
-
-// Sprite style for the all icons:
-span.icon {
-	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
-	width: 16px;
-	height: 16px;
-	line-height: 16px;
-	padding: 0 !important;
-	font-size: 9px;
-	display: inline-block;
-	overflow: hidden;
-	vertical-align: middle;
-}
-span.icon.voted {
-	margin: 0 2px;
-}
-// The fixes for rollover icon on IE8+
-@fix-IE8-visibility: ~"visible\0/";
-a.rollover_sprite:hover span.icon {
-	visibility: hidden;
-	visibility: @fix-IE8-visibility;/* IE8 */
-}
-@fix-IE9-10-media-min-width: ~"screen and (min-width: 0\0)";
-@media @fix-IE9-10-media-min-width { /* IE9-10 */
-	a.rollover_sprite:hover span.icon {
-		visibility: visible;
-	}
-}
-a.rollover_sprite:hover span.icon:before {
-	visibility: visible !important;
-	background: inherit;
-	float: left;
-	width: 32px;
-	height: 16px;
-	content: "";
-	margin-left: -16px;
-}
-.vote_spam span.icon.voted {
-	margin: auto;
-}
-
-.action_icon:hover {
-	text-decoration: none;
-}
-.action_icon.hoverlink:hover {
-	text-decoration: underline;
-}
-button.action_icon {
-	background: none;
-	border: none;
-	padding: 0;
-	cursor: pointer;
-}
-// ---------------- //
 
 // The links that look as buttons with round corners:
 a.roundbutton, a.roundbutton_text, span.roundbutton {

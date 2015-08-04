@@ -2,6 +2,192 @@
  * These are now the real basic styles that once used to be in basic.css
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
+/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
+ * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
+ * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
+ * **** Also don't forget to save the "flags.PSD"
+ *
+ * NEW ADDED FLAGS:
+ *   aq - Antarctica
+ *   ax - Aland Islands
+ *   bl - Saint Barthelemy
+ *   cc - Cocos Islands
+ *   cx - Christmas Island
+ *   sj - Svalbard And Jan Mayen
+ *
+ * CHANGED FLAGS TO 16px WIDTH:
+ *   np - Nepal
+ *   ch - Switzerland
+ */
+span.flag {
+  border: 1px solid #000000;
+  background: url(../icons/flags_sprite.png) no-repeat;
+  width: 16px;
+  height: 11px;
+  line-height: 11px;
+  padding: 0 !important;
+  font-size: 6px;
+  display: inline-block !important;
+  margin-bottom: -2px;
+}
+span.icon {
+  background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  padding: 0 !important;
+  font-size: 9px;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
+}
+span.icon.voted {
+  margin: 0 2px;
+}
+a.rollover_sprite:hover span.icon {
+  visibility: hidden;
+  visibility: visible\0/;
+  /* IE8 */
+}
+@media screen and (min-width: 0\0) {
+  /* IE9-10 */
+  a.rollover_sprite:hover span.icon {
+    visibility: visible;
+  }
+}
+a.rollover_sprite:hover span.icon:before {
+  visibility: visible !important;
+  background: inherit;
+  float: left;
+  width: 32px;
+  height: 16px;
+  content: "";
+  margin-left: -16px;
+}
+.vote_spam span.icon.voted {
+  margin: auto;
+}
+.action_icon:hover {
+  text-decoration: none;
+}
+.action_icon.hoverlink:hover {
+  text-decoration: underline;
+}
+button.action_icon {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.status_color_draft {
+  color: #ffff99;
+}
+.status_color_review {
+  color: #cc0099;
+}
+.status_color_community {
+  color: #2e8bb9;
+}
+.status_color_protected {
+  color: #ff9c2a;
+}
+.status_color_private {
+  color: #dc143c;
+}
+.status_color_published {
+  color: #99ee44;
+}
+.status_color_deprecated {
+  color: #000000;
+}
+.status_color_redirected {
+  color: #663399;
+}
+.status_color_trash {
+  color: #ff6666;
+}
+.status_color_meta {
+  color: #5133ab;
+}
+.btn[class*=btn-status-] {
+  border: 1px solid #ccc;
+}
+.btn-status-draft {
+  color: #000;
+  background-color: #ffff99;
+  border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+  color: #000;
+  background-color: #f3f392;
+}
+.btn-status-review {
+  color: #fff;
+  background-color: #cc0099;
+}
+.btn-status-review:hover {
+  color: #fff;
+  background-color: #c20092;
+}
+.btn-status-community {
+  color: #fff;
+  background-color: #2e8bb9;
+}
+.btn-status-community:hover {
+  color: #fff;
+  background-color: #2c84b0;
+}
+.btn-status-protected {
+  color: #fff;
+  background-color: #ff9c2a;
+}
+.btn-status-protected:hover {
+  color: #fff;
+  background-color: #f39528;
+}
+.btn-status-private {
+  color: #fff;
+  background-color: #dc143c;
+}
+.btn-status-private:hover {
+  color: #fff;
+  background-color: #d21339;
+}
+.btn-status-published {
+  color: #000;
+  background-color: #99ee44;
+}
+.btn-status-published .glyphicon {
+  color: inherit !important;
+}
+.btn-status-published:hover {
+  color: #000;
+  background-color: #92e341;
+}
+.btn-status-deprecated {
+  color: #fff;
+  background-color: #000000;
+}
+.btn-status-deprecated:hover {
+  color: #fff;
+  background-color: #333333;
+}
+.btn-status-redirected {
+  color: #fff;
+  background-color: #663399;
+}
+.btn-status-redirected:hover {
+  color: #fff;
+  background-color: #613192;
+}
+.btn-status-trash {
+  color: #fff;
+  background-color: #ff6666;
+}
+.btn-status-trash:hover {
+  color: #fff;
+  background-color: #ff4444;
+}
 code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -149,84 +335,6 @@ div.rightmargin {
   margin-left: 1ex;
   margin-top: .2ex;
   margin-bottom: .2ex;
-}
-/* Sprite style for the all flags */
-/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
- * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
- * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
- * **** Also don't forget to save the "flags.PSD"
- *
- * NEW ADDED FLAGS:
- *   aq - Antarctica
- *   ax - Aland Islands
- *   bl - Saint Barthelemy
- *   cc - Cocos Islands
- *   cx - Christmas Island
- *   sj - Svalbard And Jan Mayen
- *
- * CHANGED FLAGS TO 16px WIDTH:
- *   np - Nepal
- *   ch - Switzerland
- */
-span.flag {
-  border: 1px solid #000000;
-  background: url(../icons/flags_sprite.png) no-repeat;
-  width: 16px;
-  height: 11px;
-  line-height: 11px;
-  padding: 0 !important;
-  font-size: 6px;
-  display: inline-block !important;
-  margin-bottom: -2px;
-}
-span.icon {
-  background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  padding: 0 !important;
-  font-size: 9px;
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: middle;
-}
-span.icon.voted {
-  margin: 0 2px;
-}
-a.rollover_sprite:hover span.icon {
-  visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
-}
-a.rollover_sprite:hover span.icon:before {
-  visibility: visible !important;
-  background: inherit;
-  float: left;
-  width: 32px;
-  height: 16px;
-  content: "";
-  margin-left: -16px;
-}
-.vote_spam span.icon.voted {
-  margin: auto;
-}
-.action_icon:hover {
-  text-decoration: none;
-}
-.action_icon.hoverlink:hover {
-  text-decoration: underline;
-}
-button.action_icon {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
 }
 span.fa {
   line-height: inherit;
@@ -1512,115 +1620,6 @@ span.NonExistentWikiWord {
 }
 
 /* This file is used to fix the style issues on all bootstrap skins of b2evolution */
-.status_color_draft {
-  color: #ffff99;
-}
-.status_color_review {
-  color: #cc0099;
-}
-.status_color_community {
-  color: #2e8bb9;
-}
-.status_color_protected {
-  color: #ff9c2a;
-}
-.status_color_private {
-  color: #dc143c;
-}
-.status_color_published {
-  color: #99ee44;
-}
-.status_color_deprecated {
-  color: #000000;
-}
-.status_color_redirected {
-  color: #663399;
-}
-.status_color_trash {
-  color: #ff6666;
-}
-.status_color_meta {
-  color: #5133ab;
-}
-.btn[class*=btn-status-] {
-  border: 1px solid #ccc;
-}
-.btn-status-draft {
-  color: #000;
-  background-color: #ffff99;
-  border-color: #dfdfdf;
-}
-.btn-status-draft:hover {
-  color: #000;
-  background-color: #f3f392;
-}
-.btn-status-review {
-  color: #fff;
-  background-color: #cc0099;
-}
-.btn-status-review:hover {
-  color: #fff;
-  background-color: #c20092;
-}
-.btn-status-community {
-  color: #fff;
-  background-color: #2e8bb9;
-}
-.btn-status-community:hover {
-  color: #fff;
-  background-color: #2c84b0;
-}
-.btn-status-protected {
-  color: #fff;
-  background-color: #ff9c2a;
-}
-.btn-status-protected:hover {
-  color: #fff;
-  background-color: #f39528;
-}
-.btn-status-private {
-  color: #fff;
-  background-color: #dc143c;
-}
-.btn-status-private:hover {
-  color: #fff;
-  background-color: #d21339;
-}
-.btn-status-published {
-  color: #000;
-  background-color: #99ee44;
-}
-.btn-status-published .glyphicon {
-  color: inherit !important;
-}
-.btn-status-published:hover {
-  color: #000;
-  background-color: #92e341;
-}
-.btn-status-deprecated {
-  color: #fff;
-  background-color: #000000;
-}
-.btn-status-deprecated:hover {
-  color: #fff;
-  background-color: #333333;
-}
-.btn-status-redirected {
-  color: #fff;
-  background-color: #663399;
-}
-.btn-status-redirected:hover {
-  color: #fff;
-  background-color: #613192;
-}
-.btn-status-trash {
-  color: #fff;
-  background-color: #ff6666;
-}
-.btn-status-trash:hover {
-  color: #fff;
-  background-color: #ff4444;
-}
 @media (min-width: 768px) {
   div.radio:last-of-type,
   div.checkbox:last-of-type {
