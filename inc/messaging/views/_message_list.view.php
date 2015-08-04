@@ -319,7 +319,7 @@ if( $is_recipient )
 			}
 
 		$Form->end_form( array(
-				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton' ),
+				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
 	}
