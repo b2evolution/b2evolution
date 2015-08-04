@@ -189,6 +189,51 @@ button.action_icon {
   color: #fff;
   background-color: #ff4444;
 }
+span.fa {
+  line-height: inherit;
+  font-size: 14px;
+}
+.btn span.fa {
+  line-height: 14px;
+}
+a.action_icon span.fa {
+  margin-right: 2px;
+}
+a.roundbutton .fa,
+a.roundbutton:hover .fa,
+a.roundbutton_text .fa,
+a.roundbutton_text:hover .fa {
+  color: #000;
+}
+a:hover .fa-x-rollover-green {
+  color: #0C0 !important;
+}
+a:hover .fa-x-rollover-red {
+  color: #C00 !important;
+}
+a:hover .fa-x-rollover-red-light {
+  color: #F00 !important;
+}
+a:hover .fa-x-rollover-orange {
+  color: #F90 !important;
+}
+a:hover .fa-x-rollover-black {
+  color: #000 !important;
+}
+.fa-x-external-link--nudge:before {
+  position: relative;
+  top: 0.05em;
+  left: 0.11em;
+}
+.fa-x-linkedin--nudge:before {
+  position: relative;
+  top: -0.05em;
+  left: 0.04em;
+}
+.fa-x-google-plus--nudge:before {
+  position: relative;
+  left: 0.1em;
+}
 code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -660,48 +705,6 @@ span.roundbutton.rbtn_black:hover,
 .btn-danger:link,
 .btn-danger:active {
   color: #fff;
-}
-span.fa {
-  line-height: inherit;
-  font-size: 14px;
-}
-a.action_icon span.fa {
-  margin-right: 2px;
-}
-a.roundbutton .fa,
-a.roundbutton:hover .fa,
-a.roundbutton_text .fa,
-a.roundbutton_text:hover .fa {
-  color: #000;
-}
-a:hover .fa-x-rollover-green {
-  color: #0C0 !important;
-}
-a:hover .fa-x-rollover-red {
-  color: #C00 !important;
-}
-a:hover .fa-x-rollover-red-light {
-  color: #F00 !important;
-}
-a:hover .fa-x-rollover-orange {
-  color: #F90 !important;
-}
-a:hover .fa-x-rollover-black {
-  color: #000 !important;
-}
-.fa-x-external-link--nudge:before {
-  position: relative;
-  top: 0.05em;
-  left: 0.11em;
-}
-.fa-x-linkedin--nudge:before {
-  position: relative;
-  top: -0.05em;
-  left: 0.04em;
-}
-.fa-x-google-plus--nudge:before {
-  position: relative;
-  left: 0.1em;
 }
 .edit_toolbars {
   margin-top: 1ex;
