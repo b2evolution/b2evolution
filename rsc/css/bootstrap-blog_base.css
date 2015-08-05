@@ -5,6 +5,66 @@
  *
  * Override this with style.css in your skin folder.
  */
+table.rating_summary {
+  float: left;
+}
+table.rating_summary th,
+table.rating_summary td {
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: normal;
+  padding: 0;
+}
+table.rating_summary th {
+  padding-right: 5px;
+}
+table.rating_summary .progress {
+  width: 60px;
+  background: #eeeecc;
+  padding: 0;
+}
+table.rating_summary .progress div {
+  background: #ffcc66;
+}
+table.rating_summary td {
+  text-align: right;
+  padding-left: 5px;
+}
+div.rating_summary_total {
+  float: left;
+  padding: 5px 0 0 20px;
+}
+div.average_rating {
+  padding-top: 5px;
+}
+div.average_rating span {
+  float: left;
+  font-size: 11px;
+  line-height: 12px;
+  padding-left: 10px;
+}
+div.star_rating,
+div.star_rating div {
+  width: 60px;
+  height: 12px;
+  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
+  overflow: hidden;
+  text-indent: 100px;
+}
+div.star_rating div {
+  background-position: 0 -160px;
+}
+div.average_rating .star_rating {
+  float: left;
+}
+.rating_recap {
+  clear: both;
+  font-size: 10px;
+}
+.rating_recap div {
+  float: left;
+  padding-right: 10px;
+}
 main .well {
   padding: 15px 15px 25px 15px;
 }
@@ -298,66 +358,6 @@ div.results {
 }
 .pager li a {
   margin-bottom: 4px;
-}
-table.rating_summary {
-  float: left;
-}
-table.rating_summary th,
-table.rating_summary td {
-  font-size: 10px;
-  line-height: 13px;
-  font-weight: normal;
-  padding: 0;
-}
-table.rating_summary th {
-  padding-right: 5px;
-}
-table.rating_summary .progress {
-  width: 60px;
-  background: #eeeecc;
-  padding: 0;
-}
-table.rating_summary .progress div {
-  background: #ffcc66;
-}
-table.rating_summary td {
-  text-align: right;
-  padding-left: 5px;
-}
-div.rating_summary_total {
-  float: left;
-  padding: 5px 0 0 20px;
-}
-div.average_rating {
-  padding-top: 5px;
-}
-div.average_rating span {
-  float: left;
-  font-size: 11px;
-  line-height: 12px;
-  padding-left: 10px;
-}
-div.star_rating,
-div.star_rating div {
-  width: 60px;
-  height: 12px;
-  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-  overflow: hidden;
-  text-indent: 100px;
-}
-div.star_rating div {
-  background-position: 0 -160px;
-}
-div.average_rating .star_rating {
-  float: left;
-}
-.rating_recap {
-  clear: both;
-  font-size: 10px;
-}
-.rating_recap div {
-  float: left;
-  padding-right: 10px;
 }
 form.inskin {
   padding: 10px;
