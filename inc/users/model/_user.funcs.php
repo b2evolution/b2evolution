@@ -540,7 +540,7 @@ function check_setting( $setting_name )
 {
 	global $Settings, $Blog;
 
-	if( is_admin_page() || ! isset( $Blog ) )
+	if( is_admin_page() || empty( $Blog ) )
 	{ // Check setting in the Back office or when Blog is not defined
 		if( $Settings->get( $setting_name ) )
 		{ // Set TRUE if the setting is ON

@@ -214,6 +214,11 @@ class msg_menu_link_Widget extends ComponentWidget
 			$current_Blog = & $Blog;
 		}
 
+		if( empty( $current_Blog ) )
+		{ // Don't use this widget without current collection:
+			return false;
+		}
+
 		switch( $this->disp_params['show_to'] )
 		{
 			case 'any':
