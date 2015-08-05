@@ -1,0 +1,13 @@
+#eu_cookie_consent {
+	background: #FFF;
+	padding: 20px;
+	color: #000;
+	border: 1px solid #000;
+}
+#eu_cookie_consent.eu_cookie_consent__loggedin {
+	margin-top: 27px;
+	margin-bottom: -27px;
+}
+#eu_cookie_consent h3 {
+	margin-top: 0;
+}

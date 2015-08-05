@@ -1010,6 +1010,16 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Gets called before skin wrapper.
+	 *
+	 * Use this to add any HTML code before skin wrapper and after evo toolbar.
+	 */
+	function BeforeSkinWrapper( & $params )
+	{
+	}
+
 	/**
 	 * Called when a plugin gets called by its {@link $code}.
 	 *
