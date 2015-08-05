@@ -2067,6 +2067,14 @@ function col_thread_recipients( $thread_ID, $abuse_management )
 
 	$image_size = isset( $Blog ) ? $Blog->get_setting( 'image_size_messaging' ) : 'crop-top-32x32';
 
+	if( empty( $recipients ) )
+	{ // There are no recipients in this list. This is only possible if the recipients were deleted as spammer
+		return '<span class="nowrap">'
+			 .get_avatar_imgtag_default( $image_size, 'avatar_before_login_middle mb1' )
+			 .'<span class="user deleted">'.T_( 'Deleted user(s)' ).'</span>'
+			 .'</span>';
+	}
+
 	return get_avatar_imgtags( $recipients, true, true, $image_size, 'avatar_before_login_middle mb1', '', NULL, true, '<br />', true );
 }
 
