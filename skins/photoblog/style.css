@@ -1,4 +1,4 @@
-/* Designed by François PLANQUE - http://fplanque.net/ */
+/* Designed by Francois PLANQUE - http://fplanque.net/ */
 
 body {
 	padding: 0px;
@@ -297,7 +297,7 @@ div.tabs div.selected a {
 }
 
 .search_title {
-	color: #EEE;
+	color: #999;
 }
 
 .form_add_contacts .controls {

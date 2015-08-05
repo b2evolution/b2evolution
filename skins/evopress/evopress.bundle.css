@@ -614,10 +614,6 @@ div.input ul.token-input-list-facebook {
 div.tabs {
 	padding-left: 10px;
 }
-
-.search_title {
-	color: #06C;
-}
 /**
  * These are the styles that are used INSIDE of a blog item/post.
  * The skin should include this into its design,

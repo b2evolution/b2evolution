@@ -2781,6 +2781,7 @@ div.results span[class*=status_] span {
 }
 .search_title {
   font-size: 125%;
+  color: #666;
 }
 .search_title a {
   text-decoration: underline;
