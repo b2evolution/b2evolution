@@ -1,0 +1,21 @@
+// User Genders:
+.user {
+	font-weight: bold;
+	word-wrap: break-word;
+	&.anonymous {
+		font-weight: bold;
+		word-wrap: break-word;
+	}
+	&.closed, &.deleted {
+		color: #666;
+	}
+	&.man{
+		color: #00F;
+	}
+	&.woman{
+		color: #e100af;
+	}
+	&.nogender, &.anonymous.nogender{
+		color: #000;
+	}
+}
