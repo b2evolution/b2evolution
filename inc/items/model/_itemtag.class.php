@@ -53,7 +53,7 @@ class ItemTag extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table' => 'T_items__itemtag', 'fk' => 'itag_tag_ID', 'msg' => T_('%d tags from the posts') ),
+				array( 'table' => 'T_items__itemtag', 'fk' => 'itag_tag_ID', 'msg' => /* TRANS: cascade delete */ T_('%d tags from the posts') ),
 			);
 	}
 

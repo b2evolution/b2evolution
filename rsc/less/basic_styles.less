@@ -480,6 +480,250 @@ span.roundbutton.rbtn_black:hover, .roundbutton_group span.roundbutton.rbtn_blac
 }
 // ---------------- //
 
+// Bootstrap button colors:
+.btn {
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	box-sizing: border-box;
+	&:hover,
+	&:focus {
+		color: #333;
+		text-decoration: none;
+	}
+	&:link,
+	&:active {
+		color: #333;
+	}
+}
+.btn-default {
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+	&:hover,
+	&:focus {
+		color: 333;
+		background-color: #e6e6e6;
+		border-color: #adadad;
+	}
+	&:link,
+	&:active {
+		color: #333;
+	}
+}
+.btn-primary {
+	color: #fff;
+	background-color: #337ab7;
+	border-color: #2e6da4;
+	&:hover,
+	&:focus {
+		color: #fff;
+		background-color: #286090;
+		border-color: #204d74;
+	}
+	&:link,
+	&:active {
+		color: #fff;
+	}
+}
+.btn-success {
+	color: #fff;
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+	&:hover,
+	&:focus {
+		color: #fff;
+		background-color: #449d44;
+		border-color: #398439;
+	}
+	&:link,
+	&:active {
+		color: #fff;
+	}
+}
+.btn-info {
+	color: #fff;
+	background-color: #5bc0de;
+	border-color: #46b8da;
+	&:hover,
+	&:focus {
+		color: #fff;
+		background-color: #31b0d5;
+		border-color: #269abc;
+	}
+	&:link,
+	&:active {
+		color: #fff;
+	}
+}
+.btn-warning {
+	color: #fff;
+	background-color: #f0ad4e;
+	border-color: #eea236;
+	&:hover,
+	&:focus {
+		color: #fff;
+		background-color: #ec971f;
+		border-color: #d58512;
+	}
+	&:link,
+	&:active {
+		color: #fff;
+	}
+}
+.btn-danger {
+	color: #fff;
+	background-color: #d9534f;
+	border-color: #d43f3a;
+	&:hover,
+	&:focus {
+		color: #fff;
+		background-color: #c9302c;
+		border-color: #ac2925;
+	}
+	&:link,
+	&:active {
+		color: #fff;
+	}
+}
+
+
+
+// Colors for statuses of posts and comments
+@status_color_draft:            #ff9;
+@status_color_draft_hover:      #f3f392;
+@status_color_review:           #CC0099;
+@status_color_review_hover:     #c20092;
+@status_color_community:        #2E8BB9;
+@status_color_community_hover:  #2c84b0;
+@status_color_protected:        #FF9C2A;
+@status_color_protected_hover:  #f39528;
+@status_color_private:          #DC143C;
+@status_color_private_hover:    #d21339;
+@status_color_published:        #99EE44;
+@status_color_published_hover:  #92e341;
+@status_color_deprecated:       #000;
+@status_color_deprecated_hover: #333;
+@status_color_redirected:       #663399;
+@status_color_redirected_hover: #613192;
+@status_color_trash:            #f66;
+@status_color_trash_hover:      #f44;
+@status_color_meta:             #5133ab;
+
+// Status colors:
+.status_color_draft {
+	color: @status_color_draft;
+}
+.status_color_review {
+	color: @status_color_review;
+}
+.status_color_community {
+	color: @status_color_community;
+}
+.status_color_protected {
+	color: @status_color_protected;
+}
+.status_color_private {
+	color: @status_color_private;
+}
+.status_color_published {
+	color: @status_color_published;
+}
+.status_color_deprecated {
+	color: @status_color_deprecated;
+}
+.status_color_redirected {
+	color: @status_color_redirected;
+}
+.status_color_trash {
+	color: @status_color_trash;
+}
+.status_color_meta {
+	color: @status_color_meta;
+}
+
+// Buttons for the post statuses
+.btn[class*=btn-status-] {
+	border: 1px solid #ccc;
+}
+.btn-status-draft {
+	color: #000;
+	background-color: @status_color_draft;
+	border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+	color: #000;
+	background-color: @status_color_draft_hover;
+}
+.btn-status-review {
+	color: #fff;
+	background-color: @status_color_review;
+}
+.btn-status-review:hover {
+	color: #fff;
+	background-color: @status_color_review_hover;
+}
+.btn-status-community {
+	color: #fff;
+	background-color: @status_color_community;
+}
+.btn-status-community:hover {
+	color: #fff;
+	background-color: @status_color_community_hover;
+}
+.btn-status-protected {
+	color: #fff;
+	background-color: @status_color_protected;
+}
+.btn-status-protected:hover {
+	color: #fff;
+	background-color: @status_color_protected_hover;
+}
+.btn-status-private {
+	color: #fff;
+	background-color: @status_color_private;
+}
+.btn-status-private:hover {
+	color: #fff;
+	background-color: @status_color_private_hover;
+}
+.btn-status-published {
+	color: #000;
+	background-color: @status_color_published;
+	.glyphicon {
+		color: inherit !important;
+	}
+}
+.btn-status-published:hover {
+	color: #000;
+	background-color: @status_color_published_hover;
+}
+.btn-status-deprecated {
+	color: #fff;
+	background-color: @status_color_deprecated;
+}
+.btn-status-deprecated:hover {
+	color: #fff;
+	background-color: @status_color_deprecated_hover;
+}
+.btn-status-redirected {
+	color: #fff;
+	background-color: @status_color_redirected;
+}
+.btn-status-redirected:hover {
+	color: #fff;
+	background-color: @status_color_redirected_hover;
+}
+.btn-status-trash {
+	color: #fff;
+	background-color: @status_color_trash;
+}
+.btn-status-trash:hover {
+	color: #fff;
+	background-color: @status_color_trash_hover;
+}
+// ---------------- //
+
 // Additional styles for FontAwesome icons:
 span.fa {
 	line-height: inherit;

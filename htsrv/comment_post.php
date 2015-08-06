@@ -42,6 +42,8 @@ $commented_Item = & $ItemCache->get_by_ID( $comment_item_ID );
 // Make sure Blog is loaded
 $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
+// Initialize global $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
+$Blog = $commented_Item->Blog;
 
 // Re-Init charset handling, in case current_charset has changed:
 locale_activate( $commented_Item->Blog->get('locale') );

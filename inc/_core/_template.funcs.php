@@ -2371,7 +2371,7 @@ function display_login_form( $params )
  */
 function display_login_js_handler( $params )
 {
-	global $Blog, $dummy_fields, $Session;
+	global $dummy_fields, $Session;
 
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
@@ -2409,7 +2409,6 @@ function display_login_js_handler( $params )
 			type: 'POST',
 			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 			data: {
-				'blogid': '<?php echo $Blog->ID; ?>',
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
 				'get_widget_login_hidden_fields': get_widget_login_hidden_fields,
