@@ -631,6 +631,9 @@ function search_result_block( $params = array() )
 		$display_params['percentage'] = isset( $row['percentage'] ) ? $row['percentage'] : round( $row['score'] * $max_percentage / $max_score );
 		$display_params['scores_map'] = $row['scores_map'];
 		$display_params['type'] = $row['type'];
+		$display_params['best_result'] = $index == 0;
+		$display_params['max_score'] = $max_score;
+		$display_params['max_percentage'] = $max_percentage;
 		display_search_result( array_merge( $params, $display_params ) );
 	}
 
@@ -838,7 +841,7 @@ function display_search_result( $params = array() )
 
 	if( $debug )
 	{
-		display_score_map( $params['scores_map'], $params['score'], $params['type'] );
+		display_score_map( $params );
 	}
 
 	echo $params['row_end'];
@@ -849,12 +852,11 @@ function display_search_result( $params = array() )
  * Display score map regarding a search result
  *
  * @param array detailed information about the received search scores
- * @param integer total score received
  */
-function display_score_map( $scores_map, $total_score, $result_type )
+function display_score_map( $params )
 {
 	echo '<ul class="search_score_map dimmed">';
-	foreach( $scores_map as $result_part => $score_map )
+	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
 		if( ! is_array( $score_map ) )
 		{
@@ -862,13 +864,23 @@ function display_score_map( $scores_map, $total_score, $result_type )
 			{ // Score received for this field
 				switch ( $result_part )
 				{
+					case 'last_mod_date':
+					case 'creation_date':
+						echo '<li>'.sprintf( '%d points for the %s', $score_map, $result_part == 'last_mod_date' ? 'last modified date' : 'creation date' );
+						echo '<br>Rule: The number of points are calculated based on the days passed since creation or last modification<br>';
+						echo '<ul><li>days_passed < 5 => ( 8 - days_passed )</li>';
+						echo '<li>5 <= days_passed < 8 => 3</li>';
+						echo '<li>when days_passed >= 8: ( days_passed < 15 ? 2 : ( days_passed < 30 ? 1 : 0 ) )</li>';
+						echo '</ul>';
+						break;
+
 					case 'post_count':
-						if( $result_type == 'category' )
+						if( $params['type'] == 'category' )
 						{
 							echo '<li>'.sprintf( '%d points for the amount of posts in this category. Rule: number_of_posts > 30 ? 10 : intval( number_of_posts / 3 )', $score_map ).'</li>';
 							break;
 						}
-						elseif( $result_type == 'tag' )
+						elseif( $params['type'] == 'tag' )
 						{
 							echo '<li>'.sprintf( '%d posts in this tag. Total points = sum( points ) * number_of_posts.', $score_map ).'</li>';
 							break;
@@ -951,7 +963,18 @@ function display_score_map( $scores_map, $total_score, $result_type )
 			}
 		}
 	}
-	echo '<li>'.sprintf( 'Total: %d points', $total_score ).'</li>';
+	echo '<li>'.sprintf( 'Total: %d points', $params['score'] ).'</li>';
+	if( $params['best_result'] )
+	{
+		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and mathcing quoted terms.</li>';
+		echo '<li>Note: In case of the number of mathcing words even case insensitive partial matches are counted.</li>';
+		echo '<li>Percentage = ( Number of matching words + Number of matching quoted terms ) * 100 / ( Number of words in search text + Number of quoted terms in search text )</li></ul>';
+	}
+	else
+	{
+		echo '<ul><li>Percentage value is calculated based on the received points compared to the best result</li>';
+		echo '<li>'.sprintf( 'Percentage [%d%%] = ( This result total points [%d] ) * ( Best result percentage [%d] ) / ( Best result total points [%d] )', $params['percentage'], $params['score'], $params['max_percentage'], $params['max_score'] ).'</li></ul>';
+	}
 	echo '</ul>';
 }
 
