@@ -49,15 +49,9 @@ $use_l10n = 1;
  * This should be supported by {@link mb_list_encodings()}.
  */
 $evo_charset = 'utf-8'; // Set utf-8 because we started to use utf-8 internally with the Portable UTF-8 library
-// Removed forcing of UTF-8 in PHP 5.4 because it created more problems than it solved. PHP 5.4 does NOT support UTF-8 more than PHP 5.3.
-/*if( version_compare( phpversion(), '5.4', '>=' ) )
-{	// PHP 5.4 uses utf-8 internally, we must match it to avoid problems
-	// Note: this setting does not change website charset defined in locale!
-	$evo_charset = 'utf-8';
-}*/
 
 if( version_compare( phpversion(), '5.6', '>=' ) )
-{ // In case of php version greater than 5.6 set the default charset to UTF-8
+{	// In case of php version greater than 5.6 set the default charset to UTF-8
 	// All other charsets ( inconv, mbstring and php internal functions ) default value is based on the 'default_charset'
 	ini_set( 'default_charset', 'UTF-8' );
 }
