@@ -548,7 +548,7 @@ jQuery( document ).ready( function()
 				{ // Downloading is Failed
 					if( empty( $info['error'] ) )
 					{ // Some unknown error
-						$this->print_tool_log( T_( 'The url is not avaialble, please check it, probably it is old url of GeoIP.dat file.' ), 'error' );
+						$this->print_tool_log( T_( 'The URL is not available. It may correspond to an old version of the GeoIP.dat file.' ), 'error' );
 					}
 					else
 					{ // Display an error of request
@@ -561,7 +561,7 @@ jQuery( document ).ready( function()
 				$plugin_dir = dirname( __FILE__ );
 				if( ! is_writable( $plugin_dir ) )
 				{ // Check the write rights
-					$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to put the downloading GeoIP.dat. Please set the write rights and try it again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
+					$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
 					break;
 				}
 
@@ -594,13 +594,13 @@ jQuery( document ).ready( function()
 
 				if( ! ( $gzip_handle = @gzopen( $gzip_file_path, 'rb' ) ) )
 				{ // Try to open gzip file
-					$this->print_tool_log( T_('Could not open the package file!'), 'error' );
+					$this->print_tool_log( T_('Could not open the source file!'), 'error' );
 					break;
 				}
 
 				if( ! ( $out_handle = @fopen( $plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ), 'w' ) ) )
 				{
-					$this->print_tool_log( sprintf( T_('Could not open the file %s to save the extracting file, please check the rights.'), '<b>'.$plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ).'</b>' ), 'error' );
+					$this->print_tool_log( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ).'</b>' ), 'error' );
 					break;
 				}
 
@@ -627,7 +627,7 @@ jQuery( document ).ready( function()
 				}
 				else
 				{ // Failed on removing
-					$this->print_tool_log( sprintf( T_('Impossible to remove file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
+					$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
 				}
 
 				// Success message
