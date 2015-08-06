@@ -362,8 +362,8 @@ textarea.bComment
 	padding: 2px;
 	margin: 0ex;
 }
-select.bComment  /* Used by the profile form */
-{
+select.bComment
+/* Used by the profile form */  {
 	background-color: #eee;
 	border: 1px solid #ccc;
 	padding: 1px;
@@ -553,7 +553,8 @@ div.tabs div.selected a {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-o-user-select: none;
-	user-select: none;
+	-ms-user-select: none;
+	    user-select: none;
 }
 
 #ios-arrow-left:before{
@@ -589,6 +590,7 @@ div.tabs div.selected a {
 		rgba(255,255,255,0.1) 52%,
 		rgba(255,255,255,0.4) 100%
 		);
+	background-image : -webkit-linear-gradient(45deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 52%, rgba(255,255,255,0.1) 52%, rgba(255,255,255,0.4) 100%);
 	background-image : linear-gradient(
 		45deg,
 		rgba(0,0,0,0) 0%,

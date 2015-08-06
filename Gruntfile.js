@@ -351,10 +351,11 @@ module.exports = function(grunt) {
 
 		autoprefixer: {
 			options: {
-				browsers: ['last 2 versions']
+				remove: false,
+				browsers: ['last 5 versions']
 			},
 			dist: {
-				src: ['rsc/**/*.css','skins/**/*.css','skins_adm/**/*.css','plugins/**/*.css']
+				src: ['rsc/**/*.css','skins/**/*.css','skins_adm/**/*.css']
 			}
 		},
 

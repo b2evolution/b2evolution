@@ -991,9 +991,11 @@ table.widget_grid {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  flex-flow: row wrap;
+  -ms-flex-flow: row wrap;
+      flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  justify-content: space-around;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
   -webkit-justify-content: space-around;
 }
 .widget_flow_blocks div,

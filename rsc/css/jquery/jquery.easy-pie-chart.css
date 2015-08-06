@@ -10,11 +10,15 @@
 }
 
 .charts {
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
 	display: -webkit-flex;
-	justify-content: space-around;
+	-ms-flex-pack: distribute;
+	    justify-content: space-around;
 	-webkit-justify-content: space-around;
-	flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	    flex-wrap: wrap;
 	-webkit-flex-wrap: wrap;
 }
 .chart {
