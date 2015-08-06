@@ -1,6 +1,6 @@
 # b2evolution CCMS
 
-This is WORK IN PROGRESS on version **6.7.0-stable** (from the so-called "i7" branch).
+This is WORK IN PROGRESS on version **6.7.0-stable**.
 
 ## A complete engine for your website !
 
