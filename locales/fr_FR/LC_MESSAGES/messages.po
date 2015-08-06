@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-08-02 19:29+0200\n"
-"PO-Revision-Date: 2015-08-02 17:32+0000\n"
+"POT-Creation-Date: 2015-08-06 21:58+0200\n"
+"PO-Revision-Date: 2015-08-06 21:35+0000\n"
 "Last-Translator: Francois Planque\n"
-"Language-Team: French (France) (http://www.transifex.com/projects/p/b2evolution/language/fr_FR/)\n"
+"Language-Team: French (France) (http://www.transifex.com/fplanque/b2evolution/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -68,7 +68,7 @@ msgstr "Déplacer"
 
 #. TRANS: Delete
 #: ../../../conf/_icons.php:88 ../conf/_icons.php:475
-#: ../../../inc/messaging/model/_messaging.funcs.php:2008
+#: ../../../inc/messaging/model/_messaging.funcs.php:2029
 #: ../../../inc/messaging/views/_message_list.view.php:239
 msgid "Del"
 msgstr "Suppr"
@@ -81,10 +81,10 @@ msgstr "Suppr"
 #: ../../../inc/files/views/_file_list.inc.php:440
 #: ../inc/items/items.ctrl.php:1538
 #: ../../../inc/links/model/_link.funcs.php:285
-#: ../../../inc/messaging/model/_messaging.funcs.php:2181
-#: ../../../inc/messaging/model/_messaging.funcs.php:2186
-#: ../../../inc/messaging/model/_messaging.funcs.php:2350
-#: ../../../inc/messaging/model/_messaging.funcs.php:2357
+#: ../../../inc/messaging/model/_messaging.funcs.php:2210
+#: ../../../inc/messaging/model/_messaging.funcs.php:2215
+#: ../../../inc/messaging/model/_messaging.funcs.php:2379
+#: ../../../inc/messaging/model/_messaging.funcs.php:2386
 #: ../../../inc/users/model/_user.funcs.php:2352
 #: ../../../inc/users/views/_user_avatar.form.php:223
 #: ../../../skins_fallback_v5/_user.disp.php:263
@@ -231,7 +231,7 @@ msgstr "Nouveau"
 #: ../../../inc/messaging/contacts.ctrl.php:124
 #: ../../../inc/messaging/model/_messaging.funcs.php:367
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:21
-#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:257
+#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:262
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -2005,7 +2005,7 @@ msgstr "Autoriser à visualiser les utilisateurs d'autres pays"
 #: ../../../inc/users/model/_user.funcs.php:1342
 #: ../../../inc/users/model/_user.funcs.php:1347
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:20
-#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:244
+#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:249
 msgid "Messages"
 msgstr "Messages"
 
@@ -6794,7 +6794,7 @@ msgstr "L'utilisateur ne possède pas de blog"
 #: ../../../inc/comments/model/_comment.funcs.php:1089
 #: ../../../inc/items/model/_item.funcs.php:3585
 #: ../../../inc/items/model/_item.funcs.php:3685
-#: ../../../inc/messaging/model/_messaging.funcs.php:1902
+#: ../../../inc/messaging/model/_messaging.funcs.php:1907
 msgid "Delete all"
 msgstr "Supprimer tous"
 
@@ -8385,6 +8385,7 @@ msgid "Profile picture size"
 msgstr "Taille des photos de profil"
 
 #: ../../../inc/collections/views/_coll_other.form.php:69
+#: ../../../inc/messaging/model/_messaging.funcs.php:1939
 msgid "Messaging"
 msgstr "Messagerie"
 
@@ -16336,6 +16337,7 @@ msgstr "Fichier .PO non trouvé"
 
 #: ../../../inc/locales/model/_translation.funcs.php:254
 #: ../../../inc/locales/model/_translation.funcs.php:323
+#: ../../../plugins/geoip_plugin/_geoip.plugin.php:603
 #, php-format
 msgid ""
 "The file %s cannot be written to disk. Please check the filesystem "
@@ -16631,7 +16633,7 @@ msgstr "Impossible de créer le dossier &laquo;%s&raquo; pour extraire les fichi
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:296
 #, php-format
-msgid "Unable to unpack &laquo;%s&raquo; ZIP archive."
+msgid "Unable to decompress &laquo;%s&raquo; ZIP archive."
 msgstr "Impossible de décompresser l'archive ZIP &laquo;%s&raquo;."
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:297
@@ -17444,25 +17446,25 @@ msgstr "Conversations contenant des messages privés envoyés par l'utilisateur"
 msgid "User has not sent any private messages"
 msgstr "L'utilisateur n'a envoyé aucun message privé"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1902
+#: ../../../inc/messaging/model/_messaging.funcs.php:1907
 #, php-format
 msgid "Delete all private messages sent by %s"
 msgstr "Supprimer tous les messages privés envoyés par %s"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1936
+#: ../../../inc/messaging/model/_messaging.funcs.php:1940
 #, php-format
 msgid "User has sent %s private messages"
 msgstr "L'utilisateur a envoyé %s messages privés"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1965
+#: ../../../inc/messaging/model/_messaging.funcs.php:1986
 msgid "Between"
 msgstr "Entre"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1965
+#: ../../../inc/messaging/model/_messaging.funcs.php:1986
 msgid "With"
 msgstr "Avec"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1975
+#: ../../../inc/messaging/model/_messaging.funcs.php:1996
 #: ../../../inc/messaging/views/_thread.form.php:97
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
@@ -17473,26 +17475,30 @@ msgstr "Avec"
 msgid "Subject"
 msgstr "Sujet"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1986
+#: ../../../inc/messaging/model/_messaging.funcs.php:2007
 msgid "Last msg"
 msgstr "Dernier<br />msg"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1996
+#: ../../../inc/messaging/model/_messaging.funcs.php:2017
 #: ../../../inc/messaging/views/_message_list.view.php:227
 #: ../../../inc/messaging/views/_thread.form.php:301
 msgid "Read?"
 msgstr "Lu?"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2075
+#: ../../../inc/messaging/model/_messaging.funcs.php:2073
+msgid "Deleted user(s)"
+msgstr "Utilisateur(s) supprimé(s)"
+
+#: ../../../inc/messaging/model/_messaging.funcs.php:2104
 msgid "Conversation left"
 msgstr "Conversation quittée"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2078
-#: ../../../inc/messaging/model/_messaging.funcs.php:2083
+#: ../../../inc/messaging/model/_messaging.funcs.php:2107
+#: ../../../inc/messaging/model/_messaging.funcs.php:2112
 msgid "You have unread messages"
 msgstr "Vous avez des messages non lus"
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2097
+#: ../../../inc/messaging/model/_messaging.funcs.php:2126
 msgid "Show messages..."
 msgstr "Montrer les messages..."
 
@@ -27051,27 +27057,27 @@ msgstr "Widgets à usages multiples"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:51
 msgid "Menu Item Widgets"
-msgstr ""
+msgstr "Widgets de menus"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:52
 msgid "Navigation Widgets"
-msgstr ""
+msgstr "Widgets de navigation"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:53
 msgid "Content Listing Widgets"
-msgstr ""
+msgstr "Widgets pour lister les contenus"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:54
 msgid "Collection Support Widgets"
-msgstr ""
+msgstr "Widgets de support de la collection"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:55
 msgid "Site Support Widgets"
-msgstr ""
+msgstr "Widget de support du site"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:56
 msgid "User Support Widgets"
-msgstr ""
+msgstr "Widgets de support des utilisateurs"
 
 #: ../../../inc/widgets/views/_widget_list_available.view.php:141
 #: ../../../inc/widgets/views/_widget_list_available.view.php:154
@@ -27120,21 +27126,21 @@ msgstr "Ce widget ne peut pas être mis en cache dans le cache de blocs."
 
 #: ../../../inc/widgets/widgets.ctrl.php:409
 msgid "Block caching has been turned on for this widget."
-msgstr ""
+msgstr "La cache de bloc a été activé pour ce widget."
 
 #: ../../../inc/widgets/widgets.ctrl.php:413
 msgid "Block caching has been turned off for this widget."
-msgstr ""
+msgstr "La cache de bloc a été désactivé pour ce widget."
 
 #: ../../../inc/widgets/widgets.ctrl.php:449
 #, php-format
 msgid "%d widgets have been enabled."
-msgstr ""
+msgstr "%d widgets ont été activés."
 
 #: ../../../inc/widgets/widgets.ctrl.php:453
 #, php-format
 msgid "%d widgets have been disabled."
-msgstr ""
+msgstr "%d widgets ont été désactivés."
 
 #: ../../../inc/widgets/widgets.ctrl.php:466
 #, php-format
@@ -27546,7 +27552,7 @@ msgstr "Filtres actuels"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:72
 msgid "Summary of the current filters."
-msgstr ""
+msgstr "Résumé des filtres actuels."
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:93
 msgid "Show filters"
@@ -27558,21 +27564,21 @@ msgstr "Assigné à"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:104
 msgid "Past/Future"
-msgstr ""
+msgstr "Passé/Futur"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:105
 msgid "Limit by days"
-msgstr ""
+msgstr "Limiter par jours"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:148
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:149
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:150
 msgid "NOT"
-msgstr ""
+msgstr "NON"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:203
 msgid "items"
-msgstr ""
+msgstr "items"
 
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:205
 #, php-format
@@ -27706,7 +27712,7 @@ msgstr "Visibilité des items"
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:72
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:66
 msgid "What post statuses should be included in the list?"
-msgstr ""
+msgstr "Quels statuts de posts doivent être inclus dans la liste?"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:76
 msgid "show public posts"
@@ -27829,27 +27835,27 @@ msgstr "Logo titre"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:81
 msgid "Include a logo (as a title replacement)."
-msgstr ""
+msgstr "Inclue un logo (en remplacement du titre)."
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:95
 #: ../../../inc/widgets/widgets/_image.widget.php:95
 msgid "Image source"
-msgstr ""
+msgstr "Source de l'image"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:99
 #: ../../../inc/widgets/widgets/_image.widget.php:99
 msgid "Skin folder"
-msgstr ""
+msgstr "Dossier skin"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:100
 #: ../../../inc/widgets/widgets/_image.widget.php:100
 msgid "Collection File Root"
-msgstr ""
+msgstr "Racine de fichiers de la collection"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:101
 #: ../../../inc/widgets/widgets/_image.widget.php:101
 msgid "Shared File Root"
-msgstr ""
+msgstr "Racine de fichiers partagée"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:105
 #: ../../../inc/widgets/widgets/_image.widget.php:105
@@ -27859,7 +27865,7 @@ msgstr "Nom du fichier image"
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:106
 #: ../../../inc/widgets/widgets/_image.widget.php:106
 msgid "Relative to the root of the selected source."
-msgstr ""
+msgstr "Relatif à la racine de la source sélectionnée."
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:109
 #: ../../../inc/widgets/widgets/_image.widget.php:109
@@ -27869,26 +27875,26 @@ msgstr "Nom de fichier invalide."
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:112
 #: ../../../inc/widgets/widgets/_image.widget.php:112
 msgid "Image width"
-msgstr ""
+msgstr "Largeur de l'image"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:119
 #: ../../../inc/widgets/widgets/_image.widget.php:119
 msgid "Image height"
-msgstr ""
+msgstr "Hauteur de l'image"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:126
 #: ../../../inc/widgets/widgets/_image.widget.php:126
 msgid "Check file"
-msgstr ""
+msgstr "Vérifier fichier"
 
 #: ../../../inc/widgets/widgets/_coll_logo.widget.php:127
 #: ../../../inc/widgets/widgets/_image.widget.php:127
 msgid "Check if file exists. If not, no IMG tag will be created."
-msgstr ""
+msgstr "Vérifie si le fichier existe. Si ce n'est pas le cas, aucun tag IMG ne sera créé."
 
 #: ../../../inc/widgets/widgets/_coll_longdesc.widget.php:53
 msgid "Long Description of this Collection"
-msgstr ""
+msgstr "Description longue de cette collection"
 
 #: ../../../inc/widgets/widgets/_coll_longdesc.widget.php:72
 #, php-format
@@ -28034,20 +28040,20 @@ msgstr "Nuage de tag. Cliquez pour afficher les posts du blog correspondant au t
 
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:108
 msgid "Source collections"
-msgstr ""
+msgstr "Collections source"
 
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:109
 msgid ""
 "Comma-separated list of collection IDs. Leave empty for current collection."
-msgstr ""
+msgstr "Liste d'IDs de collections séparés par des virgules. Laisser vide pour la collection courante."
 
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:115
 msgid "Destination collection"
-msgstr ""
+msgstr "Collection destination"
 
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:118
 msgid "Collection ID. Leave empty for automatic selection."
-msgstr ""
+msgstr "ID de la collection. Laissez video pour sélection automatique."
 
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:122
 msgid "Max # of tags"
@@ -28080,11 +28086,11 @@ msgstr "Comment trier le nuage de tags."
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:262
 #, php-format
 msgid "Display posts tagged with \"%s\""
-msgstr ""
+msgstr "Afficher les posts taggés ave \"%s\""
 
 #: ../../../inc/widgets/widgets/_coll_tagline.widget.php:53
 msgid "Collection tagline"
-msgstr ""
+msgstr "Signature de la collection"
 
 #: ../../../inc/widgets/widgets/_coll_tagline.widget.php:74
 #: ../../../inc/widgets/widgets/_coll_title.widget.php:95
@@ -28094,15 +28100,15 @@ msgstr "&laquo;%s&raquo; provient de la signature définie dans les <a %s>régla
 
 #: ../../../inc/widgets/widgets/_coll_title.widget.php:47
 msgid "Add tagline"
-msgstr ""
+msgstr "Ajouter la signature"
 
 #: ../../../inc/widgets/widgets/_coll_title.widget.php:48
 msgid "check to add the collection tagline after the title."
-msgstr ""
+msgstr "cochez pour ajouter la signature après le titre."
 
 #: ../../../inc/widgets/widgets/_coll_title.widget.php:74
 msgid "Collection title"
-msgstr ""
+msgstr "Titre de la collection"
 
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:53
 msgid "XML Feeds (RSS / Atom)"
@@ -28140,7 +28146,7 @@ msgstr "Cocher ceci pour ajouter target=\"_blank\" au lien \"Qu'est-ce que RSS?\
 
 #: ../../../inc/widgets/widgets/_colls_list_owner.widget.php:53
 msgid "Same owner's collections list"
-msgstr ""
+msgstr "Liste des collections ayant le même propriétaire"
 
 #: ../../../inc/widgets/widgets/_colls_list_owner.widget.php:71
 msgid "Display list of all blogs owned by the same user."
@@ -28159,7 +28165,7 @@ msgstr "Comment trier les blogs"
 
 #: ../../../inc/widgets/widgets/_colls_list_public.widget.php:53
 msgid "Public collections list"
-msgstr ""
+msgstr "Liste des collections publiques"
 
 #: ../../../inc/widgets/widgets/_colls_list_public.widget.php:71
 msgid "Display list of all blogs marked as public."
@@ -28208,7 +28214,7 @@ msgstr "Contenu du bloc"
 
 #: ../../../inc/widgets/widgets/_image.widget.php:81
 msgid "Include an image."
-msgstr ""
+msgstr "Inclure une image."
 
 #: ../../../inc/widgets/widgets/_linkblog.widget.php:48
 msgid "Linkblog"
@@ -28450,11 +28456,11 @@ msgstr "Décochez cette case pour afficher ce widget uniquement pour les utilisa
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:53
 msgid "Organization Members"
-msgstr ""
+msgstr "Membres d'une organisation"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:71
 msgid "Display the members of an organization."
-msgstr ""
+msgstr "Affiche les membres d'une organisation."
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:98
 msgid "Our Awesome Team"
@@ -28462,28 +28468,28 @@ msgstr "Notre Formidable Equipe"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:101
 msgid "Organization ID"
-msgstr ""
+msgstr "ID de l'organisation"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:102
 #, php-format
 msgid "ID of the <a %s>organization</a> to display."
-msgstr ""
+msgstr "ID de l'<a %s>organisation</a> à afficher."
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:108
 msgid "Extra Info Field"
-msgstr ""
+msgstr "Champ d'infos complémentaires"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:109
 msgid "Select what extra user field should be displayed."
-msgstr ""
+msgstr "Sélectionnez quel champ d'infos complémentaires doit être affiché."
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:115
 msgid "Link to profile"
-msgstr ""
+msgstr "Lier au profil"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:116
 msgid "Check this to link each user to his profile."
-msgstr ""
+msgstr "Cochez ceci pour lier chaque utilisateur à son profil."
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:121
 #: ../../../plugins/_whosonline.plugin.php:59
@@ -28492,36 +28498,36 @@ msgstr "Icônes de contact"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:122
 msgid "Check this to display icons for User Field URLs with an icon."
-msgstr ""
+msgstr "Cochez ceci pour afficher les icônes des champs d'infos ayant une icône."
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:127
 #: ../../../inc/widgets/widgets/_user_links.widget.php:99
 msgid "Icon color"
-msgstr ""
+msgstr "Couleur des icônes"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:130
 #: ../../../inc/widgets/widgets/_user_links.widget.php:102
 msgid "Use for normal text"
-msgstr ""
+msgstr "Utiliser pour le texte normal"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:131
 #: ../../../inc/widgets/widgets/_user_links.widget.php:103
 msgid "Use for normal background"
-msgstr ""
+msgstr "Utiliser pour le fond normal"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:132
 #: ../../../inc/widgets/widgets/_user_links.widget.php:104
 msgid "Use for hover text"
-msgstr ""
+msgstr "Utiliser pour le texte survolé par la souris"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:133
 #: ../../../inc/widgets/widgets/_user_links.widget.php:105
 msgid "Use for hover background"
-msgstr ""
+msgstr "Utilisé pour le fond survolé par la souris"
 
 #: ../../../inc/widgets/widgets/_org_members.widget.php:169
 msgid "Requested Team was not found."
-msgstr ""
+msgstr "Le groupe/organisation n'a pas été trouvé."
 
 #: ../../../inc/widgets/widgets/_profile_menu_link.widget.php:53
 msgid "My Profile Menu link"
@@ -28571,27 +28577,27 @@ msgstr "Mises à jour de profil les plus récentes"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:103
 msgid "Pictures only"
-msgstr ""
+msgstr "Photos seulement"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:104
 msgid "User badges"
-msgstr ""
+msgstr "Badges utilisateur"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:109
 msgid "Gender filtering"
-msgstr ""
+msgstr "Filtrage par sexe"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:114
 msgid "Same gender as User"
-msgstr ""
+msgstr "Même sexe que l'utilisateur"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:115
 msgid "Opposite gender as User"
-msgstr ""
+msgstr "Sexe opposé à l'utilisateur"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:120
 msgid "Location filtering"
-msgstr ""
+msgstr "Filtre par localité"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:125
 msgid "Same country as User"
@@ -28627,16 +28633,16 @@ msgstr "Liens utilisateur"
 
 #: ../../../inc/widgets/widgets/_user_links.widget.php:71
 msgid "Display user links."
-msgstr ""
+msgstr "Afficher les liens utilisateur."
 
 #: ../../../inc/widgets/widgets/_user_links.widget.php:94
 msgid "leave blank to use author of current post or current collection."
-msgstr ""
+msgstr "laisser vide pour utiliser l'auteur du post actuelle ou de la collection actuelle."
 
 #: ../../../inc/widgets/widgets/_user_links.widget.php:143
 #, php-format
 msgid "User %s not found."
-msgstr ""
+msgstr "Utilisateur %s introuvable."
 
 #: ../../../inc/widgets/widgets/_user_login.widget.php:54
 #: ../../../inc/widgets/widgets/_user_login.widget.php:91
@@ -29591,7 +29597,7 @@ msgstr "Ceci est une introduction pour ce chapitre. Il s'agit d'un post utilisan
 msgid ""
 "Contrary to the other sections which are explictely sorted by default, this "
 "section is sorted alphabetically by default."
-msgstr ""
+msgstr "Contrairement aux autres section qui sont triées explicitement par défaut, celle-ci est triée alphabétiquement par défaut."
 
 #: ../../../install/_functions_create.php:2374
 msgid "About this manual"
@@ -29817,13 +29823,13 @@ msgstr "Quelle est la couleur d'une tomate? rouge"
 
 #: ../../../install/_functions_install.php:966
 msgid "Preparing to install <code>/.htaccess</code> in the base folder..."
-msgstr ""
+msgstr "Préparation à l'installation de <code>/.htaccess</code> dans le répertoire de base..."
 
 #: ../../../install/_functions_install.php:971
 msgid ""
 ".htaccess is not needed because your web server is not Apache. WARNING: you "
 "will need to configure your web server manually."
-msgstr ""
+msgstr ".htaccess n'est pas requis parce que votre serveur web n'est pas Apache. ATTENTION: vous allez devoir configurer votre serveur web manuellement."
 
 #: ../../../install/_functions_install.php:981
 msgid "ERROR!"
@@ -29860,21 +29866,21 @@ msgstr "A nouveau, nous recommandons de supprimer ce fichier avant de continuer.
 
 #: ../../../install/_functions_install.php:1041
 msgid "Cannot find file [ sample.htaccess ] in your base url folder."
-msgstr ""
+msgstr "Impossible de trouver [ sample.htaccess ] dans votre répertoire de base."
 
 #: ../../../install/_functions_install.php:1047
 msgid "Failed to copy files!"
-msgstr ""
+msgstr "Impossible de copier les fichiers!"
 
 #: ../../../install/_functions_install.php:1059
 #, php-format
 msgid "%s was not found as expected."
-msgstr ""
+msgstr "%s n'a pas été trouvé comme attendu."
 
 #: ../../../install/_functions_install.php:1065
 msgid ""
 "Test was successful, but failed to copy .htaccess into baseurl directory!"
-msgstr ""
+msgstr "Test passé avec succès, mais impossible de copier .htaccess dans votre répertoire de base."
 
 #: ../../../install/_functions_install.php:1108
 msgid "Back to install menu"
@@ -29926,7 +29932,7 @@ msgstr "Impossible de charger le fichier de configuration d'origine [%s]. Est-il
 #: ../../../install/_functions_install.php:1764
 #, php-format
 msgid "Your configuration file <code>%s</code> has been successfully created."
-msgstr ""
+msgstr "Votre fichier de configuration <code>%s</code> a été créé avec succès."
 
 #: ../../../install/_functions_install.php:1778
 msgid "Config file update"
@@ -30075,11 +30081,11 @@ msgstr "Pour activer cet outil, créez un fichier dénommé /conf/_overrides_TES
 
 #: ../../../install/debug.php:383
 msgid "Project page on GitHub"
-msgstr ""
+msgstr "Page projet sur GitHub"
 
 #: ../../../install/debug.php:386
 msgid "Get help from the community!"
-msgstr ""
+msgstr "Obtenez de l'aide de la communauté!"
 
 #: ../../../install/index.php:231
 #, php-format
@@ -30117,7 +30123,7 @@ msgstr "Supprimer les tables de b2evolution"
 
 #: ../../../install/index.php:294
 msgid "Convert/Normalize your DB to UTF-8/ASCII"
-msgstr ""
+msgstr "Convertir/Normaliser votre BD vers UTF-8/ASCII"
 
 #: ../../../install/index.php:298 ../install/index.php:463
 msgid "Base configuration"
@@ -30129,7 +30135,7 @@ msgid ""
 "Your PHP configuration only allows us to use %s of RAM. The absolute minimum"
 " we need to install b2evolution is 48M. Please contact your web host or use "
 "a <a %s>compatible hosting provider</a>."
-msgstr ""
+msgstr "Votre configuration PHP nous permet d'utiliser %s de RAM. Le minimum absolu pour installer b2evolution is 48M. Merci de contacter votre hébergeur ou d'utiliser un <a %s>hébergeur web compatible</a>."
 
 #: ../../../install/index.php:379
 #, php-format
@@ -30141,7 +30147,7 @@ msgstr "Aucun fuseau horaire par défaut n'est réglé. Merci d'ouvrir PHP.ini e
 
 #: ../../../install/index.php:384
 msgid "ERROR: Impossible to connect to Database."
-msgstr ""
+msgstr "ERREUR: Impossible de se connecter à la Base de données."
 
 #: ../../../install/index.php:385
 msgid ""
@@ -31247,7 +31253,7 @@ msgstr "Niveau de titre supérieur"
 msgid ""
 "This plugin will adjust headings so they always start at the level you want:"
 " 2 for &lt;H2&gt;, 3 for &lt;H3&gt;, etc."
-msgstr ""
+msgstr "Ce plugin va ajuster les inter-titres de telle manière qu'ils commencent toujours au niveau voulu: 2 pour &lt;H2&gt;, 3 pour &lt;H3&gt;, etc."
 
 #: ../../../plugins/_whosonline.plugin.php:43
 msgid "Who's online Widget"
@@ -31529,7 +31535,7 @@ msgstr "Player video pour les formats suivants: %s. Note: iOS supporte uniquemen
 msgid ""
 "This player can display a placeholder image of the same name as the video "
 "file with the following extensions: %s."
-msgstr ""
+msgstr "Ce lecteur peut afficher une image de remplacement ayant le même nom que le fichier vidéo avec les extensions suivantes: %s."
 
 #: ../../../plugins/flowplayer_plugin/_flowplayer.plugin.php:94
 #: ../../../plugins/html5_mediaelementjs_plugin/_html5_mediaelementjs.plugin.php:164
@@ -31635,20 +31641,20 @@ msgstr "Aucun pays trouvé pour l'adresse IP %s"
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:542
 #, php-format
 msgid "Downloading GeoIP.dat file from the url: %s ..."
-msgstr ""
+msgstr "Téléchargement du fichier GeoIP.dat depuis l'url: %s ..."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:551
 msgid ""
-"The url is not avaialble, please check it, probably it is old url of "
+"The URL is not available. It may correspond to an old version of the "
 "GeoIP.dat file."
-msgstr ""
+msgstr "L'URL ne fonctionne pas. Elle correspond peut être à une ancienne version du fichier GeoIP.dat."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:564
 #, php-format
 msgid ""
-"Plugin folder %s must be writable to put the downloading GeoIP.dat. Please "
-"set the write rights and try it again."
-msgstr ""
+"Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write"
+" permissions and try again."
+msgstr "Le répertoire du plugin %s doit pouvoir être modifié pour recevoir le fichier GeoIP.dat. Merci de corriger les permissions d'écriture et de réessayer."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:574
 #, php-format
@@ -31667,45 +31673,38 @@ msgstr "Extraction du fichier %s..."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:591
 msgid "There is no 'zip' or 'zlib' extension installed!"
-msgstr ""
+msgstr "Aucun extension 'zip' ou 'zlib' n'est installée!"
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:597
-msgid "Could not open the package file!"
-msgstr ""
-
-#: ../../../plugins/geoip_plugin/_geoip.plugin.php:603
-#, php-format
-msgid ""
-"Could not open the file %s to save the extracting file, please check the "
-"rights."
-msgstr ""
+msgid "Could not open the source file!"
+msgstr "Impossible d'ouvrir le fichier source!"
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:623
 #, php-format
 msgid "Remove gzip file %s..."
-msgstr ""
+msgstr "Suppression du fichier gzip %s..."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:630
 #, php-format
-msgid "Impossible to remove file %s. You can do it manually."
-msgstr ""
+msgid "Impossible to remove the file %s. You can do it manually."
+msgstr "Impossible de supprimer le fichier %s. Vous pouvez le faire manuellement."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:634
 #, php-format
 msgid "%s file was downloaded successfully."
-msgstr ""
+msgstr "Le fichier .%s a été téléchargé avec succès."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:641
 msgid "The plugin has been enabled."
-msgstr ""
+msgstr "Le plugin a été activé."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:650
 msgid "The plugin could not be automatically enabled."
-msgstr ""
+msgstr "Le plugin n'a pas pu être automatiquement activé."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:664
 msgid "You must enable the GeoIP plugin before to use this tool."
-msgstr ""
+msgstr "Vous devez activer le plugin GeoIP avant d'utiliser cet outil."
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:677
 msgid ""
@@ -31809,7 +31808,7 @@ msgstr "Détecte et convertit les italiques et les gras markdown."
 msgid ""
 "This plugin will adjust headings so they always start at the level you want:"
 " 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc."
-msgstr ""
+msgstr "Ce plugin va ajuster les inter-titres de telle manière qu'ils commencent toujours au niveau voulu: 1 pour &lt;H1&gt;, 2 pour &lt;H2&gt;, etc."
 
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:359
 msgid "Bold"
@@ -32086,7 +32085,7 @@ msgid ""
 "WARNING: By switching to WYSIWYG, you might lose newline and paragraph marks"
 " as well as some other formatting. Your text is safe though! Are you sure "
 "you want to switch?"
-msgstr ""
+msgstr "ATTENTION: En passant au mode WYSIWYG, vous risquez de perdre les retours à la ligne, les sauts de paragraphes et peut être d'autres formatages. Néanmoins, votre texte est en sécurité! Etes vous sûrs de vouloir changer de mode?"
 
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:398
 #, php-format
@@ -32320,7 +32319,7 @@ msgstr "Scroll Large"
 #: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:35
 msgid ""
 "This plugin allows to horizontally scroll through blocks of wide content."
-msgstr ""
+msgstr "Ce plugin permet de scroller horizontalement à travers des blocs de contenu larges."
 
 #: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:127
 msgid "Wide scroll:"
@@ -32339,7 +32338,7 @@ msgid ""
 "<br />\n"
 "|} table end<br />\n"
 "See manual for more."
-msgstr ""
+msgstr "Vous pouvez créer des tableaux au format:<br />\n{| Début du tableau<br />\n<br />\n|- Ligne du tableau<br />\n<br />\n|} Fin du tableau<br />\nConsulter le manuel pour plus d'infos."
 
 #: ../../../skins/_atom/comments.main.php:87
 #: ../skins/_rdf/comments.main.php:97 ../../../skins/_rss/comments.main.php:81
@@ -32527,7 +32526,7 @@ msgstr "Votes sur les images des Posts"
 #: ../skins/touch/_skin.class.php:62 ../../../skins/touch/_skin.class.php:74
 #: ../skins/touch/_skin.class.php:86
 msgid "Check this to enable AJAX voting buttons in the colorbox zoom view"
-msgstr ""
+msgstr "Cochez ceci pour activer les boutons de votre AJAX dans la fenêtre de zoom colorbox"
 
 #: ../../../skins/asevo/_skin.class.php:61 ../skins/asevo/_skin.class.php:73
 #: ../../../skins/asevo/_skin.class.php:85
@@ -32637,7 +32636,7 @@ msgstr "Afficher les Votes"
 #: ../skins/touch/_skin.class.php:68 ../../../skins/touch/_skin.class.php:80
 #: ../skins/touch/_skin.class.php:92
 msgid "Check to display number of likes and dislikes"
-msgstr ""
+msgstr "Cochez pour afficher le nombre de \"j'aime\" et \"je n'aime pas\""
 
 #: ../../../skins/asevo/_skin.class.php:67
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:112
@@ -32920,19 +32919,19 @@ msgstr "Mise en page"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:76
 msgid "Single Column Large"
-msgstr ""
+msgstr "Colonne Unique Large"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:77
 msgid "Single Column"
-msgstr ""
+msgstr "Colonne Unique"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:78
 msgid "Single Column Narrow"
-msgstr ""
+msgstr "Colonne Unique Etroite"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:79
 msgid "Single Column Extra Narrow"
-msgstr ""
+msgstr "Colonne Unique Très Etroite"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:80
 msgid "Left Sidebar"
@@ -32958,7 +32957,7 @@ msgstr "Noms d'utilisateurs"
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:240
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:145
 msgid "When access is denied or requires login..."
-msgstr ""
+msgstr "Lorsque l'accès est refusé ou nécessite uen identification..."
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:172
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:210
@@ -32967,7 +32966,7 @@ msgstr ""
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:243
 #: ../../../skins/bootstrap_manual_skin/_skin.class.php:148
 msgid "Display on login screen"
-msgstr ""
+msgstr "Afficher sur l'écran d'identification"
 
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:176
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:177
@@ -33398,7 +33397,7 @@ msgstr "Forum: "
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:67
 msgid "Forum Display Settings"
-msgstr ""
+msgstr "Réglages d'affichage du forum"
 
 #: ../../../skins/bootstrap_forums_skin/_skin.class.php:70
 #: ../../../skins/colourise/_skin.class.php:49
@@ -33518,37 +33517,37 @@ msgstr "Visualisation des images"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:74
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:74
 msgid "Thumbnail size for Albums"
-msgstr ""
+msgstr "Taille des miniatures pour les Albums"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:81
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:81
 msgid "Thumbnail size inside Album"
-msgstr ""
+msgstr "Taille des miniatures dans les Albums"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:88
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:88
 msgid "Thumbnail size in Media index"
-msgstr ""
+msgstr "Taille des miniatures dans l'index Media"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:96
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:96
 msgid "Display banner for \"Public\" albums (albums & comments)"
-msgstr ""
+msgstr "Afficher une bannière pour les albums \"Publics\" (albums & commentaires)"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:107
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:107
 msgid "Page Styles"
-msgstr ""
+msgstr "Styles de Page"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:110
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:110
 msgid "Page text size"
-msgstr ""
+msgstr "Taille de texte de la page"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:111
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:111
 msgid "Default value is 14 pixels."
-msgstr ""
+msgstr "La valeur par défaut est 14 pixels"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:117
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:117
@@ -33575,12 +33574,12 @@ msgstr "Ex: #00ff00 pour vert"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:123
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:123
 msgid "Page link color"
-msgstr ""
+msgstr "Couleur des liens de la page"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:129
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:129
 msgid "Current tab text color"
-msgstr ""
+msgstr "Couleur du texte des onglets"
 
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:130
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:130
@@ -33645,25 +33644,25 @@ msgstr "(%s photos)"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:67
 msgid "Image section"
-msgstr ""
+msgstr "Section Image"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:70
 msgid "Background image"
-msgstr ""
+msgstr "Image de fond"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:76
 msgid "Title color"
-msgstr ""
+msgstr "Couleur de titre"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:82
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:142
 msgid "Text color"
-msgstr ""
+msgstr "Couleur de texte"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:88
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:148
 msgid "Link color"
-msgstr ""
+msgstr "Couleur des liens"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:89
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:149
@@ -33677,11 +33676,11 @@ msgstr "Ex: #0000ff pour bleu"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:94
 msgid "Muted text color"
-msgstr ""
+msgstr "Couleur de texte \"assourdi\""
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:104
 msgid "Front Page Main Area Overlay"
-msgstr ""
+msgstr "Recouvrement de la Zone principale de la Page de garde"
 
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:107
 msgid "Width"
@@ -33782,7 +33781,7 @@ msgstr "Listé sous"
 #: ../../../skins/colourise/single.main.php:113
 #: ../../../skins/evopress/single.main.php:156
 msgid "This entry was posted on"
-msgstr ""
+msgstr "Cette entrée a été postée le"
 
 #: ../../../skins/colourise/single.main.php:121
 #: ../../../skins/evopress/single.main.php:164
@@ -33792,7 +33791,7 @@ msgstr "par"
 #: ../../../skins/colourise/single.main.php:128
 #: ../../../skins/evopress/single.main.php:171
 msgid "This entry was posted by"
-msgstr ""
+msgstr "Cette entrée a été postée par"
 
 #: ../../../skins/colourise/single.main.php:135
 #: ../../../skins/evopress/single.main.php:178
@@ -35518,7 +35517,7 @@ msgstr "Se connecter maintenant..."
 
 #: ../../../skins_fallback_v6/_item_block.inc.php:107
 msgid "posted on"
-msgstr ""
+msgstr "posté le"
 
 #: ../../../skins_fallback_v6/_item_block.inc.php:121
 msgid "in"
