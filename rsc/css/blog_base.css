@@ -308,6 +308,7 @@ textarea.form_textarea_input {
   background-color: #fec;
   padding: 1px;
   margin: 4px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
 }
 .form_footer_notes {
@@ -568,6 +569,8 @@ div.item_location {
   border: 1px solid #BBB;
   background: #D4D4D4;
   padding: 0 5px 5px 5px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
@@ -798,6 +801,8 @@ div.results span[class*=status_] span {
   text-align: center;
   vertical-align: middle;
   border: 1px solid #999;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
   padding: 2px;
@@ -836,12 +841,20 @@ input.btn-lg {
   margin: 0 auto;
 }
 .main_profile_picture {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .other_profile_pictures {
   margin-bottom: 10px;
 }
 .other_profile_pictures img {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .profile_column_left {

@@ -99,6 +99,7 @@ textarea.message_text {
 .comment_form .panel {
   margin: 0;
   border: none;
+  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .comment_form .panel .panel-body {

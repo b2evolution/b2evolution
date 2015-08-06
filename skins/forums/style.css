@@ -257,6 +257,9 @@ div.pageTop a.selected:hover {
 }
 .bForums th{
 	border-top: 3px solid #418aaf;
+	background:-webkit-linear-gradient(top, #03699c, #3a95c2);
+	background:-moz-linear-gradient(top, #03699c, #3a95c2);
+	background:-o-linear-gradient(top, #03699c, #3a95c2);
 	background: -ms-linear-gradient(top, #03699c, #3a95c2);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#03699c', endColorstr='#3a95c2');
 	position: relative;/* To make a border visible in IE */
@@ -305,6 +308,9 @@ td.InResponseTo h3 {
 .bForums tr.top td,
 .sidebar_block .sidebar_title,
 .meta_category th {
+	background:-webkit-linear-gradient(top, #c7d0d7, #e0e5e9);
+	background:-moz-linear-gradient(top, #c7d0d7, #e0e5e9);
+	background:-o-linear-gradient(top, #c7d0d7, #e0e5e9);
 	background: -ms-linear-gradient(top, #c7d0d7, #e0e5e9);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c7d0d7', endColorstr='#e0e5e9');
 	border-bottom: 4px solid #c7d0d7;

@@ -34,6 +34,8 @@ div.innerwrap /* Main white content zone */
 	padding: 5px 0;
 	border: 1px solid #fff; /* needed to force inner paddings */
 	background-color:#fff;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
 	-khtml-border-radius: 8px;
 	border-radius: 8px;
 }
@@ -216,6 +218,7 @@ h3.bTitle a {
 div.bComment, form.bComment {
 	background-color: #F5EBF3;
 	border: 1px solid #D79ADC;
+	-moz-border-radius: 7px;
 	border-radius: 7px;
 	margin-bottom: 12px;
 }
@@ -387,6 +390,7 @@ div.token-input-dropdown-facebook {
 }
 
 .messages_list form.bComment {
+	-moz-border-radius: 0;
 	border-radius: 0;
 }
 

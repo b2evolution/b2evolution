@@ -70,6 +70,8 @@ kbd {
 	background: #f7f7f7;
 	color: #333;
 	font: 11px 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	-moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
+	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
 	box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
 	text-shadow: 0 1px 0 #fff;
 	line-height: 1.4;
