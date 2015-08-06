@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-08-02 19:29+0200\n"
+"POT-Creation-Date: 2015-08-06 20:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,7 +63,7 @@ msgstr ""
 
 #. TRANS: Delete
 #: ../../../conf/_icons.php:88 ../conf/_icons.php:475
-#: ../../../inc/messaging/model/_messaging.funcs.php:2008
+#: ../../../inc/messaging/model/_messaging.funcs.php:2029
 #: ../../../inc/messaging/views/_message_list.view.php:239
 msgid "Del"
 msgstr ""
@@ -74,10 +74,10 @@ msgstr ""
 #: ../../../inc/files/views/_file_duplicates.view.php:149
 #: ../../../inc/files/views/_file_list.inc.php:440 ../inc/items/items.ctrl.php:1538
 #: ../../../inc/links/model/_link.funcs.php:285
-#: ../../../inc/messaging/model/_messaging.funcs.php:2181
-#: ../../../inc/messaging/model/_messaging.funcs.php:2186
-#: ../../../inc/messaging/model/_messaging.funcs.php:2350
-#: ../../../inc/messaging/model/_messaging.funcs.php:2357
+#: ../../../inc/messaging/model/_messaging.funcs.php:2210
+#: ../../../inc/messaging/model/_messaging.funcs.php:2215
+#: ../../../inc/messaging/model/_messaging.funcs.php:2379
+#: ../../../inc/messaging/model/_messaging.funcs.php:2386
 #: ../../../inc/users/model/_user.funcs.php:2352
 #: ../../../inc/users/views/_user_avatar.form.php:223
 #: ../../../skins_fallback_v5/_user.disp.php:263
@@ -223,7 +223,7 @@ msgstr ""
 #: ../../../inc/messaging/contacts.ctrl.php:124
 #: ../../../inc/messaging/model/_messaging.funcs.php:367
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:21
-#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:257
+#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:262
 msgid "Contacts"
 msgstr ""
 
@@ -1884,7 +1884,7 @@ msgstr ""
 #: ../../../inc/users/model/_user.funcs.php:1342
 #: ../../../inc/users/model/_user.funcs.php:1347
 #: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:20
-#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:244
+#: ../../../inc/widgets/widgets/_msg_menu_link.widget.php:249
 msgid "Messages"
 msgstr ""
 
@@ -6437,7 +6437,7 @@ msgstr ""
 #: ../../../inc/comments/model/_comment.funcs.php:1089
 #: ../../../inc/items/model/_item.funcs.php:3585
 #: ../../../inc/items/model/_item.funcs.php:3685
-#: ../../../inc/messaging/model/_messaging.funcs.php:1902
+#: ../../../inc/messaging/model/_messaging.funcs.php:1907
 msgid "Delete all"
 msgstr ""
 
@@ -7978,6 +7978,7 @@ msgid "Profile picture size"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_other.form.php:69
+#: ../../../inc/messaging/model/_messaging.funcs.php:1939
 msgid "Messaging"
 msgstr ""
 
@@ -16735,25 +16736,25 @@ msgstr ""
 msgid "User has not sent any private messages"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1902
+#: ../../../inc/messaging/model/_messaging.funcs.php:1907
 #, php-format
 msgid "Delete all private messages sent by %s"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1936
+#: ../../../inc/messaging/model/_messaging.funcs.php:1940
 #, php-format
 msgid "User has sent %s private messages"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1965
+#: ../../../inc/messaging/model/_messaging.funcs.php:1986
 msgid "Between"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1965
+#: ../../../inc/messaging/model/_messaging.funcs.php:1986
 msgid "With"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1975
+#: ../../../inc/messaging/model/_messaging.funcs.php:1996
 #: ../../../inc/messaging/views/_thread.form.php:97
 #: ../../../inc/tools/views/_email_sent.view.php:149
 #: ../../../inc/tools/views/_email_sent_details.view.php:44
@@ -16763,26 +16764,30 @@ msgstr ""
 msgid "Subject"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1986
+#: ../../../inc/messaging/model/_messaging.funcs.php:2007
 msgid "Last msg"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:1996
+#: ../../../inc/messaging/model/_messaging.funcs.php:2017
 #: ../../../inc/messaging/views/_message_list.view.php:227
 #: ../../../inc/messaging/views/_thread.form.php:301
 msgid "Read?"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2075
+#: ../../../inc/messaging/model/_messaging.funcs.php:2073
+msgid "Deleted user(s)"
+msgstr ""
+
+#: ../../../inc/messaging/model/_messaging.funcs.php:2104
 msgid "Conversation left"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2078
-#: ../../../inc/messaging/model/_messaging.funcs.php:2083
+#: ../../../inc/messaging/model/_messaging.funcs.php:2107
+#: ../../../inc/messaging/model/_messaging.funcs.php:2112
 msgid "You have unread messages"
 msgstr ""
 
-#: ../../../inc/messaging/model/_messaging.funcs.php:2097
+#: ../../../inc/messaging/model/_messaging.funcs.php:2126
 msgid "Show messages..."
 msgstr ""
 
