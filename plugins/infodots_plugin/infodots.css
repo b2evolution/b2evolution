@@ -21,8 +21,6 @@
 	background: #F00;
 	padding: 5px; /* Invisible active area around dot */
 	background-clip: content-box; /* To make additional area(padding) invisible */
-	-webkit-border-radius: 50%;
-	-moz-border-radius: 50%;
 	border-radius: 50%;
 	border: 1px solid transparent; /* Fix for IE to correct working of border-radius */
 }
@@ -34,25 +32,20 @@
 	left: -20px;
 	width: 30px;
 	height: 30px;
-	-webkit-border-radius: 50%;
-	-moz-border-radius: 50%;
 	border-radius: 50%;
 	border: 5px solid #F00;
 	opacity: 0;
 	-webkit-animation: sonar_effect 2s ease-in-out infinite;
-	-moz-animation: sonar_effect 2s ease-in-out infinite;
 	animation: sonar_effect 2s ease-in-out infinite;
 }
 @-webkit-keyframes sonar_effect { 0% { -webkit-transform: scale(.1); opacity: .6; } 100% { opacity: 0; -webkit-transform: scale(1); } }
-@-moz-keyframes sonar_effect { 0% { -moz-transform: scale(.1); opacity: .6; } 100% { opacity: 0; -moz-transform: scale(1); } }
-@keyframes sonar_effect { 0% { transform: scale(.1); opacity: .6; } 100% { opacity: 0; transform: scale(1); } }
+@keyframes sonar_effect { 0% { -webkit-transform: scale(.1); transform: scale(.1); opacity: .6; } 100% { opacity: 0; -webkit-transform: scale(1); transform: scale(1); } }
 
 .infodots_image .infodots_dot.hovered:after, .infodots_image .infodots_dot:hover:after {
 	background-color: #936760;
 }
 .infodots_image .infodots_dot.hovered:before, .infodots_image .infodots_dot:hover:before {
 	-webkit-animation: none;
-	-moz-animation: none;
 	animation: none;
 }
 .infodots_info {

@@ -588,13 +588,9 @@ span.roundbutton {
   -khtml-border-radius: 4px;
   background: #bababa;
   /* Safari 4-5, Chrome 1-9 */
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#bababa), to(#f5f5f5));
   /* Safari 5.1, Chrome 10+ */
-  background: -webkit-linear-gradient(top, #f5f5f5, #bababa);
   /* Firefox 3.6+ */
-  background: -moz-linear-gradient(center 1%, #f5f5f5, #bababa);
   /* IE 10 */
-  background: -ms-linear-gradient(top, #f5f5f5, #bababa);
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #f5f5f5, #bababa);
   /* IE 8 */
@@ -610,13 +606,9 @@ a.roundbutton_text:hover {
   color: inherit;
   background: #d2d2d2;
   /* Safari 4-5, Chrome 1-9 */
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d2d2d2), to(#a0a0a0));
   /* Safari 5.1, Chrome 10+ */
-  background: -webkit-linear-gradient(top, #a0a0a0, #d2d2d2);
   /* Firefox 3.6+ */
-  background: -moz-linear-gradient(center 1%, #a0a0a0, #d2d2d2);
   /* IE 10 */
-  background: -ms-linear-gradient(top, #a0a0a0, #d2d2d2);
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #a0a0a0, #d2d2d2);
   /* IE 8 */
@@ -628,13 +620,9 @@ span.roundbutton {
   cursor: default;
   background: #989898;
   /* Safari 4-5, Chrome 1-9 */
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#989898), to(#6b6b6b));
   /* Safari 5.1, Chrome 10+ */
-  background: -webkit-linear-gradient(top, #6b6b6b, #989898);
   /* Firefox 3.6+ */
-  background: -moz-linear-gradient(center 1%, #6b6b6b, #989898);
   /* IE 10 */
-  background: -ms-linear-gradient(top, #6b6b6b, #989898);
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #6b6b6b, #989898);
   /* IE 8 */
@@ -647,13 +635,9 @@ span.roundbutton_green:hover {
   cursor: default;
   background: #09f197;
   /* Safari 4-5, Chrome 1-9 */
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#09f197), to(#00b46e));
   /* Safari 5.1, Chrome 10+ */
-  background: -webkit-linear-gradient(top, #00b46e, #09f197);
   /* Firefox 3.6+ */
-  background: -moz-linear-gradient(center 1%, #00b46e, #09f197);
   /* IE 10 */
-  background: -ms-linear-gradient(top, #00b46e, #09f197);
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #00b46e, #09f197);
   /* IE 8 */
@@ -666,13 +650,9 @@ span.roundbutton_red:hover {
   cursor: default;
   background: #fa7171;
   /* Safari 4-5, Chrome 1-9 */
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fa7171), to(#e62020));
   /* Safari 5.1, Chrome 10+ */
-  background: -webkit-linear-gradient(top, #e62020, #fa7171);
   /* Firefox 3.6+ */
-  background: -moz-linear-gradient(center 1%, #e62020, #fa7171);
   /* IE 10 */
-  background: -ms-linear-gradient(top, #e62020, #fa7171);
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #e62020, #fa7171);
   /* IE 8 */
@@ -763,8 +743,6 @@ a.roundbutton_text_noicon span {
   background-size: 30px 30px;
   background-repeat: repeat-x;
   background-position: 0;
-  background-image: -moz-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
-  background-image: -o-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
 }
 .roundbutton.rbtn_black:before,
@@ -1063,8 +1041,6 @@ div#evo_toolbar .actions_right {
   width: 25ex;
   border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
-  -webkit-transition: opacity 0.2s ease-in-out;
-  -o-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out;
 }
 .evobar-menu ul li {
@@ -1128,8 +1104,6 @@ div#evo_toolbar .actions_right {
   display: inline-block;
   position: relative;
   background-color: #d2d2d2;
-  -webkit-transition: background-color 0.15s ease-out;
-  -o-transition: background-color 0.15s ease-out;
   transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
@@ -1144,8 +1118,6 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a:hover {
   background-color: #bfbfbf;
-  -webkit-transition: none;
-  -o-transition: none;
   transition: none;
   text-decoration: none;
 }
@@ -1399,8 +1371,6 @@ body {
 }
 a[rel~=nofollow]:hover {
   background: #f8e0e0;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
 }
@@ -1487,8 +1457,6 @@ a.selected {
   border: 1px solid #CCC;
   padding: 2px;
   display: inline-block;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
   text-align: center;
@@ -1513,8 +1481,6 @@ a.selected {
   background: #FFF;
   border: 1px solid #CCC;
   padding: 2px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
   display: table;
@@ -1753,9 +1719,7 @@ label.radiooption {
   height: 30px;
   background-color: #EEEEEE;
   cursor: pointer;
-  -moz-border-radius: 3px;
   -khtml-border-radius: 3px;
-  -webkit-border-radius: 3px;
   border-radius: 3px;
 }
 .linkbutton:hover {
@@ -1936,14 +1900,14 @@ table.widget_grid .note {
 }
 .widget_flow_blocks,
 table.widget_grid {
-  display: -webkit-box;
-  display: -moz-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  flex-flow: row wrap;
+  -ms-flex-flow: row wrap;
+      flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  justify-content: space-around;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
   -webkit-justify-content: space-around;
 }
 .widget_flow_blocks div,
@@ -2373,7 +2337,6 @@ textarea.form_textarea_input {
   background-color: #fec;
   padding: 1px;
   margin: 4px;
-  -moz-border-radius: 3px;
   border-radius: 3px;
 }
 .form_footer_notes {
@@ -2634,8 +2597,6 @@ div.item_location {
   border: 1px solid #BBB;
   background: #D4D4D4;
   padding: 0 5px 5px 5px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
@@ -2866,8 +2827,6 @@ div.results span[class*=status_] span {
   text-align: center;
   vertical-align: middle;
   border: 1px solid #999;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
   padding: 2px;
@@ -2906,20 +2865,12 @@ input.btn-lg {
   margin: 0 auto;
 }
 .main_profile_picture {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .other_profile_pictures {
   margin-bottom: 10px;
 }
 .other_profile_pictures img {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .profile_column_left {

@@ -347,12 +347,21 @@ module.exports = function(grunt) {
 				files: ['readme.md','readme.template.html','skins_adm/conf_error.main.md','skins_adm/conf_error.main.template.php'],
 				tasks: ['markdown']
 			}
-		}
+		},
 
+		autoprefixer: {
+			options: {
+				browsers: ['last 2 versions']
+			},
+			dist: {
+				src: ['rsc/**/*.css','skins/**/*.css','skins_adm/**/*.css','plugins/**/*.css']
+			}
+		},
 
 	});
 
 	// Load the plugin that provides the tasks ( "uglify", "less", "sass", etc. ):
+	grunt.loadNpmTasks('grunt-autoprefixer');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-less');
@@ -362,6 +371,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify','markdown','autoprefixer']);
 
 };

@@ -13,8 +13,6 @@
 }
 .header .header_top {
   background-color: #242D36;
-  background-image: -webkit-linear-gradient(#1E252D, #2B3540);
-  background-image: -moz-linear-gradient(#1E252D, #2B3540);
   background-image: linear-gradient(#1E252D, #2B3540);
   height: 36px;
   line-height: 36px;
@@ -23,8 +21,6 @@
 }
 .header .header_bottom {
   background-color: #3C597F;
-  background-image: -webkit-linear-gradient(#50739B, #283F63);
-  background-image: -moz-linear-gradient(#50739B, #283F63);
   background-image: linear-gradient(#50739B, #283F63);
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5D8CB7 inset;
   text-align: center;
@@ -69,8 +65,6 @@
 .header .widget_core_coll_search_form form .search_field {
   outline: none;
   background-color: #EAECF1;
-  background-image: -webkit-linear-gradient(#FFFFFF, #D5D9E3);
-  background-image: -moz-linear-gradient(#FFFFFF, #D5D9E3);
   background-image: linear-gradient(#FFFFFF, #D5D9E3);
   border: medium none;
   border-radius: 5px;
@@ -208,8 +202,6 @@ body.tablet_device div.pageHeader.site_skins {
     padding: 0 10px;
   }
 }
-
-/*# sourceMappingURL=pureforums_header.css.map */
 
 body {
   background: #FFF;
@@ -398,8 +390,6 @@ form#user_checkchanges.bComment {
 .messages_list > h2 {
   padding: 12px 20px;
   background-color: #ECEDF3;
-  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
-  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
   background-image: linear-gradient(#F1F2F6, #E7E9F0);
   color: #535C66;
   font-size: 14px;
@@ -514,17 +504,9 @@ body.round_avatars .forums_table .ft_author_avatar img {
   padding: 8px 25px 8px 20px;
   color: #535c66;
   font-weight: normal;
-  -moz-border-radius-topleft: 5px;
-  -webkit-border-top-left-radius: 5px;
   border-top-left-radius: 5px;
-  -moz-border-radius-topright: 5px;
-  -webkit-border-top-right-radius: 5px;
   border-top-right-radius: 5px;
-  -webkit-box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.1);
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.1);
-  background-image: -webkit-linear-gradient(bottom, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
-  background-image: -moz-linear-gradient(bottom, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
   background-image: linear-gradient(to top, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
 }
 
@@ -548,12 +530,8 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .topics_table tr.panel td, .topics_table tr.panel:hover td,
 .forums_table th.fieldset {
-  background-image: -webkit-linear-gradient(#f5f6fa, #e6e7f0);
-  background-image: -moz-linear-gradient(#f5f6fa, #e6e7f0);
   background-image: linear-gradient(#f5f6fa, #e6e7f0);
   background-color: #edeef5;
-  -webkit-box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
-  -moz-box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
   margin: 0;
   padding: 12px 25px;
@@ -592,8 +570,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation a, .navigation .current_page {
-  background-image: -webkit-linear-gradient(#d4d9e1, #bec4d1);
-  background-image: -moz-linear-gradient(#d4d9e1, #bec4d1);
   background-image: linear-gradient(#d4d9e1, #bec4d1);
   background-color: #c9ced9;
   text-align: center;
@@ -623,8 +599,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation a.prev, .navigation a.next {
-  background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
-  background-image: -moz-linear-gradient(#9fa3ac, #787d88);
   background-image: linear-gradient(#9fa3ac, #787d88);
   background-color: #8b909a;
   border: 1px solid #DDD;
@@ -634,8 +608,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation .current_page {
-  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
   color: #FFF;
 }
@@ -646,11 +618,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .ft_search .search_field {
   border-radius: 3px;
-  -webkit-transition: box-shadow 150ms ease;
-  -moz-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
-  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   padding: 6px 7px;
   border: 1px solid #999;
@@ -670,8 +638,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   height: 31px;
   line-height: 31px;
-  background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
-  background-image: -moz-linear-gradient(#9fa3ac, #787d88);
   background-image: linear-gradient(#9fa3ac, #787d88);
   background-color: #8b909a;
   position: relative;
@@ -680,8 +646,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .ft_search .search_submit:hover {
-  background-image: -webkit-linear-gradient(#787d88, #9fa3ac);
-  background-image: -moz-linear-gradient(#787d88, #9fa3ac);
   background-image: linear-gradient(#787d88, #9fa3ac);
   background-color: #8b909a;
 }
@@ -794,8 +758,6 @@ ul.legend span.note {
   display: inline-block;
   padding: 0 12px;
   background-color: #A3ACBE;
-  background-image: -webkit-linear-gradient(#B5BDCB, #929BB1);
-  background-image: -moz-linear-gradient(#B5BDCB, #929BB1);
   background-image: linear-gradient(#B5BDCB, #929BB1);
   border: 1px solid #000;
   border-color: transparent rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
@@ -813,8 +775,6 @@ ul.legend span.note {
 
 .breadcrumbs a:last-child {
   background-color: #848C9D;
-  background-image: -webkit-linear-gradient(#98A0AF, #70788C);
-  background-image: -moz-linear-gradient(#98A0AF, #70788C);
   background-image: linear-gradient(#98A0AF, #70788C);
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
@@ -828,21 +788,11 @@ ul.legend span.note {
   right: -8px;
   top: 50%;
   width: 20px;
-  background-image: -webkit-linear-gradient(45deg, #98A0AF, #70788C);
-  background-image: -moz-linear-gradient(45deg, #98A0AF, #70788C);
   background-image: linear-gradient(45deg, #98A0AF, #70788C);
   -webkit-transform: rotate(135deg) skew(-10deg, -10deg);
-  -moz-transform: rotate(135deg) skew(-10deg, -10deg);
-  -ms-transform: rotate(135deg) skew(-10deg, -10deg);
   transform: rotate(135deg) skew(-10deg, -10deg);
-  -moz-border-radius-topright: 6px;
-  -webkit-border-top-right-radius: 6px;
   border-top-right-radius: 6px;
-  -moz-border-radius-bottomleft: 6px;
-  -webkit-border-bottom-left-radius: 6px;
   border-bottom-left-radius: 6px;
-  -webkit-box-shadow: inset 1px 1px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: inset 1px 1px rgba(0, 0, 0, 0.2);
   box-shadow: inset 1px 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -940,8 +890,6 @@ div.results div.filters {
 }
 
 #edit_group_contacts {
-  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
-  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
   background-image: linear-gradient(#F1F2F6, #E7E9F0);
   border: none;
   padding: 10px;
@@ -1042,8 +990,6 @@ div.results div.filters {
   }
 }
 
-/*# sourceMappingURL=pureforums_main.css.map */
-
 #footer {
   text-align: right;
   color: #A1A9B7;
@@ -1051,5 +997,3 @@ div.results div.filters {
   font-weight: bold;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
-
-/*# sourceMappingURL=pureforums_footer.css.map */

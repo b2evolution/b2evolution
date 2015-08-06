@@ -306,9 +306,7 @@ input.form_text_input,
 input.form_date_input,
 input.SearchField {
 	border: 1px solid #9db0bc;
-	padding: 2px
-	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
-	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
+	padding: 2px;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	max-width: 100%;
 }
@@ -1059,8 +1057,6 @@ div.edit_area textarea,
 textarea.bComment.form_textarea_input {
 	width: 100%;
 	margin: 0 auto;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
 div.edit_actions {
@@ -1207,8 +1203,6 @@ div.input ul.token-input-list-facebook {
 	width: 97%;
 	border: 1px solid #9db0bc;
 	padding: 2px 4px 0;
-	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
-	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 }
 div#ffield_item_tags ul.token-input-list-facebook {

@@ -22,8 +22,6 @@
 	color: #fff;
 	font-weight: bold;
 	border-style: dashed;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	box-sizing: border-box;
 }
@@ -38,8 +36,6 @@
 .qq-upload-drop-area {
 	position:absolute; top:0; left:0; width:100%; height:55px; padding: 7px 0; min-height: 35px; z-index:2;
 	text-align:center;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	box-sizing: border-box;
 }
