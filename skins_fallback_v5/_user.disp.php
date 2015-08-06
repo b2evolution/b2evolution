@@ -275,7 +275,7 @@ echo '<div class="profile_column_left">';
 		{
 			if( is_array( $button ) )
 			{ // The grouped buttons
-				echo '<p'.( count( $button ) > 1 ? ' class="btn-group' : '' ).'">'.implode( "\n", $button ).'</p>';
+				echo '<p'.( count( $button ) > 1 ? ' class="btn-group' : '' ).'">'.implode( '', $button ).'</p>';
 			}
 			else
 			{ // Single button
@@ -303,8 +303,8 @@ echo '<div class="profile_column_left">';
 			}
 		}
 		echo '<hr class="profile_separator" />'."\n";
-		echo '<p><b>'.T_('Organizations').':</b>';
-		echo '<ul><li>'.implode( '</li><li>', $org_names ).'</li></ul>';
+		echo '<p><b>'.T_('Organizations').':</b></p>';
+		echo '<p>'.implode( ' &middot; ', $org_names ).'</p>';
 	}
 
 	echo '</p>';

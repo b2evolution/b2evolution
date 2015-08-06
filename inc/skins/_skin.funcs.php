@@ -2010,7 +2010,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	}
 	else
 	{	// We may wrap with a <div>:
-		$display_includes = $Session->get( 'display_includes_'.$Blog->ID ) == 1;
+		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:

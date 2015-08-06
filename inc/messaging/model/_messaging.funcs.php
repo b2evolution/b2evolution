@@ -1883,6 +1883,11 @@ function threads_results_block( $params = array() )
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
 
+	$results_params = $AdminUI->get_template( 'Results' );
+	$display_params = array(
+		'before' => str_replace( '>', ' style="margin-top:25px" id="threads_result">', $results_params['before'] ),
+		'after'  => $results_params['after'],
+	);
 
 	// Check permission:
 	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
@@ -1920,10 +1925,6 @@ function threads_results_block( $params = array() )
 			$threads_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
 		}
 
-		$results_params = $AdminUI->get_template( 'Results' );
-		$display_params = array(
-			'before' => str_replace( '>', ' style="margin-top:25px" id="threads_result">', $results_params['before'] ),
-		);
 		$threads_Results->display( $display_params );
 
 		if( !is_ajax_content() )
@@ -1932,8 +1933,28 @@ function threads_results_block( $params = array() )
 		}
 	}
 	else
-	{	// No permission for abuse management
-		echo '<div style="margin-top:25px;font-weight:bold">'.sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) ).'</div>';
+	{ // No permission for abuse management
+		$Table = new Table();
+
+		$Table->title = T_('Messaging');
+		$Table->no_results_text = sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) );
+
+		$Table->display_init();
+		$Table->total_pages = 0;
+
+		echo $display_params['before'];
+
+		$Table->display_head();
+
+		echo $Table->params['content_start'];
+
+		$Table->display_list_start();
+
+		$Table->display_list_end();
+
+		echo $Table->params['content_end'];
+
+		echo $display_params['after'];
 	}
 }
 
@@ -2044,6 +2065,14 @@ function col_thread_recipients( $thread_ID, $abuse_management )
 	$recipients = $DB->get_col( $SQL->get() );
 
 	$image_size = isset( $Blog ) ? $Blog->get_setting( 'image_size_messaging' ) : 'crop-top-32x32';
+
+	if( empty( $recipients ) )
+	{ // There are no recipients in this list. This is only possible if the recipients were deleted as spammer
+		return '<span class="nowrap">'
+			 .get_avatar_imgtag_default( $image_size, 'avatar_before_login_middle mb1' )
+			 .'<span class="user deleted">'.T_( 'Deleted user(s)' ).'</span>'
+			 .'</span>';
+	}
 
 	return get_avatar_imgtags( $recipients, true, true, $image_size, 'avatar_before_login_middle mb1', '', NULL, true, '<br />', true );
 }
@@ -2352,7 +2381,7 @@ function col_msg_actions( $thrd_ID, $msg_ID )
 	else
 	{
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete';
+		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}

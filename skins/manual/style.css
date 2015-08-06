@@ -477,6 +477,9 @@ ul.posts_list {
 ul.chapters_list ul {
 	padding: 0;
 }
+ul.chapters_list > ul ul {
+	margin: 0 0 0 20px;
+}
 ul.chapters_list li,
 ul.posts_list li {
 	padding: 5px 0;

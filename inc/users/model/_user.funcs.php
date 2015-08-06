@@ -350,27 +350,25 @@ function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 
 	if( $use_admin_page_url )
 	{ // Use backoffice form of notifications form
-		$notifications_url = $admin_url.'?ctrl=user'.$glue.'user_tab=subs#subs';
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=subs#subs';
 	}
 	else
-	{ // Use in-skin form of notifications form
+	{ // Use in-skin form of notifications form:
 		if( empty( $Blog ) )
-		{ // If no current blog, try to use a default blog
+		{ // If no current blog, try to use a default blog:
 			$url_Blog = & get_setting_Blog( 'default_blog_ID' );
 			if( empty( $url_Blog ) )
-			{ // No default blog, Use base url
+			{ // No default blog, Use base url:
 				global $baseurl;
-				$notifications_url = url_add_param( $baseurl, 'disp=subs#subs' );
+				return url_add_param( $baseurl, 'disp=subs#subs' );
 			}
 		}
 		else
-		{ // Use current blog
+		{ // Use current blog:
 			$url_Blog = & $Blog;
 		}
-		$notifications_url = $url_Blog->get( 'subsurl', array( 'glue' => $glue ) );
+		return $url_Blog->get( 'subsurl', array( 'glue' => $glue ) );
 	}
-
-	return $notifications_url;
 }
 
 
@@ -540,7 +538,7 @@ function check_setting( $setting_name )
 {
 	global $Settings, $Blog;
 
-	if( is_admin_page() || ! isset( $Blog ) )
+	if( is_admin_page() || empty( $Blog ) )
 	{ // Check setting in the Back office or when Blog is not defined
 		if( $Settings->get( $setting_name ) )
 		{ // Set TRUE if the setting is ON

@@ -896,11 +896,19 @@ input.btn-lg {
 	max-width: 300px;
 	margin: 0 auto;
 }
+.profile_separator {
+	border: none;
+	border-top: 1px solid #000;
+}
 .profile_buttons {
 	a.btn {
 		display: inline-block;
 		button {
 			width: 100%;
+			background: none;
+			border: none;
+			padding: 0;
+			color: inherit;
 		}
 	}
 	.btn, .btn-group {
@@ -909,7 +917,10 @@ input.btn-lg {
 	.btn-group {
 		white-space: nowrap;
 		.btn {
-			width: 50%;
+			width: 49.5%;
+			&:first-child {
+				margin-right: 1%;
+			}
 		}
 	}
 }

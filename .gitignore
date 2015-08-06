@@ -2,3 +2,9 @@
 _cache/c*
 conf/_basic_config.php
 _evocache
+node_modules
+conf/_overrides_TEST.php
+.sass-cache
+_transifex/files.txt
+_transifex/messages.pot.bak
+_transifex/translations

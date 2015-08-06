@@ -64,7 +64,7 @@ $Form->begin_fieldset( T_('Params') );
 
 			if( ! $Blog->get_setting( 'cache_enabled_widgets' ) )
 			{ // Widget/block cache is disabled by blog setting
-				$l_meta['allow_blockcache']['note'] = sprintf( T_('This widget could be cached but the block cache is OFF. Click to <a %s>here</a> enable.'),
+				$l_meta['allow_blockcache']['note'] = sprintf( T_('This widget could be cached but the block cache is OFF. Click <a %s>here</a> to enable.'),
 						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching"' );
 				$l_meta['disabled'] = 'disabled';
 			}

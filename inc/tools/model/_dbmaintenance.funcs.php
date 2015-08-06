@@ -55,19 +55,25 @@ function dbm_delete_messageprecache()
 
 /**
  * Clear full page cache (/cache directory)
+ *
+ * @param boolean Display messages
  */
-function dbm_delete_pagecache()
+function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
-	// Clear general cache directory
-	if( cleardir_r( $cache_path.'general' ) )
-	{
-		$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
-	}
-	else
-	{
-		$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+	// Clear general cache directory:
+	$result = cleardir_r( $cache_path.'general' );
+	if( $display_details )
+	{ // Display message only when it is required:
+		if( $result )
+		{
+			$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
+		}
+		else
+		{
+			$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+		}
 	}
 
 	$SQL = 'SELECT blog_ID FROM T_blogs
@@ -79,21 +85,25 @@ function dbm_delete_pagecache()
 	if( $blog_array = $DB->get_col( $SQL ) )
 	{
 		foreach( $blog_array as $l_blog )
-		{	// Clear blog cache
-			if( cleardir_r( $cache_path.'c'.$l_blog ) )
-			{
-				$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
-			}
-			else
-			{
-				$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+		{ // Clear blog cache:
+			$result = cleardir_r( $cache_path.'c'.$l_blog );
+			if( $display_details )
+			{ // Display message only when it is required:
+				if( $result )
+				{
+					$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+				}
 			}
 			// Create .htaccess file with deny rules
 			create_htaccess_deny( $cache_path );
 		}
 	}
 
-	$Messages->add( T_('Page cache deleted.'), 'success' );
+	$Messages->add( T_('Page caches deleted.'), 'success' );
 }
 
 

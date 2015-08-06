@@ -268,6 +268,11 @@ if( $is_recipient )
 	{ // Current user is still part of this conversation, should be able to reply
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
+		if( ! is_admin_page() )
+		{ // Add hidden blog ID to correctly redirect after message posting:
+			$Form->hidden( 'blog', $Blog->ID );
+		}
+
 		$Form->switch_template_parts( $params['skin_form_params'] );
 
 		$Form->begin_form( $params['form_class_msg'], '' );
@@ -314,7 +319,7 @@ if( $is_recipient )
 			}
 
 		$Form->end_form( array(
-				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton' ),
+				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
 	}

@@ -47,7 +47,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 		$Form->info_field( T_('Perform tests'),
 					'<a href="'.$url.'test_1">['.T_('server connection').']</a>&nbsp;&nbsp;'.
 					'<a href="'.$url.'test_2">['.T_('get one returned email').']</a>&nbsp;&nbsp;'.
-					'<a href="'.$url.'test_3">['.T_('Copy/Paste an error message').']</a>' );
+					'<a href="'.$url.'test_3">['.T_('Paste an error message/returned email').']</a>' );
 
 		if( $action == 'test_3' )
 		{ // Display a textarea to fill a sample error message
