@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-08-06 20:45+0200\n"
+"POT-Creation-Date: 2015-08-06 21:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15698,6 +15698,7 @@ msgstr ""
 
 #: ../../../inc/locales/model/_translation.funcs.php:254
 #: ../../../inc/locales/model/_translation.funcs.php:323
+#: ../../../plugins/geoip_plugin/_geoip.plugin.php:603
 #, php-format
 msgid "The file %s cannot be written to disk. Please check the filesystem permissions."
 msgstr ""
@@ -15981,7 +15982,7 @@ msgstr ""
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:296
 #, php-format
-msgid "Unable to unpack &laquo;%s&raquo; ZIP archive."
+msgid "Unable to decompress &laquo;%s&raquo; ZIP archive."
 msgstr ""
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:297
@@ -30222,12 +30223,12 @@ msgid "Downloading GeoIP.dat file from the url: %s ..."
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:551
-msgid "The url is not avaialble, please check it, probably it is old url of GeoIP.dat file."
+msgid "The URL is not available. It may correspond to an old version of the GeoIP.dat file."
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:564
 #, php-format
-msgid "Plugin folder %s must be writable to put the downloading GeoIP.dat. Please set the write rights and try it again."
+msgid "Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again."
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:574
@@ -30250,12 +30251,7 @@ msgid "There is no 'zip' or 'zlib' extension installed!"
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:597
-msgid "Could not open the package file!"
-msgstr ""
-
-#: ../../../plugins/geoip_plugin/_geoip.plugin.php:603
-#, php-format
-msgid "Could not open the file %s to save the extracting file, please check the rights."
+msgid "Could not open the source file!"
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:623
@@ -30265,7 +30261,7 @@ msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:630
 #, php-format
-msgid "Impossible to remove file %s. You can do it manually."
+msgid "Impossible to remove the file %s. You can do it manually."
 msgstr ""
 
 #: ../../../plugins/geoip_plugin/_geoip.plugin.php:634

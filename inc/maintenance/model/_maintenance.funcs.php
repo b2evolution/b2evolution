@@ -293,7 +293,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 				$src_file_name = $src_file;
 			}
 			echo '<p style="color:red">'
-				.sprintf( T_( 'Unable to unpack &laquo;%s&raquo; ZIP archive.' ), $src_file_name ).'<br />'
+				.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name ).'<br />'
 				.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) )
 				.'</p>';
 			evo_flush();
@@ -303,7 +303,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 	}
 	else
 	{
-		debug_die( 'There is no \'zip\' or \'zlib\' extension installed!' );
+		debug_die( 'Unable to decompress the file because there is no \'zip\' or \'zlib\' extension installed in your PHP!' );
 	}
 
 	return true;
