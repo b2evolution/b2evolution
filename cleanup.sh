@@ -5,5 +5,6 @@ rm -f Gruntfile.js
 rm -f package.json
 rm -f readme.md
 rm -f readme.template.html
+rm -f .bower.json
 echo Removing myself now
 rm -f cleanup.sh
