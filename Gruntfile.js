@@ -335,10 +335,10 @@ module.exports = function(grunt) {
 					nospawn: true,
 				}
 			},
-			concat_cssmin: {
+			concat_autoprefixer_cssmin: {
 				// Which files to watch (all .css files recursively in the whole blogs directory)
-				files: ['**/*.css'],
-				tasks: ['concat','cssmin'],
+				files: ['**/*.css','**/*.less'],
+				tasks: ['concat','autoprefixer','cssmin'],
 				options: {
 					nospawn: true,
 				}
@@ -371,6 +371,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify','markdown','autoprefixer']);
+	grunt.registerTask('default', ['less','sass','concat','autoprefixer','cssmin','uglify','markdown']);
 
 };
