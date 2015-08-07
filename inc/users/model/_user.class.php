@@ -3072,9 +3072,11 @@ class User extends DataObject
 	/**
 	 * Get messaging possibilities between current user and this user
 	 *
+	 * @param object Current User
+	 * @param string What level to check: 'PM', 'email'
 	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
-	function get_msgform_possibility( $current_User = NULL )
+	function get_msgform_possibility( $current_User = NULL, $check_level = 'PM' )
 	{
 		global $DB;
 
@@ -3108,7 +3110,7 @@ class User extends DataObject
 			{ // Contat to this user is not enabled
 				return NULL;
 			}
-			if( $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
+			if( $check_level == 'PM' && $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
 			{ // both user has permission to send or receive private message and not the same user
 				// check if current_User is allowed to create a new conversation with this user.
 				$blocked_contact = check_blocked_contacts( array( $this->ID ) );

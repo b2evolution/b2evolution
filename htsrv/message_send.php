@@ -104,8 +104,8 @@ if( ! empty( $recipient_id ) )
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
-	$allow_msgform = $recipient_User->get_msgform_possibility();
-	if( ! $allow_msgform )
+	$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
+	if( $allow_msgform != 'email' )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
 	}
@@ -122,8 +122,8 @@ elseif( ! empty( $comment_id ) )
 
 	if( $recipient_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		$allow_msgform = $recipient_User->get_msgform_possibility();
-		if( ! $allow_msgform )
+		$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
+		if( $allow_msgform != 'email' )
 		{ // should be prevented by UI
 			debug_die( 'Invalid recipient!' );
 		}
@@ -248,7 +248,7 @@ if( empty( $redirect_to ) && empty( $Blog ) )
 if( $success_message )
 {
 	// Never say to whom we sent the email -- prevent user enumeration.
-	$Messages->add( T_('Your message has been sent.'), 'success' );
+	$Messages->add( T_('Your message has been sent by email.'), 'success' );
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
