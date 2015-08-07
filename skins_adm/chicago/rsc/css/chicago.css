@@ -306,7 +306,7 @@ input.form_text_input,
 input.form_date_input,
 input.SearchField {
 	border: 1px solid #9db0bc;
-	padding: 2px
+	padding: 2px;
 	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
