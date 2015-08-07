@@ -1,5 +1,3 @@
-/* Designed by Asevo - http://asevo.com */
-
 /*
  * Main page construct:
  */
@@ -34,15 +32,15 @@ div.inner_wrapper
 	padding: 1px;
 }
 
-.evo_main_area /* Left column */
-{
+/* Left column */
+.evo_main_area {
 	width: 62ex;
 	float: left;
 	overflow: hidden;
 }
 
-.evo_sidebar /* Right column */
-{
+/* Right column */
+.evo_sidebar {
 	width: 23ex;
 	float: right;
 	overflow: hidden;
@@ -227,8 +225,8 @@ textarea.bComment
 	padding: 2px;
 	margin: 0ex;
 }
-select.bComment		/* Used by the profile form */
-{
+/* Used by the profile form */
+select.bComment {
 	background-color: #eee;
 	border: 1px solid #ccc;
 	padding: 1px;

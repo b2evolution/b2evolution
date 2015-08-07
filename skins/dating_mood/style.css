@@ -1,5 +1,3 @@
-/* Designed by Francois PLANQUE - http://fplanque.net/ */
-
 /*
  * Main page construct:
  */
@@ -19,18 +17,20 @@ h1, h2, h3, h4, h5, h6 {
 	font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;
 }
 
-div.wrapper /* Main centered zone */
-{
+/* Main centered zone */
+div.wrapper {
 	width: 728px;
 	margin: 0 auto;
 	color: #000;
 }
-div.outerwrap /* Main rounded content zone */
-{
+
+/* Main rounded content zone */
+div.outerwrap {
 	margin: 2ex 0 1ex 0;
 }
-div.innerwrap /* Main white content zone */
-{
+
+/* Main white content zone */
+div.innerwrap {
 	padding: 5px 0;
 	border: 1px solid #fff; /* needed to force inner paddings */
 	background-color:#fff;
@@ -39,21 +39,22 @@ div.innerwrap /* Main white content zone */
 	-khtml-border-radius: 8px;
 	border-radius: 8px;
 }
-div.pageHeader /* Title zone */
-{
+
+/* Title zone */
+div.pageHeader {
 	margin: 0 1ex;
 	padding: 0;
 }
 
-.posts /* Left column */
-{
+/* Left column */
+.posts {
 	width: 521px;
 	float: left;
 	overflow: hidden;
 }
 
-.bSideBar /* Right column */
-{
+/* Right column */
+.bSideBar {
 	width: 200px;
 	float: right;
 	overflow: hidden;
@@ -255,8 +256,8 @@ textarea.bComment
 	padding: 2px;
 	margin: 0ex;
 }
-select.bComment		/* Used by the profile form */
-{
+select.bComment {
+	/* Used by the profile form */
 	background-color: #eee;
 	border: 1px solid #ccc;
 	padding: 1px;
