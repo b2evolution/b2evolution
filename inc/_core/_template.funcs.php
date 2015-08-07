@@ -148,27 +148,27 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	$external_redirect = true; // Start with worst case, then whitelist:
 
 	if( $redirect_to[0] == '/' || $redirect_to[0] == '?' )
-	{  // We stay on the same domain or same page:
+	{ // We stay on the same domain or same page:
 		$external_redirect = false;
 	}
 	elseif( strpos($redirect_to, $dispatcher ) === 0 )
-	{	// $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
+	{ // $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
 		$external_redirect = false;
 	}
 	elseif( strpos($redirect_to, $baseurl) === 0 )
 	{
-	 	$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
-	 	$external_redirect = false;
+		$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
+		$external_redirect = false;
 	}
 	elseif( strpos($redirect_to, $htsrv_url_sensitive) === 0 )
 	{
-	 	$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
-	 	$external_redirect = false;
+		$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+		$external_redirect = false;
 	}
 	elseif( !empty($Blog) && strpos($redirect_to, $Blog->gen_baseurl()) === 0 )
 	{
-	 	$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
-	 	$external_redirect = false;
+		$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
+		$external_redirect = false;
 	}
 
 
@@ -176,16 +176,33 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
 
 	if( $external_redirect == false )
-	{	// blueyed> Removed "confirm(ed)?" so it doesn't do the same thing twice
+	{ // blueyed> Removed "confirm(ed)?" so it doesn't do the same thing twice
 		// TODO: fp> confirm should be normalized to confirmed
 		$redirect_to = preg_replace( '~(?<=\?|&) (confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
+	$allow_collection_redirect = false;
+	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
+	{ // If a redirect is external and we allow to redirect to all collection domains then check this:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all();
+		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
+		foreach( $BlogCache->cache as $url_Blog )
+		{
+			$blog_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $url_Blog->gen_baseurl() );
+			if( $blog_domain == $redirect_to_domain )
+			{ // We found current redirect goes really to collection domain, so it is not external
+				$allow_collection_redirect = true;
+				break;
+			}
+		}
+	}
 
 	// Check if we're trying to redirect to an external URL:
 	if( $external_redirect // Attempting external redirect
 		&& ( $allow_redirects_to_different_domain != 'always' ) // Always allow redirects to different domains is not set
-		&& ( ! ( ( $allow_redirects_to_different_domain == 'only_redirected_posts' ) && $redirected_post ) ) ) // This is not a 'redirected' post display request
+		&& ( ! $allow_collection_redirect ) // This is not a redirect to collection domain of this site
+		&& ( ! ( in_array( $allow_redirects_to_different_domain, array( 'all_collections_and_redirected_posts', 'only_redirected_posts' ) ) && $redirected_post ) ) ) // This is not a 'redirected' post display request
 	{ // Force header redirects into the same domain. Do not allow external URLs.
 		$Messages->add( T_('A redirection to an external URL was blocked for security reasons.'), 'error' );
 		syslog_insert( 'A redirection to an external URL '.$redirect_to.' was blocked for security reasons.', 'error', NULL );
