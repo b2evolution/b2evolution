@@ -85,8 +85,7 @@ a.swhead_sitename.swhead_logo img {
 	text-decoration: underline;
 	background: none;
 	text-shadow: none;
-	-webkit-filter: none;
-	        filter: none;
+	filter: none;
 }
 .sitewide_header a.swhead_item.swhead_item_white {
 	background: #FFF;

@@ -1394,19 +1394,13 @@ table.widget_grid {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  -ms-flex-flow: row wrap;
-      flex-flow: row wrap;
+  flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  justify-content: center;
   -webkit-justify-content: center;
-  -ms-flex-line-pack: center;
-      align-content: center;
+  align-content: center;
   -webkit-align-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   -webkit-align-items: center;
 }
 .widget_flow_blocks div,

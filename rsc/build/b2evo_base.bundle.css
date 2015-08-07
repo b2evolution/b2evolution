@@ -1941,11 +1941,9 @@ table.widget_grid {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  -ms-flex-flow: row wrap;
-      flex-flow: row wrap;
+  flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  -ms-flex-pack: distribute;
-      justify-content: space-around;
+  justify-content: space-around;
   -webkit-justify-content: space-around;
 }
 .widget_flow_blocks div,

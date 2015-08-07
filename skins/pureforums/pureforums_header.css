@@ -78,8 +78,7 @@
   height: 34px;
   line-height: 34px;
   padding: 0 34px 0 10px;
-  -webkit-transition: width 0.2s ease 0s;
-          transition: width 0.2s ease 0s;
+  transition: width 0.2s ease 0s;
   width: 100px;
 }
 .header .widget_core_coll_search_form form .search_field:focus {
@@ -209,3 +208,5 @@ body.tablet_device div.pageHeader.site_skins {
     padding: 0 10px;
   }
 }
+
+/*# sourceMappingURL=pureforums_header.css.map */

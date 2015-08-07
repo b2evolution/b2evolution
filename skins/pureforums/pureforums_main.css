@@ -7,8 +7,7 @@ body {
 a {
   color: #306595;
   text-decoration: none;
-  -webkit-transition: color 150ms ease 0s;
-          transition: color 150ms ease 0s;
+  transition: color 150ms ease 0s;
 }
 
 a:hover {
@@ -829,3 +828,5 @@ div.results div.filters {
     width: 75px;
   }
 }
+
+/*# sourceMappingURL=pureforums_main.css.map */
