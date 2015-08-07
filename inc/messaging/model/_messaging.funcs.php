@@ -198,7 +198,7 @@ function create_new_thread()
 				update_todays_thread_settings( count( $edited_Thread->recipients_list ) );
 			}
 
-			$Messages->add( T_('Message sent.'), 'success' );
+			$Messages->add( T_('Your private message has been sent.'), 'success' );
 		}
 
 		return true;
@@ -240,7 +240,7 @@ function create_new_message( $thrd_ID )
 		else//$action == 'create'
 		{ // Insert in DB:
 			$edited_Message->dbinsert_message();
-			$Messages->add( T_('Message sent.'), 'success' );
+			$Messages->add( T_('Your private message has been sent.'), 'success' );
 		}
 
 		return true;

@@ -256,13 +256,18 @@ if( $is_recipient )
 			$available_recipients[ $recipient_ID ] = $recipient_User->login;
 		}
 	}
+
+	global $Messages;
+	$Messages->clear();
 	if( empty( $available_recipients ) )
 	{ // There are no other existing and not closed users who are still part of this conversation
-		echo '<span class="error">'.T_( 'You cannot reply because this conversation was closed.' ).'</span>';
+		$Messages->add( T_( 'You cannot reply because this conversation was closed.' ), 'warning' );
+		$Messages->display();
 	}
 	elseif( !empty( $leave_msg_ID ) )
 	{ // Current user has already left this conversation
-		echo '<span class="error">'.T_( 'You cannot reply because you have already left this conversation.' ).'</span>';
+		$Messages->add( T_( 'You cannot reply because you have already left this conversation.' ), 'warning' );
+		$Messages->display();
 	}
 	else
 	{ // Current user is still part of this conversation, should be able to reply
