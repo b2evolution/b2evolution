@@ -38,10 +38,6 @@ ol.breadcrumb {
   text-align: center;
   background: #FFF;
   border: 2px solid #306595;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
   width: 21px;
   height: 21px;
@@ -73,10 +69,6 @@ ol.breadcrumb {
 }
 .forums_list .panel-heading:not(:first-child) {
   border-top: 1px solid #ddd;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
   border-radius: 0;
 }
 .forums_list .panel-heading h2 {
@@ -194,10 +186,6 @@ ol.breadcrumb {
   display: block;
 }
 .forums_list .ft_author_avatar img {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
   border-radius: 3px;
 }
 .forums_list .ft_comment_response h3 {
@@ -241,7 +229,6 @@ ol.breadcrumb {
 .comment_form .panel {
   margin: 0;
   border: none;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .comment_form .panel .panel-body {
@@ -534,10 +521,6 @@ body.round_avatars .single_topic #styled_content_block .ft_avatar > a:before,
 body.round_avatars .single_topic #styled_content_block .ft_avatar > a,
 body.round_avatars .single_topic #styled_content_block .ft_avatar > span,
 body.round_avatars .single_topic #styled_content_block .ft_avatar a > img {
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
 }
 .vote_spam {
@@ -889,9 +872,5 @@ label.control-label[for=post_title] {
   vertical-align: middle;
 }
 .popover img {
-  -webkit-border-radius: 4px !important;
-  -moz-border-radius: 4px !important;
-  -ms-border-radius: 4px !important;
-  -o-border-radius: 4px !important;
   border-radius: 4px !important;
 }
