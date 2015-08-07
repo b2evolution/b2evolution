@@ -34,15 +34,15 @@ div.inner_wrapper
 	padding: 1px;
 }
 
-.evo_main_area
-/* Left column */ {
+.evo_main_area /* Left column */
+{
 	width: 62ex;
 	float: left;
 	overflow: hidden;
 }
 
-.evo_sidebar
-/* Right column */ {
+.evo_sidebar /* Right column */
+{
 	width: 23ex;
 	float: right;
 	overflow: hidden;
@@ -227,8 +227,8 @@ textarea.bComment
 	padding: 2px;
 	margin: 0ex;
 }
-select.bComment
-/* Used by the profile form */		{
+select.bComment		/* Used by the profile form */
+{
 	background-color: #eee;
 	border: 1px solid #ccc;
 	padding: 1px;
