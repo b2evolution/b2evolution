@@ -99,6 +99,18 @@ module.exports = function(grunt) {
 			}
 		},
 
+		// Configuration for Autoprefixing tasks:
+		autoprefixer: {
+			options: {
+				// by default autoprefixer will remove old, no longer needed, prefixes:
+				browsers: ['last 5 versions']
+			},
+			dist: {
+				src: ['rsc/build/*.css','rsc/css/*.css','rsc/css/colorbox/*.css','skins/**/*.css','skins_adm/**/*.css', // INCLUDE patterns
+						'!**/*.bundle.css','!**/*.bmin.css','!**/*.min.css'] // EXCLUDE patterns
+			}
+		},
+
 		// Configuration for the concatenate tasks:
 		concat: {
 			options: { 
@@ -320,7 +332,7 @@ module.exports = function(grunt) {
 			},
 			*/
 			less: {
-				// Which files to watch (all .less files recursively in the whole blogs directory)
+				// Which files to watch (all .less files recursively)
 				files: ['**/*.less'],
 				tasks: ['less'],
 				options: {
@@ -328,7 +340,7 @@ module.exports = function(grunt) {
 				}
 			},
 			sass: {
-				// Which files to watch (all .scss files recursively in the scss directory)
+				// Which files to watch (all .scss files recursively)
 				files: ['**/*.scss'],
 				tasks: ['sass'],
 				options: {
@@ -336,9 +348,9 @@ module.exports = function(grunt) {
 				}
 			},
 			concat_autoprefixer_cssmin: {
-				// Which files to watch (all .css files recursively in the whole blogs directory)
-				files: ['**/*.css','**/*.less'],
-				tasks: ['concat','autoprefixer','cssmin'],
+				// Which files to watch (all .css files recursively)
+				files: ['**/*.css'],
+				tasks: ['autoprefixer','concat','cssmin'],
 				options: {
 					nospawn: true,
 				}
@@ -349,28 +361,19 @@ module.exports = function(grunt) {
 			}
 		},
 
-		autoprefixer: {
-			options: {
-				browsers: ['last 5 versions']
-			},
-			dist: {
-				src: ['rsc/build/*.css','rsc/css/*.css','rsc/css/colorbox/*.css','skins/**/*.css','skins_adm/**/*.css']
-			}
-		},
-
 	});
 
 	// Load the plugin that provides the tasks ( "uglify", "less", "sass", etc. ):
+	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-autoprefixer');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','concat','autoprefixer','cssmin','uglify','markdown']);
+	grunt.registerTask('default', ['less','sass','autoprefixer','concat','cssmin','uglify','markdown']);
 
 };
