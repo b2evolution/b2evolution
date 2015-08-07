@@ -8,3 +8,4 @@ conf/_overrides_TEST.php
 _transifex/files.txt
 _transifex/messages.pot.bak
 _transifex/translations
+rsc/build/testless.css
