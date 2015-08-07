@@ -2884,9 +2884,9 @@ class User extends DataObject
 
 
 	/**
-	 * Check if user status permit the give action
+	 * Check if user status permits the requested action
 	 *
-	 * @param string action
+	 * @param string requested action
 	 * @param integger target ID - can be a post ID, user ID
 	 * @return boolean true if the action is permitted, false otherwise
 	 */
@@ -3072,10 +3072,10 @@ class User extends DataObject
 
 
 	/**
-	 * Get messaging possibilities between current user and this user
+	 * Get messaging possibilities between current user and $this user
 	 *
-	 * @param object Current User
-	 * @param string What level to check: 'PM', 'email'
+	 * @param object Current User (the one trying to send the PM)
+	 * @param string Type of contact method to check first: 'PM' > 'email'  
 	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
 	function get_msgform_possibility( $current_User = NULL, $check_level = 'PM' )
@@ -3089,16 +3089,16 @@ class User extends DataObject
 		$check_owner_SQL->LIMIT( '1' );
 
 		if( $DB->get_var( $check_owner_SQL->get() ) )
-		{ // Allow to contact with this user because he is owner of at least one blog
-			$force_contact_blog_owner = true;
+		{ // Always allow to contact this user because he is owner of at least one collection:
+			$is_collection_owner = true;
 		}
 		else
 		{
-			$force_contact_blog_owner = false;
+			$is_collection_owner = false;
 		}
 
-		if( ! $force_contact_blog_owner && ! $this->check_status( 'can_receive_any_message' ) )
-		{ // there is no way to send a message to a user with closed account
+		if( ! $is_collection_owner && ! $this->check_status( 'can_receive_any_message' ) )
+		{ // In case of a closed account:
 			return NULL;
 		}
 
@@ -3108,10 +3108,12 @@ class User extends DataObject
 			{
 				global $current_User;
 			}
-			if( ! $force_contact_blog_owner && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+
+			if( ! $is_collection_owner && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
 			{ // Contat to this user is not enabled
 				return NULL;
 			}
+
 			if( $check_level == 'PM' && $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
 			{ // both user has permission to send or receive private message and not the same user
 				// check if current_User is allowed to create a new conversation with this user.
@@ -3121,17 +3123,19 @@ class User extends DataObject
 					return 'PM';
 				}
 			}
-			if( $force_contact_blog_owner || $this->accepts_email() )
-			{ // this user allows email => send email OR Force to allow to contact with this user because he is owner of the selected blog
+
+			if( $is_collection_owner || $this->accepts_email() )
+			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
 		}
 		else
 		{ // current User is not logged in
-			if( $force_contact_blog_owner || $this->accepts_email() )
-			{ // this user allows email OR Force to allow to contact with this user because he is owner of the selected blog
+			if( $is_collection_owner || $this->accepts_email() )
+			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
+
 			if( $this->accepts_pm() )
 			{ // no email option - try to log in and send private message (only registered users can send PM)
 				return 'login';
