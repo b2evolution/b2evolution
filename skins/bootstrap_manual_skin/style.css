@@ -41,6 +41,9 @@
     display: none;
   }
 }
+div.powered_by p {
+  margin: 4px auto;
+}
 ul.profile_tabs {
   margin: 0 2ex 2ex;
   position: relative;
@@ -99,7 +102,6 @@ textarea.message_text {
 .comment_form .panel {
   margin: 0;
   border: none;
-  -webkit-box-shadow: none;
   box-shadow: none;
 }
 .comment_form .panel .panel-body {
