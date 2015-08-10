@@ -98,7 +98,7 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 
 	if( $enabled )
 	{ // Enabled
-		if( $perm_edit )
+		if( $perm_edit && $Blog->can_be_item_type_disabled( $item_type_ID ) )
 		{ // URL to disable the item type
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=disable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 		}

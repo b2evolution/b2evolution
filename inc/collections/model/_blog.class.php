@@ -2290,6 +2290,15 @@ class Blog extends DataObject
 				$this->CollectionSettings->dbupdate();
 			}
 
+			$default_post_type_ID = $this->get_setting( 'default_post_type' );
+			if( ! empty( $default_post_type_ID ) )
+			{ // Enable post type that is used by default for this collection:
+				global $DB;
+				$DB->query( 'INSERT INTO T_items__type_coll
+									 ( itc_ityp_ID, itc_coll_ID )
+						VALUES ( '.$DB->quote( $default_post_type_ID ).', '.$DB->quote( $this->ID ).' )' );
+			}
+
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 		}
 
@@ -3292,7 +3301,35 @@ class Blog extends DataObject
 
 
 	/**
-	 * Check if item type is enabled for this blog
+	 * Get all enabled item types for this collection
+	 *
+	 * @return array
+	 */
+	function get_enabled_item_types()
+	{
+		if( empty( $this->ID ) )
+		{ // This is new blog, it doesn't have the enabled item types
+			return array();
+		}
+
+		if( ! isset( $this->enabled_item_types ) )
+		{ // Get all enabled item types by one sql query and only first time to cache result:
+			global $DB;
+
+			$SQL = new SQL();
+			$SQL->SELECT( 'itc_ityp_ID' );
+			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
+
+			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+		}
+
+		return $this->enabled_item_types;
+	}
+
+
+	/**
+	 * Check if item type is enabled for this collection
 	 *
 	 * @param integer Item type ID
 	 * @return boolean TRUE if enabled
@@ -3304,19 +3341,59 @@ class Blog extends DataObject
 			return false;
 		}
 
-		if( ! isset( $this->enabled_item_types ) )
-		{ // Get all enabled item types by one sql query and only first time to cache result
-			global $DB;
+		return in_array( $item_type_ID, $this->get_enabled_item_types() );
+	}
 
-			$SQL = new SQL();
-			$SQL->SELECT( 'itc_ityp_ID' );
-			$SQL->FROM( 'T_items__type_coll' );
-			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+	/**
+	 * Check if item type can be disabled
+	 *
+	 * @param integer Item type ID
+	 * @param boolean TRUE to display a message about restriction
+	 * @return boolean TRUE if can
+	 */
+	function can_be_item_type_disabled( $item_type_ID, $display_message = false )
+	{
+		if( empty( $this->ID ) )
+		{ // This is new blog, no restriction to disable any post type
+			return true;
 		}
 
-		return in_array( $item_type_ID, $this->enabled_item_types );
+		if( $this->get_setting( 'default_post_type' ) == $item_type_ID )
+		{ // Don't allow to disable an item type which is used as default for this collection:
+			if( $display_message )
+			{
+				global $Messages;
+				$Messages->add( 'This post type is used as default for this collection. Thus you cannot disable it.', 'error' );
+			}
+			return false;
+		}
+
+		if( ! isset( $this->used_item_types ) )
+		{ // Get all item types that are used for posts in this collection:
+			global $DB;
+
+			$coll_item_types_SQL = new SQL();
+			$coll_item_types_SQL->SELECT( 'post_ityp_ID' );
+			$coll_item_types_SQL->FROM( 'T_items__item' );
+			$coll_item_types_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$coll_item_types_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+			$coll_item_types_SQL->GROUP_BY( 'post_ityp_ID' );
+
+			$this->used_item_types = $DB->get_col( $coll_item_types_SQL->get() );
+		}
+
+		if( ! empty( $this->used_item_types ) && in_array( $item_type_ID, $this->used_item_types ) )
+		{ // Don't allow to disable an item type which is used at least for one post in this collection:
+			if( $display_message )
+			{
+				global $Messages;
+				$Messages->add( 'This post type is used at least for one post in this collection. Thus you cannot disable it.', 'error' );
+			}
+			return false;
+		}
+
+		return true;
 	}
 }
 
