@@ -2996,7 +2996,7 @@ function enable_item_types_for_blog( $blog_ID, $exclude_ityp_IDs = array() )
 		$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
 	}
 
-	$insert_sql = 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
+	$insert_sql = 'REPLACE INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
 	$i = 0;
 	foreach( $cache_all_item_type_IDs as $item_type_ID )
 	{
