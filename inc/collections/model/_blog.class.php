@@ -3035,10 +3035,10 @@ class Blog extends DataObject
 	 * @param integer Category ID
 	 * @param string Post title
 	 * @param string Post urltitle
-	 * @param string Post type
+	 * @param integer Post type ID
 	 * @return string Url to write a new Post
 	 */
-	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type = '' )
+	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type_ID = 0 )
 	{
 		$url = '';
 
@@ -3082,9 +3082,9 @@ class Blog extends DataObject
 				{ // Append a post urltitle
 					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
 				}
-				if( !empty( $post_type ) )
-				{ // Append a post type
-					$url = url_add_param( $url, 'post_type='.$post_type );
+				if( !empty( $post_type_ID ) )
+				{ // Append a post type ID
+					$url = url_add_param( $url, 'item_typ_ID='.$post_type_ID );
 				}
 			}
 		}

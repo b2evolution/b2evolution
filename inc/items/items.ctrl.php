@@ -741,12 +741,15 @@ switch( $action )
 		}
 
 		// Check if new category was started to create. If yes check if it is valid.
-		check_categories ( $post_category, $post_extracats );
+		check_categories( $post_category, $post_extracats );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
-		// Check permission on post type:
-		check_perm_posttype( $post_extracats );
+
+		// Get requested Post Type:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
+		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
+		check_perm_posttype( $item_typ_ID, $post_extracats );
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
@@ -907,8 +910,11 @@ switch( $action )
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
-		// Check permission on post type:
-		check_perm_posttype( $post_extracats );
+
+		// Get requested Post Type:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
+		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
+		check_perm_posttype( $item_typ_ID, $post_extracats );
 
 		// Is this post already published?
 		$was_published = $edited_Item->status == 'published';
@@ -918,7 +924,7 @@ switch( $action )
 		$edited_Item->set( 'status', $post_status );
 
 		if( $isset_category )
-		{ // we change the categories only if the check was succesfull
+		{ // we change the categories only if the check was succesful
 			$edited_Item->set( 'main_cat_ID', $post_category );
 			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 		}
