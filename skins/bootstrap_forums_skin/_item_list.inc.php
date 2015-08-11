@@ -35,6 +35,7 @@ if( ! is_array( $legend_icons ) )
 	$legend_icons = array();
 }
 
+// Calculate what comments has the Item:
 $comments_number = generic_ctp_number( $Item->ID, 'comments', get_inskin_statuses( $Item->get_blog_ID(), 'comment' ) );
 
 $status_icon = 'fa-comments';
@@ -54,7 +55,7 @@ elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled'
 	$legend_icons['topic_locked'] = 1;
 }
 elseif( $comments_number > 25 )
-{ // Popular topic
+{ // Popular topic is when coummnets number is more than 25
 	$status_icon = 'fa-star';
 	$legend_icons['topic_popular'] = 1;
 }

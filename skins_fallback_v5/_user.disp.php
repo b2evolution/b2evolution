@@ -257,14 +257,16 @@ echo '<div class="profile_column_left">';
 				.'<button type="button" class="btn btn-default">'.$params['edit_user_admin_link_text'].'</button>'
 			.'</a>';
 
-		// - Delete in back-office:
-		$buttons['del'] = array();
-		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
-				.'<button type="button">'.T_('Delete').'</button>'
-			.'</a>';
-		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
-				.'<button type="button">'.T_('Delete Spammer').'</button>'
-			.'</a>';
+		if( $current_User->ID != $User->ID )
+		{ // - Delete in back-office:
+			$buttons['del'] = array();
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					.'<button type="button">'.T_('Delete').'</button>'
+				.'</a>';
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					.'<button type="button">'.T_('Delete Spammer').'</button>'
+				.'</a>';
+		}
 	}
 
 	if( count( $buttons ) )

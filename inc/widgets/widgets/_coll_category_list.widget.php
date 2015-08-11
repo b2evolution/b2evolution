@@ -370,7 +370,7 @@ class coll_category_list_Widget extends ComponentWidget
 			{ // We want a complete form:
 			?>
 				<div class="tile">
-					<input type="submit" value="<?php echo T_( 'Filter categories' ); ?>" />
+					<input type="submit" value="<?php echo T_( 'Filter categories' ); ?>" class="btn btn-info" />
 				</div>
 				</form>
 			<?php

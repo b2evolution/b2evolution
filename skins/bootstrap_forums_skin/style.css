@@ -74,6 +74,9 @@ ol.breadcrumb {
 .forums_list .panel-heading h2 {
   margin-top: 0;
 }
+.forums_list .panel-heading .btn {
+  margin: -6px 0 0 6px;
+}
 .forums_list.panel > a + .table {
   border-top: 1px solid #ddd;
 }
@@ -855,8 +858,10 @@ label.control-label[for=post_title] {
 .cell2 {
   display: table-cell;
 }
-.evo_comment .panel-footer a.to_top.postlink {
+a.to_top {
   font-size: 14px !important;
+  margin-right: 5px;
+  float: left;
 }
 .evo_post_title {
   display: table;

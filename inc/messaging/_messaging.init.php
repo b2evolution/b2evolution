@@ -544,8 +544,8 @@ class messaging_Module extends Module
 						else
 						{
 							$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' );
-							$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
-							$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
+							$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_( 'I am sure!' ).'</a>';
+							$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">CANCEL</a>';
 							$msg = sprintf( T_( 'You are about to delete all messages in the conversation &laquo;%s&raquo;.' ), $edited_Thread->dget('title') );
 							$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 							$Messages->add( $msg, 'error' );
@@ -655,9 +655,9 @@ class messaging_Module extends Module
 								$delete_url .= '&blog='.$Blog->ID;
 							}
 							$delete_url = url_add_param( $delete_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' ).'&'.url_crumb( 'messaging_messages' );
-							$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
-							$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
-							$msg = T_('You are about to delete this message. ').'<br /> '.T_('This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button.$cancel_button;
+							$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
+							$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
+							$msg = T_('You are about to delete this message. ').'<br /> '.T_('This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 							$Messages->add( $msg, 'error' );
 						}
 						break;

@@ -79,23 +79,18 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
 		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
 
-	$Form->begin_fieldset();
-	?>
-		<div class="input">
-			<?php
-			$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit', 'value' => T_('Send message') ) );
+	// Form buttons:
+	echo $Form->begin_field( NULL, '' );
 
-			$Plugins->trigger_event( 'DisplayMessageFormButton', array( 'Form' => & $Form,
-				'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
-			?>
-		</div>
-		<?php
-	$Form->end_fieldset();
-	?>
+		// Standard button to send a message
+		$Form->button_input( array( 'name' => 'submit_message_'.$recipient_id, 'class' => 'submit', 'value' => T_('Send message') ) );
 
-	<div class="clear"></div>
+		// Additional buttons from plugins
+		$Plugins->trigger_event( 'DisplayMessageFormButton', array( 'Form' => & $Form,
+			'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
 
-<?php
+	echo $Form->end_field();
+
 $Form->end_form();
 
 echo $params['skin_form_after'];
