@@ -82,6 +82,9 @@ ol.breadcrumb {
 .forums_list .panel-heading h2 {
   margin-top: 0;
 }
+.forums_list .panel-heading .btn {
+  margin: -6px 0 0 6px;
+}
 .forums_list.panel > a + .table {
   border-top: 1px solid #ddd;
 }
