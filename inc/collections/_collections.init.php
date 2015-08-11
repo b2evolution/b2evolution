@@ -1050,8 +1050,8 @@ class collections_Module extends Module
 				else
 				{ // Display confirm unlink/delete message
 					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
-					$ok_button = '<span class="linkbutton"><a href="'.$delete_url.'">'.T_( 'I am sure!' ).'!</a></span>';
-					$cancel_button = '<span class="linkbutton"><a href="'.$redirect_to.'">CANCEL</a></span>';
+					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
+					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
 					$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
 					$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 					$Messages->add( $msg, 'error' );
