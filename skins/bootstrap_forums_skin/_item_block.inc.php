@@ -97,9 +97,12 @@ skin_widget( array(
 				'link_type' => 'permalink'
 			) );
 				// Author info:
-				echo '<div class="ft_author_info">'.T_('Started by');
+				echo '<div class="ft_author_info">'.T_('Thread started by');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+				echo '<span class="text-muted"> &ndash; '
+						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
+					.'</span>';
 				echo '</div>';
 				// Author info - shrinked:
 				echo '<div class="ft_author_info shrinked">'.T_('Started by');
@@ -171,11 +174,9 @@ skin_widget( array(
 			</div>
 		</div><!-- ../panel-body -->
 		
-		<div class="panel-footer">
-		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="postlink"><?php echo T_('Back to top'); ?></a>
+		<div class="panel-footer clearfix">
+		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
-			echo '<div class="floatleft">';
-
 			// Check if BBcode plugin is enabled for current blog
 			$bbcode_plugin_is_enabled = false;
 			if( class_exists( 'bbcode_plugin' ) )
@@ -189,9 +190,8 @@ skin_widget( array(
 			}
 			if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
 			{	// Display button to quote this post
-				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' floatleft quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 			}
-			echo '</div>';
 			echo '<div class="floatright">';
 			$Item->edit_link( array(
 					'before' => ' ',
