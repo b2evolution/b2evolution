@@ -315,14 +315,42 @@ span.loader_img.loader_user_deldata {
 // ---------------- //
 
 // Meta categories that appears on categories widget:
-.widget_core_coll_category_list .meta {
-	font-weight: bold;
-}
-.widget_core_coll_category_list .meta ul {
-	font-weight: normal;
-}
-.widget_core_coll_category_list .meta input[disabled="disabled"] {
-	visibility: hidden;
+.widget_core_coll_category_list {
+	label {
+		font-weight: normal;
+	}
+	ul {
+		margin-left: 0;
+		ul {
+			margin-left: 19px;
+		}
+	}
+	li {
+		list-style: none;
+	}
+	input[type="checkbox"], input[type="radio"] {
+		margin: 0;
+		display: inline-block;
+	}
+	.meta {
+		font-weight: bold;
+		color: #000;
+		list-style: square;
+		margin-left: 20px;
+		label, a {
+			font-weight: bold;
+			color: #000;
+		}
+		ul {
+			font-weight: normal;
+		}
+		input[disabled="disabled"] {
+			display: none;
+		}
+	}
+	.tile label {
+		display: inline;
+	}
 }
 // ---------------- //
 
