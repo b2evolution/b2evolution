@@ -305,7 +305,7 @@ class bootstrap_forums_Skin extends Skin
 
 			if( $current_Chapter && $current_Chapter->lock )
 			{ // Display icon to inform that this forum is locked
-				$post_button = '<i class="icon btn fa fa-lock" title="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'">'.T_('Locked').'</i>';
+				$post_button = '<span title="'.T_('This forum is locked: you cannot post, reply to, or edit topics.').'"><i class="icon fa fa-lock"></i> '.T_('Locked').'</span>';
 				$chapter_is_locked = true;
 			}
 		}
@@ -316,7 +316,7 @@ class bootstrap_forums_Skin extends Skin
 			{ // Display icon to inform that this topic is locked for comments
 				if( !$chapter_is_locked )
 				{ // Display this button only when chapter is not locked, to avoid a duplicate button
-					$post_button .= ' <i class="icon btn fa fa-lock" title="'.T_('This topic is locked: you cannot edit posts or make replies.').'">'.T_('Locked').'</i>';
+					$post_button .= ' <span title="'.T_('This topic is locked: you cannot edit posts or make replies.').'"><i class="icon fa fa-lock"></i> '.T_('Locked').'</span>';
 				}
 			}
 			else
