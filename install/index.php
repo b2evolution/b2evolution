@@ -82,6 +82,21 @@ $Messages->set_params( array(
  */
 load_class( 'tools/model/_syslog.class.php', 'Syslog' );
 
+load_funcs('_core/_param.funcs.php');
+
+// Init action param:
+param( 'action', 'string', 'default' );
+
+if( $action == 'newdb' )
+{ // This is a request of quick installation
+	$db_tableprefix = param( 'db_tableprefix', 'string', '' );
+	if( ! empty( $db_tableprefix ) )
+	{ // Update global config variable $tableprefix before loading of all modules:
+		global $tableprefix;
+		$tableprefix = $db_tableprefix;
+	}
+}
+
 /**
  * Load modules.
  *
@@ -115,20 +130,12 @@ require_once dirname(__FILE__).'/_functions_install.php';
 
 $Timer = new Timer('main');
 
-load_funcs('_core/_param.funcs.php');
-
 // Let the modules load/register what they need:
 modules_call_method( 'init' );
 
 // Init charset variables based on the $evo_charset value
 $current_charset = $evo_charset;
 init_charsets( $current_charset );
-
-// Init action param
-// echo "utf8_ltrim('abc')=".utf8_ltrim('abc')."<br>\n";
-// echo "utf8_substr('abc',0)=".utf8_substr('abc',0)."<br>\n";
-param( 'action', 'string', 'default' );
-// echo "action=*$action*<br>\n ";
 
 // Check minimum memory limit for successful using:
 if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
