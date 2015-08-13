@@ -495,7 +495,7 @@ class Parsedown
 					
 					$text = rtrim($element['text'], "\n");
 					
-					$text = str_replace( array( '<', '>' ), array( '--&lt;', '&gt;' ), $text );
+					$text = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $text );
 					
 					strpos($text, "\x1A\\") !== FALSE and $text = strtr($text, $this->escape_sequence_map);
 					
