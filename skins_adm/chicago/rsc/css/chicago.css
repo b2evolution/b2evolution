@@ -372,7 +372,8 @@ div.fieldset_wrapper.folded fieldset {
 	margin: 0 0 10px 0;
 	background-color: #fff;
 	width: 100%;
-	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
 }
 
 
@@ -1057,7 +1058,8 @@ div.edit_area textarea,
 textarea.bComment.form_textarea_input {
 	width: 100%;
 	margin: 0 auto;
-	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
 }
 div.edit_actions {
 	background-color: #f1f6f8;

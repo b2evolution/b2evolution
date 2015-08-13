@@ -103,7 +103,8 @@ div#evo_toolbar .actions_right {
   margin: 0;
   padding: 0;
   list-style: none;
-  box-sizing: content-box;
+  -moz-box-sizing: content-box;
+       box-sizing: content-box;
   -webkit-font-smoothing: antialiased;
 }
 .evobar-menu ul {
@@ -114,7 +115,8 @@ div#evo_toolbar .actions_right {
   border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
   -webkit-transition: opacity 0.2s ease-in-out;
-  transition: opacity 0.2s ease-in-out;
+  -moz-transition: opacity 0.2s ease-in-out;
+       transition: opacity 0.2s ease-in-out;
 }
 .evobar-menu ul li {
   width: 100%;
@@ -178,7 +180,8 @@ div#evo_toolbar .actions_right {
   position: relative;
   background-color: #d2d2d2;
   -webkit-transition: background-color 0.15s ease-out;
-  transition: background-color 0.15s ease-out;
+  -moz-transition: background-color 0.15s ease-out;
+       transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
   min-height: 14px;
@@ -193,7 +196,8 @@ div#evo_toolbar .actions_right {
 .evobar-menu a:hover {
   background-color: #bfbfbf;
   -webkit-transition: none;
-  transition: none;
+  -moz-transition: none;
+       transition: none;
   text-decoration: none;
 }
 .evobar-menu a.disabled,
@@ -687,7 +691,8 @@ div.avatartag.main .avatar_actions {
   }
   #image_crop legend {
     padding: 10px;
-    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+         box-sizing: border-box;
   }
 }
 .disp_avatar .preview_cropped_images {
@@ -953,6 +958,7 @@ table.widget_grid .note {
 .widget_flow_blocks,
 table.widget_grid {
   display: -webkit-box;
+  display: -moz-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;

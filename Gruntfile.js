@@ -103,7 +103,7 @@ module.exports = function(grunt) {
 		autoprefixer: {
 			options: {
 				// by default autoprefixer will remove old, no longer needed, prefixes:
-				browsers: ['last 5 versions']
+				browsers: ['last 5 versions', 'Firefox >= 15']
 			},
 			dist: {
 				src: ['rsc/build/*.css','rsc/css/*.css','rsc/css/colorbox/*.css','skins/**/*.css','skins_adm/**/*.css', // INCLUDE patterns

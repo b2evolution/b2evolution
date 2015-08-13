@@ -14,6 +14,7 @@
 .header .header_top {
   background-color: #242D36;
   background-image: -webkit-linear-gradient(#1E252D, #2B3540);
+  background-image: -moz-linear-gradient(#1E252D, #2B3540);
   background-image: linear-gradient(#1E252D, #2B3540);
   height: 36px;
   line-height: 36px;
@@ -23,6 +24,7 @@
 .header .header_bottom {
   background-color: #3C597F;
   background-image: -webkit-linear-gradient(#50739B, #283F63);
+  background-image: -moz-linear-gradient(#50739B, #283F63);
   background-image: linear-gradient(#50739B, #283F63);
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5D8CB7 inset;
   text-align: center;
@@ -68,6 +70,7 @@
   outline: none;
   background-color: #EAECF1;
   background-image: -webkit-linear-gradient(#FFFFFF, #D5D9E3);
+  background-image: -moz-linear-gradient(#FFFFFF, #D5D9E3);
   background-image: linear-gradient(#FFFFFF, #D5D9E3);
   border: medium none;
   border-radius: 5px;
@@ -76,6 +79,7 @@
   line-height: 34px;
   padding: 0 34px 0 10px;
   -webkit-transition: width 0.2s ease 0s;
+     -moz-transition: width 0.2s ease 0s;
           transition: width 0.2s ease 0s;
   width: 100px;
 }
@@ -217,6 +221,7 @@ a {
   color: #306595;
   text-decoration: none;
   -webkit-transition: color 150ms ease 0s;
+     -moz-transition: color 150ms ease 0s;
           transition: color 150ms ease 0s;
 }
 
@@ -233,7 +238,8 @@ textarea.form_textarea_input {
 }
 
 .layout_width {
-  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
   width: 100%;
   max-width: 1140px;
   padding: 0 25px;
@@ -396,6 +402,7 @@ form#user_checkchanges.bComment {
   padding: 12px 20px;
   background-color: #ECEDF3;
   background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
   background-image: linear-gradient(#F1F2F6, #E7E9F0);
   color: #535C66;
   font-size: 14px;
@@ -514,6 +521,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
   border-top-right-radius: 5px;
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.1);
   background-image: -webkit-linear-gradient(bottom, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
+  background-image: -moz-linear-gradient(bottom, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
   background-image: linear-gradient(to top, #e6e8f1, rgba(230, 232, 241, 0.01) 25px);
 }
 
@@ -538,6 +546,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 .topics_table tr.panel td, .topics_table tr.panel:hover td,
 .forums_table th.fieldset {
   background-image: -webkit-linear-gradient(#f5f6fa, #e6e7f0);
+  background-image: -moz-linear-gradient(#f5f6fa, #e6e7f0);
   background-image: linear-gradient(#f5f6fa, #e6e7f0);
   background-color: #edeef5;
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.05);
@@ -579,6 +588,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .navigation a, .navigation .current_page {
   background-image: -webkit-linear-gradient(#d4d9e1, #bec4d1);
+  background-image: -moz-linear-gradient(#d4d9e1, #bec4d1);
   background-image: linear-gradient(#d4d9e1, #bec4d1);
   background-color: #c9ced9;
   text-align: center;
@@ -609,6 +619,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .navigation a.prev, .navigation a.next {
   background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
+  background-image: -moz-linear-gradient(#9fa3ac, #787d88);
   background-image: linear-gradient(#9fa3ac, #787d88);
   background-color: #8b909a;
   border: 1px solid #DDD;
@@ -629,6 +640,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 .ft_search .search_field {
   border-radius: 3px;
   -webkit-transition: box-shadow 150ms ease;
+  -moz-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   padding: 6px 7px;
@@ -650,6 +662,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
   height: 31px;
   line-height: 31px;
   background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
+  background-image: -moz-linear-gradient(#9fa3ac, #787d88);
   background-image: linear-gradient(#9fa3ac, #787d88);
   background-color: #8b909a;
   position: relative;
@@ -659,6 +672,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .ft_search .search_submit:hover {
   background-image: -webkit-linear-gradient(#787d88, #9fa3ac);
+  background-image: -moz-linear-gradient(#787d88, #9fa3ac);
   background-image: linear-gradient(#787d88, #9fa3ac);
   background-color: #8b909a;
 }
@@ -772,6 +786,7 @@ ul.legend span.note {
   padding: 0 12px;
   background-color: #A3ACBE;
   background-image: -webkit-linear-gradient(#B5BDCB, #929BB1);
+  background-image: -moz-linear-gradient(#B5BDCB, #929BB1);
   background-image: linear-gradient(#B5BDCB, #929BB1);
   border: 1px solid #000;
   border-color: transparent rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
@@ -790,6 +805,7 @@ ul.legend span.note {
 .breadcrumbs a:last-child {
   background-color: #848C9D;
   background-image: -webkit-linear-gradient(#98A0AF, #70788C);
+  background-image: -moz-linear-gradient(#98A0AF, #70788C);
   background-image: linear-gradient(#98A0AF, #70788C);
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
@@ -804,8 +820,10 @@ ul.legend span.note {
   top: 50%;
   width: 20px;
   background-image: -webkit-linear-gradient(45deg, #98A0AF, #70788C);
+  background-image: -moz-linear-gradient(45deg, #98A0AF, #70788C);
   background-image: linear-gradient(45deg, #98A0AF, #70788C);
   -webkit-transform: rotate(135deg) skew(-10deg, -10deg);
+  -moz-transform: rotate(135deg) skew(-10deg, -10deg);
   -ms-transform: rotate(135deg) skew(-10deg, -10deg);
   transform: rotate(135deg) skew(-10deg, -10deg);
   border-top-right-radius: 6px;
@@ -880,7 +898,8 @@ body.round_avatars .profile_avatar img {
 }
 
 div.results div.table_scroll {
-  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
   padding: 7px;
 }
 
@@ -908,10 +927,12 @@ div.results div.filters {
 
 #edit_group_contacts {
   background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
   background-image: linear-gradient(#F1F2F6, #E7E9F0);
   border: none;
   padding: 10px;
-  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
 }
 
 #edit_group_contacts p {

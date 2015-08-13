@@ -591,6 +591,7 @@ span.roundbutton {
   /* Safari 5.1, Chrome 10+ */
   background: -webkit-linear-gradient(top, #f5f5f5, #bababa);
   /* Firefox 3.6+ */
+  background: -moz-linear-gradient(center 1%, #f5f5f5, #bababa);
   /* IE 10 */
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #f5f5f5, #bababa);
@@ -611,6 +612,7 @@ a.roundbutton_text:hover {
   /* Safari 5.1, Chrome 10+ */
   background: -webkit-linear-gradient(top, #a0a0a0, #d2d2d2);
   /* Firefox 3.6+ */
+  background: -moz-linear-gradient(center 1%, #a0a0a0, #d2d2d2);
   /* IE 10 */
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #a0a0a0, #d2d2d2);
@@ -627,6 +629,7 @@ span.roundbutton {
   /* Safari 5.1, Chrome 10+ */
   background: -webkit-linear-gradient(top, #6b6b6b, #989898);
   /* Firefox 3.6+ */
+  background: -moz-linear-gradient(center 1%, #6b6b6b, #989898);
   /* IE 10 */
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #6b6b6b, #989898);
@@ -644,6 +647,7 @@ span.roundbutton_green:hover {
   /* Safari 5.1, Chrome 10+ */
   background: -webkit-linear-gradient(top, #00b46e, #09f197);
   /* Firefox 3.6+ */
+  background: -moz-linear-gradient(center 1%, #00b46e, #09f197);
   /* IE 10 */
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #00b46e, #09f197);
@@ -661,6 +665,7 @@ span.roundbutton_red:hover {
   /* Safari 5.1, Chrome 10+ */
   background: -webkit-linear-gradient(top, #e62020, #fa7171);
   /* Firefox 3.6+ */
+  background: -moz-linear-gradient(center 1%, #e62020, #fa7171);
   /* IE 10 */
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #e62020, #fa7171);
@@ -752,6 +757,7 @@ a.roundbutton_text_noicon span {
   background-size: 30px 30px;
   background-repeat: repeat-x;
   background-position: 0;
+  background-image: -moz-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
 }
 .roundbutton.rbtn_black:before,
@@ -780,7 +786,8 @@ span.roundbutton.rbtn_black:hover,
   background-image: none;
   border: 1px solid transparent;
   border-radius: 4px;
-  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
 }
 .btn:hover,
 .btn:focus {

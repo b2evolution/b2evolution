@@ -23,7 +23,8 @@
 	font-weight: bold;
 	border-style: dashed;
 	-ms-box-sizing: border-box;
-	box-sizing: border-box;
+	     -moz-box-sizing: border-box;
+	     box-sizing: border-box;
 }
 
 .qq-upload-button span {
@@ -37,7 +38,8 @@
 	position:absolute; top:0; left:0; width:100%; height:55px; padding: 7px 0; min-height: 35px; z-index:2;
 	text-align:center;
 	-ms-box-sizing: border-box;
-	box-sizing: border-box;
+	     -moz-box-sizing: border-box;
+	     box-sizing: border-box;
 }
 .qq-upload-drop-area span {
 	display:block; position:absolute; top: 50%; width:100%; margin-top:-8px; font-size:16px;
