@@ -64,6 +64,40 @@ function set_upgrade_checkpoint( $version )
 
 
 /**
+ * Create DB table
+ * 
+ * @param string Table name
+ * @param string Fields
+ * @param string Options
+ */
+function db_create_table( $table, $fields, $options = 'ENGINE = innodb' )
+{
+	global $DB, $db_config;
+
+	if( isset( $db_config, $db_config['aliases'], $db_config['aliases'][ $table ] ) )
+	{ // Use table name with real prefix instead of T_
+		$table = $db_config['aliases'][ $table ];
+	}
+
+	// Check if the creating table doesn't exist in DB:
+	$unique_table = $table;
+	$next_table_index = 1;
+	while( $DB->get_var( 'SHOW TABLES LIKE '.$DB->quote( $unique_table ) ) )
+	{ // This table already exists in DB, try to find what next table name is free:
+		$unique_table = $table.'_'.$next_table_index;
+		$next_table_index++;
+	}
+	if( $unique_table != $table )
+	{ // Backup the existing table, in order to create the requeired table without error:
+		$DB->query( 'RENAME TABLE '.$table.' TO '.$unique_table );
+	}
+
+	// Create new table with requested table:
+	$DB->query( 'CREATE TABLE '.$table.' ( '.$fields.' ) '.$options );
+}
+
+
+/**
  * @return boolean Does a given index key name exist in DB?
  */
 function db_index_exists( $table, $index_name )
@@ -4489,14 +4523,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for file links voting... ' );
-		$DB->query( 'CREATE TABLE '.$tableprefix.'links__vote (
-				lvot_link_ID       int(11) UNSIGNED NOT NULL,
-				lvot_user_ID       int(11) UNSIGNED NOT NULL,
-				lvot_like          tinyint(1),
-				lvot_inappropriate tinyint(1),
-				lvot_spam          tinyint(1),
-				primary key (lvot_link_ID, lvot_user_ID)
-			) ENGINE = innodb' );
+		db_create_table( $tableprefix.'links__vote', '
+			lvot_link_ID       int(11) UNSIGNED NOT NULL,
+			lvot_user_ID       int(11) UNSIGNED NOT NULL,
+			lvot_like          tinyint(1),
+			lvot_inappropriate tinyint(1),
+			lvot_spam          tinyint(1),
+			primary key (lvot_link_ID, lvot_user_ID)' );
 
 		// Convert all file votes to link votes
 		$DB->query( 'INSERT INTO '.$tableprefix.'links__vote ( lvot_link_ID, lvot_user_ID, lvot_like, lvot_inappropriate, lvot_spam )
@@ -4510,12 +4543,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for goal categories... ' );
-		$DB->query( 'CREATE TABLE T_track__goalcat (
-				gcat_ID     int(10) unsigned NOT NULL auto_increment,
-				gcat_name   varchar(50) default NULL,
-				gcat_color  char(7) default NULL,
-				PRIMARY KEY (gcat_ID)
-			) ENGINE = myisam' );
+		db_create_table( 'T_track__goalcat', '
+			gcat_ID     int(10) unsigned NOT NULL auto_increment,
+			gcat_name   varchar(50) default NULL,
+			gcat_color  char(7) default NULL,
+			PRIMARY KEY (gcat_ID)',
+			'ENGINE = myisam' );
 		// Insert default goal category
 		$DB->query( 'INSERT INTO T_track__goalcat ( gcat_name, gcat_color )
 			VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
@@ -4558,7 +4591,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for email campaigns... ' );
-		$DB->query( 'CREATE TABLE T_email__campaign (
+		db_create_table( 'T_email__campaign', '
 			ecmp_ID          INT NOT NULL AUTO_INCREMENT,
 			ecmp_date_ts     TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			ecmp_name        VARCHAR(255) NOT NULL,
@@ -4566,17 +4599,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			ecmp_email_html  TEXT NULL,
 			ecmp_email_text  TEXT NULL,
 			ecmp_sent_ts     TIMESTAMP NULL,
-			PRIMARY KEY      (ecmp_ID)
-			) ENGINE = myisam' );
+			PRIMARY KEY      (ecmp_ID)',
+			'ENGINE = myisam' );
 		task_end();
 
 		task_begin( 'Create table for email campaign send data... ' );
-		$DB->query( 'CREATE TABLE T_email__campaign_send (
+		db_create_table( 'T_email__campaign_send', '
 			csnd_camp_ID  INT(11) UNSIGNED NOT NULL,
 			csnd_user_ID  INT(11) UNSIGNED NOT NULL,
 			csnd_emlog_ID INT(11) UNSIGNED NULL,
-			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
-			) ENGINE = myisam' );
+			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )',
+			'ENGINE = myisam' );
 		task_end();
 
 		task_begin( 'Rename table "email blocked" to "email address"... ' );
@@ -5073,14 +5106,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_locales', 'loc_shorttimefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i" AFTER loc_timefmt' );
 		task_end();
 		task_begin( 'Creating message prerendering cache table... ' );
-		$DB->query( 'CREATE TABLE T_messaging__prerendering(
-				mspr_msg_ID              INT(11) UNSIGNED NOT NULL,
-				mspr_format              ENUM("htmlbody","entityencoded","xml","text") COLLATE ascii_general_ci NOT NULL,
-				mspr_renderers           TEXT NOT NULL,
-				mspr_content_prerendered MEDIUMTEXT NULL,
-				mspr_datemodified        TIMESTAMP NOT NULL,
-				PRIMARY KEY (mspr_msg_ID, mspr_format)
-			) ENGINE = innodb' );
+		db_create_table( 'T_messaging__prerendering', '
+			mspr_msg_ID              INT(11) UNSIGNED NOT NULL,
+			mspr_format              ENUM("htmlbody","entityencoded","xml","text") COLLATE ascii_general_ci NOT NULL,
+			mspr_renderers           TEXT NOT NULL,
+			mspr_content_prerendered MEDIUMTEXT NULL,
+			mspr_datemodified        TIMESTAMP NOT NULL,
+			PRIMARY KEY (mspr_msg_ID, mspr_format)' );
 		db_add_col( 'T_messaging__message', 'msg_renderers', 'TEXT NOT NULL' );
 		$DB->query( 'UPDATE T_messaging__message SET msg_renderers = "default"' );
 		task_end();
@@ -5097,17 +5129,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for User post read status... ' );
-		$DB->query( 'CREATE TABLE T_users__postreadstatus (
+		db_create_table( 'T_users__postreadstatus', '
 			uprs_user_ID int(11) unsigned NOT NULL,
 			uprs_post_ID int(11) unsigned NOT NULL,
 			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
-			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
-			) ENGINE = innodb' );
+			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )' );
 		task_end();
 
 		task_begin( 'Create table for System log... ' );
-		$DB->query( "CREATE TABLE T_syslog (
+		db_create_table( 'T_syslog', "
 			slg_ID        INT NOT NULL AUTO_INCREMENT,
 			slg_timestamp TIMESTAMP NOT NULL,
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
@@ -5116,8 +5147,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			slg_object_ID INT UNSIGNED NOT NULL,
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),
-			INDEX         slg_object (slg_object, slg_object_ID)
-			) ENGINE = myisam" );
+			INDEX         slg_object (slg_object, slg_object_ID)",
+			'ENGINE = myisam' );
 		task_end();
 
 		set_upgrade_checkpoint( '11300' );
@@ -5204,34 +5235,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Creating table for User invitation codes... ' );
-		$DB->query( 'CREATE TABLE T_users__invitation_code (
+		db_create_table( 'T_users__invitation_code', '
 			ivc_ID        int(11) unsigned NOT NULL auto_increment,
 			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
 			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 			ivc_source    varchar(30) NULL,
 			ivc_grp_ID    int(4) NOT NULL,
 			PRIMARY KEY ( ivc_ID ),
-			UNIQUE ivc_code ( ivc_code )
-		) ENGINE = innodb' );
+			UNIQUE ivc_code ( ivc_code )' );
 		task_end();
 
 		task_begin( 'Creating table for User organizations... ' );
-		$DB->query( 'CREATE TABLE T_users__organization (
+		db_create_table( 'T_users__organization', '
 			org_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			org_name VARCHAR(255) NOT NULL,
 			org_url  VARCHAR(2000) NULL,
 			PRIMARY KEY ( org_ID ),
-			UNIQUE org_name ( org_name )
-		) ENGINE = innodb' );
+			UNIQUE org_name ( org_name )' );
 		task_end();
 
 		task_begin( 'Creating table for relations users with organizations... ' );
-		$DB->query( 'CREATE TABLE T_users__user_org (
+		db_create_table( 'T_users__user_org', '
 			uorg_user_ID  INT(11) UNSIGNED NOT NULL,
 			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
 			uorg_accepted TINYINT(1) DEFAULT 0,
-			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
-		) ENGINE = innodb' );
+			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )' );
 		task_end();
 
 		// Rename item settings:
@@ -5532,7 +5560,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Creating table for custom fields of Post Types... ' );
-		$DB->query( 'CREATE TABLE T_items__type_custom_field (
+		db_create_table( 'T_items__type_custom_field', '
 			itcf_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
 			itcf_label   VARCHAR(255) NOT NULL,
@@ -5540,8 +5568,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			itcf_type    ENUM( \'double\', \'varchar\' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
 			PRIMARY KEY ( itcf_ID ),
-			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
-		) ENGINE = innodb' );
+			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )' );
 
 		global $posttypes_perms;
 		// Create post types for each blog that has at aleast one custom field
@@ -6316,12 +6343,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part 18.p trunk aka 18th part of "i7"
 
 		task_begin( 'Creating table for PostType-to-Collection relationships...' );
-		$DB->query( "CREATE TABLE T_items__type_coll (
+		db_create_table( 'T_items__type_coll', '
 			itc_ityp_ID int(11) unsigned NOT NULL,
 			itc_coll_ID int(11) unsigned NOT NULL,
 			PRIMARY KEY (itc_ityp_ID, itc_coll_ID),
-			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )
-		) ENGINE = innodb" );
+			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )' );
 		task_end();
 
 		task_begin( 'Updating collection permissions... ' );
