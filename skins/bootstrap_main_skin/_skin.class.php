@@ -396,11 +396,10 @@ jQuery( document ).ready( function()
 {
 	jQuery( "#slide_button" ).click( function()
 	{
-		jQuery( "body.pictured" ).css( "height", "auto" ); // fix for webkit browsers to allow scrollTop
-		jQuery( "html, body" ).animate(
+		jQuery( "html, body, #skin_wrapper" ).animate(
 		{
 			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
-		}, 1500);
+		}, 1500 );
 	} );
 } );' );
 		}
