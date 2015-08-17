@@ -335,7 +335,7 @@ switch( $content_mode )
 		}
 
 		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
+			&& ( ($more || $params['force_more']) || ! $Item->has_content_parts($params) ) )
 		{	// Display attachments/files that are linked to this post:
 			$Item->files( array(
 					'before' =>              $params['attach_list_start'],
