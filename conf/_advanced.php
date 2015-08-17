@@ -314,11 +314,7 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
  */
-if( strpos($basehost, '.') === false )
-{	// localhost or windows machine name:
-	$cookie_domain = '';
-}
-elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
+if( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 {	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
@@ -332,6 +328,12 @@ else
 	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
 	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
 	// fp> pb with domains like .co.uk !?
+}
+
+if( isset( $_SERVER['HTTP_HOST'] ) && $_SERVER['HTTP_HOST'] != $basehost && strpos( $_SERVER['HTTP_HOST'], '.'.$basehost ) === false )
+{	// This is an external domain and we must use only this domain for cookie,
+	// otherwise it is impossible to log in
+	$cookie_domain = '.'.$_SERVER['HTTP_HOST'];
 }
 
 // echo $cookie_domain;
