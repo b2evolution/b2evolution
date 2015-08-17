@@ -428,6 +428,7 @@ function score_search_result( $search_keywords )
 	$keywords = array_unique( $keywords );
 
 	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+	$nr_of_items = count( $search_result );
 
 	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $comment_search_result );
@@ -447,6 +448,9 @@ function score_search_result( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
+		$search_result[0]['nr_of_items'] = $nr_of_items;
+		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
+		$search_result[0]['nr_of_cats_and_tags'] = count( $cats_and_tags_search_result );
 	}
 
 	return $search_result;
@@ -474,7 +478,7 @@ function search_result_block( $params = array() )
 			'date_format'           => locale_datefmt(),
 		), $params );
 
-	global $Blog, $Session, $search_result_loaded;
+	global $Blog, $Session, $search_result_loaded, $debug;
 
 	$search_result = $Session->get( 'search_result' );
 	if( empty( $search_result ) )
@@ -483,6 +487,16 @@ function search_result_block( $params = array() )
 		echo T_('Sorry, we could not find anything matching your request, please try to broaden your search.');
 		echo '<p>';
 		return;
+	}
+
+	if( $debug )
+	{
+		echo '<p class="msg_nothing" style="margin: 2em 0">';
+		echo 'Total processed result items by type:';
+		echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
+		echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
+		echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
+		echo '</p>';
 	}
 
 	$result_count = count( $search_result );
