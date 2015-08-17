@@ -377,8 +377,7 @@ body {
 }
 .posts_list .evo_post:hover img,
 .posts_list .posts_list .evo_post:hover b {
-  -moz-transform: rotate(-3deg);
-       transform: rotate(-3deg);
+  transform: rotate(-3deg);
   -ms-transform: rotate(-3deg);
   /* IE 9 */
   -webkit-transform: rotate(-3deg);
@@ -427,8 +426,7 @@ div.evo_image_index div img {
   -ms-transition: all 0.15s ease-in-out;
 }
 div.evo_image_index div:hover img {
-  -moz-transform: scale(1.06);
-       transform: scale(1.06);
+  transform: scale(1.06);
   -ms-transform: scale(1.06);
   /* IE 9 */
   -webkit-transform: scale(1.06);
@@ -447,8 +445,7 @@ div.evo_image_index div:hover {
   border-radius: 3px;
   border: 1px solid #ddd;
   background-color: #f5f5f5;
-  -moz-box-sizing: border-box;
-       box-sizing: border-box;
+  box-sizing: border-box;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 .nav_album .all_albums {
@@ -559,8 +556,7 @@ div.evo_image_index div:hover {
   -ms-transition: all 0.15s ease-in-out;
 }
 .post_images figure:hover img {
-  -moz-transform: scale(1.06);
-       transform: scale(1.06);
+  transform: scale(1.06);
   -ms-transform: scale(1.06);
   /* IE 9 */
   -webkit-transform: scale(1.06);

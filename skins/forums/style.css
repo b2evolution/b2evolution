@@ -254,6 +254,7 @@ div.pageTop a.selected:hover {
 	color: #DD6900;
 }
 .bForums th{
+	/* autoprefixer: off */
 	border-top: 3px solid #418aaf;
 	background:-webkit-linear-gradient(top, #03699c, #3a95c2);
 	background:-moz-linear-gradient(top, #03699c, #3a95c2);
@@ -305,6 +306,7 @@ td.InResponseTo h3 {
 .bForums tr.top td,
 .sidebar_block .sidebar_title,
 .meta_category th {
+	/* autoprefixer: off */
 	background:-webkit-linear-gradient(top, #c7d0d7, #e0e5e9);
 	background:-moz-linear-gradient(top, #c7d0d7, #e0e5e9);
 	background: -ms-linear-gradient(top, #c7d0d7, #e0e5e9);

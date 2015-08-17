@@ -24,8 +24,7 @@ div.browse > div.floatright {
 		width: 50%;
 		float: left;
 		padding-right: 14px;
-		-moz-box-sizing: border-box;
-		     box-sizing: border-box;
+		box-sizing: border-box;
 	}
 	div.dashboard_sidebar_panels .col-sm-6:last-child {
 		padding-right: 0;
@@ -36,8 +35,7 @@ div.browse > div.floatright {
 		width: 50%;
 		float: left;
 		padding-left: 14px;
-		-moz-box-sizing: border-box;
-		     box-sizing: border-box;
+		box-sizing: border-box;
 	}
 	div.browse .row .col-lg-6:first-child {
 		padding-left: 0;

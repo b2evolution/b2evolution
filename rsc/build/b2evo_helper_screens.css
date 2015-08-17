@@ -114,8 +114,7 @@ span.flag {
   font-size: 6px;
   display: inline-block !important;
   margin-bottom: -2px;
-  -moz-box-sizing: content-box;
-       box-sizing: content-box;
+  box-sizing: content-box;
 }
 .evo_form__install .radio {
   margin-top: 16px;

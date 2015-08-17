@@ -162,8 +162,7 @@ h2 {
 	-ms-transition: all 0.15s ease-in-out;
 }
 .posts_list .bPost:hover img, .posts_list .bPost:hover b {
-	-moz-transform:rotate(-3deg);
-	     transform:rotate(-3deg);
+	transform:rotate(-3deg);
 	-ms-transform:rotate(-3deg); /* IE 9 */
 	-webkit-transform:rotate(-3deg); /* Safari and Chrome */
 }
@@ -266,8 +265,7 @@ div.action_messages {
 	-ms-transition: all 0.15s ease-in-out;
 }
 .post_images .image_block div:hover img {
-	-moz-transform:scale(1.06);
-	     transform:scale(1.06);
+	transform:scale(1.06);
 	-ms-transform:scale(1.06); /* IE 9 */
 	-webkit-transform:scale(1.06); /* Safari and Chrome */
 }
@@ -311,8 +309,7 @@ div.mediajs_block, div.videojs_block, div.flowplayer_block {
 		display: block;
 		max-width: 100%;
 		width: 100%;
-		-moz-box-sizing: border-box;
-		     box-sizing: border-box;
+		box-sizing: border-box;
 	}
 }
 
@@ -546,6 +543,7 @@ div.tabs div.selected a {
 }
 
 #ios-arrow-left:before{
+	/* autoprefixer: off */
 	position:absolute;
 	content : ' ';
 	left:-8px;
@@ -575,7 +573,6 @@ div.tabs div.selected a {
 		);
 	-webkit-transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	-ms-transform : rotate(-45deg) skewY(-10deg) skewX(-11deg);
-	-moz-transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	     transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	border-top-right-radius : 11px;
 	border-top-left-radius :0px;
@@ -673,8 +670,7 @@ form#user_checkchanges.bComment {
 
 div.edit_toolbar, form.inskin .edit_area textarea, input.bComment, textarea.bComment {
 	width: 100%;
-	-moz-box-sizing: border-box;
-	     box-sizing: border-box;
+	box-sizing: border-box;
 }
 div.results, .messages_list h2 {
 	color: #222;
