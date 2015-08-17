@@ -1201,11 +1201,12 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
  * Get Blog object from general setting
  *
  * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'
+ * @param object|NULL Current collection, Used for additional checking
  * @param boolean true if function $BlogCache->get_by_ID() should die on error
  * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
  * @return object|NULL|false
  */
-function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_empty = false )
+function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false )
 {
 	global $Settings;
 
@@ -1213,6 +1214,11 @@ function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_emp
 
 	if( ! isset( $Settings ) )
 	{
+		return $setting_Blog;
+	}
+
+	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
+	{	// Don't allow to use main login collection if current collection has an external domain
 		return $setting_Blog;
 	}
 
