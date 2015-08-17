@@ -143,11 +143,6 @@ function score_date( $date )
  */
 function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $keywords )
 {
-	if( isset( $scores_map['whole_term'] ) )
-	{ // The whole search term was found
-		return 100;
-	}
-
 	switch( $type )
 	{
 		case 'item':
@@ -170,6 +165,16 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			debug_die( 'Invalid search type received!' );
 	}
 
+	// Check whole term match
+	foreach( $searched_parts as $searched_part )
+	{
+		if( isset( $scores_map[$searched_part]['map']['whole_term'] ) )
+		{ // The whole search term was found
+			return 100;
+		}
+	}
+
+	// Whole search term was not found, count percentage based on the matched parts
 	$matched_quoted_parts = 0;
 	foreach( $quoted_parts as $quoted_part )
 	{
