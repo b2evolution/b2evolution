@@ -266,10 +266,10 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<script type="text/javascript" src="../rsc/js/ext/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
-		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<script type="text/javascript" src="../rsc/js/ext/bootstrap/bootstrap.min.js"></script>
+		<link href="../rsc/css/ext/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
 	<body>

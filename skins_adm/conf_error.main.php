@@ -28,7 +28,7 @@ $locale_lang = locale_lang( false );
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title><?php echo format_to_output( $error_title, 'htmlhead' ); ?></title>
 		<!-- Bootstrap -->
-		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<link href="rsc/css/ext/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
 	<body>

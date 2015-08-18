@@ -888,7 +888,7 @@ class tinymce_plugin extends Plugin
 		$tmce_language = substr($current_locale, 0, 2);
 		// waltercruz> Fallback to english if there's no tinymce equivalent to the user locale
 		// to avoid some strange screens like http://www.flickr.com/photos/waltercruz/3390729964/
-		$lang_path = $rsc_path.'js/tiny_mce/langs/'.$tmce_language.'.js';
+		$lang_path = $rsc_path.'js/ext/tiny_mce/langs/'.$tmce_language.'.js';
 		if( !file_exists( $lang_path ) )
 		{
 			$tmce_language = 'en';
@@ -904,7 +904,7 @@ class tinymce_plugin extends Plugin
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
 		$init_options[] = 'plugins : "'.$tmce_plugins.'"';
 		$init_options[] = 'external_plugins: {
-				"morebreak"    : "'.$rsc_url.'js/tiny_mce/plugins/morebreak/plugin.min.js"
+				"morebreak"    : "'.$rsc_url.'js/ext/tiny_mce/plugins/morebreak/plugin.min.js"
 			}';
 		$init_options[] = 'morebreak_separator : "[teaserbreak]"';
 		$init_options[] = 'pagebreak_separator : "[pagebreak]"';
@@ -919,7 +919,7 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'block_formats : "Paragraph=p;Preformatted=pre;Block Quote=blockquote;Heading 2=h2;Heading 3=h3;Heading 4=h4;Heading 5=h5;Heading 6=h6;Address=address;Definition Term=dt;Definition Description=dd;DIV=div"';
 		$init_options[] = 'resize : true';
 		$init_options[] = 'language : "'.$tmce_language.'"';
-		$init_options[] = 'language_url : "'.$rsc_url.'js/tiny_mce/langs/'.$tmce_language.'.js"';
+		$init_options[] = 'language_url : "'.$rsc_url.'js/ext/tiny_mce/langs/'.$tmce_language.'.js"';
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
 			$init_options[] = 'spellchecker_rpc_url: \'spellchecker.php\'';

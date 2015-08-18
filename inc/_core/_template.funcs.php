@@ -1547,7 +1547,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
 	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
+	require_css( 'ext/jquery/farbtastic/farbtastic.css', $relative_to );
 }
 
 
@@ -1607,8 +1607,8 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
 			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
 			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
-			require_css( 'jquery/jquery.hintbox.css', $relative_to );
-			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
+			require_css( 'ext/jquery/jquery.hintbox.css', $relative_to );
+			require_js( 'ext/jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
 				var ajax_params = "";
@@ -2803,7 +2803,7 @@ function display_password_indicator( $params = array() )
 
 	echo "<script type='text/javascript'>
 	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
+	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/ext/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
 	// Call 'passcheck' function when document is loaded
 	if( document.addEventListener )
