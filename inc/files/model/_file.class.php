@@ -1072,6 +1072,7 @@ class File extends DataObject
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
+	 * @param array Exclude attributes
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1087,7 +1088,8 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = NULL )
+	                  $tag_size = NULL,
+	                  $exclude_attrs = array() )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1136,6 +1138,17 @@ class File extends DataObject
 				if( $img_attribs['alt'] == '' )
 				{ // Image alt
 					$img_attribs['alt'] = $image_alt;
+				}
+
+				if( count( $exclude_attrs ) )
+				{ // We should exclude several attributes:
+					foreach( $exclude_attrs as $exclude_attr )
+					{
+						if( isset( $img_attribs[ $exclude_attr ] ) )
+						{ // Exclude only if it is defined:
+							unset( $img_attribs[ $exclude_attr ] );
+						}
+					}
 				}
 
 				// Image tag
