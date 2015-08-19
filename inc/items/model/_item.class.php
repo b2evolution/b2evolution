@@ -823,7 +823,11 @@ class Item extends ItemLight
 			// Useful for code display.
 			// Will probably be used for validation also.
 			$Plugins_admin = & get_Plugins_admin();
-			$params = array( 'object_type' => 'Item', 'object_Blog' => & $this->Blog );
+			$params = array(
+					'object_type' => 'Item',
+					'object'      => & $this,
+					'object_Blog' => & $this->Blog
+				);
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
 			// Title checking:

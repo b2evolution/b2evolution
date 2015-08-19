@@ -27,7 +27,7 @@ Modifications by yura:
 	    - #header {.header-class-value#header-id-value}    => <h1 id="header-id-value" class="header-class-value">header</h1>
 	    - ####header {#header-id-value.header-class-value} => <h4 class="header-class-value" id="header-id-value">header</h4>
 	9. Don't apply <p> around list and already existing paragraph tags
-	10. Convert only '<' and '>' chars to HTML entities inside <code> html tags
+	10. Don't convert HTML entities inside <code> html tags because plugin "Escape code" does this
 */
 
 class Parsedown
@@ -496,8 +496,6 @@ class Parsedown
 					
 					$text = rtrim($element['text'], "\n");
 					
-					$text = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $text );
-					
 					strpos($text, "\x1A\\") !== FALSE and $text = strtr($text, $this->escape_sequence_map);
 					
 					$markup .= '<pre class="codeblock"><code>'.$text.'</code></pre>'."\n";
@@ -594,7 +592,6 @@ class Parsedown
 			foreach ($matches as $matches)
 			{
 				$element_text = $matches[1];
-				$element_text = str_replace( array( '<', '>' ), array( '&lt;', '&gt;' ), $element_text );
 				
 				# Decodes escape sequences.
 				
