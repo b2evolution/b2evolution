@@ -358,7 +358,11 @@ function search_result_block( $params = array() )
 		switch( $row['type'] )
 		{
 			case 'item':
-				$Item = $ItemCache->get_by_ID( $row['ID'] );
+				$Item = $ItemCache->get_by_ID( $row['ID'], false );
+				if( empty( $Item ) )
+				{ // This Item was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => $params['title_prefix_post'].$Item->get_title( array( 'link_type' => 'permalink' ) ),
 					'excerpt' => $Item->get_excerpt2(),
@@ -387,7 +391,11 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'comment':
-				$Comment = $CommentCache->get_by_ID( $row['ID'] );
+				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+				if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
+				{ // This Comment was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => $params['title_prefix_comment'].$Comment->get_permanent_link( '#item#' ),
 					'excerpt' => excerpt( $Comment->content ),
@@ -401,7 +409,11 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'category':
-				$Chapter = $ChapterCache->get_by_ID( $row['ID'] );
+				$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+				if( empty( $Chapter ) )
+				{ // This Chapter was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => $params['title_prefix_category'].' <a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>',
 					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
@@ -416,7 +428,7 @@ function search_result_block( $params = array() )
 				);
 
 			default: // Other type of result is not implemented
-				continue;
+				continue 2;
 		}
 
 		display_search_result( array_merge( $params, $display_params ) );
