@@ -19,7 +19,7 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
-$Timer->resume( '_init_session' );
+$Timer->start( '_init_session' );
 
 // fp> This needs to move to a better place
 // Check base domain for admin
@@ -33,6 +33,7 @@ if( !empty($is_admin_page) )
 	}
 }
 
+$Timer->start( '_init_session__new' );
 /**
  * The Session class.
  */
@@ -46,12 +47,14 @@ load_class( 'sessions/model/_session.class.php', 'Session' );
  *       fp> We might want to use a special session for CLI. And for cron jobs through http as well.
  */
 $Session = new Session(); // If this can't pull a session from the DB it will always INSERT a new one!
+$Timer->stop( '_init_session__new' );
 
 /**
  * Handle saving the HIT and updating the SESSION at the end of the page
  */
 register_shutdown_function( 'shutdown' );
 
+$Timer->start( '_init_session__plugin' );
 /**
  * Handle fatal error in order to display info message when debug is OFF
  */
@@ -62,6 +65,7 @@ register_shutdown_function( 'shutdown' );
 
 // NOTE: it might be faster (though more bandwidth intensive) to spit cached pages (CachePageContent event) than to look into blocking the request (SessionLoaded event).
 $Plugins->trigger_event( 'SessionLoaded' );
+$Timer->stop( '_init_session__plugin' );
 
 
 // Trigger a page content caching plugin. This would either return the cached content here or start output buffering
@@ -89,6 +93,7 @@ $Plugins->trigger_event( 'SessionLoaded' );
 */
 
 
+$Timer->start( '_init_session__user_settings' );
 // The following is needed during login, not sure that's right :/
 load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
 /**
@@ -97,6 +102,7 @@ load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
  * @global UserSettings $UserSettings
  */
 $UserSettings = new UserSettings();
+$Timer->stop( '_init_session__user_settings' );
 
 
 // LOGIN:
@@ -107,6 +113,7 @@ $Timer->resume( '_init_session' );
 
 
 
+$Timer->start( '_init_session__locale' );
 /*
  * User locale selection. Only override it if not set from REQUEST.
  */
@@ -120,6 +127,7 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 	 * User locale selection:
 	 * TODO: this should get done before instantiating $current_User, because we already use T_() there...
 	 */
+	$Timer->start( '_init_session__locale_activate' );
 	locale_activate( $current_User->get('locale') );
 	if( $current_locale == $current_User->get('locale') )
 	{
@@ -130,6 +138,8 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 	{
 		$Debuglog->add( 'Login: locale from user profile could not be activated: '.$current_User->get('locale'), 'locale' );
 	}
+	$Timer->stop( '_init_session__locale_activate' );
+	$Timer->start( '_init_session__locale_init_charsets' );
 	// Init charset based on the selected locale
 	if( init_charsets( $current_charset ) )
 	{ // Charset was changed reload current User from db to make sure that all of it's data is in the current charset
@@ -137,7 +147,9 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 		$UserCache->clear();
 		$current_User = & $UserCache->get_by_ID( $current_User->ID );
 	}
+	$Timer->stop( '_init_session__locale_init_charsets' );
 }
+$Timer->stop( '_init_session__locale' );
 
 
 $Timer->pause( '_init_session' );

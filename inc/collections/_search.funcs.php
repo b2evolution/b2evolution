@@ -566,7 +566,11 @@ function search_result_block( $params = array() )
 		switch( $row['type'] )
 		{
 			case 'item':
-				$Item = $ItemCache->get_by_ID( $row['ID'] );
+				$Item = $ItemCache->get_by_ID( $row['ID'], false );
+				if( empty( $Item ) )
+				{ // This Item was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
@@ -595,7 +599,11 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'comment':
-				$Comment = $CommentCache->get_by_ID( $row['ID'] );
+				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+				if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
+				{ // This Comment was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => $Comment->get_permanent_link( '#item#' ).$params['title_suffix_comment'],
 					'excerpt' => excerpt( $Comment->content ),
@@ -609,7 +617,11 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'category':
-				$Chapter = $ChapterCache->get_by_ID( $row['ID'] );
+				$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+				if( empty( $Chapter ) )
+				{ // This Chapter was deleted, since the search process was executed
+					continue 2; // skip from switch and skip to the next item in loop
+				}
 				$display_params = array(
 					'title'   => '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>'.$params['title_suffix_category'],
 					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
@@ -624,7 +636,7 @@ function search_result_block( $params = array() )
 				);
 
 			default: // Other type of result is not implemented
-				continue;
+				continue 2;
 		}
 
 		$display_params['score'] = $row['score'];
