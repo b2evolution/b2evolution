@@ -1067,14 +1067,14 @@ class File extends DataObject
 	 * @param string image rel
 	 * @param string image caption/description
 	 * @param integer Link ID
-	 * @param integer Ratio size, can be 1, 2 and etc.
-	 *                Example: $image_size_x = 2 return a result:
+	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
+	 *                Example: $image_size_x = 2 returns 2 img tags:
 	 *                          <img src="crop-480x320.jpg" />
 	 *                          <img src="crop-480x320.jpg" data-original="crop-960x640.jpg" class="image-2x" />
-	 * @param string Change size of the attributes "width" & "height".
+	 * @param string Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
-	 *                        NULL - use real size
+	 *                        NULL - use size defined by the thumbnail
 	 * @param array Exclude attributes
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
