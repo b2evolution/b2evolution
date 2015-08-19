@@ -92,6 +92,11 @@ body.pictured {
 		width: 100%;
 		height: 100%;
 		overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
+		&.skin_wrapper_loggedin {
+			// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+			margin-top: 0;
+			padding-top: 27px;
+		}
 	}
 	.container.main_page_wrapper {
 		display: table;

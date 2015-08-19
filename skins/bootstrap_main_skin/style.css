@@ -76,6 +76,10 @@ body.pictured #skin_wrapper {
   height: 100%;
   overflow-x: hidden;
 }
+body.pictured #skin_wrapper.skin_wrapper_loggedin {
+  margin-top: 0;
+  padding-top: 27px;
+}
 body.pictured .container.main_page_wrapper {
   display: table;
   height: 100%;
