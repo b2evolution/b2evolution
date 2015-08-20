@@ -5855,6 +5855,11 @@ class User extends DataObject
 	 */
 	function can_moderate_user( $user_ID, $assert = false )
 	{
+		if( $this->ID == $user_ID )
+		{	// User can edit own profile
+			return true;
+		}
+
 		if( $this->check_perm( 'users', 'edit' ) )
 		{ // User can edit all users
 			return true;
