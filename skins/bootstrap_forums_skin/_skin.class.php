@@ -719,6 +719,69 @@ class bootstrap_forums_Skin extends Skin
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
+
+	/**
+	 * Display a button to view the Recent/New Topics
+	 */
+	function display_button_recent_topics()
+	{
+		global $Blog;
+
+		if( ! is_logged_in() )
+		{	// For not logged in users:
+			$btn_class = 'btn-info';
+			$btn_title = T_('Recent Topics');
+		}
+		else
+		{	// For logged in users:
+			global $current_User, $DB;
+
+			// Subquery: To get the latest date of the touched comment:
+			$last_touched_SQL = new SQL();
+			$last_touched_SQL->SELECT( 'MAX( comment_last_touched_ts )' );
+			$last_touched_SQL->FROM( 'T_comments' );
+			$last_touched_SQL->WHERE( 'comment_item_ID = posts_table.post_ID' );
+			$last_touched_SQL->WHERE_and( statuses_where_clause( NULL, 'comment_', NULL, 'blog_comment!' ) );
+
+			// Subquery: To get IDs of all posts of the current collection:
+			$read_posts_SQL = new SQL();
+			$read_posts_SQL->SELECT( 'post_ID' );
+			$read_posts_SQL->FROM( 'T_users__postreadstatus' );
+			$read_posts_SQL->FROM_add( 'INNER JOIN T_items__item AS posts_table ON uprs_post_ID = post_ID' );
+			$read_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$read_posts_SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$read_posts_SQL->WHERE_and( 'uprs_read_post_ts > post_last_touched_ts' );
+			$read_posts_SQL->WHERE_and( 'uprs_read_comment_ts > ( '.$last_touched_SQL->get().' )' );
+			$read_posts_SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
+
+			// Main query: Get ID of one unread post for current user:
+			$unread_posts_SQL = new SQL();
+			$unread_posts_SQL->SELECT( 'post_ID' );
+			$unread_posts_SQL->FROM( 'T_items__item' );
+			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$unread_posts_SQL->WHERE( 'post_ID NOT IN ( '.$read_posts_SQL->get().' )' );
+			$unread_posts_SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$unread_posts_SQL->WHERE_and( statuses_where_clause() );
+			$unread_posts_SQL->LIMIT( 1 );
+
+			// Execute a query with two subqueries to know if current user has new data to view:
+			$new_data = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Check if current user has at least one unread topic' );
+
+			if( $new_data !== NULL )
+			{	// If at least one new unread topic exists
+				$btn_class = 'btn-warning';
+				$btn_title = T_('New Topics');
+			}
+			else
+			{	// Current user already have read all topics
+				$btn_class = 'btn-info';
+				$btn_title = T_('Recent Topics');
+			}
+		}
+
+		// Print out the button:
+		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right">'.$btn_title.'</a>';
+	}
 }
 
 ?>
