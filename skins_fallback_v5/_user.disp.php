@@ -223,14 +223,14 @@ echo '<div class="profile_column_left">';
 		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
-			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block" class="btn btn-warning">'
-					.'<button type="button">'.T_('Block Contact').'</button>'
+			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block">'
+					.'<button type="button" class="btn btn-warning">'.T_('Block Contact').'</button>'
 				.'</a>';
 		}
 		else
 		{ // Display a button to unblock user
-			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=unblock" class="btn btn-danger">'
-					.'<button type="button">'.T_('Unblock Contact').'</button>'
+			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=unblock">'
+					.'<button type="button" class="btn btn-danger">'.T_('Unblock Contact').'</button>'
 				.'</a>';
 		}
 	}
