@@ -518,6 +518,9 @@ function utf8_substr( $str, $start = 0, $length = NULL )
 	//iconv and mbstring are not tolerant to invalid encoding
 	//further, their behaviour is inconsistant with that of PHP's substr
 
+	// Try to use mbstring functions firstly before iconv functions, because
+	// iconv_substr() can reproduces an error noticing about illegal character in input string
+
 	if( mbstring_loaded() )
 	{
 		$str = utf8_clean( $str );

@@ -1075,7 +1075,7 @@ class File extends DataObject
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
-	 * @param array Exclude attributes
+	 *                        'none' - don't use attributes "width" & "height"
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1091,8 +1091,7 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = NULL,
-	                  $exclude_attrs = array() )
+	                  $tag_size = NULL )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1141,17 +1140,6 @@ class File extends DataObject
 				if( $img_attribs['alt'] == '' )
 				{ // Image alt
 					$img_attribs['alt'] = $image_alt;
-				}
-
-				if( count( $exclude_attrs ) )
-				{ // We should exclude several attributes:
-					foreach( $exclude_attrs as $exclude_attr )
-					{
-						if( isset( $img_attribs[ $exclude_attr ] ) )
-						{ // Exclude only if it is defined:
-							unset( $img_attribs[ $exclude_attr ] );
-						}
-					}
 				}
 
 				// Image tag
@@ -2250,6 +2238,7 @@ class File extends DataObject
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
+	 *                        'none' - don't use attributes "width" & "height"
 	 * @return array List of HTML attributes for the image.
 	 */
 	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL )
@@ -2271,30 +2260,36 @@ class File extends DataObject
 		if( $size_name == 'original' )
 		{	// We want src to link to the original file
 			$img_attribs['src'] = $this->get_url();
-			if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
-			{
-				$img_attribs += $size_arr;
+			if( $tag_size != 'none' )
+			{	// Add attributes "width" & "height" only when they are not disabled:
+				if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
+				{
+					$img_attribs += $size_arr;
+				}
 			}
 		}
 		else
 		{ // We want src to link to a thumbnail
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
-			$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
-			if( $tag_size !== NULL )
-			{ // Change size values
-				$tag_size = explode( 'x', $tag_size );
-				$img_attribs['width'] = $tag_size[0];
-				$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
-			}
-			elseif( substr( $thumb_path, 0, 1 ) != '!'
-				&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
-			{ // no error, add width and height attribs
-				$img_attribs += $size_arr;
-			}
-			elseif( $thumb_sizes = $this->get_thumb_size( $size_name ) )
-			{ // Get sizes that are used for thumbnail really
-				$img_attribs['width'] = $thumb_sizes[0];
-				$img_attribs['height'] = $thumb_sizes[1];
+			if( $tag_size != 'none' )
+			{	// Add attributes "width" & "height" only when they are not disabled:
+				$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
+				if( $tag_size !== NULL )
+				{	// Change size values
+					$tag_size = explode( 'x', $tag_size );
+					$img_attribs['width'] = $tag_size[0];
+					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( substr( $thumb_path, 0, 1 ) != '!'
+					&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
+				{	// no error, add width and height attribs
+					$img_attribs += $size_arr;
+				}
+				elseif( $thumb_sizes = $this->get_thumb_size( $size_name ) )
+				{	// Get sizes that are used for thumbnail really
+					$img_attribs['width'] = $thumb_sizes[0];
+					$img_attribs['height'] = $thumb_sizes[1];
+				}
 			}
 		}
 
