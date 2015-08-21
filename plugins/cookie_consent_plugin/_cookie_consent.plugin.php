@@ -141,7 +141,7 @@ class cookie_consent_plugin extends Plugin
 			$html_block .= '<p><a href="'.$Item->get_permanent_url().'">'.format_to_js( nl2br( $info ) ).'</a></p>';
 		}
 		$html_block .= '<p>'.format_to_js( nl2br( $consent ) ).'</p>'
-				.'<button class="btn btn-success">'.format_to_js( $accept_button ).'</button>'
+				.'<button class="btn btn-info">'.format_to_js( $accept_button ).'</button>'
 			.'</div>';
 
 		echo '<script type="text/javascript">
