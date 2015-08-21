@@ -736,22 +736,19 @@ class bootstrap_forums_Skin extends Skin
 		{	// For logged in users:
 			global $current_User, $DB;
 
-			// Subquery: To get IDs of all posts( of the current collection) that have been read by current user:
+			// Subquery: To get IDs of all posts that have been read by current user:
 			$read_posts_SQL = new SQL();
-			$read_posts_SQL->SELECT( 'post_ID' );
+			$read_posts_SQL->SELECT( 'uprs_post_ID' );
 			$read_posts_SQL->FROM( 'T_users__postreadstatus' );
-			$read_posts_SQL->FROM_add( 'INNER JOIN T_items__item ON uprs_post_ID = post_ID' );
-			$read_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$read_posts_SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$read_posts_SQL->WHERE_and( 'uprs_read_post_ts >= post_last_touched_ts' );
-			$read_posts_SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 
 			// Main query: Get ID of one unread post for current user:
 			$unread_posts_SQL = new SQL();
 			$unread_posts_SQL->SELECT( 'post_ID' );
 			$unread_posts_SQL->FROM( 'T_items__item' );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->WHERE( 'post_ID NOT IN ( '.$read_posts_SQL->get().' )' );
+			$unread_posts_SQL->WHERE( 'post_ID NOT IN ( '.$read_posts_SQL->get().' )' ); // Exclude the read posts
 			$unread_posts_SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 			$unread_posts_SQL->WHERE_and( statuses_where_clause() );
 			$unread_posts_SQL->LIMIT( 1 );
