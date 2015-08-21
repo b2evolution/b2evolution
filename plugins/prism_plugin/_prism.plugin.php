@@ -160,12 +160,22 @@ class prism_plugin extends Plugin
 
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
-		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql' ) ) )
+		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup' ) ) )
 		{ // Use Markup for unknown language
-			$lang = 'markup';
+			$lang = '';
 		}
 
-		$r = '<code class="language-'.$lang.'">'.$block[3].'</code>';
+		$code_class = '';
+		if( $type == 'codespan' )
+		{	// Use standard class for codespan:
+			$code_class .= 'codespan';
+		}
+		if( ! empty( $lang ) )
+		{	// Use language class only for known language:
+			$code_class .= ' language-'.$lang;
+		}
+
+		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$block[3].'</code>';
 
 		if( $type == 'codeblock' )
 		{ // Set special template and attributes only for codeblock
@@ -190,7 +200,7 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code( $content )
 	{
-		$content = preg_replace_callback( '#(<pre class="line-numbers"( data-start="(-?[0-9]+)")?>)?<code class="language-([a-z]+)">([\s\S]+?)?</code>(</pre>)?#i',
+		$content = preg_replace_callback( '#(<pre class="line-numbers"( data-start="(-?[0-9]+)")?>)?<code( class="([^"]+)")?>([\s\S]+?)?</code>(</pre>)?#i',
 								array( $this, 'unfilter_code_callback' ), $content );
 
 		return $content;
@@ -219,9 +229,24 @@ class prism_plugin extends Plugin
 			$line = ' line="'.( isset( $line[1] ) ? intval( $line[1] ) : '1' ).'"';
 		}
 
-		// Build codeblock
-		$r = '['.$code_tag.' lang="'.strtolower( $block[4] ).'"'.$line.']';
-		$r .= $block[5];
+		$lang = trim( strtolower( $block[5] ) );
+		if( ! empty( $lang ) )
+		{	// Add lang attribute only if it is defined:
+			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
+			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
+			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup' ) ) )
+			{	// Don't allow unknown language:
+				$lang = '';
+			}
+			else
+			{	// It is allowed language
+				$lang = ' lang="'.strtolower( $lang ).'"';
+			}
+		}
+
+		// Build codeblock:
+		$r = '['.$code_tag.$lang.$line.']';
+		$r .= $block[6];
 		$r .= '[/'.$code_tag.']';
 
 		return $r;
