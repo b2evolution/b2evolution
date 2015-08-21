@@ -204,18 +204,6 @@ pre[class*="language-"] {
 	padding-bottom: 0;
 }
 pre[class*='language-'] > code[data-language] {
-	overflow: auto;
+	overflow: visible;
 	line-height: 15px;
-}
-pre.line-numbers {
-	overflow: hidden;
-	padding-left: 3.3em;
-	width: 100%;
-	box-sizing: border-box;
-}
-pre.line-numbers > code {
-	position: static;
-}
-.line-numbers .line-numbers-rows {
-	left: 0;
 }
