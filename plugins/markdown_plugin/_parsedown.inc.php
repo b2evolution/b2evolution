@@ -27,7 +27,7 @@ Modifications by yura:
 	    - #header {.header-class-value#header-id-value}    => <h1 id="header-id-value" class="header-class-value">header</h1>
 	    - ####header {#header-id-value.header-class-value} => <h4 class="header-class-value" id="header-id-value">header</h4>
 	9. Don't apply <p> around list and already existing paragraph tags
-	10. Don't convert HTML entities inside <code> html tags because plugin "Escape code" does this
+	10. Don't convert HTML entities inside <code> html tags because the "Escape code" plugin does this
 */
 
 class Parsedown
