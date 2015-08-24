@@ -3135,7 +3135,7 @@ function init_fontawesome_icons( $icons_type = 'fontawesome' )
 	$b2evo_icons_type = $icons_type;
 
 	// Load main CSS file of font-awesome icons
-	require_css( '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' );
+	require_css( '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css' );
 }
 
 ?>

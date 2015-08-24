@@ -165,7 +165,7 @@ $b2evo_icons_type = 'fontawesome';
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo ' '.T_('Comment review').' '; ?></title>
-	<link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css?v=<?php echo $app_version_long; ?>">
+	<link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css?v=<?php echo $app_version_long; ?>">
 </head>
 
 <body>

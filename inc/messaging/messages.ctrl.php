@@ -224,10 +224,10 @@ switch( $action )
 		// Display messages list:
 		$action = $action == 'preview' ? $action : 'create';
 		$AdminUI->disp_view( 'messaging/views/_message_list.view.php', array(
-				'messages_list_title_start' => '',
-				'messages_list_title_end'   => '',
 				'messages_list_form_start'  => '',
 				'messages_list_form_end'    => '',
+				'messages_list_body_start'  => '',
+				'messages_list_body_end'    => '',
 			) );
 		break;
 }

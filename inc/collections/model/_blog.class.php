@@ -3265,9 +3265,18 @@ class Blog extends DataObject
 		{ // Only logged in users have an access to this blog
 			$Messages->add( T_( 'You need to log in before you can access this section.' ), 'error' );
 
-			// Redirect to login form on "access_requires_login.main.php"
-			header_redirect( get_login_url( 'no access to blog', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
-			// will have exited
+			$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+			if( $login_Blog && $login_Blog->ID != $this->ID )
+			{	// If this collection is not used for login actions,
+				// Redirect to login form on "access_requires_login.main.php":
+				header_redirect( get_login_url( 'no access to blog', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
+				// will have exited
+			}
+			else
+			{	// This collection is used for login actions
+				// Don't redirect, just display a login form of this collection:
+				$disp = 'access_requires_login';
+			}
 		}
 		elseif( $allow_access == 'members' )
 		{ // Check if current user is member of this blog
