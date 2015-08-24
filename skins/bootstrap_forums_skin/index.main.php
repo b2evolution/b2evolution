@@ -294,13 +294,13 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
 
-		<footer>
-		<?php skin_include( '_legend.inc.php' ); ?>
-		</footer>
-
 		</main>
 
 	</div><!-- .col -->
+
+	<footer class="col-md-12">
+	<?php skin_include( '_legend.inc.php' ); ?>
+	</footer>
 
 </div><!-- .row -->
 
