@@ -228,6 +228,9 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			'keywords' => $search_term,
 			'phrase' => 'OR',
 			'types'  => '-'.implode( ',', $filter_post_types ),
+			'orderby' => 'datemodified',
+			'order' => 'DESC',
+			'posts' => 1000
 		) );
 	$search_ItemList->query();
 
@@ -276,7 +279,13 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
-	$search_CommentList->set_filters( array( 'keywords' => $search_term, 'phrase' => 'OR', 'order_by' => 'date' ) );
+	$search_CommentList->set_filters( array(
+			'keywords' => $search_term,
+			'phrase' => 'OR',
+			'order_by' => 'date',
+			'order' => 'DESC',
+			'comments' => 1000
+		) );
 	$search_CommentList->query();
 
 	$search_result = array();
