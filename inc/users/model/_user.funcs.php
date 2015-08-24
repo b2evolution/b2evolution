@@ -702,7 +702,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
 	}
 
-	$register_url = url_add_param( $register_url, 'return_to='.$return_url, $glue );
+	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
 
 	return $register_url;
 }
