@@ -2372,9 +2372,9 @@ class File extends DataObject
 			return false;
 		}
 
-		if( isset( $img_attribs['width'], $img_attribs['height'] ) && ( $img_attribs['width'] > $min_size ) && ( $img_attribs['height'] > $min_size ) )
+		if( isset( $img_attribs['width'], $img_attribs['height'] ) )
 		{ // If image larger than 64x64 add class to display animated gif during loading
-			return true;
+			return ( $img_attribs['width'] > $min_size && $img_attribs['height'] > $min_size );
 		}
 
 		global $thumbnail_sizes;
