@@ -126,7 +126,8 @@ elseif( $comments_number > 25 )
 								'before_user' => '',
 								'after_user'  => '',
 								'link_text'   => 'only_avatar',
-								'link_class'  => 'ft_author_avatar'
+								'link_class'  => 'ft_author_avatar',
+								'thumb_class' => 'ft_author_avatar',
 							) );
 					$latest_Comment->date('D M j, Y H:i');
 					$latest_Comment->author2( array(

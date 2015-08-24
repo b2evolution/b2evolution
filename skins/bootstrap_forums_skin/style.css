@@ -203,6 +203,10 @@ ol.breadcrumb {
   -o-border-radius: 3px;
   border-radius: 3px;
 }
+.forums_list .ft_author_avatar .ft_author_avatar {
+  float: none;
+  margin-right: 0;
+}
 .forums_list .ft_comment_response h3 {
   margin: 0;
 }
