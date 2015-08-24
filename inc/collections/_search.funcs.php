@@ -216,7 +216,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  */
 function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
-	global $Blog, $posttypes_perms;
+	global $DB, $Blog, $posttypes_perms;
 
 	// Exclude search from 'sidebar' type posts and from reserved type with ID 5000
 	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
@@ -232,21 +232,30 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			'order' => 'DESC',
 			'posts' => 1000
 		) );
-	$search_ItemList->query();
+	$search_ItemList->query_init();
+
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login'
+		.$search_ItemList->ItemQuery->get_from()
+		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.$search_ItemList->ItemQuery->get_where()
+		.$search_ItemList->ItemQuery->get_group_by()
+		.$search_ItemList->ItemQuery->get_order_by()
+		.$search_ItemList->ItemQuery->get_limit();
+
+	$query_result = $DB->get_results( $search_query, OBJECT, 'Search items query' );
 
 	$search_result = array();
-	while( $Item = & $search_ItemList->get_next() )
+	foreach( $query_result as $row )
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $Item->get( 'title' ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['content'] = score_text( $Item->content, $search_term, $keywords, $quoted_parts );
-		$item_creator_login = $Item->get_creator_login();
-		if( !empty( $search_term ) && !empty( $item_creator_login ) && strpos( $item_creator_login, $search_term ) !== false )
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
+		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
 		}
-		$scores_map['last_mod_date'] = score_date( $Item->get_mod_date() );
+		$scores_map['last_mod_date'] = score_date( $row->post_datemodified );
 
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
@@ -256,7 +265,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'item',
 			'score' => $final_score,
-			'ID' => $Item->ID,
+			'ID' => $row->post_ID,
 			'scores_map' => $scores_map,
 		);
 	}
@@ -275,7 +284,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
  */
 function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 {
-	global $Blog;
+	global $DB, $Blog;
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
@@ -286,22 +295,32 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 			'order' => 'DESC',
 			'comments' => 1000
 		) );
-	$search_CommentList->query();
+	$search_CommentList->query_init();
+
+	$search_query = 'SELECT comment_ID, post_title, comment_content, comment_date,
+	 	IFNULL(comment_author, user_login) as author'
+		.$search_CommentList->CommentQuery->get_from()
+		.' LEFT JOIN T_items__item ON comment_item_ID = post_ID'
+		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.$search_CommentList->CommentQuery->get_where()
+		.$search_CommentList->CommentQuery->get_group_by()
+		.$search_CommentList->CommentQuery->get_order_by()
+		.$search_CommentList->CommentQuery->get_limit();
+
+	$query_result = $DB->get_results( $search_query, OBJECT, 'Search comments query' );
 
 	$search_result = array();
-	while( $Comment = & $search_CommentList->get_next() )
+	foreach( $query_result as $row )
 	{
-		$comment_Item = & $Comment->get_Item();
 		$scores_map = array();
 
-		$scores_map['item_title'] = score_text( $comment_Item->get( 'title' ), $search_term, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $Comment->get( 'content' ), $search_term, $keywords, $quoted_parts );
-		$comment_author_name = $Comment->get_author_name();
-		if( !empty( $comment_author_name ) && !empty( $search_term ) && strpos( $comment_author_name, $search_term ) !== false )
+		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts );
+		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts );
+		if( !empty( $row->author ) && !empty( $search_term ) && strpos( $row->author, $search_term ) !== false )
 		{
 			$scores_map['author_name'] = 5;
 		}
-		$scores_map['creation_date'] = score_date( $Comment->date );
+		$scores_map['creation_date'] = score_date( $row->comment_date );
 
 		$final_score = $scores_map['item_title']['score']
 			+ $scores_map['content']['score']
@@ -311,7 +330,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'comment',
 			'score' => $final_score,
-			'ID' => $Comment->ID,
+			'ID' => $row->comment_ID,
 			'scores_map' => $scores_map
 		);
 	}
