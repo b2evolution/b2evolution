@@ -276,20 +276,42 @@ function toggle_filter_area( filter_name )
 		return false;
 	}
 
-	var xy = clickimg.css( 'background-position' ).match( /-*\d+/g );
+	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
+	{	// Fontawesome icon | Glyph bootstrap icon
+		if( clickimg.data( 'toggle' ) != '' && clickimg.data( 'toggle' ) != undefined )
+		{	// This icon has a class name to toggle
+			var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
+			if( clickimg.data( 'toggle-orig-class' ) == undefined )
+			{	// Store original class name in data
+				clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
+			}
+			if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
+			{	// Replace original class name with exnpanded
+				clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
+					.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
+			}
+			else
+			{	// Revert back original class
+				clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
+					.addClass( clickimg.data( 'toggle-orig-class' ) );
+			}
+		}
+	}
+	else
+	{	// Sprite icon
+		var xy = clickimg.css( 'background-position' ).match( /-*\d+/g );
+		// Shift background position to the right/left to the one icon in the sprite
+		clickimg.css( 'background-position', ( parseInt( xy[0] ) + ( !clickdiv.is( ':hidden' ) ? 16 : - 16 ) ) + 'px ' + parseInt( xy[1] ) + 'px' );
+	}
 
 	if( !clickdiv.is( ':hidden' ) )
 	{	// Hide/collapse filters:
 		clickdiv.slideUp( 500 );
-		// Shift background position to the right to the one icon in the sprite
-		clickimg.css( 'background-position', ( parseInt( xy[0] ) + 16 ) + 'px ' + parseInt( xy[1] ) + 'px' );
 		jQuery.post( htsrv_url+'anon_async.php?action=collapse_filter&target='+filter_name );
 	}
 	else
 	{	// Show/expand filters
 		clickdiv.slideDown( 500 );
-		// Shift background position to the left to the one icon in the sprite
-		clickimg.css( 'background-position', ( parseInt( xy[0] ) - 16 ) + 'px ' + parseInt( xy[1] ) + 'px' );
 		jQuery.post( htsrv_url+'anon_async.php?action=expand_filter&target='+filter_name );
 	}
 
