@@ -2410,8 +2410,8 @@ class Form extends Widget
 
 		$r = $this->begin_field();
 		if( !empty( $field_params['parent'] ) )
-		{// need to display an arrow to show that this select list options has a preselection from a parent
-			$r .= get_icon( 'parent_childto_arrow' );
+		{	// need to display an arrow to show that this select list options has a preselection from a parent
+			$r .= get_icon( 'multi_action' );
 		}
 
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';

@@ -324,11 +324,6 @@ function get_icon_info( $name )
 			'glyph' => 'download-alt',
 			'fa' => 'download'
 		);
-		case 'arrow-down-green': return array(
-			'alt'  => T_('Download'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 96, 272 )
-		);
 
 
 		case 'warning': return array( // TODO: not really transparent at its borders
@@ -627,12 +622,6 @@ function get_icon_info( $name )
 			'glyph' => 'resize-full',
 			'fa' => 'unlink',
 			'color' => '#F00',
-		);
-
-		case 'parent_childto_arrow': return array(
-			'alt'  => '+',
-			'size' => array( 14, 16 ),
-			'xy' => array( 16, 128 )
 		);
 
 		case 'help': return array(
