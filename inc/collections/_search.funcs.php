@@ -143,11 +143,6 @@ function score_date( $date )
  */
 function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $keywords )
 {
-	if( isset( $scores_map['whole_term'] ) )
-	{ // The whole search term was found
-		return 100;
-	}
-
 	switch( $type )
 	{
 		case 'item':
@@ -170,6 +165,16 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			debug_die( 'Invalid search type received!' );
 	}
 
+	// Check whole term match
+	foreach( $searched_parts as $searched_part )
+	{
+		if( isset( $scores_map[$searched_part]['map']['whole_term'] ) )
+		{ // The whole search term was found
+			return 100;
+		}
+	}
+
+	// Whole search term was not found, count percentage based on the matched parts
 	$matched_quoted_parts = 0;
 	foreach( $quoted_parts as $quoted_part )
 	{
@@ -211,7 +216,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  */
 function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
-	global $Blog, $posttypes_perms;
+	global $DB, $Blog, $posttypes_perms;
 
 	// Exclude search from 'sidebar' type posts and from reserved type with ID 5000
 	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
@@ -223,22 +228,34 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			'keywords' => $search_term,
 			'phrase' => 'OR',
 			'types'  => '-'.implode( ',', $filter_post_types ),
+			'orderby' => 'datemodified',
+			'order' => 'DESC',
+			'posts' => 1000
 		) );
-	$search_ItemList->query();
+	$search_ItemList->query_init();
+
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login'
+		.$search_ItemList->ItemQuery->get_from()
+		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.$search_ItemList->ItemQuery->get_where()
+		.$search_ItemList->ItemQuery->get_group_by()
+		.$search_ItemList->ItemQuery->get_order_by()
+		.$search_ItemList->ItemQuery->get_limit();
+
+	$query_result = $DB->get_results( $search_query, OBJECT, 'Search items query' );
 
 	$search_result = array();
-	while( $Item = & $search_ItemList->get_next() )
+	foreach( $query_result as $row )
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $Item->get( 'title' ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['content'] = score_text( $Item->content, $search_term, $keywords, $quoted_parts );
-		$item_creator_login = $Item->get_creator_login();
-		if( !empty( $search_term ) && !empty( $item_creator_login ) && strpos( $item_creator_login, $search_term ) !== false )
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
+		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
 		}
-		$scores_map['last_mod_date'] = score_date( $Item->get_mod_date() );
+		$scores_map['last_mod_date'] = score_date( $row->post_datemodified );
 
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
@@ -248,7 +265,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'item',
 			'score' => $final_score,
-			'ID' => $Item->ID,
+			'ID' => $row->post_ID,
 			'scores_map' => $scores_map,
 		);
 	}
@@ -267,27 +284,43 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
  */
 function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 {
-	global $Blog;
+	global $DB, $Blog;
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
-	$search_CommentList->set_filters( array( 'keywords' => $search_term, 'phrase' => 'OR', 'order_by' => 'date' ) );
-	$search_CommentList->query();
+	$search_CommentList->set_filters( array(
+			'keywords' => $search_term,
+			'phrase' => 'OR',
+			'order_by' => 'date',
+			'order' => 'DESC',
+			'comments' => 1000
+		) );
+	$search_CommentList->query_init();
+
+	$search_query = 'SELECT comment_ID, post_title, comment_content, comment_date,
+	 	IFNULL(comment_author, user_login) as author'
+		.$search_CommentList->CommentQuery->get_from()
+		.' LEFT JOIN T_items__item ON comment_item_ID = post_ID'
+		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.$search_CommentList->CommentQuery->get_where()
+		.$search_CommentList->CommentQuery->get_group_by()
+		.$search_CommentList->CommentQuery->get_order_by()
+		.$search_CommentList->CommentQuery->get_limit();
+
+	$query_result = $DB->get_results( $search_query, OBJECT, 'Search comments query' );
 
 	$search_result = array();
-	while( $Comment = & $search_CommentList->get_next() )
+	foreach( $query_result as $row )
 	{
-		$comment_Item = & $Comment->get_Item();
 		$scores_map = array();
 
-		$scores_map['item_title'] = score_text( $comment_Item->get( 'title' ), $search_term, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $Comment->get( 'content' ), $search_term, $keywords, $quoted_parts );
-		$comment_author_name = $Comment->get_author_name();
-		if( !empty( $comment_author_name ) && !empty( $search_term ) && strpos( $comment_author_name, $search_term ) !== false )
+		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts );
+		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts );
+		if( !empty( $row->author ) && !empty( $search_term ) && strpos( $row->author, $search_term ) !== false )
 		{
 			$scores_map['author_name'] = 5;
 		}
-		$scores_map['creation_date'] = score_date( $Comment->date );
+		$scores_map['creation_date'] = score_date( $row->comment_date );
 
 		$final_score = $scores_map['item_title']['score']
 			+ $scores_map['content']['score']
@@ -297,7 +330,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 		$search_result[] = array(
 			'type' => 'comment',
 			'score' => $final_score,
-			'ID' => $Comment->ID,
+			'ID' => $row->comment_ID,
 			'scores_map' => $scores_map
 		);
 	}
@@ -423,6 +456,7 @@ function score_search_result( $search_keywords )
 	$keywords = array_unique( $keywords );
 
 	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+	$nr_of_items = count( $search_result );
 
 	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $comment_search_result );
@@ -442,6 +476,9 @@ function score_search_result( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
+		$search_result[0]['nr_of_items'] = $nr_of_items;
+		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
+		$search_result[0]['nr_of_cats_and_tags'] = count( $cats_and_tags_search_result );
 	}
 
 	return $search_result;
@@ -469,7 +506,7 @@ function search_result_block( $params = array() )
 			'date_format'           => locale_datefmt(),
 		), $params );
 
-	global $Blog, $Session, $search_result_loaded;
+	global $Blog, $Session, $search_result_loaded, $debug;
 
 	$search_result = $Session->get( 'search_result' );
 	if( empty( $search_result ) )
@@ -478,6 +515,16 @@ function search_result_block( $params = array() )
 		echo T_('Sorry, we could not find anything matching your request, please try to broaden your search.');
 		echo '<p>';
 		return;
+	}
+
+	if( $debug )
+	{
+		echo '<p class="msg_nothing" style="margin: 2em 0">';
+		echo 'Total processed result items by type:';
+		echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
+		echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
+		echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
+		echo '</p>';
 	}
 
 	$result_count = count( $search_result );
