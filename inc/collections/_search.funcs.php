@@ -21,7 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string the search keywords to score by
  * @return integer the result score
  */
-function score_text( $text, $search_term, & $percentage_map, $max_score, $words = array(), $quoted_terms = array() )
+function score_text( $text, $search_term, $words = array(), $quoted_terms = array(), $score_weight = 1 )
 {
 	global $Debuglog;
 
@@ -31,10 +31,9 @@ function score_text( $text, $search_term, & $percentage_map, $max_score, $words 
 	if( !empty( $search_term ) && strpos( $text, $search_term ) !== false )
 	{
 		// the max score what it may received in this methods
-		$score += $max_score + count( $words ) + count( $quoted_terms ) * 2;
-		$scores_map['whole_term'] = $max_score;
-		$percentage_map['whole_term'] = 1;
-		return array( 'score' => $score, 'map' => $scores_map, 'percentage_map' => $percentage_map );
+		$score = ( ( count( $words ) * 3 ) + ( count( $quoted_terms ) * 6 ) ) * 2 * $score_weight;
+		$scores_map['whole_term'] = $score;
+		return array( 'score' => $score, 'map' => $scores_map );
 	}
 
 	$all_found = true;
@@ -48,11 +47,6 @@ function score_text( $text, $search_term, & $percentage_map, $max_score, $words 
 		else
 		{
 			$score += ( ( $count > 1 ) ? 8 : 6 );
-//			if( ! isset( $percentage_map['quoted_term'][$quoted_term] ) || $percentage_map['quoted_term'][$quoted_term] < 6 )
-//			{
-//				$percentage_map['quoted_term'][$quoted_term] = 6;
-//			}
-			$percentage_map['quoted_parts'][$quoted_term] = 1;
 			$scores_map['quoted_term'][$quoted_term] = ( $count > 1 ) ? 8 : 6;
 		}
 	}
@@ -73,25 +67,15 @@ function score_text( $text, $search_term, & $percentage_map, $max_score, $words 
 		}
 		else
 		{
-			$score += ( ( $count > 1 ) ? 2 : 1 );
-//			if( ! isset( $percentage_map['word_case_sensitive_match'][$word] ) )
-//			{
-//				$percentage_map['word_case_sensitive_match'][$word] = 1;
-//			}
-//			$percentage_map['keywords'][$word] = 1;
-			$scores_map['word_case_sensitive_match'][$word] = ( $count > 1 ) ? 2 : 1;
+			$scores_map['word_case_sensitive_match'][$word] = ( ( $count > 1 ) ? 2 : 1 ) * $score_weight;
+			$score += $scores_map['word_case_sensitive_match'][$word];
 		}
 
 		if( $word_match_count = preg_match_all( '/\b'.$word.'\b/i', $text, $matches ) )
 		{ // Every word match gives one more score
-			// $Debuglog->add( sprintf('Word match: [%s]', $word), 'info' );
-			$score += ( ( $word_match_count > 1 ) ? 2 : 1 );
-//			if( ! isset( $percentage_map['whole_word_match'][$word] ) )
-//			{
-//				$percentage_map['whole_word_match'][$word] = 1;
-//			}
-//			$percentage_map['keywords'][$word] = 1;
-			$scores_map['whole_word_match'][$word] = ( ( $word_match_count > 1 ) ? 2 : 1 );
+			$scores_map['whole_word_match'][$word] = ( ( $word_match_count > 1 ) ? 2 : 1 ) * $score_weight;
+			$score += $scores_map['whole_word_match'][$word];
+
 		}
 		else
 		{
@@ -101,13 +85,7 @@ function score_text( $text, $search_term, & $percentage_map, $max_score, $words 
 
 		if( $any_match_count = preg_match_all( '/'.$word.'/i', $text, $matches ) )
 		{ // Every word match gives one more score
-			// $Debuglog->add( sprintf('Word match: [%s]', $word), 'info' );
-//			if( ! isset( $percentage_map['word_case_insensitive_match'][$word] ) )
-//			{
-//				$percentage_map['word_case_insensitive_match'][$word] = 1;
-//			}
-			$percentage_map['keywords'][$word] = 1;
-			$scores_map['word_case_insensitive_match'][$word] = ( ( $any_match_count > 1 ) ? 2 : 1 );
+			$scores_map['word_case_insensitive_match'][$word] = ( ( $any_match_count > 1 ) ? 2 : 1 ) * $score_weight;
 			$score += $scores_map['word_case_insensitive_match'][$word];
 		}
 	}
@@ -124,7 +102,7 @@ function score_text( $text, $search_term, & $percentage_map, $max_score, $words 
 		$scores_map['all_whole_words'] = 4;
 	}
 
-	return array( 'score' => $score, 'map' => $scores_map, 'percentage_map' => $percentage_map );
+	return array( 'score' => $score, 'map' => $scores_map );
 }
 
 
@@ -159,39 +137,67 @@ function score_date( $date )
 
 
 /**
- * Get percentage scores from the calculated map
+ * Get percentage value from the detailed result information
  *
- * @param array percentage map
- * @return number percentage score
+ * @return number the calculated percentage value about result - search term fit
  */
-function get_percentage_score( $percentage_map, $max_score )
+function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $keywords )
 {
-	$score = 0;
-	if( isset( $percentage_map['whole_term'] ) )
-	{
-		return $max_score;
+	if( isset( $scores_map['whole_term'] ) )
+	{ // The whole search term was found
+		return 100;
 	}
 
-	if( isset( $percentage_map['quoted_parts'] ) )
+	switch( $type )
 	{
-		foreach( $percentage_map['quoted_parts'] as $found )
+		case 'item':
+			$searched_parts = array( 'title', 'content' );
+			break;
+
+		case 'comment':
+			$searched_parts = array( 'item_title', 'content' );
+			break;
+
+		case 'category':
+			$searched_parts = array( 'name', 'description' );
+			break;
+
+		case 'tag':
+			$searched_parts = array( 'name' );
+			break;
+
+		default:
+			debug_die( 'Invalid search type received!' );
+	}
+
+	$matched_quoted_parts = 0;
+	foreach( $quoted_parts as $quoted_part )
+	{
+		foreach( $searched_parts as $searched_part )
 		{
-			if( $found )
+			if( isset( $scores_map[$searched_part]['map']['quoted_term'][$quoted_part] ) )
 			{
-				$score += 6;
+				$matched_quoted_parts++;
+				break; // go to the next quoted part
 			}
 		}
 	}
 
-	foreach( $percentage_map['keywords'] as $found )
+	$matched_keywords = 0;
+	foreach( $keywords as $keyword )
 	{
-		if( $found )
+		foreach( $searched_parts as $searched_part )
 		{
-			$score += 3;
+			if( isset( $scores_map[$searched_part]['map']['word_case_insensitive_match'][$keyword] ) )
+			{
+				$matched_keywords++;
+				break; // go to the next quoted part
+			}
 		}
 	}
 
-	return $score;
+	// return round( ( $matched_keywords + ( 2 * $matched_quoted_parts ) ) * 100 / ( count( $keywords ) + ( 2 * count( $quoted_parts ) ) ) );
+	return round( ( $matched_keywords + $matched_quoted_parts ) * 100 / ( count( $keywords ) + count( $quoted_parts ) ) );
 }
 
 
@@ -203,7 +209,7 @@ function get_percentage_score( $percentage_map, $max_score )
  * @param array all quoted parts from the search term
  * @param number max possible score
  */
-function search_and_score_items( $search_term, $keywords, $quoted_parts, $percentage_map, $max_score )
+function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
 	global $Blog, $posttypes_perms;
 
@@ -224,10 +230,9 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $percen
 	while( $Item = & $search_ItemList->get_next() )
 	{
 		$scores_map = array();
-		$item_percentage_map = $percentage_map;
 
-		$scores_map['title'] = score_text( $Item->get( 'title' ), $search_term, $item_percentage_map, $max_score, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $Item->content, $search_term, $item_percentage_map, $max_score, $keywords, $quoted_parts );
+		$scores_map['title'] = score_text( $Item->get( 'title' ), $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['content'] = score_text( $Item->content, $search_term, $keywords, $quoted_parts );
 		$item_creator_login = $Item->get_creator_login();
 		if( !empty( $search_term ) && !empty( $item_creator_login ) && strpos( $item_creator_login, $search_term ) !== false )
 		{
@@ -239,65 +244,14 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $percen
 			+ $scores_map['content']['score']
 			+ ( isset( $scores_map['creator_login'] ) ? $scores_map['creator_login'] : 0 )
 			+ $scores_map['last_mod_date'];
-		$percentage_score = get_percentage_score( $item_percentage_map, $max_score );
 
 		$search_result[] = array(
 			'type' => 'item',
 			'score' => $final_score,
 			'ID' => $Item->ID,
 			'scores_map' => $scores_map,
-			'percentage' => round( $percentage_score * 100 / $max_score ),
 		);
 	}
-
-//	// Giving percentage values
-//	foreach( $search_result as $index => $result_value )
-//	{
-//		$scores_map = $result_value['scores_map'];
-//		if( isset( $scores_map['whole_term'] ) )
-//		{
-//			$search_result[$index]['percentage'] = 100;
-//		}
-//		else
-//		{
-//			$matched_quoted_parts = 0;
-//			foreach( $quoted_parts as $quoted_part )
-//			{
-//				if( isset( $scores_map['title']['map']['quoted_term'][$quoted_part] )
-//					|| isset( $scores_map['content']['map']['quoted_term'][$quoted_part]) )
-//				{
-//					$matched_quoted_parts++;
-//				}
-//			}
-//			$percentage_score = $matched_quoted_parts * 6/* + ( ( $matched_quoted_parts == count( $quoted_parts ) ) ? 4 : 0 )*/;
-//
-//			$matched_keywords = 0;
-//			foreach( $keywords as $keyword )
-//			{
-//				if( isset( $scores_map['title']['map']['word_case_sensitive_match'][$keyword] )
-//					|| isset( $scores_map['content']['map']['word_case_sensitive_match'][$keyword]) )
-//				{
-//					$matched_keywords++;
-//				}
-//				if( isset( $scores_map['title']['map']['whole_word_match'][$keyword] )
-//					|| isset( $scores_map['content']['map']['whole_word_match'][$keyword]) )
-//				{
-//					$matched_keywords++;
-//				}
-//				if( isset( $scores_map['title']['map']['word_case_insensitive_match'][$keyword] )
-//					|| isset( $scores_map['content']['map']['word_case_insensitive_match'][$keyword]) )
-//				{
-//					$matched_keywords++;
-//				}
-//			}
-//
-//			$percentage_score += $matched_keywords /*+ ( ( count( $keywords ) == $matched_keywords / 3 ) ? 8 : 0 )*/;
-//			// $search_result[$index]['percentage'] = ( $percentage_score * 100 ) / $max_score;
-//			$final_score = $search_result[$index]['score'];
-//			$search_result[$index]['percentage'] = ( $final_score >= $max_score ) ? 100 : round( ( $final_score * 100 ) / $max_score );
-//			$search_result[$index]['percentage_score'] = $percentage_score;
-//		}
-//	}
 
 	return $search_result;
 }
@@ -311,7 +265,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $percen
  * @param array all quoted parts from the search term
  * @param number max possible score
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts, $percentage_map, $max_score )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 {
 	global $Blog;
 
@@ -325,10 +279,9 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $per
 	{
 		$comment_Item = & $Comment->get_Item();
 		$scores_map = array();
-		$comment_percentage_map = $percentage_map;
 
-		$scores_map['item_title'] = score_text( $comment_Item->get( 'title' ), $search_term, $comment_percentage_map, $max_score, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $Comment->get( 'content' ), $search_term, $comment_percentage_map, $max_score, $keywords, $quoted_parts );
+		$scores_map['item_title'] = score_text( $comment_Item->get( 'title' ), $search_term, $keywords, $quoted_parts );
+		$scores_map['content'] = score_text( $Comment->get( 'content' ), $search_term, $keywords, $quoted_parts );
 		$comment_author_name = $Comment->get_author_name();
 		if( !empty( $comment_author_name ) && !empty( $search_term ) && strpos( $comment_author_name, $search_term ) !== false )
 		{
@@ -340,12 +293,10 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $per
 			+ $scores_map['content']['score']
 			+ ( isset( $scores_map['author_name'] ) ? $scores_map['author_name'] : 0 )
 			+ $scores_map['creation_date'];
-		$percentage_score = get_percentage_score( $comment_percentage_map, $max_score );
 
 		$search_result[] = array(
 			'type' => 'comment',
 			'score' => $final_score,
-			'percentage' => round( $percentage_score * 100 / $max_score ),
 			'ID' => $Comment->ID,
 			'scores_map' => $scores_map
 		);
@@ -355,7 +306,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $per
 }
 
 
-function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_parts, $percentage_map, $max_score )
+function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_parts )
 {
 	global $DB, $Blog;
 
@@ -380,10 +331,9 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 	$ChapterCache->load_where( $cat_where_condition );
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
 	{
-		$chapters_percentage_map = $percentage_map;
 		$scores_map = array();
-		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $chapters_percentage_map, $max_score, $keywords, $quoted_parts );
-		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $chapters_percentage_map, $max_score, $keywords, $quoted_parts );
+		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts );
 
 		$post_count = get_postcount_in_category( $iterator_Chapter->ID, $Blog->ID );
 		$post_score = intval( $post_count / 3 );
@@ -398,12 +348,9 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 			+ $scores_map['post_count']
 			+ $scores_map['comment_count'];
 
-		$percentage_score = get_percentage_score( $chapters_percentage_map, $max_score );
-
 		$search_result[] = array(
 			'type' => 'category',
 			'score' => $final_score,
-			'percentage' => round( $percentage_score * 100 / $max_score ),
 			'ID' => $iterator_Chapter->ID,
 			'scores_map' => $scores_map
 		);
@@ -425,16 +372,13 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 		}
 
 		$scores_map = array();
-		$tags_percentage_map = $percentage_map;
-		$scores_map['name'] = score_text( $tag_name, $search_term, $tags_percentage_map, $max_score, $keywords, $quoted_parts );
+		$scores_map['name'] = score_text( $tag_name, $search_term, $keywords, $quoted_parts, 3 );
 		$scores_map['post_count'] = $post_count;
 		$final_score = $scores_map['name']['score'] * $post_count;
-		$percentage_score = get_percentage_score( $tags_percentage_map, $max_score );
 
 		$search_result[] = array(
 			'type' => 'tag',
 			'score' => $final_score,
-			'percentage' => round( $percentage_score * 100 / $max_score ),
 			'ID' => $tag_name.':'.$post_count,
 			'scores_map' => $scores_map
 		);
@@ -478,25 +422,12 @@ function score_search_result( $search_keywords )
 	$keywords = preg_split( '/\s+/', $keywords );
 	$keywords = array_unique( $keywords );
 
-	$percentage_map = array();
-	foreach( $quoted_parts as $quoted_part )
-	{
-		$percentage_map['quoted_parts'][$quoted_part] = 0;
-	}
-	foreach( $keywords as $keyword )
-	{
-		$percentage_map['keywords'][$keyword] = 0;
-	}
+	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
 
-	$max_score =( count( $quoted_parts ) * 6/* + 4*/ ) + ( count( $keywords ) * 3/* + 8*/ );
-	// $max_score =( count( $quoted_parts ) * 6 + 4 ) + ( count( $keywords ) * 3 + 8 );
-
-	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $percentage_map, $max_score );
-
-	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $percentage_map, $max_score );
+	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $comment_search_result );
 
-	$cats_and_tags_search_result = search_and_score_chapters_and_tags( $search_keywords, $keywords, $quoted_parts, $percentage_map, $max_score );
+	$cats_and_tags_search_result = search_and_score_chapters_and_tags( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $cats_and_tags_search_result );
 
 	$score_result = array();
@@ -505,6 +436,13 @@ function score_search_result( $search_keywords )
 		$score_result[] = $result_item['score'];
 	}
 	array_multisort( $score_result, SORT_DESC, $search_result );
+
+	if( count( $search_result ) > 0 )
+	{
+		$first_result = $search_result[0];
+		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
+		$search_result[0]['percentage'] = $max_percentage;
+	}
 
 	return $search_result;
 }
@@ -618,6 +556,10 @@ function search_result_block( $params = array() )
 
 	echo $params['block_start'];
 
+	// Get best result values
+	$max_percentage = $search_result[0]['percentage'];
+	$max_score = $search_result[0]['score'];
+
 	for( $index = $from; $index < $to; $index++ )
 	{
 		$row = $search_result[ $index ];
@@ -698,7 +640,7 @@ function search_result_block( $params = array() )
 		}
 
 		$display_params['score'] = $row['score'];
-		$display_params['percentage'] = $row['percentage'];
+		$display_params['percentage'] = isset( $row['percentage'] ) ? $row['percentage'] : round( $row['score'] * $max_percentage / $max_score );
 		$display_params['scores_map'] = $row['scores_map'];
 		$display_params['type'] = $row['type'];
 		display_search_result( array_merge( $params, $display_params ) );
@@ -922,34 +864,41 @@ function display_score_map( $scores_map, $total_score, $result_type )
 				continue;
 			}
 
+			$keyword_match = '';
+			switch( $match_type )
+			{
+				case 'word_case_sensitive_match':
+					$keyword_match = 'for case sensitive match on';
+					break;
+
+				case 'whole_word_match':
+					$keyword_match = 'for whole word match on';
+					break;
+
+				case 'word_case_insensitive_match':
+					$keyword_match = 'for case insensitive match on';
+					break;
+			}
+
 			foreach( $scores as $word => $score )
 			{
-				switch( $match_type )
+				$extra_points_reason = '';
+				if( $keyword_match != '' )
 				{
-					case 'word_case_sensitive_match':
-						echo '<li>'.sprintf( '%d points for case sensitive match on [%s] in [%s]', 1, $word, $result_part ).'</li>';
-						if( $score > 1 )
-						{
-							echo '<li>'.sprintf( '%d extra points for multiple case sensitive match on [%s] in [%s]', $score - 1, $word, $result_part ).'</li>';
-						}
-						break;
-
-					case 'whole_word_match':
-						echo '<li>'.sprintf( '%d points for whole word match on [%s] in [%s]', 1, $word, $result_part ).'</li>';
-						if( $score > 1 )
-						{
-							echo '<li>'.sprintf( '%d extra points for multiple whole word match on [%s] in [%s]', $score - 1, $word, $result_part ).'</li>';
-						}
-						break;
-
-					case 'word_case_insensitive_match':
-						echo '<li>'.sprintf( '%d points for case insensitive match on [%s] in [%s]', 1, $word, $result_part ).'</li>';
-						if( $score > 1 )
-						{
-							echo '<li>'.sprintf( '%d extra points for multiple case insensitive match on [%s] in [%s]', $score - 1, $word, $result_part ).'</li>';
-						}
-						break;
+					if( $score > 3 )
+					{
+						$extra_points_reason = sprintf( '. Result = ( {1 match point} + {1 extra point because of multiple occurences} ) * {3 because it was found on [%s]}', $result_part );
+					}
+					elseif( $score > 2 )
+					{
+						$extra_points_reason = sprintf( '. Result = ( {1 match point} ) * {3 because it was found on [%s]}', $result_part );
+					}
+					elseif( $score > 1 )
+					{
+						$extra_points_reason = '. Result = {1 match point} + {1 extra point because of multiple occurences}';
+					}
 				}
+				echo '<li>'.sprintf( '%d points %s [%s] in [%s]', $score, $keyword_match, $word, $result_part ).$extra_points_reason.'</li>';
 			}
 		}
 	}
