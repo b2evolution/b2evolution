@@ -702,7 +702,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
 	}
 
-	$register_url = url_add_param( $register_url, 'return_to='.$return_url, $glue );
+	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
 
 	return $register_url;
 }
@@ -4268,7 +4268,7 @@ echo_modalwindow_js();
 		//console.log( 'window', window_width, window_height );
 
 		// Set margins for normal view of wide screens:
-		var margin_size_width = 100;
+		var margin_size_width = 170;
 		var margin_size_height = viewport_height > max_size ? 170 : 205;
 		if( viewport_width <= 900 )
 		{ // When width is less than 900px then preview thumbnails are located under big picture, so height margin should be more

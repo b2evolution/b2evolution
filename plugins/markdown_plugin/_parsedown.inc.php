@@ -27,6 +27,7 @@ Modifications by yura:
 	    - #header {.header-class-value#header-id-value}    => <h1 id="header-id-value" class="header-class-value">header</h1>
 	    - ####header {#header-id-value.header-class-value} => <h4 class="header-class-value" id="header-id-value">header</h4>
 	9. Don't apply <p> around list and already existing paragraph tags
+	10. Don't convert HTML entities inside <code> html tags because the "Escape code" plugin does this
 */
 
 class Parsedown
@@ -164,7 +165,7 @@ class Parsedown
 				// Start new codeblock element
 				$element = array(
 						'type' => 'codeblock',
-						'lang' => strtolower( $matches[1] ),
+						'lang' => empty( $matches[1] ) ? '' : strtolower( $matches[1] ),
 						'lines' => array(),
 					);
 				continue;
@@ -495,8 +496,6 @@ class Parsedown
 					
 					$text = rtrim($element['text'], "\n");
 					
-					$text = htmlentities($text, ENT_NOQUOTES);
-					
 					strpos($text, "\x1A\\") !== FALSE and $text = strtr($text, $this->escape_sequence_map);
 					
 					$markup .= '<pre class="codeblock"><code>'.$text.'</code></pre>'."\n";
@@ -593,7 +592,6 @@ class Parsedown
 			foreach ($matches as $matches)
 			{
 				$element_text = $matches[1];
-				$element_text = htmlentities($element_text, ENT_NOQUOTES);
 				
 				# Decodes escape sequences.
 				

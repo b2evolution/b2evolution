@@ -53,10 +53,12 @@ $params = array_merge( array(
 	'messages_list_start'       => '',
 	'messages_list_end'         => '',
 	'messages_list_title'       => $edited_Thread->title,
-	'messages_list_title_start' => '<div class="panel-heading"><h2>',
+	'messages_list_title_start' => '<div class="panel-heading"><h2 class="panel-title">',
 	'messages_list_title_end'   => '</h2></div>',
 	'messages_list_form_start'  => '<div class="panel panel-default">',
 	'messages_list_form_end'    => '</div>',
+	'messages_list_body_start'  => '<div class="panel-body">',
+	'messages_list_body_end'    => '</div>',
 	), $params );
 
 echo $params['messages_list_start'];
@@ -72,10 +74,9 @@ if( $params['display_navigation'] )
 	.'</div>';
 }
 
-echo $params['messages_list_form_start'];
 if( $params['display_title'] )
-{ // Display title
-	echo $params['messages_list_title_start'].$edited_Thread->title.$params['messages_list_title_end'];
+{	// Display title:
+	echo '<h2>'.sprintf( T_('Conversation: %s'), $edited_Thread->title ).'</h2>';
 }
 
 // load Thread recipients
@@ -256,16 +257,32 @@ if( $is_recipient )
 			$available_recipients[ $recipient_ID ] = $recipient_User->login;
 		}
 	}
+
+	global $Messages;
+	$Messages->clear();
 	if( empty( $available_recipients ) )
 	{ // There are no other existing and not closed users who are still part of this conversation
-		echo '<span class="error">'.T_( 'You cannot reply because this conversation was closed.' ).'</span>';
+		$Messages->add( T_( 'You cannot reply because this conversation was closed.' ), 'warning' );
+		$Messages->display();
 	}
 	elseif( !empty( $leave_msg_ID ) )
 	{ // Current user has already left this conversation
-		echo '<span class="error">'.T_( 'You cannot reply because you have already left this conversation.' ).'</span>';
+		$Messages->add( T_( 'You cannot reply because you have already left this conversation.' ), 'warning' );
+		$Messages->display();
 	}
 	else
 	{ // Current user is still part of this conversation, should be able to reply
+		echo $params['messages_list_form_start'];
+
+		$form_title = sprintf( T_('Reply to: %s'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ) );
+
+		if( ! is_admin_page() )
+		{
+			echo $params['messages_list_title_start'].$form_title.$params['messages_list_title_end'];
+		}
+
+		echo $params['messages_list_body_start'];
+
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
 		if( ! is_admin_page() )
@@ -275,7 +292,7 @@ if( $is_recipient )
 
 		$Form->switch_template_parts( $params['skin_form_params'] );
 
-		$Form->begin_form( $params['form_class_msg'], '' );
+		$Form->begin_form( $params['form_class_msg'], is_admin_page() ? $form_title : '' );
 
 			$Form->add_crumb( 'messaging_messages' );
 			if( $perm_abuse_management )
@@ -285,7 +302,7 @@ if( $is_recipient )
 			$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 			$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
-			$Form->info_field(T_('Reply to'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ), array('required'=>true));
+			//$Form->info_field(T_('Reply to'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ), array('required'=>true));
 
 			if( !empty( $closed_recipients ) )
 			{
@@ -322,10 +339,12 @@ if( $is_recipient )
 				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
+
+		echo $params['messages_list_body_end'];
+
+		echo $params['messages_list_form_end'];
 	}
 }
-
-echo $params['messages_list_form_end'];
 
 // Display Leave or Close conversation action if they are available
 if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
@@ -358,11 +377,10 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 		$close_and_block_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
 	}
 	echo '<p>';
-	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );">'.$leave_text.'</a>';
+	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );" class="btn btn-default btn-sm">'.$leave_text.'</a>';
 	if( $leave_action == 'close' )
 	{ // user want's to close this conversation ( there is only one recipient )
-		echo '<br />';
-		echo '<a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );">'.$block_text.'</a>';
+		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
 	echo '</p>';
 	echo '</div>';

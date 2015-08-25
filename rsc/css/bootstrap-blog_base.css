@@ -500,8 +500,8 @@ div.item_location {
 .evo_private_messages_list .messages_navigation {
   padding: 5px;
 }
-.evo_private_messages_list h2 {
-  margin: 0;
+.evo_private_messages_list > h2 {
+  margin-top: 0;
 }
 .evo_private_messages_list .messages_list_actions {
   text-align: center;
@@ -513,7 +513,6 @@ div.item_location {
   text-align: center;
 }
 .evo_private_messages_list .messages_list_actions a {
-  margin-bottom: 1ex;
   display: inline-block;
 }
 .evo_private_messages_list .messages_list_actions a:last-child {
@@ -525,6 +524,9 @@ div.item_location {
   padding: 10px;
   text-align: center;
   display: block;
+}
+.evo_private_messages_list .panel {
+  margin-bottom: 0;
 }
 #styled_content_block span[class*=status_] {
   background: transparent;

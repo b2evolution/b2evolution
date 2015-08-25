@@ -28,7 +28,7 @@ html, body {
 
 // Mark the nofollow links with pink background color on mouseover event
 // fp> I actually want to keep this on all skins. It's an attempt to dissuade spammers to spam by showing visually them that the links are nofollow.
-a[rel~=nofollow]:hover {
+a[rel~=nofollow]:not([class~=btn]):hover {
 	background: #f8e0e0;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -514,34 +514,6 @@ textarea.form_textarea_input {
 // Space between radio option lable and note text
 label.radiooption {
 	margin-right: 1em;
-}
-// ---------------- //
-
-// The links that look as buttons:
-.linkbutton {
-	border: 1px solid #bbb;
-	margin-right: 5px;
-	padding: 2px 3px;
-	font: normal 12px Arial, Sans-serif;
-	height:30px;
-	background-color: #EEEEEE;
-	cursor:pointer;
-	-moz-border-radius: 3px;
-	-khtml-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-}
-.linkbutton:hover {
-	background-color: #DEF2FC;
-}
-.linkbutton a {
-	background-color: transparent;
-	text-decoration: none;
-	color: #000;
-}
-.linkbutton a:hover {
-	text-decoration: none;
-	color: #000;
 }
 // ---------------- //
 

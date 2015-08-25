@@ -283,14 +283,42 @@ span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url(../img/ajax-loader/777.gif);
 }
+.widget_core_coll_category_list label {
+  font-weight: normal;
+}
+.widget_core_coll_category_list ul {
+  margin-left: 0;
+}
+.widget_core_coll_category_list ul ul {
+  margin-left: 19px;
+}
+.widget_core_coll_category_list li {
+  list-style: none;
+}
+.widget_core_coll_category_list input[type="checkbox"],
+.widget_core_coll_category_list input[type="radio"] {
+  margin: 0;
+  display: inline-block;
+}
 .widget_core_coll_category_list .meta {
   font-weight: bold;
+  color: #000;
+  list-style: square;
+  margin-left: 20px;
+}
+.widget_core_coll_category_list .meta label,
+.widget_core_coll_category_list .meta a {
+  font-weight: bold;
+  color: #000;
 }
 .widget_core_coll_category_list .meta ul {
   font-weight: normal;
 }
 .widget_core_coll_category_list .meta input[disabled="disabled"] {
-  visibility: hidden;
+  display: none;
+}
+.widget_core_coll_category_list .tile label {
+  display: inline;
 }
 .filter_item {
   display: inline-block;
@@ -560,7 +588,7 @@ div.dev-blocks--widget--notincache > .dev-blocks-name {
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }
-a[rel~=nofollow]:hover {
+a[rel~=nofollow]:not([class~=btn]):hover {
   background: #f8e0e0;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -1024,31 +1052,6 @@ textarea.form_textarea_input {
 }
 label.radiooption {
   margin-right: 1em;
-}
-.linkbutton {
-  border: 1px solid #bbb;
-  margin-right: 5px;
-  padding: 2px 3px;
-  font: normal 12px Arial, Sans-serif;
-  height: 30px;
-  background-color: #EEEEEE;
-  cursor: pointer;
-  -moz-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-}
-.linkbutton:hover {
-  background-color: #DEF2FC;
-}
-.linkbutton a {
-  background-color: transparent;
-  text-decoration: none;
-  color: #000;
-}
-.linkbutton a:hover {
-  text-decoration: none;
-  color: #000;
 }
 div.log_container ul,
 div.action_messages ul,

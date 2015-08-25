@@ -404,15 +404,15 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 						WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
 			if( $DB->get_var( $sql ) > 0 )
 			{
-				echo '<p>'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
-				echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span>Ò</p>';
+				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+				echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
 				$not_subscribed = false;
 			}
 		}
 
 		if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
 		{
-			echo '<p>'.$notification_icon.' <span>'.$params['notification_text'];
+			echo '<p class="text-center">'.$notification_icon.' <span>'.$params['notification_text'];
 			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
 			$not_subscribed = false;
 		}
@@ -420,12 +420,12 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		{
 			if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 			{
-				echo '<p>'.$notification_icon.' <span>'.$params['notification_text2'];
+				echo '<p class="text-center">'.$notification_icon.' <span>'.$params['notification_text2'];
 				echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
 			}
 			else
 			{
-				echo '<p>'.$notification_icon.' <span><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
+				echo '<p class="text-center"><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.$params['notification_text3'].'</a></p>';
 			}
 		}
 
@@ -437,7 +437,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<nav class="evo_post_feedback_feed_msg"><p>', '</p></nav>', $params['feed_title'] );
+	$Item->feedback_feed_link( '_rss2', '<nav class="evo_post_feedback_feed_msg"><p class="text-center">', '</p></nav>', $params['feed_title'] );
 }
 
 ?>

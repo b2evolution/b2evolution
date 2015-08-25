@@ -93,7 +93,7 @@ class XHTML_Validator
 					'script' => '#PCDATA'
 				);
 				$this->tagattrs = array(
-					'meta' => 'name content charset',
+					'meta' => 'name content charset http-equiv',
 					'link' => 'charset href hreflang media rel sizes type',
 					'style' => 'media scoped type',
 					'script' => 'async charset defer src type'

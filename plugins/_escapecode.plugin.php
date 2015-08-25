@@ -58,8 +58,15 @@ class escapecode_plugin extends Plugin
 	 */
 	function FilterItemContents( & $params )
 	{
-		$content = & $params['content'];
-		$content = $this->escape_code( $content );
+		if( $params['object_type'] == 'Item' && ! empty( $params['object'] ) )
+		{
+			$Item = & $params['object'];
+			if( $Item->get_type_setting( 'allow_html' ) )
+			{	// Do escape html entities only when html is allowed for content:
+				$content = & $params['content'];
+				$content = $this->escape_code( $content );
+			}
+		}
 
 		return true;
 	}
@@ -137,6 +144,11 @@ class escapecode_plugin extends Plugin
 		if( strpos( $content, '<code' ) !== false )
 		{ // At least one tag <code> exists in the content, Do escape the html entities:
 			$content = preg_replace_callback( '#(<code[^>]*>)([\s\S]+?)(</code>)#is', array( $this, $callback_function ), $content );
+		}
+
+		if( strpos( $content, '`' ) !== false )
+		{ // String of codespan from markdown, Do escape the html entities:
+			$content = preg_replace_callback( '#(`)([^`\n]+)(`)#i', array( $this, $callback_function ), $content );
 		}
 
 		if( strpos( $content, '```' ) !== false )

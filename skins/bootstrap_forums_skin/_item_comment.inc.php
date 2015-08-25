@@ -234,8 +234,24 @@ echo $params['comment_info_after'];
 		{	// We are displaying a comment under a post/topic:
 			echo $Item->get_permanent_url();
 		}
-		?>#skin_wrapper" class="to_top postlink pull-left"><?php echo T_('Back to top'); ?></a>
+		?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 	<?php
+	// Check if BBcode plugin is enabled for current blog
+	$bbcode_plugin_is_enabled = false;
+	if( class_exists( 'bbcode_plugin' ) )
+	{ // Plugin exists
+		global $Plugins;
+		$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+		if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+		{ // Plugin is enabled and activated for comments
+			$bbcode_plugin_is_enabled = true;
+		}
+	}
+	if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
+	{ // Display button to quote this comment
+		echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+	}
+
 	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
 
 	if( $params['display_vote_helpful'] )

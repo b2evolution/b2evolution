@@ -306,7 +306,7 @@ input.form_text_input,
 input.form_date_input,
 input.SearchField {
 	border: 1px solid #9db0bc;
-	padding: 2px
+	padding: 2px;
 	-moz-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	-webkit-box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
 	box-shadow: 1px 2px 5px 0 rgba(119, 119, 119, 0.16) inset;
@@ -732,8 +732,8 @@ div.bPostcommunity {
 	border: 1px solid #2E8BB9;
 	background-color: #fff;
 }
-.bPostcommunity > div.bSmallHead /* Direct child only */
-{
+.bPostcommunity > div.bSmallHead {
+	/* Direct child only */
 	border-bottom: 1px solid #2E8BB9;
 }
 .bPostcommunity span.bStatus,
@@ -745,8 +745,8 @@ div.bPostreview {
 	border: 1px solid #CC0099;
 	background-color: #fff;
 }
-.bPostreview > div.bSmallHead /* Direct child only */
-{
+.bPostreview > div.bSmallHead {
+	/* Direct child only */
 	border-bottom: 1px solid #CC0099;
 }
 .bPostreview span.bStatus,
@@ -763,8 +763,8 @@ div.bPostreview {
 .status_protected {
 	color: #ea0;
 }
-.bPostprotected > div.bSmallHead /* Direct child only */
-{
+.bPostprotected > div.bSmallHead {
+	/* Direct child only */
 	border-bottom: 1px solid #fc9;
 }
 .bPostprivate {
@@ -776,8 +776,8 @@ div.bPostreview {
 .status_private {
 	color: #e00;
 }
-.bPostprivate > div.bSmallHead /* Direct child only */
-{
+.bPostprivate > div.bSmallHead {
+	/* Direct child only */
 	border-bottom: 1px solid #f99;
 }
 
@@ -803,8 +803,8 @@ div.bCommentdraft span.bStatus,
 }
 
 .bPostdraft > div.bSmallHead, /* Direct child only */
-div.bCommentdraft > div.bSmallHead /* Direct child only */
-{
+div.bCommentdraft > div.bSmallHead {
+	/* Direct child only */
 	background-color: #ff9;
 	border-bottom: 1px solid #fc3;
 }
@@ -836,8 +836,8 @@ div.bCommentdeprecated span.bStatus,
 	background-color: #ccc;
 }
 .bPostdeprecated > div.bSmallHead, /* Direct child only */
-div.bCommentdeprecated > div.bSmallHead /* Direct child only */
-{
+div.bCommentdeprecated > div.bSmallHead {
+	/* Direct child only */
 	background-color: #ccc;
 	border-bottom: 1px solid #000;
 }
@@ -858,8 +858,8 @@ div.block_item div.bCommenttrash {
 	border: 1px solid #f66;
 	background-color: #fcc;
 }
-div.bCommenttrash > div.bSmallHead /* Direct child only */
-{
+div.bCommenttrash > div.bSmallHead {
+	/* Direct child only */
 	background-color: #faa;
 	border-bottom: 1px solid #f66;
 }
@@ -878,8 +878,8 @@ div.block_item div.bCommentexpired {
 	border: 1px solid #f66;
 	background-color: #FCFBD9;
 }
-div.bCommentexpired > div.bSmallHead /* Direct child only */
-{
+div.bCommentexpired > div.bSmallHead {
+	/* Direct child only */
 	background-color: #F6F5CB;
 	border-bottom: 1px solid #f66;
 }
@@ -903,8 +903,8 @@ div.bCommentexpired span.bExpired {
 	color: #639;
 	background-color: #c0b0e0;
 }
-.bPostredirected > div.bSmallHead /* Direct child only */
-{
+.bPostredirected > div.bSmallHead {
+	/* Direct child only */
 	background-color: #c0b0e0;
 	border-bottom: 1px solid #639;
 }

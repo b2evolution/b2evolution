@@ -1016,7 +1016,7 @@ body {
   padding: 0;
   margin: 0;
 }
-a[rel~=nofollow]:hover {
+a[rel~=nofollow]:not([class~=btn]):hover {
   background: #f8e0e0;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -1515,31 +1515,6 @@ textarea.form_textarea_input {
 }
 label.radiooption {
   margin-right: 1em;
-}
-.linkbutton {
-  border: 1px solid #bbb;
-  margin-right: 5px;
-  padding: 2px 3px;
-  font: normal 12px Arial, Sans-serif;
-  height: 30px;
-  background-color: #EEEEEE;
-  cursor: pointer;
-  -moz-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-}
-.linkbutton:hover {
-  background-color: #DEF2FC;
-}
-.linkbutton a {
-  background-color: transparent;
-  text-decoration: none;
-  color: #000;
-}
-.linkbutton a:hover {
-  text-decoration: none;
-  color: #000;
 }
 .eform label {
   font-weight: bold;

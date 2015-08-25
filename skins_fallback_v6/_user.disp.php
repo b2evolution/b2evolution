@@ -184,7 +184,11 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Check if current user can edit other users from back-office:
-	$user_perms_edit = ( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) );
+	$user_perms_edit = ( $is_logged_in &&
+			$current_User->can_moderate_user( $User->ID ) &&
+			$current_User->check_status( 'can_access_admin' ) &&
+			$current_User->check_perm( 'admin', 'restricted' )
+		);
 
 	// - Message:
 	if( ! $is_logged_in || $current_User->ID != $User->ID )
@@ -261,14 +265,16 @@ echo '<div class="profile_column_left">';
 				.'<button type="button" class="btn btn-primary">'.$params['edit_user_admin_link_text'].'</button>'
 			.'</a>';
 
-		// - Delete in back-office:
-		$buttons['del'] = array();
-		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
-				.'<button type="button">'.T_('Delete').'</button>'
-			.'</a>';
-		$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
-				.'<button type="button">'.T_('Delete Spammer').'</button>'
-			.'</a>';
+		if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+		{ // - Delete in back-office:
+			$buttons['del'] = array();
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					.'<button type="button">'.T_('Delete').'</button>'
+				.'</a>';
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					.'<button type="button">'.T_('Delete Spammer').'</button>'
+				.'</a>';
+		}
 	}
 
 	if( count( $buttons ) )

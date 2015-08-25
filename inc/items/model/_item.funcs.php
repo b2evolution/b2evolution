@@ -129,7 +129,7 @@ function init_inskin_editing()
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
-		check_categories_nosave ( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -141,7 +141,7 @@ function init_inskin_editing()
 		$edited_Item = new Item();
 		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
 		$edited_Item->set( 'status', $def_status );
-		check_categories_nosave ( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats );
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
 		// Set default locations from current user
@@ -297,40 +297,6 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 	}
 
 	return $Item;
-}
-
-
-/**
- * Get post type ID by type code
- *
- * @param string Type code
- * @return integer Post type ID
- */
-function get_item_type_ID( $type_code )
-{
-	$item_types = array(
-			1    => 'post',
-			1000 => 'page',
-			1400 => 'intro-front',
-			1500 => 'intro-main',
-			1520 => 'intro-cat',
-			1530 => 'intro-tag',
-			1570 => 'intro-sub',
-			1600 => 'intro-all',
-			2000 => 'podcast',
-			3000 => 'sidebar-link',
-			4000 => 'advertisement',
-			//5000 => 'reserved',
-		);
-
-	$item_type_ID = array_search( $type_code, $item_types );
-
-	if( $item_type_ID === false )
-	{ // No found type, Use standard type ID = 1
-		$item_type_ID = 1;
-	}
-
-	return $item_type_ID;
 }
 
 
@@ -2095,20 +2061,25 @@ function echo_autocomplete_tags()
  * Assert that the supplied post type can be used by the current user in
  * the post's extra categories' context.
  *
+ * @param integer Item type ID
  * @param array The extra cats of the post.
  */
-function check_perm_posttype( $post_extracats )
+function check_perm_posttype( $item_typ_ID, $post_extracats )
 {
 	global $Blog, $current_User;
 
-	// Tblue> Usually, when this function is invoked, item_typ_ID is not
-	//        loaded yet... If it is, it doesn't get loaded again anyway.
-	//        Item::load_from_Request() uses param() again, in case this
-	//        function wasn't called yet when load_from_Request() gets
-	//        called (does this happen?).
-	$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+
+	if( ItemType::is_reserved( $ItemType->ID ) )
+	{ // Don't allow to use a reserved post type:
+		debug_die( 'This post type is reserved and cannot be used. Please choose another one.' );
+	}
+
+	if( ! $Blog->is_item_type_enabled( $ItemType->ID ) )
+	{ // Don't allow to use a not enabled post type:
+		debug_die( 'This post type is not enabled. Please choose another one.' );
+	}
 
 	// Check permission:
 	$current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', true /* assert */, $post_extracats );
@@ -2979,14 +2950,32 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	$user_can_edit = false;
 
 	if( $post_ID > 0 )
-	{	// Check permissions for editing of the current item
+	{ // Check permissions for editing of the current item:
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 		$user_can_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
 		$permission_message = T_('You don\'t have permission to edit this post');
+
+		if( $user_can_edit )
+		{ // Check if the post type is enabled:
+
+			if( ! $edited_Item->is_type_enabled() )
+			{ // Don't allow to use a not enabled post type:
+				$user_can_edit = false;
+				if( $edited_ItemType = & $edited_Item->get_ItemType() )
+				{
+					$permission_message = sprintf( T_( 'The post you are trying to edit uses the post type #%d "%s" which is currently disabled. Thus you cannot edit this post.' ),
+						$edited_ItemType->ID, $edited_ItemType->get( 'name' ) );
+				}
+				else
+				{
+					$permission_message = T_( 'The post you are trying to edit uses an unknown post type. Thus you cannot edit this post.' );
+				}
+			}
+		}
 	}
 	else
-	{	// Check permissions for creating of a new item
+	{ // Check permissions for creating of a new item:
 		$perm_target = empty( $Blog ) ? NULL : $Blog->ID;
 		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $perm_target );
 		$permission_message = T_('You don\'t have permission to post into this blog');

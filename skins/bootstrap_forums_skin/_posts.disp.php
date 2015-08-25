@@ -175,7 +175,15 @@ if( isset( $MainList ) && ( empty( $cat ) ||
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $cat ) )
 		{ // Display category title
-			echo '<div class="panel-heading"><h3 class="panel-title">'.$category->get( 'name' ).'</h3></div>';
+			echo '<div class="panel-heading">'
+					// Buttons to post/reply:
+					.$Skin->get_post_button( $cat, NULL, array(
+							'group_class'  => 'pull-right',
+							'button_class' => 'btn-sm',
+						) )
+					// Category title:
+					.'<h3 class="panel-title">'.$category->get( 'name' ).'</h3>'
+				.'</div>';
 		}
 	}
 	?>
@@ -235,7 +243,7 @@ elseif( isset( $current_Chapter ) )
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
 	</div>
+</div>
 <?php
-
 } // ---------------------------------- END OF POSTS ------------------------------------
 ?>

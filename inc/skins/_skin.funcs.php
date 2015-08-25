@@ -492,6 +492,8 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'msgform':
+			global $disp;
+
 			// get expected message form type
 			$msg_type = param( 'msg_type', 'string', '' );
 			// initialize
@@ -541,6 +543,12 @@ var downloadInterval = setInterval( function()
 			{ // recipient User is set
 				// get_msgform_possibility returns NULL (false), only if there is no messaging option between current_User and recipient user
 				$allow_msgform = $recipient_User->get_msgform_possibility();
+
+				if( $msg_type == 'email' && $recipient_User->get_msgform_possibility( NULL, 'email' ) != 'email' )
+				{ // User doesn't want to receive email messages, Restrict if this was requested by wrong url:
+					$msg_type = '';
+				}
+
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
 					$disp = 'login';
@@ -588,6 +596,8 @@ var downloadInterval = setInterval( function()
 						header_redirect();
 						// exited here
 					}
+
+					global $edited_Thread, $edited_Message, $recipients_selected;
 
 					// Load classes
 					load_class( 'messaging/model/_thread.class.php', 'Thread' );
@@ -669,7 +679,7 @@ var downloadInterval = setInterval( function()
 						}
 					}
 				}
-				if( $allow_msgform == 'PM' )
+				if( $allow_msgform == 'PM' && isset( $edited_Thread ) )
 				{
 					$edited_Thread->title = $subject;
 				}

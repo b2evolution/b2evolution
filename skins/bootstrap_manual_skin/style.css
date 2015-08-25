@@ -41,6 +41,9 @@
     display: none;
   }
 }
+div.powered_by p {
+  margin: 4px auto;
+}
 ul.profile_tabs {
   margin: 0 2ex 2ex;
   position: relative;

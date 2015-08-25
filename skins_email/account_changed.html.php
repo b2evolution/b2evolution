@@ -68,12 +68,12 @@ if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 	if( $params['avatar_changed'] )
 	{ // If profile pictre has been changed
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('The main profile picture was changed to:').'</p>'."\n";
-		echo '<p'.emailskin_style( '.p' ).'>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'fit-320x320','original', '', '', '', '', '', '#', '', 1, 'none' ).'</p>'."\n";
 	}
 	elseif( $params['new_avatar_upload'] )
 	{ // Display the newly uploaded file only if it was not set as main profile picture
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('A new profile picture file was uploaded:').'</p>'."\n";
-		echo '<p'.emailskin_style( '.p' ).'>'.$new_File->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.$new_File->get_tag( '', '', '', '', 'fit-320x320','original', '', '', '', '', '', '#', '', 1, 'none' ).'</p>'."\n";
 	}
 	// Display warning message about duplicated files 
 	echo $duplicated_files_message;

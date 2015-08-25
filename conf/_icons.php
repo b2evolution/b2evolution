@@ -1121,7 +1121,9 @@ function get_icon_info( $name )
 		case 'stop': return array(
 			'alt'  => T_('Stop'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 64, 128 )
+			'xy' => array( 64, 128 ),
+			'fa' => 'hand-paper-o',
+			'color' => '#C00'
 		);
 
 		case 'arrow-btn': return array(

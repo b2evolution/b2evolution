@@ -168,7 +168,7 @@ skin_include( '_left_navigation_bar.inc.php' );
 				) );
 
 			// Button to create a new page
-			$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
+			$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 1520 );
 			if( !empty( $write_new_intro_url ) )
 			{ // Display button to write a new intro
 				echo '<a href="'.$write_new_intro_url.'" class="roundbutton roundbutton_text">'

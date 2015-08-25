@@ -82,6 +82,9 @@ ol.breadcrumb {
 .forums_list .panel-heading h2 {
   margin-top: 0;
 }
+.forums_list .panel-heading .btn {
+  margin: -6px 0 0 6px;
+}
 .forums_list.panel > a + .table {
   border-top: 1px solid #ddd;
 }
@@ -199,6 +202,10 @@ ol.breadcrumb {
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
+}
+.forums_list .ft_author_avatar .ft_author_avatar {
+  float: none;
+  margin-right: 0;
 }
 .forums_list .ft_comment_response h3 {
   margin: 0;
@@ -872,8 +879,10 @@ label.control-label[for=post_title] {
 .cell2 {
   display: table-cell;
 }
-.evo_comment .panel-footer a.to_top.postlink {
+a.to_top {
   font-size: 14px !important;
+  margin-right: 5px;
+  float: left;
 }
 .evo_post_title {
   display: table;

@@ -31,23 +31,24 @@ if( !is_array( $legend_statuses ) )
 	$legend_statuses = array();
 }
 
+// Calculate what comments has the Item:
 $comments_number = generic_ctp_number( $Item->ID, 'comments', get_inskin_statuses( $Item->get_blog_ID(), 'comment' ) );
 
 $status_icon = 'topic';
 $status_title = '';
 $status_alt = T_('No new posts');
 if( $Item->is_featured() || $Item->is_intro() )
-{	// Special icon for featured & intro posts
+{ // Special icon for featured & intro posts
 	$status_icon = 'topicSticky';
 	$status_title = '<strong>'.T_('Sticky').':</strong> ';
 }
 elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )
-{	// The post is closed for comments
+{ // The post is closed for comments
 	$status_icon = 'topicLocked';
 	$status_alt = T_('This topic is locked: you cannot edit posts or make replies.');
 }
 elseif( $comments_number > 25 )
-{	// Popular topic
+{ // Popular topic is when coummnets number is more than 25
 	$status_icon = 'folder_hot.gif';
 }
 ?>

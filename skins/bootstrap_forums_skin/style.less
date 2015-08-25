@@ -97,6 +97,9 @@ ol.breadcrumb {
 		h2 {
 			margin-top: 0;
 		}
+		.btn {
+			margin: -6px 0 0 6px;
+		}
 	}
 	&.panel>a+.table {
 		border-top:1px solid #ddd;
@@ -209,6 +212,10 @@ ol.breadcrumb {
 		display: block;
 		img {
 			.border-radius(3px);
+		}
+		.ft_author_avatar {
+			float: none;
+			margin-right: 0;
 		}
 	}
 	.ft_comment_response {
@@ -951,12 +958,10 @@ label.control-label[for=post_title] {
 }
 
 // Comment-footer link TO TOP size FIX
-.evo_comment {
-	.panel-footer {
-		a.to_top.postlink {
-			font-size: 14px !important;
-		}
-	}
+a.to_top {
+	font-size: 14px !important;
+	margin-right: 5px;
+	float: left;
 }
 
 // Positions on the action buttons near page titles

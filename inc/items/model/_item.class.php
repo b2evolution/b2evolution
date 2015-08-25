@@ -573,20 +573,15 @@ class Item extends ItemLight
 			$this->set_from_Request( 'locale' );
 		}
 
-		// TYPE:
-		if( param( 'post_type', 'string', NULL ) !== NULL )
-		{ // Set type ID from request type code, happens when e.g. we add an intro from manual skin by url: /blog6.php?disp=edit&cat=25&post_type=intro-cat
-			$this->set( 'ityp_ID', get_item_type_ID( get_param( 'post_type' ) ) );
+		// POST TYPE:
+		$item_typ_ID = get_param( 'item_typ_ID' );
+		if( empty( $item_typ_ID ) )
+		{ // Try to get this from request if it has been not initialized by controller:
+			$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
 		}
-		elseif( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
-		{ // fp> when does this happen?
-			// yura>fp: this happens on submit expert form
-			$this->set_from_Request( 'ityp_ID', 'item_typ_ID' );
-
-			if( in_array( $item_typ_ID, $posttypes_reserved_IDs ) )
-			{
-				param_error( 'item_typ_ID', T_( 'This post type is reserved and cannot be used. Please choose another one.' ), '' );
-			}
+		if( ! empty( $item_typ_ID ) )
+		{ // Set new post type ID only if it is defined on request:
+			$this->set( 'ityp_ID', $item_typ_ID );
 		}
 
 		// URL associated with Item:
@@ -828,7 +823,11 @@ class Item extends ItemLight
 			// Useful for code display.
 			// Will probably be used for validation also.
 			$Plugins_admin = & get_Plugins_admin();
-			$params = array( 'object_type' => 'Item', 'object_Blog' => & $this->Blog );
+			$params = array(
+					'object_type' => 'Item',
+					'object'      => & $this,
+					'object_Blog' => & $this->Blog
+				);
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
 			// Title checking:
@@ -7426,6 +7425,26 @@ class Item extends ItemLight
 		}
 
 		return $this->ItemType->get_custom_fields( $type );
+	}
+
+
+	/**
+	 * Check if post type is enabled for the post collection
+	 *
+	 * @return boolean
+	 */
+	function is_type_enabled()
+	{
+		$ityp_ID = intval( $this->get( 'ityp_ID' ) );
+
+		if( empty( $ityp_ID ) )
+		{
+			return false;
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		return $item_Blog->is_item_type_enabled( $ityp_ID );
 	}
 
 

@@ -6421,7 +6421,46 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		// set_upgrade_checkpoint( '11480' );
+		set_upgrade_checkpoint( '11480' );
+	}
+
+	if( $old_db_version < 11482 )
+	{ // part 18.s.2 trunk aka 20th part of "i7"
+
+		task_begin( 'Updating default post types for forums and manual collections... ' );
+		$item_types = array(
+				'manual' => array( 'ID' => 100, 'name' => 'Manual Page' ),
+				'forum'  => array( 'ID' => 200, 'name' => 'Forum Topic' ),
+			);
+		$update_default_type_sql = array();
+		foreach( $item_types as $collection_type => $item_type )
+		{
+			// Try to find an item type by ID or name:
+			$item_type_ID = $DB->get_var( 'SELECT ityp_ID
+				 FROM T_items__type
+				WHERE ityp_ID = '.$item_type['ID'].'
+				   OR ityp_name = '.$DB->quote( $item_type['name'] ) );
+			if( empty( $item_type_ID ) )
+			{ // Item type is not found in DB, Skip it:
+				continue;
+			}
+			// Get all collections with type:
+			$type_collection_IDs = $DB->get_col( 'SELECT blog_ID
+				 FROM T_blogs
+				WHERE blog_type = '.$DB->quote( $collection_type ) );
+			foreach( $type_collection_IDs as $type_collection_ID )
+			{
+				$update_default_type_sql[] = '( '.$type_collection_ID.', "default_post_type", '.$DB->quote( $item_type_ID ).' )';
+			}
+		}
+		if( count( $update_default_type_sql ) > 0 )
+		{ // Update default post types of collections:
+			$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				VALUES '.implode( ',', $update_default_type_sql ) );
+		}
+		task_end();
+
+		// set_upgrade_checkpoint( '11482' );
 	}
 
 	/*

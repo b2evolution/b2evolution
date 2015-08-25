@@ -104,14 +104,15 @@ if( ! empty( $recipient_id ) )
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
-	$allow_msgform = $recipient_User->get_msgform_possibility();
-	if( ! $allow_msgform )
+	// Check if current User allows to be contacted by email:
+	$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
+	if( $allow_msgform != 'email' )
 	{ // should be prevented by UI
-		debug_die( 'Invalid recipient!' );
+		debug_die( 'Invalid recipient or no permission to contact by email!' );
 	}
 }
 elseif( ! empty( $comment_id ) )
-{ // Get the email address for the recipient if a visiting commenter.
+{ // Get the email address for the recipient if a visiting commenter:
 	$CommentCache = & get_CommentCache();
 	$Comment = $CommentCache->get_by_ID( $comment_id );
 
@@ -122,15 +123,16 @@ elseif( ! empty( $comment_id ) )
 
 	if( $recipient_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		$allow_msgform = $recipient_User->get_msgform_possibility();
-		if( ! $allow_msgform )
+		// Check if current User allows to be contacted by email:
+		$allow_msgform = $recipient_User->get_msgform_possibility( NULL, 'email' );
+		if( $allow_msgform != 'email' )
 		{ // should be prevented by UI
-			debug_die( 'Invalid recipient!' );
+			debug_die( 'Invalid recipient or no permission to contact by email!' );
 		}
 	}
 	elseif( empty($Comment->allow_msgform) )
 	{ // should be prevented by UI
-		debug_die( 'Invalid recipient!' );
+		debug_die( 'Invalid recipient or no permission to contact by email!' );
 	}
 	else
 	{
@@ -248,7 +250,7 @@ if( empty( $redirect_to ) && empty( $Blog ) )
 if( $success_message )
 {
 	// Never say to whom we sent the email -- prevent user enumeration.
-	$Messages->add( T_('Your message has been sent.'), 'success' );
+	$Messages->add( T_('Your message has been sent by email.'), 'success' );
 	if( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
