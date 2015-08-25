@@ -734,7 +734,7 @@ class bootstrap_forums_Skin extends Skin
 		}
 		else
 		{	// For logged in users:
-			global $current_User, $DB;
+			global $current_User, $DB, $localtimenow;
 
 			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
 			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL );
@@ -750,6 +750,7 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
+			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL
 				OR uprs_read_post_ts <= post_last_touched_ts
 				OR uprs_user_ID != '.$DB->quote( $current_User->ID ) );
