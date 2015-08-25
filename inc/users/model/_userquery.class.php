@@ -187,7 +187,7 @@ class UserQuery extends SQL
 	/**
 	 * Restrict with gender
 	 *
-	 * @param string Gender ( M, F, MF )
+	 * @param string Gender ( M, F, O, MF, MO, FO, MFO )
 	 */
 	function where_gender( $gender )
 	{
@@ -198,13 +198,13 @@ class UserQuery extends SQL
 			return;
 		}
 
-		if( $gender == 'MF' )
-		{	// Get men AND women
-			$this->WHERE_and( 'user_gender IN ( "M", "F" )' );
-		}
-		else
-		{	// Get men OR women
-			$this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) );
+		switch( $gender )
+		{
+			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
+			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
+			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
+			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
+			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
 		}
 	}
 

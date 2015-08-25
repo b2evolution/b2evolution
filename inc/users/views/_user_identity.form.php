@@ -271,6 +271,7 @@ if( $action != 'view' )
 	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
 			array( 'M', T_('A man') ),
 			array( 'F', T_('A woman') ),
+			array( 'O', T_('Other') ),
 		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
