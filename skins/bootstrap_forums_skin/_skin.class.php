@@ -741,7 +741,7 @@ class bootstrap_forums_Skin extends Skin
 			$read_posts_SQL->SELECT( 'uprs_post_ID' );
 			$read_posts_SQL->FROM( 'T_users__postreadstatus' );
 			$read_posts_SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-			$read_posts_SQL->WHERE_and( 'uprs_read_post_ts >= post_last_touched_ts' );
+			$read_posts_SQL->WHERE_and( 'uprs_read_post_ts > post_last_touched_ts' );
 
 			// Main query: Get ID of one unread post for current user:
 			$unread_posts_SQL = new SQL();
