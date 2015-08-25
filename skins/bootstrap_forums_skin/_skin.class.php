@@ -736,30 +736,31 @@ class bootstrap_forums_Skin extends Skin
 		{	// For logged in users:
 			global $current_User, $DB;
 
-			// Subquery: To get IDs of all posts that have been read by current user:
-			$read_posts_SQL = new SQL();
-			$read_posts_SQL->SELECT( 'uprs_post_ID' );
-			$read_posts_SQL->FROM( 'T_users__postreadstatus' );
-			$read_posts_SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-			$read_posts_SQL->WHERE_and( 'uprs_read_post_ts > post_last_touched_ts' );
+			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
+			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL );
+			$ItemList2->set_default_filters( array(
+					'unit' => 'all', // set this to don't calculate total rows
+				) );
+			$ItemList2->query_init();
 
-			// Main query: Get ID of one unread post for current user:
+			// Get a count of the unread topics for current user:
 			$unread_posts_SQL = new SQL();
-			$unread_posts_SQL->SELECT( 'post_ID' );
+			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 			$unread_posts_SQL->FROM( 'T_items__item' );
+			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->WHERE( 'post_ID NOT IN ( '.$read_posts_SQL->get().' )' ); // Exclude the read posts
-			$unread_posts_SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
-			$unread_posts_SQL->WHERE_and( statuses_where_clause() );
-			$unread_posts_SQL->LIMIT( 1 );
+			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
+			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL
+				OR uprs_read_post_ts <= post_last_touched_ts
+				OR uprs_user_ID != '.$DB->quote( $current_User->ID ) );
 
 			// Execute a query with to know if current user has new data to view:
-			$unread_post_ID = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Check if current user has at least one unread topic' );
+			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
 
-			if( $unread_post_ID !== NULL )
+			if( $unread_posts_count > 0 )
 			{	// If at least one new unread topic exists
 				$btn_class = 'btn-warning';
-				$btn_title = T_('New Topics');
+				$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
 			}
 			else
 			{	// Current user already have read all topics
