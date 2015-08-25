@@ -33,17 +33,6 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 )
 		);
 
-		case 'switch-to-admin': return array(
-			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('Adm'),
-			'size' => array( 13, 14 ),
-			'xy' => array( 32, 0 )
-		);
-		case 'switch-to-blog': return array(
-			'alt'  => /* TRANS: short for "Switch to _B_log" */ T_('Blg'),
-			'size' => array( 13, 14 ),
-			'xy' => array( 48, 0 )
-		);
-
 		case 'folder': return array( // icon for folders
 			'alt'  => T_('Folder'),
 			'size' => array( 16, 15 ),
@@ -112,22 +101,30 @@ function get_icon_info( $name )
 		case 'sort_desc_on': return array(
 			'alt'  => T_('Descending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 64, 208 )
+			'xy' => array( 64, 208 ),
+			'fa' => 'caret-down',
+			'color' => '#000'
 		);
 		case 'sort_asc_on': return array(
 			'alt'  => T_('Ascending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 80, 208 )
+			'xy' => array( 80, 208 ),
+			'fa' => 'caret-up',
+			'color' => '#000'
 		);
 		case 'sort_desc_off': return array(
 			'alt'  => T_('Descending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 96, 208 )
+			'xy' => array( 96, 208 ),
+			'fa' => 'caret-down',
+			'color' => '#999'
 		);
 		case 'sort_asc_off': return array(
 			'alt'  => T_('Ascending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 112, 208 )
+			'xy' => array( 112, 208 ),
+			'fa' => 'caret-up',
+			'color' => '#999'
 		);
 
 		case 'window_new': return array(    // open in a new window
@@ -205,7 +202,8 @@ function get_icon_info( $name )
 			'ext'  => '\.(pgp|gpg)',
 			'alt'  => '',
 			'size' => array( 16, 16 ),
-			'xy' => array( 144, 32 )
+			'xy' => array( 144, 32 ),
+			'fa' => 'file-text'
 		);
 		case 'file_tar': return array(
 			'ext'  => '\.tar',
