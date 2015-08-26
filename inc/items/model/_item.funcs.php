@@ -4036,6 +4036,18 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '</a> ';
 	}
 
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+	{	// Display icon of meta comments Only if current user can views meta comments:
+		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+		if( $metas_count > 0 )
+		{	// If at least one meta comment exists
+			$item_Blog = & $Item->get_Blog();
+			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00' ) )
+				.'</a> ';
+		}
+	}
+
 	$col .= '<a href="'.$item_url.'" class="" title="'.
 								T_('View this post...').'">'.$Item->dget( 'title' ).'</a></strong>';
 
