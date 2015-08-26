@@ -2488,14 +2488,18 @@ class User extends DataObject
 					}
 					$Item = & $Comment->get_Item();
 				}
+				elseif( $permlevel == 'blog' )
+				{	// Set Blog from target object:
+					$Blog = & $perm_target;
+				}
 				else
 				{ // Invalid permission level
 					$perm = false;
 					break;
 				}
 
-				if( empty( $Item ) )
-				{ // Item must be defined to check these permissions
+				if( empty( $Item ) && empty( $Blog ) )
+				{	// Item or Blog must be defined to check these permissions
 					$perm = false;
 					break;
 				}
@@ -2534,6 +2538,15 @@ class User extends DataObject
 						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 						    $Comment->author_user_ID == $this->ID )
 						{ // If it is own meta comment of the User
+							$perm = true;
+							break;
+						}
+						break;
+
+					case 'blog':
+						// Check perms to view all meta comments of the collection:
+						if( $this->check_perm( 'blog_del_post', '', false, $Blog->ID ) )
+						{ // If User can delete any item of the collection
 							$perm = true;
 							break;
 						}

@@ -2686,9 +2686,12 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '</div>';
 
 		echo '<div class="bCommentContent">';
-		$Comment->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-			) );
+		if( ! $Comment->is_meta() )
+		{	// Display status banner only for normal comments:
+			$Comment->format_status( array(
+					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				) );
+		}
 		if( ! $Comment->is_meta() )
 		{ // Don't display the titles for meta comments
 			echo '<div class="bCommentTitle">';
