@@ -6792,7 +6792,10 @@ jQuery( document ).ready( function()
 			else
 			{ // Use simple fade effect
 			?>
-			evoFadeSuccess( this );
+			if( typeof( evoFadeSuccess ) == 'function' )
+			{
+				evoFadeSuccess( this );
+			}
 			<?php } ?>
 		},
 		onsubmit: function( settings, original ) {},
@@ -6802,7 +6805,10 @@ jQuery( document ).ready( function()
 		},
 		onerror : function( settings, original, xhr )
 		{
-			evoFadeFailure( original );
+			if( typeof( evoFadeFailure ) == 'function' )
+			{
+				evoFadeFailure( original );
+			}
 			var input = jQuery( original ).find( 'input' );
 			if( input.length > 0 )
 			{

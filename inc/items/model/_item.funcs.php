@@ -4396,6 +4396,89 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	echo $r;
 }
 
+
+/**
+ * Get title of the item/task cell by field type
+ *
+ * @param string Type of the field: 'priority', 'status', 'assigned'
+ * @param object Item
+ * @param integer Priority
+ * @return string
+ */
+function item_td_task_cell( $type, $Item )
+{
+	global $current_User;
+
+	switch( $type )
+	{
+		case 'priority':
+			$value = $Item->priority;
+			$title = item_priority_title( $Item->priority );
+			break;
+
+		case 'status':
+			$value = $Item->pst_ID;
+			$title = $Item->get( 't_extra_status' );
+			if( empty( $title ) )
+			{
+				$title = T_('No status');
+			}
+			break;
+
+		case 'assigned':
+			$value = $Item->assigned_user_ID;
+			if( empty( $value ) )
+			{
+				$title = T_('No user');
+			}
+			else
+			{
+				$UserCache = & get_UserCache();
+				$User = & $UserCache->get_by_ID( $Item->assigned_user_ID );
+				$title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) );
+			}
+			break;
+
+		default:
+			$value = 0;
+			$title = '';
+	}
+
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{ // Current user can edit this item
+		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
+	}
+	else
+	{ // No perms to edit item, Display only a title
+		return $title;
+	}
+}
+
+
+/**
+ * Get a <td> class of a cell
+ *
+ * @param integer Post ID
+ * @param integer $post_pst_ID
+ * @param string Class name to make this cell editable
+ * @return string
+ */
+function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
+{
+	global $current_User;
+
+	$ItemCache = & get_ItemCache();
+	$Item = & $ItemCache->get_by_ID( $post_ID );
+
+	$class = 'center nowrap tskst_'.$post_pst_ID;
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{ // Current user can edit this item, Add a class to edit a priority by click from view list
+		$class .= ' '.$editable_class;
+	}
+
+	return $class;
+}
+
 /**
  * End of helper functions block to display Items results.
  * New ( not display helper ) functions must be created above items_results function.
