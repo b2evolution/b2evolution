@@ -494,10 +494,10 @@ function search_result_block( $params = array() )
 {
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
-			'title_prefix_post'     => T_('Post: '),
-			'title_prefix_comment'  => T_('Comment: '),
-			'title_prefix_category' => T_('Category: '),
-			'title_prefix_tag'      => T_('Tag: '),
+			'title_suffix_post'     => ' ('.T_('Post').')',
+			'title_suffix_comment'  => ' ('.T_('Comment').')',
+			'title_suffix_category' => ' ('.T_('Category').')',
+			'title_suffix_tag'      => ' ('.T_('Tag').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -619,7 +619,7 @@ function search_result_block( $params = array() )
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
-					'title'   => $params['title_prefix_post'].$Item->get_title( array( 'link_type' => 'permalink' ) ),
+					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
 				);
 				if( $params['use_editor'] )
@@ -652,7 +652,7 @@ function search_result_block( $params = array() )
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
-					'title'   => $params['title_prefix_comment'].$Comment->get_permanent_link( '#item#' ),
+					'title'   => $Comment->get_permanent_link( '#item#' ).$params['title_suffix_comment'],
 					'excerpt' => excerpt( $Comment->content ),
 					'author'  => $Comment->get_author( array(
 							'link_text'   => $params['author_format'],
@@ -670,7 +670,7 @@ function search_result_block( $params = array() )
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
-					'title'   => $params['title_prefix_category'].' <a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>',
+					'title'   => '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>'.$params['title_suffix_category'],
 					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
 				);
 				break;
@@ -678,7 +678,7 @@ function search_result_block( $params = array() )
 			case 'tag':
 				list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
 				$display_params = array(
-					'title'   => $params['title_prefix_tag'].' <a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>',
+					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
 				);
 
@@ -804,7 +804,7 @@ function display_search_result( $params = array() )
 
 	echo $params['row_start'];
 
-	echo '<div class="search_result_score">'.$params['percentage'].'%</div>';
+	echo '<div class="search_result_score dimmed">'.$params['percentage'].'%</div>';
 
 	echo '<div class="search_content_wrap">';
 
@@ -856,7 +856,7 @@ function display_score_map( $params )
 	echo '<ul class="search_score_map dimmed">';
 	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
-		if( ! is_array(  $score_map['map'] ) )
+		if( ! is_array( $score_map ) )
 		{
 			if( $score_map > 0 )
 			{ // Score received for this field

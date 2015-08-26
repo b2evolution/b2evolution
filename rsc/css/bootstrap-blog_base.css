@@ -644,9 +644,13 @@ div.results .status_meta span {
   float: left;
   width: 40px;
   font-size: 100%;
+  line-height: 27px;
 }
 .search_content_wrap {
   margin-left: 40px;
+}
+.search_score_map {
+  margin-left: 55px;
 }
 .track_content {
   margin: 5px;
