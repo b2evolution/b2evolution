@@ -135,7 +135,7 @@ function td_task_class( $post_ID, $post_pst_ID, $editable_class )
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
-	$class = 'nowrap tskst_'.$post_pst_ID;
+	$class = 'center nowrap tskst_'.$post_pst_ID;
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;
