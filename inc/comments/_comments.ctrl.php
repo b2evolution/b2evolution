@@ -192,6 +192,13 @@ switch( $tab3 )
 	case 'fullview':
 		$AdminUI->breadcrumbpath_add( T_('Full text view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
+
+	case 'meta':
+		// Check permission for meta comments:
+		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+
+		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		break;
 }
 
 $AdminUI->set_path( 'collections' );	// Sublevel may be attached below
@@ -659,10 +666,20 @@ switch( $action )
 		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', $comments_list_param_prefix, $tab3 );
 
 		// Filter list:
-		$CommentList->set_default_filters( array(
-				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-				//'comments' => $UserSettings->get( 'results_per_page' ),
-			) );
+		if( $tab3 == 'meta' )
+		{	// Meta comments:
+			$CommentList->set_default_filters( array(
+					'types' => array( 'meta' ),
+					'order' => 'DESC',
+				) );
+		}
+		else
+		{	// Normal comments:
+			$CommentList->set_default_filters( array(
+					'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+					//'comments' => $UserSettings->get( 'results_per_page' ),
+				) );
+		}
 
 		$CommentList->load_from_Request();
 
@@ -704,7 +721,7 @@ switch( $action )
 
 $AdminUI->set_path( 'collections', 'comments' );
 
-if( $tab3 == 'fullview' )
+if( $tab3 == 'fullview' || $tab3 == 'meta' )
 { // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 	require_js( '#jqueryUI#' );
 }
@@ -788,7 +805,7 @@ switch( $action )
 		}
 
 		// Display VIEW:
-		if( $tab3 == 'fullview' )
+		if( $tab3 == 'fullview' || $tab3 == 'meta' )
 		{
 			$AdminUI->disp_view( 'comments/views/_browse_comments.view.php' );
 		}

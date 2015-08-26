@@ -36,7 +36,7 @@ if( empty( $item_id ) )
 { // Try to get an item ID from param "p" that is used on edit post page
 	$item_id = param( 'p', 'integer', 0 );
 }
-$currentpage = param( 'currentpage', 'integer', 0 );
+$currentpage = param( 'currentpage', 'integer', 1 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
@@ -46,7 +46,7 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 }
 
 // Calculate index of first comment:
-$comment_index = $comments_number - ( $CommentList->limit * ( $currentpage - 1 ) );
+$comment_index = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
 
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:

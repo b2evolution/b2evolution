@@ -1521,6 +1521,15 @@ function attach_browse_tabs( $display_tabs3 = true )
 				'text' => T_('List view'),
 				'href' => $admin_url.'?ctrl=comments&amp;tab3=listview&amp;filter=restore&amp;blog='.$Blog->ID ),
 			) );
+
+		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
+		{	// Initialize menu entry for meta discussion if current user has a permission:
+			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
+				'meta' => array(
+					'text' => T_('Meta discussion'),
+					'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;filter=restore&amp;blog='.$Blog->ID ),
+				) );
+		}
 	}
 }
 
@@ -2565,7 +2574,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			'expiry_statuses' => $expiry_statuses,
 			'comment_ID_list' => $exlude_ID_list,
 			'post_ID' => $item_ID,
-			'order' => 'ASC',//$order,
+			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
 			'comments' => $limit,
 			'page' => $currentpage,
 		) );
@@ -2575,7 +2584,8 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
-			'types' => array( 'comment', 'trackback', 'pingback' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
 		) );
 		$CommentList->restore_filterset();
 	}

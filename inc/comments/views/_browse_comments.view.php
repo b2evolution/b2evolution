@@ -27,9 +27,7 @@ global $Blog;
  */
 global $CommentList, $show_statuses;
 
-global $dispatcher;
-
-global $current_User, $admin_url;
+global $current_User, $admin_url, $tab3;
 
 /*
  * Display comments:
@@ -44,7 +42,7 @@ $block_item_Widget = new Widget( 'block_item' );
 
 if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
-	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3='.$tab3.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 if( check_comment_mass_delete( $CommentList ) )
@@ -55,7 +53,7 @@ if( check_comment_mass_delete( $CommentList ) )
 $emptytrash_link = '';
 // Display recycle bin placeholder, because users may have rights to recycle particular comments
 $opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
-if( $current_User->check_perm( 'blogs', 'editall' ) )
+if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
@@ -66,7 +64,7 @@ if( $current_User->check_perm( 'blogs', 'editall' ) )
 		$opentrash_link = get_opentrash_link( false );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->title = $opentrash_link.$emptytrash_link.( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
@@ -95,6 +93,7 @@ $CommentList->display_nav( 'header' );
 load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 // Display list of comments:
+echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 // comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
 echo '<div id="comments_container" value="-1" class="full_comment_list">';
 require dirname(__FILE__).'/_comment_list.inc.php';

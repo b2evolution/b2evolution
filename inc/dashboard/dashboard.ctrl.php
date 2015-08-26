@@ -193,13 +193,12 @@ if( $blog )
 		// Filter list:
 		$CommentList->set_filters( array(
 				'types' => array( 'meta' ),
-				'user_perm' => 'moderate',
 				'order' => 'DESC',
 				'comments' => 5,
 			) );
 
 		// Set param prefix for URLs:
-		$param_prefix = 'cmnt_fullview_';
+		$param_prefix = 'cmnt_meta_';
 		if( !empty( $CommentList->param_prefix ) )
 		{
 			$param_prefix = $CommentList->param_prefix;
@@ -221,10 +220,10 @@ if( $blog )
 
 			$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 			$block_item_Widget->title = $opentrash_link.T_('Latest Meta Comments').
-				' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
+				' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=meta" style="text-decoration:none">'.
 				'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
-			echo '<a id="comments"></a>';
+			echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 			echo '<div id="styled_content_block" class="evo_content_block">';
 			echo '<div id="meta_comments_block" class="dashboard_comments_block">';
 

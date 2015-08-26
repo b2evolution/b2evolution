@@ -774,7 +774,7 @@ class CommentList2 extends DataObjectList2
 	{
 		if( ! $only_trash )
 		{ // Check if statuses filter contains the 'trash' value
-			return in_array( 'trash', $this->filters['statuses'] );
+			return is_array( $this->filters['statuses'] ) && in_array( 'trash', $this->filters['statuses'] );
 		}
 		if( count( $this->filters['statuses'] ) == 1 )
 		{ // Check if statuses filter contains only the 'trash' value
