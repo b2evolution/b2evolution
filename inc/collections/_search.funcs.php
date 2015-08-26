@@ -539,10 +539,10 @@ function search_result_block( $params = array() )
 		}
 
 		$page_params = array_merge( array(
-			'total' => $result_count,
-			'result_per_page' => $result_per_page,
+			'total'        => $result_count,
 			'current_page' => $current_page,
-			'total_pages' => $total_pages,
+			'total_pages'  => $total_pages,
+			'list_span'    => 11, // Number of visible pages on navigation line
 		), $params['pagination'] );
 		search_page_links( $page_params );
 	}
@@ -729,21 +729,64 @@ function search_page_links( $params = array() )
 			'next_class'            => '',
 		), $params );
 
+	$page_list_span = $params['list_span'];
 	$total_pages = $params['total_pages'];
 	$current_page = isset( $params['current_page'] ) ? $params['current_page'] : 1;
 	$page_url = regenerate_url( 'page', '' );
 
+	// Initialize a start of pages list:
+	if( $current_page <= intval( $page_list_span / 2 ) )
+	{ // the current page number is small
+		$page_list_start = 1;
+	}
+	elseif( $current_page > $total_pages - intval( $page_list_span / 2 ) )
+	{ // the current page number is big
+		$page_list_start = max( 1, $total_pages - $page_list_span+1);
+	}
+	else
+	{ // the current page number can be centered
+		$page_list_start = $current_page - intval( $page_list_span / 2 );
+	}
+
+	// Initialize an end of pages list:
+	if( $current_page > $total_pages - intval( $page_list_span / 2 ) )
+	{ //the current page number is big
+		$page_list_end = $total_pages;
+	}
+	else
+	{
+		$page_list_end = min( $total_pages, $page_list_start + $page_list_span - 1 );
+	}
+
 	echo $params['block_start'];
+
 	if( $current_page > 1 )
-	{ // A link to previous page
+	{ // A link to previous page:
 		echo $params['page_item_before'];
 		$prev_attrs = empty( $params['prev_class'] ) ? '' : ' class="'.$params['prev_class'].'"';
 		echo '<a href="'.url_add_param( $page_url, 'page='.( $current_page - 1 ) ).'" rel="prev"'.$prev_attrs.'>'.$params['prev_text'].'</a>';
 		echo $params['page_item_after'];
 	}
+
+	if( $page_list_start > 1 )
+	{ // The pages list doesn't contain the first page
+		// Display a link to first page:
+		echo $params['page_item_before'];
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_after'];
+
+		if( $page_list_start > 2 )
+		{ // Display a link to previous pages range:
+			$page_no = ceil( $page_list_start / 2 );
+			echo $params['page_item_before'];
+			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			echo $params['page_item_after'];
+		}
+	}
+
 	$page_prev_i = $current_page - 1;
 	$page_next_i = $current_page + 1;
-	for( $i = 1 ; $i <= $total_pages; $i++ )
+	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
 		echo $params['page_item_before'];
 		if( $i == $current_page )
@@ -765,13 +808,31 @@ function search_page_links( $params = array() )
 		}
 		echo $params['page_item_after'];
 	}
+
+	if( $page_list_end < $total_pages )
+	{ // The pages list doesn't contain the last page
+		if( $page_list_end < $total_pages - 1 )
+		{ // Display a link to next pages range:
+			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+			echo $params['page_item_before'];
+			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			echo $params['page_item_after'];
+		}
+
+		// Display a link to last page:
+		echo $params['page_item_before'];
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_after'];
+	}
+
 	if( $current_page < $total_pages )
-	{ // A link to next page
+	{ // A link to next page:
 		echo $params['page_item_before'];
 		$next_attrs = empty( $params['next_class'] ) ? '' : ' class="'.$params['next_class'].'"';
 		echo ' <a href="'.url_add_param( $page_url, 'page='.( $current_page + 1 ) ).'" rel="next"'.$next_attrs.'>'.$params['next_text'].'</a>';
 		echo $params['page_item_after'];
 	}
+
 	echo $params['block_end'];
 }
 
