@@ -1706,8 +1706,6 @@ function update_basic_config_file( $params = array() )
 			'name'     => $params['db_name'],
 			'host'     => $params['db_host'],
 			'aliases'          => $db_config['aliases'],
-			'use_transactions' => $db_config['use_transactions'],
-			'table_options'    => $db_config['table_options'],
 			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error'      => false
 		) );
