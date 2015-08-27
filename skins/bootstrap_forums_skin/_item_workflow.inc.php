@@ -21,9 +21,15 @@ if( ! empty( $Item ) &&
 { // Display workflow properties if current user can edit this post:
 	$Form = new Form();
 
+	$Form->switch_layout( 'blockspan' );
+
 	$Form->begin_form();
 
+	$Form->switch_layout( NULL );
+
 	$Form->begin_fieldset( T_('Workflow properties') );
+
+	$Form->switch_layout( 'blockspan' );
 
 	$Form->info( T_('Priority'), '<div class="task_priority_edit" rel="'.$Item->ID.'">'.item_td_task_cell( 'priority', $Item ).'</div>' );
 
@@ -31,7 +37,11 @@ if( ! empty( $Item ) &&
 
 	$Form->info( T_('Priority'), '<div class="task_status_edit" rel="'.$Item->ID.'">'.item_td_task_cell( 'status', $Item ).'</div>' );
 
+	$Form->switch_layout( NULL );
+	
 	$Form->end_fieldset();
+
+	$Form->switch_layout( 'blockspan' );
 
 	$Form->end_form();
 
