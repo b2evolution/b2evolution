@@ -31,6 +31,7 @@ $params = array_merge( array(
 		'disp_trackbacks'       => true,
 		'disp_trackback_url'    => true,
 		'disp_pingbacks'        => true,
+		'disp_meta_comments'    => false,
 		'disp_section_title'    => true,
 		'disp_rating_summary'   => true,
 		'before_section_title'  => '<div class="clearfix"></div><h3>',
@@ -115,7 +116,7 @@ if( $Item->can_see_comments( true ) )
 		$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
 	}
 
-	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] || $params['disp_meta_comments'] ) )
 	{	// Nothing more to do....
 		return false;
 	}
@@ -188,8 +189,29 @@ if( $Item->can_see_comments( true ) )
 		}
 	}
 
+	if( $params['disp_meta_comments'] && is_logged_in() )
+	{	// We requested to display meta comments
+		if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+		{	// User can see meta comments
+			$type_list[] = 'meta';
+			if( !empty( $params['comments_title_text'] ) )
+			{
+				$disp_title[] = $params['comments_title_text'];
+			}
+			else if( $title = $Item->get_feedback_title( 'comments' ) )
+			{
+				$disp_title[] = $title;
+			}
+		}
+		else
+		{	// User cannot see meta comments
+			$params['disp_meta_comments'] = false;
+		}
+		echo '<a id="comments"></a>';
+	}
 
-	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
+
+	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_meta_comments'] )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
@@ -213,15 +235,15 @@ if( $Item->can_see_comments( true ) )
 		echo $rating_summary;
 
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
-		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
+		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', $params['disp_meta_comments'] ? 'mc_' : 'c_' );
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
 				'types' => $type_list,
 				'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 				'post_ID' => $Item->ID,
-				'order' => $Blog->get_setting( 'comments_orderdir' ),
-				'threaded_comments' => $Blog->get_setting( 'threaded_comments' ),
+				'order' => $params['disp_meta_comments'] ? 'DESC' : $Blog->get_setting( 'comments_orderdir' ),
+				'threaded_comments' => $params['disp_meta_comments'] ? false : $Blog->get_setting( 'threaded_comments' ),
 			) );
 
 		$CommentList->load_from_Request();
@@ -272,6 +294,12 @@ if( $Item->can_see_comments( true ) )
 
 		// Set number of comment depending on current page
 		$comment_number = ( ( $CommentList->page - 1 ) * $CommentList->limit ) + 1;
+
+		if( $params['disp_meta_comments'] )
+		{	// Calculate index of first meta comment:
+			global $comment_template_counter;
+			$comment_template_counter = $CommentList->total_rows - ( $CommentList->limit * ( $CommentList->page - 1 ) );
+		}
 
 		/**
 		 * @var Comment
@@ -348,12 +376,15 @@ if( $Item->can_see_comments( true ) )
 		// Restore "redir" param
 		forget_param('redir');
 
-		// _______________________________________________________________
-		// Display count of comments to be moderated:
-		$Item->feedback_moderation( 'feedbacks', '<p class="alert alert-info">', '</p>', '',
-				T_('This post has 1 feedback awaiting moderation... %s'),
-				T_('This post has %d feedbacks awaiting moderation... %s') );
-		// _______________________________________________________________
+		if( ! $params['disp_meta_comments'] )
+		{ // Only normal(not meta) comments can be moderated
+			// _______________________________________________________________
+			// Display count of comments to be moderated:
+			$Item->feedback_moderation( 'feedbacks', '<p class="alert alert-info">', '</p>', '',
+					T_('This post has 1 feedback awaiting moderation... %s'),
+					T_('This post has %d feedbacks awaiting moderation... %s') );
+			// _______________________________________________________________
+		}
 	}
 
 	echo '</section>';

@@ -74,7 +74,7 @@ $Comment->get_Item();
 
 
 $Comment->anchor();
-echo '<article class="'.$comment_class.' evo_comment panel panel-default" id="comment_'.$Comment->ID.'">';
+echo '<article class="'.$comment_class.' evo_comment'.( $Comment->is_meta() ? ' evo_comment__meta' : '' ).' panel panel-default" id="comment_'.$Comment->ID.'">';
 
 // Title
 echo $params['comment_title_before'];
@@ -127,7 +127,16 @@ switch( $Comment->get( 'type' ) )
 		
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
-		?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+	case 'meta': // Display a meta comment:
+
+		if( $Comment->is_meta() )
+		{	// Meta comment:
+			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
+		}
+		else
+		{	// Normal comment:
+			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -296,5 +305,12 @@ echo $params['comment_info_after'];
 
 <?php echo $params['comment_end'];
 
-$comment_template_counter++;
+if( $Comment->is_meta() )
+{	// Decrease a counter for meta comments:
+	$comment_template_counter--;
+}
+else
+{	// Increase a counter for normal comments:
+	$comment_template_counter++;
+}
 ?>

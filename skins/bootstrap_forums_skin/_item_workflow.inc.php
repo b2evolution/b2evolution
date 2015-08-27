@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays a workflow properties of the viewed post
+ * This is the template that displays the workflow properties of the viewed post
  *
  * This file is not meant to be called directly.
  *

@@ -1773,6 +1773,11 @@ class Comment extends DataObject
 				'button_group_class'  => button_class( 'group' ),
 			), $params );
 
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return;
+		}
+
 		global $current_User;
 
 		$this->get_Item();
@@ -1844,6 +1849,11 @@ class Comment extends DataObject
 				'title_empty'     => T_('No votes on helpfulness yet.'),
 				'class'           => '',
 			), $params );
+
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return;
+		}
 
 		global $current_User;
 
@@ -3216,6 +3226,11 @@ class Comment extends DataObject
 				'status'       => NULL,
 				'status_title' => NULL,
 			), $params );
+
+		if( $this->is_meta() )
+		{	// Don't display a status banner of meta comments:
+			return;
+		}
 
 		if( is_null( $params['status'] ) )
 		{ // Use current status of this comment

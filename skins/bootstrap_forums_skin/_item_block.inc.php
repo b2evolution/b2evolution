@@ -246,6 +246,12 @@ echo_comment_moderate_js();
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
 	?>
+
+	<?php
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php' );
+		// ---------------------- END OF META COMMENTS ---------------------
+	?>
 </div><!-- ../forums_list single_topic -->
 
 	<?php
