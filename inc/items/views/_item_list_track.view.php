@@ -201,7 +201,8 @@ $ItemStatusCache->load_all();
 $task_statuses = array( 0 => T_('No status') );
 foreach( $ItemStatusCache->cache as $ItemStatus )
 {
-	$task_statuses[ $ItemStatus->ID ] = $ItemStatus->name;
+	// Add '_' to don't break a sorting by name on jeditable:
+	$task_statuses[ '_'.$ItemStatus->ID ] = $ItemStatus->name;
 }
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',

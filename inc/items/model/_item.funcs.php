@@ -4417,7 +4417,7 @@ function item_td_task_cell( $type, $Item )
 			break;
 
 		case 'status':
-			$value = $Item->pst_ID;
+			$value = '_'.$Item->pst_ID; // The char '_' is used to don't break a sorting by name on jeditable
 			$title = $Item->get( 't_extra_status' );
 			if( empty( $title ) )
 			{
