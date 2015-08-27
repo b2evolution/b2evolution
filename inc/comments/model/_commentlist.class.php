@@ -674,6 +674,9 @@ class CommentList2 extends DataObjectList2
 				'list_next_text' => '...',
 				'list_span' => 11,
 				'scroll_list_range' => 5,
+				'page_item_before' => '',
+				'page_item_after'  => '',
+				'page_current_template' => '<strong class="current_page">$page_num$</strong>',
 			);
 
 		// Use defaults + overrides:

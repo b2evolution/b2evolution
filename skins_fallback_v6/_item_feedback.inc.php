@@ -74,12 +74,16 @@ $params = array_merge( array(
 		'disp_nav_bottom'       => true,
 		'nav_top_inside'        => false, // TRUE to display it after start of comments list (inside), FALSE to display a page navigation before comments list
 		'nav_bottom_inside'     => false, // TRUE to display it before end of comments list (inside), FALSE to display a page navigation after comments list
-		'nav_block_start'       => '<p class="center">',
-		'nav_block_end'         => '</p>',
-		'nav_prev_text'         => '&lt;&lt;',
-		'nav_next_text'         => '&gt;&gt;',
+		'nav_block_start'       => '<div class="text-center"><ul class="pagination">',
+		'nav_block_end'         => '</ul></div>',
+		'nav_prev_text'         => '<i class="fa fa-angle-double-left"></i>',
+		'nav_next_text'         => '<i class="fa fa-angle-double-right"></i>',
 		'nav_prev_class'        => '',
 		'nav_next_class'        => '',
+		'nav_page_item_before'  => '<li>',
+		'nav_page_item_after'   => '</li>',
+		'nav_page_current_template' => '<span><b>$page_num$</b></span>',
+		'comments_per_page'     => NULL, // Used instead of blog setting "comments_per_page"
 	), $params );
 
 
@@ -234,7 +238,14 @@ if( $Item->can_see_comments( true ) )
 		}
 		echo $rating_summary;
 
-		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
+		if( $params['comments_per_page'] === NULL )
+		{ // Use blog setting:
+			$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
+		}
+		else
+		{ // Use from params:
+			$comments_per_page = $params['comments_per_page'];
+		}
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', $params['disp_meta_comments'] ? 'mc_' : 'c_' );
 
 		// Filter list:
@@ -259,7 +270,7 @@ if( $Item->can_see_comments( true ) )
 			echo $params['comment_list_start'];
 		}
 
-		if( $params['disp_nav_top'] && $Blog->get_setting( 'paged_comments' ) )
+		if( $params['disp_nav_top'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
 			$CommentList->page_links( array(
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
@@ -269,6 +280,9 @@ if( $Item->can_see_comments( true ) )
 					'next_text'   => $params['nav_next_text'],
 					'prev_class'  => $params['nav_prev_class'],
 					'next_class'  => $params['nav_next_class'],
+					'page_item_before'      => $params['nav_page_item_before'],
+					'page_item_after'       => $params['nav_page_item_after'],
+					'page_current_template' => $params['nav_page_current_template'],
 				) );
 		}
 
@@ -355,7 +369,7 @@ if( $Item->can_see_comments( true ) )
 			echo $params['comment_list_end'];
 		}
 
-		if( $params['disp_nav_bottom'] && $Blog->get_setting( 'paged_comments' ) )
+		if( $params['disp_nav_bottom'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
 			$CommentList->page_links( array(
 					'page_url'    => url_add_tail( $Item->get_permanent_url(), '#comments' ),
@@ -365,6 +379,9 @@ if( $Item->can_see_comments( true ) )
 					'next_text'   => $params['nav_next_text'],
 					'prev_class'  => $params['nav_prev_class'],
 					'next_class'  => $params['nav_next_class'],
+					'page_item_before'      => $params['nav_page_item_before'],
+					'page_item_after'       => $params['nav_page_item_after'],
+					'page_current_template' => $params['nav_page_current_template'],
 				) );
 		}
 

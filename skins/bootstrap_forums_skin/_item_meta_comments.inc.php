@@ -45,6 +45,8 @@ if( ! empty( $Item ) &&
 		'comment_avatar_after'  => '</span>',
 		'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 		'comment_text_after'    => '</div>',
+
+		'comments_per_page'     => 20,
 	) );
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.
