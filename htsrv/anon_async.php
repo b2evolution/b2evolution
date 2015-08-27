@@ -1275,6 +1275,94 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'item_task_edit':
+		// Update task fields of Item from list screen by clicking on the cell
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemtask' );
+
+		$field = param( 'field', 'string' );
+		if( ! in_array( $field, array( 'priority', 'status', 'assigned' ) ) )
+		{ // Invalid field
+			$Ajaxlog->add( sprintf( 'Invalid field: %s', $field ), 'error' );
+			break;
+		}
+
+		$post_ID = param( 'post_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $post_ID );
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+
+		$new_attrs = '';
+		switch( $field )
+		{
+			case 'priority':
+				// Update task priority
+				$new_value = param( 'new_priority', 'integer', NULL );
+				$new_attrs = ' color="'.item_priority_color( $new_priority ).'"';
+				$new_title = item_priority_title( $new_priority );
+				$Item->set_from_Request( 'priority', 'new_priority', true );
+				$Item->dbupdate();
+				break;
+
+			case 'assigned':
+				// Update task assigned user
+				$new_assigned_ID = param( 'new_assigned_ID', 'integer', NULL );
+				$new_assigned_login = param( 'new_assigned_login', 'string', NULL );
+				if( $Item->assign_to( $new_assigned_ID, $new_assigned_login ) )
+				{ // An assigned user can be changed
+					$Item->dbupdate();
+				}
+				else
+				{ // Error on changing of an assigned user
+					load_funcs('_core/_template.funcs.php');
+					headers_content_mightcache( 'text/html', 0, '#', false );		// Do NOT cache error messages! (Users would not see they fixed them)
+					header_http_response('400 Bad Request');
+					// This message is displayed after an input field
+					echo T_('Username not found!');
+					die(2); // Error code 2. Note: this will still call the shutdown function.
+					// EXIT here!
+				}
+
+				if( empty( $Item->assigned_user_ID ) )
+				{
+					$new_title = T_('No user');
+				}
+				else
+				{
+					$is_admin_page = true;
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $Item->assigned_user_ID );
+					$new_title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) );
+				}
+				$new_value = $Item->assigned_user_ID;
+				break;
+
+			case 'status':
+				// Update task status
+				$new_value = param( 'new_status', 'string', NULL );
+				// Remove '_' that is used to don't break a sorting by name on jeditable:
+				$new_value = intval( str_replace( '_', '', $new_value ) );
+				set_param( 'new_status', $new_value );
+
+				$Item->set_from_Request( 'pst_ID', 'new_status', true );
+				$Item->dbupdate();
+
+				$new_title = empty( $Item->pst_ID ) ? T_('No status') : $Item->get( 't_extra_status' );
+				if( ! empty( $new_value ) )
+				{	// Add '_' to don't break a sorting by name on jeditable:
+					$new_value = '_'.$new_value;
+				}
+				break;
+		}
+
+		// Return a link to make the cell editable on next time
+		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
