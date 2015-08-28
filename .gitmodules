@@ -1,0 +1,3 @@
+[submodule "plugins/ldap_plugin"]
+	path = plugins/ldap_plugin
+	url = https://fplanque@github.com/b2evolution/ldap_plugin.git
