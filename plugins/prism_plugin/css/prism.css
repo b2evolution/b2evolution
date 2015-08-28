@@ -205,4 +205,5 @@ pre[class*="language-"] {
 pre[class*='language-'] > code[data-language] {
 	overflow: visible;
 	line-height: 15px;
+	display: inline-block;
 }
