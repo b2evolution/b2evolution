@@ -2348,6 +2348,9 @@ input.btn-lg {
   display: inline-block;
   width: auto;
 }
+.evo_item_workflow_form .evo_item_workflow_form__fields .btn {
+  margin-bottom: 15px;
+}
 
 /**
  * item_base.css 

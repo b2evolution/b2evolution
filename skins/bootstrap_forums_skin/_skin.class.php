@@ -265,8 +265,11 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
-		{	// JS to edit priority/status/assignee of items
-			require_js( 'jquery/jquery.jeditable.js', 'blog' );
+		{	// Init JS to autcomplete the user logins
+			require_js( '#bootstrap_typeahead#', 'blog' );
+			init_autocomplete_login_js( 'blog', 'typeahead' );
+			// Initialize date picker for _item_expert.form.php
+			init_datepicker_js( 'blog' );
 		}
 	}
 

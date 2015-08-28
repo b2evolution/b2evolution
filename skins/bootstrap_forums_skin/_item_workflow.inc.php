@@ -19,7 +19,11 @@ if( ! empty( $Item ) &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
-	$Form = new Form();
+	$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+
+	$Form->add_crumb( 'item' );
+	$Form->hidden( 'blog', $Blog->ID );
+	$Form->hidden( 'post_ID', $Item->ID );
 
 	$Form->begin_form( 'evo_item_workflow_form' );
 
@@ -27,70 +31,36 @@ if( ! empty( $Item ) &&
 
 	echo '<div class="evo_item_workflow_form__fields">';
 
-	$Form->info( T_('Priority'), '<div class="task_priority_edit" rel="'.$Item->ID.'">'.item_td_task_cell( 'priority', $Item ).'</div>' );
+	$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
 
-	$Form->info( T_('Assigned to'), '<div class="task_assigned_edit" rel="'.$Item->ID.'">'.item_td_task_cell( 'assigned', $Item ).'</div>' );
+	// Load current blog members into cache:
+	$UserCache = & get_UserCache();
+	// Load only first 21 users to know when we should display an input box instead of full users list
+	$UserCache->load_blogmembers( $Blog->ID, 21, false );
 
-	$Form->info( T_('Priority'), '<div class="task_status_edit" rel="'.$Item->ID.'">'.item_td_task_cell( 'status', $Item ).'</div>' );
+	if( count( $UserCache->cache ) > 20 )
+	{
+		$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+		$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+	}
+	else
+	{
+		$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'),
+												'', true, '', 'get_assigned_user_options' );
+	}
+
+	$ItemStatusCache = & get_ItemStatusCache();
+	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
+
+	$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+
+	$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 
 	echo '</div>';
 
 	$Form->end_fieldset();
 
 	$Form->end_form();
-
-	// Print JS to edit a task priority
-	echo_editable_column_js( array(
-		'column_selector' => '.task_priority_edit',
-		'ajax_url'        => get_secure_htsrv_url().'anon_async.php?action=item_task_edit&field=priority&'.url_crumb( 'itemtask' ),
-		'options'         => item_priority_titles(),
-		'new_field_name'  => 'new_priority',
-		'ID_value'        => 'jQuery( this ).attr( "rel" )',
-		'ID_name'         => 'post_ID' ) );
-
-	// Print JS to edit a task assigned
-	// Load current blog members into cache:
-	$UserCache = & get_UserCache();
-	// Load only first 21 users to know when we should display an input box instead of full users list
-	$UserCache->load_blogmembers( $Blog->ID, 21, false );
-	// Init this array only for <select> when we have less than 21 users, otherwise we use <input> field with autocomplete feature
-	$field_type = count( $UserCache->cache ) < 21 ? 'select' : 'text';
-
-	$task_assignees = array( 0 => T_('No user') );
-	if( $field_type == 'select' )
-	{
-		foreach( $UserCache->cache as $User )
-		{
-			$task_assignees[ $User->ID ] = $User->login;
-		}
-	}
-	echo_editable_column_js( array(
-		'column_selector' => '.task_assigned_edit',
-		'ajax_url'        => get_secure_htsrv_url().'anon_async.php?action=item_task_edit&field=assigned&'.url_crumb( 'itemtask' ),
-		'options'         => $task_assignees,
-		'new_field_name'  => $field_type == 'select' ? 'new_assigned_ID' : 'new_assigned_login',
-		'ID_value'        => 'jQuery( this ).attr( "rel" )',
-		'ID_name'         => 'post_ID',
-		'field_type'      => $field_type,
-		'field_class'     => 'autocomplete_login only_assignees',
-		'null_text'       => TS_('No user') ) );
-
-	// Print JS to edit a task status
-	$ItemStatusCache = & get_ItemStatusCache();
-	$ItemStatusCache->load_all();
-	$task_statuses = array( 0 => T_('No status') );
-	foreach( $ItemStatusCache->cache as $ItemStatus )
-	{
-		// Add '_' to don't break a sorting by name on jeditable:
-		$task_statuses[ '_'.$ItemStatus->ID ] = $ItemStatus->name;
-	}
-	echo_editable_column_js( array(
-		'column_selector' => '.task_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'anon_async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
-		'options'         => $task_statuses,
-		'new_field_name'  => 'new_status',
-		'ID_value'        => 'jQuery( this ).attr( "rel" )',
-		'ID_name'         => 'post_ID' ) );
 }
 
 ?>
