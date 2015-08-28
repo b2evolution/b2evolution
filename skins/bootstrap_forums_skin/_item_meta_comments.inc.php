@@ -19,6 +19,15 @@ if( ! empty( $Item ) &&
     $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
 { // Display the meta comments if current user can edit this post:
 
+	$Form = new Form();
+
+	$Form->begin_form();
+
+	$total_comments_number = generic_ctp_number( $Item->ID, 'metas', 'total' );
+
+	$Form->begin_fieldset( T_('Meta comments')
+						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ) );
+
 	// Unset a comment counter to set new for meta comments:
 	global $comment_template_counter;
 	$comment_template_counter = NULL;
@@ -50,4 +59,14 @@ if( ! empty( $Item ) &&
 	) );
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.
+
+	if( $current_User->check_perm( 'meta_comment', 'add', false, $Item ) )
+	{ // Display a link to add new meta comment if current user has a permission
+		global $admin_url;
+		echo action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 );
+	}
+
+	$Form->end_fieldset();
+
+	$Form->end_form();
 }
