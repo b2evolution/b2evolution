@@ -87,7 +87,7 @@ load_funcs('_core/_param.funcs.php');
 // Init action param:
 param( 'action', 'string', 'default' );
 
-if( $action == 'newdb' )
+if( $action == 'newdb' && empty( $config_is_done ) )
 { // This is a request of quick installation
 	$db_tableprefix = param( 'db_tableprefix', 'string', '' );
 	if( ! empty( $db_tableprefix ) )
