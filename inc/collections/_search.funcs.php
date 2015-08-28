@@ -519,12 +519,12 @@ function search_result_block( $params = array() )
 
 	if( $debug )
 	{
-		echo '<p class="msg_nothing" style="margin: 2em 0">';
+		echo '<div class="muted" style="margin: 2em 0">';
 		echo 'Total processed result items by type:';
 		echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
 		echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
 		echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
-		echo '</p>';
+		echo '</div>';
 	}
 
 	$result_count = count( $search_result );
@@ -917,6 +917,7 @@ function display_score_map( $params )
 	echo '<ul class="search_score_map dimmed">';
 	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
+		echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).'</li><ul>';
 		if( ! is_array( $score_map ) )
 		{
 			if( $score_map > 0 )
@@ -925,8 +926,8 @@ function display_score_map( $params )
 				{
 					case 'last_mod_date':
 					case 'creation_date':
-						echo '<li>'.sprintf( '%d points for the %s', $score_map, $result_part == 'last_mod_date' ? 'last modified date' : 'creation date' );
-						echo '<br>Rule: The number of points are calculated based on the days passed since creation or last modification<br>';
+						echo '<li>'.sprintf( '%d points.', $score_map );
+						echo ' Rule: The number of points are calculated based on the days passed since creation or last modification';
 						echo '<ul><li>days_passed < 5 => ( 8 - days_passed )</li>';
 						echo '<li>5 <= days_passed < 8 => 3</li>';
 						echo '<li>when days_passed >= 8: ( days_passed < 15 ? 2 : ( days_passed < 30 ? 1 : 0 ) )</li>';
@@ -950,11 +951,13 @@ function display_score_map( $params )
 						break;
 				}
 			}
+			echo '</ul>';
 			continue;
 		}
 
 		if( $score_map['score'] == 0 )
 		{
+			echo '</ul>';
 			continue;
 		}
 
@@ -963,19 +966,19 @@ function display_score_map( $params )
 			switch( $match_type )
 			{
 				case 'whole_term':
-					echo '<li>'.sprintf( '%d points for whole term match in [%s]', $scores, $result_part ).'</li>';
+					echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
 					continue;
 
 				case 'quoted_term_all':
-					echo '<li>'.sprintf( '%d extra points for all quoted term match in [%s]', $scores, $result_part ).'</li>';
+					echo '<li>'.sprintf( '%d extra points for all quoted term match', $scores ).'</li>';
 					continue;
 
 				case 'all_case_sensitive':
-					echo '<li>'.sprintf( '%d extra points for all word case sensitive match in [%s]', $scores, $result_part ).'</li>';
+					echo '<li>'.sprintf( '%d extra points for all word case sensitive match', $scores ).'</li>';
 					continue;
 
 				case 'all_whole_words':
-					echo '<li>'.sprintf( '%d extra points for all word complete match in [%s]', $scores, $result_part ).'</li>';
+					echo '<li>'.sprintf( '%d extra points for all word complete match', $scores ).'</li>';
 					continue;
 			}
 
@@ -1018,9 +1021,10 @@ function display_score_map( $params )
 						$extra_points_reason = '. Result = {1 match point} + {1 extra point because of multiple occurences}';
 					}
 				}
-				echo '<li>'.sprintf( '%d points %s [%s] in [%s]', $score, $keyword_match, $word, $result_part ).$extra_points_reason.'</li>';
+				echo '<li>'.sprintf( '%d points %s [%s]', $score, $keyword_match, $word ).$extra_points_reason.'</li>';
 			}
 		}
+		echo '</ul>';
 	}
 	echo '<li>'.sprintf( 'Total: %d points', $params['score'] ).'</li>';
 	if( $params['best_result'] )
