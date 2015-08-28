@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 if( ! empty( $Item ) &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
 	$Form = new Form();
 
