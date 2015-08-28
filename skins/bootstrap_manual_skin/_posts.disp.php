@@ -170,8 +170,6 @@ else
 		skin_include( '_item_list.inc.php', array(
 				'before_title'   => '<h3>',
 				'after_title'    => '</h3>',
-				'before_content' => '<div class="excerpt">',
-				'after_content'  => '</div>',
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
