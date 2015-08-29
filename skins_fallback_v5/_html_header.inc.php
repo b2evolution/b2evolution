@@ -28,9 +28,6 @@ $params = array_merge( array(
 	'body_class'    => NULL,
 ), $params );
 
-// fp> I am removing this because it forces all skins to include a style.css file which we don't necessarily want.
-// require_css( 'style.css', 'relative' );
-
 // The following is temporary and should be moved to some SiteSkin class
 siteskin_init();
 
@@ -55,6 +52,7 @@ echo $params['html_tag'];
 			echo $params['viewport_tag'];
 		}
 	?>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<?php skin_content_meta(); /* Charset in case we can't trust the HTTP header or the page is saved to an .html file */ ?>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
