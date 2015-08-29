@@ -1598,6 +1598,7 @@ function check_quick_install_request()
 	$db_password = param( 'db_password', 'raw', '' );
 	$db_name = param( 'db_name', 'string', '' );
 	$db_host = param( 'db_host', 'string', '' );
+	$db_tableprefix = param( 'db_tableprefix', 'string', '' );
 
 	// Admin e-mail:
 	global $admin_email;
@@ -1605,7 +1606,8 @@ function check_quick_install_request()
 	$conf_admin_email = param( 'admin_email', 'string', '', false, true );
 
 	if( ! empty( $conf_admin_email ) ||
-	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) )
+	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) ||
+	    ! empty( $db_tableprefix ) )
 	{ // Try to update basic config file ONLY when at least one of these params are defined
 
 		if( empty( $conf_admin_email ) || ! param_check_email( 'admin_email' ) )
@@ -1614,7 +1616,7 @@ function check_quick_install_request()
 		}
 
 		// Base URL:
-		global $baseurl, $admin_url, $dispatcher;
+		global $baseurl, $admin_url, $dispatcher, $tableprefix;
 		$baseurl = param( 'baseurl', 'string', '', false, true );
 		if( empty( $baseurl ) || ! preg_match( '~https?://~', $baseurl ) )
 		{ // Try to autogenerate base url if it is empty or wrong from request:
@@ -1629,12 +1631,16 @@ function check_quick_install_request()
 		// Update $admin_url to new value because it depends on $baseurl:
 		$admin_url = $baseurl.$dispatcher;
 
+		// Update $tableprefix to new from request:
+		$tableprefix = $db_tableprefix;
+
 		// Try to create basic config file:
 		$basic_config_params = array(
 				'db_user'        => $db_user,
 				'db_password'    => $db_password,
 				'db_name'        => $db_name,
 				'db_host'        => $db_host,
+				'db_tableprefix' => $db_tableprefix,
 				'baseurl'        => $baseurl,
 				'admin_email'    => $conf_admin_email,
 				'print_messages' => false,
@@ -1673,14 +1679,14 @@ function update_basic_config_file( $params = array() )
 	global $DB, $db_config, $evo_charset, $conf_path, $default_locale;
 
 	// These global params should be rewritten by this function on success result
-	global $tableprefix, $baseurl, $admin_email, $config_is_done, $action;
+	global $baseurl, $admin_email, $config_is_done, $action;
 
 	$params = array_merge( array(
 			'db_user'        => '',
 			'db_password'    => '',
 			'db_name'        => '',
 			'db_host'        => '',
-			'db_tableprefix' => $tableprefix,
+			'db_tableprefix' => '',
 			'baseurl'        => '',
 			'admin_email'    => '',
 			'print_messages' => true, // TRUE - to print out all messages on screen, FALSE - to return
