@@ -917,11 +917,12 @@ function display_score_map( $params )
 	echo '<ul class="search_score_map dimmed">';
 	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
-		echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).'</li><ul>';
+		$note = ( $result_part == 'title' || $result_part == 'name' ) ? ' - the match scores are multiplied with 3' : '';
 		if( ! is_array( $score_map ) )
 		{
 			if( $score_map > 0 )
 			{ // Score received for this field
+				echo '<li>'.sprintf( 'Extra points for [%s]', $result_part ).'</li><ul>';
 				switch ( $result_part )
 				{
 					case 'last_mod_date':
@@ -950,17 +951,19 @@ function display_score_map( $params )
 						echo '<li>'.sprintf( '%d points for [%s]', $score_map, $result_part ).'</li>';
 						break;
 				}
+				echo '</ul>';
 			}
-			echo '</ul>';
 			continue;
 		}
 
+		echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).$note.'</li><ul>';
 		if( $score_map['score'] == 0 )
 		{
 			echo '</ul>';
 			continue;
 		}
 
+		$keyword_match = null;
 		foreach( $score_map['map'] as $match_type => $scores )
 		{
 			switch( $match_type )
@@ -987,42 +990,44 @@ function display_score_map( $params )
 				continue;
 			}
 
-			$keyword_match = '';
-			switch( $match_type )
+			if( $keyword_match != $match_type && $keyword_match !== null )
+			{ // close previously started list
+				echo '</ul>';
+			}
+			if( $keyword_match != $match_type )
 			{
-				case 'word_case_sensitive_match':
-					$keyword_match = 'for case sensitive match on';
-					break;
+				switch( $match_type )
+				{
+					case 'word_case_sensitive_match':
+						echo '<li>Case sensitive mathces</li>';
+						break;
 
-				case 'whole_word_match':
-					$keyword_match = 'for whole word match on';
-					break;
+					case 'whole_word_match':
+						echo '<li>Whole word mathces</li>';
+						break;
 
-				case 'word_case_insensitive_match':
-					$keyword_match = 'for case insensitive match on';
-					break;
+					case 'word_case_insensitive_match':
+						echo '<li>Case insensitive mathces</li>';
+						break;
+				}
+				$keyword_match = $match_type;
+				echo '<ul>';
 			}
 
 			foreach( $scores as $word => $score )
 			{
 				$extra_points_reason = '';
-				if( $keyword_match != '' )
+				if( ( $keyword_match != null ) && ( ( $score > 3 ) || ( $score == 2 ) ) )
 				{
-					if( $score > 3 )
-					{
-						$extra_points_reason = sprintf( '. Result = ( {1 match point} + {1 extra point because of multiple occurences} ) * {3 because it was found on [%s]}', $result_part );
-					}
-					elseif( $score > 2 )
-					{
-						$extra_points_reason = sprintf( '. Result = ( {1 match point} ) * {3 because it was found on [%s]}', $result_part );
-					}
-					elseif( $score > 1 )
-					{
-						$extra_points_reason = '. Result = {1 match point} + {1 extra point because of multiple occurences}';
-					}
+					$extra_points_reason = '. Result = {1 match point} + {1 extra point because of multiple occurences}';
 				}
-				echo '<li>'.sprintf( '%d points %s [%s]', $score, $keyword_match, $word ).$extra_points_reason.'</li>';
+				$points_label = ( $score > 1 ) ? '%d points - match on [%s]' : '%d point - match on [%s]';
+				echo '<li>'.sprintf( $points_label, $score, $word ).$extra_points_reason.'</li>';
 			}
+		}
+		if( $keyword_match != null )
+		{ // display the end of the specific match type
+			echo '</ul>';
 		}
 		echo '</ul>';
 	}
