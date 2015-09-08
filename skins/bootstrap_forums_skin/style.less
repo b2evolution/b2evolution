@@ -90,10 +90,6 @@ ol.breadcrumb {
 	}
 	box-shadow: none;
 	.panel-heading {
-		&:not(:first-child) {
-			border-top: 1px solid #ddd;
-			.border-radius(0);
-		}
 		h2 {
 			margin-top: 0;
 		}
@@ -982,4 +978,13 @@ a.to_top {
 // 
 .popover img {
 	.border-radius !important;
+}
+.forums_list.front_panel {
+	border-bottom: 0px !important;
+	.table {
+		border-bottom: 1px solid #ddd;
+		&:nth-last-child(1) {
+			border-radius: 0px 0px 4px 4px;
+		}
+	}
 }

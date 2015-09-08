@@ -839,8 +839,7 @@ $sendmail_additional_params = '-r $return-address$';
  *
  * @global boolean $use_cdns
  */
-$use_cdns = true;
-
+$use_cdns = false;		// Use false by default so b2evo works on intranets, local tests on laptops and in countries with firewalls...
 
 /**
  * Which CDN do you want to use for loading common libraries?
@@ -848,9 +847,11 @@ $use_cdns = true;
  * If you don't want to use a CDN and want to use the local version, comment out the line.
  * Each line starts with the js or css alias.
  * The first string is the production (minified URL), the second is the development URL (optional).
+ * By default, only the most trusted CDNs are enabled while the other ones are commented out.
  */
 $library_cdn_urls = array(
 		'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
+		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
