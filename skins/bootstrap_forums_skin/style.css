@@ -71,14 +71,6 @@ ol.breadcrumb {
   margin: 0 auto;
   margin-left: -76px;
 }
-.forums_list .panel-heading:not(:first-child) {
-  border-top: 1px solid #ddd;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
-}
 .forums_list .panel-heading h2 {
   margin-top: 0;
 }
@@ -903,4 +895,13 @@ a.to_top {
   -ms-border-radius: 4px !important;
   -o-border-radius: 4px !important;
   border-radius: 4px !important;
+}
+.forums_list.front_panel {
+  border-bottom: 0px !important;
+}
+.forums_list.front_panel .table {
+  border-bottom: 1px solid #ddd;
+}
+.forums_list.front_panel .table:nth-last-child(1) {
+  border-radius: 0px 0px 4px 4px;
 }
