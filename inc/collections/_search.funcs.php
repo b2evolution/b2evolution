@@ -492,6 +492,24 @@ function score_search_result( $search_keywords )
  */
 function search_result_block( $params = array() )
 {
+	global $Blog, $Session, $debug;
+
+	evo_flush(); // flush displayed data before start searching
+
+	$search_keywords = param( 's', 'string', '', true );
+	$search_params = $Session->get( 'search_params' );
+	$search_result = $Session->get( 'search_result' );
+	$search_result_loaded = false;
+	if( empty( $search_params ) || ( $search_params['search_keywords'] != $search_keywords )
+		|| ( $search_params['search_blog'] != $Blog->ID ) || ( $search_result === NULL ) )
+	{ // this is a new search
+		$search_params = array( 'search_keywords' => $search_keywords, 'search_blog' => $Blog->ID );
+		$search_result = score_search_result( $search_keywords );
+		$Session->set( 'search_params', $search_params );
+		$Session->set( 'search_result', $search_result );
+		$search_result_loaded = true;
+	}
+
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'title_suffix_post'     => ' ('.T_('Post').')',
@@ -505,8 +523,6 @@ function search_result_block( $params = array() )
 			'author_format'         => 'avatar_name', // @see User::get_identity_link() // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 			'date_format'           => locale_datefmt(),
 		), $params );
-
-	global $Blog, $Session, $search_result_loaded, $debug;
 
 	$search_result = $Session->get( 'search_result' );
 	if( empty( $search_result ) )
@@ -525,6 +541,9 @@ function search_result_block( $params = array() )
 		echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
 		echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
 		echo '</div>';
+
+		// show how many items are processed
+		evo_flush();
 	}
 
 	$result_count = count( $search_result );
