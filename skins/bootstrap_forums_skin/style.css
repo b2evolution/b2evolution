@@ -502,10 +502,10 @@ ul.legend span.note {
 .single_topic .evo_content_block .panel-body .ft_avatar {
   padding: 0px;
   text-align: center;
-}
-.single_topic .evo_content_block .panel-body .ft_avatar span > img.loadimg,
-.single_topic .evo_content_block .panel-body .ft_avatar a > img.loadimg {
-  border-radius: 50% !important;
+  /* @MILOS > Still testing to see if this is overrulled by: line 992
+				span > img.loadimg, a > img.loadimg {
+					border-radius: 50% !important;
+				}*/
 }
 .single_topic .evo_content_block .panel-body .post_main {
   padding-right: 0px;
