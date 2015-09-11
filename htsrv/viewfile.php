@@ -111,6 +111,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <?php if( isset( $JS_additional ) ) { ?>

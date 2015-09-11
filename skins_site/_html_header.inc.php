@@ -17,6 +17,7 @@ siteskin_init();
 ?>
 <html lang="<?php locale_lang() ?>">
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
 		echo $page_title;
