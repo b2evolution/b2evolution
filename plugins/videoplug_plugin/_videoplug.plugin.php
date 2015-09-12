@@ -56,18 +56,21 @@ class videoplug_plugin extends Plugin
 		$search_list = array(
 				'#\[video:youtube:(.+?)]#',     // Youtube
 				'#\[video:dailymotion:(.+?)]#', // Dailymotion
+				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+				// Unavailable services. Keep them for backwards compatibility
 				'#\[video:google:(.+?)]#',      // Google video
 				'#\[video:livevideo:(.+?)]#',   // LiveVideo
 				'#\[video:ifilm:(.+?)]#',       // iFilm
-				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+
 			);
 		$replace_list = array(
 				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="http://www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"/>',
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
-				'<div class="videoblock"><embed style="width:400px; height:326px;" id="VideoPlayback" type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docId=\\1&hl=en" flashvars=""></embed></div>',
-				'<div class="videoblock"><object src="http://www.livevideo.com/flvplayer/embed/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"><param name="movie" value="http://www.livevideo.com/flvplayer/embed/\\1"></param><param name="wmode" value="transparent"></param></object></div>',
-				'<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
+				// Unavailable services. Keep them for backwards compatibility
+				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
+				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
+				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
 			);
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
@@ -122,10 +125,7 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
-		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|google" value="Google video" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
-		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|livevideo" value="LiveVideo" />';
-		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|ifilm" value="iFilm" />';
 		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="vimeo" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
