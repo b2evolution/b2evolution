@@ -64,7 +64,7 @@ class videoplug_plugin extends Plugin
 
 			);
 		$replace_list = array(
-				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="http://www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"/>',
+				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"/>',
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
 				// Unavailable services. Keep them for backwards compatibility
