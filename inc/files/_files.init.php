@@ -153,8 +153,8 @@ class files_Module extends Module
 				$permshared = 'add';
 				$permimport = 'none';
 				break;
-			case 3: // Trusted Users (group ID 3) have permission by default:
-				$permfiles = 'view';
+			case 3: // Editors (group ID 3) have permission by default:
+				$permfiles = 'edit';
 				$permshared = 'view';
 				$permimport = 'none';
 				break;

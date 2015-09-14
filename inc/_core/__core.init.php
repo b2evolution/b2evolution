@@ -544,7 +544,17 @@ class _core_Module extends Module
 				$def_notification = 'short';
 				break;
 
-			case 3:		// Trusted Users (group ID 3) have permission by default:
+			case 3:		// Editors (group ID 3) have permission by default:
+				$permadmin = 'restricted';
+				$permusers = 'none';
+				$permoptions = 'none';
+				$permspam = 'view';
+				$permslugs = 'none';
+				$permtemplates = 'denied';
+				$permemails = 'none';
+				$def_notification = 'short';
+				break;
+
 			case 4: 	// Normal Users (group ID 4) have permission by default:
 				$permadmin = 'no_toolbar';
 				$permusers = 'none';

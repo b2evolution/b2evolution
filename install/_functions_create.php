@@ -89,7 +89,7 @@ function create_default_data()
 	$Group_Privileged->dbinsert();
 
 	$Group_Bloggers = new Group(); // COPY !
-	$Group_Bloggers->set( 'name', 'Trusted Users' );
+	$Group_Bloggers->set( 'name', 'Editors' );
 	$Group_Bloggers->set( 'level', 6 );
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
