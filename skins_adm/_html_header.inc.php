@@ -28,6 +28,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo $this->get_html_title(); ?></title>
 	<?php
 	global $robots_index, $robots_follow;

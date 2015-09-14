@@ -42,7 +42,7 @@
 .evo_comment_text {
 	padding-right: 0px;
 }
-.evo_comment_avatar span img, .evo_comment_avatar a img {
+.evo_comment_avatar > span > img, .evo_comment_avatar > a > img {
 	border-radius: 50%;
 	float: none !important;
 	margin: 0px 0px 14px 0px !important;
@@ -540,9 +540,10 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
-				span img.loadimg, a img.loadimg {
+				/* @MILOS > Still testing to see if this is overrulled by: line 992
+				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
-				}
+				}*/
 			}
 			.post_main {
 				padding-right: 0px;
@@ -987,4 +988,10 @@ a.to_top {
 			border-radius: 0px 0px 4px 4px;
 		}
 	}
+}
+.ft_avatar > a > img, .ft_avatar > span > img {
+	border-radius: 50% !important;
+}
+.evo_comment_avatar > a:hover {
+	background-color: transparent !important;
 }

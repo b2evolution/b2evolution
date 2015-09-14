@@ -69,8 +69,6 @@ function skin_init( $disp )
 
 	global $Session, $current_User;
 
-	global $search_result_loaded;
-
 	$Timer->resume( 'skin_init' );
 
 	if( empty($disp_detail) )
@@ -107,20 +105,8 @@ function skin_init( $disp )
 		case 'search':
 			// Searching post, comments and categories
 			load_funcs( 'collections/_search.funcs.php' );
-
-			$search_keywords = param( 's', 'string', '', true );
-			$search_params = $Session->get( 'search_params' );
-			$search_result = $Session->get( 'search_result' );
-			$search_result_loaded = false;
-			if( empty( $search_params ) || ( $search_params['search_keywords'] != $search_keywords )
-				|| ( $search_params['search_blog'] != $Blog->ID ) || ( $search_result === NULL ) )
-			{ // this is a new search
-				$search_params = array( 'search_keywords' => $search_keywords, 'search_blog' => $Blog->ID );
-				$search_result = score_search_result( $search_keywords );
-				$Session->set( 'search_params', $search_params );
-				$Session->set( 'search_result', $search_result );
-				$search_result_loaded = true;
-			}
+			// Check previous search keywords so it can be displayed in the search input box
+			param( 's', 'string', '', true );
 			break;
 	}
 

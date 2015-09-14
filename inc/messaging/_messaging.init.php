@@ -155,7 +155,7 @@ class messaging_Module extends Module
 				$max_new_threads = ''; // empty = no limit
 				break;
 			case 2: // Moderators group equals 2
-			case 3: // Trusted users group ID equals 3
+			case 3: // Editors group ID equals 3
 				$perm_messaging = 'write'; // Messaging permissions
 				$max_new_threads = '10'; // Maximum number of new threads per day
 				break;

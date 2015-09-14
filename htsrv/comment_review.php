@@ -35,6 +35,7 @@ if( $action == 'exit' )
 	<html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 	<html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title><?php echo T_('Comment moderation') ?></title>
 		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	</head>
@@ -164,6 +165,7 @@ $b2evo_icons_type = 'fontawesome';
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo ' '.T_('Comment review').' '; ?></title>
 	<link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css?v=<?php echo $app_version_long; ?>">
 </head>

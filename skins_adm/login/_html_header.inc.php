@@ -108,9 +108,10 @@ if( isset( $wrap_width ) )
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
 <head>
+	<meta name="viewport" content="width = 600" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo $page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
-	<meta name="viewport" content="width = 600" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>

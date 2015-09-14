@@ -429,7 +429,7 @@ class collections_Module extends Module
 				$permgetblog = 'denied';
 				break;
 
-			case 3:		// Trusted Users (group ID 3) have permission by default:
+			case 3:		// Editors (group ID 3) have permission by default:
 			case 4: 	// Normal Users (group ID 4) have permission by default:
 				$permapi = 'always';
 				$permcreateblog = 'denied';

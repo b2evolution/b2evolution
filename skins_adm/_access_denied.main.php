@@ -12,6 +12,7 @@ headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title><?php echo T_('Back-office access denied') ?></title>
 	</head>
 <body>
