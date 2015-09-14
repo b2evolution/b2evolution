@@ -6460,7 +6460,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		// set_upgrade_checkpoint( '11482' );
+		set_upgrade_checkpoint( '11482' );
+	}
+
+	if( $old_db_version < 11483 )
+	{ // part 18.s.3 trunk aka 20th part of "i7"
+
+		task_begin( 'Updating general settings...' );
+		$DB->query( 'UPDATE T_settings
+				SET set_value = '.$DB->quote( 'no' ).'
+			WHERE set_name = '.$DB->quote( 'newusers_canregister' ).'
+				AND set_value = '.$DB->quote( '0' ) );
+		task_end();
+
+		// set_upgrade_checkpoint( '11483' );
 	}
 
 	/*
