@@ -122,7 +122,7 @@ $Form->begin_form( 'evo_comment' );
 	{ // there are attachments to display
 		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
 		{
-			$Form->begin_fieldset( T_('Attachments') );
+			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
 			display_attachments( $LinkOwner );
 			$Form->end_fieldset();
 		}
