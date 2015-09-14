@@ -309,6 +309,12 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		
+		// Set proxy:
+		// curl_setopt( $ch, CURLOPT_PROXY, $timeout );
+		// curl_setopt( $ch, CURLOPT_PROXYPORT, $timeout );
+		// username
+
 		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true ); // made silent due to possible errors with safe_mode/open_basedir(?)
 		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );
 		$r = curl_exec( $ch );

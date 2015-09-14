@@ -96,6 +96,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 		$client->debug = 1;
 	}
 
+	// Set proxy for outgoing connections:
+	// $client->setProxy( $proxy_host, $proxy_port, $proxy_username, $proxy_password );
+
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );
 
