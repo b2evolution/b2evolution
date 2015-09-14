@@ -27,6 +27,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
+	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 	if( ! isset( $allow_evo_stats ) )
 	{	// Set default value:
@@ -97,7 +98,10 @@ function b2evonet_get_updates( $force_short_delay = false )
 	}
 
 	// Set proxy for outgoing connections:
-	// $client->setProxy( $proxy_host, $proxy_port, $proxy_username, $proxy_password );
+	if( !empty($outgoing_proxy_hostname) )
+	{
+		$client->setProxy( $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password );
+	}
 
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );

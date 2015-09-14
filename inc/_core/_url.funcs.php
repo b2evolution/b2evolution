@@ -290,6 +290,8 @@ function _http_wrapper_last_status( & $headers )
  */
 function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
 {
+	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
 	$info = array(
 		'error' => '',
 		'status' => NULL,
@@ -311,9 +313,12 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
 		
 		// Set proxy:
-		// curl_setopt( $ch, CURLOPT_PROXY, $timeout );
-		// curl_setopt( $ch, CURLOPT_PROXYPORT, $timeout );
-		// username
+		if( !empty($outgoing_proxy_hostname) )
+		{
+			curl_setopt( $ch, CURLOPT_PROXY, $outgoing_proxy_hostname );
+			curl_setopt( $ch, CURLOPT_PROXYPORT, $outgoing_proxy_port );
+			curl_setopt( $ch, CURLOPT_PROXYUSERPWD, $outgoing_proxy_username.':'.$outgoing_proxy_password );
+		}
 
 		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true ); // made silent due to possible errors with safe_mode/open_basedir(?)
 		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );

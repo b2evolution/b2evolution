@@ -919,6 +919,17 @@ $library_local_urls = array(
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 	);
 
+
+/**
+ * Proxy configuration for all outgoing connections (like pinging b2evolution.net or twitter, etc...)
+ * Leave empty if you don't want to use a proxy.
+ */
+$outgoing_proxy_hostname = '';
+$outgoing_proxy_port = '';
+$outgoing_proxy_username = '';
+$outgoing_proxy_password = '';
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
