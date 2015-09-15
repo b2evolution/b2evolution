@@ -2675,7 +2675,7 @@ class Comment extends DataObject
 			}
 			else
 			{ // Set default position for preview files
-				$link_position = ( $index == 0 ) ? 'teaser' : 'aftermore';
+				$link_position = 'aftermore';
 			}
 
 			$File = $attachment;
