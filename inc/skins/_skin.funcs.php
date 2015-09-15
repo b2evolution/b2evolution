@@ -1564,7 +1564,15 @@ var downloadInterval = setInterval( function()
 	global $Hit;
 	if( $Hit->is_IE( 9, '<' ) )
 	{ // IE < 9
-		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+		global $debug;
+		if( $debug )
+		{
+			$Messages->add( sprintf( T_('Your web browser is too old (%s). For this site to work correctly, we recommend you use a more recent browser.'), $Hit->get_user_agent() ), 'note' );
+		}
+		else
+		{
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+		}
 	}
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
