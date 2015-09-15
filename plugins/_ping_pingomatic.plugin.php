@@ -62,11 +62,18 @@ class ping_pingomatic_plugin extends Plugin
 	function ItemSendPing( & $params )
 	{
 		global $debug;
+		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( '/', 'rpc.pingomatic.com', 80 );
 		$client->debug = ($debug && $params['display']);
+
+		// Set proxy for outgoing connections:
+		if( ! empty( $outgoing_proxy_hostname ) )
+		{
+			$client->setProxy( $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password );
+		}
 
 		$message = new xmlrpcmsg("weblogUpdates.ping", array(
 				new xmlrpcval( $item_Blog->get('name') ),

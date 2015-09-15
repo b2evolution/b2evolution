@@ -64,14 +64,21 @@ class ping_b2evonet_plugin extends Plugin
 	{
 		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 		global $debug, $baseurl, $instance_name, $evo_charset;
+		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
-    /**
+		/**
 		 * @var Blog
 		 */
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 		$client->debug = ( $debug == 2 );
+
+		// Set proxy for outgoing connections:
+		if( ! empty( $outgoing_proxy_hostname ) )
+		{
+			$client->setProxy( $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password );
+		}
 
 		$message = new xmlrpcmsg( 'b2evo.ping', array(
 				new xmlrpcval($item_Blog->ID),    // id
