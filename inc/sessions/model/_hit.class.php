@@ -1755,28 +1755,20 @@ class Hit
 
 		if( ! is_null( $version ) )
 		{ // Check version of IE
-
-			$browser_version = $this->get_browser_version();
-			if( empty( $browser_version ) )
-			{	// If browser version is not detected by some reason
-				// Don't check a version because it is not detected correctly:
-				return false;
-			}
-
 			switch( $operator )
 			{
 				case '=':
-					return $browser_version == $version;
+					return $this->get_browser_version() == $version;
 				case '>':
-					return $browser_version > $version;
+					return $this->get_browser_version() > $version;
 				case '<':
-					return $browser_version < $version;
+					return $this->get_browser_version() < $version;
 				case '>=':
-					return $browser_version >= $version;
+					return $this->get_browser_version() >= $version;
 				case '<=':
-					return $browser_version <= $version;
+					return $this->get_browser_version() <= $version;
 				case '!=':
-					return $browser_version != $version;
+					return $this->get_browser_version() != $version;
 				default:
 					// Incorrect operator
 					return false;
