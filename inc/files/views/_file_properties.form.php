@@ -16,9 +16,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @global File
  */
-global $edited_File;
+global $edited_File, $selected_Filelist;
 
 global $blog, $filename_max_length;
+
+$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() );
 
 $Form = new Form( NULL, 'fm_properties_checkchanges' );
 
@@ -35,7 +37,7 @@ $Form->begin_form( 'fform', ( get_param( 'mode' ) == 'modal' ? '' : T_('File pro
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->begin_fieldset( T_('Properties') );
-		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( $edit_allowed_perm )
 		{ // User can edit: 
 			$Form->text( 'name', $edited_File->dget('name'), 32, T_('Filename'), T_('This is the name of the file on the server hard drive.'), $filename_max_length );
 		}
@@ -47,7 +49,7 @@ $Form->begin_form( 'fform', ( get_param( 'mode' ) == 'modal' ? '' : T_('File pro
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Meta data') );
-		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( $edit_allowed_perm )
 		{ // User can edit:
 			$Form->text( 'title', $edited_File->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
 			$Form->text( 'alt', $edited_File->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
@@ -68,7 +70,7 @@ $Form->begin_form( 'fform', ( get_param( 'mode' ) == 'modal' ? '' : T_('File pro
 		$Form->info( T_('Reported as spam'), $edited_File->get_votes_count_info( 'spam' ) );
 	$Form->end_fieldset();
 
-if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+if( $edit_allowed_perm )
 { // User can edit:
 	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }

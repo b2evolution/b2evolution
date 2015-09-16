@@ -146,7 +146,7 @@ $Form->begin_form();
 
 	// Set FileList perms
 	$all_perm = $current_User->check_perm( 'files', 'all', false );
-	$edit_perm = $current_User->check_perm( 'files', 'edit', false, $fm_Filelist->get_FileRoot() );
+	$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -385,7 +385,7 @@ $Form->begin_form();
 			echo '<td class="perms">';
 			$fm_permlikelsl = $UserSettings->param_Request( 'fm_permlikelsl', 'fm_permlikelsl', 'integer', 0 );
 
-			if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+			if( $edit_allowed_perm )
 			{ // User can edit:
 				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ).'">'
 							.$lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' ).'</a>';
@@ -419,7 +419,7 @@ $Form->begin_form();
 
 		echo '<td class="actions lastcol text-nowrap">';
 
-		if( $edit_perm )
+		if( $edit_allowed_perm )
 		{ // User can edit:
 			if( $lFile->is_editable( $all_perm ) )
 			{
@@ -429,10 +429,7 @@ $Form->begin_form();
 			{
 				echo get_icon( 'edit', 'noimg' );
 			}
-		}
 
-		if( $edit_perm )
-		{ // User can edit:
 			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
 							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.rawurlencode( $lFile->get_rdfp_rel_path() ).'\' )' ) );
 			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
@@ -609,7 +606,7 @@ $Form->begin_form();
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 
-			if( $edit_perm )
+			if( $edit_allowed_perm )
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
 				$field_options['delete'] = T_('Delete files...');

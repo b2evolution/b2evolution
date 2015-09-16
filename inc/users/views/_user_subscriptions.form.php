@@ -369,10 +369,13 @@ else
 				array( 'sub_items_new',    '1', T_('All posts'),    0 ),
 				array( 'sub_comments_new', '1', T_('All comments'), 0 )
 			);
+		$label_suffix = $Form->label_suffix;
+		$Form->label_suffix = '';
 		$Form->checklist( $subscriptions, 'subscribe_blog', trim( $subscribe_blogs_select ), false, false, array(
 			'field_suffix' => $subscribe_blogs_button,
 			'input_prefix' => '<div class="floatleft">',
 			'input_suffix' => '</div>' ) );
+		$Form->label_suffix = $label_suffix;
 	}
 }
 $Form->end_fieldset();
