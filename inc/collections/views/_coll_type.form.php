@@ -32,7 +32,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-$Form->begin_fieldset( T_('Collection type').get_manual_link('collection-type') );
+$Form->begin_fieldset( T_('Collection type').get_manual_link('collection-change-type') );
 
 	$collection_kinds = get_collection_kinds();
 	$radio_options = array();

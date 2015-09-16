@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 echo '<div class="panel panel-default">';
 
 echo '<div class="panel-heading">'
-			.'<h2 class="panel-title">'.T_('What kind of collection would you like to create?').get_manual_link('collection-type').'</h2>'
+			.'<h2 class="panel-title">'.T_('What kind of collection would you like to create?').get_manual_link('create-collection-select-type').'</h2>'
 		.'</div>';
 
 echo '<div class="panel-body">';
