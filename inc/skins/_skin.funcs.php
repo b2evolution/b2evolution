@@ -1559,7 +1559,7 @@ var downloadInterval = setInterval( function()
 	}
 
 	global $Hit;
-	if( $Hit->is_IE( 9, '<' ) )
+	if( $Hit->is_IE( 9, '<' ) && $Hit->get_browser_version() > 0 )
 	{ // IE < 9
 		global $debug;
 		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
