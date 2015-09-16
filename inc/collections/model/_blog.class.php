@@ -261,6 +261,10 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Allow email subscriptions by default:
+		$this->set_setting( 'allow_subscriptions', '1' );
+		$this->set_setting( 'allow_item_subscriptions', '1' );
+
 		switch( $kind )
 		{
 			case 'main':
