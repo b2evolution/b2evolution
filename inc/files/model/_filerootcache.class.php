@@ -53,7 +53,7 @@ class FileRootCache
 
 		if( ! empty( $special_root_ID ) &&
 		    ( $special_FileRoot = & $FileRootCache->get_by_ID( $special_root_ID, true ) ) &&
-		    $current_User->check_perm( 'files', 'edit', false, $special_FileRoot ) )
+		    $current_User->check_perm( 'files', 'edit_allowed', false, $special_FileRoot ) )
 		{ // Try to add special file root if current user has an access
 			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
 		}
