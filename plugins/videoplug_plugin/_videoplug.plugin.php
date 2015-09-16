@@ -126,7 +126,7 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
-		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="vimeo" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="Vimeo" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
