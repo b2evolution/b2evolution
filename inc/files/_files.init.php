@@ -204,7 +204,7 @@ class files_Module extends Module
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
-						array( 'view', T_('View files for all allowed roots'), T_('You can allow specific collection roots in their advanced user/group permissions.') ),
+						array( 'view', T_('View files for all allowed roots'), T_('You can allow specific collection roots in each collection\'s advanced user/group permissions.') ),
 						array( 'add', T_('Add/Upload files to allowed roots'), sprintf( T_('Only %sunlocked file types can be uploaded.'), $filetypes_allowed_icon ) ),
 						array( 'edit_allowed', T_('Edit files in allowed roots'), sprintf( T_('Only %sunlocked file types can be edited.'), $filetypes_allowed_icon ) ),
 						array( 'edit', sprintf( T_('Edit %sunlocked files in all roots'), $filetypes_allowed_icon ) ),
