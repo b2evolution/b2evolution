@@ -832,7 +832,7 @@ switch( $action )
 		// Delete Item from Session
 		delete_session_Item( 0 );
 
-		if( ! $exit_after_save )
+		if( ! $exit_after_save && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// We want to continue editing...
 			$tab_switch_params = 'p='.$edited_Item->ID;
 			$action = 'edit';	// It's basically as if we had updated

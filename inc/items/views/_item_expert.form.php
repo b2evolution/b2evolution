@@ -199,9 +199,9 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( isset($GLOBALS['files_Module']) && ( !$creating ||
-		( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-		&& $current_User->check_perm( 'files', 'view', false ) ) ) )
+	if( isset( $GLOBALS['files_Module'] )
+		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+		&& $current_User->check_perm( 'files', 'view', false ) )
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		$LinkOwner = new LinkItem( $edited_Item );

@@ -1854,6 +1854,11 @@ class Hit
 	 */
 	function get_browser_version()
 	{
+		if( is_null( $this->browser_version ) )
+		{	// Initialize browser version on first calling:
+			$this->detect_useragent();
+		}
+
 		return intval( $this->browser_version );
 	}
 }
