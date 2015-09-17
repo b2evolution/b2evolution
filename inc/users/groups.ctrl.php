@@ -98,6 +98,7 @@ switch ( $action )
 		// We want to create a new group:
 		if( isset( $edited_Group ) )
 		{ // We want to use a template
+			$edited_Group->get_GroupSettings(); // Load all group settings
 			$new_Group = $edited_Group; // Copy !
 			$new_Group->set( 'ID', 0 );
 			$edited_Group = & $new_Group;
