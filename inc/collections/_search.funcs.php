@@ -25,13 +25,13 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 {
 	global $Debuglog;
 
-	$score = 0;
+	$score = 0.0;
 	$scores_map = array();
 
 	if( !empty( $search_term ) && strpos( $text, $search_term ) !== false )
 	{
 		// the max score what it may received in this methods
-		$score = ( ( count( $words ) * 3 ) + ( count( $quoted_terms ) * 6 ) ) * 2 * $score_weight;
+		$score = ( ( count( $words ) * 4 ) + ( count( $quoted_terms ) * 6 ) ) * $score_weight;
 		$scores_map['whole_term'] = $score;
 		return array( 'score' => $score, 'map' => $scores_map );
 	}
@@ -61,32 +61,35 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 	foreach( $words as $word )
 	{
 		$count = empty( $word ) ? 0 : substr_count( $text, $word );
-		if( $count == 0 )
+		if( $count === 0 )
 		{
 			$all_case_sensitive_match = false;
 		}
 		else
 		{
-			$scores_map['word_case_sensitive_match'][$word] = ( ( $count > 1 ) ? 2 : 1 ) * $score_weight;
+			$scores_map['word_case_sensitive_match'][$word] = $score_weight;
 			$score += $scores_map['word_case_sensitive_match'][$word];
 		}
 
 		if( $word_match_count = preg_match_all( '/\b'.$word.'\b/i', $text, $matches ) )
 		{ // Every word match gives one more score
-			$scores_map['whole_word_match'][$word] = ( ( $word_match_count > 1 ) ? 2 : 1 ) * $score_weight;
+			$scores_map['whole_word_match'][$word] = $score_weight;
 			$score += $scores_map['whole_word_match'][$word];
-
 		}
 		else
 		{
-			// $Debuglog->add( 'All word match set to false', 'info' );
 			$all_whole_word_match = false;
 		}
 
 		if( $any_match_count = preg_match_all( '/'.$word.'/i', $text, $matches ) )
 		{ // Every word match gives one more score
-			$scores_map['word_case_insensitive_match'][$word] = ( ( $any_match_count > 1 ) ? 2 : 1 ) * $score_weight;
+			$scores_map['word_case_insensitive_match'][$word] = $score_weight;
 			$score += $scores_map['word_case_insensitive_match'][$word];
+			if( $any_match_count > 1 )
+			{ // there are multiple occurrences
+				$scores_map['word_multiple_occurences'][$word] = score_multiple_occurences( $any_match_count, $score_weight );
+				$score += $scores_map['word_multiple_occurences'][$word];
+			}
 		}
 	}
 
@@ -102,7 +105,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 		$scores_map['all_whole_words'] = 4;
 	}
 
-	return array( 'score' => $score, 'map' => $scores_map );
+	return array( 'score' => $score, 'score_weight' => $score_weight, 'map' => $scores_map );
 }
 
 
@@ -133,6 +136,25 @@ function score_date( $date )
 	}
 
 	return ( ( $day_diff < 31 ) ? 1 : 0 );
+}
+
+
+/**
+ * Count score of multiple occurrences
+ * The score is sum( $score_weight / x ) where x goes from 2 to match count
+ *
+ * @param integer match count
+ * @param integer score weight
+ * @return float multiple occurrences score based on the received parameters
+ */
+function score_multiple_occurences( $match_count, $score_weight )
+{
+	$result = 0.0;
+	for( $i = 2; $i <= $match_count; $i++ )
+	{
+		$result = $result + floatval($score_weight) / floatval($match_count);
+	}
+	return $result;
 }
 
 
@@ -249,7 +271,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, 5 );
 		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
@@ -360,6 +382,7 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 
 	// Search between categories
 	$ChapterCache = & get_ChapterCache();
+	$ChapterCache->clear();
 	$cat_where_condition = '( cat_blog_ID = '.$DB->quote( $Blog->ID ).' ) AND ('.$cat_where_condition.' )';
 	$ChapterCache->load_where( $cat_where_condition );
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
@@ -429,6 +452,12 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
  */
 function score_search_result( $search_keywords )
 {
+	$keywords = trim( $search_keywords );
+	if( empty( $keywords ) )
+	{
+		return array();
+	}
+
 	global $Blog, $DB, $posttypes_perms;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
@@ -454,6 +483,15 @@ function score_search_result( $search_keywords )
 	$keywords = trim( $keywords );
 	$keywords = preg_split( '/\s+/', $keywords );
 	$keywords = array_unique( $keywords );
+
+	if( isset( $keywords[0] ) && empty( $keywords[0] ) )
+	{ // The first item is an empty string when the search keyword contains only irrelevant characters
+		unset( $keywords[0] ); // remove empty word
+	}
+	if( empty( $keywords ) && empty( $quoted_parts ) )
+	{ // There is nothing to search for
+		return array();
+	}
 
 	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
 	$nr_of_items = count( $search_result );
@@ -710,7 +748,7 @@ function search_result_block( $params = array() )
 		$display_params['scores_map'] = $row['scores_map'];
 		$display_params['type'] = $row['type'];
 		$display_params['best_result'] = $index == 0;
-		$display_params['max_score'] = $max_score;
+		$display_params['max_score'] = sprintf( ( floor( $max_score ) != $max_score ) ? '%.2f' : '%d', $max_score );
 		$display_params['max_percentage'] = $max_percentage;
 		display_search_result( array_merge( $params, $display_params ) );
 	}
@@ -936,7 +974,7 @@ function display_score_map( $params )
 	echo '<ul class="search_score_map dimmed">';
 	foreach( $params['scores_map'] as $result_part => $score_map )
 	{
-		$note = ( $result_part == 'title' || $result_part == 'name' ) ? ' - the match scores are multiplied with 3' : '';
+
 		if( ! is_array( $score_map ) )
 		{
 			if( $score_map > 0 )
@@ -973,6 +1011,14 @@ function display_score_map( $params )
 				echo '</ul>';
 			}
 			continue;
+		}
+		elseif( isset( $score_map['score_weight'] ) && $score_map['score_weight'] > 1 )
+		{ // add note that the score was multiplied because of the importance of the field where it was found
+			$note =  sprintf( ' - the match scores are multiplied with %d', $score_map['score_weight'] );
+		}
+		else
+		{ // note is not required
+			$note = '';
 		}
 
 		echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).$note.'</li><ul>';
@@ -1028,6 +1074,10 @@ function display_score_map( $params )
 					case 'word_case_insensitive_match':
 						echo '<li>Case insensitive mathces</li>';
 						break;
+
+					case 'word_multiple_occurences':
+						echo '<li>Extra points for multiple occurrences - Rule: sum( score weight / x ) where x goes from 2 to number of occurrences</li>';
+						break;
 				}
 				$keyword_match = $match_type;
 				echo '<ul>';
@@ -1035,13 +1085,15 @@ function display_score_map( $params )
 
 			foreach( $scores as $word => $score )
 			{
-				$extra_points_reason = '';
-				if( ( $keyword_match != null ) && ( ( $score > 3 ) || ( $score == 2 ) ) )
+				if( is_float( $score ) )
 				{
-					$extra_points_reason = '. Result = {1 match point} + {1 extra point because of multiple occurences}';
+					$points_label = '%.2F points - match on [%s]';
 				}
-				$points_label = ( $score > 1 ) ? '%d points - match on [%s]' : '%d point - match on [%s]';
-				echo '<li>'.sprintf( $points_label, $score, $word ).$extra_points_reason.'</li>';
+				else
+				{
+					$points_label = ( $score > 1 ) ? '%d points - match on [%s]' : '%d point - match on [%s]';
+				}
+				echo '<li>'.sprintf( $points_label, $score, $word ).'</li>';
 			}
 		}
 		if( $keyword_match != null )
@@ -1050,7 +1102,8 @@ function display_score_map( $params )
 		}
 		echo '</ul>';
 	}
-	echo '<li>'.sprintf( 'Total: %d points', $params['score'] ).'</li>';
+	$total_score_pattern = ( floor( $params['score'] ) != $params['score'] ) ? '%.2f' : '%d';
+	echo '<li>'.sprintf( 'Total: '.$total_score_pattern.' points', $params['score'] ).'</li>';
 	if( $params['best_result'] )
 	{
 		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and mathcing quoted terms.</li>';
@@ -1060,7 +1113,7 @@ function display_score_map( $params )
 	else
 	{
 		echo '<ul><li>Percentage value is calculated based on the received points compared to the best result</li>';
-		echo '<li>'.sprintf( 'Percentage [%d%%] = ( This result total points [%d] ) * ( Best result percentage [%d] ) / ( Best result total points [%d] )', $params['percentage'], $params['score'], $params['max_percentage'], $params['max_score'] ).'</li></ul>';
+		echo '<li>'.sprintf( 'Percentage [%d%%] = ( This result total points ['.$total_score_pattern.'] ) * ( Best result percentage [%d] ) / ( Best result total points [%s] )', $params['percentage'], $params['score'], $params['max_percentage'], $params['max_score'] ).'</li></ul>';
 	}
 	echo '</ul>';
 }
