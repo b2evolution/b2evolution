@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug;
+		global $Messages, $debug, $Hit;
 
 		// This is included before controller specifc require_css() calls:
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
@@ -87,6 +87,15 @@ class AdminUI extends AdminUI_general
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 		init_fontawesome_icons( 'fontawesome-glyphicons' );
+
+		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// IE < 9
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+			if( $debug )
+			{
+				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+			}
+		}
 	}
 
 
@@ -221,20 +230,7 @@ class AdminUI extends AdminUI_general
 	{
 		global $app_footer_text, $copyright_text;
 
-		global $Hit;
-
-		$r = '';
-
-		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
-		{ // Warning for IE 9 and less
-			$r .= '<div class="container-fluid"><div class="alert alert-danger" role="alert">'
-				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
-				.'</div></div>';
-		}
-
-		$r .= '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
-
-		return $r;
+		return '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
 	}
 
 

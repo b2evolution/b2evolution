@@ -62,6 +62,16 @@ class AdminUI extends AdminUI_general
 		$Messages->set_params( array(
 				'class_outerdiv' => 'action_messages',
 			) );
+
+		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// IE < 9
+			global $debug;
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+			if( $debug )
+			{
+				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+			}
+		}
 	}
 
 
@@ -138,16 +148,7 @@ class AdminUI extends AdminUI_general
 		global $app_footer_text, $copyright_text;
 		global $adminskins_url;
 
-		global $Hit;
-
 		$r = '<div class="footer">';
-
-		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
-		{ // Warning for IE 9 and less
-			$r .= '<div style="text-align:center; color:#f00; font-weight:bold;">'
-				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
-				.'</div>';
-		}
 
 		$r .= '<a href="http://b2evolution.net/" class="footer_logo"><img src="'.$adminskins_url.'chicago/rsc/img/b2evolution-footer-logo-blue-bg.gif" alt="Powered by b2evolution" width="142" height="43" longdesc="http://b2evolution.net/" /></a>';
 
