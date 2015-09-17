@@ -1800,7 +1800,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 	// ---------- SAVE ----------
 	$next_action = ($creating ? 'create' : 'update');
-	if( ! $inskin )
+	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
 		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
 	}

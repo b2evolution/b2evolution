@@ -2829,7 +2829,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		// Init the special permissions for Forums
 		$gp_user_groups_forums = array(
 				'bloggers'   => $Group_Bloggers->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
-				'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 0, 0",
+				'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 1, 0, 0",
 				'suspect'    => $Group_Suspect->ID.",    1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
 			);
 		$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
