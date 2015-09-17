@@ -21,9 +21,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
-use Abraham\TwitterOAuth\TwitterOAuth;
-
 // Twitter params initialization
 define( 'TWITTER_CONSUMER_KEY', 'z680vsCAnATc0ZQNgMVwbg' );
 define( 'TWITTER_CONSUMER_SECRET', 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8' );
@@ -219,7 +216,7 @@ class twitter_plugin extends Plugin
 	{
 		global $Blog;
 
-		require_once 'twitteroauth/autoload.php';
+		require_once 'twitteroauth/twitteroauth.php';
 
 		// Uses either plugin CollSettings or UserSettings
 		$oauth = $this->get_oauth_info( array(
@@ -250,10 +247,7 @@ class twitter_plugin extends Plugin
 		}
 
 		// create new connection
-		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET );
-
-		// Set proxy:
-		$this->set_twitter_proxy( $connection );
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
 
 		// set callback url
 		$callback = $this->get_htsrv_url( 'twitter_callback', array(), '&', true );
@@ -262,12 +256,14 @@ class twitter_plugin extends Plugin
 		//     because twitter cannot redirects to this complex url with serialized data
 		$callback = url_add_param( $callback, 'target_type='.$target_type.'&target_id='.$target_id, '&' );
 
-		$req_token = $connection->oauth( 'oauth/request_token', array( 'oauth_callback' => $callback ) );
+		$req_token = $connection->getRequestToken( $callback );
 
 		if( $req_token == NULL )
 		{
 			return T_( 'Connection is not available!' );
 		}
+
+		$token = $req_token['oauth_token'];
 
 		/* Save temporary credentials to session. */
 		global $Session;
@@ -279,11 +275,11 @@ class twitter_plugin extends Plugin
 
 		if( empty( $result ) )
 		{ // wasn't linked to twitter
-			$result = '<a href='.$connection->url( 'oauth/authorize', array( 'oauth_token' => $req_token['oauth_token'] ) ).'>'.T_( 'Click here to link to your twitter account' ).'</a>';
+			$result = '<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Click here to link to your twitter account' ).'</a>';
 		}
 		else
 		{
-			$result = $result.'<a href='.$connection->url( 'oauth/authorize', array( 'oauth_token' => $req_token['oauth_token'] ) ).'>'.T_( 'Link to another account' ).'</a>';
+			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
 			$unlink_url = $this->get_htsrv_url( 'unlink_account', array( 'target_type' => $target_type, 'target_id' => $target_id ), '&' );
 			$unlink_url = $unlink_url.'&'.url_crumb( $target_type );
 			$result = $result.' / '.'<a href="'.$unlink_url.'">'.T_( 'Unlink this account' ).'</a>';
@@ -304,11 +300,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_contact( $oauth_token, $oauth_token_secret )
 	{
-		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
-
-		// Set proxy:
-		$this->set_twitter_proxy( $connection );
-
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
 		// get linked user account
 		$account = $connection->get('account/verify_credentials');
 		if( empty( $account->errors ) )
@@ -396,14 +388,11 @@ class twitter_plugin extends Plugin
 			header_redirect( $redirect_to ); // !!!! Where to redirect
 		}
 
-		require_once 'twitteroauth/autoload.php';
+		require_once 'twitteroauth/twitteroauth.php';
 		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $Session->get( 'oauth_token_secret' ) );
 
-		// Set proxy:
-		$this->set_twitter_proxy( $connection );
-
 		//get access token
-		$access_token = $connection->oauth( 'oauth/access_token', array( 'oauth_verifier' => $oauth_verifier ) );
+		$access_token = $connection->getAccessToken( $oauth_verifier );
 
 		// get oauth params
 		$token = $access_token['oauth_token'];
@@ -616,12 +605,8 @@ class twitter_plugin extends Plugin
 			$msg = strmaxlen( str_replace( '$url$', $content['url'], $msg ), $this->message_length_limit, '...' );
 		}
 
-		require_once 'twitteroauth/autoload.php';
-		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth['token'], $oauth['token_secret'] );
-
-		// Set proxy:
-		$this->set_twitter_proxy( $connection );
-
+		require_once 'twitteroauth/twitteroauth.php';
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth['token'], $oauth['token_secret'] );
 		$result = $connection->post('statuses/update', array( 'status' => $msg ));
 
 		if( empty($result) )
@@ -642,26 +627,6 @@ class twitter_plugin extends Plugin
 
 		$xmlrpcresp = T_('Posted to account @').$oauth['contact'];
 		return true;
-	}
-
-
-	/**
-	 * Set proxy configuration for twitter connection object
-	 *
-	 * @param object TwitterOAuth
-	 */
-	function set_twitter_proxy( $connection )
-	{
-		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
-
-		if( ! empty( $outgoing_proxy_hostname ) )
-		{
-			$connection->setProxy( array(
-					'CURLOPT_PROXY'        => $outgoing_proxy_hostname,
-					'CURLOPT_PROXYPORT'    => $outgoing_proxy_port,
-					'CURLOPT_PROXYUSERPWD' => $outgoing_proxy_username.':'.$outgoing_proxy_password,
-				) );
-		}
 	}
 }
 
