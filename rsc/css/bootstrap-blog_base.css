@@ -827,3 +827,16 @@ input.btn-lg {
     margin-bottom: 4px;
   }
 }
+.evo_content_block table {
+  margin: 1em auto;
+}
+.evo_content_block table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  background-color: #eee;
+}
+.evo_content_block table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
+}
