@@ -201,7 +201,7 @@ function init_inskin_editing()
  */
 function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 {
-	global $Blog;
+	global $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
 	global $featured_displayed_item_IDs;
 
@@ -217,8 +217,14 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// Get ready to obtain 1 post only:
 		$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
 
+		$featured_list_filters = $MainList->filters;
+		if( ! empty( $cat ) )
+		{	// Get a featured post only of the selected category and don't touch the posts of the child categories:
+			$featured_list_filters['cat_array'] = array( $cat );
+		}
+
 		// Set default filters for the current page:
-		$FeaturedList->set_default_filters( $MainList->filters );
+		$FeaturedList->set_default_filters( $featured_list_filters );
 
 		// FIRST: Try to find an Intro post:
 
