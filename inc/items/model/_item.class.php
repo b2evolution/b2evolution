@@ -6463,6 +6463,7 @@ class Item extends ItemLight
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_type != "meta"' );
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
