@@ -215,6 +215,24 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Scheduler'), $admin_url.'?ctrl=crontab' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'create':
+	case 'edit':
+	case 'update':
+	case 'copy':
+		$AdminUI->set_page_manual_link( 'scheduler-job-form' );
+		break;
+	case 'view':
+		$AdminUI->set_page_manual_link( 'scheduler-job-info' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'scheduler' );
+		break;
+}
+
 if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy', 'list' ) ) )
 { // Initialize date picker for cronjob.form.php
 	init_datepicker_js();

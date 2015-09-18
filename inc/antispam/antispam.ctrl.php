@@ -495,14 +495,23 @@ if( $display_mode != 'js' )
 	{
 		case 'settings':
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=antispam&amp;tab3='.$tab3 );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'antispam-settings' );
 			break;
 
 		case 'tools':
 			$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=antispam&amp;tab3='.$tab3 );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'antispam-tools' );
 			break;
 
 		case 'blacklist':
 			$AdminUI->breadcrumbpath_add( T_('Blacklist'), '?ctrl=antispam' );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'antispam-tab' );
 			break;
 
 		case 'ipranges':
@@ -516,6 +525,8 @@ if( $display_mode != 'js' )
 				$action = '';
 			}
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
+
+			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'ip-ranges' );
 			break;
 
@@ -524,6 +535,9 @@ if( $display_mode != 'js' )
 			{
 				require_js( 'jquery/jquery.jeditable.js' );
 			}
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'countries-list' );
 			break;
 
 		case 'domains':
@@ -538,6 +552,9 @@ if( $display_mode != 'js' )
 			// Used for edit form
 			$tab_from = 'antispam';
 			$blog = 0; // Don't restrict domains by blog ID on this controller
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 			break;
 	}
 

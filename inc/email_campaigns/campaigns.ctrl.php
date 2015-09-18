@@ -302,7 +302,18 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
 $AdminUI->breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
-$AdminUI->set_page_manual_link( 'email-campaigns' );
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'edit':
+		$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'email-campaigns' );
+		break;
+}
 
 if( $action == 'edit' )
 { // Build special tabs in edit mode of the campaign

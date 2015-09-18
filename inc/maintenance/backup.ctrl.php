@@ -49,6 +49,8 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Backup'), $admin_url.'?ctrl=backup' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'backup-tab' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

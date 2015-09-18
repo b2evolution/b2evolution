@@ -336,15 +336,24 @@ switch( $tab3 )
 {
 	case 'import':
 		$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'import-tab' );
 		break;
 
 	case 'test':
 		$AdminUI->breadcrumbpath_add( T_('Testing'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'testing-tools' );
 		break;
 
 	case 'tools':
 	default:
 		$AdminUI->breadcrumbpath_add( T_('Tools'), $admin_url.'?ctrl=tools' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'tools-tab' );
 		break;
 }
 

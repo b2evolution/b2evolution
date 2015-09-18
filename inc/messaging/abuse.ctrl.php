@@ -83,6 +83,9 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Abuse Management'), '?ctrl=abuse' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'messages-abuse-management' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
