@@ -1641,7 +1641,7 @@ class Item extends ItemLight
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
-				echo '<a href="'.$this->get_permanent_url().'">'.$params['excerpt_more_text'].'</a>';
+				echo '<a href="'.$this->get_permanent_url().'" class="nowrap">'.$params['excerpt_more_text'].'</a>';
 				echo $params['excerpt_after_more'];
 			}
 			echo $params['after'];
