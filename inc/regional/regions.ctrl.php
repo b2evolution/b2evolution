@@ -284,6 +284,22 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Regions'), $admin_url.'?ctrl=regions' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'regions-editing' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'regions-list' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

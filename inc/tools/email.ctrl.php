@@ -376,6 +376,9 @@ switch( $tab )
 		{ // Initialize date picker on list page
 			init_datepicker_js();
 		}
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
 	case 'blocked':
@@ -385,6 +388,9 @@ switch( $tab )
 			// Init js to edit status field
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'email-addresses' );
 		break;
 
 	case 'return':
@@ -393,6 +399,9 @@ switch( $tab )
 		{ // Initialize date picker on list page
 			init_datepicker_js();
 		}
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'email-returned' );
 		break;
 
 	case 'settings':
@@ -406,6 +415,9 @@ switch( $tab )
 		{
 			case 'notifications':
 				$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-notification-settings' );
 				break;
 
 			case 'returned':
@@ -428,10 +440,16 @@ switch( $tab )
 						$Messages->add( $repath_warning, 'warning' );
 					}
 				}
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'return-path-configuration' );
 				break;
 
 			case 'smtp':
 				$AdminUI->breadcrumbpath_add( T_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
 				break;
 		}
 

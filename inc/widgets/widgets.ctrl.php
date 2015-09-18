@@ -602,6 +602,9 @@ if( $display_mode == 'normal' )
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
 
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'widget-settings' );
+
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
 

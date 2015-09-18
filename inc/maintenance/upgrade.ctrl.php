@@ -49,10 +49,16 @@ $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 if( $tab == 'svn' )
 {
 	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'upgrade-from-svn' );
 }
 else
 {
 	$AdminUI->breadcrumbpath_add( T_('Auto Upgrade'), $admin_url.'?ctrl=upgrade' );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'auto-upgrade' );
 }
 
 

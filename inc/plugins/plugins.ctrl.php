@@ -845,6 +845,16 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Plugin configuration'), $admin_url.'?ctrl=plugins' );
 
+// Set an url for manual page:
+if( $action == 'list_available' )
+{
+	$AdminUI->set_page_manual_link( 'plugins-available-for-installation' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'installed-plugins' );
+}
+
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

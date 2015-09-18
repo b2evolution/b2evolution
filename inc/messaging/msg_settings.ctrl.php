@@ -105,6 +105,9 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=msgsettings' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'messages-settings' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

@@ -415,13 +415,13 @@ function create_default_locales()
 function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
-		'newusers_grp_ID' => $Group_Users->ID,
+		'newusers_grp_ID' => $users_Group->ID,
 		'evocache_foldername' => '_evocache',
 		'newusers_canregister' => 'yes',
 		'registration_is_public' => 1,
@@ -441,26 +441,26 @@ function create_default_settings( $override = array() )
 	{ // Set default site color
 		$defaults['site_color'] = $install_site_color;
 	}
-	if( !empty( $Group_Suspect ) )
+	if( !empty( $suspect_Group ) )
 	{ // Set default antispam suspicious group
-		$defaults['antispam_suspicious_group'] = $Group_Suspect->ID;
+		$defaults['antispam_suspicious_group'] = $suspect_Group->ID;
 	}
 	$antispam_trust_groups = array();
-	if( !empty( $Group_Admins ) )
+	if( !empty( $admins_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Admins->ID;
+		$antispam_trust_groups[] = $admins_Group->ID;
 	}
-	if( !empty( $Group_Privileged ) )
+	if( !empty( $moderators_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Privileged->ID;
+		$antispam_trust_groups[] = $moderators_Group->ID;
 	}
-	if( !empty( $Group_Bloggers ) )
+	if( !empty( $editors_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Bloggers->ID;
+		$antispam_trust_groups[] = $editors_Group->ID;
 	}
-	if( !empty( $Group_Spam ) )
+	if( !empty( $spam_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Spam->ID;
+		$antispam_trust_groups[] = $spam_Group->ID;
 	}
 	if( count( $antispam_trust_groups ) > 0 )
 	{ // Set default antispam trust group

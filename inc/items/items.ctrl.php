@@ -1702,6 +1702,38 @@ if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create', 'create_pu
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'history':
+	case 'history_details':
+		$AdminUI->set_page_manual_link( 'item-revision-history' );
+		break;
+	case 'new':
+	case 'new_switchtab':
+	case 'edit':
+	case 'edit_switchtab':
+	case 'copy':
+	case 'create':
+	case 'create_edit':
+	case 'create_publish':
+	case 'update':
+	case 'update_edit':
+	case 'update_publish':
+		$AdminUI->set_page_manual_link( 'expert-edit-screen' );
+		break;
+	case 'edit_type':
+		$AdminUI->set_page_manual_link( 'change-post-type' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		break;
+}
+if( $tab == 'manual' )
+{
+	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

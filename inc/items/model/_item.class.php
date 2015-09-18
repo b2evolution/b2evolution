@@ -1641,7 +1641,7 @@ class Item extends ItemLight
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
-				echo '<a href="'.$this->get_permanent_url().'">'.$params['excerpt_more_text'].'</a>';
+				echo '<a href="'.$this->get_permanent_url().'" class="nowrap">'.$params['excerpt_more_text'].'</a>';
 				echo $params['excerpt_after_more'];
 			}
 			echo $params['after'];
@@ -6463,6 +6463,7 @@ class Item extends ItemLight
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_type != "meta"' );
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 

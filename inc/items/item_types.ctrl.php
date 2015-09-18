@@ -310,7 +310,22 @@ $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' =
 $AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 $AdminUI->breadcrumbpath_add( T_('Post Types'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
 
-$AdminUI->set_page_manual_link( 'managing-item-types' );
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'item-custom-fields' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'managing-item-types' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

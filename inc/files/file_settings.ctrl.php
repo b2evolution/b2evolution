@@ -188,6 +188,8 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'file-settings' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
