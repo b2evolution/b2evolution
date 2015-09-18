@@ -41,7 +41,7 @@ function create_tables()
  */
 function create_default_data()
 {
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
 	global $test_install_all_features, $create_sample_contents;
@@ -72,50 +72,50 @@ function create_default_data()
 
 	// added in 0.8.9
 	task_begin( 'Creating default groups... ' );
-	$Group_Admins = new Group(); // COPY !
-	$Group_Admins->set( 'name', 'Administrators' );
-	$Group_Admins->set( 'level', 10 );
-	$Group_Admins->set( 'perm_blogs', 'editall' );
-	$Group_Admins->set( 'perm_stats', 'edit' );
-	$Group_Admins->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Admins->dbinsert();
+	$admins_Group = new Group(); // COPY !
+	$admins_Group->set( 'name', 'Administrators' );
+	$admins_Group->set( 'level', 10 );
+	$admins_Group->set( 'perm_blogs', 'editall' );
+	$admins_Group->set( 'perm_stats', 'edit' );
+	$admins_Group->set( 'perm_xhtml_css_tweaks', 1 );
+	$admins_Group->dbinsert();
 
-	$Group_Privileged = new Group(); // COPY !
-	$Group_Privileged->set( 'name', 'Moderators' );
-	$Group_Privileged->set( 'level', 8 );
-	$Group_Privileged->set( 'perm_blogs', 'viewall' );
-	$Group_Privileged->set( 'perm_stats', 'user' );
-	$Group_Privileged->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Privileged->dbinsert();
+	$moderators_Group = new Group(); // COPY !
+	$moderators_Group->set( 'name', 'Moderators' );
+	$moderators_Group->set( 'level', 8 );
+	$moderators_Group->set( 'perm_blogs', 'viewall' );
+	$moderators_Group->set( 'perm_stats', 'user' );
+	$moderators_Group->set( 'perm_xhtml_css_tweaks', 1 );
+	$moderators_Group->dbinsert();
 
-	$Group_Bloggers = new Group(); // COPY !
-	$Group_Bloggers->set( 'name', 'Editors' );
-	$Group_Bloggers->set( 'level', 6 );
-	$Group_Bloggers->set( 'perm_blogs', 'user' );
-	$Group_Bloggers->set( 'perm_stats', 'none' );
-	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Bloggers->dbinsert();
+	$editors_Group = new Group(); // COPY !
+	$editors_Group->set( 'name', 'Editors' );
+	$editors_Group->set( 'level', 6 );
+	$editors_Group->set( 'perm_blogs', 'user' );
+	$editors_Group->set( 'perm_stats', 'none' );
+	$editors_Group->set( 'perm_xhtml_css_tweaks', 1 );
+	$editors_Group->dbinsert();
 
-	$Group_Users = new Group(); // COPY !
-	$Group_Users->set( 'name', 'Normal Users' );
-	$Group_Users->set( 'level', 4 );
-	$Group_Users->set( 'perm_blogs', 'user' );
-	$Group_Users->set( 'perm_stats', 'none' );
-	$Group_Users->dbinsert();
+	$users_Group = new Group(); // COPY !
+	$users_Group->set( 'name', 'Normal Users' );
+	$users_Group->set( 'level', 4 );
+	$users_Group->set( 'perm_blogs', 'user' );
+	$users_Group->set( 'perm_stats', 'none' );
+	$users_Group->dbinsert();
 
-	$Group_Suspect = new Group(); // COPY !
-	$Group_Suspect->set( 'name', 'Misbehaving/Suspect Users' );
-	$Group_Suspect->set( 'level', 2 );
-	$Group_Suspect->set( 'perm_blogs', 'user' );
-	$Group_Suspect->set( 'perm_stats', 'none' );
-	$Group_Suspect->dbinsert();
+	$suspect_Group = new Group(); // COPY !
+	$suspect_Group->set( 'name', 'Misbehaving/Suspect Users' );
+	$suspect_Group->set( 'level', 2 );
+	$suspect_Group->set( 'perm_blogs', 'user' );
+	$suspect_Group->set( 'perm_stats', 'none' );
+	$suspect_Group->dbinsert();
 
-	$Group_Spam = new Group(); // COPY !
-	$Group_Spam->set( 'name', 'Spammers/Restricted Users' );
-	$Group_Spam->set( 'level', 1 );
-	$Group_Spam->set( 'perm_blogs', 'user' );
-	$Group_Spam->set( 'perm_stats', 'none' );
-	$Group_Spam->dbinsert();
+	$spam_Group = new Group(); // COPY !
+	$spam_Group->set( 'name', 'Spammers/Restricted Users' );
+	$spam_Group->set( 'level', 1 );
+	$spam_Group->set( 'perm_blogs', 'user' );
+	$spam_Group->set( 'perm_stats', 'none' );
+	$spam_Group->dbinsert();
 	task_end();
 
 	task_begin( 'Creating groups for user field definitions... ' );
@@ -215,7 +215,7 @@ function create_default_data()
 			'lastname'  => 'Admin',
 			'level'     => 10,
 			'gender'    => 'M',
-			'Group'     => $Group_Admins,
+			'Group'     => $admins_Group,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
@@ -1293,7 +1293,7 @@ function create_demo_contents()
 	global $baseurl, $admin_url, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group;
 	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
@@ -1373,7 +1373,7 @@ function create_demo_contents()
 			'lastname'  => 'Wilson',
 			'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
 			'gender'    => 'F',
-			'Group'     => $Group_Privileged,
+			'Group'     => $moderators_Group,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
@@ -1395,7 +1395,7 @@ function create_demo_contents()
 			'lastname'  => 'Parker',
 			'level'     => 3,
 			'gender'    => 'M',
-			'Group'     => $Group_Privileged,
+			'Group'     => $moderators_Group,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
@@ -1417,7 +1417,7 @@ function create_demo_contents()
 			'lastname'  => 'Miller',
 			'level'     => 2,
 			'gender'    => 'M',
-			'Group'     => $Group_Bloggers,
+			'Group'     => $editors_Group,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
@@ -1439,7 +1439,7 @@ function create_demo_contents()
 			'lastname'  => 'Jones',
 			'level'     => 1,
 			'gender'    => 'M',
-			'Group'     => $Group_Bloggers,
+			'Group'     => $editors_Group,
 			'org_IDs'   => $user_org_IDs,
 			'fields'    => array(
 					'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
@@ -1461,7 +1461,7 @@ function create_demo_contents()
 			'lastname'  => 'Smith',
 			'level'     => 0,
 			'gender'    => 'M',
-			'Group'     => $Group_Users,
+			'Group'     => $users_Group,
 			'fields'    => array(
 					'Micro bio' => 'Hi there!',
 				)
@@ -1476,7 +1476,7 @@ function create_demo_contents()
 			'lastname'  => 'Adams',
 			'level'     => 0,
 			'gender'    => 'F',
-			'Group'     => $Group_Users,
+			'Group'     => $users_Group,
 			'fields'    => array(
 					'Micro bio' => 'Just me!',
 				)
@@ -2794,16 +2794,17 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember, bloggroup_can_be_assignee,
 			bloggroup_perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
 			bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses, bloggroup_perm_edit_cmt,
-			bloggroup_perm_cats, bloggroup_perm_properties,
+			bloggroup_perm_cats, bloggroup_perm_properties, bloggroup_perm_admin,
 			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
 		VALUES ';
 
 	// Init the permissions for all blogs
 	$all_statuses = "'published,community,deprecated,protected,private,review,draft'";
+	$all_post_statuses = "'published,community,deprecated,protected,private,review,draft,redirected'";
 	$gp_user_groups = array(
-			'admins'     => $Group_Admins->ID.",     1, 1, $all_statuses, 'admin', 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1",
-			'privileged' => $Group_Privileged->ID.", 1, 1, $all_statuses, 'restricted', 'le', 1, 0, 1, 1, 1, $all_statuses, 'le', 0, 0, 1, 1, 1",
-			'bloggers'   => $Group_Bloggers->ID.",   1, 0, '', 'standard', 'no', 0, 0, 0, 0, 1, '', 'no', 0, 0, 1, 1, 0",
+			'admins'     => $admins_Group->ID.",     1, 1, $all_post_statuses, 'admin', 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1, 1",
+			'moderators' => $moderators_Group->ID.", 1, 1, $all_statuses, 'restricted', 'le', 1, 1, 1, 1, 1, $all_statuses, 'le', 0, 0, 0, 1, 1, 1",
+			'editors'    => $editors_Group->ID.",    1, 0, '', 'standard', 'no', 0, 1, 0, 0, 1, '', 'no', 0, 0, 0, 1, 1, 0",
 		);
 
 	$gp_blogs_IDs = array();
@@ -2828,9 +2829,9 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		$gp_blogs_IDs[] = $blog_forums_ID;
 		// Init the special permissions for Forums
 		$gp_user_groups_forums = array(
-				'bloggers'   => $Group_Bloggers->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 1, 'community,draft', 'no', 0, 0, 1, 1, 0",
-				'users'      => $Group_Users->ID.",      1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 1, 0, 0",
-				'suspect'    => $Group_Suspect->ID.",    1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0"
+				'editors' => $editors_Group->ID.", 1, 0, 'community,protected,draft,deprecated', 'standard', 'own', 0, 1, 0, 0, 1, 'community,protected,review,draft,deprecated', 'own', 0, 0, 0, 1, 1, 0",
+				'users'   => $users_Group->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 1, 0, 0",
+				'suspect' => $suspect_Group->ID.", 1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0, 0"
 			);
 		$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
 	}
