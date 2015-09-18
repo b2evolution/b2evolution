@@ -253,6 +253,9 @@ else
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Skin'), $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
 	$AdminUI->breadcrumbpath_add( T_('Manage skins'), $admin_url.'?ctrl=skins' );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'manage-skins' );
 }
 
 

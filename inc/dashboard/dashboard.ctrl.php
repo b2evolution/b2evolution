@@ -49,6 +49,9 @@ if( $blog )
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Collection Dashboard'), $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
 
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'collection-dashboard' );
+
 	// We should activate toolbar menu items for this controller and action
 	$activate_collection_toolbar = true;
 }
@@ -59,6 +62,9 @@ else
 	$AdminUI->breadcrumbpath_init( false );
 	$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 	$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'site-dashboard' );
 }
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin

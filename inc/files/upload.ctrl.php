@@ -408,6 +408,9 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 }
 $AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Advanced Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'advanced-upload' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

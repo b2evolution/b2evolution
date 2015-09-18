@@ -756,38 +756,72 @@ if( $display_mode != 'js')
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 			require_js( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
+
+			// Set an url for manual page:
+			if( $action == 'new' )
+			{
+				$AdminUI->set_page_manual_link( 'user-edit' );
+			}
+			else
+			{
+				$AdminUI->set_page_manual_link( 'user-profile-tab' );
+			}
 			break;
 		case 'avatar':
 			if( isset($GLOBALS['files_Module']) )
 			{
 				$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'user-profile-picture-tab' );
 			}
 			require_js( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'pwdchange':
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-password-tab' );
 			break;
 		case 'userprefs':
 			$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-preferences-tab' );
 			break;
 		case 'subs':
 			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
 			break;
 		case 'advanced':
 			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-advanced-tab' );
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			load_funcs( 'tools/model/_email.funcs.php' );
 			load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-admin-tab' );
 			break;
 		case 'sessions':
 			$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-sessions-tab' );
 			break;
 		case 'activity':
 			$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-activity-tab' );
 			break;
 	}
 

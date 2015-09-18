@@ -42,14 +42,23 @@ switch( $tab )
 {
 	case 'likes':
 		$AdminUI->breadcrumbpath_add( T_('Likes'), '?ctrl=filemod&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'file-moderation-likes' );
 		break;
 
 	case 'suspicious':
 		$AdminUI->breadcrumbpath_add( T_('Suspicious'), '?ctrl=filemod&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'file-moderation-suspicious' );
 		break;
 
 	case 'duplicates':
 		$AdminUI->breadcrumbpath_add( T_('Duplicates'), '?ctrl=filemod&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'file-moderation-duplicates' );
 		break;
 }
 

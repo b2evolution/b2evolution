@@ -231,6 +231,18 @@ if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'edit':
+		$AdminUI->set_page_manual_link( 'editing-user-groups' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'user-groups' );
+		break;
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

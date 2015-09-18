@@ -1605,6 +1605,9 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'browse' );
+
 $mode = param( 'mode', 'string', '' );
 
 if( $mode != 'modal' )

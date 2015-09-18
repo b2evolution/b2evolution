@@ -692,8 +692,25 @@ if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'up
 { // Page with comment edit form
 	// Initialize js to autocomplete usernames in comment form
 	init_autocomplete_usernames_js();
-	// Set an url for manual page
-	$AdminUI->set_page_manual_link( 'editing-comments' );
+}
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'edit':
+	case 'elevate':
+	case 'update':
+	case 'update_publish':
+	case 'update_edit':
+	case 'switch_view':
+		$AdminUI->set_page_manual_link( 'editing-comments' );
+		break;
+	case 'mass_delete':
+		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'comments-tab' );
+		break;
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

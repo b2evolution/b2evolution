@@ -385,6 +385,9 @@ if( $tab == 'stats' )
 	$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=users&amp;tab=stats' );
 	// Init jqPlot charts
 	init_jqplot_js();
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'user-stats' );
 }
 else
 {	// Users list
@@ -395,8 +398,10 @@ else
 		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 	}
 	load_funcs( 'regional/model/_regional.funcs.php' );
-}
 
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'users-users' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
