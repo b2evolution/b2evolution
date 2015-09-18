@@ -91,6 +91,10 @@ body.pictured .container.main_page_wrapper .panel a:not([class]):hover {
 body.pictured .container.main_page_wrapper .panel input {
   -webkit-font-smoothing: subpixel-antialiased;
 }
+body.pictured div#debug_info.debug {
+  position: absolute;
+  top: 100%;
+}
 #bg_picture {
   position: fixed;
   top: 0;
