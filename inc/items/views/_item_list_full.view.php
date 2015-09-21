@@ -69,7 +69,7 @@ if( $action == 'view' )
 }
 else
 { // We are displaying multiple posts ( Not a single post! )
-	$block_item_Widget->title = T_('Posts Browser');
+	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
 	if( $ItemList->is_filtered() )
 	{ // List is filtered, offer option to reset filters:
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );

@@ -294,7 +294,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'recent-hits-list' );
+		$AdminUI->set_page_manual_link( 'direct-b-hits' );
 		break;
 
 	case 'hits':
@@ -310,7 +310,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'recent-hits-list' );
+		$AdminUI->set_page_manual_link( 'referred-b-hits' );
 		break;
 
 	case 'refsearches':

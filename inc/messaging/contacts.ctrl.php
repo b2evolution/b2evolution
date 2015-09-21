@@ -123,7 +123,7 @@ $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Contacts'), '?ctrl=contacts' );
 
 // Set an url for manual page:
-$AdminUI->set_page_manual_link( 'contacts-tab' );
+$AdminUI->set_page_manual_link( 'contacts-list' );
 
 // Display messages depending on user email status
 display_user_email_status_message();
