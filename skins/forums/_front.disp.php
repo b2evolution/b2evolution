@@ -17,6 +17,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $number_of_posts_in_cat, $cat, $legend_icons;
 
+if( ! is_array( $legend_icons ) )
+{ // Init this array only first time
+	$legend_icons = array();
+}
+
 $ChapterCache = & get_ChapterCache();
 $chapters = $ChapterCache->get_chapters( $Blog->ID, $cat, true );
 
