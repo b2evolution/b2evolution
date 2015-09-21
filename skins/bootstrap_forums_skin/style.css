@@ -582,6 +582,9 @@ label.control-label[for=post_title] {
 .evo_search_navigation a {
   margin: 0px 3px;
 }
+.evo_search_list .evo_search_list__row {
+  padding: 15px 0;
+}
 @media screen and (max-width: 1199px) {
   .front_panel .ft_count {
     margin-top: 5px;

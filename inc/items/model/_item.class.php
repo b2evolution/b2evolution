@@ -1674,7 +1674,8 @@ class Item extends ItemLight
 				$this->dbupdate( false );		// Do not auto track modification date.
 			}
 		}
-		return $this->excerpt;
+
+		return excerpt( $this->excerpt );
 	}
 
 
