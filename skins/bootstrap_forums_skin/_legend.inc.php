@@ -28,6 +28,10 @@ if( $disp == 'front' || $disp == 'posts' )
 				'icon'  => 'fa-lock big',
 				'title' => T_('Forum is locked'),
 			),
+			'forum_sub' => array(
+				'icon'  => 'fa-folder big',
+				'title' => T_('Sub-forum (contains several topics)'),
+			),
 		);
 }
 

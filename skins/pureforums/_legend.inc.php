@@ -28,6 +28,10 @@ if( $disp == 'front' || $disp == 'posts' )
 				'icon'  => 'catBigLocked',
 				'title' => T_('Forum is locked'),
 			),
+			'forum_sub' => array(
+				'icon'  => 'catBig',
+				'title' => T_('Sub-forum (contains several topics)'),
+			),
 		);
 }
 
