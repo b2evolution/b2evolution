@@ -7093,6 +7093,12 @@ class Item extends ItemLight
 			return;
 		}
 
+		$this->load_Blog();
+		if( ! $this->Blog->get_setting( 'track_unread_content' ) )
+		{	// The tracking of unread content is turned off for the collection
+			return;
+		}
+
 		global $DB, $current_User, $localtimenow, $user_post_read_statuses;
 
 		$timestamp = date2mysql( $localtimenow );
@@ -7169,6 +7175,12 @@ class Item extends ItemLight
 			return 'read';
 		}
 
+		$this->load_Blog();
+		if( ! $this->Blog->get_setting( 'track_unread_content' ) )
+		{	// The tracking of unread content is turned off for the collection
+			return 'read';
+		}
+
 		global $DB, $current_User;
 
 		$read_dates = $this->get_read_dates();
@@ -7234,8 +7246,13 @@ class Item extends ItemLight
 	 */
 	function display_unread_status( $params = array() )
 	{
-		// Set titles by Blog type
 		$this->load_Blog();
+		if( ! $this->Blog->get_setting( 'track_unread_content' ) )
+		{	// The tracking of unread content is turned off for the collection
+			return;
+		}
+
+		// Set titles by Blog type:
 		if( $this->Blog->get( 'type' ) == 'forum' )
 		{
 			$title_new = T_('New topic');

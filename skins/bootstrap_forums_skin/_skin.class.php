@@ -727,8 +727,8 @@ class bootstrap_forums_Skin extends Skin
 	{
 		global $Blog;
 
-		if( ! is_logged_in() )
-		{	// For not logged in users:
+		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
+		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
 			$btn_class = 'btn-info';
 			$btn_title = T_('Recent Topics');
 		}
