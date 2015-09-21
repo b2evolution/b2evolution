@@ -771,7 +771,7 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		// Print out the button:
-		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right">'.$btn_title.'</a>';
+		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right btn_recent_topics">'.$btn_title.'</a>';
 	}
 }
 

@@ -550,6 +550,9 @@ label.control-label[for=post_title] {
   padding: 10px;
   margin-left: 10px;
 }
+.btn_recent_topics {
+  margin: 0 0 20px 5px;
+}
 .widget_core_coll_search_form {
   float: right;
   width: 40%;
