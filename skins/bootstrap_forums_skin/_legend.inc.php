@@ -22,7 +22,7 @@ if( $disp == 'front' || $disp == 'posts' )
 	$legends[] = array(
 			'forum_default' => array(
 				'icon'  => 'fa-folder big',
-				'title' => T_('No new posts'),
+				'title' => T_('Forum (contains several topics)'),
 			),
 			'forum_locked' => array(
 				'icon'  => 'fa-lock big',
@@ -40,11 +40,11 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 			),
 			'topic_popular' => array(
 				'icon'  => 'fa-star',
-				'title' => T_('Discussion topic').' [ '.T_('Popular').' ]',
+				'title' => T_('Popular topic'),
 			),
 			'topic_locked' => array(
 				'icon'  => 'fa-lock',
-				'title' => T_('Discussion topic').' [ '.T_('Locked').' ]',
+				'title' => T_('Locked topic'),
 			),
 			'topic_sticky' => array(
 				'icon'  => 'fa-bullhorn',

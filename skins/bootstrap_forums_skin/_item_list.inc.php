@@ -58,7 +58,7 @@ elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled'
 elseif( $comments_number > 25 )
 { // Popular topic is when coummnets number is more than 25
 	$status_icon = 'fa-star';
-	$status_alt = T_('Discussion topic').' [ '.T_('Popular').' ]';
+	$status_alt = T_('Popular topic');
 	$legend_icons['topic_popular'] = 1;
 }
 ?>
