@@ -1326,7 +1326,7 @@ class ItemLight extends DataObject
 	function get_excerpt( $format = 'htmlbody' )
 	{
 		// Character conversions
-		return format_to_output( $this->excerpt, $format );
+		return format_to_output( utf8_strip_tags( $this->excerpt ), $format );
 	}
 
 
