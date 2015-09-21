@@ -257,7 +257,7 @@ switch( $action )
 	case 'create_copy':
 	case 'edit':
 	case 'update':
-		$AdminUI->set_page_manual_link( 'user-fields-editing' );
+		$AdminUI->set_page_manual_link( 'user-field-form' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'user-fields-list' );

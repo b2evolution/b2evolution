@@ -190,7 +190,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'messages-new-thread' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'messages-tab' );
+		$AdminUI->set_page_manual_link( 'conversations-list' );
 		break;
 }
 
