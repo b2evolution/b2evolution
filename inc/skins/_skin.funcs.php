@@ -102,6 +102,15 @@ function skin_init( $disp )
 			{
 				$post_navigation = $Blog->get_setting( 'post_navigation' );
 			}
+
+			if( ! empty( $MainList ) && $MainList->single_post &&
+			    $single_Item = & mainlist_get_item() )
+			{	// If we are currently viewing a single post
+				// Update the read timestamp of the item by current user:
+				$single_Item->update_read_date();
+				// Restart the items list:
+				$MainList->restart();
+			}
 			break;
 
 		case 'search':
