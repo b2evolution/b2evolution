@@ -33,7 +33,7 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'ctrl', 'msgsettings' );
 	$Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_( 'General settings' ) );
+$Form->begin_fieldset( T_( 'General settings' ).get_manual_link( 'messages-settings' ) );
 
 	$Form->checkbox( 'allow_html_message', $Settings->get( 'allow_html_message' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in messages.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );

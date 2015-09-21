@@ -1650,10 +1650,8 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get item excerpt.
-	 *
-	 * @todo fp>blueyed WTF? Same function name as in ItemLight but different params!
-	 * fp> NOTE: I think we can't move this code to ItemLight because we can't update the excerpt there since we don't have the post text there
+	 * Template tag: get excerpt 2 (Full version)
+	 * This full version may auto-generate an excerpt if it is found to be empty.
 	 *
 	 * @param array Associative list of params
 	 *   - allow_empty: force generation if excert is empty (Default: false)
@@ -1675,7 +1673,7 @@ class Item extends ItemLight
 			}
 		}
 
-		return excerpt( $this->excerpt );
+		return utf8_strip_tags( $this->excerpt );
 	}
 
 

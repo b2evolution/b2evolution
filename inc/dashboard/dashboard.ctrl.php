@@ -169,7 +169,8 @@ if( $blog )
 		$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
 			' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
-			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
+			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>'.
+			get_manual_link( 'collection-dashboard' );
 
 		echo '<div id="styled_content_block" class="evo_content_block">';
 		echo '<div id="comments_block" class="dashboard_comments_block">';

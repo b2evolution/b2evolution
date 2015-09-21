@@ -306,10 +306,11 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		case 'htmlfeed':
-			// For use in RSS <content:encoded>, allow full HTML + absolute URLs
+			// For use in RSS <content:encoded><![CDATA[ ... ]]></content:encoded>
+			// allow full HTML + absolute URLs...
 			$content = make_rel_links_abs($content);
 			$content = convert_chars($content, 'html');
-			$content = str_replace(']]>', ']]&gt;', $content); // encode CDATA closing tag
+			$content = str_replace(']]>', ']]&gt;', $content); // encode CDATA closing tag to prevent injection/breaking of the <![CDATA[ ... ]]>
 			break;
 
 		case 'htmlhead':

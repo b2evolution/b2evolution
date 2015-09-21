@@ -64,7 +64,7 @@ $ItemList->filter_area = array(
 */
 
 
-$ItemList->title = sprintf( /* TRANS: list of "posts"/"intros"/"custom types"/etc */ T_('"%s" list'), $tab_type );
+$ItemList->title = sprintf( /* TRANS: list of "posts"/"intros"/"custom types"/etc */ T_('"%s" list'), $tab_type ).get_manual_link( 'browse-edit-tab' );
 
 // Initialize Results object
 items_results( $ItemList, array(
