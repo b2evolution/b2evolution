@@ -302,6 +302,9 @@ ol.breadcrumb {
   height: 0;
   clear: both;
 }
+.legends {
+  text-align: center;
+}
 .legends legend {
   text-align: center;
   border: none;
@@ -321,6 +324,7 @@ ol.breadcrumb {
 }
 .legend-item {
   margin: 0px 5px 12px 5px;
+  display: inline-block;
 }
 ul.legend {
   list-style: none;

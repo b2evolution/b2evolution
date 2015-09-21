@@ -349,13 +349,16 @@ ol.breadcrumb {
 }
 
 // Legend table & list
-.legends legend {
+.legends {
 	text-align: center;
-	border: none;
-	text-transform: uppercase;
-    font-variant: small-caps;
-	font-size: 82%;
-	margin-bottom: 10px;
+	legend {
+		text-align: center;
+		border: none;
+		text-transform: uppercase;
+		font-variant: small-caps;
+		font-size: 82%;
+		margin-bottom: 10px;
+	}
 }
 .legend, .legend-item {
 	text-align: center;
@@ -366,6 +369,7 @@ ol.breadcrumb {
 }
 .legend-item {
 	margin: 0px 5px 12px 5px;
+	display: inline-block;
 }
 ul.legend {
 	list-style: none;
