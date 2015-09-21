@@ -39,9 +39,9 @@ search_result_block( array(
 		'title_prefix_comment'  => T_('Reply: '),
 		'title_prefix_category' => T_('Forum: '),
 		'title_prefix_tag'      => T_('Tag: '),
-		'block_start' => '<div class="panel">',
+		'block_start' => '<div class="evo_search_list">',
 		'block_end'   => '</div>',
-		'row_start'   => '<div class="panel-body">',
+		'row_start'   => '<div class="evo_search_list__row">',
 		'row_end'     => '</div>',
 		'pagination'  => $params['pagination']
 	) );
