@@ -1675,7 +1675,7 @@ class Item extends ItemLight
 			}
 		}
 
-		return excerpt( $this->excerpt );
+		return utf8_strip_tags( $this->excerpt );
 	}
 
 
