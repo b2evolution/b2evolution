@@ -224,7 +224,7 @@ class ItemQuery extends SQL
 		$this->cat_array = $cat_array;
 		$this->cat_modifier = $cat_modifier;
 
-		if( $cat_focus == 'wide' || $cat_focus == 'extra' )
+		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
 		{
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
