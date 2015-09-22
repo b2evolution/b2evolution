@@ -752,8 +752,7 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
 			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL
-				OR uprs_read_post_ts < post_last_touched_ts
-				OR uprs_user_ID != '.$DB->quote( $current_User->ID ) );
+				OR uprs_read_post_ts < post_last_touched_ts' );
 
 			// Execute a query with to know if current user has new data to view:
 			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
