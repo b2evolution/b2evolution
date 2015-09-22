@@ -329,7 +329,7 @@ XX(      graydead.gif
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 		{ // Call ReplaceTagSafe() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
-					'~(`|<(code|pre)[^>]*>).*(\1|</\2>)~is',
+					'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 					array( & $this, 'ReplaceTagSafe' ) );
 		}
 		else

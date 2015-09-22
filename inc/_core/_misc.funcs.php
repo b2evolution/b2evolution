@@ -882,7 +882,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 		{ // Call replace_content() on everything outside code/pre and markdown codeblocks:
 			$content = callback_on_non_matching_blocks( $content,
-				'~(`|<(code|pre)[^>]*>).*(\1|</\2>)~is',
+				'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else

@@ -88,7 +88,7 @@ class gmcode_plugin extends Plugin
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 		{	// Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
-				'~(`|<(code|pre)[^>]*>).*(\1|</\2>)~is',
+				'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 				array( $this, 'replace_out_tags' ) );
 		}
 		else

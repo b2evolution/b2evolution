@@ -982,12 +982,15 @@ switch( $action )
 		 *     we can make this optional...
 		 */
 		if( $edited_Item->status == 'redirected' ||
-		    strpos( $redirect_to, 'tab=tracker' ) ||
-		    strpos( $redirect_to, 'tab=manual' ) )
+		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
 			//    a post is in "Redirected" status
-			//    a post is updated from "workflow" or "manual" view tab
+			//    a post is updated from "workflow" view tab
 			$blog_redirect_setting = 'no';
+		}
+		elseif( strpos( $redirect_to, 'tab=manual' ) )
+		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
+			$blog_redirect_setting = 'orig';
 		}
 		elseif( ! $was_published && $edited_Item->status == 'published' )
 		{ // The post's last status wasn't "published", but we're going to publish it now.
@@ -1007,6 +1010,12 @@ switch( $action )
 		elseif( $blog_redirect_setting == 'post' )
 		{ // redirect to post page:
 			$redirect_to = $edited_Item->get_permanent_url();
+		}
+		elseif( $blog_redirect_setting == 'orig' )
+		{ // Use original $redirect_to:
+			// Set highlight:
+			$Session->set( 'highlight_id', $edited_Item->ID );
+			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
 		}
 		else
 		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list
