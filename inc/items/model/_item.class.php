@@ -7046,11 +7046,6 @@ class Item extends ItemLight
 			$this->dbupdate( false, false, false );
 		}
 
-		if( is_logged_in() && ( $this->content_read_status == 'read' ) )
-		{ // Update current user post read date because it was read before this modifications as well
-			$this->update_read_date();
-		}
-
 		// Also update last touched date of all categories of this Item
 		$chapters = $this->get_Chapters();
 		if( count( $chapters ) > 0 )
@@ -7078,9 +7073,17 @@ class Item extends ItemLight
 
 	/**
 	 * Update field uprs_read_post_ts for current User
+	 *
+	 * @param boolean TRUE to update a post read timestamp
+	 * @param boolean TRUE to update a comments read timestamp
 	 */
-	function update_read_date()
+	function update_read_timestamps( $read_post = true, $read_comments = true )
 	{
+		if( ! $read_post && ! $read_comments )
+		{ // Nothing to update
+			return;
+		}
+
 		if( $this->ID == 0 )
 		{ // Item is not saved in DB
 			return;
@@ -7110,15 +7113,45 @@ class Item extends ItemLight
 
 		if( ! empty( $read_date ) )
 		{	// Update the read status:
+			$update_fields = '';
+			if( $read_post )
+			{	// Update a post read timestamp:
+				$update_fields = 'uprs_read_post_ts = '.$DB->quote( $timestamp );
+			}
+			if( $read_comments )
+			{	// Update a comments read timestamp:
+				if( $read_post )
+				{
+					$update_fields .= ', ';
+				}
+				$update_fields .= 'uprs_read_comment_ts = '.$DB->quote( $timestamp );
+			}
 			$DB->query( 'UPDATE T_users__postreadstatus
-				  SET uprs_read_post_ts = '.$DB->quote( $timestamp ).'
+				  SET '.$update_fields.'
 				WHERE uprs_user_ID = '.$DB->quote( $current_User->ID ).'
 				  AND uprs_post_ID = '.$DB->quote( $this->ID ) );
 		}
 		else
 		{	// Insert new read status:
-			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, uprs_read_post_ts )
-				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $timestamp ).' )' );
+			$insert_fields = '';
+			$insert_values = '';
+			if( $read_post )
+			{	// Update a post read timestamp:
+				$insert_fields = 'uprs_read_post_ts';
+				$insert_values = $DB->quote( $timestamp );
+			}
+			if( $read_comments )
+			{	// Update a comments read timestamp:
+				if( $read_post )
+				{
+					$insert_fields .= ', ';
+					$insert_values .= ', ';
+				}
+				$insert_fields .= 'uprs_read_comment_ts';
+				$insert_values .= $DB->quote( $timestamp );
+			}
+			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, '.$insert_fields.' )
+				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$insert_values.' )' );
 		}
 
 		// Update the cached date:
@@ -7179,7 +7212,7 @@ class Item extends ItemLight
 			return 'new';
 		}
 
-		if( $read_date >= $this->last_touched_ts )
+		if( $read_date > $this->last_touched_ts )
 		{	// This post was read by current user
 			return 'read';
 		}

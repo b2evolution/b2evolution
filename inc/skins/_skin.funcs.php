@@ -106,8 +106,8 @@ function skin_init( $disp )
 			if( ! empty( $MainList ) && $MainList->single_post &&
 			    $single_Item = & mainlist_get_item() )
 			{	// If we are currently viewing a single post
-				// Update the read timestamp of the item by current user:
-				$single_Item->update_read_date();
+				// We assume the current user will have read the entire post and all its current comments:
+				$single_Item->update_read_timestamps( true, true );
 				// Restart the items list:
 				$MainList->restart();
 			}
