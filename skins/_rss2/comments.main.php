@@ -84,7 +84,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<docs>http://backend.userland.com/rss</docs>
 		<admin:generatorAgent rdf:resource="http://b2evolution.net/?v=<?php echo $app_version ?>"/>
 		<ttl>60</ttl>
-		<?php while( $Comment = & $CommentList->get_next( false ) )
+		<?php while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 			// Load comment's Item:
 			$Comment->get_Item();

@@ -1995,15 +1995,12 @@ function load_user_read_statuses( $post_ids = NULL )
 
 	// SELECT current User's post and comment read statuses for all post with the given ids
 	$SQL = new SQL();
-	$SQL->SELECT( 'uprs_post_ID as post_ID, uprs_read_post_ts AS `post`, uprs_read_comment_ts AS `comment`' );
+	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
 	$SQL->FROM( 'T_users__postreadstatus' );
 	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
-	// Set those post read statuses which were opened before
-	foreach( $DB->get_results( $SQL->get() ) as $row )
-	{ // Load $user_post_read_statuses by post
-		$user_post_read_statuses[$row->post_ID] = array( 'post' => $row->post, 'comment' => $row->comment );
-	}
+	// Set those post read statuses which were opened before:
+	$user_post_read_statuses = $DB->get_assoc( $SQL->get() );
 
 	if( empty( $post_ids ) )
 	{ // The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user
@@ -2013,9 +2010,9 @@ function load_user_read_statuses( $post_ids = NULL )
 	// Set new posts read statuses
 	foreach( $post_ids as $post_ID )
 	{ // Make sure to set read statuses for each requested post ID
-		if( ! isset( $user_post_read_statuses[$post_ID] ) )
+		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
 		{ // Set each read status to 0
-			$user_post_read_statuses[$post_ID] = array( 'post' => 0, 'comment' => 0 );
+			$user_post_read_statuses[ $post_ID ] = 0;
 		}
 	}
 }

@@ -7048,7 +7048,7 @@ class Item extends ItemLight
 
 		if( is_logged_in() && ( $this->content_read_status == 'read' ) )
 		{ // Update current user post read date because it was read before this modifications as well
-			$this->update_read_date( 'post' );
+			$this->update_read_date();
 		}
 
 		// Also update last touched date of all categories of this Item
@@ -7078,10 +7078,8 @@ class Item extends ItemLight
 
 	/**
 	 * Update field uprs_read_post_ts for current User
-	 *
-	 * @param string Type of date field: 'post' | 'comment'
 	 */
-	function update_read_date( $date_type = 'post' )
+	function update_read_date()
 	{
 		if( $this->ID == 0 )
 		{ // Item is not saved in DB
@@ -7103,31 +7101,28 @@ class Item extends ItemLight
 
 		$timestamp = date2mysql( $localtimenow );
 
-		$read_dates = $this->get_read_dates();
+		$read_date = $this->get_read_date();
 
-		if( $timestamp == $read_dates[ $date_type ] )
-		{ // The read status is already updated, Don't repeat it
+		if( $timestamp == $read_date )
+		{	// The read status is already updated, Don't repeat it:
 			return;
 		}
 
-		// Set what date field we should update
-		$date_field_name = $date_type == 'post' ? 'uprs_read_post_ts' : 'uprs_read_comment_ts';
-
-		if( !empty( $read_dates[ 'post' ] ) || !empty( $read_dates[ 'comment' ] ) )
-		{ // Update the read status
+		if( ! empty( $read_date ) )
+		{	// Update the read status:
 			$DB->query( 'UPDATE T_users__postreadstatus
-				  SET '.$date_field_name.' = '.$DB->quote( $timestamp ).'
+				  SET uprs_read_post_ts = '.$DB->quote( $timestamp ).'
 				WHERE uprs_user_ID = '.$DB->quote( $current_User->ID ).'
 				  AND uprs_post_ID = '.$DB->quote( $this->ID ) );
 		}
 		else
-		{ // Insert new read status
-			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, '.$date_field_name.' )
+		{	// Insert new read status:
+			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, uprs_read_post_ts )
 				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $timestamp ).' )' );
 		}
 
-		// Update the cached date
-		$user_post_read_statuses[ $this->ID ][ $date_type ] = $timestamp;
+		// Update the cached date:
+		$user_post_read_statuses[ $this->ID ] = $timestamp;
 	}
 
 
@@ -7136,8 +7131,6 @@ class Item extends ItemLight
 	 */
 	function load_content_read_status()
 	{
-		global $localtimenow;
-
 		if( !is_logged_in() )
 		{
 			return;
@@ -7148,11 +7141,7 @@ class Item extends ItemLight
 			return;
 		}
 
-		$read_dates = $this->get_read_dates();
-		if( $read_dates['post'] >= $this->last_touched_ts )
-		{
-			$this->content_read_status = 'read';
-		}
+		$this->content_read_status = $this->get_read_status();
 	}
 
 
@@ -7183,21 +7172,16 @@ class Item extends ItemLight
 
 		global $DB, $current_User;
 
-		$read_dates = $this->get_read_dates();
+		$read_date = $this->get_read_date();
 
-		if( empty( $read_dates['post'] ) )
-		{ // This post is recent for current user
+		if( empty( $read_date ) )
+		{	// This post is recent for current user
 			return 'new';
 		}
 
-		// A post is read if the post was seen after the latest update and the last updated comment was also seen by this user.
-		if( $read_dates['post'] >= $this->last_touched_ts )
-		{ // This post was read by current user
-			$max_comment_last_touched = load_comments_last_touched( array( $this->ID ) );
-			if( empty( $max_comment_last_touched ) || $read_dates['comment'] >= $max_comment_last_touched[$this->ID] )
-			{ // Comments read ts is higher the the max last_touched_ts value between the available comments
-				return 'read';
-			}
+		if( $read_date >= $this->last_touched_ts )
+		{	// This post was read by current user
+			return 'read';
 		}
 
 		// This post is Unread by current user
@@ -7208,10 +7192,9 @@ class Item extends ItemLight
 	/**
 	 * Get the read dates from DB or from Cached array of this post for current User
 	 *
-	 * @return array 'post' => the read date of post
-	 *               'comment' => the read date of comment
+	 * @return string The read date of this post
 	 */
-	function get_read_dates()
+	function get_read_date()
 	{
 		global $DB, $current_User, $user_post_read_statuses;
 
@@ -7223,16 +7206,16 @@ class Item extends ItemLight
 		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
 		{ // Get the read post date only one time from DB and store it in cache array
 			$SQL = new SQL();
-			$SQL->SELECT( 'uprs_read_post_ts AS `post`, uprs_read_comment_ts AS `comment`' );
+			$SQL->SELECT( 'uprs_read_post_ts' );
 			$SQL->FROM( 'T_users__postreadstatus' );
 			$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $this->ID ) );
-			$user_post_read_statuses[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A );
+			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get() );
 		}
 
-		if( empty( $user_post_read_statuses[ $this->ID ] ) )
-		{ // Init empty array keys
-			$user_post_read_statuses[ $this->ID ] = array( 'post' => 0, 'comment' => 0 );
+		if( ! isset( $user_post_read_statuses[ $this->ID ] ) )
+		{	// Init empty read date:
+			$user_post_read_statuses[ $this->ID ] = 0;
 		}
 
 		return $user_post_read_statuses[ $this->ID ];
