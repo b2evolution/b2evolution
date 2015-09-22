@@ -4256,17 +4256,17 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	// Order
-	$order_attrs = '';
+	$order_attrs = ' style="padding-left:'.( $level + 1 ).'em"';
 	$order_value = T_('Alphabetic');
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Parent chapter ordering is set to manual and not alphabetic
 		if( $perm_edit )
 		{ // Add availability to edit an order if current user can edit chapters
-			$order_attrs = ' id="order-chapter-'.$Chapter->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+			$order_attrs .= ' id="order-chapter-'.$Chapter->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
 		$order_value = $Chapter->dget('order');
 	}
-	$r .= '<td class="center"'.$order_attrs.'>'.$order_value.'</td>';
+	$r .= '<td'.$order_attrs.'>'.$order_value.'</td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">';
@@ -4321,7 +4321,14 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$params = array_merge( array(
 			'title_before' => '',
 			'title_after'  => '',
+			'title_field'  => 'urltitle',
 		), $params );
+
+	if( $params['chapter_ID'] != $Item->main_cat_ID )
+	{	// Posts from extracats are displayed with italic:
+		$params['title_before'] = '<i>';
+		$params['title_after'] = '</i>';
+	}
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
@@ -4357,17 +4364,17 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= '</td>';
 
 	// Order
-	$order_attrs = '';
+	$order_attrs = ' style="padding-left:'.( $level + 1 ).'em"';
 	$order_value = T_('Alphabetic');
 	if( isset( $params['cat_order'] ) && $params['cat_order'] == 'manual' )
 	{
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
-			$order_attrs = ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+			$order_attrs .= ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
 		$order_value = $Item->dget('order');
 	}
-	$r .= '<td class="center"'.$order_attrs.'>'.$order_value.'</td>';
+	$r .= '<td'.$order_attrs.'>'.$order_value.'</td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';
