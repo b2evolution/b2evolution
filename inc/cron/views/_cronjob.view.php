@@ -51,7 +51,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduler_execution_info') );
+	$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduled-job-execution-details') );
 
 		if( empty( $cjob_row->clog_status ) )
 		{

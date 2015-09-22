@@ -116,7 +116,7 @@ $SQL->ORDER_BY( '*, ctsk_ID' );
 
 $Results = new Results( $SQL->get(), 'crontab_', '-D' );
 
-$Results->title = T_('Scheduled jobs').get_manual_link('scheduler');
+$Results->title = T_('Scheduled jobs').get_manual_link('scheduled-jobs-list');
 
 
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );

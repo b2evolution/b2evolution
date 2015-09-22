@@ -223,13 +223,13 @@ switch( $action )
 	case 'edit':
 	case 'update':
 	case 'copy':
-		$AdminUI->set_page_manual_link( 'scheduler-job-form' );
+		$AdminUI->set_page_manual_link( 'scheduled-job-form' );
 		break;
 	case 'view':
-		$AdminUI->set_page_manual_link( 'scheduler-job-info' );
+		$AdminUI->set_page_manual_link( 'scheduled-job-info' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'scheduler' );
+		$AdminUI->set_page_manual_link( 'scheduled-jobs-list' );
 		break;
 }
 
