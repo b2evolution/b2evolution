@@ -4223,7 +4223,7 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	// Order
-	$order_attrs = ' style="padding-left:'.( $level + 1 ).'em"';
+	$order_attrs = ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Parent chapter ordering is set to manual and not alphabetic
@@ -4331,7 +4331,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= '</td>';
 
 	// Order
-	$order_attrs = ' style="padding-left:'.( $level + 1 ).'em"';
+	$order_attrs = ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
 	if( isset( $params['cat_order'] ) && $params['cat_order'] == 'manual' )
 	{
