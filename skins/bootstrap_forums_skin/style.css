@@ -311,6 +311,9 @@ ol.breadcrumb {
   height: 0;
   clear: both;
 }
+.legends {
+  text-align: center;
+}
 .legends legend {
   text-align: center;
   border: none;
@@ -330,6 +333,7 @@ ol.breadcrumb {
 }
 .legend-item {
   margin: 0px 5px 12px 5px;
+  display: inline-block;
 }
 ul.legend {
   list-style: none;
@@ -563,11 +567,14 @@ label.control-label[for=post_title] {
   padding: 10px;
   margin-left: 10px;
 }
+.btn_recent_topics {
+  margin: 0 0 20px 5px;
+}
 .widget_core_coll_search_form {
   float: right;
   width: 40%;
   min-width: 250px;
-  margin-bottom: 20px;
+  margin: 0 0 20px 5px;
 }
 .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;

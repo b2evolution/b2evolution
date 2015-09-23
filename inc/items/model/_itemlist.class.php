@@ -339,11 +339,6 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		if( $this->single_post && !empty( $Item ) )
-		{ // Update the read timestamp of the item by current user
-			$Item->update_read_date();
-		}
-
 		return $Item;
 	}
 

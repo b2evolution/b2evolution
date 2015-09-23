@@ -107,8 +107,17 @@ if( count( $chapters ) > 0 )
 			else
 			{ // Set icon for unlocked chapter
 				$chapter_icon = 'fa-folder big';
-				$chapter_icon_title = T_('No new posts');
-				$legend_icons['forum_default'] = 1;
+				global $disp_detail;
+				if( $disp_detail == 'posts-subcat' )
+				{
+					$chapter_icon_title = T_('Sub-forum (contains several topics)');
+					$legend_icons['forum_sub'] = 1;
+				}
+				else
+				{
+					$chapter_icon_title = T_('Forum (contains several topics)');
+					$legend_icons['forum_default'] = 1;
+				}
 			}
 
 ?>
