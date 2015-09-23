@@ -135,7 +135,7 @@ if( $new_user_creating )
 	$current_User->check_perm( 'users', 'edit', true );
 	$edited_User->get_Group();
 
-	$Form->begin_fieldset( T_( 'New user' ), array( 'class' => 'fieldset clear' ) );
+	$Form->begin_fieldset( T_( 'New user' ).get_manual_link( 'user-edit' ), array( 'class' => 'fieldset clear' ) );
 
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
 	$GroupCache = & get_GroupCache();

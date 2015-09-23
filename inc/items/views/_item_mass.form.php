@@ -111,7 +111,7 @@ $Form->begin_form( '', '', $params );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Mass post contents') );
+	$Form->begin_fieldset( T_('Mass post contents').get_manual_link( 'mass-new-screen' ) );
 	//$Form->begin_fieldset( T_('Mass post contents').get_manual_link('post_contents_fieldset') );
 
 	$Form->hidden( 'post_title', 'None' );

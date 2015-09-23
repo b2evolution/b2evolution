@@ -25,7 +25,7 @@ $SQL->FROM_add( 'LEFT JOIN T_items__type_coll AS tb ON itc_ityp_ID = ityp_ID AND
 // Create result set:
 $Results = new Results( $SQL->get(), 'ityp_' );
 
-$Results->title = T_('Item/Post/Page types');
+$Results->title = T_('Item/Post/Page types').get_manual_link( 'managing-item-types' );
 
 // get reserved and default ids
 global $default_ids;

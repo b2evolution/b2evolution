@@ -28,7 +28,7 @@ $display_same_as_normal = false;
 switch( $skin_type )
 {
 	case 'normal':
-		$block_item_Widget->title = T_('Choose a skin');
+		$block_item_Widget->title = T_('Choose a skin').get_manual_link( 'skins-for-this-blog' );
 		break;
 
 	case 'mobile':

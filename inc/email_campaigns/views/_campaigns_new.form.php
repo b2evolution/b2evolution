@@ -21,7 +21,7 @@ $Form->add_crumb( 'campaign' );
 $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'action', 'add' );
 
-$Form->begin_fieldset( T_('New campaign') );
+$Form->begin_fieldset( T_('New campaign').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_name', '', 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 

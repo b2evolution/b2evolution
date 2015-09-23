@@ -33,7 +33,7 @@ $Form = new Form();
 $redirect_to = regenerate_url( 'action', '', '', '&' );
 $Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, 4, 2 );
 
-$Form->begin_form( 'fform', T_('Mass edit the current post list') );
+$Form->begin_form( 'fform', T_('Mass edit the current post list').get_manual_link( 'mass-edit-screen' ) );
 
 // hidden params
 $Form->add_crumb( 'item' );

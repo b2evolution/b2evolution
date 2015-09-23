@@ -49,7 +49,7 @@ $filtered_num_results = $DB->get_var( 'SELECT COUNT( link_file_ID ) FROM ( '. $c
 
 $Results = new Results( $SQL->get(), 'flike_', '---D', $UserSettings->get( 'results_per_page' ), (int)$filtered_num_results );
 $Results->Cache = & get_FileCache();
-$Results->title = T_('Liked files');
+$Results->title = T_('Liked files').get_manual_link( 'file-moderation-likes' );
 
 
 /**
