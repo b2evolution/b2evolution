@@ -216,6 +216,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_after'  => '</span></div>',
 					'button'               => T_('Search')
 				) );
+			// Display a button to view the Recent/New Topics:
+			$Skin->display_button_recent_topics();
 		}
 		?>
 

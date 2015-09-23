@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $disp, $MainList, $legend_statuses, $legend_icons;
+global $Blog, $disp, $MainList, $legend_statuses, $legend_icons;
 
 $legends = array();
 
@@ -22,11 +22,15 @@ if( $disp == 'front' || $disp == 'posts' )
 	$legends[] = array(
 			'forum_default' => array(
 				'icon'  => 'fa-folder big',
-				'title' => T_('No new posts'),
+				'title' => T_('Forum (contains several topics)'),
 			),
 			'forum_locked' => array(
 				'icon'  => 'fa-lock big',
 				'title' => T_('Forum is locked'),
+			),
+			'forum_sub' => array(
+				'icon'  => 'fa-folder big',
+				'title' => T_('Sub-forum (contains several topics)'),
 			),
 		);
 }
@@ -36,21 +40,35 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 	$legends[] = array(
 			'topic_default' => array(
 				'icon'  => 'fa-comments',
-				'title' => T_('No new posts'),
+				'title' => T_('Discussion topic'),
 			),
 			'topic_popular' => array(
 				'icon'  => 'fa-star',
-				'title' => T_('No new posts').' [ '.T_('Popular').' ]',
+				'title' => T_('Popular topic'),
 			),
 			'topic_locked' => array(
 				'icon'  => 'fa-lock',
-				'title' => T_('No new posts').' [ '.T_('Locked').' ]',
+				'title' => T_('Locked topic'),
 			),
 			'topic_sticky' => array(
 				'icon'  => 'fa-bullhorn',
-				'title' => T_('Sticky'),
+				'title' => T_('Sticky topic / Announcement'),
 			),
 		);
+
+	if( $Blog->get_setting( 'track_unread_content' ) )
+	{	// If tracking of unread content is enabled:
+		$legends[] = array(
+				'topic_new' => array(
+					'system_icon' => 'bullet_orange',
+					'title'       => T_('New topic'),
+				),
+				'topic_updated' => array(
+					'system_icon' => 'bullet_brown',
+					'title'       => T_('Updated topic'),
+				),
+			);
+	}
 }
 
 if( ! empty( $legend_icons ) || ! empty( $legend_statuses ) )
@@ -62,6 +80,7 @@ if( ! empty( $legend_icons ) || ! empty( $legend_statuses ) )
 foreach( $legends as $l => $legend )
 { // Print out all legends
 ?>
+	<div>
 	<?php
 	foreach( $legend as $legend_key => $legend_data )
 	{ // Display legend icon with description
@@ -69,13 +88,24 @@ foreach( $legends as $l => $legend )
 		{ // Display a legend icon only if it realy exists on the current page
 	?>
 		<div class="legend-item">
+			<?php
+			if( isset( $legend_data['system_icon'] ) )
+			{	// Use system icon:
+				echo get_icon( $legend_data['system_icon'], 'imgtag', array( 'title' => $legend_data['title'] ) ).' ';
+			}
+			else
+			{	// Use forum icon:
+			?>
 			<i class="icon fa <?php echo $legend_data['icon']; ?>" title="<?php echo $legend_data['title']; ?>"></i>
-			<?php echo $legend_data['title']; ?>
+			<?php
+			}
+			echo $legend_data['title']; ?>
 		</div>
 	<?php
 		}
 	}
 	?>
+	</div>
 <?php } ?>
 
 <?php
