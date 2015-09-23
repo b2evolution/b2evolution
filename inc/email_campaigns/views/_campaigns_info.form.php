@@ -25,7 +25,7 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( T_('Campaign info') );
+$Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_name', $edited_EmailCampaign->get( 'name' ), 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );

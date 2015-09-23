@@ -68,7 +68,7 @@ if( !empty( $email ) )
 
 $Results = new Results( $SQL->get(), 'emret_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Returned emails');
+$Results->title = T_('Returned emails').get_manual_link( 'email-returned' );
 
 /**
  * Callback to add filters on top of the result set

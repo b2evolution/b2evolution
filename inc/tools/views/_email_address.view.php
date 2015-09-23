@@ -47,7 +47,7 @@ if( !empty( $statuses ) )
 
 $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Email addresses');
+$Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
 $Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;tab=blocked&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4 );
 

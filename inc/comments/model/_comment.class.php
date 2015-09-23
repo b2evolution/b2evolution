@@ -4075,16 +4075,6 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( is_logged_in() )
-		{
-			$max_comment_last_touched = load_comments_last_touched( array( $this->item_ID ), $this->ID );
-			$user_read_dates = $comment_Item->get_read_dates();
-			if( empty( $max_comment_last_touched[$this->item_ID] ) || ( ( $user_read_dates['comment'] < $timestamp ) && ( $user_read_dates['comment'] >= $max_comment_last_touched[$this->item_ID] ) ) )
-			{ // Update current user comments read date on this comment's post
-				$comment_Item->update_read_date( 'comment' );
-			}
-		}
-
 		if( $update_item_date )
 		{ // Update last touched data of the Item
 			$comment_Item->update_last_touched_date();

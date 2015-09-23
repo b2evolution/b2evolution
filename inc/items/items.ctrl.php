@@ -1734,6 +1734,12 @@ switch( $action )
 	case 'edit_type':
 		$AdminUI->set_page_manual_link( 'change-post-type' );
 		break;
+	case 'new_mass':
+		$AdminUI->set_page_manual_link( 'mass-new-screen' );
+		break;
+	case 'mass_edit':
+		$AdminUI->set_page_manual_link( 'mass-edit-screen' );
+		break;
 	default:
 		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
 		break;

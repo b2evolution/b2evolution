@@ -43,7 +43,7 @@ $Form->add_crumb( 'element' );
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
-$Form->begin_fieldset( T_('Properties') );
+$Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	// We're essentially double checking here...
 	$edited_Blog = & $edited_Chapter->get_Blog();

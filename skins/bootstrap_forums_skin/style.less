@@ -349,13 +349,16 @@ ol.breadcrumb {
 }
 
 // Legend table & list
-.legends legend {
+.legends {
 	text-align: center;
-	border: none;
-	text-transform: uppercase;
-    font-variant: small-caps;
-	font-size: 82%;
-	margin-bottom: 10px;
+	legend {
+		text-align: center;
+		border: none;
+		text-transform: uppercase;
+		font-variant: small-caps;
+		font-size: 82%;
+		margin-bottom: 10px;
+	}
 }
 .legend, .legend-item {
 	text-align: center;
@@ -366,6 +369,7 @@ ol.breadcrumb {
 }
 .legend-item {
 	margin: 0px 5px 12px 5px;
+	display: inline-block;
 }
 ul.legend {
 	list-style: none;
@@ -608,12 +612,17 @@ label.control-label[for=post_title] {
 	margin-left: 10px;
 }
 
+// Recent topics button
+.btn_recent_topics {
+	margin: 0 0 20px 5px;
+}
+
 // Search form
 .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
-	margin-bottom: 20px;
+	margin: 0 0 20px 5px;
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}

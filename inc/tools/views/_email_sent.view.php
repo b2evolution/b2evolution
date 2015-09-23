@@ -68,7 +68,7 @@ if( !empty( $email ) )
 
 $Results = new Results( $SQL->get(), 'emlog_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Sent emails');
+$Results->title = T_('Sent emails').get_manual_link( 'sent-emails' );
 
 /**
  * Callback to add filters on top of the result set

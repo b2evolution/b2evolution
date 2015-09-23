@@ -66,7 +66,7 @@ if( $current_User->check_perm( 'blogs', 'editall' ) )
 		$opentrash_link = get_opentrash_link( false );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->title = $opentrash_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)').get_manual_link( 'comments-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title

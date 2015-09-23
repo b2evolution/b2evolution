@@ -24,11 +24,15 @@ global $Item, $cat;
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
  */
-global $legend_statuses;
+global $legend_statuses, $legend_icons;
 
 if( !is_array( $legend_statuses ) )
 {	// Init this array only first time
 	$legend_statuses = array();
+}
+if( ! is_array( $legend_icons ) )
+{ // Init this array only first time
+	$legend_icons = array();
 }
 
 // Calculate what comments has the Item:
@@ -41,15 +45,22 @@ if( $Item->is_featured() || $Item->is_intro() )
 { // Special icon for featured & intro posts
 	$status_icon = 'topicSticky';
 	$status_title = '<strong>'.T_('Sticky').':</strong> ';
+	$legend_icons['topic_sticky'] = 1;
 }
 elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )
 { // The post is closed for comments
 	$status_icon = 'topicLocked';
 	$status_alt = T_('This topic is locked: you cannot edit posts or make replies.');
+	$legend_icons['topic_locked'] = 1;
 }
 elseif( $comments_number > 25 )
 { // Popular topic is when coummnets number is more than 25
 	$status_icon = 'folder_hot.gif';
+	$legend_icons['topic_popular'] = 1;
+}
+else
+{ // Default topic
+	$legend_icons['topic_default'] = 1;
 }
 ?>
 		<tr>
@@ -79,6 +90,16 @@ elseif( $comments_number > 25 )
 				if( $Item->Blog->get_setting( 'track_unread_content' ) )
 				{
 					$Item->display_unread_status();
+					// Update legend array to display the unread status icons in footer legend:
+					switch( $Item->get_read_status() )
+					{
+						case 'new':
+							$legend_icons['topic_new'] = 1;
+							break;
+						case 'updated':
+							$legend_icons['topic_updated'] = 1;
+							break;
+					}
 				}
 				// Title:
 				$Item->title( array(

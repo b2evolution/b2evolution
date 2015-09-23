@@ -16,7 +16,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat;
+global $number_of_posts_in_cat, $cat, $legend_icons;
+
+if( ! is_array( $legend_icons ) )
+{ // Init this array only first time
+	$legend_icons = array();
+}
 
 if( $cat > 0 )
 {
@@ -75,11 +80,22 @@ if( count( $chapters ) > 0 )
 			{	// Set icon for locked chapter
 				$chapter_icon = 'catBigLocked';
 				$chapter_icon_title = T_('This forum is locked: you cannot post, reply to, or edit topics.');
+				$legend_icons['forum_locked'] = 1;
 			}
 			else
 			{	// Set icon for unlocked chapter
 				$chapter_icon = 'catBig';
-				$chapter_icon_title = T_('No new posts');
+				global $disp_detail;
+				if( $disp_detail == 'posts-subcat' )
+				{
+					$chapter_icon_title = T_('Sub-forum (contains several topics)');
+					$legend_icons['forum_sub'] = 1;
+				}
+				else
+				{
+					$chapter_icon_title = T_('Forum (contains several topics)');
+					$legend_icons['forum_default'] = 1;
+				}
 			}
 ?>
 		<tr>
