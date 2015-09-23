@@ -2427,6 +2427,9 @@ ol {
   margin: 0 0 10px 25px;
   padding: 0;
 }
+.table-hover > tbody > tr:hover {
+  background-color: #ffc;
+}
 .btn.btn-success .fa,
 .btn.btn-danger .fa {
   color: #FFF !important;

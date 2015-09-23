@@ -79,7 +79,7 @@ if( $num_file_results > 0 )
 $Results = new Results( $num_file_results ? $SQL->get() : NULL, 'fdupl_', $default_order, $UserSettings->get( 'results_per_page' ), $num_file_results );
 $Results->Cache = & get_FileCache();
 $Results->Cache->clear();
-$Results->title = T_('Duplicate files');
+$Results->title = T_('Duplicate files').get_manual_link( 'file-moderation-duplicates' );
 
 /*
  * Grouping params:

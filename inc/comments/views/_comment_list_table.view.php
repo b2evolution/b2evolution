@@ -35,7 +35,7 @@ display_comment_mass_delete( $CommentList );
 // Display title depending on selection params:
 echo $CommentList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
-$CommentList->title = T_('Comment List');
+$CommentList->title = T_('Comment List').get_manual_link( 'comments-tab' );
 
 if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:

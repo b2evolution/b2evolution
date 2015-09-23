@@ -41,7 +41,7 @@ $Form->hidden( 'action', 'settings' );
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {
-	$Form->begin_fieldset( T_('Test saved settings') );
+	$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'smtp-gateway-settings' ) );
 
 		$url = '?ctrl=email&amp;tab=settings&amp;tab3=smtp&amp;'.url_crumb('emailsettings').'&amp;action=';
 		$Form->info_field( T_('Perform tests'),

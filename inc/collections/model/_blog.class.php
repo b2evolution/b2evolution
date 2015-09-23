@@ -3281,6 +3281,9 @@ class Blog extends DataObject
 			{	// This collection is used for login actions
 				// Don't redirect, just display a login form of this collection:
 				$disp = 'access_requires_login';
+				// Set redirect_to param to current url in order to display a requested page after login action:
+				global $ReqURI;
+				param( 'redirect_to', 'url', $ReqURI );
 			}
 		}
 		elseif( $allow_access == 'members' )

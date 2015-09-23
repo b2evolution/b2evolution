@@ -40,7 +40,7 @@ $count_SQL->WHERE( 'dom_type = \'email\'' );
 // Create result set:
 $Results = new Results( $SQL->get(), 'dom_', '--D', NULL, $count_SQL->get() );
 
-$Results->title = T_('Email statistics');
+$Results->title = T_('Email statistics').get_manual_link( 'user-stats' );
 
 $Results->cols[] = array(
 		'th' => T_('Email domain'),

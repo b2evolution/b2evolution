@@ -45,7 +45,7 @@ $AdminUI->breadcrumbpath_add( T_('Post Statuses'), $admin_url.'?ctrl=itemtypes&a
 
 $AdminUI->set_page_manual_link( 'managing-item-statuses' );
 
-$list_title = T_('Post Statuses');
+$list_title = T_('Post Statuses').get_manual_link( 'managing-item-statuses' );
 $default_col_order = 'A';
 $edited_name_maxlen = 30;
 $perm_name = 'options';
