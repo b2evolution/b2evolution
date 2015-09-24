@@ -685,6 +685,11 @@ class User extends DataObject
 
 			foreach( $userfield_IDs as $userfield )
 			{
+				if( ! isset( $this->userfield_defs[$userfield->uf_ufdf_ID] ) )
+				{	// Don't update this user field because it doesn't exist in DB:
+					continue;
+				}
+
 				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 

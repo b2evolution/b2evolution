@@ -2872,13 +2872,13 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	$group_ID = 0;
 	foreach( $userfields as $userfield )
 	{
-		if( $group_ID != $userfield->ufgp_ID && $add_group_fieldset )
+		if( $group_ID !== $userfield->ufgp_ID && $add_group_fieldset )
 		{	// Start new group
-			if( $group_ID > 0 )
+			if( $group_ID !== 0  )
 			{	// End previous group
 				$Form->end_fieldset();
 			}
-			$Form->begin_fieldset( $userfield->ufgp_name, array( 'id' => $userfield->ufgp_ID ) );
+			$Form->begin_fieldset( ( empty( $userfield->ufgp_name ) ? T_('Other fields') : $userfield->ufgp_name ), array( 'id' => $userfield->ufgp_ID ) );
 		}
 
 		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
