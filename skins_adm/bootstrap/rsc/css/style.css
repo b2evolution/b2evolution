@@ -234,6 +234,13 @@ div.bPost {
   margin: 4px 10px 10px 0;
   float: left;
 }
+#comments_container.full_comment_list {
+  border: none;
+}
+#comments_container.full_comment_list div.bComment {
+  margin-left: 0;
+  margin-right: 0;
+}
 .bFeedback #comments_container {
   border: none;
 }
@@ -1333,4 +1340,7 @@ input[name=new_cat_order] {
 }
 form#blogperm_checkchanges {
   padding-bottom: 20px;
+}
+.control-label.label {
+  color: #333;
 }
