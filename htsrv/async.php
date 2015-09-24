@@ -83,6 +83,11 @@ switch( $action )
 		// Check permission to view plugin settings:
 		$current_User->check_perm( 'options', 'view', true );
 
+		// Set admin skin, used for buttons, @see button_class()
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
 		param( 'plugin_ID', 'integer', true );
 
 		$admin_Plugins = & get_Plugins_admin(); // use Plugins_admin, because a plugin might be disabled

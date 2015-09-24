@@ -446,6 +446,7 @@ switch( $action )
 
 
 	case 'update_settings':
+	case 'update_edit_settings':
 		// Update plugin settings:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -607,7 +608,7 @@ switch( $action )
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
 		}
 
-		if( ! $Messages->has_errors() )
+		if( $action == 'update_settings' && ! $Messages->has_errors() )
 		{ // there were no errors, go back to list:
 			//save fadeout item
 			$Session->set('fadeout_id', $edit_Plugin->ID);

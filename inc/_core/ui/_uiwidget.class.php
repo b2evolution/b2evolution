@@ -81,7 +81,9 @@ class Widget
 	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
 	{
 		$link_attribs = array_merge( array(
-				'class' => 'action_icon'
+				'class'  => 'action_icon',
+				'before' => '',
+				'after'  => '',
 			), $link_attribs );
 
 		$this->global_icons[] = array(
@@ -246,8 +248,12 @@ class Widget
 			}
 			else
 			{ // Separated icon
-				$icons[] = action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
-						$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] );
+				$before = $icon_params['link_attribs']['before'];
+				$after = $icon_params['link_attribs']['after'];
+				unset( $icon_params['link_attribs']['before'] );
+				unset( $icon_params['link_attribs']['after'] );
+				$icons[] = $before.action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
+							$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] ).$after;
 			}
 		}
 

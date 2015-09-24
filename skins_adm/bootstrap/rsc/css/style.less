@@ -254,6 +254,13 @@ div.bPost {
 		float: left;
 	}
 }
+#comments_container.full_comment_list {
+	border: none;
+	div.bComment {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
 .bFeedback {
 	#comments_container {
 		border: none;
@@ -805,6 +812,13 @@ form#FilesForm {
 		ul {
 			margin-left: 20px;
 		}
+	}
+}
+#fmbar_filter {
+	display: inline;
+	white-space: nowrap;
+	em.filter {
+		color: #F00;
 	}
 }
 #fmbar_filter_checkchanges {
@@ -1394,4 +1408,66 @@ input[name=new_cat_order] {
 // Fix space under submit button on blog permission pages
 form#blogperm_checkchanges {
 	padding-bottom: 20px;
+}
+
+// Fix label color from white invisible:
+.control-label.label {
+	color: #333;
+}
+
+// Table to display a difference between post revisions:
+table.diff {
+	border: medium none;
+	border-spacing: 4px;
+	table-layout: fixed;
+	width: 100%;
+	background-color: white;
+	border-collapse: initial;
+	td {
+		padding: 0;
+		div {
+			overflow: auto;
+			word-wrap: break-word;
+		}
+	}
+	col.diff-marker {
+		width: 2%;
+	}
+	col.diff-content {
+		width: 48%;
+	}
+	td.diff-otitle, td.diff-ntitle {
+		background-color: white;
+		text-align: center;
+		width: 50%;
+	}
+	td.diff-marker {
+		text-align: right;
+	}
+	td.diff-lineno {
+		font-weight: bold;
+	}
+	td.diff-addedline {
+		background: none repeat scroll 0 0 #CCFFCC;
+		font-size: smaller;
+	}
+	td.diff-deletedline {
+		background: none repeat scroll 0 0 #FFFFAA;
+		font-size: smaller;
+	}
+	td.diff-context {
+		background: none repeat scroll 0 0 #EEEEEE;
+		font-size: smaller;
+	}
+	.diffchange {
+		color: red;
+		font-weight: bold;
+		text-decoration: none;
+		white-space: pre-wrap;
+	}
+	td.diff-title-deletedline, td.diff-title-addedline {
+		text-align: center;
+		font-size: 120%;
+		font-weight: bold;
+	}
 }

@@ -51,6 +51,8 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
 		'fold_upgrade_backup_options' => 1,
+		'fold_plugin_vars' => 1,
+		'fold_plugin_events' => 1,
 
 		'show_quick_publish' => 1, // Show the quick "Publish!" button on item form edit screen in back-office
 
