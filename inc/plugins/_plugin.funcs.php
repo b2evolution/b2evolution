@@ -326,19 +326,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
-						$remove_action = action_icon(
-								T_('Delete set!'),
-								'delete',
+						$remove_action = '<span class="pull-right">'.action_icon(
+								T_('Remove'),
+								'minus',
 								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
-								'',
-								5, 0, /* icon/text prio */
+								T_('Remove'),
+								5, 3, /* icon/text prio */
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
 										jQuery('#".$parname.'_'.$k_nb."').remove();
 										return false;",
 									)
-								);
+								).'</span>';
 					}
 					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
 
@@ -375,10 +375,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				echo '<div id="'.$parname.'_add_new">';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
-					'new',
+					'add',
 					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
-					T_('New set'),
-					5, 1, /* icon/text prio */
+					T_('Add'),
+					5, 3, /* icon/text prio */
 					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 					array('onclick'=>"
 						var oThis = this;
