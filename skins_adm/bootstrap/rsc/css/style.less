@@ -1407,3 +1407,60 @@ form#blogperm_checkchanges {
 .control-label.label {
 	color: #333;
 }
+
+// Table to display a difference between post revisions:
+table.diff {
+	border: medium none;
+	border-spacing: 4px;
+	table-layout: fixed;
+	width: 100%;
+	background-color: white;
+	border-collapse: initial;
+	td {
+		padding: 0;
+		div {
+			overflow: auto;
+			word-wrap: break-word;
+		}
+	}
+	col.diff-marker {
+		width: 2%;
+	}
+	col.diff-content {
+		width: 48%;
+	}
+	td.diff-otitle, td.diff-ntitle {
+		background-color: white;
+		text-align: center;
+		width: 50%;
+	}
+	td.diff-marker {
+		text-align: right;
+	}
+	td.diff-lineno {
+		font-weight: bold;
+	}
+	td.diff-addedline {
+		background: none repeat scroll 0 0 #CCFFCC;
+		font-size: smaller;
+	}
+	td.diff-deletedline {
+		background: none repeat scroll 0 0 #FFFFAA;
+		font-size: smaller;
+	}
+	td.diff-context {
+		background: none repeat scroll 0 0 #EEEEEE;
+		font-size: smaller;
+	}
+	.diffchange {
+		color: red;
+		font-weight: bold;
+		text-decoration: none;
+		white-space: pre-wrap;
+	}
+	td.diff-title-deletedline, td.diff-title-addedline {
+		text-align: center;
+		font-size: 120%;
+		font-weight: bold;
+	}
+}

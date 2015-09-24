@@ -1344,3 +1344,60 @@ form#blogperm_checkchanges {
 .control-label.label {
   color: #333;
 }
+table.diff {
+  border: medium none;
+  border-spacing: 4px;
+  table-layout: fixed;
+  width: 100%;
+  background-color: white;
+  border-collapse: initial;
+}
+table.diff td {
+  padding: 0;
+}
+table.diff td div {
+  overflow: auto;
+  word-wrap: break-word;
+}
+table.diff col.diff-marker {
+  width: 2%;
+}
+table.diff col.diff-content {
+  width: 48%;
+}
+table.diff td.diff-otitle,
+table.diff td.diff-ntitle {
+  background-color: white;
+  text-align: center;
+  width: 50%;
+}
+table.diff td.diff-marker {
+  text-align: right;
+}
+table.diff td.diff-lineno {
+  font-weight: bold;
+}
+table.diff td.diff-addedline {
+  background: none repeat scroll 0 0 #CCFFCC;
+  font-size: smaller;
+}
+table.diff td.diff-deletedline {
+  background: none repeat scroll 0 0 #FFFFAA;
+  font-size: smaller;
+}
+table.diff td.diff-context {
+  background: none repeat scroll 0 0 #EEEEEE;
+  font-size: smaller;
+}
+table.diff .diffchange {
+  color: red;
+  font-weight: bold;
+  text-decoration: none;
+  white-space: pre-wrap;
+}
+table.diff td.diff-title-deletedline,
+table.diff td.diff-title-addedline {
+  text-align: center;
+  font-size: 120%;
+  font-weight: bold;
+}
