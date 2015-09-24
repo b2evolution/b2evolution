@@ -808,6 +808,13 @@ form#FilesForm {
 #fm_dirtree ul.clicktree ul {
   margin-left: 20px;
 }
+#fmbar_filter {
+  display: inline;
+  white-space: nowrap;
+}
+#fmbar_filter em.filter {
+  color: #F00;
+}
 #fmbar_filter_checkchanges {
   float: right;
 }
