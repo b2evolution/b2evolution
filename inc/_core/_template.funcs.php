@@ -3003,22 +3003,41 @@ function init_field_editor_js( $params = array() )
 		return false;
 	}
 
+	// Get current value and wrapper if value is stored in <span>:
+	var value = jQuery( this ).html();
+	var wrapper = false;
+	if( jQuery( this ).find( "span" ).length > 0 )
+	{
+		wrapper = jQuery( this ).find( "span" );
+		value = wrapper.html();
+	}
+
 	// Create <input> to edit order field
 	var input = document.createElement( "input" )
 	var $input = jQuery( input );
-	$input.val( jQuery( this ).html() );
+	$input.val( value );
 	$input.css( {
-		width: jQuery( this ).width() - 2,
-		height: jQuery( this ).height() - 2,
+		width: jQuery( this ).width(),
+		height: jQuery( this ).height(),
+		"line-height": jQuery( this ).height() + "px",
 		padding: "0",
-		"text-align": "center"
+		"text-align": "center",
+		"vertical-align": "bottom",
 	} );
 
 	// Save current value
-	jQuery( this ).attr( "rel", jQuery( this ).html() );
+	jQuery( this ).attr( "rel", value );
 
-	// Replace statis value with <input>
-	jQuery( this ).html( "" ).append( $input );
+	// Replace static value with <input>:
+	if( wrapper === false )
+	{
+		jQuery( this ).html( "" );
+	}
+	else
+	{
+		wrapper.hide();
+	}
+	jQuery( this ).append( $input );
 	$input.focus();
 
 	// Bind events for <input>
@@ -3028,7 +3047,15 @@ function init_field_editor_js( $params = array() )
 		var parent_obj = jQuery( this ).parent();
 		if( key == 27 )
 		{ // "Esc" key
-			parent_obj.html( parent_obj.attr( "rel" ) );
+			if( wrapper === false )
+			{
+				parent_obj.html( parent_obj.attr( "rel" ) );
+			}
+			else
+			{
+				parent_obj.find( "input" ).remove();
+				wrapper.show();
+			}
 		}
 		else if( key == 13 )
 		{ // "Enter" key
@@ -3055,7 +3082,15 @@ function init_field_editor_js( $params = array() )
 
 		if( revert_changes )
 		{ // Revert the changed value
-			parent_obj.html( parent_obj.attr( "rel" ) );
+			if( wrapper === false )
+			{
+				parent_obj.html( parent_obj.attr( "rel" ) );
+			}
+			else
+			{
+				parent_obj.find( "input" ).remove();
+				wrapper.show();
+			}
 		}
 	} );
 
