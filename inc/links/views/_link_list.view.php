@@ -158,8 +158,9 @@ else
 }
 
 // Display a button to quick upload the files by drag&drop method
-echo '<div id="fileuploader_form">';
 display_dragdrop_upload_button( array(
+		'before' => '<div id="fileuploader_form">',
+		'after'  => '</div>',
 		'fileroot_ID'      => FileRoot::gen_ID( 'collection', $Blog->ID ),
 		'path'             => '/quick-uploads/'.( $LinkOwner->type == 'item' ? 'p' : 'c' ).$LinkOwner->link_Object->ID.'/',
 		'list_style'       => 'table',
@@ -187,5 +188,4 @@ display_dragdrop_upload_button( array(
 		'resize_frame'           => true,
 		'table_headers'          => $table_headers,
 	) );
-echo '</div>';
 ?>
