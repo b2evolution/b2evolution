@@ -1798,7 +1798,7 @@ form.inskin .edit_area textarea {
   width: 100%;
 }
 #itemform_categories .extracats {
-  max-height: 500px;
+  max-height: 310px;
   overflow: auto;
 }
 table.catselect {
