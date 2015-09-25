@@ -114,12 +114,13 @@ $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation'
 	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
 	// Get moderation statuses with status text
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
+	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'post_moderation_statuses' );
 	$checklist_options = array();
 	foreach( $moderation_statuses as $status => $status_text )
 	{ // Add a checklist option for each possible modeartion status
 		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'post_notif_'.$status, 1, $status_text, $is_checked );
+		$checklist_options[] = array( 'post_notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('Post moderation reminder statuses'), false, false, array( 'note' => 'Posts with the selected statuses will be notified on the "Send reminders about posts awaiting moderation" scheduled job.' ) );
 
