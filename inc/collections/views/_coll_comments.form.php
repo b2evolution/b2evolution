@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog;
+global $edited_Blog, $AdminUI;
 
 ?>
 <script type="text/javascript">
@@ -185,8 +185,23 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
+	
+	if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	{	// Use dropdown for bootstrap skin:
+		$new_status_field = get_status_dropdown_button( array(
+				'name'    => 'new_feedback_status',
+				'value'   => $edited_Blog->get_setting('new_feedback_status'),
+				'options' => $status_options,
+			) );
+		$Form->info( T_('New feedback status'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+		$Form->hidden( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status') );
+		echo_form_dropdown_js();
+	}
+	else
+	{	// Use standard select element for other skins:
+		$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
 				T_('New feedback status'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+	}
 	echo '</div>';
 
 	// Moderation statuses setting
