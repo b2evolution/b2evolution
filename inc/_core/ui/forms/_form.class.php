@@ -2111,8 +2111,6 @@ class Form extends Widget
 
 		$r = $this->begin_field( $field_name, $field_label );
 
-		$r .= $field_params['input_prefix'];
-
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
