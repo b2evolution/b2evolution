@@ -331,23 +331,26 @@ else
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 { // ####################### ATTACHMENTS FIELDSETS #########################
+	global $advanced_edit_link;
+	$perm_attach = ( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) );
 	echo '<div class="well center">';
-	if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+	if( $perm_attach )
 	{	// If current user has a permission to attach files to this post
+		$advanced_edit_link_params = ' href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'"';
 		if( $creating )
 		{	// New post
-			echo T_('If you need to attach files, please use Advanced Edit.');
+			echo sprintf( T_('If you need to attach files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
 		}
 		else
 		{	// Edit post
-			echo T_('If you need to attach additional files, please use Advanced Edit.');
+			echo sprintf( T_('If you need to attach additional files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
 		}
 	}
 	else
 	{	// If current user has no permission to attach files to this post
 		if( $creating )
 		{	// New post
-			echo T_('If you need to attach files, please add a comment right after you edit this or use Advanced Edit.');
+			echo T_('If you need to attach files, please add a comment right after you post this.');
 		}
 		else
 		{	// Edit post
@@ -355,19 +358,15 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		}
 	}
 	echo '</div>';
-	$LinkOwner = new LinkItem( $edited_Item );
-	if( $LinkOwner->count_links() )
+	if( $perm_attach )
 	{
-		$Form->begin_fieldset( T_('Attachments') );
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			display_attachments( $LinkOwner );
+		$LinkOwner = new LinkItem( $edited_Item );
+		if( $LinkOwner->count_links() )
+		{	// Display the attached files:
+			$Form->begin_fieldset( T_('Attachments') );
+				display_attachments( $LinkOwner );
+			$Form->end_fieldset();
 		}
-		else
-		{
-			$Form->info( '', T_('You do not have permission to edit file attachments for this post') );
-		}
-		$Form->end_fieldset();
 	}
 }
 
