@@ -46,9 +46,13 @@ $Form->begin_form( 'fform', ( $creating ? T_('New invitation code') : T_('Invita
 
 	$Form->text_input( 'ivc_code', $edited_Invitation->code, 32, T_('Code'), T_('Must be from 3 to 32 letters, digits or signs "-", "_".'), array( 'required' => true ) );
 
-	$Form->date_input( 'ivc_expire_date', date2mysql( $edited_Invitation->expire_ts ), T_('Expire date'), array( 'required' => true ) );
+	$Form->begin_line( T_('Expire date'), 'ivc_expire_date', '', array( 'required' => true ) );
 
-	$Form->time_input( 'ivc_expire_time', date2mysql( $edited_Invitation->expire_ts ), T_('Expire time'), array( 'required' => true ) );
+		$Form->date_input( 'ivc_expire_date', date2mysql( $edited_Invitation->expire_ts ), '' );
+
+		$Form->time_input( 'ivc_expire_time', date2mysql( $edited_Invitation->expire_ts ), '' );
+
+	$Form->end_line();
 
 	$Form->text_input( 'ivc_source', $edited_Invitation->source, 32, T_('Source'), '', array( 'maxlength' => 30 ) );
 
