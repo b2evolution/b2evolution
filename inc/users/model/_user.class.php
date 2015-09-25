@@ -686,7 +686,8 @@ class User extends DataObject
 			foreach( $userfield_IDs as $userfield )
 			{
 				if( ! isset( $this->userfield_defs[$userfield->uf_ufdf_ID] ) )
-				{	// Don't update this user field because it doesn't exist in DB:
+				{	// If user field definition doesn't exist in DB then delete field value of this user:
+					$this->userfield_update( $userfield->uf_ID, NULL );
 					continue;
 				}
 

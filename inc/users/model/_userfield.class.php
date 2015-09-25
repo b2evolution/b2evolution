@@ -72,6 +72,19 @@ class Userfield extends DataObject
 
 
 	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_users__fields', 'fk' => 'uf_ufdf_ID', 'msg' => T_('%d user fields') ),
+			);
+	}
+
+
+	/**
 	 * Returns array of possible user field types
 	 *
 	 * @return array
