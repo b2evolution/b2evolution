@@ -341,6 +341,30 @@ else
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 { // ####################### ATTACHMENTS FIELDSETS #########################
+	echo '<div class="well center">';
+	if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+	{	// If current user has a permission to attach files to this post
+		if( $creating )
+		{	// New post
+			echo T_('If you need to attach files, please use Advanced Edit.');
+		}
+		else
+		{	// Edit post
+			echo T_('If you need to attach additional files, please use Advanced Edit.');
+		}
+	}
+	else
+	{	// If current user has no permission to attach files to this post
+		if( $creating )
+		{	// New post
+			echo T_('If you need to attach files, please add a comment right after you edit this or use Advanced Edit.');
+		}
+		else
+		{	// Edit post
+			echo T_('If you need to attach additional files, please add a comment right after you edit this.');
+		}
+	}
+	echo '</div>';
 	$LinkOwner = new LinkItem( $edited_Item );
 	if( $LinkOwner->count_links() )
 	{
