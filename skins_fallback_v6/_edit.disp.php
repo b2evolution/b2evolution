@@ -308,13 +308,7 @@ else
 
 	if( count( $custom_fields ) > 0 )
 	{
-		$Form->begin_fieldset( T_('Properties') );
-
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
-
-		echo $Form->formstart;
+		$Form->begin_fieldset( T_('Additional fields') );
 
 		foreach( $custom_fields as $field )
 		{ // Display each custom field
@@ -330,10 +324,6 @@ else
 			}
 			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
 		}
-
-		echo $Form->formend;
-
-		$Form->switch_layout( NULL );
 
 		$Form->end_fieldset();
 	}
