@@ -32,31 +32,41 @@ $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
-  $Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
-  $Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
-                        'ASC'  => T_('Ascending'),
-                        'DESC' => T_('Descending'), ), T_('Direction') );
-  $Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
-                array(  array( 'days', T_('days') ),
-                        array( 'posts', T_('posts') ),
-                      ), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
-  $Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts do you want to display on the home page?'), 4 );
+	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
+	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
+												'ASC'  => T_('Ascending'),
+												'DESC' => T_('Descending'), ), T_('Direction') );
+	$Form->begin_line( T_('Display') );
+		$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, '', '', 4 );
+		$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
+									array(  array( 'days', T_('days') ),
+													array( 'posts', T_('posts') ),
+												), '' );
+	$Form->end_line( T_('per page') );
 
-  $Form->radio( 'timestamp_min', $edited_Blog->get_setting('timestamp_min'),
-                array(  array( 'yes', T_('yes') ),
-                        array( 'no', T_('no') ),
-                        array( 'duration', T_('only the last') ),
-                      ), T_('Show past posts'), true );
-  $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
+	$Form->output = false;
+	$Form->switch_layout( 'none' );
+	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
+	$Form->switch_layout( NULL );
+	$Form->output = true;
+	$Form->radio( 'timestamp_min', $edited_Blog->get_setting('timestamp_min'),
+								array(  array( 'yes', T_('yes') ),
+												array( 'no', T_('no') ),
+												array( 'duration', T_('only the last'), '', $timestamp_min_duration_input ),
+											), T_('Show past posts'), true );
 
-  $Form->radio( 'timestamp_max', $edited_Blog->get_setting('timestamp_max'),
-                array(  array( 'yes', T_('yes') ),
-                        array( 'no', T_('no') ),
-                        array( 'duration', T_('only the next') ),
-                      ), T_('Show future posts'), true );
-  $Form->duration_input( 'timestamp_max_duration', $edited_Blog->get_setting('timestamp_max_duration'), '' );
+	$Form->output = false;
+	$Form->switch_layout( 'none' );
+	$timestamp_max_duration_input = $Form->duration_input( 'timestamp_max_duration', $edited_Blog->get_setting('timestamp_max_duration'), '' );
+	$Form->switch_layout( NULL );
+	$Form->output = true;
+	$Form->radio( 'timestamp_max', $edited_Blog->get_setting('timestamp_max'),
+								array(  array( 'yes', T_('yes') ),
+												array( 'no', T_('no') ),
+												array( 'duration', T_('only the next'), '', $timestamp_max_duration_input ),
+											), T_('Show future posts'), true );
 
-  $Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
+	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
 
 $Form->end_fieldset();
 

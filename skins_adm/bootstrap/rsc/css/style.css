@@ -1360,3 +1360,7 @@ table.diff td.diff-title-addedline {
   font-size: 120%;
   font-weight: bold;
 }
+.radio input[type="radio"][name^="timestamp_"][value="duration"] {
+  position: relative;
+  margin-right: 4px;
+}
