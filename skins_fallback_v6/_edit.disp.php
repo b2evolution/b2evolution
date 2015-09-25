@@ -308,13 +308,7 @@ else
 
 	if( count( $custom_fields ) > 0 )
 	{
-		$Form->begin_fieldset( T_('Properties') );
-
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
-
-		echo $Form->formstart;
+		$Form->begin_fieldset( T_('Additional fields') );
 
 		foreach( $custom_fields as $field )
 		{ // Display each custom field
@@ -331,29 +325,48 @@ else
 			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
 		}
 
-		echo $Form->formend;
-
-		$Form->switch_layout( NULL );
-
 		$Form->end_fieldset();
 	}
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 { // ####################### ATTACHMENTS FIELDSETS #########################
-	$LinkOwner = new LinkItem( $edited_Item );
-	if( $LinkOwner->count_links() )
-	{
-		$Form->begin_fieldset( T_('Attachments') );
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			display_attachments( $LinkOwner );
+	global $advanced_edit_link;
+	$perm_attach = ( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) );
+	echo '<div class="well center">';
+	if( $perm_attach )
+	{	// If current user has a permission to attach files to this post
+		$advanced_edit_link_params = ' href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'"';
+		if( $creating )
+		{	// New post
+			echo sprintf( T_('If you need to attach files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
 		}
 		else
-		{
-			$Form->info( '', T_('You do not have permission to edit file attachments for this post') );
+		{	// Edit post
+			echo sprintf( T_('If you need to attach additional files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
 		}
-		$Form->end_fieldset();
+	}
+	else
+	{	// If current user has no permission to attach files to this post
+		if( $creating )
+		{	// New post
+			echo T_('If you need to attach files, please add a comment right after you post this.');
+		}
+		else
+		{	// Edit post
+			echo T_('If you need to attach additional files, please add a comment right after you edit this.');
+		}
+	}
+	echo '</div>';
+	if( $perm_attach )
+	{
+		$LinkOwner = new LinkItem( $edited_Item );
+		if( $LinkOwner->count_links() )
+		{	// Display the attached files:
+			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
+				display_attachments( $LinkOwner );
+			$Form->end_fieldset();
+		}
 	}
 }
 

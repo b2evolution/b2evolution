@@ -360,7 +360,7 @@ form.inskin .edit_area textarea{
 
 // Categories selection table:
 #itemform_categories .extracats {
-	max-height: 500px;
+	max-height: 310px;
 	overflow: auto;
 }
 table.catselect {
@@ -733,7 +733,11 @@ div.results .status_meta span {
 // Comment edit form:
 form#comment_edit {
 	clear: both;
-	#comment_attachments .panel-body {
+}
+
+// Remove padding around attachment frame:
+#post_attachments, #comment_attachments {
+	.panel-body {
 		padding: 0;
 	}
 }
