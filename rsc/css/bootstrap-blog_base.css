@@ -731,7 +731,8 @@ div.results .status_meta span {
 form#comment_edit {
   clear: both;
 }
-form#comment_edit #comment_attachments .panel-body {
+#post_attachments .panel-body,
+#comment_attachments .panel-body {
   padding: 0;
 }
 input.btn-lg {

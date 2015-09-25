@@ -363,7 +363,7 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		$LinkOwner = new LinkItem( $edited_Item );
 		if( $LinkOwner->count_links() )
 		{	// Display the attached files:
-			$Form->begin_fieldset( T_('Attachments') );
+			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
 				display_attachments( $LinkOwner );
 			$Form->end_fieldset();
 		}
