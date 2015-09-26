@@ -3457,7 +3457,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Creating mail log table...' );
 		$DB->query( 'CREATE TABLE '.$tableprefix.'mail__log (
 		  emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-		  emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+		  emlog_timestamp TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
 		  emlog_to        VARCHAR(255) DEFAULT NULL,
 		  emlog_success   TINYINT(1) NOT NULL DEFAULT 0,
 		  emlog_subject   VARCHAR(255) DEFAULT NULL,
@@ -5109,7 +5109,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				mspr_format              ENUM("htmlbody","entityencoded","xml","text") COLLATE ascii_general_ci NOT NULL,
 				mspr_renderers           TEXT NOT NULL,
 				mspr_content_prerendered MEDIUMTEXT NULL,
-				mspr_datemodified        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+				mspr_datemodified        TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
 				PRIMARY KEY (mspr_msg_ID, mspr_format)
 			) ENGINE = innodb' );
 		db_add_col( 'T_messaging__message', 'msg_renderers', 'TEXT NOT NULL' );
