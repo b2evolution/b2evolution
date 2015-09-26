@@ -92,7 +92,7 @@ if( ! empty( $keywords ) )
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
 
-$Results->title = T_('Group permissions').get_manual_link('advanced-user-permissions');
+$Results->title = T_('Group permissions').get_manual_link('advanced-group-permissions');
 
 $Results->filter_area = array(
 	'submit' => 'actionArray[filter1]',
