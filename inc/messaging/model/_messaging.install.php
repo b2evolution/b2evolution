@@ -54,7 +54,7 @@ $schema_queries['T_messaging__prerendering'] = array(
 			mspr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			mspr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			mspr_content_prerendered MEDIUMTEXT NULL,
-			mspr_datemodified        TIMESTAMP NOT NULL,
+			mspr_datemodified        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (mspr_msg_ID, mspr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
