@@ -75,7 +75,7 @@ else
 	$blog_siteurl_absolute = 'http://';
 }
 
-$Form->begin_fieldset( T_('Collection base URL').' ['.T_('Admin').']'.get_manual_link('blog_url_settings') );
+$Form->begin_fieldset( T_('Collection base URL').' ['.T_('Admin').']' . get_manual_link('collection-base-url-settings') );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
@@ -307,7 +307,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').' ['.T_('Admin').']'.get_
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Date archive URLs') );
+$Form->begin_fieldset( T_('Date archive URLs').get_manual_link('date-archive-url-settings')  );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
@@ -320,7 +320,7 @@ $Form->begin_fieldset( T_('Date archive URLs') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Category URLs') );
+$Form->begin_fieldset( T_('Category URLs') . get_manual_link('category-url-settings') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
@@ -353,7 +353,7 @@ $Form->begin_fieldset( T_('Category URLs') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Tag page URLs'), array('id'=>'tag_links_fieldset') );
+$Form->begin_fieldset( T_('Tag page URLs') . get_manual_link('tag-page-url-settings'), array('id'=>'tag_links_fieldset') );
 
 	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
 		array(
@@ -426,7 +426,7 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
-$Form->begin_fieldset( T_('Single post URLs') );
+$Form->begin_fieldset( T_('Single post URLs') . get_manual_link('single-post-url-settings') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
