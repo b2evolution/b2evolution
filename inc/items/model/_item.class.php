@@ -1637,7 +1637,7 @@ class Item extends ItemLight
 		if( ! empty( $r ) )
 		{
 			echo $params['before'];
-			echo format_to_output( $this->excerpt, $params['format'] );
+			echo format_to_output( $r, $params['format'] );
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
@@ -1673,6 +1673,7 @@ class Item extends ItemLight
 			}
 		}
 
+		// Old DBs may have tags in exceprts, so we strip them:
 		return utf8_strip_tags( $this->excerpt );
 	}
 
