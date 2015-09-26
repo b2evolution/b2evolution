@@ -737,7 +737,7 @@ class bootstrap_forums_Skin extends Skin
 			global $current_User, $DB, $localtimenow;
 
 			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
-			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL );
+			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
 			$ItemList2->set_default_filters( array(
 					'unit' => 'all', // set this to don't calculate total rows
 				) );
