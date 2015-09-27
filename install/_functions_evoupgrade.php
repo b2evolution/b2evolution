@@ -6458,8 +6458,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11482 )
-	{ // part 18.s.2 trunk aka 20th part of "i7"
-
+	{ // v6.6.3
 		task_begin( 'Updating default post types for forums and manual collections... ' );
 		$item_types = array(
 				'manual' => array( 'ID' => 100, 'name' => 'Manual Page' ),
@@ -6497,7 +6496,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11483 )
-	{ // part 18.s.3 trunk aka 20th part of "i7"
+	{ // v6.6.4
 
 		task_begin( 'Updating general settings...' );
 		$DB->query( 'UPDATE T_settings
@@ -6505,6 +6504,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			WHERE set_name = '.$DB->quote( 'newusers_canregister' ).'
 				AND set_value = '.$DB->quote( '0' ) );
 		task_end();
+
+		task_begin( 'Updating user settings...' );
+		$DB->query( 'ALTER TABLE evo_users__usersettings CHANGE COLUMN uset_name uset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		$DB->query( 'ALTER TABLE evo_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+ 		task_end();
 
 		// set_upgrade_checkpoint( '11483' );
 	}
