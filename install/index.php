@@ -993,7 +993,13 @@ switch( $action )
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
 
-		if( $upgrade_result === true )
+		if( $upgrade_result != 'need-fix' )
+		{	// We are waiting for the user to click on "try to repair/upgarde now"...
+			// We already displayed teh orange upgrade button. Offer an alternative:
+			// A link to back to install menu
+			display_install_back_link();
+		}
+		elseif( $upgrade_result === true )
 		{
 			if( $not_evoupgrade )
 			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
@@ -1017,18 +1023,18 @@ switch( $action )
 			display_install_result_window( $upgrade_result_title, $upgrade_result_body );
 		}
 		else
-		{
+		{	// There has been an error during upgrade... (or upgrade was not performed)
+
 			if( $not_evoupgrade )
-			{ // disable maintenance mode at the end of the upgrade script
+			{	// disable maintenance mode at the end of the upgrade script
+				// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
 				switch_maintenance_mode( false, 'upgrade' );
 			}
 
-			if( $upgrade_result != 'need-fix' )
-			{
-				?>
-				<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
-				<?php
-			}
+			?>
+			<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
+			<?php
+
 			// A link to back to install menu
 			display_install_back_link();
 		}
