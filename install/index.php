@@ -993,8 +993,8 @@ switch( $action )
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
 
-		if( $upgrade_result != 'need-fix' )
-		{	// We are waiting for the user to click on "try to repair/upgarde now"...
+		if( $upgrade_result == 'need-fix' )
+		{	// We are waiting for the user to click on "try to repair/upgrade now"...
 			// We already displayed teh orange upgrade button. Offer an alternative:
 			// A link to back to install menu
 			display_install_back_link();
