@@ -989,20 +989,21 @@ switch( $action )
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
 		evo_flush();
 
-		$not_evoupgrade = ( $action !== 'evoupgrade' );
+		$is_automated_upgrade = ( $action !== 'evoupgrade' );
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
 
 		if( $upgrade_result == 'need-fix' )
 		{	// We are waiting for the user to click on "try to repair/upgrade now"...
-			// We already displayed teh orange upgrade button. Offer an alternative:
-			// A link to back to install menu
+			// We already displayed the orange upgrade button. Offer an alternative:
+			// A link back to install menu
 			display_install_back_link();
 		}
 		elseif( $upgrade_result === true )
 		{
-			if( $not_evoupgrade )
+			if( $is_automated_upgrade )  // What EXACTLY does "$not_upgrade mean???"
 			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+// TODO: this should kick in case of an auto-upgrade that goes through "need-fix". Currently it doesn't.
 				remove_after_upgrade();
 				// disable maintenance mode at the end of the upgrade script
 				switch_maintenance_mode( false, 'upgrade' );
@@ -1025,7 +1026,7 @@ switch( $action )
 		else
 		{	// There has been an error during upgrade... (or upgrade was not performed)
 
-			if( $not_evoupgrade )
+			if( $is_automated_upgrade )
 			{	// disable maintenance mode at the end of the upgrade script
 				// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
 				switch_maintenance_mode( false, 'upgrade' );
@@ -1035,7 +1036,7 @@ switch( $action )
 			<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
 			<?php
 
-			// A link to back to install menu
+			// A link back to install menu
 			display_install_back_link();
 		}
 
