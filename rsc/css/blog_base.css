@@ -384,11 +384,17 @@ div.results {
   width: 100%;
   overflow: auto;
 }
+table.ratings_table td {
+  border: none;
+  padding: 10px;
+}
 table.rating_summary {
   float: left;
+  margin: 0;
 }
 table.rating_summary th,
 table.rating_summary td {
+  border: none;
   font-size: 10px;
   line-height: 13px;
   font-weight: normal;
@@ -396,11 +402,13 @@ table.rating_summary td {
 }
 table.rating_summary th {
   padding-right: 5px;
+  background-color: transparent;
 }
 table.rating_summary .progress {
   width: 60px;
   background: #eeeecc;
   padding: 0;
+  box-shadow: none;
 }
 table.rating_summary .progress div {
   background: #ffcc66;
