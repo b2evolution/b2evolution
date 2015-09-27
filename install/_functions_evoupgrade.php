@@ -1609,7 +1609,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					itpr_format                   ENUM('htmlbody', 'entityencoded', 'xml', 'text') NOT NULL,
 					itpr_renderers                TEXT NOT NULL,
 					itpr_content_prerendered      TEXT NULL,
-					itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+					itpr_datemodified             TIMESTAMP NOT NULL,
 					PRIMARY KEY (itpr_itm_ID, itpr_format)
 				)" );
 		echo "OK.<br />\n";
@@ -3457,7 +3457,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Creating mail log table...' );
 		$DB->query( 'CREATE TABLE '.$tableprefix.'mail__log (
 		  emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-		  emlog_timestamp TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+		  emlog_timestamp TIMESTAMP NOT NULL,
 		  emlog_to        VARCHAR(255) DEFAULT NULL,
 		  emlog_success   TINYINT(1) NOT NULL DEFAULT 0,
 		  emlog_subject   VARCHAR(255) DEFAULT NULL,
@@ -3621,7 +3621,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  emret_ID        INT(10) UNSIGNED NOT NULL auto_increment,
 			  emret_address   VARCHAR(255) DEFAULT NULL,
 			  emret_errormsg  VARCHAR(255) DEFAULT NULL,
-			  emret_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			  emret_timestamp TIMESTAMP NOT NULL,
 			  emret_headers   TEXT DEFAULT NULL,
 			  emret_message   TEXT DEFAULT NULL,
 			  emret_errtype   CHAR(1) NOT NULL DEFAULT 'U',
@@ -4116,7 +4116,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			cmpr_format ENUM('htmlbody','entityencoded','xml','text') NOT NULL,
 			cmpr_renderers TEXT NOT NULL,
 			cmpr_content_prerendered MEDIUMTEXT NULL,
-			cmpr_datemodified TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			cmpr_datemodified TIMESTAMP NOT NULL,
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
 		) ENGINE = innodb" );
 		db_add_col( 'T_comments', 'comment_renderers', "TEXT NOT NULL AFTER comment_content" );
@@ -5109,7 +5109,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				mspr_format              ENUM("htmlbody","entityencoded","xml","text") COLLATE ascii_general_ci NOT NULL,
 				mspr_renderers           TEXT NOT NULL,
 				mspr_content_prerendered MEDIUMTEXT NULL,
-				mspr_datemodified        TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				mspr_datemodified        TIMESTAMP NOT NULL,
 				PRIMARY KEY (mspr_msg_ID, mspr_format)
 			) ENGINE = innodb' );
 		db_add_col( 'T_messaging__message', 'msg_renderers', 'TEXT NOT NULL' );
@@ -5140,7 +5140,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Create table for System log... ' );
 		$DB->query( "CREATE TABLE T_syslog (
 			slg_ID        INT NOT NULL AUTO_INCREMENT,
-			slg_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			slg_timestamp TIMESTAMP NOT NULL,
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
 			slg_origin_ID INT UNSIGNED NULL,
 			slg_object    ENUM('comment', 'item', 'user') COLLATE ascii_general_ci,

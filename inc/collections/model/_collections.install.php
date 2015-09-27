@@ -240,7 +240,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			itpr_content_prerendered      MEDIUMTEXT NULL,
-			itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			itpr_datemodified             TIMESTAMP NOT NULL,
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -251,7 +251,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			cmpr_content_prerendered      MEDIUMTEXT NULL,
-			cmpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			cmpr_datemodified             TIMESTAMP NOT NULL,
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
