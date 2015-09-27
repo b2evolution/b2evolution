@@ -6510,6 +6510,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE evo_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
  		task_end();
 
+		task_begin( 'Updating defaults for timestamp fields...' );
+		$DB->query( 'ALTER TABLE evo_email__log ALTER COLUMN emlog_timestamp SET DEFAULT "2000-01-01 00:00:00"' );
+		$DB->query( 'ALTER TABLE evo_email__returns ALTER COLUMN emret_timestamp SET DEFAULT "2000-01-01 00:00:00"' );
+		$DB->query( 'ALTER TABLE evo_syslog ALTER COLUMN slg_timestamp SET DEFAULT "2000-01-01 00:00:00"' );
+		$DB->query( 'ALTER TABLE evo_items__prerendering ALTER COLUMN itpr_datemodified SET DEFAULT "2000-01-01 00:00:00"' );
+		$DB->query( 'ALTER TABLE evo_comments__prerendering ALTER COLUMN cmpr_datemodified SET DEFAULT "2000-01-01 00:00:00"' );
+		$DB->query( 'ALTER TABLE evo_messaging__prerendering ALTER COLUMN mspr_datemodified SET DEFAULT "2000-01-01 00:00:00"' );
+ 		task_end();
+
 		// set_upgrade_checkpoint( '11483' );
 	}
 
