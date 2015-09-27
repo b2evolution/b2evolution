@@ -325,7 +325,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( empty($old_db_version) )
 	{
 		echo '<p><strong>OOPS! b2evolution doesn\'t seem to be installed yet.</strong></p>';
-		return;
+		return false;
 	}
 
 	echo $old_db_version, ' : ';
@@ -6746,7 +6746,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$Form->hidden( 'locale', $locale );
 
 
-			echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions...').'</p>';
+			echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen if you\'ve been using development versions directly off GitHub...').'</p>';
 
 			echo '<p>'.T_('The following database changes will be carried out. If you are not sure what this means, it will probably be alright.').'</p>';
 
@@ -6757,10 +6757,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				echo '<li><pre>'.str_replace( "\t", '  ', $l_delta ).'</pre></li>';
 			}
 			echo '</ul>';
-			$Form->submit( array( '', T_('Upgrade database!'), 'ActionButton' ) );
+			$Form->submit( array( '', T_('Try to Repair/Upgrade database now!'), 'btn-warning' ) );
 			$Form->end_form();
 
-			return false;
+			return 'need-fix';
 		}
 
 		// Alter DB to match DB schema:

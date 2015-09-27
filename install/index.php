@@ -990,7 +990,10 @@ switch( $action )
 		evo_flush();
 
 		$not_evoupgrade = ( $action !== 'evoupgrade' );
-		if( upgrade_b2evo_tables( $action ) )
+
+		$upgrade_result = upgrade_b2evo_tables( $action );
+
+		if( $upgrade_result === true )
 		{
 			if( $not_evoupgrade )
 			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
@@ -1006,7 +1009,7 @@ switch( $action )
 			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
 
 			?>
-			<p class="text-success"><evo:success><?php echo $upgrade_result_title; ?></evo:success></p>
+			<p class="alert alert-success"><evo:success><?php echo $upgrade_result_title; ?></evo:success></p>
 			<p><?php echo $upgrade_result_body; ?></p>
 			<?php
 
@@ -1019,9 +1022,13 @@ switch( $action )
 			{ // disable maintenance mode at the end of the upgrade script
 				switch_maintenance_mode( false, 'upgrade' );
 			}
-			?>
-			<p class="text-danger"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
-			<?php
+
+			if( $upgrade_result != 'need-fix' )
+			{
+				?>
+				<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
+				<?php
+			}
 			// A link to back to install menu
 			display_install_back_link();
 		}
