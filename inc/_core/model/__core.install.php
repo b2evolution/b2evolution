@@ -265,7 +265,7 @@ $schema_queries = array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
-			uset_name    VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			uset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			uset_value   VARCHAR( 255 ) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -301,7 +301,7 @@ $schema_queries = array(
 		"CREATE TABLE T_pluginusersettings (
 			puset_plug_ID INT(11) UNSIGNED NOT NULL,
 			puset_user_ID INT(11) UNSIGNED NOT NULL,
-			puset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			puset_value TEXT NULL,
 			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

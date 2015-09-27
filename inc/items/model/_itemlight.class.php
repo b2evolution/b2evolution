@@ -1320,7 +1320,7 @@ class ItemLight extends DataObject
 	 */
 	function get_excerpt( $format = 'htmlbody' )
 	{
-		// Character conversions
+		// Character conversions + old DBs may have tags in excerpts, so we strip them:
 		return format_to_output( utf8_strip_tags( $this->excerpt ), $format );
 	}
 
