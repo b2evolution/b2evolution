@@ -829,7 +829,7 @@ input.btn-lg {
   }
 }
 .evo_content_block table {
-  margin: 1em auto;
+  margin: 1em 0;
 }
 .evo_content_block table th {
   border: 1px solid #ddd;

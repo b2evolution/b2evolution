@@ -1326,15 +1326,6 @@ ul.jslog_error {
   background: #fbf2ee;
   color: #e00;
 }
-.item_custom_fields {
-  border: none;
-  margin-bottom: 10px;
-  border-collapse: collapse;
-}
-.item_custom_fields th,
-.item_custom_fields td {
-  padding: 0 10px 0 0;
-}
 .item_custom_fields th {
   text-align: left;
 }
@@ -2262,7 +2253,7 @@ input.btn-lg {
   }
 }
 .evo_content_block table {
-  margin: 1em auto;
+  margin: 1em 0;
 }
 .evo_content_block table th {
   border: 1px solid #ddd;
