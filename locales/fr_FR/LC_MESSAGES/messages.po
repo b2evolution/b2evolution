@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
 "POT-Creation-Date: 2015-09-26 15:44+0200\n"
-"PO-Revision-Date: 2015-09-27 21:32+0000\n"
+"PO-Revision-Date: 2015-09-27 23:17+0000\n"
 "Last-Translator: Francois Planque\n"
 "Language-Team: French (France) (http://www.transifex.com/fplanque/b2evolution/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -18235,7 +18235,7 @@ msgstr "Le plugin requiert les modifications de base de donnée suivantes."
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
-msgstr "Les modifications suivantes vont être effectuées sur la base de données. Si vous n'êtes pas sûr de ce que celà signifie, il n'y aura probablement pas de problème."
+msgstr "Les modifications suivantes vont être effectuées sur la base de données. Si vous n'êtes pas sûr de ce que cela signifie, il n'y aura probablement pas de problème."
 
 #: ../../../inc/plugins/plugins.ctrl.php:923
 msgid "Install!"
@@ -29603,7 +29603,7 @@ msgid ""
 "[teaserbreak]\n"
 "\n"
 "<p>This is the extended text. You only see it when you have clicked the \"more\" link.</p>"
-msgstr "<p>Ceci est un sujet étendu. Celà signifie que vous voyez seulement cette courte accroche et que vous devez cliquer sur le lien ci-dessous pour en voir plus.</p>\n\n[teaserbreak]\n\n<p>Ceci est le texte étendu. Vous ne le voyez que lorsque vous avez cliqué sur le lien \"lire la suite\".</p>"
+msgstr "<p>Ceci est un sujet étendu. Cela signifie que vous voyez seulement cette courte accroche et que vous devez cliquer sur le lien ci-dessous pour en voir plus.</p>\n\n[teaserbreak]\n\n<p>Ceci est le texte étendu. Vous ne le voyez que lorsque vous avez cliqué sur le lien \"lire la suite\".</p>"
 
 #: ../../../install/_functions_create.php:2302
 #: ../install/_functions_create.php:2692
@@ -29757,7 +29757,7 @@ msgstr "Mise à jour de la base de données!"
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen with CVS versions..."
-msgstr "Le numero de version est correct, mais nous avons détecté des changements dans le schéma de la base. Celà peut arriver avec les version CVS..."
+msgstr "Le numero de version est correct, mais nous avons détecté des changements dans le schéma de la base. Cela peut arriver avec les version CVS..."
 
 #: ../../../install/_functions_evoupgrade.php:6756
 msgid "Upgrade database!"
@@ -30467,7 +30467,7 @@ msgstr "Mise à jour terminée avec succès!"
 msgid ""
 "Now you can <a %s>log in</a> with your usual b2evolution username and "
 "password."
-msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec vos identifiant et mot de passe b2evolution habituels."
+msgstr "Vous pouvez maintenant <a %s>vous connecter</a> avec votre identifiant et votre mot de passe b2evolution habituels."
 
 #: ../../../install/index.php:1047
 msgid "Deletion in progress"
