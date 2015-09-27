@@ -155,8 +155,20 @@ class AdminUI_general extends Menu
 	 */
 	function init_templates()
 	{
+		global $Hit;
+
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+
+		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// IE < 9
+			global $Messages, $debug;
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+			if( $debug )
+			{
+				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+			}
+		}
 	}
 
 	/**
@@ -1515,20 +1527,7 @@ class AdminUI_general extends Menu
 	{
 		global $app_footer_text, $copyright_text;
 
-		global $Hit;
-
-		$r = '';
-
-		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
-		{ // Warning for IE 9 and less
-			$r .= '<div style="text-align:center; color:#f00; font-weight:bold;">'
-				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
-				.'</div>';
-		}
-
-		$r .= '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
-
-		return $r;
+		return '<div class="footer">'.$app_footer_text.' &ndash; '.$copyright_text."</div>\n\n";
 	}
 
 

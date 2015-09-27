@@ -174,6 +174,9 @@ $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 $AdminUI->breadcrumbpath_add( T_('phpBB Importer'), $admin_url.'?ctrl=phpbbimport' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'phpbb-import' );
+
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

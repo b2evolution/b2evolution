@@ -181,6 +181,19 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'create':
+	case 'preview':
+		$AdminUI->set_page_manual_link( 'messages-new-thread' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'conversations-list' );
+		break;
+}
+
 // Display messages depending on user email status
 display_user_email_status_message();
 

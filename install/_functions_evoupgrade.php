@@ -325,7 +325,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( empty($old_db_version) )
 	{
 		echo '<p><strong>OOPS! b2evolution doesn\'t seem to be installed yet.</strong></p>';
-		return;
+		return false;
 	}
 
 	echo $old_db_version, ' : ';
@@ -606,7 +606,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$query = "ALTER TABLE T_users
 							ADD COLUMN user_notify tinyint(1) NOT NULL default 1,
 							ADD COLUMN user_grp_ID int(4) NOT NULL default 1,
-							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login',
+							MODIFY COLUMN user_idmode varchar(20) NOT NULL DEFAULT 'login'";
+		$DB->query( $query );
+
+		$query = "ALTER TABLE T_users
 							ADD KEY user_grp_ID (user_grp_ID)";
 		$DB->query( $query );
 		echo "OK.<br />\n";
@@ -689,10 +692,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							CHANGE COLUMN post_lang post_locale varchar(20) NOT NULL default 'en-EU',
 							DROP COLUMN post_url,
 							CHANGE COLUMN post_trackbacks post_url varchar(250) NULL default NULL,
-							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default',
-							DROP INDEX post_date,
+							ADD COLUMN post_renderers VARCHAR(179) NOT NULL default 'default'";
+		$DB->query( $query );
+
+		$query = "ALTER TABLE {$tableprefix}posts
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
+		$DB->query( $query );
+		
+		$query = "ALTER TABLE {$tableprefix}posts
+					DROP INDEX post_date";
 		$DB->query( $query );
 
 		$query = "UPDATE {$tableprefix}posts
@@ -1028,9 +1037,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
 							ADD COLUMN blog_media_subdir VARCHAR( 255 ) NOT NULL AFTER blog_media_location,
 							ADD COLUMN blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
-							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath,
-							DROP INDEX blog_stub,
+							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath";
+		$DB->query( $query );
+
+		$query = "ALTER TABLE T_blogs
 							ADD UNIQUE blog_urlname ( blog_urlname )";
+		$DB->query( $query );
+
+		$query = "ALTER TABLE T_blogs
+							DROP INDEX blog_stub";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -1065,11 +1080,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{
 		echo 'Upgrading posts table... ';
 		$query = "ALTER TABLE {$tableprefix}posts
-							DROP COLUMN post_karma,
-							DROP COLUMN post_autobr,
 							DROP INDEX post_author,
 							DROP INDEX post_issue_date,
-							DROP INDEX post_category,
+							DROP INDEX post_category";
+		$DB->query( $query );
+		
+		$query = "ALTER TABLE {$tableprefix}posts
+							DROP COLUMN post_karma,
+							DROP COLUMN post_autobr,
 							CHANGE COLUMN ID post_ID int(11) unsigned NOT NULL auto_increment,
 							CHANGE COLUMN post_author	post_creator_user_ID int(11) unsigned NOT NULL,
 							CHANGE COLUMN post_issue_date	post_datestart datetime NOT NULL,
@@ -1084,7 +1102,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD post_ptyp_ID					int(11) unsigned NULL AFTER post_pst_ID,
 							ADD post_views						int(11) unsigned NOT NULL DEFAULT 0 AFTER post_flags,
 							ADD post_commentsexpire		datetime DEFAULT NULL AFTER post_comments,
-							ADD post_priority					int(11) unsigned null,
+							ADD post_priority					int(11) unsigned null";
+		$DB->query( $query );
+
+		$query = "ALTER TABLE {$tableprefix}posts
 							ADD INDEX post_creator_user_ID( post_creator_user_ID ),
 							ADD INDEX post_parent_ID( post_parent_ID ),
 							ADD INDEX post_assigned_user_ID( post_assigned_user_ID ),
@@ -1428,7 +1449,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 										ADD COLUMN plug_apply_rendering ENUM( \'stealth\', \'always\', \'opt-out\', \'opt-in\', \'lazy\', \'never\' ) NOT NULL DEFAULT \'never\' AFTER plug_code,
 										ADD COLUMN plug_version         VARCHAR(42) NOT NULL default \'0\' AFTER plug_apply_rendering,
 										ADD COLUMN plug_status          ENUM( \'enabled\', \'disabled\', \'needs_config\', \'broken\' ) NOT NULL AFTER plug_version,
-										ADD COLUMN plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plug_status,
+										ADD COLUMN plug_spam_weight     TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plug_status');
+		$DB->query( 'ALTER TABLE T_plugins
 										ADD UNIQUE plug_code( plug_code ),
 										ADD INDEX plug_status( plug_status )' );
 		task_end();
@@ -2115,7 +2137,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 										MODIFY COLUMN post_datestart DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 										MODIFY COLUMN post_datemodified DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\',
 										ADD COLUMN post_order    float NULL AFTER post_priority,
-										ADD COLUMN post_featured tinyint(1) NOT NULL DEFAULT 0 AFTER post_order,
+										ADD COLUMN post_featured tinyint(1) NOT NULL DEFAULT 0 AFTER post_order');
+		$DB->query( 'ALTER TABLE T_items__item
 										ADD INDEX post_order( post_order )' );
 		task_end();
 
@@ -2916,7 +2939,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						MODIFY COLUMN link_itm_ID int(11) unsigned NULL,
 						MODIFY COLUMN link_creator_user_ID int(11) unsigned NULL,
 						MODIFY COLUMN link_lastedit_user_ID int(11) unsigned NULL,
-						ADD COLUMN link_cmt_ID int(11) unsigned NULL COMMENT "Used for linking files to comments (comment attachments)" AFTER link_itm_ID,
+						ADD COLUMN link_cmt_ID int(11) unsigned NULL COMMENT "Used for linking files to comments (comment attachments)" AFTER link_itm_ID');
+		$DB->query( 'ALTER TABLE T_links
 						ADD INDEX link_cmt_ID ( link_cmt_ID )' );
 		task_end();
 
@@ -3584,7 +3608,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_users', 'user_email_dom_ID', 'int(10) unsigned NULL' );
 		$DB->query( 'ALTER TABLE T_users CHANGE dateYMDhour user_created_datetime DATETIME NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		db_add_col( 'T_users', 'user_reg_ctry_ID', 'int(10) unsigned NULL AFTER user_age_max' );
-		db_add_col( 'T_users', 'user_profileupdate_ts', 'timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP' );
+		db_add_col( 'T_users', 'user_profileupdate_ts', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP' );
 		$DB->query( 'ALTER TABLE T_users ADD INDEX user_email ( user_email )' );
 		task_end();
 
@@ -4542,8 +4566,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Upgrading Comments table...' );
 		$DB->query( 'ALTER TABLE T_comments
 			CHANGE comment_post_ID   comment_item_ID        int(11) unsigned NOT NULL default 0,
-			CHANGE comment_author_ID comment_author_user_ID int unsigned NULL default NULL,
-			DROP INDEX comment_post_ID,
+			CHANGE comment_author_ID comment_author_user_ID int unsigned NULL default NULL');
+		$DB->query( 'ALTER TABLE T_comments
+			DROP INDEX comment_post_ID');
+		$DB->query( 'ALTER TABLE T_comments
 			ADD KEY comment_item_ID ( comment_item_ID )' );
 		task_end();
 
@@ -4592,9 +4618,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE emblk_spamerror_count       emadr_spamerror_count       INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			CHANGE emblk_othererror_count      emadr_othererror_count      INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			CHANGE emblk_last_sent_ts          emadr_last_sent_ts          TIMESTAMP NULL,
-			CHANGE emblk_last_error_ts         emadr_last_error_ts         TIMESTAMP NULL,
-			DROP INDEX emblk_address,
+			CHANGE emblk_last_error_ts         emadr_last_error_ts         TIMESTAMP NULL");
+		$DB->query( "ALTER TABLE T_email__address
 			ADD UNIQUE emadr_address ( emadr_address )" );
+		$DB->query( "ALTER TABLE T_email__address
+			DROP INDEX emblk_address");
 		task_end();
 
 		// Add new email status 'redemption'
@@ -4653,9 +4681,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE COLUMN hit_serprank      hit_serprank      SMALLINT UNSIGNED DEFAULT NULL,
 			CHANGE COLUMN hit_blog_ID       hit_coll_ID       INT(10) UNSIGNED NULL DEFAULT NULL,
 			CHANGE COLUMN hit_response_code hit_response_code SMALLINT DEFAULT NULL,
-			ADD COLUMN hit_agent_ID SMALLINT UNSIGNED NULL DEFAULT NULL AFTER hit_agent_type,
-			DROP INDEX hit_blog_ID,
+			ADD COLUMN hit_agent_ID SMALLINT UNSIGNED NULL DEFAULT NULL AFTER hit_agent_type' );
+		$DB->query( 'ALTER TABLE T_hitlog
+			DROP INDEX hit_blog_ID');
+		$DB->query( 'ALTER TABLE T_hitlog
 			ADD KEY hit_coll_ID ( hit_coll_ID )' );
+
 		task_end();
 
 		set_upgrade_checkpoint( '11208' );
@@ -5430,9 +5461,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrade table posts... ' );
 		$DB->query( 'ALTER TABLE T_items__item
-			CHANGE post_ptyp_ID post_ityp_ID int(10) unsigned NOT NULL DEFAULT 1,
-			DROP INDEX post_ptyp_ID ,
-			ADD INDEX post_ityp_ID ( post_ityp_ID )' );
+            CHANGE post_ptyp_ID post_ityp_ID int(10) unsigned NOT NULL DEFAULT 1');
+        $DB->query( 'ALTER TABLE T_items__item
+            DROP INDEX post_ptyp_ID');
+		$DB->query( 'ALTER TABLE T_items__item
+            ADD INDEX post_ityp_ID ( post_ityp_ID )');
 		task_end();
 
 		task_begin( 'Upgrade table post types... ' );
@@ -6425,8 +6458,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11482 )
-	{ // part 18.s.2 trunk aka 20th part of "i7"
-
+	{ // v6.6.3
 		task_begin( 'Updating default post types for forums and manual collections... ' );
 		$item_types = array(
 				'manual' => array( 'ID' => 100, 'name' => 'Manual Page' ),
@@ -6460,7 +6492,25 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		task_end();
 
-		// set_upgrade_checkpoint( '11482' );
+		set_upgrade_checkpoint( '11482' );
+	}
+
+	if( $old_db_version < 11483 )
+	{ // v6.6.4
+
+		task_begin( 'Updating general settings...' );
+		$DB->query( 'UPDATE T_settings
+				SET set_value = '.$DB->quote( 'no' ).'
+			WHERE set_name = '.$DB->quote( 'newusers_canregister' ).'
+				AND set_value = '.$DB->quote( '0' ) );
+		task_end();
+
+		task_begin( 'Updating user settings...' );
+		$DB->query( 'ALTER TABLE T_users__usersettings CHANGE COLUMN uset_name uset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		$DB->query( 'ALTER TABLE T_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+ 		task_end();
+
+		// set_upgrade_checkpoint( '11483' );
 	}
 
 	/*
@@ -6696,7 +6746,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$Form->hidden( 'locale', $locale );
 
 
-			echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions...').'</p>';
+			echo '<p>'.T_('The version number is correct, but we have detected changes in the database schema. This can happen if you\'ve been using development versions directly off GitHub...').'</p>';
 
 			echo '<p>'.T_('The following database changes will be carried out. If you are not sure what this means, it will probably be alright.').'</p>';
 
@@ -6707,10 +6757,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				echo '<li><pre>'.str_replace( "\t", '  ', $l_delta ).'</pre></li>';
 			}
 			echo '</ul>';
-			$Form->submit( array( '', T_('Upgrade database!'), 'ActionButton' ) );
+			$Form->submit( array( '', T_('Try to Repair/Upgrade database now!'), 'btn-warning' ) );
 			$Form->end_form();
 
-			return false;
+			return 'need-fix';
 		}
 
 		// Alter DB to match DB schema:

@@ -196,6 +196,9 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'user-field-group-form' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

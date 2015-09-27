@@ -194,11 +194,16 @@ switch( $tab )
 {
 	case 'eblog':
 		$AdminUI->breadcrumbpath_add( T_('Post by Email'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
+
+		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'post-by-email' );
 		break;
 
 	case 'xmlrpc':
 		$AdminUI->breadcrumbpath_add( T_('XML-RPC'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'xml-rpc' );
 		break;
 }
 

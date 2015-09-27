@@ -45,7 +45,7 @@ $FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
 $import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
 if( $import_perm_view )
 { // Current user must has access to the import dir
-	if( $current_User->check_perm( 'files', 'edit', false, $FileRoot ) )
+	if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 	{ // User has full access
 		$import_title = T_('Upload/Manage import files');
 	}

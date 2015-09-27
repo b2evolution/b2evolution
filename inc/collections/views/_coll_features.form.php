@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog;
+global $edited_Blog, $AdminUI;
 
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
@@ -108,18 +108,33 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
 
-	$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses('notes-string'), T_('Default status'), T_('Default status for new posts') );
+	if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	{	// Use dropdown for bootstrap skin:
+		$default_status_field = get_status_dropdown_button( array(
+				'name'         => 'default_post_status',
+				'value'        => $edited_Blog->get_setting('default_post_status'),
+				'title_format' => 'notes-string',
+			) );
+		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
+		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
+		echo_form_dropdown_js();
+	}
+	else
+	{	// Use standard select element for other skins:
+		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string' ), T_('Default status'), T_('Default status for new posts') );
+	}
 
 	// Moderation statuses setting
 	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
 	// Get moderation statuses with status text
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
+	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'post_moderation_statuses' );
 	$checklist_options = array();
 	foreach( $moderation_statuses as $status => $status_text )
 	{ // Add a checklist option for each possible modeartion status
 		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'post_notif_'.$status, 1, $status_text, $is_checked );
+		$checklist_options[] = array( 'post_notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('Post moderation reminder statuses'), false, false, array( 'note' => 'Posts with the selected statuses will be notified on the "Send reminders about posts awaiting moderation" scheduled job.' ) );
 

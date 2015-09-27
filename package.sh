@@ -8,3 +8,7 @@ rm -f readme.template.html
 rm -f .bower.json
 echo Removing myself now
 rm -f cleanup.sh
+echo Stepping out
+cd ..
+echo Compressing
+zip -qr9 b2evolution.zip b2evolution 

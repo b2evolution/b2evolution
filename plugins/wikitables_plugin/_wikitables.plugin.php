@@ -84,10 +84,10 @@ See manual for more.');
 		$content = & $params['data'];
 
 		// Parse wiki tables
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '```' ) !== false )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
+				'~(```|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 				array( $this, 'parse_tables' ) );
 		}
 		else

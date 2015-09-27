@@ -446,6 +446,7 @@ switch( $action )
 
 
 	case 'update_settings':
+	case 'update_edit_settings':
 		// Update plugin settings:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -607,7 +608,7 @@ switch( $action )
 			$Plugins->set_Plugin_status( $edit_Plugin, 'enabled' );
 		}
 
-		if( ! $Messages->has_errors() )
+		if( $action == 'update_settings' && ! $Messages->has_errors() )
 		{ // there were no errors, go back to list:
 			//save fadeout item
 			$Session->set('fadeout_id', $edit_Plugin->ID);
@@ -844,6 +845,16 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Plugin configuration'), $admin_url.'?ctrl=plugins' );
+
+// Set an url for manual page:
+if( $action == 'list_available' )
+{
+	$AdminUI->set_page_manual_link( 'plugins-available-for-installation' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'installed-plugins' );
+}
 
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 

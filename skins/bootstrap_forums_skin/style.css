@@ -24,8 +24,8 @@
 .evo_comment_text {
   padding-right: 0px;
 }
-.evo_comment_avatar span img,
-.evo_comment_avatar a img {
+.evo_comment_avatar > span > img,
+.evo_comment_avatar > a > img {
   border-radius: 50%;
   float: none !important;
   margin: 0px 0px 14px 0px !important;
@@ -70,14 +70,6 @@ ol.breadcrumb {
   vertical-align: top;
   margin: 0 auto;
   margin-left: -76px;
-}
-.forums_list .panel-heading:not(:first-child) {
-  border-top: 1px solid #ddd;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
 }
 .forums_list .panel-heading h2 {
   margin-top: 0;
@@ -319,6 +311,9 @@ ol.breadcrumb {
   height: 0;
   clear: both;
 }
+.legends {
+  text-align: center;
+}
 .legends legend {
   text-align: center;
   border: none;
@@ -338,6 +333,7 @@ ol.breadcrumb {
 }
 .legend-item {
   margin: 0px 5px 12px 5px;
+  display: inline-block;
 }
 ul.legend {
   list-style: none;
@@ -510,10 +506,10 @@ ul.legend span.note {
 .single_topic .evo_content_block .panel-body .ft_avatar {
   padding: 0px;
   text-align: center;
-}
-.single_topic .evo_content_block .panel-body .ft_avatar span img.loadimg,
-.single_topic .evo_content_block .panel-body .ft_avatar a img.loadimg {
-  border-radius: 50% !important;
+  /* @MILOS > Still testing to see if this is overrulled by: line 992
+				span > img.loadimg, a > img.loadimg {
+					border-radius: 50% !important;
+				}*/
 }
 .single_topic .evo_content_block .panel-body .post_main {
   padding-right: 0px;
@@ -571,11 +567,14 @@ label.control-label[for=post_title] {
   padding: 10px;
   margin-left: 10px;
 }
+.btn_recent_topics {
+  margin: 0 0 20px 5px;
+}
 .widget_core_coll_search_form {
   float: right;
   width: 40%;
   min-width: 250px;
-  margin-bottom: 20px;
+  margin: 0 0 20px 5px;
 }
 .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
@@ -602,6 +601,9 @@ label.control-label[for=post_title] {
 .evo_search_navigation strong,
 .evo_search_navigation a {
   margin: 0px 3px;
+}
+.evo_search_list .evo_search_list__row {
+  padding: 15px 0;
 }
 @media screen and (max-width: 1199px) {
   .front_panel .ft_count {
@@ -903,4 +905,20 @@ a.to_top {
   -ms-border-radius: 4px !important;
   -o-border-radius: 4px !important;
   border-radius: 4px !important;
+}
+.forums_list.front_panel {
+  border-bottom: 0px !important;
+}
+.forums_list.front_panel .table {
+  border-bottom: 1px solid #ddd;
+}
+.forums_list.front_panel .table:nth-last-child(1) {
+  border-radius: 0px 0px 4px 4px;
+}
+.ft_avatar > a > img,
+.ft_avatar > span > img {
+  border-radius: 50% !important;
+}
+.evo_comment_avatar > a:hover {
+  background-color: transparent !important;
 }

@@ -69,8 +69,6 @@ function skin_init( $disp )
 
 	global $Session, $current_User;
 
-	global $search_result_loaded;
-
 	$Timer->resume( 'skin_init' );
 
 	if( empty($disp_detail) )
@@ -102,25 +100,22 @@ function skin_init( $disp )
 			{
 				$post_navigation = $Blog->get_setting( 'post_navigation' );
 			}
+
+			if( ! empty( $MainList ) && $MainList->single_post &&
+			    $single_Item = & mainlist_get_item() )
+			{	// If we are currently viewing a single post
+				// We assume the current user will have read the entire post and all its current comments:
+				$single_Item->update_read_timestamps( true, true );
+				// Restart the items list:
+				$MainList->restart();
+			}
 			break;
 
 		case 'search':
 			// Searching post, comments and categories
 			load_funcs( 'collections/_search.funcs.php' );
-
-			$search_keywords = param( 's', 'string', '', true );
-			$search_params = $Session->get( 'search_params' );
-			$search_result = $Session->get( 'search_result' );
-			$search_result_loaded = false;
-			if( empty( $search_params ) || ( $search_params['search_keywords'] != $search_keywords )
-				|| ( $search_params['search_blog'] != $Blog->ID ) || ( $search_result === NULL ) )
-			{ // this is a new search
-				$search_params = array( 'search_keywords' => $search_keywords, 'search_blog' => $Blog->ID );
-				$search_result = score_search_result( $search_keywords );
-				$Session->set( 'search_params', $search_params );
-				$Session->set( 'search_result', $search_result );
-				$search_result_loaded = true;
-			}
+			// Check previous search keywords so it can be displayed in the search input box
+			param( 's', 'string', '', true );
 			break;
 	}
 
@@ -1573,9 +1568,14 @@ var downloadInterval = setInterval( function()
 	}
 
 	global $Hit;
-	if( $Hit->is_IE( 9, '<' ) )
+	if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 	{ // IE < 9
+		global $debug;
 		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+		if( $debug )
+		{
+			$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+		}
 	}
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"

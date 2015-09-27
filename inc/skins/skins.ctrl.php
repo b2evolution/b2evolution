@@ -255,6 +255,18 @@ else
 	$AdminUI->breadcrumbpath_add( T_('Manage skins'), $admin_url.'?ctrl=skins' );
 }
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'skin-settings' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'manage-skins' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

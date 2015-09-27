@@ -67,7 +67,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents') );
+	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
 
 	echo '<table cellspacing="0" class="compose_layout" align="center">';
 

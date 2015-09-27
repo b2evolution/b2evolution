@@ -2675,7 +2675,7 @@ class Comment extends DataObject
 			}
 			else
 			{ // Set default position for preview files
-				$link_position = ( $index == 0 ) ? 'teaser' : 'aftermore';
+				$link_position = 'aftermore';
 			}
 
 			$File = $attachment;
@@ -4073,16 +4073,6 @@ class Comment extends DataObject
 		{ // If the comment was not deleted then update last touched date
 			$this->set_param( 'last_touched_ts', 'date', $timestamp );
 			$this->dbupdate();
-		}
-
-		if( is_logged_in() )
-		{
-			$max_comment_last_touched = load_comments_last_touched( array( $this->item_ID ), $this->ID );
-			$user_read_dates = $comment_Item->get_read_dates();
-			if( empty( $max_comment_last_touched[$this->item_ID] ) || ( ( $user_read_dates['comment'] < $timestamp ) && ( $user_read_dates['comment'] >= $max_comment_last_touched[$this->item_ID] ) ) )
-			{ // Update current user comments read date on this comment's post
-				$comment_Item->update_read_date( 'comment' );
-			}
 		}
 
 		if( $update_item_date )

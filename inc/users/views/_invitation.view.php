@@ -27,7 +27,7 @@ $count_SQL->FROM( 'T_users__invitation_code' );
 
 $Results = new Results( $SQL->get(), 'ivc_', '-D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Invitation codes').get_manual_link( 'invitation-codes-tab' );
+$Results->title = T_('Invitation codes').get_manual_link( 'invitation-codes-list' );
 
 /*
  * Table icons:

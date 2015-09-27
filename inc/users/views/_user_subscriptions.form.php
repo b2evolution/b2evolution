@@ -321,8 +321,10 @@ else
 		$blogs_settings_SQL->WHERE( 'cset_name = \'allow_subscriptions\'' );
 		$blogs_settings_SQL->WHERE_and( 'cset_value = 0' );
 		$blogs_disabled_subscriptions_IDs = $DB->get_col( $blogs_settings_SQL->get() );
-		// Exclude the blogs which don't allow the subscriptions
-		$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $blogs_disabled_subscriptions_IDs ).')' );
+		if( count( $blogs_disabled_subscriptions_IDs ) )
+		{	// Exclude the blogs which don't allow the subscriptions
+			$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $blogs_disabled_subscriptions_IDs ).')' );
+		}
 	}
 	if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
 	{	// If a subscribing to new blogs available only for the public blogs
@@ -367,10 +369,13 @@ else
 				array( 'sub_items_new',    '1', T_('All posts'),    0 ),
 				array( 'sub_comments_new', '1', T_('All comments'), 0 )
 			);
+		$label_suffix = $Form->label_suffix;
+		$Form->label_suffix = '';
 		$Form->checklist( $subscriptions, 'subscribe_blog', trim( $subscribe_blogs_select ), false, false, array(
 			'field_suffix' => $subscribe_blogs_button,
 			'input_prefix' => '<div class="floatleft">',
 			'input_suffix' => '</div>' ) );
+		$Form->label_suffix = $label_suffix;
 	}
 }
 $Form->end_fieldset();

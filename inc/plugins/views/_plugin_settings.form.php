@@ -98,21 +98,14 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 
 
 // --------------------------- VARIABLES ---------------------------
-$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
+$Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear', 'fold' => true, 'id' => 'plugin_vars' ) );
 	$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
 	$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
 $Form->end_fieldset();
 
 
 // --------------------------- EVENTS ---------------------------
-$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') '.get_icon( 'collapse', 'imgtag', array( 'id' => 'clickimg_pluginevents' ) ),
-											 array('legend_params' => array( 'onclick' => 'toggle_clickopen(\'pluginevents\')') )
-											 );
-	?>
-
-	<div id="clickdiv_pluginevents">
-
-	<?php
+$Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') ', array( 'fold' => true, 'id' => 'plugin_events' ) );
 
 	if( $edit_Plugin->status != 'enabled' )
 	{
@@ -139,28 +132,18 @@ $Form->begin_fieldset( T_('Plugin events').' ('.T_('Advanced').') '.get_icon( 'c
 	{
 		echo T_( 'This plugin has no registered events.' );
 	}
-	?>
 
-	</div>
-
-	<?php
 $Form->end_fieldset();
-?>
 
-
-<script type="text/javascript">
-	<!--
-	toggle_clickopen('pluginevents');
-	// -->
-</script>
-
-<?php
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & Edit...') ),
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
 		) );
 }
 $Form->end_form();
 
+// Fieldset folding
+echo_fieldset_folding_js();
 ?>

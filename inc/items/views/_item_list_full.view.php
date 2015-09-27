@@ -69,7 +69,7 @@ if( $action == 'view' )
 }
 else
 { // We are displaying multiple posts ( Not a single post! )
-	$block_item_Widget->title = T_('Posts Browser');
+	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
 	if( $ItemList->is_filtered() )
 	{ // List is filtered, offer option to reset filters:
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
@@ -273,8 +273,10 @@ while( $Item = & $ItemList->get_item() )
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('View').'</a>';
 			}
 
-			if( isset($GLOBALS['files_Module']) && $current_User->check_perm( 'files', 'view' ) )
-			{
+			if( isset( $GLOBALS['files_Module'] )
+			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
+			    && $current_User->check_perm( 'files', 'view' ) )
+			{	// Display a button to view the files of the post only if current user has a permissions:
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
 							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Files').'</a>';
 			}

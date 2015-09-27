@@ -1904,15 +1904,6 @@ ul.jslog_error {
   background: #fbf2ee;
   color: #e00;
 }
-.item_custom_fields {
-  border: none;
-  margin-bottom: 10px;
-  border-collapse: collapse;
-}
-.item_custom_fields th,
-.item_custom_fields td {
-  padding: 0 10px 0 0;
-}
 .item_custom_fields th {
   text-align: left;
 }
@@ -2412,11 +2403,17 @@ div.results {
   width: 100%;
   overflow: auto;
 }
+table.ratings_table td {
+  border: none;
+  padding: 10px;
+}
 table.rating_summary {
   float: left;
+  margin: 0;
 }
 table.rating_summary th,
 table.rating_summary td {
+  border: none;
   font-size: 10px;
   line-height: 13px;
   font-weight: normal;
@@ -2424,11 +2421,13 @@ table.rating_summary td {
 }
 table.rating_summary th {
   padding-right: 5px;
+  background-color: transparent;
 }
 table.rating_summary .progress {
   width: 60px;
   background: #eeeecc;
   padding: 0;
+  box-shadow: none;
 }
 table.rating_summary .progress div {
   background: #ffcc66;
@@ -2758,6 +2757,18 @@ div.results span[class*=status_] span {
 .search_info {
   font-size: 8pt;
 }
+.search_result_score {
+  float: left;
+  width: 40px;
+  font-size: 100%;
+  line-height: 22px;
+}
+.search_content_wrap {
+  margin-left: 40px;
+}
+.search_score_map {
+  margin-left: 15px;
+}
 .track_content {
   margin: 5px;
 }
@@ -2906,6 +2917,21 @@ input.btn-lg {
 .bComment .other_profile_pictures div.avatartag {
   float: none;
   display: inline-block;
+}
+.evo_content_block table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+.evo_content_block table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  background-color: #eee;
+}
+.evo_content_block table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
 }
 
 /**

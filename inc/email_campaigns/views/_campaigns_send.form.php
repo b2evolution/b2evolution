@@ -34,7 +34,7 @@ if( !empty( $template_action ) && $template_action == 'send_campaign' )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Review and Send') );
+$Form->begin_fieldset( T_('Review and Send').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );

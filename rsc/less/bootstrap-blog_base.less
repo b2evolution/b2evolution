@@ -334,29 +334,37 @@ div.results {
 }
 
 // Rating Summary for all comments of the selected post on disp=single
-table.rating_summary{
+// TODO: put ALL of teh followinf into a separate .less file and @import + clean up duplicate styles in individual skins
+.evo_content_block table.ratings_table td {
+	border: none;
+}
+.evo_content_block table.rating_summary {
 	float: left;
-}
-table.rating_summary th, table.rating_summary td{
-	font-size: 10px;
-	line-height: 13px;
-	font-weight: normal;
-	padding: 0;
-}
-table.rating_summary th{
-	padding-right: 5px;
-}
-table.rating_summary .progress{
-	width: 60px;
-	background: #eeeecc;
-	padding: 0;
-}
-table.rating_summary .progress div{
-	background: #ffcc66;
-}
-table.rating_summary td{
-	text-align: right;
-	padding-left: 5px;
+	margin: 0;
+	th, td {
+		border: none;
+		font-size: 10px;
+		line-height: 13px;
+		font-weight: normal;
+		padding: 0;
+	}
+	th{
+		padding-right: 5px;
+		background-color: transparent;
+	}
+	.progress {
+		width: 60px;
+		background: #eeeecc;
+		padding: 0;
+		box-shadow: none; // override bootstrap
+	}
+	.progress div{
+		background: #ffcc66;
+	}
+	td{
+		text-align: right;
+		padding-left: 5px;
+	}
 }
 div.rating_summary_total{
 	float: left;
@@ -392,6 +400,7 @@ div.average_rating .star_rating{
 	float: left;
 	padding-right: 10px;
 }
+// END OF TODO
 
 // Styles for in-skin editing
 form.inskin{
@@ -412,7 +421,7 @@ form.inskin .edit_area textarea{
 
 // Categories selection table:
 #itemform_categories .extracats {
-	max-height: 500px;
+	max-height: 310px;
 	overflow: auto;
 }
 table.catselect {
@@ -699,6 +708,18 @@ div.results .status_meta span {
 .search_info {
 	font-size: 8pt;
 }
+.search_result_score {
+	float: left;
+	width: 40px;
+	font-size: 100%;
+	line-height: 27px;
+}
+.search_content_wrap {
+	margin-left: 40px;
+}
+.search_score_map {
+	margin-left: 55px;
+}
 
 .track_content {
 	margin: 5px;
@@ -769,8 +790,16 @@ div.results .status_meta span {
 	display: inline-block;
 }
 
+// Comment edit form:
 form#comment_edit {
 	clear: both;
+}
+
+// Remove padding around attachment frame:
+#post_attachments, #comment_attachments {
+	.panel-body {
+		padding: 0;
+	}
 }
 
 input.btn-lg {
@@ -860,5 +889,20 @@ input.btn-lg {
 @media (max-width: 375px) {
 	.evo_form .control-buttons .submit, .evo_form .control-buttons .preview { // Separates form buttons on low resolution when they are not inline
 		margin-bottom: 4px;
+	}
+}
+
+// Standard style for all tables of content:
+.evo_content_block table {
+	margin: 1em 0;
+	th {
+		border: 1px solid #ddd;
+		padding: 8px;
+		background-color: #eee;
+	}
+	td {
+		border: 1px solid #ddd;
+		padding: 8px;
+		vertical-align: top;
 	}
 }

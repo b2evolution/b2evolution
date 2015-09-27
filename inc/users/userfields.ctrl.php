@@ -247,6 +247,23 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'user-field-form' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'user-fields-list' );
+		break;
+}
+
 if( in_array( $action, array( 'delete', 'new', 'create', 'create_new', 'create_copy', 'edit', 'update' ) ) )
 { // Init JS for icon color field on the edit form
 	init_colorpicker_js();

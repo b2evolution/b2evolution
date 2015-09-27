@@ -59,7 +59,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	<head>
 		<base href="<?php echo $baseurl; ?>">
 		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title>b2evolution - Default Page</title>

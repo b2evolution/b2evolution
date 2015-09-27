@@ -187,6 +187,9 @@ else
 	$AdminUI->set_path( 'messaging', 'threads' );
 }
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'messages-view-thread' );
+
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Display messages depending on user email status

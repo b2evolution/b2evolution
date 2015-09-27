@@ -29,7 +29,7 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
 
-	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduler_job_form') );
+	$Form->begin_fieldset( T_('Job details').get_manual_link('scheduled-job-form') );
 
 		if( $creating && $action != 'copy' )
 		{ // New cronjob
@@ -63,7 +63,7 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 
 	if( !$creating )
 	{	// We can edit only pending cron jobs, Show this field just for info
-		$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduler_execution_info') );
+		$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduled-job-execution-details') );
 
 			$Form->info( T_('Status'), 'pending' );
 

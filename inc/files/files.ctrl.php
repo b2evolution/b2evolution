@@ -528,7 +528,7 @@ switch( $action )
 		}
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
+ 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
  		// Get the file we want to update:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -677,7 +677,7 @@ switch( $action )
 		// Rename a file:
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
-		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -764,7 +764,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -970,7 +970,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
+ 		$current_User->check_perm( 'files', 'edit_allowed', true, $blog ? $blog : NULL );
 
  		// Get the file we want to edit:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -1006,7 +1006,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
-		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
+		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
@@ -1021,7 +1021,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
+ 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
@@ -1219,7 +1219,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -1340,7 +1340,7 @@ switch( $fm_mode )
 			// fp>> Okay. It should *definitely* be a method of the File object and we should ask for ONE file at a time. Any question about 'where is the file?' (what/where/when/who, etc) should be asked to the File object itself.
 		*/
 
-		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$fm_mode = NULL;
@@ -1604,6 +1604,9 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'browse' );
 
 $mode = param( 'mode', 'string', '' );
 

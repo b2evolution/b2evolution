@@ -833,7 +833,7 @@ class ItemQuery extends SQL
 			$keywords = str_replace(',', ' ', $keywords);
 			$keywords = str_replace('"', ' ', $keywords);
 			$keywords = trim($keywords);
-			$keyword_array = explode(' ',$keywords);
+			$keyword_array = preg_split( '/\s+/', $keywords );
 			$join = '';
 			for ( $i = 0; $i < count($keyword_array); $i++)
 			{

@@ -30,6 +30,7 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 <html lang="<?php locale_lang() ?>">
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
 	<title><?php echo $this->get_html_title(); ?></title>
 	<?php

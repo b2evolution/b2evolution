@@ -434,15 +434,8 @@ class DB
 			// echo count($this->dbaliases);
 		}
 
-		if( $debug )
-		{ // Force MySQL strict mode
-			// TRADITIONAL mode is only available to mysql > 5.0.2
-			$mysql_version = $this->get_version( 'we do this in DEBUG mode only' );
-			if( version_compare( $mysql_version, '5.0.2' ) > 0 )
-			{
-				$this->query( 'SET sql_mode = "TRADITIONAL"', 'we do this in DEBUG mode only' );
-			}
-		}
+		// Force MySQL strict mode
+		$this->query( 'SET sql_mode = "TRADITIONAL"', 'Force MySQL "strict" mode (and make sure server is not configured with a weird incompatible mode)' );
 
 		if( $this->debug_profile_queries )
 		{

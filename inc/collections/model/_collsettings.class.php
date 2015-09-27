@@ -151,8 +151,8 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
-			'allow_subscriptions' => 0,					// Don't allow email subscriptions by default
-			'allow_item_subscriptions' => 0,			// Don't allow email subscriptions for a specific post by default
+			'allow_subscriptions' => 0,      // Don't allow email subscriptions by default
+			'allow_item_subscriptions' => 0, // Don't allow email subscriptions for a specific post by default
 			'use_workflow' => 0,						// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',

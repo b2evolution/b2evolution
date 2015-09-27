@@ -460,6 +460,16 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Locales'), $admin_url.'?ctrl=locales' );
 
+// Set an url for manual page:
+if( $action == 'edit' )
+{
+	$AdminUI->set_page_manual_link( 'locale-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'locales-tab' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

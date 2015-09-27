@@ -31,6 +31,8 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('System log'), $admin_url.'?ctrl=syslog' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'system-log-tab' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

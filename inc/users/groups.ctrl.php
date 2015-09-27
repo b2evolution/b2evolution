@@ -98,6 +98,7 @@ switch ( $action )
 		// We want to create a new group:
 		if( isset( $edited_Group ) )
 		{ // We want to use a template
+			$edited_Group->get_GroupSettings(); // Load all group settings
 			$new_Group = $edited_Group; // Copy !
 			$new_Group->set( 'ID', 0 );
 			$edited_Group = & $new_Group;
@@ -228,6 +229,18 @@ if( !empty( $edited_Group ) )
 if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
 { // Include to edit group level
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+}
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'edit':
+		$AdminUI->set_page_manual_link( 'editing-user-groups' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'user-groups' );
+		break;
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

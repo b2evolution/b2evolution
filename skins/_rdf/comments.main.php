@@ -77,7 +77,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	<sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
 	<items>
 		<rdf:Seq>
-		<?php while( $Comment = & $CommentList->get_next( false ) )
+		<?php while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 			?>
 			<rdf:li rdf:resource="<?php $Comment->permanent_url() ?>"/>

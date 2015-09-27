@@ -20,6 +20,7 @@ $params = array_merge( array(
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <?php
 if( file_exists( $emailskins_path.'_email_style.css' ) )
 { // Require the styles for email content

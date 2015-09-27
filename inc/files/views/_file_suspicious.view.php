@@ -79,7 +79,7 @@ else
 
 $Results = new Results( $SQL->get(), 'fsusp_', $default_order, $UserSettings->get( 'results_per_page' ), (int)$filtered_num_results );
 $Results->Cache = & get_FileCache();
-$Results->title = T_('Suspicious files');
+$Results->title = T_('Suspicious files').get_manual_link( 'file-moderation-suspicious' );
 
 
 /**

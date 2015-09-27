@@ -2198,9 +2198,11 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url, $blog;
+	global $htsrv_url, $blog, $current_User;
 
 	$params = array_merge( array(
+			'before'           => '',
+			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
 			'path'             => '', // Subpath for the file/folder
 			'list_style'       => 'list',  // 'list' or 'table'
@@ -2230,8 +2232,18 @@ function display_dragdrop_upload_button( $params = array() )
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 		), $params );
 
+	$FileRootCache = & get_FileRootCache();
+	$fm_FileRoot = $FileRootCache->get_by_ID( $params['fileroot_ID'] );
+
+	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	{	// Don't display the button if current user has no permission to upload to the selected file root:
+		return;
+	}
+
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
 	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
+
+	echo $params['before'];
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2552,6 +2564,8 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php } ?>
 	</script>
 	<?php
+
+	echo $params['after'];
 }
 
 

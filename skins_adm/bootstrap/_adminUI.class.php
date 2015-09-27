@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug;
+		global $Messages, $debug, $Hit;
 
 		// This is included before controller specifc require_css() calls:
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
@@ -87,6 +87,15 @@ class AdminUI extends AdminUI_general
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 		init_fontawesome_icons( 'fontawesome-glyphicons' );
+
+		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// IE < 9
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+			if( $debug )
+			{
+				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+			}
+		}
 	}
 
 
@@ -221,20 +230,7 @@ class AdminUI extends AdminUI_general
 	{
 		global $app_footer_text, $copyright_text;
 
-		global $Hit;
-
-		$r = '';
-
-		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
-		{ // Warning for IE 9 and less
-			$r .= '<div class="container-fluid"><div class="alert alert-danger" role="alert">'
-				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
-				.'</div></div>';
-		}
-
-		$r .= '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
-
-		return $r;
+		return '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
 	}
 
 
@@ -435,7 +431,7 @@ class AdminUI extends AdminUI_general
 					'inputend'       => "\n",
 					'infostart'      => '<div class="form-control-static">',
 					'infoend'        => "</div>\n",
-					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => '</div></div>'."\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -476,15 +472,15 @@ class AdminUI extends AdminUI_general
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-2',
+					'labelclass'     => 'control-label col-sm-3',
 					'labelstart'     => '',
 					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-2"></label>',
-					'inputstart'     => '<div class="controls col-sm-10">',
+					'labelempty'     => '<label class="control-label col-sm-3"></label>',
+					'inputstart'     => '<div class="controls col-sm-9">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-10"><div class="form-control-static">',
+					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
 					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => '</div></div>'."\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -492,7 +488,7 @@ class AdminUI extends AdminUI_general
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls col-sm-10"><div class="checkbox"><label>',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
 					'checkbox_newline_start' => '<div class="checkbox">',
 					'checkbox_newline_end'   => "</div>\n",
@@ -523,15 +519,15 @@ class AdminUI extends AdminUI_general
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-2',
+					'labelclass'     => 'control-label col-sm-3',
 					'labelstart'     => '',
 					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-2"></label>',
-					'inputstart'     => '<div class="controls col-sm-10">',
+					'labelempty'     => '<label class="control-label col-sm-3"></label>',
+					'inputstart'     => '<div class="controls col-sm-9">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-10"><div class="form-control-static">',
+					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
 					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => "</div></div>\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -539,7 +535,7 @@ class AdminUI extends AdminUI_general
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls col-sm-10"><div class="checkbox"><label>',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
 					'checkbox_newline_start' => '<div class="checkbox">',
 					'checkbox_newline_end'   => "</div>\n",

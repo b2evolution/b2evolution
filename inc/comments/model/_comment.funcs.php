@@ -304,6 +304,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 
 			if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 			{ // Use dropdown for bootstrap skin
+				$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 				$Form->hidden( 'comment_status', $edited_Comment->status );
 				echo '<div class="btn-group dropup comment_status_dropdown">';
 				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
@@ -312,7 +313,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 				echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
 				foreach( $status_options as $status_key => $status_title )
 				{
-					echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+					echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 				}
 				echo '</ul>';
 				echo '</div>';
@@ -357,6 +358,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
 	$Form->hidden( 'comment_status', $edited_Comment->status );
 	echo '<div class="btn-group dropup comment_status_dropdown">';
@@ -369,7 +371,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1"><span class="fa fa-circle status_color_'.$status_key.'"></span> <span>'.$status_title.'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';

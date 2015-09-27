@@ -261,6 +261,10 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Allow email subscriptions by default:
+		$this->set_setting( 'allow_subscriptions', '1' );
+		$this->set_setting( 'allow_item_subscriptions', '1' );
+
 		switch( $kind )
 		{
 			case 'main':
@@ -332,6 +336,7 @@ class Blog extends DataObject
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'category_ordering', 'manual' );
+				$this->set_setting( 'main_content', 'excerpt' );
 
 				// Try to find post type "Manual Page" in DB
 				global $DB;
@@ -3171,6 +3176,9 @@ class Blog extends DataObject
 			{	// This collection is used for login actions
 				// Don't redirect, just display a login form of this collection:
 				$disp = 'access_requires_login';
+				// Set redirect_to param to current url in order to display a requested page after login action:
+				global $ReqURI;
+				param( 'redirect_to', 'url', $ReqURI );
 			}
 		}
 		elseif( $allow_access == 'members' )

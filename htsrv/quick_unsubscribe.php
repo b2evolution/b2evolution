@@ -19,6 +19,7 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 ?>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title><?php echo T_( 'Quick unsubscribe' ) ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	</head>

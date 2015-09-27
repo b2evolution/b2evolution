@@ -34,7 +34,7 @@ load_funcs('plugins/_plugin.funcs.php');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {	// Display this message only if current user has permission to manage the plugins
-	echo '<p class="center">'
+	echo '<p class="alert alert-info">'
 			.sprintf( T_('Here you can configure some plugins individually for each blog. To manage your installed plugins go <a %s>here</a>.'),
 					      'href="'.$admin_url.'?ctrl=plugins"' )
 		.'</p>';

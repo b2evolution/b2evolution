@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog;
+global $edited_Blog, $AdminUI;
 
 ?>
 <script type="text/javascript">
@@ -185,20 +185,36 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
+	
+	if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	{	// Use dropdown for bootstrap skin:
+		$new_status_field = get_status_dropdown_button( array(
+				'name'    => 'new_feedback_status',
+				'value'   => $edited_Blog->get_setting('new_feedback_status'),
+				'options' => $status_options,
+			) );
+		$Form->info( T_('New feedback status'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+		$Form->hidden( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status') );
+		echo_form_dropdown_js();
+	}
+	else
+	{	// Use standard select element for other skins:
+		$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
 				T_('New feedback status'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+	}
 	echo '</div>';
 
 	// Moderation statuses setting
 	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
 	// Get moderation statuses with status text
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
+	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'moderation_statuses' );
 	$checklist_options = array();
 	foreach( $moderation_statuses as $status => $status_text )
 	{ // Add a checklist option for each possible modeartion status
 		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'notif_'.$status, 1, $status_text, $is_checked );
+		$checklist_options[] = array( 'notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
 

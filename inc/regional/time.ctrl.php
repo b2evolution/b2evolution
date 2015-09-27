@@ -91,6 +91,9 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Time'), $admin_url.'?ctrl=time' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'regional-time-tab' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 

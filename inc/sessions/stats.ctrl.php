@@ -259,18 +259,30 @@ switch( $tab )
 		{
 			case 'global':
 				$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'global-hits-summary' );
 				break;
 
 			case 'browser':
 				$AdminUI->breadcrumbpath_add( T_('Browsers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'browser-hits-summary' );
 				break;
 
 			case 'robot':
 				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'robots-hits-summary' );
 				break;
 
 			case 'feed':
 				$AdminUI->breadcrumbpath_add( T_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'feed-hits-summary' );
 				break;
 		}
 		// Init jqPlot charts
@@ -280,16 +292,25 @@ switch( $tab )
 	case 'other':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'direct-b-hits' );
 		break;
 
 	case 'hits':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'recent-hits-list' );
 		break;
 
 	case 'referers':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'referred-b-hits' );
 		break;
 
 	case 'refsearches':
@@ -303,14 +324,23 @@ switch( $tab )
 		{
 			case 'hits':
 				// $AdminUI->breadcrumbpath_add( T_('Latest'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-hits-tab' );
 				break;
 
 			case 'keywords':
 				$AdminUI->breadcrumbpath_add( T_('Searched keywords'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-keywords-tab' );
 				break;
 
 			case 'topengines':
 				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-top-engines-tab' );
 				break;
 				
 		}
@@ -320,6 +350,9 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->breadcrumbpath_add( T_('Top IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		$tab3 = 'top';
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'top-ips' );
 		break;
 
 	case 'domains':
@@ -343,6 +376,9 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 		}
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 		break;
 
 	case 'goals':
@@ -358,6 +394,9 @@ switch( $tab )
 
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'hit-logging' );
 		break;
 
 }

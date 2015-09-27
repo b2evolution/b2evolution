@@ -42,7 +42,7 @@
 .evo_comment_text {
 	padding-right: 0px;
 }
-.evo_comment_avatar span img, .evo_comment_avatar a img {
+.evo_comment_avatar > span > img, .evo_comment_avatar > a > img {
 	border-radius: 50%;
 	float: none !important;
 	margin: 0px 0px 14px 0px !important;
@@ -90,10 +90,6 @@ ol.breadcrumb {
 	}
 	box-shadow: none;
 	.panel-heading {
-		&:not(:first-child) {
-			border-top: 1px solid #ddd;
-			.border-radius(0);
-		}
 		h2 {
 			margin-top: 0;
 		}
@@ -353,13 +349,16 @@ ol.breadcrumb {
 }
 
 // Legend table & list
-.legends legend {
+.legends {
 	text-align: center;
-	border: none;
-	text-transform: uppercase;
-    font-variant: small-caps;
-	font-size: 82%;
-	margin-bottom: 10px;
+	legend {
+		text-align: center;
+		border: none;
+		text-transform: uppercase;
+		font-variant: small-caps;
+		font-size: 82%;
+		margin-bottom: 10px;
+	}
 }
 .legend, .legend-item {
 	text-align: center;
@@ -370,6 +369,7 @@ ol.breadcrumb {
 }
 .legend-item {
 	margin: 0px 5px 12px 5px;
+	display: inline-block;
 }
 ul.legend {
 	list-style: none;
@@ -544,9 +544,10 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
-				span img.loadimg, a img.loadimg {
+				/* @MILOS > Still testing to see if this is overrulled by: line 992
+				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
-				}
+				}*/
 			}
 			.post_main {
 				padding-right: 0px;
@@ -611,12 +612,17 @@ label.control-label[for=post_title] {
 	margin-left: 10px;
 }
 
+// Recent topics button
+.btn_recent_topics {
+	margin: 0 0 20px 5px;
+}
+
 // Search form
 .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
-	margin-bottom: 20px;
+	margin: 0 0 20px 5px;
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}
@@ -643,6 +649,11 @@ label.control-label[for=post_title] {
 	padding-bottom: 20px;
 	strong, a {
 		margin: 0px 3px;
+	}
+}
+.evo_search_list {
+	.evo_search_list__row {
+		padding: 15px 0;
 	}
 }
 
@@ -982,4 +993,19 @@ a.to_top {
 // 
 .popover img {
 	.border-radius !important;
+}
+.forums_list.front_panel {
+	border-bottom: 0px !important;
+	.table {
+		border-bottom: 1px solid #ddd;
+		&:nth-last-child(1) {
+			border-radius: 0px 0px 4px 4px;
+		}
+	}
+}
+.ft_avatar > a > img, .ft_avatar > span > img {
+	border-radius: 50% !important;
+}
+.evo_comment_avatar > a:hover {
+	background-color: transparent !important;
 }

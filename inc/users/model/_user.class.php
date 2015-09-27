@@ -685,6 +685,12 @@ class User extends DataObject
 
 			foreach( $userfield_IDs as $userfield )
 			{
+				if( ! isset( $this->userfield_defs[$userfield->uf_ufdf_ID] ) )
+				{	// If user field definition doesn't exist in DB then delete field value of this user:
+					$this->userfield_update( $userfield->uf_ID, NULL );
+					continue;
+				}
+
 				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
@@ -5543,12 +5549,31 @@ class User extends DataObject
 		}
 
 		if( $total_num_posts > 0 )
-		{ // Make a link to page with user's posts
-			$total_num_posts = '<a href="'.get_dispctrl_url( 'useritems', 'user_ID='.$this->ID ).'"><b>'.$total_num_posts.'</b></a>';
+		{	// Make a link to page with user's posts:
+			global $current_User;
+			if( is_admin_page() && is_logged_in() &&
+			    ( $this->ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) ) )
+			{	// For back-office
+				global $admin_url;
+				$total_num_posts_url = $admin_url.'?ctrl=user&amp;user_tab=activity&amp;user_ID='.$this->ID;
+			}
+			else
+			{	// For front-office
+				global $Blog;
+				if( ! empty( $Blog ) )
+				{	// Only if blog is defined
+					$total_num_posts_url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems&amp;user_ID='.$this->ID );
+				}
+			}
+		}
+
+		if( empty( $total_num_posts_url ) )
+		{	// No link to view posts
+			$total_num_posts = '<b>'.$total_num_posts.'</b>';
 		}
 		else
-		{
-			$total_num_posts = '<b>'.$total_num_posts.'</b>';
+		{	// Set a posts number as link if it is allowed:
+			$total_num_posts = '<a href="'.$total_num_posts_url.'"><b>'.$total_num_posts.'</b></a>';
 		}
 
 		return sprintf( $params['text'], $total_num_posts, $public_percent );

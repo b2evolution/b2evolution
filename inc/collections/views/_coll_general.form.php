@@ -51,7 +51,7 @@ else
 }
 
 
-$Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type' ) );
+$Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-panel' ) );
 	$collection_kinds = get_collection_kinds();
 	if( isset( $collection_kinds[ $edited_Blog->get( 'type' ) ] ) )
 	{ // Display type of this blog

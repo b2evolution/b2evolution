@@ -415,13 +415,13 @@ function create_default_locales()
 function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
-		'newusers_grp_ID' => $Group_Users->ID,
+		'newusers_grp_ID' => $users_Group->ID,
 		'evocache_foldername' => '_evocache',
 		'newusers_canregister' => 'yes',
 		'registration_is_public' => 1,
@@ -441,26 +441,26 @@ function create_default_settings( $override = array() )
 	{ // Set default site color
 		$defaults['site_color'] = $install_site_color;
 	}
-	if( !empty( $Group_Suspect ) )
+	if( !empty( $suspect_Group ) )
 	{ // Set default antispam suspicious group
-		$defaults['antispam_suspicious_group'] = $Group_Suspect->ID;
+		$defaults['antispam_suspicious_group'] = $suspect_Group->ID;
 	}
 	$antispam_trust_groups = array();
-	if( !empty( $Group_Admins ) )
+	if( !empty( $admins_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Admins->ID;
+		$antispam_trust_groups[] = $admins_Group->ID;
 	}
-	if( !empty( $Group_Privileged ) )
+	if( !empty( $moderators_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Privileged->ID;
+		$antispam_trust_groups[] = $moderators_Group->ID;
 	}
-	if( !empty( $Group_Bloggers ) )
+	if( !empty( $editors_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Bloggers->ID;
+		$antispam_trust_groups[] = $editors_Group->ID;
 	}
-	if( !empty( $Group_Spam ) )
+	if( !empty( $spam_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Spam->ID;
+		$antispam_trust_groups[] = $spam_Group->ID;
 	}
 	if( count( $antispam_trust_groups ) > 0 )
 	{ // Set default antispam trust group
@@ -1598,6 +1598,7 @@ function check_quick_install_request()
 	$db_password = param( 'db_password', 'raw', '' );
 	$db_name = param( 'db_name', 'string', '' );
 	$db_host = param( 'db_host', 'string', '' );
+	$db_tableprefix = param( 'db_tableprefix', 'string', '' );
 
 	// Admin e-mail:
 	global $admin_email;
@@ -1605,7 +1606,8 @@ function check_quick_install_request()
 	$conf_admin_email = param( 'admin_email', 'string', '', false, true );
 
 	if( ! empty( $conf_admin_email ) ||
-	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) )
+	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) ||
+	    ! empty( $db_tableprefix ) )
 	{ // Try to update basic config file ONLY when at least one of these params are defined
 
 		if( empty( $conf_admin_email ) || ! param_check_email( 'admin_email' ) )
@@ -1614,7 +1616,7 @@ function check_quick_install_request()
 		}
 
 		// Base URL:
-		global $baseurl, $admin_url, $dispatcher;
+		global $baseurl, $admin_url, $dispatcher, $tableprefix;
 		$baseurl = param( 'baseurl', 'string', '', false, true );
 		if( empty( $baseurl ) || ! preg_match( '~https?://~', $baseurl ) )
 		{ // Try to autogenerate base url if it is empty or wrong from request:
@@ -1629,12 +1631,16 @@ function check_quick_install_request()
 		// Update $admin_url to new value because it depends on $baseurl:
 		$admin_url = $baseurl.$dispatcher;
 
+		// Update $tableprefix to new from request:
+		$tableprefix = $db_tableprefix;
+
 		// Try to create basic config file:
 		$basic_config_params = array(
 				'db_user'        => $db_user,
 				'db_password'    => $db_password,
 				'db_name'        => $db_name,
 				'db_host'        => $db_host,
+				'db_tableprefix' => $db_tableprefix,
 				'baseurl'        => $baseurl,
 				'admin_email'    => $conf_admin_email,
 				'print_messages' => false,
@@ -1673,14 +1679,14 @@ function update_basic_config_file( $params = array() )
 	global $DB, $db_config, $evo_charset, $conf_path, $default_locale;
 
 	// These global params should be rewritten by this function on success result
-	global $tableprefix, $baseurl, $admin_email, $config_is_done, $action;
+	global $baseurl, $admin_email, $config_is_done, $action;
 
 	$params = array_merge( array(
 			'db_user'        => '',
 			'db_password'    => '',
 			'db_name'        => '',
 			'db_host'        => '',
-			'db_tableprefix' => $tableprefix,
+			'db_tableprefix' => '',
 			'baseurl'        => '',
 			'admin_email'    => '',
 			'print_messages' => true, // TRUE - to print out all messages on screen, FALSE - to return
@@ -1701,8 +1707,6 @@ function update_basic_config_file( $params = array() )
 			'name'     => $params['db_name'],
 			'host'     => $params['db_host'],
 			'aliases'          => $db_config['aliases'],
-			'use_transactions' => $db_config['use_transactions'],
-			'table_options'    => $db_config['table_options'],
 			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error'      => false
 		) );

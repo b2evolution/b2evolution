@@ -147,10 +147,10 @@ class wacko_plugin extends Plugin
 		$content = replace_content_outcode( $this->search, $this->replace, $content );
 
 		// Find bullet lists
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 		{	// Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
+				'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 				array( $this, 'find_bullet_lists' ) );
 		}
 		else

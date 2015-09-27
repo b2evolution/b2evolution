@@ -52,21 +52,24 @@ if( check_comment_mass_delete( $CommentList ) )
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
-$emptytrash_link = '';
-// Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
 if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3, array( 'class' => 'action_icon btn btn-default btn-sm' ) ).'</span> ';
+		$block_item_Widget->global_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 );
 	}
 	else
 	{
-		$opentrash_link = get_opentrash_link( false );
+		global $blog;
+		$block_item_Widget->global_icon( T_('Open recycle bin'), 'recycle_full', $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;'.$CommentList->param_prefix.'show_statuses[]=trash', T_('Open recycle bin'), 5, 3,
+			array(
+				// Display recycle bin placeholder, because users may have rights to recycle particular comments
+				'before' => '<span id="recycle_bin">',
+				'after'  => '</span>',
+			) );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)').get_manual_link( 'comments-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title

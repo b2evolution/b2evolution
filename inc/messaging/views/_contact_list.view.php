@@ -103,6 +103,10 @@ else
 $Results = new Results( $select_SQL->get(), 'mct_', $default_order, NULL, $count_SQL->get() );
 
 $Results->title = T_('Contacts list');
+if( is_admin_page() )
+{ // Set an url for manual page:
+	$Results->title .= get_manual_link( 'contacts-list' );
+}
 
 /**
  * Callback to add filters on top of the result set

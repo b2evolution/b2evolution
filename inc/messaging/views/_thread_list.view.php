@@ -41,7 +41,7 @@ $Results->Cache = & get_ThreadCache();
 $Results->title = T_('Conversations list');
 if( is_admin_page() )
 {
-	$Results->title .= get_manual_link( 'messaging' );
+	$Results->title .= get_manual_link( 'conversations-list' );
 }
 
 /**

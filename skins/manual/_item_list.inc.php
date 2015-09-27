@@ -19,32 +19,32 @@ $params = array_merge( array(
 		'post_navigation' => 'same_category', // Always navigate through category in this skin
 		'before_title'    => '<h3>',
 		'after_title'     => '</h3>',
-		'before_content'  => '<div class="excerpt">',
-		'after_content'   => '</div>',
 		'Item'            => NULL
 	), $params );
 
-$curr_Item = $params['Item'];
-if( empty( $curr_Item ) )
-{
-	global $Item;
-	$curr_Item = $Item;
+global $Item;
+if( ! empty( $params['Item'] ) )
+{ // Get Item from params:
+	$Item = $params['Item'];
 }
 
 ?>
 <li><?php
-		$item_edit_link = $curr_Item->get_edit_link( array(
+		$item_edit_link = $Item->get_edit_link( array(
 				'class' => 'roundbutton roundbutton_text',
 			) );
-		$curr_Item->title( array(
+		$Item->title( array(
 				'before'          => $params['before_title'],
 				'after'           => $params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',
 			) );
-		$curr_Item->excerpt( array(
-				'before' => $params['before_content'],
-				'after'  => $params['after_content'],
-			) );
+		// this will create a <section>
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			skin_include( '_item_content.inc.php', $params );
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		// this will end a </section>
 ?></li>

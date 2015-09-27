@@ -162,8 +162,8 @@ $Form->begin_fieldset( T_('Custom fields').get_manual_link('item-custom-fields')
 			{ // Create this <hidden> to know this custom field is new created field
 				echo '<input type="hidden" name="custom_'.$type.'_new'.$i.'" value="1" />';
 			}
-			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
-			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input custom_field_order" maxlength="11" size="3" />';
+			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input form-control custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
+			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
 					'maxlength'    => $data[ 'maxlength' ],
 					'input_prefix' => T_('Title').' ',
@@ -210,15 +210,15 @@ jQuery( '#add_new_double_custom_field' ).click( function()
 	var count_custom_double = jQuery( 'input[name=count_custom_double]' ).attr( 'value' );
 	count_custom_double++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_double_field_list' ).append( '<fieldset id="ffield_custom_double_' + count_custom_double + '">' +
+	jQuery( '#custom_double_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_double_\' + count_custom_double + \'', '' ), $Form->fieldstart ); ?>' +
 			'<input type="hidden" name="custom_double_ID' + count_custom_double + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_double_new' + count_custom_double + '" value="1" />' +
 			'<?php echo $Form->labelstart; ?><label for="custom_double_' + count_custom_double + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('Numeric'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
 			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input new_custom_field_title" size="20" maxlength="60" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_double_order' + count_custom_double + '" value="" class="form_text_input custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend ); ?></fieldset>' );
+				'<?php echo TS_('Title'); ?> <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input form-control new_custom_field_title" size="20" maxlength="60" />' +
+				' <?php echo TS_('Name'); ?> <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
+				' <?php echo TS_('Order'); ?> <input type="text" name="custom_double_order' + count_custom_double + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
+			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
 	jQuery( 'input[name=count_custom_double]' ).attr( 'value', count_custom_double );
 } );
 
@@ -227,15 +227,15 @@ jQuery( '#add_new_varchar_custom_field' ).click( function()
 	var count_custom_varchar = jQuery( 'input[name=count_custom_varchar]' ).attr( 'value' );
 	count_custom_varchar++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_varchar_field_list' ).append( '<fieldset id="ffield_custom_string' + count_custom_varchar + '">' +
+	jQuery( '#custom_varchar_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_string_\' + count_custom_varchar + \'', '' ), $Form->fieldstart ); ?>' +
 			'<input type="hidden" name="custom_varchar_ID' + count_custom_varchar + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_varchar_new' + count_custom_varchar + '" value="1" />' +
 			'<?php echo $Form->labelstart; ?><label for="custom_varchar_' + count_custom_varchar + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('String'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
 			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input new_custom_field_title" size="30" maxlength="40" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_varchar_order' + count_custom_varchar + '" value="" class="form_text_input custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend ); ?></fieldset>' );
+				'<?php echo TS_('Title'); ?> <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input form-control new_custom_field_title" size="30" maxlength="40" />' +
+				' <?php echo TS_('Name'); ?> <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
+				' <?php echo TS_('Order'); ?> <input type="text" name="custom_varchar_order' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
+			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
 	jQuery( 'input[name=count_custom_varchar]' ).attr( 'value', count_custom_varchar );
 } );
 

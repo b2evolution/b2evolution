@@ -832,7 +832,7 @@ switch( $action )
 		// Delete Item from Session
 		delete_session_Item( 0 );
 
-		if( ! $exit_after_save )
+		if( ! $exit_after_save && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// We want to continue editing...
 			$tab_switch_params = 'p='.$edited_Item->ID;
 			$action = 'edit';	// It's basically as if we had updated
@@ -982,12 +982,15 @@ switch( $action )
 		 *     we can make this optional...
 		 */
 		if( $edited_Item->status == 'redirected' ||
-		    strpos( $redirect_to, 'tab=tracker' ) ||
-		    strpos( $redirect_to, 'tab=manual' ) )
+		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
 			//    a post is in "Redirected" status
-			//    a post is updated from "workflow" or "manual" view tab
+			//    a post is updated from "workflow" view tab
 			$blog_redirect_setting = 'no';
+		}
+		elseif( strpos( $redirect_to, 'tab=manual' ) )
+		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
+			$blog_redirect_setting = 'orig';
 		}
 		elseif( ! $was_published && $edited_Item->status == 'published' )
 		{ // The post's last status wasn't "published", but we're going to publish it now.
@@ -1007,6 +1010,12 @@ switch( $action )
 		elseif( $blog_redirect_setting == 'post' )
 		{ // redirect to post page:
 			$redirect_to = $edited_Item->get_permanent_url();
+		}
+		elseif( $blog_redirect_setting == 'orig' )
+		{ // Use original $redirect_to:
+			// Set highlight:
+			$Session->set( 'highlight_id', $edited_Item->ID );
+			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
 		}
 		else
 		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list
@@ -1700,6 +1709,44 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
+}
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'history':
+	case 'history_details':
+		$AdminUI->set_page_manual_link( 'item-revision-history' );
+		break;
+	case 'new':
+	case 'new_switchtab':
+	case 'edit':
+	case 'edit_switchtab':
+	case 'copy':
+	case 'create':
+	case 'create_edit':
+	case 'create_publish':
+	case 'update':
+	case 'update_edit':
+	case 'update_publish':
+		$AdminUI->set_page_manual_link( 'expert-edit-screen' );
+		break;
+	case 'edit_type':
+		$AdminUI->set_page_manual_link( 'change-post-type' );
+		break;
+	case 'new_mass':
+		$AdminUI->set_page_manual_link( 'mass-new-screen' );
+		break;
+	case 'mass_edit':
+		$AdminUI->set_page_manual_link( 'mass-edit-screen' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
+		break;
+}
+if( $tab == 'manual' )
+{
+	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

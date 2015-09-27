@@ -290,28 +290,35 @@ div.results {
 .pager li a {
   margin-bottom: 4px;
 }
-table.rating_summary {
-  float: left;
+.evo_content_block table.ratings_table td {
+  border: none;
 }
-table.rating_summary th,
-table.rating_summary td {
+.evo_content_block table.rating_summary {
+  float: left;
+  margin: 0;
+}
+.evo_content_block table.rating_summary th,
+.evo_content_block table.rating_summary td {
+  border: none;
   font-size: 10px;
   line-height: 13px;
   font-weight: normal;
   padding: 0;
 }
-table.rating_summary th {
+.evo_content_block table.rating_summary th {
   padding-right: 5px;
+  background-color: transparent;
 }
-table.rating_summary .progress {
+.evo_content_block table.rating_summary .progress {
   width: 60px;
   background: #eeeecc;
   padding: 0;
+  box-shadow: none;
 }
-table.rating_summary .progress div {
+.evo_content_block table.rating_summary .progress div {
   background: #ffcc66;
 }
-table.rating_summary td {
+.evo_content_block table.rating_summary td {
   text-align: right;
   padding-left: 5px;
 }
@@ -365,7 +372,7 @@ form.inskin .edit_area textarea {
   width: 100%;
 }
 #itemform_categories .extracats {
-  max-height: 500px;
+  max-height: 310px;
   overflow: auto;
 }
 table.catselect {
@@ -640,6 +647,18 @@ div.results .status_meta span {
 .search_info {
   font-size: 8pt;
 }
+.search_result_score {
+  float: left;
+  width: 40px;
+  font-size: 100%;
+  line-height: 27px;
+}
+.search_content_wrap {
+  margin-left: 40px;
+}
+.search_score_map {
+  margin-left: 55px;
+}
 .track_content {
   margin: 5px;
 }
@@ -718,6 +737,10 @@ div.results .status_meta span {
 }
 form#comment_edit {
   clear: both;
+}
+#post_attachments .panel-body,
+#comment_attachments .panel-body {
+  padding: 0;
 }
 input.btn-lg {
   font-size: 120%;
@@ -811,4 +834,17 @@ input.btn-lg {
   .evo_form .control-buttons .preview {
     margin-bottom: 4px;
   }
+}
+.evo_content_block table {
+  margin: 1em 0;
+}
+.evo_content_block table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  background-color: #eee;
+}
+.evo_content_block table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
 }

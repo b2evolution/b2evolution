@@ -166,6 +166,7 @@ class generic_ping_plugin extends Plugin
 	function ItemSendPing( & $params )
 	{
 		global $debug;
+		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 		$url = $this->parse_ping_url( $this->Settings->get( 'ping_service_url' ) );
 
@@ -174,6 +175,12 @@ class generic_ping_plugin extends Plugin
 
 		$client = new xmlrpc_client( $url['path'], $url['host'], $url['port'] );
 		$client->debug = ($debug && $params['display']);
+
+		// Set proxy for outgoing connections:
+		if( ! empty( $outgoing_proxy_hostname ) )
+		{
+			$client->setProxy( $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password );
+		}
 
 		if( $this->Settings->get('ping_service_extended') )
 		{
