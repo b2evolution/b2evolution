@@ -993,7 +993,7 @@ switch( $action )
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
 
-		if( $upgrade_result == 'need-fix' )
+		if( $upgrade_result === 'need-fix' )
 		{	// We are waiting for the user to click on "try to repair/upgrade now"...
 			// We already displayed the orange upgrade button. Offer an alternative:
 			// A link back to install menu
@@ -1003,7 +1003,6 @@ switch( $action )
 		{
 			if( $is_automated_upgrade )  // What EXACTLY does "$not_upgrade mean???"
 			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
-// TODO: this should kick in case of an auto-upgrade that goes through "need-fix". Currently it doesn't.
 				remove_after_upgrade();
 				// disable maintenance mode at the end of the upgrade script
 				switch_maintenance_mode( false, 'upgrade' );
