@@ -6506,8 +6506,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Updating user settings...' );
-		$DB->query( 'ALTER TABLE evo_users__usersettings CHANGE COLUMN uset_name uset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
-		$DB->query( 'ALTER TABLE evo_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		$DB->query( 'ALTER TABLE T_users__usersettings CHANGE COLUMN uset_name uset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
+		$DB->query( 'ALTER TABLE T_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
  		task_end();
 
 		// set_upgrade_checkpoint( '11483' );
