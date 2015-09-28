@@ -3527,8 +3527,7 @@ class Item extends ItemLight
 		$average_real = number_format( $ratings["summary"] / $ratings_count, 1, ".", "" );
 		$active_average_real = ( $active_ratings_count == 0 ) ? 0 : ( number_format( $active_ratings["summary"] / $active_ratings_count, 1, ".", "" ) );
 
-		$result = '<table class="ratings_table" cellspacing="2">';
-		$result .= '<tr>';
+		$result = '';
 		$expiry_delay = $this->get_setting( 'comment_expiry_delay' );
 		if( empty( $expiry_delay ) )
 		{
@@ -3537,16 +3536,16 @@ class Item extends ItemLight
 		else
 		{
 			$all_ratings_title = T_('Overall user ratings');
-			$result .= '<td><div><strong>'.get_duration_title( $expiry_delay ).'</strong></div>';
+			$result .= '<div class="ratings_table">';
+			$result .= '<div><strong>'.get_duration_title( $expiry_delay ).'</strong></div>';
 			$result .= $this->get_rating_table( $active_ratings, $params );
-			$result .= '</td>';
-			$result .= '<td width="2px"></td>';
+			$result .= '</div>';
 		}
 
-		$result .= '<td><div><strong>'.$all_ratings_title.'</strong></div>';
+		$result .= '<div class="ratings_table">';
+		$result .= '<div><strong>'.$all_ratings_title.'</strong></div>';
 		$result .= $this->get_rating_table( $ratings, $params );
-		$result .= '</td>';
-		$result .= '</tr></table>';
+		$result .= '</div>';
 
 		return $result;
 	}
