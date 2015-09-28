@@ -295,6 +295,7 @@ class Results extends Table
 
 		if( empty( $UserSettings ) )
 		{
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
 			$UserSettings = new UserSettings();
 		}
 

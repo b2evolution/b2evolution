@@ -2021,9 +2021,13 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	{	// We're outside of the page body: NEVER display wrap this include with a <div>
 		$display_includes = false;
 	}
-	else
+	elseif( isset( $Session ) )
 	{	// We may wrap with a <div>:
 		$display_includes = $Session->get( 'display_includes_'.( empty( $Blog ) ? 0 : $Blog->ID ) ) == 1;
+	}
+	else
+	{	// Request without defined $Session, Don't display the includes:
+		$display_includes = false;
 	}
 	if( $display_includes )
 	{ // Wrap the include with a visible div:
