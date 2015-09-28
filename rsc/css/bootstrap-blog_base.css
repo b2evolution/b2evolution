@@ -290,8 +290,17 @@ div.results {
 .pager li a {
   margin-bottom: 4px;
 }
-.evo_content_block table.ratings_table td {
-  border: none;
+.evo_content_block .ratings_table {
+  margin: 0 10px 10px 0;
+  display: inline-block;
+}
+.evo_content_block .ratings_table .rating_summary {
+  border-spacing: 1px;
+  border-collapse: separate;
+}
+.evo_content_block .ratings_table .progress {
+  border-radius: 0;
+  height: 13px;
 }
 .evo_content_block table.rating_summary {
   float: left;

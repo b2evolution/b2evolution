@@ -285,17 +285,6 @@ ol.breadcrumb {
 #comment_edit .comment_rating {
   margin-top: 9px;
 }
-.ratings_table {
-  margin-bottom: 10px;
-}
-.ratings_table .rating_summary {
-  border-spacing: 1px;
-  border-collapse: separate;
-}
-.ratings_table .progress {
-  border-radius: 0;
-  height: 13px;
-}
 .btn-group > .btn.first-child {
   border-top-left-radius: 3px !important;
   border-bottom-left-radius: 3px !important;

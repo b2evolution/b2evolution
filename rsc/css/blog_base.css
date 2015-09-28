@@ -384,9 +384,10 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-table.ratings_table td {
-  border: none;
+.ratings_table {
   padding: 10px;
+  margin-right: 10px;
+  display: inline-block;
 }
 table.rating_summary {
   float: left;

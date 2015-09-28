@@ -335,8 +335,17 @@ div.results {
 
 // Rating Summary for all comments of the selected post on disp=single
 // TODO: put ALL of teh followinf into a separate .less file and @import + clean up duplicate styles in individual skins
-.evo_content_block table.ratings_table td {
-	border: none;
+.evo_content_block .ratings_table {
+	margin: 0 10px 10px 0;
+	display: inline-block;
+	.rating_summary {
+		border-spacing: 1px;
+		border-collapse: separate;
+	}
+	.progress {
+		border-radius: 0;
+		height: 13px;
+	}
 }
 .evo_content_block table.rating_summary {
 	float: left;
