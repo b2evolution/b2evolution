@@ -19,17 +19,17 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Blog, $admin_url;
+global $Blog, $admin_url, $AdminUI;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'form' );
 
-// Manual link
-$Form->global_icon( T_('View manual'), 'manual', $edited_ComponentWidget->get_help_url(), '', 3, 2, array( 'target' => '_blank' ) );
-// Close link
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+{	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
+	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+}
 
 $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_('Edit widget %s in %s'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) ) );
 
@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Display properties:
-$Form->begin_fieldset( T_('Properties') );
+$Form->begin_fieldset( T_('Properties').' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) ) );
 	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_name() );
 	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
 $Form->end_fieldset();
