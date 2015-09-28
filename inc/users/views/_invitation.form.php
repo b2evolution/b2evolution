@@ -50,7 +50,7 @@ $Form->begin_form( 'fform', ( $creating ? T_('New invitation code') : T_('Invita
 
 		$Form->date_input( 'ivc_expire_date', date2mysql( $edited_Invitation->expire_ts ), '' );
 
-		$Form->time_input( 'ivc_expire_time', date2mysql( $edited_Invitation->expire_ts ), '' );
+		$Form->time_input( 'ivc_expire_time', date2mysql( $edited_Invitation->expire_ts ), T_('at') );
 
 	$Form->end_line();
 

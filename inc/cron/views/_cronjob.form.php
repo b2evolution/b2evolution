@@ -53,11 +53,9 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 
 		$Form->begin_line( T_('Schedule date'), 'cjob_date', '', array( 'required' => true ) );
 
-			$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), '', array(
-								 'required' => true ) );
+			$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), '' );
 
-			$Form->time_input( 'cjob_time', date2mysql( $edited_Cronjob->start_timestamp ), '', array(
-								 'required' => true ) );
+			$Form->time_input( 'cjob_time', date2mysql( $edited_Cronjob->start_timestamp ), T_('at') );
 
 		$Form->end_line();
 

@@ -53,12 +53,12 @@ $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
 	$Form->begin_line( T_('Temporary Start Date'), 'goal_temp_start_date' );
 		$Form->date_input( 'goal_temp_start_date', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, '' );
-		$Form->time_input( 'goal_temp_start_time', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, '' );
+		$Form->time_input( 'goal_temp_start_time', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, T_('at') );
 	$Form->end_line();
 
 	$Form->begin_line( T_('Temporary End Date'), 'goal_temp_end_date' );
 		$Form->date_input( 'goal_temp_end_date', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, '' );
-		$Form->time_input( 'goal_temp_end_time', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, '' );
+		$Form->time_input( 'goal_temp_end_time', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, T_('at') );
 	$Form->end_line();
 
 	$Form->text_input( 'goal_default_value', $edited_Goal->default_value, 15, T_('Default value'), '' );
