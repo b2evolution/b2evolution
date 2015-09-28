@@ -245,6 +245,7 @@ function create_default_data()
 	$DB->query( "
 		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html, ityp_perm_level )
 		VALUES ( 1,    'Post',          'Posts',         'single', 1, 'standard' ),
+					 ( 2,    'Custom fields example', 'Posts', 'single', 1, 'standard' ),
 					 ( 100,  'Manual Page',   'Posts',         'single', 0, 'standard' ),
 					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 'standard' ),
 					 ( 1000, 'Page',          'Pages',         'page',   1, 'restricted' ),
@@ -258,6 +259,12 @@ function create_default_data()
 					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 'admin' ),
 					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 'admin' ),
 					 ( 5000, 'Reserved',      NULL,            NULL,     1, 'standard' )" );
+
+	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
+			VALUES ( 2, "First numeric field", "first_numeric_field", "double" ),
+						 ( 2, "Second numeric field", "second_numeric_field", "double" ),
+						 ( 2, "First text field", "first_text_field", "varchar" ),
+						 ( 2, "Define you own labels", "define_you_own_labels", "varchar" )' );
 	task_end();
 
 
@@ -1953,6 +1960,19 @@ function create_demo_contents()
 		$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
 		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
+
+		// Insert a post:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'demo' );
+		$edited_Item->set_setting( 'custom_double_1', '123' );
+		$edited_Item->set_setting( 'custom_double_2', '456' );
+		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
+		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
+		$edited_Item->insert( 1, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
+				.T_('<p>This post type defines 4 custom fields.</p>')
+				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 2 );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
