@@ -391,8 +391,8 @@ class LinkOwner
 
 
 	/**
-	 * Update owner last_touched_ts if exists
-	 * This must be override in the subclasses if the owner object has last_touched_ts field
+	 * Update owner last_touched_mts if exists
+	 * This must be override in the subclasses if the owner object has last_touched_mts field
 	 */
 	function update_last_touched_date()
 	{

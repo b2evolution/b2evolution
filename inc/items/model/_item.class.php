@@ -65,7 +65,7 @@ class Item extends ItemLight
 	 * @see Item::update_last_touched_date()
 	 * @var integer
 	 */
-	var $last_touched_ts;
+	var $last_touched_mts;
 
 
 	/**
@@ -299,7 +299,7 @@ class Item extends ItemLight
 		else
 		{
 			$this->datecreated = $db_row->post_datecreated; 					// When Item was created in the system
-			$this->last_touched_ts = $db_row->post_last_touched_ts;		// When Item received last visible change (edit, comment, etc.)
+			$this->last_touched_mts = $db_row->post_last_touched_mts;		// When Item received last visible change (edit, comment, etc.)
 			$this->creator_user_ID = $db_row->post_creator_user_ID; 	// Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
@@ -5038,7 +5038,7 @@ class Item extends ItemLight
 			$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 		}
 
-		$this->set_last_touched_ts();
+		$this->set_last_touched_mts();
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
@@ -5120,9 +5120,9 @@ class Item extends ItemLight
 	 */
 	function dbinsert_test()
 	{
-		global $DB, $localtimenow;
+		global $DB, $localmicrotimenow;
 
-		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		$this->set_param( 'last_touched_mts', 'number', $localmicrotimenow );
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -5260,9 +5260,9 @@ class Item extends ItemLight
 			$db_changed = true;
 		}
 
-		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
-		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
-			$this->set_last_touched_ts();
+		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_mts'] ) ) )
+		{ // Update last_touched_mts field only if it wasn't updated yet and the datemodified will be updated for sure.
+			$this->set_last_touched_mts();
 		}
 
 		$parent_update = parent::dbupdate( $auto_track_modification );
@@ -6135,6 +6135,11 @@ class Item extends ItemLight
 
 			case 'excerpt':
 				return $this->get_excerpt2();
+
+			case 'last_touched_ts':
+				// Field "last_touched_ts" is deprecated,
+				// But keep this for 3rd party skins, plugins and etc.
+				return date( 'Y-m-d H:i:s', $this->last_touched_mts );
 		}
 
 		return parent::get( $parname );
@@ -7015,20 +7020,20 @@ class Item extends ItemLight
 	}
 
 
-	function set_last_touched_ts()
+	function set_last_touched_mts()
 	{
-		global $localtimenow, $current_User;
+		global $localmicrotimenow, $current_User;
 
 		if( is_logged_in() )
 		{
 			$this->load_content_read_status();
 		}
-		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
+		$this->set_param( 'last_touched_mts', 'number', $localmicrotimenow );
 	}
 
 
 	/**
-	 * Update field last_touched_ts
+	 * Update field last_touched_mts
 	 *
 	 * @param boolean Use transaction
 	 * @param boolean Use FALSE to update only the categories
@@ -7043,7 +7048,7 @@ class Item extends ItemLight
 
 		if( $update_item_date )
 		{
-			$this->set_last_touched_ts();
+			$this->set_last_touched_mts();
 			$this->dbupdate( false, false, false );
 		}
 
@@ -7073,7 +7078,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Update field uprs_read_post_ts for current User
+	 * Update field uirs_read_item_mts for current User
 	 *
 	 * @param boolean TRUE to update a post read timestamp
 	 * @param boolean TRUE to update a comments read timestamp
@@ -7101,13 +7106,11 @@ class Item extends ItemLight
 			return;
 		}
 
-		global $DB, $current_User, $localtimenow, $user_post_read_statuses;
-
-		$timestamp = date2mysql( $localtimenow );
+		global $DB, $current_User, $localmicrotimenow, $user_post_read_statuses;
 
 		$read_date = $this->get_read_date();
 
-		if( $timestamp == $read_date )
+		if( $localmicrotimenow == $read_date )
 		{	// The read status is already updated, Don't repeat it:
 			return;
 		}
@@ -7117,7 +7120,7 @@ class Item extends ItemLight
 			$update_fields = '';
 			if( $read_post )
 			{	// Update a post read timestamp:
-				$update_fields = 'uprs_read_post_ts = '.$DB->quote( $timestamp );
+				$update_fields = 'uirs_read_item_mts = '.$DB->quote( $localmicrotimenow );
 			}
 			if( $read_comments )
 			{	// Update a comments read timestamp:
@@ -7125,12 +7128,12 @@ class Item extends ItemLight
 				{
 					$update_fields .= ', ';
 				}
-				$update_fields .= 'uprs_read_comment_ts = '.$DB->quote( $timestamp );
+				$update_fields .= 'uirs_read_comment_mts = '.$DB->quote( $localmicrotimenow );
 			}
-			$DB->query( 'UPDATE T_users__postreadstatus
+			$DB->query( 'UPDATE T_users__item_read_status
 				  SET '.$update_fields.'
-				WHERE uprs_user_ID = '.$DB->quote( $current_User->ID ).'
-				  AND uprs_post_ID = '.$DB->quote( $this->ID ) );
+				WHERE uirs_user_ID = '.$DB->quote( $current_User->ID ).'
+				  AND uirs_item_ID = '.$DB->quote( $this->ID ) );
 		}
 		else
 		{	// Insert new read status:
@@ -7138,8 +7141,8 @@ class Item extends ItemLight
 			$insert_values = '';
 			if( $read_post )
 			{	// Update a post read timestamp:
-				$insert_fields = 'uprs_read_post_ts';
-				$insert_values = $DB->quote( $timestamp );
+				$insert_fields = 'uirs_read_item_mts';
+				$insert_values = $DB->quote( $localmicrotimenow );
 			}
 			if( $read_comments )
 			{	// Update a comments read timestamp:
@@ -7148,15 +7151,15 @@ class Item extends ItemLight
 					$insert_fields .= ', ';
 					$insert_values .= ', ';
 				}
-				$insert_fields .= 'uprs_read_comment_ts';
-				$insert_values .= $DB->quote( $timestamp );
+				$insert_fields .= 'uirs_read_comment_mts';
+				$insert_values .= $DB->quote( $localmicrotimenow );
 			}
-			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, '.$insert_fields.' )
+			$DB->query( 'INSERT INTO T_users__item_read_status ( uirs_user_ID, uirs_item_ID, '.$insert_fields.' )
 				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$insert_values.' )' );
 		}
 
 		// Update the cached date:
-		$user_post_read_statuses[ $this->ID ] = $timestamp;
+		$user_post_read_statuses[ $this->ID ] = $localmicrotimenow;
 	}
 
 
@@ -7214,9 +7217,9 @@ class Item extends ItemLight
 		}
 
 		// In theory, it would be more safe to use this comparison:
-		// if( $read_date > $this->last_touched_ts )
+		// if( $read_date > $this->last_touched_mts )
 		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-		if( $read_date >= $this->last_touched_ts )
+		if( $read_date >= $this->last_touched_mts )
 		{	// This post was read by current user
 			return 'read';
 		}
@@ -7243,10 +7246,10 @@ class Item extends ItemLight
 		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
 		{ // Get the read post date only one time from DB and store it in cache array
 			$SQL = new SQL();
-			$SQL->SELECT( 'uprs_read_post_ts' );
-			$SQL->FROM( 'T_users__postreadstatus' );
-			$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-			$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $this->ID ) );
+			$SQL->SELECT( 'uirs_read_item_mts' );
+			$SQL->FROM( 'T_users__item_read_status' );
+			$SQL->WHERE( 'uirs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$SQL->WHERE_and( 'uirs_item_ID = '.$DB->quote( $this->ID ) );
 			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get() );
 		}
 

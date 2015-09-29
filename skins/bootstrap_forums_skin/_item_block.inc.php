@@ -101,7 +101,7 @@ skin_widget( array(
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
+						.T_('Last touched:').' '.date( 'D M j, Y H:i', $Item->get( 'last_touched_mts' ) )
 					.'</span>';
 				echo '</div>';
 				// Author info - shrinked:

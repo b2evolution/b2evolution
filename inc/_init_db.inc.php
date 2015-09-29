@@ -59,6 +59,12 @@ $time_difference = $Settings->get('time_difference');
  */
 $localtimenow = $servertimenow + $time_difference;
 
+/**
+ * Corrected Unix timestamp with microseconds to match server timezone
+ * @global int $localmicrotimenow
+ */
+$localmicrotimenow = microtime( true ) + $time_difference;
+
 
 /**
  * @global AbstractSettings

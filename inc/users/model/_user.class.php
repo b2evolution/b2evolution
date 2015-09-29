@@ -298,7 +298,7 @@ class User extends DataObject
 				array( 'table'=>'T_messaging__contact_groupusers', 'fk'=>'cgu_user_ID', 'msg'=>T_('%d contacts from contact groups') ),
 				array( 'table'=>'T_pluginusersettings', 'fk'=>'puset_user_ID', 'msg'=>T_('%d user settings on plugins') ),
 				array( 'table'=>'T_users__fields', 'fk'=>'uf_user_ID', 'msg'=>T_('%d user fields') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_user_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_users__item_read_status', 'fk'=>'uirs_user_ID', 'msg'=>T_('%d recordings of a post having been read') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),

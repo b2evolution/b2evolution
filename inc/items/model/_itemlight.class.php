@@ -191,7 +191,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_users__item_read_status', 'fk'=>'uirs_item_ID', 'msg'=>T_('%d recordings of a post having been read') ),
 			);
 	}
 

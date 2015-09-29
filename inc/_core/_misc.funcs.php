@@ -5475,7 +5475,7 @@ function get_available_sort_options()
 		'title'           => T_('Title'),
 		'datecreated'     => T_('Date created'),
 		'datemodified'    => T_('Date last modified'),
-		'last_touched_ts' => T_('Date last touched'),
+		'last_touched_mts'=> T_('Date last touched'),
 		'urltitle'        => T_('URL "filename"'),
 		'priority'        => T_('Priority'),
 		'RAND'            => T_('Random order!'),

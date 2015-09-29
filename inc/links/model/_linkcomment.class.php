@@ -183,7 +183,7 @@ class LinkComment extends LinkOwner
 
 
 	/**
-	 * Update field last_touched_ts of Comment & Item
+	 * Update field last_touched_mts of Comment & Item
 	 */
 	function update_last_touched_date()
 	{

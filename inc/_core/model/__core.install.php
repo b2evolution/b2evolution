@@ -158,14 +158,14 @@ $schema_queries = array(
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_users__postreadstatus' => array(
+	'T_users__item_read_status' => array(
 		'Creating table for User post read status',
-		"CREATE TABLE T_users__postreadstatus (
-			uprs_user_ID int(11) unsigned NOT NULL,
-			uprs_post_ID int(11) unsigned NOT NULL,
-			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
+		"CREATE TABLE T_users__item_read_status (
+			uirs_user_ID          int(11) unsigned NOT NULL,
+			uirs_item_ID          int(11) unsigned NOT NULL,
+			uirs_read_item_mts    DOUBLE(13,3) unsigned NOT NULL DEFAULT 0,
+			uirs_read_comment_mts DOUBLE(13,3) unsigned NOT NULL DEFAULT 0,
+			PRIMARY KEY ( uirs_user_ID, uirs_item_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__invitation_code' => array(

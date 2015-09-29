@@ -1991,13 +1991,13 @@ function load_user_read_statuses( $post_ids = NULL )
 		$user_post_read_statuses = array();
 	}
 
-	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
+	$post_condition = empty( $post_ids ) ? NULL : 'uirs_item_ID IN ( '.implode( ',', $post_ids ).' )';
 
 	// SELECT current User's post and comment read statuses for all post with the given ids
 	$SQL = new SQL();
-	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
-	$SQL->FROM( 'T_users__postreadstatus' );
-	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL->SELECT( 'uirs_item_ID, uirs_read_item_mts' );
+	$SQL->FROM( 'T_users__item_read_status' );
+	$SQL->WHERE( 'uirs_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
 	$user_post_read_statuses = $DB->get_assoc( $SQL->get() );

@@ -173,7 +173,7 @@ class ItemList2 extends ItemListLight
 			'$item_issue_date' AS post_datestart,
 			'$item_issue_date' AS post_datecreated,
 			'$item_issue_date' AS post_datemodified,
-			'$item_issue_date' AS post_last_touched_ts,
+			'$item_issue_date' AS post_last_touched_mts,
 			0 AS post_dateset,
 			'".$DB->escape($post_status)."' AS post_status,
 			'".$DB->escape($post_locale)."' AS post_locale,
@@ -761,7 +761,7 @@ class ItemList2 extends ItemListLight
 			case 'ityp_ID':
 			case 'datecreated':
 			case 'datemodified':
-			case 'last_touched_ts':
+			case 'last_touched_mts':
 			case 'urltitle':
 			case 'priority':
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]

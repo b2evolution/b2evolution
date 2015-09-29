@@ -1839,7 +1839,7 @@ class File extends DataObject
 		// Let parent do the update:
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			// Update field 'last_touched_ts' of each item that has a link with this edited file
+			// Update field 'last_touched_mts' of each item that has a link with this edited file
 			$LinkCache = & get_LinkCache();
 			$links = $LinkCache->get_by_file_ID( $this->ID );
 			foreach( $links as $Link )

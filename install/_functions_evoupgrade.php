@@ -5128,7 +5128,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for User post read status... ' );
-		$DB->query( 'CREATE TABLE T_users__postreadstatus (
+		$DB->query( 'CREATE TABLE '.$tableprefix.'users__postreadstatus (
 			uprs_user_ID int(11) unsigned NOT NULL,
 			uprs_post_ID int(11) unsigned NOT NULL,
 			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
@@ -6551,11 +6551,43 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( $old_db_version < 11500 )
-	{ // part 18.u trunk aka 22th part of "i7"
+	{ // part 1 of 6.7.0
 
 		task_begin( 'Upgrading cron tasks table...' );
 		$DB->query( 'ALTER TABLE T_cron__task
 			ADD COLUMN ctsk_repeat_variation int(10) unsigned DEFAULT 0 AFTER ctsk_repeat_after' );
+		task_end();
+
+		set_upgrade_checkpoint( '11500' );
+	}
+
+	if( $old_db_version < 11510 )
+	{ // part 2 of 6.7.0
+
+		task_begin( 'Upgrading table for User item read status... ' );
+		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_users__item_read_status' );
+		$DB->query( 'ALTER TABLE T_users__item_read_status
+			CHANGE uprs_user_ID uirs_user_ID int(11) unsigned NOT NULL,
+			CHANGE uprs_post_ID uirs_item_ID int(11) unsigned NOT NULL,
+			ADD uirs_read_item_mts    DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0,
+			ADD uirs_read_comment_mts DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0' );
+		$DB->query( 'UPDATE T_users__item_read_status SET
+			uirs_read_item_mts    = UNIX_TIMESTAMP( uprs_read_post_ts ),
+			uirs_read_comment_mts = UNIX_TIMESTAMP( uprs_read_comment_ts )' );
+		$DB->query( 'ALTER TABLE T_users__item_read_status
+			DROP COLUMN uprs_read_post_ts,
+			DROP COLUMN uprs_read_comment_ts' );
+		task_end();
+
+		task_begin( 'Upgrade table posts... ' );
+		db_add_col( 'T_items__item', 'post_last_touched_mts', 'DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0 AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_last_touched_mts = UNIX_TIMESTAMP( post_last_touched_ts )' );
+		db_drop_col( 'T_items__item', 'post_last_touched_ts' );
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "last_touched_mts"
+			WHERE cset_name = "orderby"
+			  AND cset_value = "last_touched_ts"' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11500' );

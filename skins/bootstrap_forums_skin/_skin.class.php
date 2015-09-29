@@ -747,14 +747,14 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL = new SQL();
 			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__item_read_status ON post_ID = uirs_item_ID AND uirs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
-			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
+			$unread_posts_SQL->WHERE_and( 'post_last_touched_mts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts <= post_last_touched_ts' );
+			// $unread_posts_SQL->WHERE_and( 'uirs_item_ID IS NULL OR uirs_read_item_mts <= post_last_touched_mts' );
 			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts < post_last_touched_ts' );
+			$unread_posts_SQL->WHERE_and( 'uirs_item_ID IS NULL OR uirs_read_item_mts < post_last_touched_mts' );
 
 			// Execute a query with to know if current user has new data to view:
 			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );

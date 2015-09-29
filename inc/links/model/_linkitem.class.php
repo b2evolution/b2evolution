@@ -237,7 +237,7 @@ class LinkItem extends LinkOwner
 
 
 	/**
-	 * Update field last_touched_ts of Item
+	 * Update field last_touched_mts of Item
 	 */
 	function update_last_touched_date()
 	{

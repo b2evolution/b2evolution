@@ -306,7 +306,7 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
 				$this->set_setting( 'allow_html_comment', 0 );
-				$this->set_setting( 'orderby', 'last_touched_ts' );
+				$this->set_setting( 'orderby', 'last_touched_mts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
 				$this->set_setting( 'front_disp', 'front' );
