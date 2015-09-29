@@ -29,7 +29,7 @@ $Form = new Form( NULL, 'city_checkchanges', 'post', 'compact' );
 $Form->global_icon( T_('Delete this city!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('city') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New city') : T_('City') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New city') : T_('City') ).get_manual_link( 'cities-editing' ) );
 
 	$Form->add_crumb( 'city' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',city_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

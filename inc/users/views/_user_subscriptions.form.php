@@ -84,7 +84,7 @@ if( !$user_profile_only )
 $is_admin_page = is_admin_page();
 if( $is_admin_page )
 {
-	$form_text_title = T_( 'Edit notifications' ); // used for js confirmation message on leave the changed form
+	$form_text_title = T_( 'Edit notifications' ).get_manual_link( 'user-notifications-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'subs', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
@@ -122,7 +122,7 @@ else
 
 $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 
-$Form->begin_fieldset( T_('Email') );
+$Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-notifications-tab' ) : '' ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 

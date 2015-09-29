@@ -153,14 +153,23 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 		$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget( 'fullname' ) );
 	}
 
+	$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
+			array(
+				array( '0', T_('Simple permissions'), T_('(the owner above has full permissions on this collection)') ),
+				array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
+		), T_('Permission management'), true );
+
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
 				array( 'users', T_('Logged in users') ),
-				array( 'members', T_('Members') ),
+				array( 'members', ( $edited_Blog->get( 'advanced_perms' ) ? T_('Members') : T_('Only the owner') ),
+									sprintf( T_('(Assign membership in <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
 		), T_('Allow access to'), true );
-
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
 
 $Form->end_fieldset();
 

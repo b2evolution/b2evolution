@@ -33,7 +33,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
 
-	$Form->begin_fieldset( T_('Skin properties') );
+	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-settings' ) );
 
 		echo '<div class="skin_settings well">';
 			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );

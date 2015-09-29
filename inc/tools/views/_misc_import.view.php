@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $block_item_Widget = new Widget( 'block_item' );
 
 // fp> TODO: pluginize MT! :P
-$block_item_Widget->title = T_('Movable Type Import');
+$block_item_Widget->title = T_('Movable Type Import').get_manual_link( 'import-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 ?>
 	<ol>

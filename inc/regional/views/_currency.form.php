@@ -26,7 +26,7 @@ $Form = new Form( NULL, 'currency_checkchanges', 'post', 'compact' );
 $Form->global_icon( T_('Delete this currency!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('currency') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New currency') : T_('Currency') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New currency') : T_('Currency') ).get_manual_link( 'currencies-editing' ) );
 
 	$Form->add_crumb( 'currency' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',curr_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

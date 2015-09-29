@@ -76,7 +76,7 @@ $Form->add_crumb( 'time' );
 $Form->hidden( 'ctrl', 'time' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Time settings') );
+$Form->begin_fieldset( T_('Time settings').get_manual_link( 'regional-time-tab' ) );
 
 // Time difference:
 $td_value = $Settings->get('time_difference');

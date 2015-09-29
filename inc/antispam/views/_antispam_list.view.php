@@ -29,7 +29,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 	global $keyword;
 
 	$Form = new Form( NULL, 'antispam_add', 'post', 'compact' );
-	$Form->begin_form( 'fform', T_('Add a banned keyword') );
+	$Form->begin_form( 'fform', T_('Add a banned keyword').get_manual_link( 'antispam-tab' ) );
 		$Form->add_crumb('antispam');
 		$Form->hidden_ctrl();
 		$Form->hidden( 'action', 'ban' );

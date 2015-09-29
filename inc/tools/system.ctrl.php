@@ -119,7 +119,7 @@ $block_item_Widget = new Widget( 'block_item' );
 /**
  * b2evolution
  */
-$block_item_Widget->title = 'b2evolution';
+$block_item_Widget->title = 'b2evolution'.get_manual_link( 'system-status-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Instance name:
