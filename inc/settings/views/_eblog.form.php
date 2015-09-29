@@ -35,7 +35,7 @@ $Form->hidden( 'ctrl', 'remotepublish' );
 $Form->hidden( 'tab', 'eblog' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Test saved settings') );
+$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'post-by-email' ) );
 
 	$url = '?ctrl=remotepublish&amp;tab=eblog&amp;'.url_crumb('globalsettings').'&amp;action=';
 	$Form->info_field( T_('Perform tests'),

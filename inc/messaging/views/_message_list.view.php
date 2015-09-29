@@ -179,7 +179,7 @@ $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
-$Results->title = $params['messages_list_title'];
+$Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_link( 'messages-thread-list' ) : '' );
 
 if( is_admin_page() )
 {
@@ -275,6 +275,10 @@ if( $is_recipient )
 		echo $params['messages_list_form_start'];
 
 		$form_title = sprintf( T_('Reply to: %s'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ) );
+		if( is_admin_page() )
+		{
+			$form_title .= get_manual_link( 'messages-reply-to-thread' );
+		}
 
 		if( ! is_admin_page() )
 		{

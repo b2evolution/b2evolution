@@ -29,7 +29,7 @@ $Form = new Form( NULL, 'region_checkchanges', 'post', 'compact' );
 $Form->global_icon( T_('Delete this region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('region') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New region') : T_('Region') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New region') : T_('Region') ).get_manual_link( 'regions-editing' ) );
 
 	$Form->add_crumb( 'region' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',rgn_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

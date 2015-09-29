@@ -63,7 +63,7 @@ if( !empty( $object ) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'slg_', 'D' );
 
-$Results->title = T_('System log');
+$Results->title = T_('System log').get_manual_link( 'system-log-tab' );
 
 /**
  * Callback to add filters on top of the result set

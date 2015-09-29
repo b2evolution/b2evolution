@@ -55,7 +55,7 @@ $Form->begin_form( 'fform', '',
 
 
 // --------------------------- INFO ---------------------------
-$Form->begin_fieldset( T_('Plugin info'), array( 'class' => 'clear' ) );
+$Form->begin_fieldset( T_('Plugin info').get_manual_link( 'plugins-editing' ), array( 'class' => 'clear' ) );
 	// Name:
 	$Form->text_input( 'edited_plugin_name', $edited_plugin_name, 25, T_('Name'), '', array('maxlength' => 255) );
 	// Desc:

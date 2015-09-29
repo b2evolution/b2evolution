@@ -527,7 +527,14 @@ if( $display_mode != 'js' )
 			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
 
 			// Set an url for manual page:
-			$AdminUI->set_page_manual_link( 'ip-ranges' );
+			if( $action == 'iprange_new' || $action == 'iprange_edit' )
+			{
+				$AdminUI->set_page_manual_link( 'ip-range-editing' );
+			}
+			else
+			{
+				$AdminUI->set_page_manual_link( 'ip-ranges' );
+			}
 			break;
 
 		case 'countries':

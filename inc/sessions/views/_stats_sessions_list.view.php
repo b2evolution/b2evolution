@@ -63,9 +63,9 @@ echo '<span class="floatright">'.$Results->gen_global_icons().'</span>';
 $Results->global_icons = array();
 
 // echo user tabs
-echo '<div>'.get_usertab_header( $edited_User, $user_tab, T_( 'Sessions' ) ).'</div>';
+echo '<div>'.get_usertab_header( $edited_User, $user_tab, T_( 'Sessions' ).get_manual_link( 'user-sessions-tab' ) ).'</div>';
 
-$Results->title = T_('Recent sessions');
+$Results->title = T_('Recent sessions').get_manual_link( 'user-sessions-tab' );
 
 /**
  * Callback to add filters on top of the result set

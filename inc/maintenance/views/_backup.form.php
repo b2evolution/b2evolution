@@ -40,7 +40,7 @@ echo '<p>Your backups will be saved into the directory: <b>'.$backup_path.'</b> 
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Backup settings for folders and files
-$Form->begin_fieldset( T_( 'Folders & files' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ), array( 'class'=>'fieldset clear' ) );
 
 // Display checkboxes
 foreach( $backup_paths as $name => $settings )

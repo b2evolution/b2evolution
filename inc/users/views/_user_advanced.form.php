@@ -92,8 +92,8 @@ if( !$user_profile_only )
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$form_text_title = T_( 'Edit notifications' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ) );
+$form_text_title = T_( 'Edit advanced preferences' ); // used for js confirmation message on leave the changed form
+$form_title = get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ).get_manual_link( 'user-advanced-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
