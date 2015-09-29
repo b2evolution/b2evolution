@@ -1490,30 +1490,46 @@ table.widget_grid div {
  *
  * Override this with style.css in your skin folder.
  */
+.ratings_table {
+  margin: 0 10px 10px 0;
+  display: inline-block;
+}
+.ratings_table .rating_summary {
+  border-spacing: 1px;
+  border-collapse: separate;
+}
+.ratings_table .progress {
+  border-radius: 0;
+  height: 13px;
+}
 table.rating_summary {
   float: left;
+  margin: 0;
 }
-table.rating_summary th,
-table.rating_summary td {
+table.rating_summary tr th,
+table.rating_summary tr td {
+  border: none;
   font-size: 10px;
   line-height: 13px;
   font-weight: normal;
   padding: 0;
 }
-table.rating_summary th {
+table.rating_summary tr th {
   padding-right: 5px;
+  background-color: transparent;
+}
+table.rating_summary tr td {
+  text-align: right;
+  padding-left: 5px;
 }
 table.rating_summary .progress {
   width: 60px;
   background: #eeeecc;
   padding: 0;
+  box-shadow: none;
 }
 table.rating_summary .progress div {
   background: #ffcc66;
-}
-table.rating_summary td {
-  text-align: right;
-  padding-left: 5px;
 }
 div.rating_summary_total {
   float: left;
@@ -1843,82 +1859,6 @@ div.results {
 }
 .pager li a {
   margin-bottom: 4px;
-}
-.evo_content_block .ratings_table {
-  margin: 0 10px 10px 0;
-  display: inline-block;
-}
-.evo_content_block .ratings_table .rating_summary {
-  border-spacing: 1px;
-  border-collapse: separate;
-}
-.evo_content_block .ratings_table .progress {
-  border-radius: 0;
-  height: 13px;
-}
-.evo_content_block table.rating_summary {
-  float: left;
-  margin: 0;
-}
-.evo_content_block table.rating_summary th,
-.evo_content_block table.rating_summary td {
-  border: none;
-  font-size: 10px;
-  line-height: 13px;
-  font-weight: normal;
-  padding: 0;
-}
-.evo_content_block table.rating_summary th {
-  padding-right: 5px;
-  background-color: transparent;
-}
-.evo_content_block table.rating_summary .progress {
-  width: 60px;
-  background: #eeeecc;
-  padding: 0;
-  box-shadow: none;
-}
-.evo_content_block table.rating_summary .progress div {
-  background: #ffcc66;
-}
-.evo_content_block table.rating_summary td {
-  text-align: right;
-  padding-left: 5px;
-}
-div.rating_summary_total {
-  float: left;
-  padding: 5px 0 0 20px;
-}
-div.average_rating {
-  padding-top: 5px;
-}
-div.average_rating span {
-  float: left;
-  font-size: 11px;
-  line-height: 12px;
-  padding-left: 10px;
-}
-div.star_rating,
-div.star_rating div {
-  width: 60px;
-  height: 12px;
-  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-  overflow: hidden;
-  text-indent: 100px;
-}
-div.star_rating div {
-  background-position: 0 -160px;
-}
-div.average_rating .star_rating {
-  float: left;
-}
-.rating_recap {
-  clear: both;
-  font-size: 10px;
-}
-.rating_recap div {
-  float: left;
-  padding-right: 10px;
 }
 form.inskin {
   padding: 10px;
