@@ -834,6 +834,15 @@ $sendmail_additional_params = '-r $return-address$';
 
 
 /**
+ * Turn this on to simulate email sends instead of really sending them through SMTP.
+ * This is useful if you are debugging a production database on a development machine.
+ * It will prevent from sending test notifications to real user accounts.
+ * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
+ */
+$email_send_simulate_only = false;
+
+
+/**
  * Would you like to use CDNs as definied in the array $library_cdn_urls below 
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *

@@ -185,7 +185,7 @@ function emadr_get_status_icon( $status )
 /**
  * Get result info of email log
  *
- * @param string Result ( 'ok', 'error', 'blocked' )
+ * @param string Result ( 'ok', 'error', 'blocked', 'simulated' )
  * @param boolean Params
  * @return string Result info
  */
@@ -242,6 +242,17 @@ function emlog_result_info( $result, $params = array() )
 				}
 			}
 			break;
+
+		case 'simulated':
+			if( $params['display_icon'] )
+			{
+				$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Simulated') ) );
+			}
+			if( $params['display_text'] )
+			{
+				$result_info .= ' '.T_('Simulated');
+			}
+			break;
 	}
 
 	return $result_info;
@@ -256,7 +267,7 @@ function emlog_result_info( $result, $params = array() )
  * @param string Subject
  * @param string Message
  * @param string Headers
- * @param string Result type ( 'ok', 'error', 'blocked' )
+ * @param string Result type ( 'ok', 'error', 'blocked', 'simulated' )
  */
 function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 {

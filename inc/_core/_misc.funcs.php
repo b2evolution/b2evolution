@@ -3416,7 +3416,7 @@ function user_get_notification_sender( $user_ID, $setting )
  */
 function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
 {
-	global $servertimenow;
+	global $servertimenow, $email_send_simulate_only;
 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
@@ -3546,20 +3546,25 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		return false;
 	}
 
-	// SEND MESSAGE:
-	if( $debug > 1 )
-	{ // We agree to die for debugging...
-		if( ! evo_mail( $to, $subject, $message_data, $headers, $additional_parameters ) )
-		{
+	if( $email_send_simulate_only )
+	{	// The email sending is turned on simulation mode, Don't send a real message:
+		$send_mail_result = true;
+	}
+	else
+	{	// Send email message on real mode:
+		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+	}
+
+	if( ! $send_mail_result )
+	{	// The message has not been sent successfully
+		if( $debug > 1 )
+		{ // We agree to die for debugging...
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
-	}
-	else
-	{ // Soft debugging only....
-		if( ! evo_mail( $to, $subject, $message_data, $headers, $additional_parameters ) )
-		{
+		else
+		{ // Soft debugging only....
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
@@ -3570,7 +3575,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'ok' );
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
 
 	return true;
 }

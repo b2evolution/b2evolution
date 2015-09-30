@@ -427,7 +427,7 @@ $schema_queries = array(
 			emlog_timestamp TIMESTAMP NOT NULL,
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emlog_result    ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
+			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
 			emlog_message   TEXT DEFAULT NULL,
