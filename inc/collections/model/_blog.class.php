@@ -2360,39 +2360,6 @@ class Blog extends DataObject
 						1, 1, 1 )' );
 		}
 
-		/*
-		if( $kind == 'forum' )
-		{	// Set default group permissions for the Forum blog
-			$GroupCache = & get_GroupCache();
-			$groups_permissions = array();
-			if( $GroupCache->get_by_ID( 1, false ) )
-			{	// Check if "Administrators" group still exists
-				$groups_permissions[ 'admins' ] = "( $this->ID, 1, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )";
-			}
-			if( $GroupCache->get_by_ID( 2, false ) )
-			{	// Check if "Moderators" group still exists
-				$groups_permissions[ 'privileged' ] = "( $this->ID, 2, 1, 'published,deprecated,protected,private,draft', 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1 )";
-			}
-			if( $GroupCache->get_by_ID( 3, false ) )
-			{	// Check if "Bloggers" group still exists
-				$groups_permissions[ 'bloggers' ] = "( $this->ID, 3, 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0 )";
-			}
-			if( $GroupCache->get_by_ID( 4, false ) )
-			{	// Check if "Basic Users" group still exists
-				$groups_permissions[ 'users' ] = "( $this->ID, 4, 1, 'published', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
-			}
-			if( $GroupCache->get_by_ID( 5, false ) )
-			{	// Check if "Spam/Suspect Users" group still exists
-				$groups_permissions[ 'spam' ] = "( $this->ID, 5, 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )";
-			}
-			$DB->query( 'INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember,
-					bloggroup_perm_poststatuses, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
-					bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,
-					bloggroup_perm_cats, bloggroup_perm_properties,
-					bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
-				VALUES '.implode( ',', $groups_permissions ) );
-		}*/
-
 		// Create default category:
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 		$edited_Chapter = new Chapter( NULL, $this->ID );
@@ -2424,14 +2391,210 @@ class Blog extends DataObject
 		}
 		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );
 
-		if( $this->get( 'advanced_perms' ) )
-		{	// Display this warning if blog has the enabled advanced perms be default
-			$Messages->add( sprintf(T_('ATTENTION: go to the <a %s>advanced group permissions for this blog/forum</a> in order to allow some user groups to post new topics into this forum.'), 'href='.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$this->ID ), 'warning' );
+		// Insert default group permissions:
+		$default_perms_inserted = $this->insert_default_group_permissions();
+
+		if( $this->get( 'advanced_perms' ) && $default_perms_inserted )
+		{	// Display this warning if coolection has the enabled advanced perms AND default permissions have been inserted for at least one group:
+			$Messages->add( sprintf( T_('ATTENTION: We have set some advanced permissions for this collection. Please verify the <a %s>User permissions</a> and the <a %s>Group permissions</a> now.'),
+						'href='.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$this->ID,
+						'href='.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$this->ID ),
+					'warning' );
 		}
 
 		// Commit changes in cache:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->add( $this );
+	}
+
+
+	/**
+	 * Insert default group permissions
+	 *
+	 * @return boolean TRUE on inserting the permissions for at least one group
+	 */
+	function insert_default_group_permissions()
+	{
+		global $DB, $default_locale;
+
+		$groups = array(
+			'admins'     => array( 'ID' => 1, 'name' => 'Administrators' ),
+			'moderators' => array( 'ID' => 2, 'name' => 'Moderators' ),
+			'editors'    => array( 'ID' => 3, 'name' => 'Editors' ),
+			'users'      => array( 'ID' => 4, 'name' => 'Normal Users' ),
+			'suspect'    => array( 'ID' => 5, 'name' => 'Misbehaving/Suspect Users' ),
+			'spam'       => array( 'ID' => 6, 'name' => 'Spammers/Restricted Users' ),
+		);
+
+		// Define default group permissions for each group for any collection type:
+		// NOTE: The fields order should be same in each group array!
+		$group_permissions = array(
+			'admins' => array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 1,
+				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
+				'perm_item_type'       => 'admin',
+				'perm_edit'            => 'all',
+				'perm_delpost'         => 1,
+				'perm_edit_ts'         => 1,
+				'perm_delcmts'         => 1,
+				'perm_recycle_owncmts' => 1,
+				'perm_vote_spam_cmts'  => 1,
+				'perm_cmtstatuses'     => 'published,community,deprecated,protected,private,review,draft',
+				'perm_edit_cmt'        => 'all',
+				'perm_cats'            => 1,
+				'perm_properties'      => 1,
+				'perm_admin'           => 1,
+				'perm_media_upload'    => 1,
+				'perm_media_browse'    => 1,
+				'perm_media_change'    => 1,
+			),
+			'moderators' => array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 1,
+				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
+				'perm_item_type'       => 'restricted',
+				'perm_edit'            => 'le',
+				'perm_delpost'         => 1,
+				'perm_edit_ts'         => 1,
+				'perm_delcmts'         => 1,
+				'perm_recycle_owncmts' => 1,
+				'perm_vote_spam_cmts'  => 1,
+				'perm_cmtstatuses'     => 'published,community,deprecated,protected,private,review,draft',
+				'perm_edit_cmt'        => 'le',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 1,
+				'perm_media_browse'    => 1,
+				'perm_media_change'    => 1,
+			),
+			'editors' => array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 0,
+				'perm_poststatuses'    => '',
+				'perm_item_type'       => 'standard',
+				'perm_edit'            => 'no',
+				'perm_delpost'         => 0,
+				'perm_edit_ts'         => 1,
+				'perm_delcmts'         => 0,
+				'perm_recycle_owncmts' => 0,
+				'perm_vote_spam_cmts'  => 1,
+				'perm_cmtstatuses'     => '',
+				'perm_edit_cmt'        => 'no',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 1,
+				'perm_media_browse'    => 1,
+				'perm_media_change'    => 0,
+			)
+		);
+		if( $this->type == 'forum' )
+		{	// Set special permissions for collection with type "Forum"
+			$group_permissions['editors'] = array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 0,
+				'perm_poststatuses'    => 'community,protected,draft,deprecated',
+				'perm_item_type'       => 'standard',
+				'perm_edit'            => 'own',
+				'perm_delpost'         => 0,
+				'perm_edit_ts'         => 1,
+				'perm_delcmts'         => 0,
+				'perm_recycle_owncmts' => 0,
+				'perm_vote_spam_cmts'  => 1,
+				'perm_cmtstatuses'     => 'community,protected,review,draft,deprecated',
+				'perm_edit_cmt'        => 'own',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 1,
+				'perm_media_browse'    => 1,
+				'perm_media_change'    => 0,
+			);
+			$group_permissions['users'] = array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 0,
+				'perm_poststatuses'    => 'community,draft',
+				'perm_item_type'       => 'standard',
+				'perm_edit'            => 'no',
+				'perm_delpost'         => 0,
+				'perm_edit_ts'         => 0,
+				'perm_delcmts'         => 0,
+				'perm_recycle_owncmts' => 0,
+				'perm_vote_spam_cmts'  => 0,
+				'perm_cmtstatuses'     => 'community,draft',
+				'perm_edit_cmt'        => 'no',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 1,
+				'perm_media_browse'    => 0,
+				'perm_media_change'    => 0,
+			);
+			$group_permissions['suspect'] = array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 0,
+				'perm_poststatuses'    => 'review,draft',
+				'perm_item_type'       => 'standard',
+				'perm_edit'            => 'no',
+				'perm_delpost'         => 0,
+				'perm_edit_ts'         => 0,
+				'perm_delcmts'         => 0,
+				'perm_recycle_owncmts' => 0,
+				'perm_vote_spam_cmts'  => 0,
+				'perm_cmtstatuses'     => 'review,draft',
+				'perm_edit_cmt'        => 'no',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 0,
+				'perm_media_browse'    => 0,
+				'perm_media_change'    => 0,
+			);
+		}
+
+		$insert_values = array();
+		foreach( $groups as $group_key => $group )
+		{
+			if( ! isset( $group_permissions[ $group_key ] ) )
+			{	// Skip group without default permissions:
+				continue;
+			}
+
+			// Check if the requested group still exists in DB:
+			$group_SQL = new SQL();
+			$group_SQL->SELECT( 'grp_ID' );
+			$group_SQL->FROM( 'T_groups' );
+			$group_SQL->WHERE( 'grp_ID = '.$DB->quote( $group['ID'] ) );
+			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( $group['name'] ) );
+			$group_SQL->WHERE_and( 'grp_name = '.$DB->quote( T_( $group['name'], $default_locale ) ) );
+			if( ! $DB->get_var( $group_SQL->get() ) )
+			{	// Skip this group because we cannot find it in DB:
+				continue;
+			}
+
+			if( ! isset( $insert_fields ) )
+			{	// Initialize DB field names only first time:
+				$insert_fields = 'bloggroup_'.implode( ', bloggroup_', array_keys( $group_permissions[ $group_key ] ) );
+			}
+
+			// Initialize permission values for each group:
+			$insert_values[] = $this->ID.', '.$group['ID'].', "'.implode( '", "', $group_permissions[ $group_key ] ).'"';
+		}
+
+		if( isset( $insert_fields ) )
+		{	// Insert group permissions into DB:
+			$r = $DB->query( 'INSERT INTO T_coll_group_perms ( bloggroup_blog_ID, bloggroup_group_ID, '.$insert_fields.' )
+					VALUES ( '.implode( ' ), ( ', $insert_values ).' )' );
+			if( $r )
+			{	// The permissions have been inserted successfully
+				return true;
+			}
+		}
+
+		// No permission insertion
+		return false;
 	}
 
 

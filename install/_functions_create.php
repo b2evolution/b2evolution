@@ -1176,6 +1176,9 @@ function create_blog(
 
 	$Blog->dbupdate();
 
+	// Insert default group permissions:
+	$Blog->insert_default_group_permissions();
+
 	return $Blog->ID;
 }
 
@@ -2808,82 +2811,6 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		echo sprintf( '%d test hits are added.', $insert_data_count );
 		task_end();
 	}
-
-	task_begin( 'Creating default group/blog permissions... ' );
-	$query = '
-		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember, bloggroup_can_be_assignee,
-			bloggroup_perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
-			bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses, bloggroup_perm_edit_cmt,
-			bloggroup_perm_cats, bloggroup_perm_properties, bloggroup_perm_admin,
-			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
-		VALUES ';
-
-	// Init the permissions for all blogs
-	$all_statuses = "'published,community,deprecated,protected,private,review,draft'";
-	$all_post_statuses = "'published,community,deprecated,protected,private,review,draft,redirected'";
-	$gp_user_groups = array(
-			'admins'     => $admins_Group->ID.",     1, 1, $all_post_statuses, 'admin', 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1, 1",
-			'moderators' => $moderators_Group->ID.", 1, 1, $all_statuses, 'restricted', 'le', 1, 1, 1, 1, 1, $all_statuses, 'le', 0, 0, 0, 1, 1, 1",
-			'editors'    => $editors_Group->ID.",    1, 0, '', 'standard', 'no', 0, 1, 0, 0, 1, '', 'no', 0, 0, 0, 1, 1, 0",
-		);
-
-	$gp_blogs_IDs = array();
-	if( $install_collection_home )
-	{ // Install permissions for Info blog
-		$gp_blogs_IDs[] = $blog_home_ID;
-	}
-	if( $install_collection_bloga )
-	{ // Install permissions for Blog A
-		$gp_blogs_IDs[] = $blog_a_ID;
-	}
-	if( $install_collection_blogb )
-	{ // Install permissions for Blog B
-		$gp_blogs_IDs[] = $blog_b_ID;
-	}
-	if( $install_collection_photos )
-	{ // Install permissions for Photos blog
-		$gp_blogs_IDs[] = $blog_photoblog_ID;
-	}
-	if( $install_collection_forums )
-	{ // Install permissions for Forums blog
-		$gp_blogs_IDs[] = $blog_forums_ID;
-		// Init the special permissions for Forums
-		$gp_user_groups_forums = array(
-				'editors' => $editors_Group->ID.", 1, 0, 'community,protected,draft,deprecated', 'standard', 'own', 0, 1, 0, 0, 1, 'community,protected,review,draft,deprecated', 'own', 0, 0, 0, 1, 1, 0",
-				'users'   => $users_Group->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 1, 0, 0",
-				'suspect' => $suspect_Group->ID.", 1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0, 0"
-			);
-		$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
-	}
-	if( $install_collection_manual )
-	{ // Install permissions for Manual blog
-		$gp_blogs_IDs[] = $blog_manual_ID;
-	}
-
-	$query_values = array();
-	foreach( $gp_blogs_IDs as $gp_blog_ID )
-	{
-		if( $install_collection_forums && $gp_blog_ID == $blog_forums_ID )
-		{ // Permission for forums blogs
-			foreach( $gp_user_groups_forums as $gp_user_group_perms )
-			{
-				$query_values[] = "( $gp_blog_ID, ".$gp_user_group_perms.")";
-			}
-		}
-		else
-		{ // Permission for other blogs
-			foreach( $gp_user_groups as $gp_user_group_perms )
-			{
-				$query_values[] = "( $gp_blog_ID, ".$gp_user_group_perms.")";
-			}
-		}
-	}
-	if( count( $query_values ) )
-	{ // Execute sql insert query only when at least one demo blog has been installed
-		$query .= implode( ',', $query_values );
-		$DB->query( $query );
-	}
-	task_end();
 
 	/*
 	// Note: we don't really need this any longer, but we might use it for a better default setup later...
