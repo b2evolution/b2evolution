@@ -135,7 +135,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on THREE lines */ sprintf( T_('Member<br />of<br />%s'), $Blog->get( 'shortname' ) ),
+						'th' => /* TRANS: SHORT table header on TWO lines */ sprintf( T_('Member of<br />%s'), $Blog->get( 'shortname' ) ),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'ismember\', \''.format_to_output( T_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$grp_ID$\' )%'.
 						( $edited_Blog->get_setting( 'use_workflow' ) ? '%coll_perm_checkbox( {row}, \'bloggroup_\', \'can_be_assignee\', \''.format_to_output( T_('Items can be assigned to members of this group'), 'htmlattr' ).'\', \'checkallspan_state_$grp_ID$\' )%' : '' ),
