@@ -2340,20 +2340,24 @@ class Blog extends DataObject
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
 
-		// Set default user permissions for this blog (All permissions for the current user, typically the admin who is creating the blog)
-		// Note: current_User can be NULL only during new user registration process, when new user automatically get a new blog
-		// Note: The owner of teh blog has permissions just by the sole fact he is registered as the owner.
-		if( $current_User != NULL )
-		{ // Proceed insertions:
-			$perm_statuses = "'review,draft,private,protected,deprecated,community,published'";
-			$DB->query( "
-					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_edit_ts,
-						bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
-						bloguser_perm_cats, bloguser_perm_properties,
+		// Set default user permissions for this collection (All permissions for the collection owner):
+		if( ! empty( $this->owner_user_ID ) )
+		{ // Proceed insertion:
+			$DB->query( 'INSERT INTO T_coll_user_perms
+					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
+						bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
+						bloguser_perm_delpost, bloguser_perm_edit_ts,
+						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
+						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
+						bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-					VALUES ( $this->ID, $current_User->ID, 1,
-						$perm_statuses, 1, 1, 1, 1, $perm_statuses, 1, 1, 1, 1, 1 )" );
+					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
+						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
+						1, 1,
+						1, 1, 1,
+						"published,community,deprecated,protected,private,review,draft", "all",
+						1, 1, 1,
+						1, 1, 1 )' );
 		}
 
 		/*
