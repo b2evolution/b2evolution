@@ -477,6 +477,10 @@ switch( $action )
 							$field_value = 'yes';
 							break;
 
+						case 'noopinion':
+							$field_value = 'noopinion';
+							break;
+
 						case 'dontlike':
 							$field_value = 'no';
 							break;

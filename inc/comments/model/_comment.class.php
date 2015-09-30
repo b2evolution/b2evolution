@@ -487,15 +487,16 @@ class Comment extends DataObject
 
 		switch ( $vote_value )
 		{ // Set a value for spam vote
-			case "spam":
-			case "yes":
+			case 'spam':
+			case 'yes':
 				$vote = '1';
 				break;
-			case "notsure":
+			case 'notsure':
+			case 'noopinion':
 				$vote = '0';
 				break;
-			case "ok":
-			case "no":
+			case 'ok':
+			case 'no':
 				$vote = '-1';
 				break;
 			default:
@@ -1836,13 +1837,15 @@ class Comment extends DataObject
 	function vote_helpful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $params = array() )
 	{
 		$params = array_merge( array(
-				'helpful_text'    => T_('Is this comment helpful?'),
-				'title_yes'       => T_('Mark this comment as helpful!'),
-				'title_yes_voted' => T_('You think this comment is helpful'),
-				'title_no'        => T_('Mark this comment as not helpful!'),
-				'title_no_voted'  => T_('You think this comment is not helpful'),
-				'title_empty'     => T_('No votes on helpfulness yet.'),
-				'class'           => '',
+				'helpful_text'          => T_('Is this comment helpful?'),
+				'title_yes'             => T_('Mark this comment as helpful!'),
+				'title_yes_voted'       => T_('You think this comment is helpful'),
+				'title_noopinion'       => T_('Mark this comment as no opinion!'),
+				'title_noopinion_voted' => T_('You have no opinion about this comment'),
+				'title_no'              => T_('Mark this comment as not helpful!'),
+				'title_no_voted'        => T_('You think this comment is not helpful'),
+				'title_empty'           => T_('No votes on helpfulness yet.'),
+				'class'                 => '',
 			), $params );
 
 		global $current_User;
@@ -1888,12 +1891,13 @@ class Comment extends DataObject
 			display_voting_form( array(
 					'vote_type'             => 'comment',
 					'vote_ID'               => $this->ID,
-					'display_noopinion'     => false,
 					'display_inappropriate' => false,
 					'display_spam'          => false,
 					'title_text'            => $title_text.' ',
 					'title_like'            => $params['title_yes'],
 					'title_like_voted'      => $params['title_yes_voted'],
+					'title_noopinion'       => $params['title_noopinion'],
+					'title_noopinion_voted' => $params['title_noopinion_voted'],
 					'title_dontlike'        => $params['title_no'],
 					'title_dontlike_voted'  => $params['title_no_voted'],
 				) );
