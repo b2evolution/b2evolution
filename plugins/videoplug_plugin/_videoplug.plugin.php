@@ -141,25 +141,19 @@ class videoplug_plugin extends Plugin
 				while( 1 )
 				{
 					var valid_video_ID = false;
-					var p = '<?php echo TS_('Enter video ID from %s:') ?>';
+					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
 						return;
 					}
 
-					// Validate Video ID:
-					// TODO: verify validation / add for others..
+					// Validate Video ID or URL:
 					switch( tag )
 					{
-						case 'google':
-							if( video_ID.match( /^[0-9-]+$/ ) )
-							{ // valid
-								valid_video_ID = true;
-							}
-							break;
-
 						case 'youtube':
+							// Parse video ID from URL:
+							video_ID = video_ID.replace( /^(.+\?v=)?([a-z0-9_-]+)$/i, '$2' );
 							// Allow HD video code with ?hd=1 at the end
 							if( video_ID.match( /^[a-z0-9_?=-]+$/i ) )
 							{ // valid
@@ -167,7 +161,19 @@ class videoplug_plugin extends Plugin
 							}
 							break;
 
+						case 'dailymotion':
+							// Parse video ID from URL:
+							video_ID = video_ID.replace( /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i, '$2' );
+							alert( video_ID );
+							if( video_ID.match( /^[a-z0-9]+$/i ) )
+							{ // valid
+								valid_video_ID = true;
+							}
+							break;
+
 						case 'vimeo':
+							// Parse video ID from URL:
+							video_ID = video_ID.replace( /^(.+\/)?([0-9]+)$/i, '$2' );
 							if( video_ID.match( /^\d+$/ ) )
 							{ // valid
 								valid_video_ID = true;
@@ -175,7 +181,8 @@ class videoplug_plugin extends Plugin
 							break;
 
 						default:
-							valid_video_ID = true;
+							// Don't allow unknown video:
+							valid_video_ID = false;
 							break;
 					}
 
@@ -183,7 +190,7 @@ class videoplug_plugin extends Plugin
 					{
 						break;
 					}
-					alert( '<?php echo TS_('The video ID is invalid.'); ?>' );
+					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';
