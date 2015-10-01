@@ -51,29 +51,14 @@ class widescroll_plugin extends Plugin
 
 	/**
 	 * Display Toolbar
-	 *
-	 * @param object Blog
 	 */
-	function DisplayCodeToolbar( $Blog = NULL )
+	function DisplayCodeToolbar()
 	{
 		global $Hit;
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate toolbar on Lynx, because they don't work there.
 			return false;
-		}
-
-		if( empty( $Blog ) )
-		{ // TODO: We should decide how to handle these settings for Message
-			$text_styles_enabled = true;
-			$links_enabled = true;
-			$images_enabled = true;
-		}
-		else
-		{ // Get plugin setting values depending on Blog
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $Blog );
 		}
 
 		// Load js to work with textarea
@@ -142,10 +127,14 @@ class widescroll_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		$allow_HTML = false;
+
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
 			$Blog = & $edited_Item->get_Blog();
+			// We editing an Item, Check if HTML is allowed for the post type:
+			$allow_HTML = $edited_Item->get_type_setting( 'allow_html' );
 		}
 
 		if( empty( $Blog ) )
@@ -155,6 +144,16 @@ class widescroll_plugin extends Plugin
 			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
+		}
+
+		if( ! empty( $params['Comment'] ) )
+		{	// We editing a Comment, Check if HTML is allowed for the comments of current Blog:
+			$allow_HTML = $Blog->get_setting( 'allow_html_comment' );
+		}
+
+		if( ! $allow_HTML )
+		{	// Only when HTML is allowed in post/comment
+			return false;
 		}
 
 		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
@@ -173,7 +172,7 @@ class widescroll_plugin extends Plugin
 		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css' );
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar();
 	}
 
 
@@ -204,6 +203,11 @@ class widescroll_plugin extends Plugin
 			}
 		}
 
+		if( ! $Blog->get_setting( 'allow_html_comment' ) )
+		{	// Only when HTML is allowed in comment
+			return false;
+		}
+
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
 		{ // Plugin is not enabled for current case, so don't display a toolbar:
@@ -211,7 +215,7 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar();
 	}
 
 
