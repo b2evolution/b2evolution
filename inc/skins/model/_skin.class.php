@@ -785,6 +785,7 @@ class Skin extends DataObject
 	 *
 	 * This method may register some CSS or JS. 
 	 * The default implementation can register a few common things that you may request in the $features param.
+	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
 	 * If this doesn't do what you need you may add functions like the following to your skin's display_init():
 	 * require_js() , require_css() , add_js_headline()
