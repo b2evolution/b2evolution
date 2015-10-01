@@ -71,83 +71,60 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<?php
 	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
 
-	echo '<table cellspacing="0" class="compose_layout" align="center">';
+	echo '<div class="row">';
+		echo '<div class="col-md-7 col-sm-12">';
 
-	echo '<tr><td width="1%"><strong>'.T_('In response to').':</strong></td>';
-	echo '<td>';
-	$comment_Item = & $edited_Comment->get_Item();
-	$comment_Item->title( array(
-			'link_type' => 'admin_view',
-			'max_length' => '30'
-		) );
-	echo '</td>';
+		$comment_Item = & $edited_Comment->get_Item();
+		$Form->info( T_('In response to'), $comment_Item->get_title( array(
+				'link_type'  => 'admin_view',
+				'max_length' => '30'
+			) ) );
 
-	$Blog_owner_User = & $Blog->get_owner_User();
-	if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
-	{ // User has prmission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
-		$Form->switch_layout( 'none' );
+		echo '</div>';
+		echo '<div class="col-md-5 col-sm-12">';
 
-		// Move to another post
-		echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Move to post ID').':</strong></td>';
-		echo '<td class="input">';
-		$Form->text_input( 'moveto_post', $comment_Item->ID, 20, '', '', array('maxlength'=>100, 'style'=>'width:25%;') );
-		echo '</td>';
+		$Blog_owner_User = & $Blog->get_owner_User();
+		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
+			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'style' => 'width:25%' ) );
+		}
 
-		$Form->switch_layout( NULL );
-	}
+		echo '</div>';
+	echo '</div>';
 
-	echo '</tr></table>';
+	echo '<div class="row">';
+		echo '<div class="col-md-7 col-sm-12">';
 
-	if( $Blog->get_setting( 'threaded_comments' ) )
-	{ // Display a reply comment ID only when this feature is enabled in blog settings
-		echo '<table cellspacing="0" class="compose_layout" align="center">';
-		echo '<tr><td width="1%"><strong>'.T_('In reply to comment ID').':</strong></td>';
-		echo '<td class="input">';
-		$Form->switch_layout( 'none' );
-		$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, '' );
-		$Form->switch_layout( NULL );
-		echo '&nbsp;<span class="note">'.T_('(leave blank for normal comments)').'</span>';
-		echo '</td>';
-		echo '</tr></table>';
-	}
+		if( $Blog->get_setting( 'threaded_comments' ) )
+		{	// Display a reply comment ID only when this feature is enabled in blog settings:
+			$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, T_('In reply to comment ID'), T_('(leave blank for normal comments)') );
+		}
 
-	echo '<table cellspacing="0" class="compose_layout" align="center">';
+		if( $edited_Comment->get_author_User() )
+		{	// This comment has been created by member
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{	// Allow to change an author if current user has a permission:
+				$Form->username( 'comment_author_login', $edited_Comment->get_author_User(), T_('Author'), '' );
+			}
+			else
+			{	// Current user has no permission to edit a comment author
+				$Form->info( T_('Author'), $edited_Comment->get_author( array(
+						'before'    => '',
+						'link_to'   => '',
+						'link_text' => 'name',
+					) ) );
+			}
+		}
+		else
+		{	// This is not a member comment
+			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
+			$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him en email.') );
+			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+		}
 
-	if( ! $edited_Comment->get_author_User() )
-	{ // This is not a member comment
-		$Form->switch_layout( 'none' );
-
-		echo '<tr><td width="1%"><strong>'.T_('Author').':</strong></td>';
-		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, '', '', array( 'maxlength' => 100, 'style' => 'width: 100%;' ) );
-		echo '</td></tr>';
-
-		echo '<tr><td width="1%"><strong>'.T_('Email').':</strong></td>';
-		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td></tr>';
-
-		echo '<tr><td width="1%"><strong>'.T_('Allow contact').':</strong></td>';
-		echo '<td class="input">';
-		$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, '', T_('If checked, the comment author can be contacted through a form that will send him en email.') );
-		echo '</td></tr>';
-
-		echo '<tr><td width="1%"><strong>'.T_('Website URL').':</strong></td>';
-		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td></tr>';
-
-		$Form->switch_layout( NULL );
-	}
-	else
-	{
-		echo '<tr><td width="1%"><strong>'.T_('Author').':</strong></td>';
-		echo '<td class="input">';
-		$edited_Comment->author();
-		echo '</td></tr>';
-	}
-
-	echo '</table>';
+		echo '</div>';
+	echo '</div>';
 	?>
 
 	<div class="edit_toolbars">

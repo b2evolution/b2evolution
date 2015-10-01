@@ -234,8 +234,21 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		if( ! $edited_Comment->get_author_User() )
-		{ // If this is not a member comment
+		if( $edited_Comment->get_author_User() )
+		{	// This comment has been created by member
+			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
+			{	// Only admins can change the author
+				if( param_check_not_empty( 'comment_author_login', T_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
+				{
+					if( ( $author_User = & $UserCache->get_by_login( $comment_author_login ) ) !== false )
+					{	// Update author user:
+						$edited_Comment->set_author_User( $author_User );
+					}
+				}
+			}
+		}
+		else
+		{	// If this is not a member comment
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
@@ -712,6 +725,8 @@ if( $tab3 == 'fullview' )
 if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
+	// Init JS to autocomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
