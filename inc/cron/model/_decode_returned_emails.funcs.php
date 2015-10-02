@@ -230,6 +230,16 @@ function dre_process_messages( & $mbox, $limit )
 				$strbody = '';
 				foreach( $decodedMIME[0]['Parts'] as $part )
 				{
+					if( isset( $part['Parts'] ) && is_array( $part['Parts'] ) )
+					{
+						foreach( $part['Parts'] as $sub_part )
+						{
+							if( ! empty( $sub_part['BodyFile'] ) )
+							{	// Use only not empty file path:
+								$strbody .= quoted_printable_decode( file_get_contents( $sub_part['BodyFile'] ) );
+							}
+						}
+					}
 					if( ! empty( $part['BodyFile'] ) )
 					{	// Use only not empty file path:
 						$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
@@ -813,7 +823,7 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 	$email_returned = array(
 			'address'  => $emails,
 			'errormsg' => $error_info['text'],
-			'message'  => htmlspecialchars( $message_text ),
+			'message'  => htmlspecialchars( utf8_clean( $message_text ) ),
 			'headers'  => $headers,
 			'errtype'  => $error_info['type']
 		);
