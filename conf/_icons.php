@@ -1011,17 +1011,6 @@ function get_icon_info( $name )
 			'color' => '#7f7f7f'
 		);
 
-		case 'login': return array(
-			'alt'  => T_('Login'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 272 )
-		);
-		case 'register': return array(
-			'alt'  => T_('Register'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 296 )
-		);
-
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),
