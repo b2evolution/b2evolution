@@ -1102,13 +1102,6 @@ function get_icon_info( $name )
 			'color' => '#C00'
 		);
 
-		case 'arrow-btn': return array(
-			'alt'  => T_('More info'),
-			'size' => array( 8, 12 ),
-			'xy' => array( 128, 160 ),
-			'rollover' => true,
-		);
-
 		case 'lightning': return array(
 			'alt'  => T_('Kill spam'),
 			'size' => array( 10, 16 ),
