@@ -33,7 +33,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
 
-	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-settings' ) );
+	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
 		echo '<div class="skin_settings well">';
 			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
@@ -75,7 +75,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 		echo '</div>';
 		echo '<div class="skin_settings_form">';
-			$Form->begin_fieldset( T_('Edit properties') );
+			$Form->begin_fieldset( T_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
 
 			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 

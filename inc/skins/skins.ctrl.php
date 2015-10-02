@@ -261,7 +261,7 @@ switch( $action )
 	case 'delete':
 	case 'edit':
 	case 'update':
-		$AdminUI->set_page_manual_link( 'skin-settings' );
+		$AdminUI->set_page_manual_link( 'skin-system-settings' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'manage-skins' );
