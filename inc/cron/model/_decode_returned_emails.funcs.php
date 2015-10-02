@@ -155,6 +155,9 @@ function dre_process_messages( & $mbox, $limit )
 		// Save the whole body of a specific message from the mailbox:
 		imap_savebody( $mbox, $tmpMIME, $index );
 
+// fp> TODO: soemwhere here we should skip messages that already have the "seen" flag. This should be optional but should be the default.
+// This will allow to keep the emails in the INBOX without reprocessing them but to easily try them again my marking them unread.
+
 		// Create random temp directory for message parts:
 		$tmpDirMIME = dre_tempdir( sys_get_temp_dir(), 'b2evo_' );
 
@@ -249,6 +252,9 @@ function dre_process_messages( & $mbox, $limit )
 			}
 			elseif( $parsedMIME['Type'] == 'delivery-status' )
 			{	// Mail is delivery-status:
+
+// fp> Why do we use $decodedMIME in this section instead of using just $parsedMIME as in other message types above?
+// It seems we try to do the work of $mimeParser->Analyze() a second time! :(
 	
 				$strbody = '';
 				foreach( $decodedMIME[0]['Parts'] as $part )
@@ -328,6 +334,11 @@ function dre_process_messages( & $mbox, $limit )
 		global $dre_emails, $DB, $localtimenow;
 
 		dre_msg( sprintf('<h4>Saving the returned email in the database</h4>' ) );
+// fp> BAD factorization!!!!
+// Before we say we are saving to the DB, we must first parse the message and find the info about the returned email
+// Then we must display the email adress + the delivery error we found
+// And only then should we save to DB
+// BREAK dre_insert_returned_email() down into several parts!
 
 		// Insert a returned email's data into DB
 		if( $returned_email = dre_insert_returned_email( $content, $message_text, dre_get_headers( $decodedMIME ) ) )
@@ -338,9 +349,10 @@ function dre_process_messages( & $mbox, $limit )
 			++$email_cntr;
 		}
 
-		// Delete temporary directory
+		// Delete temporary directory:
 		rmdir_r( $tmpDirMIME );
 
+		// Mark message to be deleted:
 		if( $Settings->get('repath_delete_emails') )
 		{
 			dre_msg( 'Marking message for deletion from inbox: '.$index );
