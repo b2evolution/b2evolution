@@ -13,8 +13,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Print out a debugging message with optional HTML color added
+ *
+ * fp> How / where can we see these messages?
  *
  * @param string Message
  * @param string
@@ -36,8 +39,9 @@ function dre_msg( $message, $cron = false )
 	}
 }
 
+
 /**
- * Connect to a mail server
+ * Connect to an IMAP or POP mail server
  *
  * @param string Message
  * @return resource $mbox
@@ -45,7 +49,7 @@ function dre_msg( $message, $cron = false )
 function dre_connect()
 {
 	if( !extension_loaded( 'imap' ) )
-	{	// Exit here if imap extension is not loaded
+	{	// Exit here if imap extension is not loaded:
 		dre_msg('<b class="red">IMAP extension is NOT loaded!</b>');
 		return false;
 	}
@@ -124,19 +128,17 @@ function dre_connect()
  */
 function dre_process_messages( & $mbox, $limit )
 {
-	//return; // Exit, in development...
-
-
 	global $Settings;
 	global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
-	// No execution time limit
+	// This may take a very long time if there are many messages; No execution time limit:
 	set_max_execution_time(0);
 
 	$email_cntr = 0;
 	$del_cntr = 0;
 	for( $index = 1; $index <= $limit; $index++ )
-	{
+	{	// Repeat for as many messages as allowed...
+
 		dre_msg('<hr /><h3>Processing message #'.$index.':</h3>');
 
 		$html_body = '';
@@ -144,42 +146,47 @@ function dre_process_messages( & $mbox, $limit )
 		$hasAttachment = false;
 		$hasRelated = false;
 
-		// Save email to hard drive, otherwise attachments may take a lot of RAM
+		// Save email to a temporary file on hard drive, otherwise BIG attachments may take a lot of RAM:
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
 			dre_msg( T_('Could not create temporary file.'), true );
 			continue;
 		}
+		// Save the whole body of a specific message from the mailbox:
 		imap_savebody( $mbox, $tmpMIME, $index );
 
-		// Create random temp directory for message parts
+		// Create random temp directory for message parts:
 		$tmpDirMIME = dre_tempdir( sys_get_temp_dir(), 'b2evo_' );
 
-		$mimeParser = new mime_parser_class;
-		$mimeParser->mbox = 0;				// Set to 0 for parsing a single message file
-		$mimeParser->decode_headers = 1;
-		$mimeParser->ignore_syntax_errors = 1;
+		// Instanciate mime_parser.php library:
+		$mimeParser = new mime_parser_class();
+		$mimeParser->mbox = 0;						// Set to 0 for parsing a *single* RFC 2822 message
+		$mimeParser->decode_headers = 1;			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
+		$mimeParser->ignore_syntax_errors = 1;	// ignore syntax errors in	malformed messages.
 		$mimeParser->extract_addresses = 0;
 
+		// Associative array to specify parameters for the messagedata parsing and decoding operation.
 		$MIMEparameters = array(
-				'File' => $tmpMIME,
+				'File' => $tmpMIME,			// Name of the file from which the message data will be read.
 				'SaveBody' => $tmpDirMIME,	// Save message body parts to a directory
-				'SkipBody' => 1,			// Do not retrieve or save message body parts
+				'SkipBody' => 1,				// 1 means the information about the message body part structure is returned in $decodedMIME below but it does not return any body data.
 			);
 
-		if( !$mimeParser->Decode( $MIMEparameters, $decodedMIME ) )
-		{
+		// STEP 1: Parse and decode message data and retrieve its structure:
+		if( !$mimeParser->Decode( $MIMEparameters, /* BY REF */ $decodedMIME ) )
+		{	// error:
 			dre_msg( sprintf( 'MIME message decoding error: %s at position %d.', $mimeParser->error, $mimeParser->error_position), true );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
 		}
 		else
-		{
+		{	// the specified message data was parsed successfully:
 			dre_msg('MIME message decoding successful');
 
-			if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
-			{
+			// STEP 2: Analyze (the first) parsed message to describe its contents:
+			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
+			{	// error:
 				dre_msg( sprintf( 'MIME message analyse error: %s', $mimeParser->error), true );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
@@ -187,19 +194,27 @@ function dre_process_messages( & $mbox, $limit )
 			}
 
 			// Get message $subject and $post_date from headers (by reference)
-			if( ! dre_process_header( $parsedMIME, $subject, $post_date ) )
-			{	// Couldn't process message headers
+			if( ! dre_process_header( $parsedMIME, /* BY REF */ $subject, /* BY REF */ $post_date ) )
+			{	// Couldn't process message headers:
 				rmdir_r( $tmpDirMIME );
 				unlink($tmpMIME);
 				continue;
 			}
 
 			// TODO: handle type == "message" recursively
+// fp> where is type == "message" ???
+
+
 			// sam2kb> For some reason imap_qprint() demages HTML text... needs more testing
 			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
 
+// fp> "Email Type:" ($parsedMIME['Type']) must clearly be displayed when running a test one 1 message
+// In case of returned emails, we only expect "delivery-status"... but we may have other junk in the mailbox...
+// Can we ignore any email that is not 'delivery-status' ??
+
 			if( $parsedMIME['Type'] == 'html' )
-			{	// Mail is HTML
+			{	// Mail is HTML:
+
 				dre_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
 				$html_body = file_get_contents($parsedMIME['DataFile']);
 
@@ -209,6 +224,10 @@ function dre_process_messages( & $mbox, $limit )
 					{	// HTML text
 						dre_msg('HTML alternative message part saved as '.$alternative['DataFile']);
 						// sam2kb> TODO: we may need to use $html_body here instead
+// fp> This looks wrong 
+// 1. We should probably use $html_body indeed
+// 2. IS it normal we have no	quoted_printable_decode() here?
+
 						$strbody = file_get_contents($alternative['DataFile']);
 						break; // stop after first alternative
 					}
@@ -219,14 +238,18 @@ function dre_process_messages( & $mbox, $limit )
 						break; // stop after first alternative
 					}
 				}
+
 			}
 			elseif( $parsedMIME['Type'] == 'text' )
-			{	// Mail is plain text
+			{	// Mail is plain text:
+
 				dre_msg('Plain-text message part saved as '.$parsedMIME['DataFile']);
 				$strbody = quoted_printable_decode( file_get_contents($parsedMIME['DataFile']) );
+
 			}
 			elseif( $parsedMIME['Type'] == 'delivery-status' )
-			{	// Mail is delivery-status
+			{	// Mail is delivery-status:
+	
 				$strbody = '';
 				foreach( $decodedMIME[0]['Parts'] as $part )
 				{
@@ -235,20 +258,21 @@ function dre_process_messages( & $mbox, $limit )
 						foreach( $part['Parts'] as $sub_part )
 						{
 							if( ! empty( $sub_part['BodyFile'] ) )
-							{	// Use only not empty file path:
+							{	// Use only non-empty file path:
 								$strbody .= quoted_printable_decode( file_get_contents( $sub_part['BodyFile'] ) );
 							}
 						}
 					}
 					if( ! empty( $part['BodyFile'] ) )
-					{	// Use only not empty file path:
+					{	// Use only non-empty file path:
 						$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
 					}
 				}
 			}
 
+
 			if( count($mimeParser->warnings) > 0 )
-			{
+			{ // Record potential warnings:
 				dre_msg( sprintf('<h4>%d warnings during decode:</h4>', count($mimeParser->warnings)) );
 				foreach( $mimeParser->warnings as $k => $v )
 				{
@@ -257,6 +281,7 @@ function dre_process_messages( & $mbox, $limit )
 			}
 		}
 		unlink( $tmpMIME );
+
 
 		if( empty($html_body) )
 		{	// Plain-text message
@@ -270,15 +295,18 @@ function dre_process_messages( & $mbox, $limit )
 		{	// HTML message
 			dre_msg('Message type: HTML');
 
+// fp> What is the following suposed to do???
 			if( ($parsed_message = dre_prepare_html_message( $html_body )) === false )
 			{	// No 'auth' tag provided, skip to the next message
 				rmdir_r( $tmpDirMIME );
 				continue;
 			}
 			list($auth, $content) = $parsed_message;
+// fp> Seriously, what is the above supposed to do?
 		}
 
-		dre_msg('<b class="green">Success</b>');
+
+		dre_msg('<b class="green">MIME Decoding Successful</b>');
 
 		$message_text = $content;
 
@@ -321,7 +349,7 @@ function dre_process_messages( & $mbox, $limit )
 		}
 	}
 
-	// Expunge messages market for deletion
+	// Expunge messages marked for deletion
 	imap_expunge( $mbox );
 
 	return true;
@@ -341,11 +369,11 @@ function dre_simulate_message( $message_text )
 
 	$content = $message_text;
 
-	dre_msg('<hr /><h3>Processing message:</h3>');
+	dre_msg('<hr /><h3>Working with message:</h3>');
 
 	dre_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>');
 
-	dre_msg('<b class="green">Success</b>');
+	dre_msg('<b class="green">(No MIME decoding is done in simulation mode)</b>');
 
 	// Remove content after terminators
 	$content = dre_limit_by_terminators( $content );
