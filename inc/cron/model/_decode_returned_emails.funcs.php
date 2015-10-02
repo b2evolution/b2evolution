@@ -230,6 +230,16 @@ function dre_process_messages( & $mbox, $limit )
 				$strbody = '';
 				foreach( $decodedMIME[0]['Parts'] as $part )
 				{
+					if( isset( $part['Parts'] ) && is_array( $part['Parts'] ) )
+					{
+						foreach( $part['Parts'] as $sub_part )
+						{
+							if( ! empty( $sub_part['BodyFile'] ) )
+							{	// Use only not empty file path:
+								$strbody .= quoted_printable_decode( file_get_contents( $sub_part['BodyFile'] ) );
+							}
+						}
+					}
 					if( ! empty( $part['BodyFile'] ) )
 					{	// Use only not empty file path:
 						$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
