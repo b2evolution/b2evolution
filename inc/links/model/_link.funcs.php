@@ -247,7 +247,9 @@ function display_attachments( & $LinkOwner, $params = array() )
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
-			'block_end' => '</div>',
+			'block_end'   => '</div>',
+			'table_start' => '<table class="grouped" cellspacing="0" cellpadding="0">',
+			'table_end'   => '</table>',
 		), $params );
 
 	$links = $LinkOwner->get_Links();
@@ -259,8 +261,8 @@ function display_attachments( & $LinkOwner, $params = array() )
 
 	$redirect_to = urlencode( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to );
 
-	echo $params[ 'block_start' ];
-	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">';
+	echo $params['block_start'];
+	echo $params['table_start'];
 	echo '<thead>';
 	echo '<th class="firstcol shrinkwrap"><span>'.T_('Icon/Type').'</span></th>';
 	echo '<th class="nowrap"><span>'.T_('Path').'</span></th>';
@@ -280,7 +282,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo $link_File->get_preview_thumb( 'fulltype' );
 		echo '</td><td class="nowrap left">';
 		echo $link_File->get_view_link();
-		echo '</td><td class="shrinkwrap">';
+		echo '</td><td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
 			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
@@ -288,8 +290,9 @@ function display_attachments( & $LinkOwner, $params = array() )
 		}
 		echo '</td></tr>';
 	}
-	echo '</tbody></table>';
-	echo $params[ 'block_end' ];
+	echo '</tbody>';
+	echo $params['table_end'];
+	echo $params['block_end'];
 }
 
 

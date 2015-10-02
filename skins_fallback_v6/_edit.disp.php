@@ -364,7 +364,10 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		if( $LinkOwner->count_links() )
 		{	// Display the attached files:
 			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
-				display_attachments( $LinkOwner );
+				display_attachments( $LinkOwner, array(
+						'block_start' => '<div class="attachment_list results">',
+						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
+					) );
 			$Form->end_fieldset();
 		}
 	}

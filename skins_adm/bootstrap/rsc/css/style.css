@@ -1364,3 +1364,15 @@ table.diff td.diff-title-addedline {
   position: relative;
   margin-right: 4px;
 }
+#iframe_wrapper .results_compact.panel {
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+#iframe_wrapper .results_compact.panel .table-bordered {
+  border: none;
+}
+#iframe_wrapper .results_compact.panel .table-bordered tr:first-child td {
+  border-top: none;
+}

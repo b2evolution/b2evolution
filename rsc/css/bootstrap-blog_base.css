@@ -745,6 +745,13 @@ form#comment_edit {
 #comment_attachments .panel-body {
   padding: 0;
 }
+.attachment_list.results {
+  margin: 0;
+}
+.attachment_list.results .table-bordered {
+  border: none;
+  margin: 0;
+}
 input.btn-lg {
   font-size: 120%;
 }
