@@ -813,7 +813,7 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 	$email_returned = array(
 			'address'  => $emails,
 			'errormsg' => $error_info['text'],
-			'message'  => htmlspecialchars( $message_text ),
+			'message'  => htmlspecialchars( utf8_clean( $message_text ) ),
 			'headers'  => $headers,
 			'errtype'  => $error_info['type']
 		);
