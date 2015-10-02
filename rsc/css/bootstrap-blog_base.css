@@ -125,7 +125,8 @@ div.error_additional_content {
 .evo_comment_rating {
   margin: 3px;
 }
-#styled_content_block .evo_comment_avatar img {
+#styled_content_block .evo_comment_avatar img,
+.evo_content_block .evo_comment_avatar img {
   margin: 4px 10px 10px 0;
   float: left;
   border-radius: 50%;
