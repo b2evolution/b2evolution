@@ -4053,7 +4053,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('Publish NOW!');
+		if( $text == '#' ) $text = get_icon( 'post', 'imgtag' ).' '.T_('Publish NOW!');
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		$r = $before;

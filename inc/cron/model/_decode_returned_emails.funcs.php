@@ -230,7 +230,10 @@ function dre_process_messages( & $mbox, $limit )
 				$strbody = '';
 				foreach( $decodedMIME[0]['Parts'] as $part )
 				{
-					$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
+					if( ! empty( $part['BodyFile'] ) )
+					{	// Use only not empty file path:
+						$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
+					}
 				}
 			}
 
@@ -810,14 +813,14 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 	$email_returned = array(
 			'address'  => $emails,
 			'errormsg' => $error_info['text'],
-			'message'  => $message_text,
+			'message'  => htmlspecialchars( $message_text ),
 			'headers'  => $headers,
 			'errtype'  => $error_info['type']
 		);
 
 	// INSERT RETURNED DATA INTO DB
 	$DB->query( 'INSERT INTO T_email__returns ( emret_address, emret_errormsg, emret_message, emret_headers, emret_errtype )
-		VALUES ( '.$DB->quote( $email_returned ).' )' );
+		VALUES ( '.$DB->quote( $email_returned ).' )', 'Insert info of the returned email' );
 
 	if( $DB->insert_id > 0 )
 	{

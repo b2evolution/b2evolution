@@ -507,7 +507,7 @@ class DB
 			{
 				$r .= $this->quote($elt).',';
 			}
-			return substr( $r, 0, -1 );
+			return substr( $r, 0, -1 );  // remove last ,
 		}
 		else
 		{
