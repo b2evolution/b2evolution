@@ -629,6 +629,9 @@ div.filters .filter_item div {
 .evo_comment__meta {
   border: 2px solid #5133ab;
 }
+.evo_comment__meta:last-child {
+  margin-bottom: 0;
+}
 .evo_comment__meta .panel-heading {
   border-bottom: 1px solid #5133ab;
   background-color: #f7f4ff;
