@@ -126,6 +126,9 @@ switch( $action )
 				param( 'repath_password', 'string', true );
 				$Settings->set( 'repath_password', $repath_password );
 
+				param( 'repath_ignore_read', 'boolean', 0 );
+				$Settings->set( 'repath_ignore_read', $repath_ignore_read );
+
 				param( 'repath_delete_emails', 'boolean', 0 );
 				$Settings->set( 'repath_delete_emails', $repath_delete_emails );
 

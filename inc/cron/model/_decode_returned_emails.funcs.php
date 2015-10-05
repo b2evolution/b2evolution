@@ -141,12 +141,30 @@ function dre_process_messages( & $mbox, $limit )
 	// This may take a very long time if there are many messages; No execution time limit:
 	set_max_execution_time(0);
 
+	if( $Settings->get( 'repath_ignore_read' ) )
+	{	// Read status info of all messages in order to know which have already been read:
+		$msg_statuses = imap_fetch_overview( $mbox, '1:'.$limit );
+	}
+
 	$email_cntr = 0;
 	$del_cntr = 0;
 	for( $index = 1; $index <= $limit; $index++ )
 	{	// Repeat for as many messages as allowed...
 
 		dre_msg('<hr /><h3>Processing message #'.$index.':</h3>');
+
+		if( $Settings->get( 'repath_ignore_read' ) )
+		{	// Check if we can read this message or we should skip this:
+			if( isset( $msg_statuses[ $index - 1 ] ) && $msg_statuses[ $index - 1 ]->seen == 1 )
+			{	// Skip this message because it has already been read:
+				dre_msg( 'Ignore this message because it has aleady been read.', true );
+				continue;
+			}
+			else
+			{	// Mark this message as "Seen" in order to don't read it twice:
+				imap_setflag_full( $mbox, $index, '\\Seen' );
+			}
+		}
 
 		$html_body = '';
 		$strbody = '';
