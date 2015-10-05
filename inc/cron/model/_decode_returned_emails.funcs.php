@@ -135,7 +135,7 @@ function dre_connect()
  */
 function dre_process_messages( & $mbox, $limit )
 {
-	global $Settings;
+	global $Settings, $debug;
 	global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
 	// This may take a very long time if there are many messages; No execution time limit:
@@ -210,12 +210,12 @@ function dre_process_messages( & $mbox, $limit )
 		}
 		else
 		{	// the specified message data was parsed successfully:
-			dre_msg('MIME message decoding successful');
+			dre_msg( 'MIME message decoding successful' );
 
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
 			{	// error:
-				dre_msg( sprintf( 'MIME message analyse error: %s', $mimeParser->error), true );
+				dre_msg( sprintf( 'MIME message analyse error: %s', $mimeParser->error ), true );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -225,7 +225,7 @@ function dre_process_messages( & $mbox, $limit )
 			if( ! dre_process_header( $parsedMIME, /* BY REF */ $subject, /* BY REF */ $post_date ) )
 			{	// Couldn't process message headers:
 				rmdir_r( $tmpDirMIME );
-				unlink($tmpMIME);
+				unlink( $tmpMIME );
 				continue;
 			}
 
@@ -235,12 +235,16 @@ function dre_process_messages( & $mbox, $limit )
 
 			// sam2kb> For some reason imap_qprint() demages HTML text... needs more testing
 			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
+			// yura> imap_qprint() and quoted_printable_decode() do empty the message text, thus they were deleted.
 
 			dre_msg( 'Email Type: '.$parsedMIME['Type'] );
 
 			if( $parsedMIME['Type'] == 'html' )
 			{	// Mail is HTML:
-				dre_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
+				if( $debug )
+				{	// Display this info only in debug mode:
+					dre_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
+				}
 				$html_body = file_get_contents( $parsedMIME['DataFile'] );
 
 				if( empty( $html_body ) )
@@ -249,14 +253,20 @@ function dre_process_messages( & $mbox, $limit )
 					{	// First try to get HTML alternative (when possible)
 						if( $alternative['Type'] == 'html' )
 						{	// HTML text
-							dre_msg( 'HTML alternative message part saved as '.$alternative['DataFile'] );
-							$strbody = quoted_printable_decode( file_get_contents( $alternative['DataFile'] ) );
+							if( $debug )
+							{	// Display this info only in debug mode:
+								dre_msg( 'HTML alternative message part saved as '.$alternative['DataFile'] );
+							}
+							$strbody = file_get_contents( $alternative['DataFile'] );
 							break; // stop after first alternative
 						}
 						elseif( $alternative['Type'] == 'text' )
 						{	// Plain text
-							dre_msg( 'Text alternative message part saved as '.$alternative['DataFile'] );
-							$strbody = quoted_printable_decode( file_get_contents( $alternative['DataFile'] ) );
+							if( $debug )
+							{	// Display this info only in debug mode:
+								dre_msg( 'Text alternative message part saved as '.$alternative['DataFile'] );
+							}
+							$strbody = file_get_contents( $alternative['DataFile'] );
 							break; // stop after first alternative
 						}
 					}
@@ -264,8 +274,11 @@ function dre_process_messages( & $mbox, $limit )
 			}
 			elseif( $parsedMIME['Type'] == 'text' )
 			{	// Mail is plain text:
-				dre_msg( 'Plain-text message part saved as '.$parsedMIME['DataFile'] );
-				$strbody = quoted_printable_decode( file_get_contents( $parsedMIME['DataFile'] ) );
+				if( $debug )
+				{	// Display this info only in debug mode:
+					dre_msg( 'Plain-text message part saved as '.$parsedMIME['DataFile'] );
+				}
+				$strbody = file_get_contents( $parsedMIME['DataFile'] );
 			}
 			elseif( $parsedMIME['Type'] == 'delivery-status' )
 			{	// Mail is delivery-status:
@@ -275,10 +288,10 @@ function dre_process_messages( & $mbox, $limit )
 
 			if( count($mimeParser->warnings) > 0 )
 			{ // Record potential warnings:
-				dre_msg( sprintf('<h4>%d warnings during decode:</h4>', count($mimeParser->warnings)) );
+				dre_msg( sprintf( '<h4>%d warnings during decode:</h4>', count( $mimeParser->warnings ) ) );
 				foreach( $mimeParser->warnings as $k => $v )
 				{
-					dre_msg('Warning: '.$v.' at position '.$k);
+					dre_msg( 'Warning: '.$v.' at position '.$k );
 				}
 			}
 		}
