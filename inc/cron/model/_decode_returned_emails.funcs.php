@@ -15,26 +15,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Print out a debugging message with optional HTML color added
+ * Log a result message in global variables to use them later
+ *     on cron CLI/Web screens or in back-office "Returned emails" test tool
  *
- * fp> How / where can we see these messages?
- *
- * @param string Message
- * @param string
+ * @param string Message text
+ * @param boolean TRUE if it is called from cron
  */
 function dre_msg( $message, $cron = false )
 {
 	global $is_web, $result_message, $dre_messages;
 
-	// Log all messages to $dre_messages no matter if we are in cron mode or not
+	if( ! is_array( $dre_messages ) )
+	{	// Initialize global array first time:
+		$dre_messages = array();
+	}
+
+	// Log all messages to global array $dre_messages no matter if we are in cron mode or not
 	// We may use this report later, display or send to the blog owner
 	$dre_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode, log the message
+	{	// We are in cron mode
 		if( $is_web )
+		{	// Separate a message with newline when we call a cron from browser:
 			$message .= '<br />';
+		}
 
+		// Log the message in global variable $result_message:
 		$result_message .= $message."\n";
 	}
 }
@@ -206,74 +213,45 @@ function dre_process_messages( & $mbox, $limit )
 
 			// TODO: handle type == "message" recursively
 // fp> where is type == "message" ???
-
+// yura> I don't find the type == 'message' in dump of $decodedMIME and $parsedMIME
 
 			// sam2kb> For some reason imap_qprint() demages HTML text... needs more testing
 			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
 
-// fp> "Email Type:" ($parsedMIME['Type']) must clearly be displayed when running a test one 1 message
-// In case of returned emails, we only expect "delivery-status"... but we may have other junk in the mailbox...
-// Can we ignore any email that is not 'delivery-status' ??
+			dre_msg( 'Email Type: '.$parsedMIME['Type'] );
 
 			if( $parsedMIME['Type'] == 'html' )
 			{	// Mail is HTML:
-
 				dre_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
-				$html_body = file_get_contents($parsedMIME['DataFile']);
+				$html_body = file_get_contents( $parsedMIME['DataFile'] );
 
-				foreach( $parsedMIME['Alternative'] as $alternative )
-				{	// First try to get HTML alternative (when possible)
-					if( $alternative['Type'] == 'html' )
-					{	// HTML text
-						dre_msg('HTML alternative message part saved as '.$alternative['DataFile']);
-						// sam2kb> TODO: we may need to use $html_body here instead
-// fp> This looks wrong 
-// 1. We should probably use $html_body indeed
-// 2. IS it normal we have no	quoted_printable_decode() here?
-
-						$strbody = file_get_contents($alternative['DataFile']);
-						break; // stop after first alternative
-					}
-					elseif( $alternative['Type'] == 'text' )
-					{	// Plain text
-						dre_msg('Text alternative message part saved as '.$alternative['DataFile']);
-						$strbody = quoted_printable_decode( file_get_contents($alternative['DataFile']) );
-						break; // stop after first alternative
+				if( empty( $html_body ) )
+				{	// Try to get a body text from alternative parts if main html body is empty:
+					foreach( $parsedMIME['Alternative'] as $alternative )
+					{	// First try to get HTML alternative (when possible)
+						if( $alternative['Type'] == 'html' )
+						{	// HTML text
+							dre_msg( 'HTML alternative message part saved as '.$alternative['DataFile'] );
+							$strbody = quoted_printable_decode( file_get_contents( $alternative['DataFile'] ) );
+							break; // stop after first alternative
+						}
+						elseif( $alternative['Type'] == 'text' )
+						{	// Plain text
+							dre_msg( 'Text alternative message part saved as '.$alternative['DataFile'] );
+							$strbody = quoted_printable_decode( file_get_contents( $alternative['DataFile'] ) );
+							break; // stop after first alternative
+						}
 					}
 				}
-
 			}
 			elseif( $parsedMIME['Type'] == 'text' )
 			{	// Mail is plain text:
-
-				dre_msg('Plain-text message part saved as '.$parsedMIME['DataFile']);
-				$strbody = quoted_printable_decode( file_get_contents($parsedMIME['DataFile']) );
-
+				dre_msg( 'Plain-text message part saved as '.$parsedMIME['DataFile'] );
+				$strbody = quoted_printable_decode( file_get_contents( $parsedMIME['DataFile'] ) );
 			}
 			elseif( $parsedMIME['Type'] == 'delivery-status' )
 			{	// Mail is delivery-status:
-
-// fp> Why do we use $decodedMIME in this section instead of using just $parsedMIME as in other message types above?
-// It seems we try to do the work of $mimeParser->Analyze() a second time! :(
-	
-				$strbody = '';
-				foreach( $decodedMIME[0]['Parts'] as $part )
-				{
-					if( isset( $part['Parts'] ) && is_array( $part['Parts'] ) )
-					{
-						foreach( $part['Parts'] as $sub_part )
-						{
-							if( ! empty( $sub_part['BodyFile'] ) )
-							{	// Use only non-empty file path:
-								$strbody .= quoted_printable_decode( file_get_contents( $sub_part['BodyFile'] ) );
-							}
-						}
-					}
-					if( ! empty( $part['BodyFile'] ) )
-					{	// Use only non-empty file path:
-						$strbody .= quoted_printable_decode( file_get_contents( $part['BodyFile'] ) );
-					}
-				}
+				$strbody = $parsedMIME['Response'];
 			}
 
 
@@ -289,26 +267,24 @@ function dre_process_messages( & $mbox, $limit )
 		unlink( $tmpMIME );
 
 
-		if( empty($html_body) )
+		if( empty( $html_body ) )
 		{	// Plain-text message
-			dre_msg('Message type: TEXT');
-			dre_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
+			dre_msg( 'Message type: TEXT' );
 
-			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
-			$content = str_replace( array("\r", "\n\n"), "\n", trim($strbody) );
+			// Process text message. First fix different line-endings (dos, mac, unix), remove double newlines:
+			$content = str_replace( array( "\r", "\n\n" ) , "\n", trim( $strbody ) );
+
+			dre_msg( 'Message body: <pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' );
 		}
 		else
 		{	// HTML message
-			dre_msg('Message type: HTML');
+			dre_msg( 'Message type: HTML' );
+			dre_msg( 'Message body (original): <pre style="font-size:10px">'.htmlspecialchars( $html_body ).'</pre>' );
 
-// fp> What is the following suposed to do???
-			if( ($parsed_message = dre_prepare_html_message( $html_body )) === false )
-			{	// No 'auth' tag provided, skip to the next message
-				rmdir_r( $tmpDirMIME );
-				continue;
-			}
-			list($auth, $content) = $parsed_message;
-// fp> Seriously, what is the above supposed to do?
+			// Prepare html message body text:
+			$content = dre_prepare_html_message( $html_body );
+
+			dre_msg( 'Message body (processed): <pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' );
 		}
 
 
@@ -333,19 +309,21 @@ function dre_process_messages( & $mbox, $limit )
 
 		global $dre_emails, $DB, $localtimenow;
 
-		dre_msg( sprintf('<h4>Saving the returned email in the database</h4>' ) );
-// fp> BAD factorization!!!!
-// Before we say we are saving to the DB, we must first parse the message and find the info about the returned email
-// Then we must display the email adress + the delivery error we found
-// And only then should we save to DB
-// BREAK dre_insert_returned_email() down into several parts!
+		dre_msg( '<h4>Saving the returned email in the database</h4>' );
+
+		// Get Headers from Decoded MIME Data:
+		$email_headers = dre_get_headers( $decodedMIME );
+
+		// Get data of the returned email:
+		$email_data = dre_get_email_data( $content, $message_text, $email_headers );
+
+		dre_msg( 'Email Address: '.$email_data['address'] );
+		dre_msg( 'Error Type: '.dre_decode_error_type( $email_data['errtype'] ) );
+		dre_msg( 'Error Message: '.$email_data['errormsg'] );
 
 		// Insert a returned email's data into DB
-		if( $returned_email = dre_insert_returned_email( $content, $message_text, dre_get_headers( $decodedMIME ) ) )
+		if( dre_insert_returned_email( $email_data ) )
 		{
-			dre_msg( 'Error Type: '.dre_decode_error_type( $returned_email['errtype'] ) );
-			dre_msg( 'Error Message: '.$returned_email['errormsg'] );
-
 			++$email_cntr;
 		}
 
@@ -392,17 +370,15 @@ function dre_simulate_message( $message_text )
 
 	dre_msg( sprintf('<h4>Saving the returned email in the database</h4>' ) );
 
-	// Insert a returned email's data into DB
-	if( $returned_email = dre_insert_returned_email( $content, $message_text, 'Empty headers' ) )
-	{
-		dre_msg( 'Error Type: '.dre_decode_error_type( $returned_email['errtype'] ) );
-		dre_msg( 'Error Message: '.$returned_email['errormsg'] );
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	// Get data of the returned email:
+	$email_data = dre_get_email_data( $content, $message_text, 'Empty headers' );
+
+	dre_msg( 'Email Address: '.$email_data['address'] );
+	dre_msg( 'Error Type: '.dre_decode_error_type( $email_data['errtype'] ) );
+	dre_msg( 'Error Message: '.$email_data['errormsg'] );
+
+	// Insert a returned email's data into DB:
+	return dre_insert_returned_email( $email_data );
 }
 
 
@@ -551,8 +527,6 @@ function dre_get_emails( $content, $max_count = 1, $delimeter = ', ' )
  */
 function dre_prepare_html_message( $message )
 {
-	dre_msg('Message body (original): <pre style="font-size:10px">'.htmlspecialchars($message).'</pre>');
-
 	$marker = 0;
 	if( preg_match( '~<body[^>]*>(.*?)</body>~is', $message, $result ) )
 	{	// First see if we can get contents of <body> tag
@@ -571,13 +545,13 @@ function dre_prepare_html_message( $message )
 	}
 
 	// First fix different line-endings (dos, mac, unix), remove double newlines
-	$content = str_replace( array("\r", "\n\n"), "\n", trim($content) );
+	$content = str_replace( array("\r", "\n\n"), "\n", trim( $content ) );
 
 	// Decode 'category', 'title' and 'auth' tags
 	$content = preg_replace( '~&lt;(/)?(category|title|auth)&gt;~i', '<\\1\\2>', $content );
 
 	// Balance tags
-	$content = balance_tags($content);
+	$content = balance_tags( $content );
 
 	// Remove markup that cause validator errors
 	$patterns = array(
@@ -586,8 +560,6 @@ function dre_prepare_html_message( $message )
 		'~ goomoji="[^"]+"~',					// Gmail smilies
 	);
 	$content = preg_replace( $patterns, '', $content );
-
-	dre_msg('Message body (processed): <pre style="font-size:10px">'.htmlspecialchars($content).'</pre>');
 
 	return $content;
 }
@@ -840,24 +812,22 @@ function dre_limit_by_terminators( $content )
 
 
 /**
- * Insert a returned email's data into DB
- *
+ * Get data of returned email
+ * 
  * @param string Prepared message text (without text after body terminator)
  * @param string Full message text
  * @param string Headers
- * @return array|boolean Data of returned email| False
+ * @return array ( 'address', 'errormsg', 'message', 'headers', 'errtype' )
  */
-function dre_insert_returned_email( $content, $message_text, $headers )
+function dre_get_email_data( $content, $message_text, $headers )
 {
-	global $DB, $dre_emails;
-
-	// Extract emails from content
+	// Extract emails from content:
 	$emails = utf8_strtolower( dre_get_emails( $content ) );
 
-	// Get content between email and body terminator
+	// Get content between email and body terminator:
 	$content = dre_get_processing_content( $content, $emails );
 
-	// Get Error info
+	// Get Error info:
 	$error_info = dre_get_error_info( $content );
 
 	$email_returned = array(
@@ -868,19 +838,34 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 			'errtype'  => $error_info['type']
 		);
 
-	// INSERT RETURNED DATA INTO DB
+	return $email_returned;
+}
+
+
+/**
+ * Insert a returned email's data into DB
+ *
+ * @param array Data of an returned email ( 'address', 'errormsg', 'message', 'headers', 'errtype' )
+ * @return boolean TRUE on successful insertion
+ */
+function dre_insert_returned_email( $email_data )
+{
+	global $DB, $dre_emails;
+
+	// INSERT RETURNED DATA INTO DB:
 	$DB->query( 'INSERT INTO T_email__returns ( emret_address, emret_errormsg, emret_message, emret_headers, emret_errtype )
-		VALUES ( '.$DB->quote( $email_returned ).' )', 'Insert info of the returned email' );
+		VALUES ( '.$DB->quote( $email_data ).' )',
+		'Insert info of the returned email' );
 
 	if( $DB->insert_id > 0 )
 	{
-		// Save a blocked email's data
-		dre_save_blocked_email( $email_returned );
+		// Save the data for the returned email address into DB:
+		dre_save_email_address_data( $email_data );
 
-		// Save saved emails for reports
-		$dre_emails[] = $email_returned;
+		// Save the saved emails for reports:
+		$dre_emails[] = $email_data;
 
-		return $email_returned;
+		return true;
 	}
 	else
 	{
@@ -889,7 +874,7 @@ function dre_insert_returned_email( $content, $message_text, $headers )
 }
 
 /**
- * Insert/Update a blocked email's data into DB
+ * Insert/Update the data of email address into DB
  *
  * @param array Data of returned email:
  *               'address'
@@ -898,7 +883,7 @@ function dre_insert_returned_email( $content, $message_text, $headers )
  *               'headers'
  *               'errtype'
  */
-function dre_save_blocked_email( $email_returned )
+function dre_save_email_address_data( $email_returned )
 {
 	global $DB;
 
