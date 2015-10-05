@@ -90,6 +90,10 @@ ol.breadcrumb {
 	}
 	box-shadow: none;
 	.panel-heading {
+		&:not(:first-child) {
+			border-top: 1px solid #ddd;
+			.border-radius(0);
+		}
 		h2 {
 			margin-top: 0;
 		}
@@ -263,6 +267,7 @@ ol.breadcrumb {
 	h3 {
 		margin: 0;
 	}
+	// fp> It is NOT normal that we need this. Why do we have a panel INSIDE the comment form in the first place!?
 	.panel {
 		margin: 0;
 		border: none;

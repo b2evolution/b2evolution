@@ -37,7 +37,7 @@ function pbm_msg( $message, $cron = false )
 }
 
 /**
- * Connect to a mail server
+ * Connect to an IMAP or POP mail server
  *
  * @param string Message
  * @return resource $mbox
@@ -45,7 +45,7 @@ function pbm_msg( $message, $cron = false )
 function pbm_connect()
 {
 	if( !extension_loaded( 'imap' ) )
-	{	// Exit here if imap extension is not loaded
+	{	// Exit here if imap extension is not loaded:
 		pbm_msg('<b class="red">IMAP extension is NOT loaded!</b>');
 		return false;
 	}
@@ -124,10 +124,10 @@ function pbm_connect()
  */
 function pbm_process_messages( & $mbox, $limit )
 {
-	global $Settings;
+	global $Settings, $debug;
 	global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
-	// No execution time limit
+	// This may take a very long time if there are many messages; No execution time limit:
 	set_max_execution_time(0);
 
 	// Are we in test mode?
@@ -136,7 +136,7 @@ function pbm_process_messages( & $mbox, $limit )
 	$post_cntr = 0;
 	$del_cntr = 0;
 	for( $index = 1; $index <= $limit; $index++ )
-	{
+	{	// Repeat for as many messages as allowed...
 		pbm_msg('<hr /><h3>Processing message #'.$index.':</h3>');
 
 		$html_body = '';
@@ -146,21 +146,23 @@ function pbm_process_messages( & $mbox, $limit )
 
 		$pbm_item_files = array(); // reset the value for each new Item
 
-		// Save email to hard drive, otherwise attachments may take a lot of RAM
+		// Save email to a temporary file on hard drive, otherwise BIG attachments may take a lot of RAM:
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
 			pbm_msg( T_('Could not create temporary file.'), true );
 			continue;
 		}
+		// Save the whole body of a specific message from the mailbox:
 		imap_savebody( $mbox, $tmpMIME, $index );
 
-		// Create random temp directory for message parts
+		// Create random temp directory for message parts:
 		$tmpDirMIME = pbm_tempdir( sys_get_temp_dir(), 'b2evo_' );
 
-		$mimeParser = new mime_parser_class;
-		$mimeParser->mbox = 0;				// Set to 0 for parsing a single message file
-		$mimeParser->decode_headers = 1;
-		$mimeParser->ignore_syntax_errors = 1;
+		// Instanciate mime_parser.php library:
+		$mimeParser = new mime_parser_class();
+		$mimeParser->mbox = 0;						// Set to 0 for parsing a *single* RFC 2822 message
+		$mimeParser->decode_headers = 1;			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
+		$mimeParser->ignore_syntax_errors = 1;	// ignore syntax errors in	malformed messages.
 		$mimeParser->extract_addresses = 0;
 
 		$MIMEparameters = array(
@@ -169,20 +171,29 @@ function pbm_process_messages( & $mbox, $limit )
 				'SkipBody' => 1,			// Do not retrieve or save message body parts
 			);
 
+		// Associative array to specify parameters for the messagedata parsing and decoding operation.
+		$MIMEparameters = array(
+				'File' => $tmpMIME,			// Name of the file from which the message data will be read.
+				'SaveBody' => $tmpDirMIME,	// Save message body parts to a directory
+				'SkipBody' => 1,				// 1 means the information about the message body part structure is returned in $decodedMIME below but it does not return any body data.
+			);
+
+		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, $decodedMIME ) )
-		{
+		{	// error:
 			pbm_msg( sprintf( 'MIME message decoding error: %s at position %d.', $mimeParser->error, $mimeParser->error_position), true );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
 		}
 		else
-		{
+		{	// the specified message data was parsed successfully:
 			pbm_msg('MIME message decoding successful');
 
+			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
-			{
-				pbm_msg( sprintf( 'MIME message analyse error: %s', $mimeParser->error), true );
+			{	// error:
+				pbm_msg( sprintf( 'MIME message analyse error: %s', $mimeParser->error ), true );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -190,88 +201,100 @@ function pbm_process_messages( & $mbox, $limit )
 
 			// Get message $subject and $post_date from headers (by reference)
 			if( ! pbm_process_header( $parsedMIME, $subject, $post_date ) )
-			{	// Couldn't process message headers
+			{	// Couldn't process message headers:
 				rmdir_r( $tmpDirMIME );
-				unlink($tmpMIME);
+				unlink( $tmpMIME );
 				continue;
 			}
 
 			// TODO: handle type == "message" recursively
 			// sam2kb> For some reason imap_qprint() demages HTML text... needs more testing
 			// yura> I replaced imap_qprint() with quoted_printable_decode() to avoid notices about invalid quoted-printable sequence
+			// yura> imap_qprint() and quoted_printable_decode() do empty the message text, thus they were deleted.
 
 			if( $parsedMIME['Type'] == 'html' )
-			{	// Mail is HTML
+			{	// Mail is HTML:
 				if( $Settings->get('eblog_html_enabled') )
 				{	// HTML posting enabled
-					pbm_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
-					$html_body = file_get_contents($parsedMIME['DataFile']);
+					if( $debug )
+					{	// Display this info only in debug mode:
+						pbm_msg( 'HTML message part saved as '.$parsedMIME['DataFile'] );
+					}
+					$html_body = file_get_contents( $parsedMIME['DataFile'] );
 				}
 
 				foreach( $parsedMIME['Alternative'] as $alternative )
 				{	// First try to get HTML alternative (when possible)
 					if( $alternative['Type'] == 'html' && $Settings->get('eblog_html_enabled') )
-					{	// HTML text
-						pbm_msg('HTML alternative message part saved as '.$alternative['DataFile']);
-						// sam2kb> TODO: we may need to use $html_body here instead
-						$strbody = file_get_contents($alternative['DataFile']);
+					{	// HTML text:
+						if( $debug )
+						{	// Display this info only in debug mode:
+							pbm_msg( 'HTML alternative message part saved as '.$alternative['DataFile'] );
+						}
+						$strbody = file_get_contents( $alternative['DataFile'] );
 						break; // stop after first alternative
 					}
 					elseif( $alternative['Type'] == 'text' )
-					{	// Plain text
-						pbm_msg('Text alternative message part saved as '.$alternative['DataFile']);
-						$strbody = quoted_printable_decode( file_get_contents($alternative['DataFile']) );
+					{	// Plain text:
+						if( $debug )
+						{	// Display this info only in debug mode:
+							pbm_msg( 'Text alternative message part saved as '.$alternative['DataFile'] );
+						}
+						$strbody = file_get_contents( $alternative['DataFile'] );
 						break; // stop after first alternative
 					}
 				}
 			}
 			elseif( $parsedMIME['Type'] == 'text' )
-			{	// Mail is plain text
-				pbm_msg('Plain-text message part saved as '.$parsedMIME['DataFile']);
-				$strbody = quoted_printable_decode( file_get_contents($parsedMIME['DataFile']) );
+			{	// Mail is plain text:
+				if( $debug )
+				{	// Display this info only in debug mode:
+					pbm_msg( 'Plain-text message part saved as '.$parsedMIME['DataFile'] );
+				}
+				$strbody = file_get_contents( $parsedMIME['DataFile'] );
 			}
 
-			// Check for attachments
-			if( !empty($parsedMIME['Attachments']) )
+			// Check for attachments:
+			if( ! empty( $parsedMIME['Attachments'] ) )
 			{
 				$hasAttachment = true;
 				foreach( $parsedMIME['Attachments'] as $file )
 				{
-					pbm_msg('Attachment: '.$file['FileName'].' stored as '.$file['DataFile']);
+					pbm_msg( 'Attachment: '.$file['FileName'].' stored as '.$file['DataFile'] );
 				}
 			}
 
-			// Check for inline images
-			if( !empty($parsedMIME['Related']) )
+			// Check for inline images:
+			if( ! empty( $parsedMIME['Related'] ) )
 			{
 				$hasRelated = true;
 				foreach( $parsedMIME['Related'] as $file )
 				{
-					pbm_msg('Related file with content ID: '.$file['ContentID'].' stored as '.$file['DataFile']);
+					pbm_msg( 'Related file with content ID: '.$file['ContentID'].' stored as '.$file['DataFile'] );
 				}
 			}
 
-			if( count($mimeParser->warnings) > 0 )
+			if( count( $mimeParser->warnings ) > 0 )
 			{
-				pbm_msg( sprintf('<h4>%d warnings during decode:</h4>', count($mimeParser->warnings)) );
+				pbm_msg( sprintf( '<h4>%d warnings during decode:</h4>', count( $mimeParser->warnings ) ) );
 				foreach( $mimeParser->warnings as $k => $v )
 				{
-					pbm_msg('Warning: '.$v.' at position '.$k);
+					pbm_msg ('Warning: '.$v.' at position '.$k );
 				}
 			}
 		}
 		unlink( $tmpMIME );
 
-		if( empty($html_body) )
+		if( empty( $html_body ) )
 		{	// Plain-text message
-			pbm_msg('Message type: TEXT');
-			pbm_msg('Message body: <pre style="font-size:10px">'.htmlspecialchars($strbody).'</pre>');
+			pbm_msg( 'Message type: TEXT' );
+			pbm_msg( 'Message body: <pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' );
 
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
-			$content = str_replace( array("\r", "\n\n"), "\n", trim($strbody) );
+			$content = str_replace( array( "\r", "\n\n" ), "\n", trim( $strbody ) );
 
 			// First see if there's an <auth> tag with login and password
-			if( ($auth = pbm_get_auth_tag($content)) === false )
+			if( ( $auth = pbm_get_auth_tag( $content ) ) === false )
 			{	// No <auth> tag, let's detect legacy "username:password" on the first line
 				$a_body = explode( "\n", $content, 2 );
 
@@ -285,9 +308,9 @@ function pbm_process_messages( & $mbox, $limit )
 		}
 		else
 		{	// HTML message
-			pbm_msg('Message type: HTML');
+			pbm_msg( 'Message type: HTML' );
 
-			if( ($parsed_message = pbm_prepare_html_message( $html_body )) === false )
+			if( ( $parsed_message = pbm_prepare_html_message( $html_body ) ) === false )
 			{	// No 'auth' tag provided, skip to the next message
 				rmdir_r( $tmpDirMIME );
 				continue;
