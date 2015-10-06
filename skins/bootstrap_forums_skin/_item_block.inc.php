@@ -85,7 +85,7 @@ skin_widget( array(
 		}
 	?>
 
-<div id="styled_content_block" class="forums_list single_topic">
+<div class="forums_list single_topic evo_content_block">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
 	
 	<div class="single_page_title">

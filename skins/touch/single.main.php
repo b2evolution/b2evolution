@@ -56,7 +56,7 @@ skin_include( '_body_header.inc.php' );
 // Display message if no post:
 display_if_empty();
 
-echo '<div id="styled_content_block">'; // Beginning of posts display
+echo '<div class="evo_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 	?>

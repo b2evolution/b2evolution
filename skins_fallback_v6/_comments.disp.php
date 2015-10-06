@@ -57,7 +57,7 @@ $CommentList->display_init();
 
 $CommentList->display_if_empty();
 
-echo '<div id="styled_content_block">';
+echo '<div class="evo_content_block">';
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	?>

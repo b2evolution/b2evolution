@@ -141,8 +141,6 @@ div.error_additional_content {
 	margin: 3px;
 }
 // Display round avatars:
-// TODO: get rid of first line:
-#styled_content_block .evo_comment_avatar img,
 .evo_content_block .evo_comment_avatar img {
 	margin: 4px 10px 10px 0;
 	float:left;
@@ -568,7 +566,7 @@ div.item_location {
 }
 
 // Not published comments display
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -628,7 +626,7 @@ div.item_location {
 	background-color: #5133ab !important;
 }
 
-#styled_content_block span[class*=status_] span {
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -666,7 +664,7 @@ div.results .status_meta span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}

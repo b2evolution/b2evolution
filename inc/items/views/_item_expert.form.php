@@ -412,7 +412,7 @@ $Form->begin_form( '', '', $params );
 		$CommentList->query();
 
 		// comments_container value shows, current Item ID
-		echo '<div id="styled_content_block">';
+		echo '<div class="evo_content_block">';
 		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
 		// display comments
 		$CommentList->display_if_empty( array(

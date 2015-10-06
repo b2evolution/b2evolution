@@ -847,7 +847,7 @@ ul.legend span.note {
 }
 
 /* Statuses of posts display in table view */
-#styled_content_block span[class*='status_'] {
+.evo_content_block span[class*='status_'] {
   top: -10px;
   left: 20px;
 }

@@ -125,7 +125,6 @@ div.error_additional_content {
 .evo_comment_rating {
   margin: 3px;
 }
-#styled_content_block .evo_comment_avatar img,
 .evo_content_block .evo_comment_avatar img {
   margin: 4px 10px 10px 0;
   float: left;
@@ -514,7 +513,7 @@ div.item_location {
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
 }
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
   background: transparent;
   width: 75px;
   height: 75px;
@@ -572,7 +571,7 @@ div.item_location {
   color: #fff !important;
   background-color: #5133ab !important;
 }
-#styled_content_block span[class*=status_] span {
+.evo_content_block span[class*=status_] span {
   display: block;
   width: 120px;
   text-align: center;
@@ -609,7 +608,7 @@ div.results .status_meta span {
 }
 @media \0screen {
   /* IE8 */
-  #styled_content_block span[class*=status_] span {
+  .evo_content_block span[class*=status_] span {
     top: -15px;
     left: -2px;
   }

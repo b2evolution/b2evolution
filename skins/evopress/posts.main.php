@@ -108,7 +108,7 @@ display_if_empty();
 // Load posts read statuses if required
 $MainList->load_content_read_statuses();
 
-echo '<div id="styled_content_block">'; // Beginning of posts display
+echo '<div class="evo_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post:
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------

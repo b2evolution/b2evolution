@@ -344,20 +344,20 @@ input#thrd_title {
 }
 
 /* Not published comments display */
-#styled_content_block .bComment .status_draft,
-#styled_content_block .bComment .status_review,
-#styled_content_block .bComment .status_community,
-#styled_content_block .bComment .status_protected,
-#styled_content_block .bComment .status_private {
+.evo_content_block .bComment .status_draft,
+.evo_content_block .bComment .status_review,
+.evo_content_block .bComment .status_community,
+.evo_content_block .bComment .status_protected,
+.evo_content_block .bComment .status_private {
 	top: 0px;
 	left: 14px;
 }
 /* Not published posts display */
-#styled_content_block .evo_post_head .status_draft,
-#styled_content_block .evo_post_head .status_review,
-#styled_content_block .evo_post_head .status_community,
-#styled_content_block .evo_post_head .status_protected,
-#styled_content_block .evo_post_head .status_private {
+.evo_content_block .evo_post_head .status_draft,
+.evo_content_block .evo_post_head .status_review,
+.evo_content_block .evo_post_head .status_community,
+.evo_content_block .evo_post_head .status_protected,
+.evo_content_block .evo_post_head .status_private {
 	top: -4px;
 }
 

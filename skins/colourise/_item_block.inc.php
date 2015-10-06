@@ -24,7 +24,7 @@ $params = array_merge( array(
 		'image_size'      => 'fit-400x320'
 	), $params );
 
-echo '<div id="styled_content_block">'; // Beginning of posts display
+echo '<div class="evo_content_block">'; // Beginning of posts display
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
