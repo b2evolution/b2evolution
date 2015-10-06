@@ -29,6 +29,7 @@ class ItemType extends DataObject
 	var $template_name;
 	var $use_title = 'required';
 	var $use_url = 'optional';
+	var $use_parent = 'never';
 	var $use_text = 'optional';
 	var $allow_html = 1;
 	var $allow_attachments = 1;
@@ -90,6 +91,7 @@ class ItemType extends DataObject
 			$this->template_name = $db_row->ityp_template_name;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
+			$this->use_parent = $db_row->ityp_use_parent;
 			$this->use_text = $db_row->ityp_use_text;
 			$this->allow_html = $db_row->ityp_allow_html;
 			$this->allow_attachments = $db_row->ityp_allow_attachments;
@@ -185,6 +187,10 @@ class ItemType extends DataObject
 		// Use URL
 		param( 'ityp_use_url', 'string' );
 		$this->set_from_Request( 'use_url' );
+
+		// Use Parent ID
+		param( 'ityp_use_parent', 'string' );
+		$this->set_from_Request( 'use_parent' );
 
 		// Use text
 		param( 'ityp_use_text', 'string' );

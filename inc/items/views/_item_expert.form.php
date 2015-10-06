@@ -303,7 +303,7 @@ $Form->begin_form( '', '', $params );
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
 	{ // Display url
 		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
+		echo '<tr><td class="label"><label for="post_url">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		echo '</td></tr>';
@@ -311,6 +311,36 @@ $Form->begin_form( '', '', $params );
 	else
 	{ // Hide url
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+	}
+
+	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
+	{ // Display parent ID:
+		if( $parent_Item = & $edited_Item->get_parent_Item() )
+		{	// Get parent item info if it is defined:
+			$parent_info = '';
+			$status_icons = get_visibility_statuses( 'icons' );
+			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
+			{	// Status colored icon:
+				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
+			}
+			// Title with link to permament url:
+			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
+			// Icon to edit:
+			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
+		}
+		else
+		{	// No parent item defined
+			$parent_info = '';
+		}
+		$field_required = ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="post_parent_ID">'.$field_required.'<strong>'.T_('Parent ID').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide parent ID:
+		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
