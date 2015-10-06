@@ -224,6 +224,18 @@ class Item extends ItemLight
 	var $city_ID = NULL;
 
 	/**
+	 * ID of parent Item.
+	 * @var integer
+	 */
+	var $parent_ID = NULL;
+
+	/**
+	 * Parent Item.
+	 * @var object
+	 */
+	var $parent_Item = NULL;
+
+	/**
 	 * Additional settings for the items.  lazy filled.
  	 *
 	 * @see Item::get_setting()
@@ -317,6 +329,7 @@ class Item extends ItemLight
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
+			$this->parent_ID = $db_row->post_parent_ID;
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -594,6 +607,32 @@ class Item extends ItemLight
 		if( empty( $post_url ) && $this->get_type_setting( 'use_url' ) == 'required' )
 		{ // URL must be entered
 			param_check_not_empty( 'post_url', T_('Please provide a "Link To" URL.'), '' );
+		}
+
+		// Item parent ID:
+		$post_parent_ID = param( 'post_parent_ID', 'integer', NULL );
+		if( $post_parent_ID !== NULL )
+		{	// If item parent ID is entered:
+			$ItemCache = & get_ItemCache();
+			if( $ItemCache->get_by_ID( $post_parent_ID, false, false ) )
+			{	// Save only ID of existing item:
+				$this->set_from_Request( 'parent_ID' );
+			}
+			else
+			{	// Display an error of the entered item parent ID is incorrect:
+				param_error( 'post_parent_ID', T_('The parent ID is not a correct Item ID.') );
+			}
+		}
+		if( empty( $post_parent_ID ) )
+		{	// If empty parent ID is entered:
+			if( $this->get_type_setting( 'use_parent' ) == 'required' )
+			{	// Item parent ID must be entered:
+				param_check_not_empty( 'post_parent_ID', T_('Please provide a parent ID.'), '' );
+			}
+			else
+			{	// Remove parent ID:
+				$this->set_from_Request( 'parent_ID' );
+			}
 		}
 
 		if( $this->status == 'redirected' && empty( $this->url ) )
@@ -7552,6 +7591,37 @@ class Item extends ItemLight
 	function city_visible()
 	{
 		return $this->get_type_setting( 'use_city' ) != 'never';
+	}
+
+
+	/**
+	 * Get the parent Item
+	 *
+	 * @return object Item
+	 */
+	function & get_parent_Item()
+	{
+		if( ! empty( $this->parent_Item ) )
+		{	// Return the initialized parent Item:
+			return $this->parent_Item;
+		}
+
+		if( empty( $this->parent_ID ) )
+		{	// No defined parent Item
+			$this->parent_Item = NULL;
+			return $this->parent_Item;
+		}
+
+		if( $this->get_type_setting( 'use_parent' ) == 'never' )
+		{	// Parent Item is not allowed for current item type
+			$this->parent_Item = NULL;
+			return $this->parent_Item;
+		}
+
+		$ItemCache = & get_ItemCache();
+		$this->parent_Item = & $ItemCache->get_by_ID( $this->parent_ID, false, false );
+
+		return $this->parent_Item;
 	}
 }
 ?>

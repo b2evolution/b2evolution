@@ -60,7 +60,7 @@ $Item->title( array(
 
 <a name="top"></a>
 <a name="p<?php echo $Item->ID; ?>"></a>
-<table id="styled_content_block" class="bForums fixed_layout evo_content_block" width="100%" cellspacing="1" cellpadding="2" border="0">
+<table class="bForums fixed_layout evo_content_block" width="100%" cellspacing="1" cellpadding="2" border="0">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
 	<tr class="fixrow0"><td class="col1"></td><td></td></tr>
 	<tr class="top">

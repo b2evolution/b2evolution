@@ -224,7 +224,7 @@ class bootstrap_blog_Skin extends Skin
 		switch( $name )
 		{
 			case 'Results':
-				// Results list:
+				// Results list (Used to view the lists of the users, messages, contacts and etc.):
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
@@ -366,7 +366,7 @@ class bootstrap_blog_Skin extends Skin
 
 			case 'compact_form':
 			case 'Form':
-				// Default Form settings:
+				// Default Form settings (Used for any form on front-office):
 				return array(
 					'layout'         => 'fieldset',
 					'formclass'      => 'form-horizontal',
@@ -410,57 +410,8 @@ class bootstrap_blog_Skin extends Skin
 					'radio_oneline_end'      => "</label>\n",
 				);
 
-			case 'linespan_form':
-				// Linespan form:
-				return array(
-					'layout'         => 'linespan',
-					'formclass'      => 'form-horizontal',
-					'formstart'      => '',
-					'formend'        => '',
-					'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
-					'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
-															.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
-					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
-					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
-					'fieldend'       => "</div>\n\n",
-					'labelclass'     => '',
-					'labelstart'     => '',
-					'labelend'       => "\n",
-					'labelempty'     => '',
-					'inputstart'     => '<div class="controls">',
-					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls"><div class="form-control-static">',
-					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
-					'buttonsend'     => "</div></div>\n\n",
-					'customstart'    => '<div class="custom_content">',
-					'customend'      => "</div>\n",
-					'note_format'    => ' <span class="help-inline">%s</span>',
-					// Additional params depending on field type:
-					// - checkbox
-					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls"><div class="checkbox"><label>',
-					'inputend_checkbox'      => "</label></div></div>\n",
-					'checkbox_newline_start' => '<div class="checkbox">',
-					'checkbox_newline_end'   => "</div>\n",
-					'checkbox_basic_start'   => '<div class="checkbox"><label>',
-					'checkbox_basic_end'     => "</label></div>\n",
-					// - radio
-					'fieldstart_radio'       => '',
-					'fieldend_radio'         => '',
-					'inputstart_radio'       => '<div class="controls">',
-					'inputend_radio'         => "</div>\n",
-					'inputclass_radio'       => '',
-					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
-					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
-					'radio_oneline_end'      => "</label>\n",
-				);
-
 			case 'fixed_form':
-				// Form with fixed label width:
+				// Form with fixed label width (Used for form on disp=user):
 				return array(
 					'layout'         => 'fieldset',
 					'formclass'      => 'form-horizontal',
@@ -505,7 +456,7 @@ class bootstrap_blog_Skin extends Skin
 				);
 
 			case 'user_navigation':
-				// The Prev/Next links of users
+				// The Prev/Next links of users (Used on disp=user to navigate between users):
 				return array(
 					'block_start'  => '<ul class="pager">',
 					'prev_start'   => '<li class="previous">',
@@ -520,7 +471,7 @@ class bootstrap_blog_Skin extends Skin
 				);
 
 			case 'button_classes':
-				// Button classes
+				// Button classes (Used to initialize classes for action buttons like buttons to spam vote, or edit an intro post):
 				return array(
 					'button'       => 'btn btn-default btn-xs',
 					'button_red'   => 'btn-danger',
@@ -531,12 +482,15 @@ class bootstrap_blog_Skin extends Skin
 
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
+				// We should use 'popover' tooltip plugin for bootstrap skins
+				// This tooltips appear on mouse over user logins or on plugin help icons
 				return 'popover';
 				break;
 
 			case 'plugin_template':
-				// Template for plugins
+				// Template for plugins:
 				return array(
+						// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
 						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
 						'toolbar_after'        => '</div>',
 						'toolbar_title_before' => '<div class="btn-toolbar-title">',

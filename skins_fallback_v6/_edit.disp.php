@@ -108,6 +108,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 		$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );

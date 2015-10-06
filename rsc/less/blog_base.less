@@ -633,7 +633,8 @@ div.item_location {
 }
 
 // Not published comments display
-#styled_content_block span[class*=status_] {
+#styled_content_block span[class*=status_],
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -683,7 +684,8 @@ div.item_location {
 	background-color: #5133ab;
 }
 
-#styled_content_block span[class*=status_] span {
+#styled_content_block span[class*=status_] span,
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -712,7 +714,8 @@ div.results span[class*=status_] span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	#styled_content_block span[class*=status_] span,
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}
@@ -752,7 +755,8 @@ div.results span[class*=status_] span {
 // It is used for example on forums skins where we use AJAX to change a comment status.
 //     On AJAX success result we change only a visibility of the status banners and buttons
 //     and we do NOT reload a comment content
-#styled_content_block {
+#styled_content_block,
+.evo_content_block {
 	.vs_published,
 	.vs_community,
 	.vs_protected,

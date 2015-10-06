@@ -631,12 +631,12 @@ div.input ul.token-input-list-facebook {
 }
 
 /* Not published comments display */
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	top: -15px;
 	left: 15px;
 }
 
-#styled_content_block .postinfo {
+.evo_content_block .postinfo {
 	clear:none;
 }
 

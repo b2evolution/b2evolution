@@ -22,7 +22,7 @@ display_if_empty();
 
 while( mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
-	echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
+	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail

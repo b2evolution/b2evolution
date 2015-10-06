@@ -65,7 +65,7 @@ skin_include( '_body_header.inc.php' );
 		// Display message if no post:
 		display_if_empty();
 
-		echo '<div id="styled_content_block">';
+		echo '<div class="evo_content_block">';
 
 		$item_class_params = array(
 				'item_class'        => 'post',

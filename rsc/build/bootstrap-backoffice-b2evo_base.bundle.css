@@ -2187,14 +2187,14 @@ div.message_toolbars {
 .mce-container label.mce-label {
   max-width: none;
 }
-#styled_content_block {
+.evo_content_block {
   /*
 	a.user img { // bubbletip
 		.border-radius(0);
 	}
 	*/
 }
-#styled_content_block img {
+.evo_content_block img {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;

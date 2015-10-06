@@ -40,7 +40,7 @@ if( $CommentList->result_num_rows > 0 )
 {
 ?>
 <div class="panel panel-default forums_list single_topic">
-	<div id="styled_content_block" class="table evo_content_block">
+	<div class="table evo_content_block">
 <?php
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:

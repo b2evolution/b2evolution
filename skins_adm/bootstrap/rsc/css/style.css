@@ -371,7 +371,7 @@ div.CommentActionsArea {
 .dashboard_action_area .vote_spam a.action_icon {
   font-size: 12px;
 }
-#styled_content_block span[class*="status_"] {
+.evo_content_block span[class*="status_"] {
   left: 8px;
   top: -8px;
 }
@@ -571,11 +571,11 @@ fieldset ul {
 .items_container span[class*=status_] {
   line-height: 20px;
 }
-.dashboard_comments_block #styled_content_block a.user img,
-.dashboard_comments_block #styled_content_block img.user {
+.dashboard_comments_block .evo_content_block a.user img,
+.dashboard_comments_block .evo_content_block img.user {
   border-radius: 50%;
 }
-.dashboard_comments_block #styled_content_block .popover a.user img {
+.dashboard_comments_block .evo_content_block .popover a.user img {
   border-radius: 0;
 }
 .dashboard_comments_block #comments_container {
@@ -936,7 +936,7 @@ div.fieldset_wrapper.folded .panel-body {
 span[id^=title_folding_] {
   cursor: default;
 }
-.browse #styled_content_block {
+.browse .evo_content_block {
   margin-right: 0;
 }
 div.results {

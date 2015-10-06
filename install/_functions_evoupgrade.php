@@ -6513,6 +6513,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11483' );
 	}
 
+	if( $old_db_version < 11484 )
+	{ // part 2 of v6.6.4
+
+		task_begin( 'Upgrade table item types... ' );
+		$DB->query( "ALTER TABLE T_items__type
+			ADD ityp_use_parent ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never' AFTER ityp_use_url" );
+		task_end();
+
+		set_upgrade_checkpoint( '11484' );
+	}
+
 	if( $old_db_version < 11490 )
 	{ // part 18.t trunk aka 21th part of "i7"
 

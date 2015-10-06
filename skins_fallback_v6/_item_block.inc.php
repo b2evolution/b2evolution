@@ -38,7 +38,7 @@ $params = array_merge( array(
 	), $params );
 
 
-echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get rid of this ID, use class .evo_content_block instead
+echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
 
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">

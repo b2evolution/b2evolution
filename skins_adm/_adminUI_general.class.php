@@ -1186,7 +1186,7 @@ class AdminUI_general extends Menu
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="block_item evo_content_block" id="styled_content_block"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
+					'block_start' => '<div class="block_item evo_content_block"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
 					'block_end' => '</div>',
 				);
 

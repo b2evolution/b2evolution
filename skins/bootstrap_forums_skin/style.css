@@ -67,6 +67,10 @@ ol.breadcrumb {
   margin: 0 auto;
   margin-left: -76px;
 }
+.forums_list .panel-heading:not(:first-child) {
+  border-top: 1px solid #ddd;
+  border-radius: 0;
+}
 .forums_list .panel-heading h2 {
   margin-top: 0;
 }
@@ -513,10 +517,10 @@ ul.legend span.note {
 .single_topic .ft_avatar a > img {
   display: inline-block;
 }
-body.round_avatars .single_topic #styled_content_block .ft_avatar > a:before,
-body.round_avatars .single_topic #styled_content_block .ft_avatar > a,
-body.round_avatars .single_topic #styled_content_block .ft_avatar > span,
-body.round_avatars .single_topic #styled_content_block .ft_avatar a > img {
+body.round_avatars .single_topic .evo_content_block .ft_avatar > a:before,
+body.round_avatars .single_topic .evo_content_block .ft_avatar > a,
+body.round_avatars .single_topic .evo_content_block .ft_avatar > span,
+body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
   border-radius: 50%;
 }
 .vote_spam {
