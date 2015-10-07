@@ -16,3 +16,16 @@
 #eu_cookie_consent p {
 	margin: 0 0 5px 0;
 }
+
+@media (min-width: 401px) {
+	#eu_cookie_consent {
+		display: table;
+	}
+	#eu_cookie_consent > div {
+		display: table-cell;
+	}
+	.eu_cookie_consent__button {
+		vertical-align: bottom;
+		text-align: right;
+	}
+}

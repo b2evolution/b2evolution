@@ -134,6 +134,7 @@ class cookie_consent_plugin extends Plugin
 		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
 
 		$html_block = '<div id="eu_cookie_consent"'.( is_logged_in() ? ' class="eu_cookie_consent__loggedin"' : '' ).'>'
+				.'<div>'
 				.'<h3>'.format_to_js( $title ).'</h3>'
 				.'<p>'.format_to_js( $intro ).'</p>';
 		if( ! empty( $Item ) )
@@ -141,7 +142,8 @@ class cookie_consent_plugin extends Plugin
 			$html_block .= '<p><a href="'.$Item->get_permanent_url().'">'.format_to_js( nl2br( $info ) ).'</a></p>';
 		}
 		$html_block .= '<p>'.format_to_js( nl2br( $consent ) ).'</p>'
-				.'<button class="btn btn-info">'.format_to_js( $accept_button ).'</button>'
+				.'</div>'
+				.'<div class="eu_cookie_consent__button"><button class="btn btn-info">'.format_to_js( $accept_button ).'</button></div>'
 			.'</div>';
 
 		echo '<script type="text/javascript">
