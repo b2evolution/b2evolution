@@ -62,16 +62,6 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
-	$ItemTypeCache = & get_ItemTypeCache();
-	$ItemTypeCache->clear();
-	// Allow to select default post type only for enabled types:
-	$ItemTypeCache->load_list( $edited_Blog->get_enabled_item_types() );
-	$item_type_options = array();
-	foreach( $ItemTypeCache->cache as $ItemType )
-	{
-		$item_type_options[ $ItemType->ID ] = $ItemType->get_name();
-	}
-	$Form->select_input_array( 'default_post_type', $edited_Blog->get_setting('default_post_type'), $item_type_options, T_('Default type'), T_('Default type for new posts'), array( 'force_keys_as_values' => true ) );
 
 	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
