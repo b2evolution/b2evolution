@@ -69,7 +69,7 @@ function get_link_owner( $link_type, $object_ID )
 function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creating = false, $fold = false )
 {
 	global $admin_url, $dispatcher;
-	global $current_User;
+	global $current_User, $action;
 
 	if( $LinkOwner->type == 'item' && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
 	{ // Attachments are not allowed for current post type
@@ -100,9 +100,12 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
 
-		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
 		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
-		echo '</td></tr></table>';
+
+		if( ! empty( $action ) && ( $action == 'copy' || $action == 'create_link' ) )
+		{	// Display a button to duplicate the attachments to new item:
+			$Form->submit( array( 'actionArray[create_link]', /* TRANS: This is the value of an input submit button */ T_('Save & Link files from original'), 'SaveEditButton' ) );
+		}
 
 		$Form->end_fieldset();
 

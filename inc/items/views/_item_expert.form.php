@@ -82,6 +82,14 @@ $Form->begin_form( '', '', $params );
 		// Item ID
 		$Form->hidden( 'post_ID', $edited_Item->ID );
 	}
+
+	// Try to get the original item ID (For example, on copy action):
+	$original_item_ID = get_param( 'p' );
+	if( ! empty( $original_item_ID ) )
+	{
+		$Form->hidden( 'p', $original_item_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
