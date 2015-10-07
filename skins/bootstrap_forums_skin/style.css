@@ -230,56 +230,6 @@ ol.breadcrumb {
   float: left;
   margin: 4px 10px 10px 0;
 }
-.comment_form h3 {
-  margin: 0;
-}
-.comment_form .panel {
-  margin: 0;
-  border: none;
-  box-shadow: none;
-}
-.comment_form .panel .panel-body {
-  padding: 0;
-}
-.form-horizontal .form-group,
-.form-horizontal .custom_content {
-  margin-left: 0;
-  margin-right: 0;
-}
-.form-horizontal fieldset {
-  margin-top: 0;
-}
-.form-horizontal input[type=file] {
-  display: inline;
-}
-.form-group[id^="ffield_uploadfile"] .controls {
-  padding-top: 5px;
-}
-.form-group[id^="ffield_uploadfile"] .controls input {
-  line-height: 10px;
-}
-#comment_date_field .panel {
-  border: none;
-  box-shadow: none;
-  margin-bottom: 0;
-}
-#comment_date_field .panel .panel-body {
-  padding: 0;
-}
-#comment_date_field .panel .panel-body .control-label {
-  font-weight: bold;
-}
-#comment_date_field .panel .panel-body .controls .form-group {
-  display: inline-block;
-  padding-left: 15px;
-  margin-bottom: 0;
-}
-.comment_rating {
-  margin-top: 2px;
-}
-#comment_edit .comment_rating {
-  margin-top: 9px;
-}
 .btn-group > .btn.first-child {
   border-top-left-radius: 3px !important;
   border-bottom-left-radius: 3px !important;

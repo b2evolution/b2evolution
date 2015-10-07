@@ -82,6 +82,14 @@ $Form->begin_form( '', '', $params );
 		// Item ID
 		$Form->hidden( 'post_ID', $edited_Item->ID );
 	}
+
+	// Try to get the original item ID (For example, on copy action):
+	$original_item_ID = get_param( 'p' );
+	if( ! empty( $original_item_ID ) )
+	{
+		$Form->hidden( 'p', $original_item_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
@@ -94,13 +102,30 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-md-9">
+<div class="left_col col-lg-9 col-md-8">
 
 	<?php
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content' ) );
+	if( $edited_Item->ID > 0 )
+	{	// Set form title for editing the item:
+		$form_title_item_ID = T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>';
+	}
+	elseif( $creating )
+	{
+		if( ! empty( $original_item_ID ) )
+		{	// Set form title for duplicating the item:
+			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+		}
+		else
+		{	// Set form title for creating new item:
+			$form_title_item_ID = T_('New Item');
+		}
+	}
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link('post_contents_fieldset')
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -468,7 +493,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col col-md-3">
+<div class="right_col col-lg-3 col-md-4">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################

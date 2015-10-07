@@ -1705,17 +1705,6 @@ div.moderation_msg {
   border: 1px dotted #fa9;
   color: #e70;
 }
-.comment_form .panel-body .alert.alert-primary,
-.comment_form .panel-body .alert.alert-success,
-.comment_form .panel-body .alert.alert-info,
-.comment_form .panel-body .alert.alert-warning,
-.comment_form .panel-body .alert.alert-danger {
-  margin: 0px;
-  padding: 10px 15px;
-}
-.comment_form .bg-warning {
-  margin: 0px !important;
-}
 div.feedback_feed_msg {
   margin: 2em 2ex;
   text-align: center;
@@ -2327,6 +2316,74 @@ input.btn-lg {
   border: 1px solid #ddd;
   padding: 8px;
   vertical-align: top;
+}
+.evo_form__comment .panel {
+  margin: 0;
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.evo_form__comment .panel .panel-body {
+  padding: 0;
+}
+.evo_form__comment .panel-body .alert.alert-primary,
+.evo_form__comment .panel-body .alert.alert-success,
+.evo_form__comment .panel-body .alert.alert-info,
+.evo_form__comment .panel-body .alert.alert-warning,
+.evo_form__comment .panel-body .alert.alert-danger {
+  margin: 0px;
+  padding: 10px 15px;
+}
+.evo_form__comment .bg-warning {
+  margin: 0px !important;
+}
+.form-horizontal .form-group,
+.form-horizontal .custom_content {
+  margin-left: 0;
+  margin-right: 0;
+}
+.form-horizontal fieldset {
+  margin-top: 0;
+}
+.form-horizontal input[type=file] {
+  display: inline;
+}
+#comment_date_field input {
+  width: 80px;
+}
+#comment_date_field label {
+  font-weight: normal;
+}
+.form-group[id^="ffield_uploadfile"] .controls {
+  padding-top: 5px;
+}
+.form-group[id^="ffield_uploadfile"] .controls input {
+  line-height: 10px;
+}
+.comment_rating {
+  margin-top: 2px;
+}
+#comment_edit .comment_rating {
+  margin-top: 9px;
+}
+#comment_preview {
+  background-color: #FFF;
+}
+#comment_date_field .panel {
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+#comment_date_field .panel .panel-body {
+  padding: 0;
+}
+#comment_date_field .panel .panel-body .control-label {
+  font-weight: bold;
+}
+#comment_date_field .panel .panel-body .controls .form-group {
+  display: inline-block;
+  padding-left: 15px;
+  margin-bottom: 0;
 }
 
 /**

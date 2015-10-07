@@ -162,10 +162,11 @@ switch( $action )
 	case 'new_type':
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 	case 'list':
-		if( in_array( $action, array( 'create_edit', 'create', 'create_publish' ) ) )
+		if( in_array( $action, array( 'create_edit', 'create_link', 'create', 'create_publish' ) ) )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
 		}
@@ -197,7 +198,7 @@ switch( $action )
 
 			// What form buttton has been pressed?
 			param( 'save', 'string', '' );
-			$exit_after_save = ( $action != 'create_edit' );
+			$exit_after_save = ( $action != 'create_edit' && $action != 'create_link' );
 		}
 		break;
 
@@ -539,6 +540,9 @@ switch( $action )
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 
+		// Change creator user to current user for correct permission checking:
+		$edited_Item->set( 'creator_user_ID', $current_User->ID );
+
 		$edited_Item->load_Blog();
 		$item_status = $edited_Item->Blog->get_allowed_item_status();
 
@@ -727,6 +731,7 @@ switch( $action )
 
 
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 		// Check that this action request is not a CSRF hacked request:
@@ -764,7 +769,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
+		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit' || $action == 'create_link'), /* creating? */ true );
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
@@ -795,6 +800,33 @@ switch( $action )
 			if( !$result )
 			{ // Add error message
 				$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+			}
+		}
+
+		if( $result && $action == 'create_link' )
+		{	// If the item has been inserted correctly and we should copy all links from the duplicated item:
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+			    && $current_User->check_perm( 'files', 'view', false ) )
+			{	// Allow this action only if current user has a permission to view the links of new created item:
+				$original_item_ID = param( 'p', 'integer', NULL );
+				$ItemCache = & get_ItemCache();
+				if( $original_Item = & $ItemCache->get_by_ID( $original_item_ID, false, false ) )
+				{	// Copy the links only if the requested item is correct:
+					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
+					{	// Current user must has a permission to view an original item
+						$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID,
+								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+							SELECT '.$DB->quote( date2mysql( $localtimenow ) ).', '.$DB->quote( date2mysql( $localtimenow ) ).', '.$current_User->ID.',
+								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_ltype_ID, link_position, link_order
+									FROM T_links
+									WHERE link_itm_ID = '.$original_Item->ID );
+					}
+					else
+					{	// Display error if user tries to duplicate the disallowed item:
+						$Messages->add( T_('You have no permission to duplicate the original post.'), 'error' );
+						$result = false;
+					}
+				}
 			}
 		}
 
@@ -1507,6 +1539,7 @@ switch( $action )
 	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 		// Generate available blogs list:
@@ -1706,7 +1739,7 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
+if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -1725,6 +1758,7 @@ switch( $action )
 	case 'copy':
 	case 'create':
 	case 'create_edit':
+	case 'create_link':
 	case 'create_publish':
 	case 'update':
 	case 'update_edit':
@@ -1773,6 +1807,7 @@ switch( $action )
 	case 'new':
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 	case 'edit':

@@ -22,8 +22,8 @@ global $Blog, $dummy_fields;
 // Default params:
 $params = array_merge( array(
 		'disp_comment_form'    => true,
-		'form_title_start'     => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' )
-															 .' comment_form"><div class="panel-heading"><h4 class="panel-title">',
+		'form_title_start'     => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).'">'
+																.'<div class="panel-heading"><h4 class="panel-title">',
 		'form_title_end'       => '</h4></div><div class="panel-body">',
 		'form_title_text'      => T_('Leave a comment'),
 		'form_comment_text'    => T_('Comment text'),
