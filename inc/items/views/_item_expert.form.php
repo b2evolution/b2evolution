@@ -108,8 +108,22 @@ $Form->begin_form( '', '', $params );
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>'
-				.get_manual_link('post_contents_fieldset')
+	if( $edited_Item->ID > 0 )
+	{	// Set form title for editing the item:
+		$form_title_item_ID = T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>';
+	}
+	elseif( $creating )
+	{
+		if( ! empty( $original_item_ID ) )
+		{	// Set form title for duplicating the item:
+			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+		}
+		else
+		{	// Set form title for creating new item:
+			$form_title_item_ID = T_('New Item');
+		}
+	}
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link('post_contents_fieldset')
 				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
 			array( 'id' => 'itemform_content' ) );
 
