@@ -137,9 +137,17 @@ h2 .glyphicon {
 }
 .edit_actions {
   clear: both;
-  padding-top: 7px;
 }
-.edit_actions .PreviewButton {
+.edit_actions .btn {
+  margin-top: 7px;
+}
+.edit_actions .edit_actions_text {
+  margin: 7px 7px 0 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.edit_actions .PreviewButton,
+.edit_actions .pull-left {
   margin-right: 10px;
 }
 .compose_layout {

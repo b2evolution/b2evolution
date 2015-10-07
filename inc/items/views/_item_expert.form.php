@@ -94,13 +94,16 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-md-9">
+<div class="left_col col-lg-9 col-md-8">
 
 	<?php
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content' ) );
+	$Form->begin_fieldset( T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>'
+				.get_manual_link('post_contents_fieldset')
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -468,7 +471,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col col-md-3">
+<div class="right_col col-lg-3 col-md-4">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
