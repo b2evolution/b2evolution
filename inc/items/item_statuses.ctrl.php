@@ -43,14 +43,38 @@ $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' =
 $AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 $AdminUI->breadcrumbpath_add( T_('Post Statuses'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
-$AdminUI->set_page_manual_link( 'managing-item-statuses' );
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'managing-item-statuses-form' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'managing-item-statuses' );
+		break;
+}
 
 $list_title = T_('Post Statuses').get_manual_link( 'managing-item-statuses' );
 $default_col_order = 'A';
 $edited_name_maxlen = 30;
 $perm_name = 'options';
 $perm_level = 'edit';
-$form_below_list = true;
+$form_below_list = false;
+
+$generic_params = array(
+		'form_title_new'        => T_('New post status'),
+		'form_title_edit'       => T_('Edit post status'),
+		'form_fieldset_title'   => T_('Post status').get_manual_link( 'managing-item-statuses-form' ),
+		'form_field_name_title' => T_('Name'),
+		'icon_new_title'        => T_('Create a new post status...'),
+		'icon_new_text'         => T_('New post status').' &raquo;',
+	);
 
 /**
  * Delete restrictions
