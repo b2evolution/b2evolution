@@ -202,7 +202,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 		<?php
-		if( in_array( $disp, array( 'front', 'single', 'page' ) ) || ( $disp == 'posts' && ! empty( $cat ) ) )
+		if( in_array( $disp, array( 'front', 'single', 'page', 'posts' ) ) )
 		{ // Widget 'Search form':
 			skin_widget( array(
 					// CODE for the widget:
