@@ -40,6 +40,17 @@ function toggleall_perm( the_form, id, set )
 	}
 
 	// Selects
-	the_form.elements['blog_perm_edit_'+String(id)].value = allchecked[id] ? 'all' : 'no';
-	the_form.elements['blog_perm_edit_cmt_'+String(id)].value = allchecked[id] ? 'all' : 'no';
+	if( ! the_form.elements['blog_perm_item_type_'+String(id)].disabled )
+	{	// Toggle only enabled select element:
+		the_form.elements['blog_perm_item_type_'+String(id)].value = allchecked[id] ? 'admin' : 'standard';
+	}
+	if( ! the_form.elements['blog_perm_edit_'+String(id)].disabled )
+	{	// Toggle only enabled select element:
+		the_form.elements['blog_perm_edit_'+String(id)].value = allchecked[id] ? 'all' : 'no';
+	}
+	
+	if( ! the_form.elements['blog_perm_edit_cmt_'+String(id)].disabled )
+	{	// Toggle only enabled select element:
+		the_form.elements['blog_perm_edit_cmt_'+String(id)].value = allchecked[id] ? 'all' : 'no';
+	}
 }

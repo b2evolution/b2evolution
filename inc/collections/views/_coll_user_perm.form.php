@@ -59,15 +59,17 @@ else
 }
 
 $SQL = new SQL();
-$SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_ismember, bloguser_can_be_assignee,'
+$SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
 	. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
 	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
-	. 'bloguser_perm_media_browse, bloguser_perm_media_change' );
+	. 'bloguser_perm_media_browse, bloguser_perm_media_change,'
+	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, bloguser_ismember ) AS bloguser_ismember,'
+	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, 0 ) AS bloguser_is_owner' );
 $SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
 				 						user_ID = bloguser_user_ID
 										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
-$SQL->ORDER_BY( 'bloguser_ismember DESC, *, user_login, user_ID' );
+$SQL->ORDER_BY( 'bloguser_is_owner DESC, bloguser_ismember DESC, *, user_login, user_ID' );
 
 if( !empty( $keywords ) )
 {
@@ -127,7 +129,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '%get_user_identity_link( #user_login#, NULL, "profile", "avatar_login" )%',
+						'td' => '%coll_perm_login( #user_ID#, #user_login# )%',
 					);
 
 $Results->cols[] = array(
