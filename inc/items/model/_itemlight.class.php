@@ -1537,6 +1537,40 @@ class ItemLight extends DataObject
 
 		return $admin_url.'?ctrl=items'.$glue.'action=history'.$glue.'p='.$this->ID;
 	}
+
+
+	/**
+	 * Get the links to all chapters of this item
+	 *
+	 * @param array Params
+	 * @return string The chapter links
+	 */
+	function get_chapter_links( $params = array() )
+	{
+		$params = array_merge( array(
+				'separator' => ', ',
+			) );
+
+		// Get all item chapters:
+		$chapters = $this->get_Chapters();
+
+		if( empty( $chapters ) )
+		{	// No chapters for this item, Return empty string:
+			return '';
+		}
+
+		$chapter_links = '';
+		foreach( $chapters as $c => $Chapter )
+		{
+			$chapter_links .= '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_path_name().'</a>';
+			if( $c < count( $chapters ) - 1 )
+			{	// Add separator between chapters:
+				$chapter_links .= $params['separator'];
+			}
+		}
+
+		return $chapter_links;
+	}
 }
 
 ?>

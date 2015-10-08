@@ -62,6 +62,36 @@ class bootstrap_forums_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'section_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Layout Settings')
+				),
+					'layout_general' => array(
+						'label' => T_('General Layout'),
+						'note' => '',
+						'defaultvalue' => 'no_sidebar',
+						'options' => array(
+								'no_sidebar'    => T_('No Sidebar'),
+								'left_sidebar'  => T_('Left Sidebar'),
+								'right_sidebar' => T_('Right Sidebar'),
+							),
+						'type' => 'select',
+					),
+					'layout_single' => array(
+						'label' => T_('Single Thread Layout'),
+						'note' => '',
+						'defaultvalue' => 'no_sidebar',
+						'options' => array(
+								'no_sidebar'    => T_('No Sidebar'),
+								'left_sidebar'  => T_('Left Sidebar'),
+								'right_sidebar' => T_('Right Sidebar'),
+							),
+						'type' => 'select',
+					),
+				'section_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
 				'section_forum_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Forum Display Settings')
@@ -717,6 +747,78 @@ class bootstrap_forums_Skin extends Skin
 		$access = $this->get_setting( $setting_name );
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+	}
+
+
+	/**
+	 * Check if we can display a sidebar for the current layout
+	 *
+	 * @param boolean TRUE to check if at least one sidebar container is visible
+	 * @return boolean TRUE to display a sidebar
+	 */
+	function is_visible_sidebar( $check_containers = false )
+	{
+		$layout = $this->get_setting_layout();
+
+		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
+		{ // Sidebar is not displayed for selected skin layout
+			return false;
+		}
+
+		if( $check_containers )
+		{ // Check if at least one sidebar container is visible
+			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+		}
+		else
+		{ // We should not check the visibility of the sidebar containers for this case
+			return true;
+		}
+	}
+
+
+	/**
+	 * Get value for attbiute "class" of column block
+	 * depending on skin setting "Layout"
+	 *
+	 * @return string
+	 */
+	function get_column_class()
+	{
+		switch( $this->get_setting_layout() )
+		{
+			case 'no_sidebar':
+				// Single Column Large
+				return 'col-md-12';
+
+			case 'left_sidebar':
+				// Left Sidebar
+				return 'col-md-9 pull-right';
+
+			case 'right_sidebar':
+				// Right Sidebar
+			default:
+				return 'col-md-9';
+		}
+	}
+
+
+	/**
+	 * Get a layout setting value depending on $disp
+	 *
+	 * @return string
+	 */
+	function get_setting_layout()
+	{
+		global $disp;
+
+		if( $disp == 'single' || $disp == 'page' )
+		{
+			return $this->get_setting( 'layout_single' );
+		}
+		else
+		{
+			return $this->get_setting( 'layout_general' );
+		}
 	}
 
 

@@ -105,6 +105,9 @@ elseif( $comments_number > 25 )
 					?>
 				</div>
 				<div class="ft_author_info ellipsis">
+					<?php echo sprintf( T_('In %s'), $Item->get_chapter_links() ); ?>
+				</div>
+				<div class="ft_author_info ellipsis">
 					<?php
 					// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
 					echo T_('Started by');
