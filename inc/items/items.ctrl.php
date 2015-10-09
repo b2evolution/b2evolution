@@ -537,6 +537,9 @@ switch( $action )
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
+		// Load tags of the duplicated item:
+		$item_tags = implode( ', ', $edited_Item->get_tags() );
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 
