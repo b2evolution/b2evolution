@@ -288,7 +288,7 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 .chapters_list, .posts_list {
 	list-style: none;
 	margin: 0;
-	.fa {
+	.link .fa {
 		margin-right: 5px;
 		font-size: inherit;
 		width: auto !important;
@@ -298,7 +298,7 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 	h3 {
 		display: inline-block;
 	}
-	li > a.btn {
+	li > .btn-group {
 		margin: 0 0 6px 30px;
 	}
 }
@@ -320,5 +320,9 @@ ol.breadcrumb {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
+		white-space: nowrap;
+		.btn {
+			float: none;
+		}
 	}
 }
