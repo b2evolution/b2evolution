@@ -33,9 +33,27 @@ if( ! empty( $params['Item'] ) )
 		$item_edit_link = $Item->get_edit_link( array(
 				'class' => 'roundbutton roundbutton_text',
 			) );
+		
+
+		$item_action_links = $Item->get_edit_link( array(
+				'before' => '',
+				'after'  => '',
+				'class' => 'roundbutton roundbutton_text',
+			) );
+		$item_action_links .= $Item->get_copy_link( array(
+				'before' => '',
+				'after'  => '',
+				'class' => 'roundbutton',
+				'text'  => '#icon#',
+			) );
+		if( ! empty( $item_action_links ) )
+		{	// Group all action icons:
+			$item_action_links = '<div class="roundbutton_group">'.$item_action_links.'</div>';
+		}
+
 		$Item->title( array(
 				'before'          => $params['before_title'],
-				'after'           => $params['after_title'].$item_edit_link.'<div class="clear"></div>',
+				'after'           => $params['after_title'].$item_action_links.'<div class="clear"></div>',
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',

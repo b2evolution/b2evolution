@@ -678,6 +678,7 @@ function search_result_block( $params = array() )
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
+					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
 				);
 				if( $params['use_editor'] )
 				{ // Get editor info to display
@@ -913,6 +914,8 @@ function display_search_result( $params = array() )
 			'row_end'            => '</div>',
 			'cell_title_start'   => '<div class="search_title">',
 			'cell_title_end'     => '</div>',
+			'cell_chapter_start' => '<div class="search_info dimmed">',
+			'cell_chapter_end'   => '</div>',
 			'cell_author_start'  => '<div class="search_info dimmed">',
 			'cell_author_end'    => '</div>',
 			'cell_author_empty'  => false, // false - to display author only when it is defined, use string to print text instead of empty author
@@ -933,6 +936,13 @@ function display_search_result( $params = array() )
 	echo $params['cell_content_start'];
 	echo ! empty( $params['excerpt'] ) ? $params['excerpt'] : '&nbsp;';
 	echo $params['cell_content_end'];
+
+	if( ! empty( $params['chapter'] ) )
+	{	// Display a chapter info:
+		echo $params['cell_chapter_start'];
+		echo $params['chapter'];
+		echo $params['cell_chapter_end'];
+	}
 
 	if( ! empty( $params['author'] ) || ! empty( $params['editor'] ) || $params['cell_author_empty'] !== false )
 	{ // Display author or empty string when no author

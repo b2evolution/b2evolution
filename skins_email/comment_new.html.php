@@ -43,7 +43,7 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url(), $Item->get('title'), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
 if( $params['notify_full'] )
 { // Long format notification:
@@ -123,7 +123,7 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url(), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email

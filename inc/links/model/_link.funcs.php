@@ -102,7 +102,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
 
-		if( ! empty( $action ) && ( $action == 'copy' || $action == 'create_link' ) )
+		if( get_param( 'p' ) > 0 )
 		{	// Display a button to duplicate the attachments to new item:
 			$Form->submit( array( 'actionArray[create_link]', /* TRANS: This is the value of an input submit button */ T_('Save & Link files from original'), 'SaveEditButton' ) );
 		}

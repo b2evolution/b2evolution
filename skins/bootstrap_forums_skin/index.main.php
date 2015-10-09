@@ -308,8 +308,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<?php
-		if( $disp == 'single' || $disp == 'page' )
-		{	// Use special sidebar container for single pages:
+		if( $disp == 'single' )
+		{	// Use special sidebar container for single post page:
 		?>
 		<div class="evo_container evo_container__sidebar_single">
 		<?php

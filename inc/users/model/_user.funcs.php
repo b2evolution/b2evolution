@@ -352,7 +352,7 @@ function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 
 	if( $use_admin_page_url )
 	{ // Use backoffice form of notifications form
-		return $admin_url.'?ctrl=user'.$glue.'user_tab=subs#subs';
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=subs';
 	}
 	else
 	{ // Use in-skin form of notifications form:
@@ -362,7 +362,7 @@ function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 			if( empty( $url_Blog ) )
 			{ // No default blog, Use base url:
 				global $baseurl;
-				return url_add_param( $baseurl, 'disp=subs#subs' );
+				return url_add_param( $baseurl, 'disp=subs' );
 			}
 		}
 		else

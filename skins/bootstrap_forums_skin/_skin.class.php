@@ -787,7 +787,7 @@ class bootstrap_forums_Skin extends Skin
 		switch( $this->get_setting_layout() )
 		{
 			case 'no_sidebar':
-				// Single Column Large
+				// No Sidebar (Single large column)
 				return 'col-md-12';
 
 			case 'left_sidebar':
@@ -811,12 +811,12 @@ class bootstrap_forums_Skin extends Skin
 	{
 		global $disp;
 
-		if( $disp == 'single' || $disp == 'page' )
-		{
+		if( $disp == 'single' )
+		{	// Single post page has a separate setting for layout:
 			return $this->get_setting( 'layout_single' );
 		}
 		else
-		{
+		{	// Use this settings for all other pages:
 			return $this->get_setting( 'layout_general' );
 		}
 	}

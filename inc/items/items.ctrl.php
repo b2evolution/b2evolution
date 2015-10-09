@@ -439,6 +439,9 @@ switch( $action )
 			break;
 		}
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		if( in_array( $action, array( 'new', 'new_type' ) ) )
 		{
 			param( 'restore', 'integer', 0 );
@@ -526,8 +529,10 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 
 		if( $action == 'new_type' )
-		{ // Save the changes of Item to Session
+		{	// Save the changes of Item to Session:
 			set_session_Item( $edited_Item );
+			// Initialize original item ID that is used on diplicating action:
+			param( 'p', 'integer', NULL );
 		}
 		break;
 
@@ -536,6 +541,14 @@ switch( $action )
 		$item_ID = param( 'p', 'integer', true );
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Load tags of the duplicated item:
+		$item_tags = implode( ', ', $edited_Item->get_tags() );
+
+		// Load all settings of the duplicating item and copy them to new item:
+		$edited_Item->load_ItemSettings();
+		$edited_Item->ItemSettings->_load( $edited_Item->ID, NULL );
+		$edited_Item->ItemSettings->cache[0] = $edited_Item->ItemSettings->cache[ $edited_Item->ID ];
 
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
@@ -1079,6 +1092,9 @@ switch( $action )
 		param( 'post_ID', 'integer', true, true );
 		param( 'ityp_ID', 'integer', true );
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		// Load post from Session
 		$edited_Item = get_session_Item( $post_ID );
 
@@ -1117,6 +1133,10 @@ switch( $action )
 			if( $post_ID > 0 )
 			{ // Edit item form
 				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID;
+			}
+			elseif( $duplicated_item_ID > 0 )
+			{ // Copy item form
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1&p='.$duplicated_item_ID;
 			}
 			else
 			{ // New item form

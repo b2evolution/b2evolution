@@ -16,14 +16,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-echo '<div class="forums_table_search panel panel-default">';
+echo '<div class="forums_table_search">';
 
 // --------------------------------- START OF COMMON LINKS --------------------------------
 skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'coll_search_form',
 		// Optional display params
-		'block_start' => '<div class="panel-heading">',
+		'block_start' => '<div class="panel panel-default"><div class="panel-heading">',
 		'block_end' => '</div></div>',
 		'block_display_title' => false,
 		'disp_search_options' => 0,

@@ -534,7 +534,7 @@ ul.posts_list h3 {
 a.roundbutton {
 	text-decoration: none;
 }
-ul.posts_list li a.roundbutton {
+ul.posts_list li .roundbutton_group {
 	float: left;
 	margin-left: 30px;
 }
