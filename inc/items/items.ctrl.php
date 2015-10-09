@@ -545,6 +545,11 @@ switch( $action )
 		// Load tags of the duplicated item:
 		$item_tags = implode( ', ', $edited_Item->get_tags() );
 
+		// Load all settings of the duplicating item and copy them to new item:
+		$edited_Item->load_ItemSettings();
+		$edited_Item->ItemSettings->_load( $edited_Item->ID, NULL );
+		$edited_Item->ItemSettings->cache[0] = $edited_Item->ItemSettings->cache[ $edited_Item->ID ];
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 
