@@ -439,6 +439,9 @@ switch( $action )
 			break;
 		}
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		if( in_array( $action, array( 'new', 'new_type' ) ) )
 		{
 			param( 'restore', 'integer', 0 );
@@ -526,8 +529,10 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 
 		if( $action == 'new_type' )
-		{ // Save the changes of Item to Session
+		{	// Save the changes of Item to Session:
 			set_session_Item( $edited_Item );
+			// Initialize original item ID that is used on diplicating action:
+			param( 'p', 'integer', NULL );
 		}
 		break;
 
@@ -1082,6 +1087,9 @@ switch( $action )
 		param( 'post_ID', 'integer', true, true );
 		param( 'ityp_ID', 'integer', true );
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		// Load post from Session
 		$edited_Item = get_session_Item( $post_ID );
 
@@ -1120,6 +1128,10 @@ switch( $action )
 			if( $post_ID > 0 )
 			{ // Edit item form
 				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID;
+			}
+			elseif( $duplicated_item_ID > 0 )
+			{ // Copy item form
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1&p='.$duplicated_item_ID;
 			}
 			else
 			{ // New item form

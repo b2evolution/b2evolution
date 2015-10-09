@@ -7411,11 +7411,15 @@ class Item extends ItemLight
 			if( $attr != 'onclick' )
 			{ // Init an url
 				if( $this->ID > 0 )
-				{
+				{	// URL when item is editing:
 					$attr_href = $admin_url.'?ctrl=items&amp;action=edit_type&amp;post_ID='.$this->ID;
 				}
+				elseif( get_param( 'p' ) > 0 )
+				{	// URL when item is duplicating:
+					$attr_href = $admin_url.'?ctrl=items&amp;action=new_type&amp;p='.get_param( 'p' );
+				}
 				else
-				{
+				{	// URL when item is creating:
 					$attr_href = $admin_url.'?ctrl=items&amp;action=new_type';
 				}
 			}

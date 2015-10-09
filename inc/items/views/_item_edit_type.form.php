@@ -64,7 +64,9 @@ function get_name_for_itemtype( $ityp_ID, $name )
 
 	$from_tab_param = empty( $from_tab ) ? '' : '&amp;from_tab='.$from_tab;
 
-	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.'&amp;'.url_crumb( 'item' ).'">'
+	$duplicated_item_param = get_param( 'p' ) > 0 ? '&amp;p='.get_param( 'p' ) : '';
+
+	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.$duplicated_item_param.'&amp;'.url_crumb( 'item' ).'">'
 		.$name.'</a></strong>'
 		.$current;
 }
