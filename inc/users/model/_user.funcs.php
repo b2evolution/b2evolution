@@ -2883,7 +2883,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			{	// End previous group
 				$Form->end_fieldset();
 			}
-			$Form->begin_fieldset( $userfield->ufgp_name, array( 'id' => $userfield->ufgp_ID ) );
+			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
 		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );

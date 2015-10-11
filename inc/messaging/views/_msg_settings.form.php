@@ -33,14 +33,14 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'ctrl', 'msgsettings' );
 	$Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_( 'General settings' ).get_manual_link( 'messages-settings' ) );
+$Form->begin_fieldset( T_( 'General settings' ).get_manual_link( 'messages-general-settings' ) );
 
 	$Form->checkbox( 'allow_html_message', $Settings->get( 'allow_html_message' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in messages.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Welcome message after account activation' ) );
+$Form->begin_fieldset( T_( 'Welcome message after account activation' ).get_manual_link('messages-welcome-after-account-activation') );
 
 	$Form->checkbox_input( 'welcomepm_enabled', $Settings->get( 'welcomepm_enabled' ), T_('Send Welcome PM'), array( 'note' => T_('Check to automatically send a welcome message to users when they activate their account.' ) ) );
 
@@ -58,7 +58,7 @@ $Form->begin_fieldset( T_( 'Welcome message after account activation' ) );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Info message to reporters after account deletion' ) );
+$Form->begin_fieldset( T_( 'Info message to reporters after account deletion' ).get_manual_link('messages-info-reporters-after-deletion') );
 
 	$Form->checkbox_input( 'reportpm_enabled', $Settings->get( 'reportpm_enabled' ), /* TRANS: Send a Private Message to reporters when an account is deleted by a moderator */ T_('Send delete notification'), array( 'note' => T_('Check to allow sending a message to users who have reported an account whenever that account is deleted by a moderator.' ) ) );
 

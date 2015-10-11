@@ -227,7 +227,7 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Notification options') );
+$Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification-options') );
 
 	// Display pluggale notification options
 	display_pluggable_permissions( $Form, 'notifications');
