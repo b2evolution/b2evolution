@@ -253,7 +253,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th_group' => T_('Perms on Coll.'),
-						'th' => get_admin_badge( 'coll', false ),
+						'th' => get_admin_badge( 'coll', '#', T_('Coll.<br />Admin'), T_('Check this to give Collection Admin permission.') ),
 						'th_title' => T_('Advanced/Administrative blog properties'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_admin',

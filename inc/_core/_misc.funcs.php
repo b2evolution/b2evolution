@@ -7482,13 +7482,19 @@ function get_script_baseurl()
  * @param string Manual URL, '#' - default, false - don't set URL
  * @return string
  */
-function get_admin_badge( $type = 'coll', $manual_url = '#' )
+function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#' )
 {
 	switch( $type )
 	{
 		case 'coll':
-			$text = T_('Coll. Admin');
-			$title = T_('This can only be edited by users with the Admin permission.');
+			if( $text == '#' )
+			{	// Use default text:
+				$text = T_('Coll. Admin');
+			}
+			if( $title == '#' )
+			{	// Use default title:
+				$title = T_('This can only be edited by users with the Collection Admin permission.');
+			}
 			if( $manual_url == '#' )
 			{	// Use default manual url:
 				$manual_url = 'collection-admin';
@@ -7496,8 +7502,14 @@ function get_admin_badge( $type = 'coll', $manual_url = '#' )
 			break;
 
 		case 'user':
-			$text = T_('User Admin');
-			$title = T_('This can only be edited by users with the Admin permission.');
+			if( $text == '#' )
+			{	// Use default text:
+				$text = T_('User Admin');
+			}
+			if( $title == '#' )
+			{	// Use default title:
+				$title = T_('This can only be edited by users with the User Admin permission.');
+			}
 			if( $manual_url == '#' )
 			{	// Use default manual url:
 				$manual_url = 'user-admin';

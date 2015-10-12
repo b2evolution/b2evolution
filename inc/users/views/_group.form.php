@@ -162,7 +162,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
 							array( 'viewall', T_('View all blogs') ),
-							array( 'editall', T_('Full Access') )
+							array( 'editall', T_('Full Access').get_admin_badge( 'coll', '#', '#', T_('Select to give Collection Admin permission') ) )
 						), T_('Blogs'), false );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
