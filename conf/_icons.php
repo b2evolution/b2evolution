@@ -481,6 +481,13 @@ function get_icon_info( $name )
 			'fa' => 'times-circle',
 			'color' => '#F00',
 		);
+		case 'cleanup': return array(
+			'alt'  => T_('Cleanup'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 128, 64 ),
+			'glyph' => 'wrench',
+			'fa' => 'wrench'
+		);
 		case 'xross': return array(	// Do NOT use for actions. Use only to indicate Mismatch
 			'alt' => 'x',
 			'size' => array( 13, 13 ),
