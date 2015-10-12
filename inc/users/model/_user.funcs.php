@@ -5083,7 +5083,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_blogs'] && isset( $collections_Module ) )
 	{ // We are handling blogs:
 		$UserList->cols[] = array(
-				'th' => T_('Blogs'),
+				'th' => T_('Collections'),
 				'order' => 'nb_blogs',
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'center small',

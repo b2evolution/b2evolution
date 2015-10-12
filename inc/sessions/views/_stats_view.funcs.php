@@ -147,7 +147,7 @@ function hits_results( & $Results, $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Blog'),
+			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'

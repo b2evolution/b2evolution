@@ -32,9 +32,9 @@ $Blog = & $Item->get_Blog();
 if( $params['notify_full'] )
 {	/* Full notification */
 	// Calculate length for str_pad to align labels:
-	$pad_len = max( utf8_strlen( T_('Blog') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
+	$pad_len = max( utf8_strlen( T_('Collection') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
 
-	echo str_pad( T_('Blog'), $pad_len ).': '.$Blog->get('shortname').' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
+	echo str_pad( T_('Collection'), $pad_len ).': '.$Blog->get('shortname').' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
 
 	echo str_pad( T_('Author'), $pad_len ).': '.$Item->creator_User->get('preferredname').' ('.$Item->creator_User->get('login').")\n";
 

@@ -55,7 +55,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Blogs'),
+						'th' => T_('Collections'),
 						'order' => 'nb_blogs',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',

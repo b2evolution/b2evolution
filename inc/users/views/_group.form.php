@@ -163,7 +163,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
 							array( 'viewall', T_('View all blogs') ),
 							array( 'editall', T_('Full Access').get_admin_badge( 'coll', '#', '#', T_('Select to give Collection Admin permission') ) )
-						), T_('Blogs'), false );
+						), T_('Collections'), false );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
 			array(  array( 'always', T_('Force valid XHTML + strong security'),

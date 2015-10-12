@@ -48,7 +48,7 @@ $Form->begin_fieldset( T_('Report of the forums import') );
 
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
-	$Form->info( T_('Blog'), $Blog->get( 'name' ), '' );
+	$Form->info( T_('Collection'), $Blog->get( 'name' ), '' );
 
 $Form->end_fieldset();
 

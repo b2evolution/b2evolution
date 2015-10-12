@@ -3790,7 +3790,7 @@ function items_results( & $items_Results, $params = array() )
 		if( !empty( $Blog ) && $Blog->get_setting( 'aggregate_coll_IDs' ) )
 		{ // Aggregated blog: display name of blog
 			$items_Results->cols[] = array(
-					'th' => T_('Blog'),
+					'th' => T_('Collection'),
 					'th_class' => 'nowrap',
 					'td_class' => 'nowrap',
 					'td' => '@load_Blog()@<a href="~regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )~">@Blog->dget(\'shortname\')@</a>',

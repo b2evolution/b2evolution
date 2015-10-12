@@ -385,7 +385,7 @@ function get_collection_kinds( $kind = NULL )
 				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as private messaging, user profile editing, etc.'),
 			),
 		'std' => array(
-				'name' => T_('Blog'),
+				'name' => T_('Blog'), // NOTE: this is a REAL usage of the word 'Blog'. Do NOT change to 'collection'.
 				'class' => 'btn-info',
 				'desc' => T_('A collection optimized to be used as a standard blog (with the most common features).'),
 				'note' => T_('Many users start with a blog and add other features later.'),
