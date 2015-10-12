@@ -349,7 +349,7 @@ switch( $action )
 	case 'create_copy':
 	case 'edit':
 	case 'update':
-		$AdminUI->set_page_manual_link( 'item-custom-fields' );
+		$AdminUI->set_page_manual_link( 'item-type-form' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'managing-item-types' );

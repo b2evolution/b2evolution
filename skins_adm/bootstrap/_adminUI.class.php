@@ -53,6 +53,9 @@ class AdminUI extends AdminUI_general
 		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
 
+		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+
 		if( $debug )
 		{	// Use readable CSS:
 			// rsc/less/bootstrap-basic_styles.less

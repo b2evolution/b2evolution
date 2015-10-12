@@ -128,7 +128,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 	{ // Only admin can turn ON this setting
 		$trackbacks_warning_attrs = ' id="trackbacks_warning" style="display:'.( $edited_Blog->get( 'allowtrackbacks' ) ? 'inline' : 'none' ).'"';
 		$trackbacks_warning = str_replace( '$attrs$', $trackbacks_warning_attrs, $spammers_warning );
-		$trackbacks_title = !$edited_Blog->get( 'allowtrackbacks' ) ? ' ['.T_('Admin').']' : '';
+		$trackbacks_title = !$edited_Blog->get( 'allowtrackbacks' ) ? get_admin_badge() : '';
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
@@ -169,6 +169,7 @@ $Form->end_fieldset();
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moderation') );
+	$is_bootstrap_skin = ( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' );
 	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
 	$newstatus_warning = str_replace( '$attrs$', $newstatus_warning_attrs, $spammers_warning );
 	$status_options = get_visibility_statuses( '', array( 'redirected', 'trash' ) );
@@ -176,7 +177,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	{
 		if( $perm_blog_admin )
 		{ // Only admin can set this setting to 'Public'
-			$status_options['published'] .= ' ['.T_('Admin').']';
+			$status_options['published'] .= $is_bootstrap_skin ? get_admin_badge( 'coll', false ) : ' ['.T_('Admin').']';
 		}
 		else
 		{ // Remove published status for non-admin users
@@ -186,7 +187,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
 	
-	if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(
 				'name'    => 'new_feedback_status',

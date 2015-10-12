@@ -35,7 +35,7 @@ if( !empty($s) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-D' );
 
-$Results->title = T_('Countries').get_manual_link('countries_list');
+$Results->title = T_('Countries').get_manual_link('regional-countries-tab');
 
 /*
  * STATUS TD:

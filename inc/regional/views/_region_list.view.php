@@ -45,7 +45,7 @@ if( count( $sql_where ) > 0 )
 // Create result set:
 $Results = new Results( $SQL->get(), 'rgn_', '----A' );
 
-$Results->title = T_('Regions/States').get_manual_link('countries_list');
+$Results->title = T_('Regions/States').get_manual_link('regions-list');
 
 /*
  * STATUS TD:

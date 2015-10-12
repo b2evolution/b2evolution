@@ -75,7 +75,7 @@ else
 	$blog_siteurl_absolute = 'http://';
 }
 
-$Form->begin_fieldset( T_('Collection base URL').' ['.T_('Admin').']' . get_manual_link('collection-base-url-settings') );
+$Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_link('collection-base-url-settings') );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings

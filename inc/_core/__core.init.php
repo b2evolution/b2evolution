@@ -636,7 +636,7 @@ class _core_Module extends Module
 				'label' => T_( 'Users & Groups' ),
 				'perm_block' => 'core',
 				'perm_type' => 'info',
-				'info' => T_( 'Full Access' ),
+				'info' => T_( 'Full Access' ).get_admin_badge( 'user', '#', '#', T_('This group has User Admin permission.') ),
 			);
 		}
 		else
@@ -654,12 +654,14 @@ class _core_Module extends Module
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 			);
+			$user_edit_option = $edit_option;
+			$user_edit_option[1] .= get_admin_badge( 'user', '#', '#', T_('Select to give User Admin permission') );
 			$perm_users_values = array(
 				'label' => T_('Users & Groups'),
 				'user_func'  => 'check_core_user_perm',
 				'group_func' => 'check_core_group_perm',
 				'perm_block' => 'core',
-				'options'  => array( $none_option, $view_details, $moderate_option, $edit_option ),
+				'options'  => array( $none_option, $view_details, $moderate_option, $user_edit_option ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
 			);

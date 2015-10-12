@@ -553,7 +553,7 @@ userfields_display( $userfields, $Form );
 if( $action != 'view' )
 {	// Edit mode
 // ------------------- Add new field: -------------------------------
-$Form->begin_fieldset( T_('Add new fields') );
+$Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link( 'user-profile-tab-addnewfields' ) : '' ) );
 
 	// -------------------  Display new added userfields: -------------------------------
 	global $add_field_types, $Messages;
