@@ -253,7 +253,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th_group' => T_('Perms on Coll.'),
-						'th' => /* TRANS: Short for advanced */  T_('Adv.'),
+						'th' => get_admin_badge( 'coll', false ),
 						'th_title' => T_('Advanced/Administrative blog properties'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_admin',

@@ -103,12 +103,12 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
-	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']'.get_manual_link('collection_aggregation_settings') );
+	$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
 		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.'), 255 );
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']'.get_manual_link('collection_cache_settings'), array( 'id' => 'caching' ) );
+	$Form->begin_fieldset( T_('Caching').get_admin_badge().get_manual_link('collection_cache_settings'), array( 'id' => 'caching' ) );
 		$ajax_enabled = $edited_Blog->get_setting( 'ajax_form_enabled' );
 		$ajax_loggedin_params = array( 'note' => T_('Also use JS forms for logged in users') );
 		if( !$ajax_enabled )
@@ -121,7 +121,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), get_icon( 'block_cache_on' ).' '.T_('Enable widget/block cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('In-skin Actions').' ['.T_('Admin').']'.get_manual_link('in_skin_action_settings') );
+	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in_skin_action_settings') );
 		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
 		{ // The login blog is defined in general settings
 			$Form->info( T_( 'In-skin login' ), sprintf( T_('All login/registration functions are delegated to the collection: %s'), '<a href="'.$admin_url.'?ctrl=collections&tab=site_settings">'.$login_Blog->get( 'shortname' ).'</a>' ) );
@@ -133,7 +133,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Media directory location').' ['.T_('Admin').']'.get_manual_link('media_directory_location') );
+	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media_directory_location') );
 	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
@@ -193,7 +193,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
-	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Skin and style').get_admin_badge() );
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
 		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
 		$Form->textarea( 'blog_head_includes', $edited_Blog->get_setting( 'head_includes' ), 5, T_('Custom meta tag/css section (before &lt;/head&gt;)'),
