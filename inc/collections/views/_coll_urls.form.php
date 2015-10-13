@@ -226,7 +226,7 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Assets URLs / CDN support').' ['.T_('Admin').']'.get_manual_link( 'assets-url-cdn-settings' ) );
+$Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
