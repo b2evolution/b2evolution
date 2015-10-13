@@ -156,7 +156,7 @@ if( $disp == 'single' )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
-				'before_section_title' => '<h3 class="comments_list_title">',
+				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			) ) );
 		// Note: You can customize the default item feedback by copying the generic

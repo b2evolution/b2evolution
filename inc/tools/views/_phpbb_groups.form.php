@@ -66,9 +66,9 @@ $Form->begin_fieldset( T_('Users groups') );
 
 	$b2evo_groups_default = $b2evo_groups;
 	$b2evo_groups_default['0'] = T_('Select');
-	$Form->select_input_array( 'phpbb_group_default', phpbb_get_var( 'group_default' ), $b2evo_groups_default, T_('Default group'), T_( 'Use this group as default for users without defined rank' ), array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'phpbb_group_default', phpbb_get_var( 'group_default' ), $b2evo_groups_default, T_('Default group'), T_( 'Use this group as the default for users without a defined rank' ), array( 'force_keys_as_values' => true ) );
 
-	$Form->select_input_array( 'phpbb_group_invalid', phpbb_get_var( 'group_invalid' ), $b2evo_groups, '<span class="red">'.T_('Invalid users').'</span>', T_( 'Use this group as default for users which was deleted from DB' ), array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'phpbb_group_invalid', phpbb_get_var( 'group_invalid' ), $b2evo_groups, '<span class="red">'.T_('Invalid users').'</span>', T_( 'Use this group as the default for users which were deleted from the DB' ), array( 'force_keys_as_values' => true ) );
 
 	echo T_('Please select the ranks which should be imported:');
 

@@ -456,11 +456,6 @@ class UserList extends DataObjectList2
 			$this->UserQuery->where_status( 'closed', $this->query_params['where_status_closed'] );
 		}
 
-		if( isset( $this->query_params['where_org_ID'] ) )
-		{ // Select by organization ID
-			$this->UserQuery->where_organization( $this->query_params['where_org_ID'] );
-		}
-
 		// If browse users from different countries is restricted, then always filter to the current User country
 		if( has_cross_country_restriction( 'users', 'list' ) )
 		{ // Browse users from different countries is restricted, filter to current user country
@@ -491,7 +486,11 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_age_group( $this->filters['age_min'], $this->filters['age_max'] );
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
 		$this->UserQuery->where_level( $this->filters['level_min'], $this->filters['level_max'] );
-		$this->UserQuery->where_organization( $this->filters['org'] );
+		if( isset( $this->filters['org'] ) || isset( $this->query_params['where_org_ID'] ) )
+        { // Filter by organization ID
+			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
+			$this->UserQuery->where_organization( $org_ID );
+        }
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;

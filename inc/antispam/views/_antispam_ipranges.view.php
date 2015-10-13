@@ -155,7 +155,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		);
 }
 
-$Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'action', 'action=iprange_new'), T_('New IP range').' &raquo;', 3, 4  );
+$Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'action', 'action=iprange_new'), T_('New IP range').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 $Results->display();
 

@@ -247,16 +247,8 @@ switch( $action )
 			 WHERE itag_itm_ID IS NULL' );
 		$Messages->add( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success' );
 
-		if( param( 'from', 'string' ) == 'tools' )
-		{	// Set redirect url back to tools page:
-			$redirect_to = $admin_url.'?ctrl=tools';
-		}
-		else
-		{	// Set redirect url to tag list:
-			$redirect_to = $admin_url.'?ctrl=itemtags';
-		}
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $redirect_to, 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }

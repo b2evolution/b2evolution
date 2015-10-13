@@ -155,7 +155,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new currency...'), 'new',
-				regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();

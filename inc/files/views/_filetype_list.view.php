@@ -117,7 +117,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete&amp;'.url_crumb('filetype').'\')%' ),
 						);
 
-  $Results->global_icon( T_('Create a new file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('New file type').' &raquo;', 3, 4  );
+  $Results->global_icon( T_('Create a new file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('New file type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $fadeout_id = $Session->get('fadeout_id');

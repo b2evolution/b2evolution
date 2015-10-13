@@ -351,7 +351,7 @@ function coll_perm_login( $user_ID, $user_login )
 
 	if( $Blog->owner_user_ID == $user_ID )
 	{
-		$r = sprintf( T_('Owner (%s)'), $user_login );
+		$r = $user_login.' ('.T_('Owner').')';
 	}
 	else
 	{

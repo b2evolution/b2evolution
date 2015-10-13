@@ -1687,6 +1687,13 @@ div.error_additional_content {
 .evo_comment_rating {
   margin: 3px;
 }
+.evo_comment__list_title {
+  float: left;
+}
+.evo_comment__meta_info {
+  float: right;
+  padding: 20px 0 10px 0;
+}
 .evo_content_block .evo_comment_avatar img {
   margin: 4px 10px 10px 0;
   float: left;
@@ -3028,6 +3035,10 @@ div.message_toolbars {
 }
 .badge-warning {
   background-color: #f0ad4e !important;
+  color: #fff !important;
+}
+.badge-meta {
+  background-color: #5133ab !important;
   color: #fff !important;
 }
 .dropdown-menu > li > a .tooltip {

@@ -235,7 +235,7 @@ if( $blog )
 
 		if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 		{	// We have permission to add a post with at least one status:
-			$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4 );
+			$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		}
 
 		echo '<div class="items_container evo_content_block">';

@@ -212,12 +212,12 @@ function & get_ItemTagsCache()
  */
 function & get_ItemStatusCache()
 {
-	global $Plugins;
 	global $ItemStatusCache;
 
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
-		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', NT_(\'No status\') )' );
+		load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
+		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name' );
 	}
 
 	return $ItemStatusCache;

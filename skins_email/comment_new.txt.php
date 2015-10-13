@@ -48,7 +48,7 @@ if( $params['notify_full'] )
 		( $params['notify_type'] == 'meta_comment' ? T_('New meta comment') : T_('New comment') ).': '
 		.$Comment->get_permanent_url( '&', '#comments' )."\n"
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
-		.T_('Blog').': '.$Blog->get('shortname')."\n"
+		.T_('Collection').': '.$Blog->get('shortname')."\n"
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Blog->gen_blogurl())." )\n"
 		.T_('Post').': '.$Item->get('title')."\n";
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url( '', '', '&' ))." )\n";

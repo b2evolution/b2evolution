@@ -3020,7 +3020,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Blog;
+	global $Settings, $current_User, $Blog, $edited_Organization;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3106,11 +3106,14 @@ function callback_filter_userlist( & $Form )
 		$Form->text( 'level_max', get_param('level_max'), 3, T_('to') );
 	$Form->end_line();
 
-	$OrganizationCache = & get_OrganizationCache( T_('All') );
-	$OrganizationCache->load_all();
-	if( count( $OrganizationCache->cache ) > 0 )
-	{
-		$Form->select_input_object( 'org', get_param( 'org' ), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
+	if( empty( $edited_Organization ) )
+	{ // Show organization filter only when organization form is not selected
+		$OrganizationCache = & get_OrganizationCache( T_('All') );
+		$OrganizationCache->load_all();
+		if( count( $OrganizationCache->cache ) > 0 )
+		{
+			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
+		}
 	}
 	echo '<br />';
 
@@ -4677,7 +4680,7 @@ function users_results_block( $params = array() )
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
 		) );
-	$default_filters = array( 'order' => $params['results_order'] );
+	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
@@ -4736,7 +4739,7 @@ function users_results_block( $params = array() )
 	{
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add user
-			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4 );
+			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		}
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add group
@@ -4932,7 +4935,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_blogs'] && isset( $collections_Module ) )
 	{ // We are handling blogs:
 		$UserList->cols[] = array(
-				'th' => T_('Blogs'),
+				'th' => T_('Collections'),
 				'order' => 'nb_blogs',
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'center small',

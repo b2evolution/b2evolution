@@ -69,7 +69,7 @@ if( $perm_options_edit )
 				.'~conditional( #gcat_ID# > 1, \'%action_icon( "'.T_('Delete this goal category...').'", "delete", "'.$admin_url.'?ctrl=goals&amp;tab3=cats&amp;action=cat_delete&amp;blog='.$blog.'&amp;gcat_ID=#gcat_ID#&amp;'.url_crumb( 'goalcat' ).'" )%\', "" )~',
 		);
 
-	$Results->global_icon( T_('Create a new goal category...'), 'new', regenerate_url( 'action', 'action=cat_new' ), T_('New goal category').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new goal category...'), 'new', regenerate_url( 'action', 'action=cat_new' ), T_('New goal category').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // Display results:

@@ -33,7 +33,7 @@ $Results->title = T_('Organizations').get_manual_link( 'organizations-tab' );
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new group link
-	$Results->global_icon( T_('Create a new organization...'), 'new', '?ctrl=organizations&amp;action=new', T_('Add organization').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new organization...'), 'new', '?ctrl=organizations&amp;action=new', T_('Add organization').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->cols[] = array(

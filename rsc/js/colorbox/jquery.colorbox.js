@@ -821,6 +821,9 @@
 							photo.className = photo.className.replace( /zoomout/, '' );
 							photo.width = photo_width;
 							photo.height = photo_height;
+							// Reset image position and scrolling to top/left corner:
+							jQuery( this ).parent().scrollLeft( 0 ).scrollTop( 0 );
+							jQuery( this ).css( { 'position': 'relative', 'top': '0', 'left': '0' } );
 						}
 						else
 						{ // Zoom in a photo to real size

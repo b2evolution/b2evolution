@@ -85,7 +85,7 @@ threads_results( $Results, array_merge( array(
 if( ! $perm_abuse_management )
 { // Show link to create a new conversation
 	$Results->global_icon( T_('See My Contacts'), 'contacts', get_dispctrl_url( 'contacts' ), T_('See My Contacts').' ', 3, 4 );
-	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', get_dispctrl_url( 'threads', 'action=new' ), T_('Compose new').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', get_dispctrl_url( 'threads', 'action=new' ), T_('Compose new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display( $display_params );

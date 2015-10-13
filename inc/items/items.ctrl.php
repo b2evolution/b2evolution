@@ -1613,17 +1613,20 @@ switch( $action )
 						' '.T_('Permalink'), 4, 3, array(
 								'style' => 'margin-right: 3ex',
 						) );
+
+				$edited_item_url = $edited_Item->get_copy_url();
+				if( ! empty( $edited_item_url ) )
+				{	// If user has a permission to copy the edited Item:
+					$AdminUI->global_icon( T_('Duplicate this post'), 'copy', $edited_item_url,
+						' '.T_('Duplicate'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
 				break;
 		}
 
 		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
 		{
-			$AdminUI->global_icon( T_('Change type'), 'edit', $edited_Item->get_type_edit_link( 'url' ),
-				' '.T_('Change type'), 4, 3, array(
-						'style' => 'margin-right: 3ex',
-						'onclick' => $edited_Item->get_type_edit_link( 'onclick' )
-				) );
-
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
 				$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),

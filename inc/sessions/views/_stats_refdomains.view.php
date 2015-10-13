@@ -106,7 +106,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 { // Current user has a permission to create new domain
 	global $tab_from;
 	$tab_from_param = empty( $tab_from ) ? '' : '&amp;tab_from='.$tab_from;
-	$Results->global_icon( T_('Add domain'), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.'&amp;action=domain_new'.$tab_from_param.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Add domain').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Add domain'), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.'&amp;action=domain_new'.$tab_from_param.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Add domain').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 /**

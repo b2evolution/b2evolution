@@ -77,7 +77,7 @@ if( !empty( $params['trigger_url'] ) )
 
 if( !empty ( $params['initial_hit'] ) )
 { // Hit info
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Blog')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
 }
 
