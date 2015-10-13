@@ -3547,7 +3547,7 @@ class Blog extends DataObject
 			if( $display_message )
 			{
 				global $Messages;
-				$Messages->add( 'This post type is used as default for this collection. Thus you cannot disable it.', 'error' );
+				$Messages->add( 'This Item type is used as the default for this collection. Thus you cannot disable it.', 'error' );
 			}
 			return false;
 		}

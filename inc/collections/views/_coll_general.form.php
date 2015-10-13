@@ -155,7 +155,7 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 
 	$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
 			array(
-				array( '0', T_('Simple permissions'), T_('(the owner above has full permissions on this collection)') ),
+				array( '0', T_('Simple permissions'), sprintf( T_('(the owner above has most permissions on this collection, except %s)'), get_admin_badge() ) ),
 				array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
 										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
 										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),

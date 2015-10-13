@@ -228,7 +228,7 @@ switch( $action )
 		{ // is default post type of the blog
 			if( $item_type_blog_ID == 'default' )
 			{
-				$Messages->add( T_('This Post Type is the default for all collections. You can not delete this Post Type.' ) );
+				$Messages->add( T_('This Item type is the default for all collections. You can not delete this Item type.' ) );
 			}
 			else
 			{
@@ -241,7 +241,7 @@ switch( $action )
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}
 				}
-				$Messages->add( sprintf( T_('This Post Type is default for the collections: %s. You can not delete this Post Type.' ), implode( ', ', $blog_names ) ) );
+				$Messages->add( sprintf( T_('This Item type is the default for the collections: %s. You can not delete this Item type.' ), implode( ', ', $blog_names ) ) );
 			}
 			// To don't display a confirmation question
 			$action = 'edit';
@@ -323,7 +323,7 @@ switch( $action )
 								 ( itc_ityp_ID, itc_coll_ID )
 					VALUES ( '.$DB->quote( $edited_Itemtype->ID ).', '.$DB->quote( $blog ).' )' );
 
-			$Messages->add( T_('Item type has been selected as default for this collection.'), 'success' );
+			$Messages->add( T_('The item type has been set as the default for this collection.'), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
