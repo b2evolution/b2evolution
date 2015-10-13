@@ -159,9 +159,7 @@ $Form->begin_fieldset( T_('Communications') );
 
 	$email_messaging_note = '';
 	if( ! $UserSettings->get( 'enable_email', $edited_User->ID ) &&
-			( $emails_msgform == 'userset' ||
-				( $emails_msgform == 'adminset' && $current_User->check_perm( 'users', 'edit' ) )
-			) )
+			( $emails_msgform == 'userset' || $emails_msgform == 'adminset' ) )
 	{ // Check if user has own blog and display a red note
 		$user_own_blogs_count = $edited_User->get_own_blogs_count();
 		if( $user_own_blogs_count > 0 )
@@ -171,6 +169,7 @@ $Form->begin_fieldset( T_('Communications') );
 		}
 	}
 
+	$msgform_checklist_params = $checklist_params;
 	if( $emails_msgform == 'userset' )
 	{ // user can set
 		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
@@ -179,7 +178,11 @@ $Form->begin_fieldset( T_('Communications') );
 	{ // only administrator users can set and current User is in 'Administrators' group
 		$messaging_options[] = array( 'email', 2, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $disabled, $email_messaging_note );
 	}
-	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me'), false, false, $checklist_params );
+	elseif( ! empty( $email_messaging_note ) )
+	{	// Display red message to inform user when he don't have a permission to edit the setting:
+		$msgform_checklist_params['note'] = $email_messaging_note;
+	}
+	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Other users can send me'), false, false, $msgform_checklist_params );
 
 $Form->end_fieldset();
 
