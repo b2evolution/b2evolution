@@ -49,7 +49,7 @@ $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'resu
 
 $Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
-$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;tab=blocked&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4 );
+$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;tab=blocked&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 /**
  * Callback to add filters on top of the result set

@@ -122,7 +122,7 @@ $Results->title = T_('Scheduled jobs').get_manual_link('scheduled-jobs-list');
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
 if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
 {	// Permission to edit settings:
-	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 /**

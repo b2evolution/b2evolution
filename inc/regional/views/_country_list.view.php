@@ -233,7 +233,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new country ...'), 'new',
-				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4  );
+				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();

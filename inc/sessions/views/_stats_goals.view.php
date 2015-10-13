@@ -155,7 +155,7 @@ if( $perm_options_edit )
 							'td' => '@action_icon("edit")@@action_icon("copy")@@action_icon("delete")@',
 						);
 
-  $Results->global_icon( T_('Create a new goal...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New goal').' &raquo;', 3, 4  );
+  $Results->global_icon( T_('Create a new goal...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New goal').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 

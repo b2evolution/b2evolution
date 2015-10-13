@@ -229,7 +229,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 						);
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
-				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // Display results:

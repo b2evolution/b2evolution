@@ -48,7 +48,7 @@ $Results = new Results( $SQL->get(), 'itst_', '-A'/*, NULL, $count_SQL->get()*/ 
 
 $Results->title = sprintf( T_('Translation editor for locale "%s"'), $edit_locale );
 
-$Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url( '', 'action=new_strings' ), T_('Add new translated string').' &raquo;', 3, 4 );
+$Results->global_icon( T_('Add new translated string...'), 'new', regenerate_url( '', 'action=new_strings' ), T_('Add new translated string').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 $Results->cols[] = array(
 		'th' => T_('Original string'),

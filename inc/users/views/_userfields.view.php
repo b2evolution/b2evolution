@@ -272,7 +272,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 						);
 
 	$Results->global_icon( T_('Create a new user field...'), 'new',
-				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4 );
+				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$Results->global_icon( T_('Create a new user field group...'), 'new',
 				'?ctrl=userfieldsgroups&action=new', T_('New user field group').' &raquo;', 3, 4 );
 }

@@ -113,7 +113,7 @@ if( !$form_below_list )
 {	// Need to dispaly global icon to add new geenric element:
 	if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
 	{	// We have permission permission to edit:
-		$Results->global_icon( $generic_params['icon_new_title'], 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), $generic_params['icon_new_text'], 3, 4 );
+		$Results->global_icon( $generic_params['icon_new_title'], 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), $generic_params['icon_new_text'], 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 }
 

@@ -48,7 +48,7 @@ function display_container( $container, $legend_suffix = '' )
 	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
 
 	$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
+			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id, 'class' => 'action_icon btn-primary' ) );
 
 	$Table->cols = array(
 			array(

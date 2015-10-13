@@ -34,7 +34,7 @@ $Results->title = T_('Invitation codes').get_manual_link( 'invitation-codes-list
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new group link
-	$Results->global_icon( T_('Create a new invitation code...'), 'new', '?ctrl=invitations&amp;action=new', T_('Add invitation code').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new invitation code...'), 'new', '?ctrl=invitations&amp;action=new', T_('Add invitation code').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->cols[] = array(
