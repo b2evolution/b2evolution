@@ -219,11 +219,11 @@ if( $Item->can_see_comments( true ) )
 			$meta_comments_url = $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments';
 			if( $meta_comments_count > 0 )
 			{	// Display a badge with meta comments count if at least one exists for this Item:
-				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta-comments'), $meta_comments_count ).'</a>';
+				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta comments'), $meta_comments_count ).'</a>';
 			}
 			elseif( $current_User->check_perm( 'meta_comment', 'add', false, $Item ) )
 			{	// No meta comments yet, Display a button to add new meta comment:
-				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta-comment').'</a>';
+				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta comment').'</a>';
 			}
 			echo '</div>';
 		}
