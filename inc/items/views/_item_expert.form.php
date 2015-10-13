@@ -532,6 +532,7 @@ $Form->begin_form( '', '', $params );
 			echo ' '; // allow wrapping!
 
 			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->load_all();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
