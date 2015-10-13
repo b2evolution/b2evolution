@@ -3017,7 +3017,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Blog;
+	global $Settings, $current_User, $Blog, $edited_Organization;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3097,11 +3097,14 @@ function callback_filter_userlist( & $Form )
 
 	$Form->interval( 'level_min', get_param('level_min'), 'level_max', get_param('level_max'), 3, T_('Level') );
 
-	$OrganizationCache = & get_OrganizationCache( T_('All') );
-	$OrganizationCache->load_all();
-	if( count( $OrganizationCache->cache ) > 0 )
-	{
-		$Form->select_input_object( 'org', get_param( 'org' ), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
+	if( empty( $edited_Organization ) )
+	{ // Show organization filter only when organization form is not selected
+		$OrganizationCache = & get_OrganizationCache( T_('All') );
+		$OrganizationCache->load_all();
+		if( count( $OrganizationCache->cache ) > 0 )
+		{
+			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
+		}
 	}
 	echo '<br />';
 
@@ -4828,7 +4831,7 @@ function users_results_block( $params = array() )
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
 		) );
-	$default_filters = array( 'order' => $params['results_order'] );
+	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
