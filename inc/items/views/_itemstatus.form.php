@@ -28,7 +28,7 @@ $Form = new Form( NULL, 'itemstatus_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New Post Status') : T_('Post Status') ).get_manual_link( 'managing-item-statuses-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  T_('New post status') : T_('Post status') ).get_manual_link( 'managing-item-statuses-form' ) );
 
 	$Form->add_crumb( 'itemstatus' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',pst_ID' : '' ) ) );
