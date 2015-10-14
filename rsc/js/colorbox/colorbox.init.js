@@ -31,11 +31,17 @@ jQuery( document ).ready( function()
 	{ // Use swipe plugin for touch devices
 		swipeLeft: function( event, direction, distance, duration, fingerCount )
 		{
-			jQuery.colorbox.next();
+			if( typeof( colorbox_is_zoomed ) == 'undefined' || ! colorbox_is_zoomed )
+			{	// Don't switch to next image when current is zoomed:
+				jQuery.colorbox.next();
+			}
 		},
 		swipeRight: function( event, direction, distance, duration, fingerCount )
 		{
-			jQuery.colorbox.prev();
+			if( typeof( colorbox_is_zoomed ) == 'undefined' || ! colorbox_is_zoomed )
+			{	// Don't switch to previous image when current is zoomed:
+				jQuery.colorbox.prev();
+			}
 		},
 	} );
 	jQuery( document ).on( 'click', '#colorbox img.cboxPhoto', function()
