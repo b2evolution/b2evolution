@@ -210,6 +210,9 @@ class ItemList2 extends ItemListLight
 		// ATTENTION: we skip the parent on purpose here!! fp> refactor
 		DataObjectList2::query( false, false, false, 'PREVIEW QUERY' );
 
+		// Clear cache to view new updated data of the post:
+		$this->Cache->clear();
+
 		$Item = & $this->Cache->instantiate( $this->rows[0] );
 
 		// set Item settings
