@@ -797,7 +797,7 @@
 				// Clear classes from previous image
 				jQuery( photo ).removeClass( 'zoomin zoomout' );
 
-				var photo_is_zoomed = false;
+				colorbox_is_zoomed = false;
 				var photo_width = 0;
 				var photo_height = 0;
 				var photo_is_big = photo.naturalWidth > photo.width * 1.1 || photo.naturalHeight > photo.height * 1.1;
@@ -814,9 +814,9 @@
 				}
 				if( photo_is_big )
 				{ // Photo is big - Use a click event to zoom a photo
-					jQuery( photo ).bind( 'click dblclick', function( e )
+					jQuery( photo ).bind( 'click dblclick', function( event, touch_event )
 					{
-						if( photo_is_zoomed )
+						if( colorbox_is_zoomed )
 						{ // Zoom out a photo to window size
 							photo.className = photo.className.replace( /zoomout/, '' );
 							photo.width = photo_width;
@@ -828,8 +828,10 @@
 						else
 						{ // Zoom in a photo to real size
 							var this_offset = jQuery( this ).offset();
-							var pecentX = ( e.pageX - this_offset.left ) / jQuery( this ).width();
-							var pecentY = ( e.pageY - this_offset.top ) / jQuery( this ).height();
+							var pageX = typeof( event.pageX ) != 'undefined' ? event.pageX : touch_event.originalEvent.touches[0].pageX;
+							var pageY = typeof( event.pageY ) != 'undefined' ? event.pageY : touch_event.originalEvent.touches[0].pageY;
+							var pecentX = ( pageX - this_offset.left ) / jQuery( this ).width();
+							var pecentY = ( pageY - this_offset.top ) / jQuery( this ).height();
 
 							photo.className = photo.className + ' zoomout';
 							photo_width = photo.width;
@@ -843,7 +845,7 @@
 								.scrollLeft( pecentX * ( this_parent.scrollWidth - this_parent.clientWidth ) )
 								.scrollTop( pecentY * ( this_parent.scrollHeight - this_parent.clientHeight ) );
 						}
-						photo_is_zoomed = photo_is_zoomed ? false : true;
+						colorbox_is_zoomed = colorbox_is_zoomed ? false : true;
 					} );
 				}
 
@@ -947,14 +949,14 @@ jQuery.event.special.dblclick = {
 	{
 		var elem = this,
 			$elem = jQuery( elem );
-		$elem.bind( 'touchend.dblclick', jQuery.event.special.dblclick.handler );
+		$elem.bind( 'touchstart.dblclick', jQuery.event.special.dblclick.handler );
 	},
 
 	teardown: function( namespaces )
 	{
 		var elem = this,
 			$elem = jQuery( elem );
-		$elem.unbind( 'touchend.dblclick' );
+		$elem.unbind( 'touchstart.dblclick' );
 	},
 
 	handler: function( event )
@@ -968,7 +970,7 @@ jQuery.event.special.dblclick = {
 		if( delta > 20 && delta < 500 )
 		{
 			$elem.data( 'lastTouch', 0 );
-			$elem.trigger( 'dblclick' );
+			$elem.trigger( 'dblclick', event );
 		} else
 		{
 			$elem.data( 'lastTouch', now );
