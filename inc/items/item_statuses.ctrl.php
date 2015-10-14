@@ -40,7 +40,7 @@ if( param( 'pst_ID', 'integer', '', true ) )
 	{	// We could not find the post status to edit:
 		unset( $edited_ItemStatus );
 		forget_param( 'pst_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Post Status') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Post status') ), 'error' );
 		$action = 'nil';
 	}
 }

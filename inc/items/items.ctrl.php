@@ -1617,8 +1617,8 @@ switch( $action )
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
 				{	// If user has a permission to copy the edited Item:
-					$AdminUI->global_icon( T_('Duplicate this post'), 'copy', $edited_item_url,
-						' '.T_('Duplicate'), 4, 3, array(
+					$AdminUI->global_icon( T_('Duplicate this post...'), 'copy', $edited_item_url,
+						' '.T_('Duplicate...'), 4, 3, array(
 								'style' => 'margin-right: 3ex;',
 						) );
 				}
