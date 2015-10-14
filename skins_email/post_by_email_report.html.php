@@ -27,7 +27,7 @@ echo '<p'.emailskin_style( '.p' ).'>'.T_('You just created the following posts:'
 foreach( $Items as $Item )
 {
 	echo format_to_output( $Item->title );
-	echo '<p'.emailskin_style( '.p' ).'>'.get_link_tag( $Item->get_permanent_url(), '', '.a' ).'</p>';
+	echo '<p'.emailskin_style( '.p' ).'>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), '', '.a' ).'</p>';
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

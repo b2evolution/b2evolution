@@ -245,6 +245,7 @@ function create_default_data()
 	$DB->query( "
 		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html, ityp_perm_level )
 		VALUES ( 1,    'Post',          'Posts',         'single', 1, 'standard' ),
+					 ( 2,    'Custom fields example', 'Posts', 'single', 1, 'standard' ),
 					 ( 100,  'Manual Page',   'Posts',         'single', 0, 'standard' ),
 					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 'standard' ),
 					 ( 1000, 'Page',          'Pages',         'page',   1, 'restricted' ),
@@ -258,6 +259,12 @@ function create_default_data()
 					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 'admin' ),
 					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 'admin' ),
 					 ( 5000, 'Reserved',      NULL,            NULL,     1, 'standard' )" );
+
+	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
+			VALUES ( 2, "First numeric field", "first_numeric_field", "double" ),
+						 ( 2, "Second numeric field", "second_numeric_field", "double" ),
+						 ( 2, "First text field", "first_text_field", "varchar" ),
+						 ( 2, "Define you own labels", "define_you_own_labels", "varchar" )' );
 	task_end();
 
 
@@ -1169,6 +1176,9 @@ function create_blog(
 
 	$Blog->dbupdate();
 
+	// Insert default group permissions:
+	$Blog->insert_default_group_permissions();
+
 	return $Blog->ID;
 }
 
@@ -1953,6 +1963,19 @@ function create_demo_contents()
 		$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
 		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
+
+		// Insert a post:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'demo' );
+		$edited_Item->set_setting( 'custom_double_1', '123' );
+		$edited_Item->set_setting( 'custom_double_2', '456' );
+		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
+		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
+		$edited_Item->insert( 1, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
+				.T_('<p>This post type defines 4 custom fields.</p>')
+				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 2 );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2788,82 +2811,6 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		echo sprintf( '%d test hits are added.', $insert_data_count );
 		task_end();
 	}
-
-	task_begin( 'Creating default group/blog permissions... ' );
-	$query = '
-		INSERT INTO T_coll_group_perms( bloggroup_blog_ID, bloggroup_group_ID, bloggroup_ismember, bloggroup_can_be_assignee,
-			bloggroup_perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_perm_delpost, bloggroup_perm_edit_ts,
-			bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses, bloggroup_perm_edit_cmt,
-			bloggroup_perm_cats, bloggroup_perm_properties, bloggroup_perm_admin,
-			bloggroup_perm_media_upload, bloggroup_perm_media_browse, bloggroup_perm_media_change )
-		VALUES ';
-
-	// Init the permissions for all blogs
-	$all_statuses = "'published,community,deprecated,protected,private,review,draft'";
-	$all_post_statuses = "'published,community,deprecated,protected,private,review,draft,redirected'";
-	$gp_user_groups = array(
-			'admins'     => $admins_Group->ID.",     1, 1, $all_post_statuses, 'admin', 'all', 1, 1, 1, 1, 1, $all_statuses, 'all', 1, 1, 1, 1, 1, 1",
-			'moderators' => $moderators_Group->ID.", 1, 1, $all_statuses, 'restricted', 'le', 1, 1, 1, 1, 1, $all_statuses, 'le', 0, 0, 0, 1, 1, 1",
-			'editors'    => $editors_Group->ID.",    1, 0, '', 'standard', 'no', 0, 1, 0, 0, 1, '', 'no', 0, 0, 0, 1, 1, 0",
-		);
-
-	$gp_blogs_IDs = array();
-	if( $install_collection_home )
-	{ // Install permissions for Info blog
-		$gp_blogs_IDs[] = $blog_home_ID;
-	}
-	if( $install_collection_bloga )
-	{ // Install permissions for Blog A
-		$gp_blogs_IDs[] = $blog_a_ID;
-	}
-	if( $install_collection_blogb )
-	{ // Install permissions for Blog B
-		$gp_blogs_IDs[] = $blog_b_ID;
-	}
-	if( $install_collection_photos )
-	{ // Install permissions for Photos blog
-		$gp_blogs_IDs[] = $blog_photoblog_ID;
-	}
-	if( $install_collection_forums )
-	{ // Install permissions for Forums blog
-		$gp_blogs_IDs[] = $blog_forums_ID;
-		// Init the special permissions for Forums
-		$gp_user_groups_forums = array(
-				'editors' => $editors_Group->ID.", 1, 0, 'community,protected,draft,deprecated', 'standard', 'own', 0, 1, 0, 0, 1, 'community,protected,review,draft,deprecated', 'own', 0, 0, 0, 1, 1, 0",
-				'users'   => $users_Group->ID.",   1, 0, 'community,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'community,draft', 'no', 0, 0, 0, 1, 0, 0",
-				'suspect' => $suspect_Group->ID.", 1, 0, 'review,draft', 'standard', 'no', 0, 0, 0, 0, 0, 'review,draft', 'no', 0, 0, 0, 0, 0, 0"
-			);
-		$gp_user_groups_forums = array_merge( $gp_user_groups, $gp_user_groups_forums );
-	}
-	if( $install_collection_manual )
-	{ // Install permissions for Manual blog
-		$gp_blogs_IDs[] = $blog_manual_ID;
-	}
-
-	$query_values = array();
-	foreach( $gp_blogs_IDs as $gp_blog_ID )
-	{
-		if( $install_collection_forums && $gp_blog_ID == $blog_forums_ID )
-		{ // Permission for forums blogs
-			foreach( $gp_user_groups_forums as $gp_user_group_perms )
-			{
-				$query_values[] = "( $gp_blog_ID, ".$gp_user_group_perms.")";
-			}
-		}
-		else
-		{ // Permission for other blogs
-			foreach( $gp_user_groups as $gp_user_group_perms )
-			{
-				$query_values[] = "( $gp_blog_ID, ".$gp_user_group_perms.")";
-			}
-		}
-	}
-	if( count( $query_values ) )
-	{ // Execute sql insert query only when at least one demo blog has been installed
-		$query .= implode( ',', $query_values );
-		$DB->query( $query );
-	}
-	task_end();
 
 	/*
 	// Note: we don't really need this any longer, but we might use it for a better default setup later...

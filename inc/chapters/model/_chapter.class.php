@@ -738,6 +738,34 @@ class Chapter extends GenericCategory
 
 		return $r;
 	}
+
+
+	/**
+	 * Get name of this chapter as path of all parent chapters
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_path_name( $params = array() )
+	{
+		$params = array_merge( array(
+				'separator' => ' / ',
+			) );
+
+		$path_name = $this->get_name();
+
+		$parent_Chapter = $this->get_parent_Chapter();
+
+		while( $parent_Chapter )
+		{	// Append all parent chapters name:
+			$path_name = $parent_Chapter->get_name().$params['separator'].$path_name;
+
+			// Get next parent Chapter:
+			$parent_Chapter = $parent_Chapter->get_parent_Chapter();
+		}
+
+		return $path_name;
+	}
 }
 
 ?>

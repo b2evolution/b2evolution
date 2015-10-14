@@ -149,7 +149,7 @@ if( $current_User->check_perm('options', 'edit') )
 	$block_item_Widget->title = T_('Cleanup tools');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
-	echo '<li><a href="'.regenerate_url('action', 'action=del_obsolete_tags&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan Tag entries (not used anywhere) - DB only.').'</a></li>';
+	echo '<li><a href="'.$admin_url.'?ctrl=itemtags&amp;action=cleanup&amp;'.url_crumb('tag').'">'.T_('Find and delete all orphan Tag entries (not used anywhere) - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts (with no matching Category) + Option to delete with related objects - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comments&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';

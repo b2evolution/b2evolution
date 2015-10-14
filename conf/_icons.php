@@ -481,6 +481,13 @@ function get_icon_info( $name )
 			'fa' => 'times-circle',
 			'color' => '#F00',
 		);
+		case 'cleanup': return array(
+			'alt'  => T_('Cleanup'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 128, 64 ),
+			'glyph' => 'wrench',
+			'fa' => 'wrench'
+		);
 		case 'xross': return array(	// Do NOT use for actions. Use only to indicate Mismatch
 			'alt' => 'x',
 			'size' => array( 13, 13 ),
@@ -1011,17 +1018,6 @@ function get_icon_info( $name )
 			'color' => '#7f7f7f'
 		);
 
-		case 'login': return array(
-			'alt'  => T_('Login'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 272 )
-		);
-		case 'register': return array(
-			'alt'  => T_('Register'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 296 )
-		);
-
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),
@@ -1111,13 +1107,6 @@ function get_icon_info( $name )
 			'xy' => array( 64, 128 ),
 			'fa' => 'hand-paper-o',
 			'color' => '#C00'
-		);
-
-		case 'arrow-btn': return array(
-			'alt'  => T_('More info'),
-			'size' => array( 8, 12 ),
-			'xy' => array( 128, 160 ),
-			'rollover' => true,
 		);
 
 		case 'lightning': return array(

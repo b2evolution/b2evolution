@@ -112,7 +112,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 
 if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
 {	// We have permission permission to edit:
-	$Results->global_icon( T_('Create a new element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('New element').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('New element').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // EXPERIMENTAL

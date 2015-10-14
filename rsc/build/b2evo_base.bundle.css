@@ -2403,9 +2403,10 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-table.ratings_table td {
-  border: none;
+.ratings_table {
   padding: 10px;
+  margin-right: 10px;
+  display: inline-block;
 }
 table.rating_summary {
   float: left;
@@ -2664,7 +2665,8 @@ div.item_location {
   text-align: center;
   display: block;
 }
-#styled_content_block span[class*=status_] {
+#styled_content_block span[class*=status_],
+.evo_content_block span[class*=status_] {
   background: transparent;
   width: 75px;
   height: 75px;
@@ -2712,7 +2714,8 @@ div.item_location {
   color: #fff;
   background-color: #5133ab;
 }
-#styled_content_block span[class*=status_] span {
+#styled_content_block span[class*=status_] span,
+.evo_content_block span[class*=status_] span {
   display: block;
   width: 120px;
   text-align: center;
@@ -2740,7 +2743,8 @@ div.results span[class*=status_] span {
 }
 @media \0screen {
   /* IE8 */
-  #styled_content_block span[class*=status_] span {
+  #styled_content_block span[class*=status_] span,
+  .evo_content_block span[class*=status_] span {
     top: -15px;
     left: -2px;
   }
@@ -2773,47 +2777,83 @@ div.results span[class*=status_] span {
   margin: 5px;
 }
 #styled_content_block .vs_published .note[class*=status_],
+.evo_content_block .vs_published .note[class*=status_],
 #styled_content_block .vs_community .note[class*=status_],
+.evo_content_block .vs_community .note[class*=status_],
 #styled_content_block .vs_protected .note[class*=status_],
+.evo_content_block .vs_protected .note[class*=status_],
 #styled_content_block .vs_private .note[class*=status_],
+.evo_content_block .vs_private .note[class*=status_],
 #styled_content_block .vs_review .note[class*=status_],
-#styled_content_block .vs_draft .note[class*=status_] {
+.evo_content_block .vs_review .note[class*=status_],
+#styled_content_block .vs_draft .note[class*=status_],
+.evo_content_block .vs_draft .note[class*=status_] {
   display: none;
 }
 #styled_content_block .vs_published a[class*='btn_lower_status_'],
+.evo_content_block .vs_published a[class*='btn_lower_status_'],
 #styled_content_block .vs_community a[class*='btn_lower_status_'],
+.evo_content_block .vs_community a[class*='btn_lower_status_'],
 #styled_content_block .vs_protected a[class*='btn_lower_status_'],
+.evo_content_block .vs_protected a[class*='btn_lower_status_'],
 #styled_content_block .vs_private a[class*='btn_lower_status_'],
+.evo_content_block .vs_private a[class*='btn_lower_status_'],
 #styled_content_block .vs_review a[class*='btn_lower_status_'],
+.evo_content_block .vs_review a[class*='btn_lower_status_'],
 #styled_content_block .vs_draft a[class*='btn_lower_status_'],
+.evo_content_block .vs_draft a[class*='btn_lower_status_'],
 #styled_content_block .vs_published a[class*='btn_raise_status_'],
+.evo_content_block .vs_published a[class*='btn_raise_status_'],
 #styled_content_block .vs_community a[class*='btn_raise_status_'],
+.evo_content_block .vs_community a[class*='btn_raise_status_'],
 #styled_content_block .vs_protected a[class*='btn_raise_status_'],
+.evo_content_block .vs_protected a[class*='btn_raise_status_'],
 #styled_content_block .vs_private a[class*='btn_raise_status_'],
+.evo_content_block .vs_private a[class*='btn_raise_status_'],
 #styled_content_block .vs_review a[class*='btn_raise_status_'],
-#styled_content_block .vs_draft a[class*='btn_raise_status_'] {
+.evo_content_block .vs_review a[class*='btn_raise_status_'],
+#styled_content_block .vs_draft a[class*='btn_raise_status_'],
+.evo_content_block .vs_draft a[class*='btn_raise_status_'] {
   display: none;
 }
 #styled_content_block .vs_published a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_published a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_community a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_community a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_protected a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_protected a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_private a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_private a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_review a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_review a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_draft a[class*='btn_lower_status_'].btn_next_status,
+.evo_content_block .vs_draft a[class*='btn_lower_status_'].btn_next_status,
 #styled_content_block .vs_published a[class*='btn_raise_status_'].btn_next_status,
+.evo_content_block .vs_published a[class*='btn_raise_status_'].btn_next_status,
 #styled_content_block .vs_community a[class*='btn_raise_status_'].btn_next_status,
+.evo_content_block .vs_community a[class*='btn_raise_status_'].btn_next_status,
 #styled_content_block .vs_protected a[class*='btn_raise_status_'].btn_next_status,
+.evo_content_block .vs_protected a[class*='btn_raise_status_'].btn_next_status,
 #styled_content_block .vs_private a[class*='btn_raise_status_'].btn_next_status,
+.evo_content_block .vs_private a[class*='btn_raise_status_'].btn_next_status,
 #styled_content_block .vs_review a[class*='btn_raise_status_'].btn_next_status,
-#styled_content_block .vs_draft a[class*='btn_raise_status_'].btn_next_status {
+.evo_content_block .vs_review a[class*='btn_raise_status_'].btn_next_status,
+#styled_content_block .vs_draft a[class*='btn_raise_status_'].btn_next_status,
+.evo_content_block .vs_draft a[class*='btn_raise_status_'].btn_next_status {
   display: inline-block;
 }
 #styled_content_block .vs_published .note.status_published,
+.evo_content_block .vs_published .note.status_published,
 #styled_content_block .vs_community .note.status_community,
+.evo_content_block .vs_community .note.status_community,
 #styled_content_block .vs_protected .note.status_protected,
+.evo_content_block .vs_protected .note.status_protected,
 #styled_content_block .vs_private .note.status_private,
+.evo_content_block .vs_private .note.status_private,
 #styled_content_block .vs_review .note.status_review,
-#styled_content_block .vs_draft .note.status_draft {
+.evo_content_block .vs_review .note.status_review,
+#styled_content_block .vs_draft .note.status_draft,
+.evo_content_block .vs_draft .note.status_draft {
   display: block;
 }
 .image_index {

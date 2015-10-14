@@ -153,14 +153,25 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 		$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget( 'fullname' ) );
 	}
 
+	$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
+			array(
+				array( '0', T_('Simple permissions'), sprintf( T_('(the owner above has most permissions on this collection, except %s)'), get_admin_badge() ) ),
+				array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
+		), T_('Permission management'), true );
+
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
 				array( 'users', T_('Logged in users') ),
-				array( 'members', T_('Members') ),
+				array( 'members',
+									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members').'</span>'.
+									'<span id="allow_access_members_simple_title"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('Only the owner').'</span>',
+									'<span id="allow_access_members_advanced_note"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.sprintf( T_('(Assign membership in <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ).'</span>' ),
 		), T_('Allow access to'), true );
-
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
 
 $Form->end_fieldset();
 
@@ -196,3 +207,18 @@ $Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButt
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[name=advanced_perms]' ).click( function()
+{	// Display a proper label for "Allow access to" depending on selected "Permission management":
+	if( jQuery( this ).val() == '1' )
+	{	// If advanced permissions are selected
+		jQuery( '#allow_access_members_simple_title' ).hide();
+		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).show();
+	}
+	else
+	{	// If simple permissions are selected
+		jQuery( '#allow_access_members_simple_title' ).show();
+		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).hide();
+	}
+} );
+</script>

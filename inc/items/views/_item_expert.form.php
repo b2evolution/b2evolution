@@ -82,6 +82,14 @@ $Form->begin_form( '', '', $params );
 		// Item ID
 		$Form->hidden( 'post_ID', $edited_Item->ID );
 	}
+
+	// Try to get the original item ID (For example, on copy action):
+	$original_item_ID = get_param( 'p' );
+	if( ! empty( $original_item_ID ) )
+	{
+		$Form->hidden( 'p', $original_item_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
@@ -94,13 +102,30 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-md-9">
+<div class="left_col col-lg-9 col-md-8">
 
 	<?php
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
-	$Form->begin_fieldset( sprintf( T_('%s contents'), $item_type_link ).get_manual_link('post_contents_fieldset'), array( 'id' => 'itemform_content' ) );
+	if( $edited_Item->ID > 0 )
+	{	// Set form title for editing the item:
+		$form_title_item_ID = T_('Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>';
+	}
+	elseif( $creating )
+	{
+		if( ! empty( $original_item_ID ) )
+		{	// Set form title for duplicating the item:
+			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+		}
+		else
+		{	// Set form title for creating new item:
+			$form_title_item_ID = T_('New Item');
+		}
+	}
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link('post_contents_fieldset')
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'none' );
 
@@ -303,7 +328,7 @@ $Form->begin_form( '', '', $params );
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
 	{ // Display url
 		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
+		echo '<tr><td class="label"><label for="post_url">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		echo '</td></tr>';
@@ -311,6 +336,36 @@ $Form->begin_form( '', '', $params );
 	else
 	{ // Hide url
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+	}
+
+	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
+	{ // Display parent ID:
+		if( $parent_Item = & $edited_Item->get_parent_Item() )
+		{	// Get parent item info if it is defined:
+			$parent_info = '';
+			$status_icons = get_visibility_statuses( 'icons' );
+			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
+			{	// Status colored icon:
+				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
+			}
+			// Title with link to permament url:
+			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
+			// Icon to edit:
+			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
+		}
+		else
+		{	// No parent item defined
+			$parent_info = '';
+		}
+		$field_required = ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ) ? $required_star : '';
+		echo '<tr><td class="label"><label for="post_parent_ID">'.$field_required.'<strong>'.T_('Parent ID').':</strong></label></td>';
+		echo '<td class="input" width="97%">';
+		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info );
+		echo '</td></tr>';
+	}
+	else
+	{ // Hide parent ID:
+		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
@@ -412,7 +467,7 @@ $Form->begin_form( '', '', $params );
 		$CommentList->query();
 
 		// comments_container value shows, current Item ID
-		echo '<div id="styled_content_block">';
+		echo '<div class="evo_content_block">';
 		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
 		// display comments
 		$CommentList->display_if_empty( array(
@@ -426,7 +481,7 @@ $Form->begin_form( '', '', $params );
 
 		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
 		{ // Display a link to add new meta comment if current user has a permission
-			echo action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 );
+			echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
 		}
 
 		// Load JS functions to work with meta comments:
@@ -438,7 +493,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="right_col col-md-3">
+<div class="right_col col-lg-3 col-md-4">
 
 	<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
@@ -477,6 +532,7 @@ $Form->begin_form( '', '', $params );
 			echo ' '; // allow wrapping!
 
 			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->load_all();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
 
 			echo ' '; // allow wrapping!

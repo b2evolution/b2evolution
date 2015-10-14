@@ -6,6 +6,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+load_funcs( 'skins/_skin.funcs.php' );
+
 header_http_response('403 Forbidden');
 
 $page_title = '403 Forbidden - Please stop referer spam.';

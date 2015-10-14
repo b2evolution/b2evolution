@@ -38,7 +38,7 @@ $params = array_merge( array(
 	), $params );
 
 
-echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get rid of this ID, use class .evo_content_block instead
+echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
 
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
@@ -193,7 +193,7 @@ echo '<div id="styled_content_block">'; // Beginning of post display  TODO: get 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
-				'before_section_title' => '<div class="clearfix"></div><h3>',
+				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic

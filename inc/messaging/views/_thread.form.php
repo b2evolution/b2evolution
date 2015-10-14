@@ -38,7 +38,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class_thread' => 'fform',
-	'form_title' => T_('New thread'),
+	'form_title' => T_('New thread').( is_admin_page() ? get_manual_link( 'messages-new-thread' ) : '' ),
 	'form_action' => NULL,
 	'form_name' => 'thread_checkchanges',
 	'form_layout' => 'compact',

@@ -317,7 +317,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'countries-editing' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'countries-list' );
+		$AdminUI->set_page_manual_link( 'regional-countries-tab' );
 		break;
 }
 

@@ -140,8 +140,15 @@ div.error_additional_content {
 .evo_comment_rating {
 	margin: 3px;
 }
+.evo_comment__list_title {
+	float: left;
+}
+.evo_comment__meta_info {
+	float: right;
+	padding: 20px 0 10px 0;
+}
 // Display round avatars:
-#styled_content_block .evo_comment_avatar img {
+.evo_content_block .evo_comment_avatar img {
 	margin: 4px 10px 10px 0;
 	float:left;
 	border-radius: 50%;
@@ -161,16 +168,6 @@ div.moderation_msg
 	padding: 0 1ex;
 	border: 1px dotted #fa9;
 	color: #e70;
-}
-
-.comment_form .panel-body .alert {
-	&.alert-primary, &.alert-success, &.alert-info, &.alert-warning, &.alert-danger {
-		margin: 0px;
-		padding: 10px 15px;
-	}
-}
-.comment_form .bg-warning {
-	margin: 0px !important;
 }
 
 div.feedback_feed_msg {
@@ -335,8 +332,17 @@ div.results {
 
 // Rating Summary for all comments of the selected post on disp=single
 // TODO: put ALL of teh followinf into a separate .less file and @import + clean up duplicate styles in individual skins
-.evo_content_block table.ratings_table td {
-	border: none;
+.evo_content_block .ratings_table {
+	margin: 0 10px 10px 0;
+	display: inline-block;
+	.rating_summary {
+		border-spacing: 1px;
+		border-collapse: separate;
+	}
+	.progress {
+		border-radius: 0;
+		height: 13px;
+	}
 }
 .evo_content_block table.rating_summary {
 	float: left;
@@ -556,43 +562,8 @@ div.item_location {
 	width: 100%;
 }
 
-// Messages list & form
-.evo_private_messages_list {
-	.messages_navigation {
-		padding: 5px;
-	}
-	> h2 {
-		margin-top: 0;
-	}
-	.messages_list_actions {
-		text-align: center;
-		padding: 10px 0;
-		p {
-			margin: 0;
-			padding: 0;
-			text-align: center;
-		}
-		a {
-			display: inline-block;
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-	span.error {
-		border: 1px solid #BBB;
-		border-bottom: none;
-		padding: 10px;
-		text-align: center;
-		display: block;
-	}
-	.panel {
-		margin-bottom: 0;
-	}
-}
-
 // Not published comments display
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -652,7 +623,7 @@ div.item_location {
 	background-color: #5133ab !important;
 }
 
-#styled_content_block span[class*=status_] span {
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -690,7 +661,7 @@ div.results .status_meta span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}
@@ -704,9 +675,6 @@ div.results .status_meta span {
 }
 .search_result {
 	padding: 15px 15px 5px;
-}
-.search_info {
-	font-size: 8pt;
 }
 .search_result_score {
 	float: left;
@@ -904,5 +872,80 @@ input.btn-lg {
 		border: 1px solid #ddd;
 		padding: 8px;
 		vertical-align: top;
+	}
+}
+
+// Fix the form elements:
+.evo_form__comment {
+	.panel {
+		margin: 0;
+		border: none;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.panel-body .alert {
+		&.alert-primary, &.alert-success, &.alert-info, &.alert-warning, &.alert-danger {
+			margin: 0px;
+			padding: 10px 15px;
+		}
+	}
+	.bg-warning {
+		margin: 0px !important;
+	}
+}
+.form-horizontal {
+	.form-group, .custom_content {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	fieldset {
+		margin-top: 0;
+	}
+	input[type=file] {
+		display: inline;
+	}
+}
+#comment_date_field {
+	input {
+		width: 80px;
+	}
+	label {
+		font-weight: normal;
+	}
+}
+.form-group[id^="ffield_uploadfile"] .controls {
+	padding-top: 5px;
+	input {
+		line-height: 10px;
+	}
+}
+
+// Comment template:
+.comment_rating {
+	margin-top: 2px;
+}
+#comment_edit .comment_rating {
+	margin-top: 9px;
+}
+#comment_preview {
+	background-color: #FFF;
+}
+#comment_date_field .panel {
+	border: none;
+	box-shadow: none;
+	margin-bottom: 0;
+	.panel-body {
+		padding: 0;
+		.control-label {
+			font-weight: bold;
+		}
+		.controls .form-group {
+			display: inline-block;
+			padding-left: 15px;
+			margin-bottom: 0;
+		}
 	}
 }

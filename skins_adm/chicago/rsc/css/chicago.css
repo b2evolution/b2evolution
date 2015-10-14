@@ -1221,7 +1221,7 @@ div#ffield_item_tags ul.token-input-list-facebook {
 }
 
 /* Statuses of posts & comments display */
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	top: -7px;
 	left: 7px;
 }

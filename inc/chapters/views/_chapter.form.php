@@ -52,7 +52,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 	{ // If moving cats between blogs is allowed:
 		$move = ' '.action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$edited_Chapter->ID.'&amp;action=move' ), T_('Move') );
 	}
-	$Form->info( T_('Blog'), $edited_Blog->get_maxlen_name().$move );
+	$Form->info( T_('Collection'), $edited_Blog->get_maxlen_name().$move );
 
 	$Form->select_input_options( 'cat_parent_ID',
 				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );

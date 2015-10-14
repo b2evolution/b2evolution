@@ -68,8 +68,8 @@ function get_link_owner( $link_type, $object_ID )
  */
 function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creating = false, $fold = false )
 {
-	global $admin_url, $dispatcher;
-	global $current_User;
+	global $admin_url;
+	global $current_User, $action;
 
 	if( $LinkOwner->type == 'item' && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
 	{ // Attachments are not allowed for current post type
@@ -100,9 +100,12 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
 
-		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
 		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
-		echo '</td></tr></table>';
+
+		if( get_param( 'p' ) > 0 )
+		{	// Display a button to duplicate the attachments to new item:
+			$Form->submit( array( 'actionArray[create_link]', /* TRANS: This is the value of an input submit button */ T_('Save & Link files from original'), 'SaveEditButton' ) );
+		}
 
 		$Form->end_fieldset();
 
@@ -122,12 +125,24 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$LinkOwner->get_ID();
+		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
+		{	// Get first file of the Link Owner:
+			$linkowner_File = & $linkowner_FileList->get_next();
+			if( ! empty( $linkowner_File ) && $current_User->check_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
+			{	// Obtain and use file root of first file:
+				$linkowner_FileRoot = & $linkowner_File->get_FileRoot();
+				$attach_files_url .= '&amp;root='.$linkowner_FileRoot->ID;
+				$attach_files_url .= '&amp;path='.dirname( $linkowner_File->get_rdfs_rel_path() ).'/';
+			}
+		}
 		$fieldset_title .= ' - '
-			.action_icon( T_('Attach existing files'), 'folder',
-				$dispatcher.'?ctrl=links&amp;link_type='.$LinkOwner->type.'&amp;fm_mode=link_object&amp;link_object_ID='.$LinkOwner->get_ID(),
+			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' )
-			);
+				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
+				T_('Attach existing files'), 1, 0,
+				array( 'target' => '_blank' ) );
 	}
 
 	// Get a count of links in order to deny folding when there is at least one link
@@ -337,9 +352,14 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
 		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
 
+		// A link to open file manager in modal window:
 		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
 					.' target="_parent" title="'.$title.'">'
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
+
+		// A link to open file manager in new window:
+		$r .= '<a href="'.$url.'" target="_blank" title="'.$title.'">'
+					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
 	// Delete link.

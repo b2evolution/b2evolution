@@ -639,6 +639,17 @@ div.edit_toolbars, div.message_toolbars {
 	background-color: #5bc0de !important;
 	color: #FFF !important;
 }
+.badge-warning {
+	background-color: #f0ad4e !important;
+	color: #fff !important;
+}
+.badge-meta {
+	background-color: #5133ab !important;
+	color: #fff !important;
+}
+.dropdown-menu > li > a .tooltip {
+	white-space: normal;
+}
 .panel-heading .badge {
 	position: relative;
 	top: -1px;
@@ -843,7 +854,7 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Make rounded corners for all images in content
-#styled_content_block {
+.evo_content_block {
 	img {
 		.border-radius;
 	}
@@ -879,5 +890,43 @@ div.edit_toolbars, div.message_toolbars {
 		font-size: 20px;
 		line-height: 40px;
 		display: block;
+	}
+}
+
+// Messages list & form
+.evo_private_messages_list {
+	.messages_navigation {
+		padding: 5px;
+	}
+	> h2 {
+		margin-top: 0;
+	}
+	.messages_list_actions {
+		text-align: center;
+		padding: 10px 0;
+		p {
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+		a {
+			display: inline-block;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	span.error {
+		border: 1px solid #BBB;
+		border-bottom: none;
+		padding: 10px;
+		text-align: center;
+		display: block;
+	}
+	.panel {
+		margin-bottom: 0;
+		&.results {
+			margin-bottom: 20px;
+		}
 	}
 }

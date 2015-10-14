@@ -226,7 +226,7 @@ if( $ItemList->is_filtered() )
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Create a new task...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ), T_('New task').' &raquo;', 3 ,4 );
+	$ItemList->global_icon( T_('Create a new task...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ), T_('New task').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 

@@ -20,7 +20,13 @@ global $result_fadeout;
 
 global $GenericElementCache;
 
-global $list_title, $default_col_order, $form_below_list;
+global $list_title, $default_col_order, $form_below_list, $generic_params;
+
+
+$generic_params = array_merge( array(
+		'icon_new_title' => T_('Create a new element...'),
+		'icon_new_text'  => T_('New element').' &raquo;',
+	), $generic_params );
 
 
 // EXPERIMENTAL
@@ -107,7 +113,7 @@ if( !$form_below_list )
 {	// Need to dispaly global icon to add new geenric element:
 	if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) )
 	{	// We have permission permission to edit:
-		$Results->global_icon( T_('Create a new element...'), 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), T_('New element').' &raquo;', 3, 4 );
+		$Results->global_icon( $generic_params['icon_new_title'], 'new', regenerate_url( 'action,'.$GenericElementCache->dbIDname, 'action=new' ), $generic_params['icon_new_text'], 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 }
 

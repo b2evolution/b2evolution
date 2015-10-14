@@ -321,6 +321,9 @@ switch( $action )
 	case 'update':
 		$AdminUI->set_page_manual_link( 'cities-editing' );
 		break;
+	case 'csv':
+		$AdminUI->set_page_manual_link( 'cities-import' );
+		break;
 	default:
 		$AdminUI->set_page_manual_link( 'cities-list' );
 		break;

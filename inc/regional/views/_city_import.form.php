@@ -19,7 +19,7 @@ $Form = new Form( NULL, 'city_checkchanges', 'post', 'compact', 'multipart/form-
 
 $Form->global_icon( T_('Cancel importing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Import cities') );
+$Form->begin_form( 'fform', T_('Import cities').get_manual_link( 'cities-import' ) );
 
 	echo T_('Select a country and upload a CSV file with the following columns:');
 	echo '<div style="padding:10px 0 10px 40px">';

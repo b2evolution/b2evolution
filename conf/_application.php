@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.6.4-stable';
+$app_version = '6.6.5-stable';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2015-09-27';
+$app_date = '2015-10-13';
 
 /**
  * Long version string for checking differences
@@ -36,7 +36,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 11483;
+$new_db_version = 11484;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.

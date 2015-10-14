@@ -77,11 +77,19 @@ if( $disp == 'single' )
 			) );*/
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 
-	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
+	// Link for editing:
+	$action_links = $Item->get_edit_link( array(
 			'before' => '',
 			'after'  => '',
 			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 			'class'  => button_class( 'text' ),
+		) );
+	// Link for duplicating:
+	$action_links .= $Item->get_copy_link( array(
+			'before' => '',
+			'after'  => '',
+			'text'   => '#icon#',
+			'class'  => button_class(),
 		) );
 	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
 	{ // Link to edit category
@@ -95,6 +103,11 @@ if( $disp == 'single' )
 				) );
 		}
 	}
+	if( ! empty( $action_links ) )
+	{	// Group all action icons:
+		$action_links = '<div class="'.button_class( 'group' ).'">'.$action_links.'</div>';
+	}
+
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
@@ -104,7 +117,7 @@ if( $disp == 'single' )
 	$Item->title( array(
 			'link_type'  => $params['item_link_type'],
 			'before'     => '<div class="evo_post_title"><h1>',
-			'after'      => '</h1><div class="'.button_class( 'group' ).'">'.$action_links.'</div></div>',
+			'after'      => '</h1>'.$action_links.'</div>',
 			'nav_target' => false,
 		) );
 	?>
@@ -143,7 +156,7 @@ if( $disp == 'single' )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
-				'before_section_title' => '<h3 class="comments_list_title">',
+				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			) ) );
 		// Note: You can customize the default item feedback by copying the generic

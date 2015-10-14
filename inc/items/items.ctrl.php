@@ -162,10 +162,11 @@ switch( $action )
 	case 'new_type':
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 	case 'list':
-		if( in_array( $action, array( 'create_edit', 'create', 'create_publish' ) ) )
+		if( in_array( $action, array( 'create_edit', 'create_link', 'create', 'create_publish' ) ) )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
 		}
@@ -197,7 +198,7 @@ switch( $action )
 
 			// What form buttton has been pressed?
 			param( 'save', 'string', '' );
-			$exit_after_save = ( $action != 'create_edit' );
+			$exit_after_save = ( $action != 'create_edit' && $action != 'create_link' );
 		}
 		break;
 
@@ -438,6 +439,9 @@ switch( $action )
 			break;
 		}
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		if( in_array( $action, array( 'new', 'new_type' ) ) )
 		{
 			param( 'restore', 'integer', 0 );
@@ -525,8 +529,10 @@ switch( $action )
 		$tab_switch_params = 'blog='.$blog;
 
 		if( $action == 'new_type' )
-		{ // Save the changes of Item to Session
+		{	// Save the changes of Item to Session:
 			set_session_Item( $edited_Item );
+			// Initialize original item ID that is used on diplicating action:
+			param( 'p', 'integer', NULL );
 		}
 		break;
 
@@ -536,8 +542,19 @@ switch( $action )
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
+		// Load tags of the duplicated item:
+		$item_tags = implode( ', ', $edited_Item->get_tags() );
+
+		// Load all settings of the duplicating item and copy them to new item:
+		$edited_Item->load_ItemSettings();
+		$edited_Item->ItemSettings->_load( $edited_Item->ID, NULL );
+		$edited_Item->ItemSettings->cache[0] = $edited_Item->ItemSettings->cache[ $edited_Item->ID ];
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
+
+		// Change creator user to current user for correct permission checking:
+		$edited_Item->set( 'creator_user_ID', $current_User->ID );
 
 		$edited_Item->load_Blog();
 		$item_status = $edited_Item->Blog->get_allowed_item_status();
@@ -727,6 +744,7 @@ switch( $action )
 
 
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 		// Check that this action request is not a CSRF hacked request:
@@ -764,7 +782,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
+		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit' || $action == 'create_link'), /* creating? */ true );
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
@@ -795,6 +813,33 @@ switch( $action )
 			if( !$result )
 			{ // Add error message
 				$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+			}
+		}
+
+		if( $result && $action == 'create_link' )
+		{	// If the item has been inserted correctly and we should copy all links from the duplicated item:
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+			    && $current_User->check_perm( 'files', 'view', false ) )
+			{	// Allow this action only if current user has a permission to view the links of new created item:
+				$original_item_ID = param( 'p', 'integer', NULL );
+				$ItemCache = & get_ItemCache();
+				if( $original_Item = & $ItemCache->get_by_ID( $original_item_ID, false, false ) )
+				{	// Copy the links only if the requested item is correct:
+					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
+					{	// Current user must has a permission to view an original item
+						$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID,
+								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+							SELECT '.$DB->quote( date2mysql( $localtimenow ) ).', '.$DB->quote( date2mysql( $localtimenow ) ).', '.$current_User->ID.',
+								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_ltype_ID, link_position, link_order
+									FROM T_links
+									WHERE link_itm_ID = '.$original_Item->ID );
+					}
+					else
+					{	// Display error if user tries to duplicate the disallowed item:
+						$Messages->add( T_('You have no permission to duplicate the original post.'), 'error' );
+						$result = false;
+					}
+				}
 			}
 		}
 
@@ -1047,6 +1092,9 @@ switch( $action )
 		param( 'post_ID', 'integer', true, true );
 		param( 'ityp_ID', 'integer', true );
 
+		// Used when we change a type of the duplicated item:
+		$duplicated_item_ID = param( 'p', 'integer', NULL );
+
 		// Load post from Session
 		$edited_Item = get_session_Item( $post_ID );
 
@@ -1085,6 +1133,10 @@ switch( $action )
 			if( $post_ID > 0 )
 			{ // Edit item form
 				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=edit&restore=1&p='.$edited_Item->ID;
+			}
+			elseif( $duplicated_item_ID > 0 )
+			{ // Copy item form
+				$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&action=new&restore=1&p='.$duplicated_item_ID;
 			}
 			else
 			{ // New item form
@@ -1507,6 +1559,7 @@ switch( $action )
 	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 		// Generate available blogs list:
@@ -1560,17 +1613,20 @@ switch( $action )
 						' '.T_('Permalink'), 4, 3, array(
 								'style' => 'margin-right: 3ex',
 						) );
+
+				$edited_item_url = $edited_Item->get_copy_url();
+				if( ! empty( $edited_item_url ) )
+				{	// If user has a permission to copy the edited Item:
+					$AdminUI->global_icon( T_('Duplicate this post...'), 'copy', $edited_item_url,
+						' '.T_('Duplicate...'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
 				break;
 		}
 
 		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
 		{
-			$AdminUI->global_icon( T_('Change type'), 'edit', $edited_Item->get_type_edit_link( 'url' ),
-				' '.T_('Change type'), 4, 3, array(
-						'style' => 'margin-right: 3ex',
-						'onclick' => $edited_Item->get_type_edit_link( 'onclick' )
-				) );
-
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
 				$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
@@ -1706,7 +1762,7 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
+if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -1725,6 +1781,7 @@ switch( $action )
 	case 'copy':
 	case 'create':
 	case 'create_edit':
+	case 'create_link':
 	case 'create_publish':
 	case 'update':
 	case 'update_edit':
@@ -1773,6 +1830,7 @@ switch( $action )
 	case 'new':
 	case 'copy':
 	case 'create_edit':
+	case 'create_link':
 	case 'create':
 	case 'create_publish':
 	case 'edit':

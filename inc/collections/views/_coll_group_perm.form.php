@@ -135,7 +135,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Is<br />member'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ sprintf( T_('Member of<br />%s'), $Blog->get( 'shortname' ) ),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'ismember\', \''.format_to_output( T_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$grp_ID$\' )%'.
 						( $edited_Blog->get_setting( 'use_workflow' ) ? '%coll_perm_checkbox( {row}, \'bloggroup_\', \'can_be_assignee\', \''.format_to_output( T_('Items can be assigned to members of this group'), 'htmlattr' ).'\', \'checkallspan_state_$grp_ID$\' )%' : '' ),
@@ -143,13 +143,14 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Posts'),
 						'th' => T_('Post Statuses'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.format_to_output( T_('Permission to post into this blog with published status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.format_to_output( T_('Permission to post into this blog with community status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.format_to_output( T_('Permission to post into this blog with members status'), 'htmlattr' ).'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( T_('Permission to post into this blog with private status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.format_to_output( T_('Permission to post into this blog with review status'), 'htmlattr' ).'\', \'post\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( T_('Permission to post into this blog with private status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to post into this blog with draft status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to post into this blog with deprecated status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'redirected\', \''.format_to_output( T_('Permission to post into this blog with redirected status'), 'htmlattr' ).'\', \'post\' )%',
@@ -157,6 +158,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Posts'),
 						'th' => T_('Post Types'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_item_type( {row}, \'bloggroup_\' )%',
@@ -164,6 +166,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Posts'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit posts<br />/user level'),
 						'th_class' => 'checkright',
 						'default_dir' => 'D',
@@ -172,6 +175,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Posts'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Delete<br />posts'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_delpost',
@@ -181,6 +185,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Posts'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />TS'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_edit_ts',
@@ -190,19 +195,21 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Comments'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Comment<br />statuses'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'published\', \''.format_to_output( T_('Permission to comment into this blog with published status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'community\', \''.format_to_output( T_('Permission to comment into this blog with community status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'protected\', \''.format_to_output( T_('Permission to comment into this blog with members status'), 'htmlattr' ).'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( T_('Permission to comment into this blog with private status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'review\', \''.format_to_output( T_('Permission to comment into this blog with review status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'private\', \''.format_to_output( T_('Permission to comment into this blog with private status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Comments'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit cmts<br />/user level'),
 						'th_class' => 'checkright',
 						'default_dir' => 'D',
@@ -211,6 +218,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th_group' => T_('Permissions on Comments'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Delete<br />cmts'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_delcmts',
@@ -222,7 +230,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th_group' => T_('Edit blog settings'),
+						'th_group' => T_('Perms on Coll.'),
 						'th' => T_('Cats'),
 						'th_title' => T_('Categories'),
 						'th_class' => 'checkright',
@@ -233,7 +241,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th_group' => T_('Edit blog settings'),
+						'th_group' => T_('Perms on Coll.'),
 						'th' => /* TRANS: Short for blog features */  T_('Feat.'),
 						'th_title' => T_('Features'),
 						'th_class' => 'checkright',
@@ -244,8 +252,8 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th_group' => T_('Edit blog settings'),
-						'th' => /* TRANS: Short for advanced */  T_('Adv.'),
+						'th_group' => T_('Perms on Coll.'),
+						'th' => get_admin_badge( 'coll', '#', T_('Coll.<br />Admin'), T_('Check this to give Collection Admin permission.') ),
 						'th_title' => T_('Advanced/Administrative blog properties'),
 						'th_class' => 'checkright',
 						'order' => 'bloggroup_perm_admin',

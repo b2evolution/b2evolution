@@ -33,7 +33,7 @@ $params = array_merge( array(
 		'disp_pingbacks'        => true,
 		'disp_section_title'    => true,
 		'disp_rating_summary'   => true,
-		'before_section_title'  => '<div class="clearfix"></div><h3>',
+		'before_section_title'  => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 		'after_section_title'   => '</h3>',
 		'comments_title_text'   => '',
 		'comment_list_start'    => "\n\n",
@@ -210,6 +210,27 @@ if( $Item->can_see_comments( true ) )
 			echo implode( ', ', $disp_title);
 			echo $params['after_section_title'];
 		}
+
+		if( is_logged_in() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+		{	// Display the meta comments info if current user can edit this post:
+			global $admin_url;
+			echo '<div class="evo_comment__meta_info">';
+			$meta_comments_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+			$meta_comments_url = $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments';
+			if( $meta_comments_count > 0 )
+			{	// Display a badge with meta comments count if at least one exists for this Item:
+				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta comments'), $meta_comments_count ).'</a>';
+			}
+			elseif( $current_User->check_perm( 'meta_comment', 'add', false, $Item ) )
+			{	// No meta comments yet, Display a button to add new meta comment:
+				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta comment').'</a>';
+			}
+			echo '</div>';
+		}
+
+		echo '<div class="clearfix"></div>';
+
+		// Display rating summary:
 		echo $rating_summary;
 
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;

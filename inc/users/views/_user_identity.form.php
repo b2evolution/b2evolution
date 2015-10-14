@@ -99,7 +99,7 @@ if( $is_admin )
 	}
 	else
 	{
-		$form_text_title = T_( 'Edit profile' ); // used for js confirmation message on leave the changed form
+		$form_text_title = T_( 'Edit profile' ).get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
 		$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	}
@@ -153,7 +153,7 @@ if( $new_user_creating )
 
 	/***************  Identity  **************/
 
-$Form->begin_fieldset( T_('Identity') );
+$Form->begin_fieldset( T_('Identity').( is_admin_page() ? get_manual_link( 'user-profile-tab' ) : '' ) );
 
 if( ($url = $edited_User->get('url')) != '' )
 {
@@ -550,7 +550,7 @@ userfields_display( $userfields, $Form );
 if( $action != 'view' )
 {	// Edit mode
 // ------------------- Add new field: -------------------------------
-$Form->begin_fieldset( T_('Add new fields') );
+$Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link( 'user-profile-tab-addnewfields' ) : '' ) );
 
 	// -------------------  Display new added userfields: -------------------------------
 	global $add_field_types, $Messages;

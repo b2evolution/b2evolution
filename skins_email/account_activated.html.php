@@ -80,7 +80,7 @@ if( !empty( $registration_trigger_url ) )
 $initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
 if( !empty( $initial_blog_ID ) )
 { // Hit info
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID ).'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $activated_User->ID ), '', '.a' ).'</td></tr>'."\n";
 }
 

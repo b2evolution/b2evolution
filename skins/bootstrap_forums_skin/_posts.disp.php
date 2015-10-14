@@ -42,19 +42,20 @@ if( $cat > 0 )
 
 	// Load read statuses if required
 	$MainList->load_content_read_statuses();
-
-	// Breadcrumbs
-	skin_widget( array(
-			// CODE for the widget:
-			'widget' => 'breadcrumb_path',
-			// Optional display params
-			'block_start'      => '<ol class="breadcrumb">',
-			'block_end'        => '</ol><div class="clear"></div>',
-			'separator'        => '',
-			'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-			'item_active_mask' => '<li class="active">$title$</li>',
-		) );
 }
+
+// Breadcrumbs
+skin_widget( array(
+		// CODE for the widget:
+		'widget' => 'breadcrumb_path',
+		// Optional display params
+		'block_start'      => '<ol class="breadcrumb">',
+		'block_end'        => '</ol><div class="clear"></div>',
+		'separator'        => '',
+		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+		'item_active_mask' => '<li class="active">$title$</li>',
+		'suffix_text'      => empty( $cat ) ? T_('Latest topics') : '',
+	) );
 
 if( !empty( $cat ) && ( $cat > 0 ) )
 { // Display sub-chapters

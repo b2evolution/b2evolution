@@ -78,7 +78,7 @@ echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody'
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 // This block is used to keep correct css style for the comment status banners
-echo '<div id="styled_content_block" class="block_item evo_content_block">';
+echo '<div class="block_item evo_content_block">';
 
 global $AdminUI;
 $admin_template = $AdminUI->get_template( 'Results' );
@@ -106,6 +106,6 @@ echo '</div>';
 // Display navigation:
 $CommentList->display_nav( 'footer' );
 
-echo '</div>'; // END OF <div id="styled_content_block">
+echo '</div>'; // END OF <div class="evo_content_block">
 
 ?>

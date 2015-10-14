@@ -80,7 +80,14 @@ class GenericElement extends DataObject
 	 */
 	function disp_form()
 	{
-		global $ctrl, $action, $edited_name_maxlen, $form_below_list;
+		global $ctrl, $action, $edited_name_maxlen, $form_below_list, $generic_params;
+
+		$generic_params = array_merge( array(
+				'form_title_new'        => T_('New element'),
+				'form_title_edit'       => T_('Element'),
+				'form_fieldset_title'   => T_('Element'),
+				'form_field_name_title' => T_('name'),
+			), $generic_params );
 
 		// Determine if we are creating or updating...
 		$creating = is_create_action( $action );
@@ -92,14 +99,18 @@ class GenericElement extends DataObject
 			$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 		}
 
-		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
+		$Form->begin_form( 'fform', $creating ? $generic_params['form_title_new'] : $generic_params['form_title_edit'] );
 
 		$Form->add_crumb( 'element' );
 		$Form->hidden( 'action', $creating ? 'create' : 'update' );
 		$Form->hidden( 'ctrl', $ctrl );
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
 
-		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), '', array( 'required' => true ) );
+		$Form->begin_fieldset( $generic_params['form_fieldset_title'] );
+
+		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, $generic_params['form_field_name_title'], '', array( 'required' => true ) );
+
+		$Form->end_fieldset();
 
 		if( ! $creating ) $Form->hidden( $this->dbIDname, $this->ID );
 

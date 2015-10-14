@@ -31,7 +31,7 @@ $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Blog').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('Collection').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true ) ).' ('.$Item->creator_User->get('login').")</p>\n";
 

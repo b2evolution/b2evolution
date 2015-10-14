@@ -112,11 +112,19 @@ class breadcrumb_path_Widget extends ComponentWidget
 		$params = array_merge( array(
 				'item_mask'        => '<a href="$url$">$title$</a>',
 				'item_active_mask' => '$title$',
+				'suffix_text'      => '', // Used to add custom item at the end of list
 			), $params );
 
 		$this->init_display( $params );
 
 		$breadcrumbs = array();
+
+		if( ! empty( $this->disp_params['suffix_text'] ) )
+		{	// Append custom breadcrumb item at the end:
+			$breadcrumbs[] = array(
+					'title' => $this->disp_params['suffix_text'],
+				);
+		}
 
 		if( ! empty( $disp ) && $disp == 'single' )
 		{ // Include current post

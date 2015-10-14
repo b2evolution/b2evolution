@@ -123,9 +123,53 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 	}
 }
 $Results->cols[] = array(
-		'th' => sprintf( T_('Enabled in %s'), $Blog->get( 'shortname' ) ),
+		'th' => sprintf( T_('Enabled in<br />%s'), $Blog->get( 'shortname' ) ),
 		'order' => 'ityp_perm_level',
 		'td' => '%ityp_row_enabled( #type_enabled#, #ityp_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center',
+	);
+
+function ityp_row_default( $item_type_ID )
+{
+	if( ItemType::is_reserved( $item_type_ID ) )
+	{ // It is reserved item type, Don't allow to enable this
+		return '';
+	}
+
+	global $current_User, $admin_url, $Blog;
+
+	if( $Blog->get_setting( 'default_post_type' ) == $item_type_ID )
+	{ // The item type is default for current collection:
+		$status_icon = get_icon( 'bullet_black', 'imgtag', array( 'title' => sprintf( T_('The item type is the default for %s.'), $Blog->get( 'shortname' ) ) ) );
+	}
+	else
+	{ // The item type is not default:
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		{ // URL to use the item type as default if current user has a permission to edit collection properties:
+			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=default&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
+			$status_icon_title = sprintf( T_('Set this item type as the default for %s.'), $Blog->get( 'shortname' ) );
+		}
+		else
+		{
+			$status_icon_title = sprintf( T_('The item type is not the default for %s.'), $Blog->get( 'shortname' ) );
+		}
+		$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => $status_icon_title ) );
+	}
+
+	if( isset( $status_url ) )
+	{
+		return '<a href="'.$status_url.'">'.$status_icon.'</a>';
+	}
+	else
+	{
+		return $status_icon;
+	}
+}
+$Results->cols[] = array(
+		'th' => sprintf( T_('Default for<br />%s'), $Blog->get( 'shortname' ) ),
+		'order' => 'ityp_perm_level',
+		'td' => '%ityp_row_default( #ityp_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 	);
@@ -185,7 +229,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 						);
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
-				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // Display results:

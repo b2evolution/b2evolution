@@ -256,7 +256,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new city ...'), 'new',
-				regenerate_url( 'action', 'action=new'), T_('New city').' &raquo;', 3, 4  );
+				regenerate_url( 'action', 'action=new'), T_('New city').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 	$Results->global_icon( T_('Import cities from CSV file ...'), 'new',
 				regenerate_url( 'action', 'action=csv'), T_('Import CSV').' &raquo;', 3, 4  );

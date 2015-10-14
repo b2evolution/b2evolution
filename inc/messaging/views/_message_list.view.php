@@ -50,8 +50,8 @@ $params = array_merge( array(
 	'skin_form_params'          => array(),
 	'display_navigation'        => false,
 	'display_title'             => false,
-	'messages_list_start'       => '',
-	'messages_list_end'         => '',
+	'messages_list_start'       => is_admin_page() ? '<div class="evo_private_messages_list">' : '',
+	'messages_list_end'         => is_admin_page() ? '</div>' : '',
 	'messages_list_title'       => $edited_Thread->title,
 	'messages_list_title_start' => '<div class="panel-heading"><h2 class="panel-title">',
 	'messages_list_title_end'   => '</h2></div>',
@@ -179,7 +179,7 @@ $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
-$Results->title = $params['messages_list_title'];
+$Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_link( 'messages-thread-list' ) : '' );
 
 if( is_admin_page() )
 {
@@ -275,6 +275,10 @@ if( $is_recipient )
 		echo $params['messages_list_form_start'];
 
 		$form_title = sprintf( T_('Reply to: %s'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ) );
+		if( is_admin_page() )
+		{
+			$form_title .= get_manual_link( 'messages-reply-to-thread' );
+		}
 
 		if( ! is_admin_page() )
 		{

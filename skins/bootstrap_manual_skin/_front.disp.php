@@ -22,7 +22,7 @@ $intro_Item = & get_featured_Item( 'front' ); // $intro_Item is used below for c
 $Item = $intro_Item;
 if( !empty( $Item ) )
 { // We have a featured/intro post to display:
-	echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
+	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
 			'feature_block'     => true,
@@ -55,10 +55,10 @@ if( ! empty( $intro_Item ) )
 {
 	global $c, $ReqURI;
 	$c = 1; // Display comments
-	echo '<div id="styled_content_block">'; // Beginning of posts display TODO: get rid of this ID, use class .evo_content_block instead
+	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 	skin_include( '_item_feedback.inc.php', array_merge( array(
-			'before_section_title' => '<h3 class="comments_list_title">',
+			'before_section_title' => '<h3 class="evo_comment__list_title">',
 			'after_section_title'  => '</h3>',
 			'Item'                 => $intro_Item,
 			'form_title_text'      => T_('Comment form'),

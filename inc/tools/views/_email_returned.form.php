@@ -104,6 +104,9 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.') ) );
 	}
 
+	$Form->checkbox( 'repath_ignore_read', $Settings->get( 'repath_ignore_read' ), T_('Ignore emails that have already been read'),
+				T_('Check this in order not to re-process emails that already have the "seen" flag on the server.') );
+
 	$Form->checkbox( 'repath_delete_emails', $Settings->get( 'repath_delete_emails' ), T_('Delete processed emails'),
 				T_('Check this if you want processed messages to be deleted from server after successful processing.') );
 

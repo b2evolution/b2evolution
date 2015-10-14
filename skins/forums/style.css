@@ -253,7 +253,7 @@ div.pageTop a.selected:hover {
 .bForums a:hover {
 	color: #DD6900;
 }
-.bForums th{
+.bForums > tbody > tr > th{
 	border-top: 3px solid #418aaf;
 	background:-webkit-linear-gradient(top, #03699c, #3a95c2);
 	background:-moz-linear-gradient(top, #03699c, #3a95c2);
@@ -266,7 +266,7 @@ div.pageTop a.selected:hover {
 	font-weight: bold;
 	height: 25px;
 }
-.bForums td{
+.bForums > tbody > tr > td{
 	background-color: #EFEFEF;
 	text-align: center;
 }
@@ -870,7 +870,7 @@ td.comment_content textarea {
 }
 
 /* Statuses of posts & comments display */
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	top: -3px;
 	left: 3px;
 }

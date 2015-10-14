@@ -117,7 +117,11 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 					.action_icon( T_('Delete this tag!'), 'delete', regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID=$tag_ID$&amp;action=delete&amp;'.url_crumb( 'tag' ) ) ),
 		);
 
-	$Results->global_icon( T_('Add a new tag...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New tag').' &raquo;', 3, 4 );
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Allow to clean up tags only if current user has a permission to edit tags:
+		$Results->global_icon( T_('Cleanup orphans'), 'cleanup', regenerate_url( 'action', 'action=cleanup' ).'&amp;'.url_crumb( 'tag' ), T_('Cleanup orphans'), 3, 4 );
+	}
+	$Results->global_icon( T_('Add a new tag...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New tag').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();

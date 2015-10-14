@@ -62,7 +62,7 @@ function get_id_coll_from_prefix( $prefix )
  */
 function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 {
-	global $permission_to_change_admin;
+	global $edited_Blog, $permission_to_change_admin;
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -72,14 +72,22 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 		$r .= ' id="'.$id.'"';
 	}
 	$r .= ' name="blog_'.$perm.'_'.$row->{$row_id_coll}.'"';
-	if( !empty( $row->{$prefix.$perm} ) )
-	{
-	 	$r .= ' checked="checked"';
+
+	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties)
+		$r .= ' checked="checked" disabled="disabled"';
 	}
-	if( ! $permission_to_change_admin
-			&& ($row->{$prefix.'perm_admin'} || $perm == 'perm_admin' ) )
-	{ // No permission to touch nOR create admins
-	 	$r .= ' disabled="disabled"';
+	else
+	{	// Not owner
+		if( !empty( $row->{$prefix.$perm} ) )
+		{
+			$r .= ' checked="checked"';
+		}
+		if( ! $permission_to_change_admin
+				&& ($row->{$prefix.'perm_admin'} || $perm == 'perm_admin' ) )
+		{ // No permission to touch nOR create admins
+			$r .= ' disabled="disabled"';
+		}
 	}
 	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
 	return $r;
@@ -164,14 +172,23 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 		$r .= ' id="'.$id.'"';
 	}
 	$r .= ' name="blog_perm_'.$perm_status.'_'.$type_param.$row->{$row_id_coll}.'"';
-	if( get_status_permvalue( $perm_status ) & $row->{$perm_statuses} )
-	{
-	 	$r .= ' checked="checked"';
+
+	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has the permissions to edit all item/comment statuses by default
+		$r .= ' checked="checked" disabled="disabled"';
 	}
-	if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
-	{
-	 	$r .= ' disabled="disabled"';
+	else
+	{	// Not owner
+		if( get_status_permvalue( $perm_status ) & $row->{$perm_statuses} )
+		{
+			$r .= ' checked="checked"';
+		}
+		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
+		{
+			$r .= ' disabled="disabled"';
+		}
 	}
+
 	if( $perm_status == $default_status )
 	{
 		$title .= "\n".T_('Note: Anonymous users may create comments with this status. You will probably want to give the same permission to this user/group.');
@@ -193,17 +210,25 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
  */
 function coll_perm_edit( $row, $prefix )
 {
-	global $permission_to_change_admin;
+	global $edited_Blog, $permission_to_change_admin;
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
 	$r = '<select id="blog_perm_edit_'.$row->{$row_id_coll}.'" name="blog_perm_edit_'.$row->{$row_id_coll}.'"';
-	if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
-	{
-	 	$r .= ' disabled="disabled"';
+	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has the max permission to edit items:
+		$r .= ' disabled="disabled"';
+		$perm_edit_value = 'all';
+	}
+	else
+	{	// Not owner
+		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
+		{
+			$r .= ' disabled="disabled"';
+		}
+		$perm_edit_value = $row->{$prefix.'perm_edit'};
 	}
 	$r .= ' >';
-	$perm_edit_value = $row->{$prefix.'perm_edit'};
 	$r .= '<option value="no" '.( $perm_edit_value == 'no' ? 'selected="selected"' : '' ).'>No editing</option>';
 	$r .= '<option value="own" '.( $perm_edit_value == 'own' ? 'selected="selected"' : '' ).'>Own posts</option>';
 	$r .= '<option value="lt" '.( $perm_edit_value == 'lt' ? 'selected="selected"' : '' ).'>&lt; own level</option>';
@@ -222,16 +247,24 @@ function coll_perm_edit( $row, $prefix )
  */
 function coll_perm_edit_cmt( $row, $prefix )
 {
-	global $permission_to_change_admin;
+	global $edited_Blog, $permission_to_change_admin;
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
 	$r = '<select id="blog_perm_edit_cmt'.$row->{$row_id_coll}.'" name="blog_perm_edit_cmt_'.$row->{$row_id_coll}.'"';
-	if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
-	{
-	 	$r .= ' disabled="disabled"';
+	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has the max permission to edit items:
+		$r .= ' disabled="disabled"';
+		$perm_edit_cmt_value = 'all';
 	}
-	$perm_edit_cmt_value = $row->{$prefix.'perm_edit_cmt'};
+	else
+	{	// Not owner
+		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
+		{
+			$r .= ' disabled="disabled"';
+		}
+		$perm_edit_cmt_value = $row->{$prefix.'perm_edit_cmt'};
+	}
 	$r .= ' >';
 	$r .= '<option value="no" '.( $perm_edit_cmt_value == 'no' ? 'selected="selected"' : '' ).'>No editing</option>';
 	$r .= '<option value="own" '.( $perm_edit_cmt_value == 'own' ? 'selected="selected"' : '' ).'>Own cmts</option>';
@@ -252,17 +285,25 @@ function coll_perm_edit_cmt( $row, $prefix )
  */
 function coll_perm_item_type( $row, $prefix )
 {
-	global $permission_to_change_admin;
+	global $edited_Blog, $permission_to_change_admin;
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
 	$r = '<select id="blog_perm_item_type_'.$row->{$row_id_coll}.'" name="blog_perm_item_type_'.$row->{$row_id_coll}.'"';
-	if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
-	{
-	 	$r .= ' disabled="disabled"';
+	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has the max permission to edit item types:
+		$r .= ' disabled="disabled"';
+		$perm_edit_value = 'admin';
+	}
+	else
+	{	// Not owner
+		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
+		{
+			$r .= ' disabled="disabled"';
+		}
+		$perm_edit_value = $row->{$prefix.'perm_item_type'};
 	}
 	$r .= ' >';
-	$perm_edit_value = $row->{$prefix.'perm_item_type'};
 	$r .= '<option value="standard" '.( $perm_edit_value == 'standard' ? 'selected="selected"' : '' ).'>'.T_('Standard').'</option>';
 	$r .= '<option value="restricted" '.( $perm_edit_value == 'restricted' ? 'selected="selected"' : '' ).'>'.T_('Restricted').'</option>';
 	$r .= '<option value="admin" '.( $perm_edit_value == 'admin' ? 'selected="selected"' : '' ).'>'.T_('Admin').'</option>';
@@ -293,6 +334,31 @@ function perm_check_all( $row, $prefix )
 	return '<a href="javascript:toggleall_perm(document.getElementById(\'blogperm_checkchanges\'), '.$row_id_value.' );setcheckallspan('.$row_id_value.');" title="'.TS_('(un)selects all checkboxes using Javascript').'">
 				<span id="checkallspan_'.$row_id_value.'">'.TS_('(un)check all').'</span>
 			</a>';
+}
+
+
+/**
+ * Get the user login
+ * 
+ * @param integer User ID
+ * @param string User login
+ */
+function coll_perm_login( $user_ID, $user_login )
+{
+	global $Blog;
+
+	$user_login = get_user_identity_link( $user_login, NULL, 'profile', 'avatar_login' );
+
+	if( $Blog->owner_user_ID == $user_ID )
+	{
+		$r = $user_login.' ('.T_('Owner').')';
+	}
+	else
+	{
+		$r = $user_login;
+	}
+
+	return $r;
 }
 
 ?>

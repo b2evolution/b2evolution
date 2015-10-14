@@ -1732,7 +1732,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Only for back-office
 		global $AdminUI;
 
-		echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
+		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
 		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
@@ -3790,7 +3790,7 @@ function items_results( & $items_Results, $params = array() )
 		if( !empty( $Blog ) && $Blog->get_setting( 'aggregate_coll_IDs' ) )
 		{ // Aggregated blog: display name of blog
 			$items_Results->cols[] = array(
-					'th' => T_('Blog'),
+					'th' => T_('Collection'),
 					'th_class' => 'nowrap',
 					'td_class' => 'nowrap',
 					'td' => '@load_Blog()@<a href="~regenerate_url( \'blog,results_order\', \'blog=@blog_ID@\' )~">@Blog->dget(\'shortname\')@</a>',

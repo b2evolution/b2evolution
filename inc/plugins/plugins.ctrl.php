@@ -847,13 +847,17 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Plugin configuration'), $admin_url.'?ctrl=plugins' );
 
 // Set an url for manual page:
-if( $action == 'list_available' )
+switch( $action )
 {
-	$AdminUI->set_page_manual_link( 'plugins-available-for-installation' );
-}
-else
-{
-	$AdminUI->set_page_manual_link( 'installed-plugins' );
+	case 'list_available':
+		$AdminUI->set_page_manual_link( 'plugins-available-for-installation' );
+		break;
+	case 'edit_settings':
+		$AdminUI->set_page_manual_link( 'plugins-editing' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'installed-plugins' );
+		break;
 }
 
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );

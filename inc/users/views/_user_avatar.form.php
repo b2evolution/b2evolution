@@ -59,7 +59,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_text_title = T_( 'Edit profile picture' ); // used for js confirmation message on leave the changed form
+	$form_text_title = T_( 'Edit profile picture' ).get_manual_link( 'user-profile-picture-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'avatar', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
@@ -95,7 +95,7 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 	/***************  Avatar  **************/
 
-$Form->begin_fieldset( $is_admin ? T_('Profile picture') : '', array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( $is_admin ? T_('Profile picture').get_manual_link( 'user-profile-picture-tab' ) : '', array( 'class'=>'fieldset clear' ) );
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag( 'fit-320x320', 'avatar', '', true, '', 'user_pictures' );

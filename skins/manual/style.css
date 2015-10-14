@@ -534,7 +534,7 @@ ul.posts_list h3 {
 a.roundbutton {
 	text-decoration: none;
 }
-ul.posts_list li a.roundbutton {
+ul.posts_list li .roundbutton_group {
 	float: left;
 	margin-left: 30px;
 }
@@ -564,11 +564,11 @@ div.error_404 {
 }
 
 /* Not published comments display */
-#styled_content_block .bComment .status_draft,
-#styled_content_block .bComment .status_review,
-#styled_content_block .bComment .status_community,
-#styled_content_block .bComment .status_protected,
-#styled_content_block .bComment .status_private {
+.evo_content_block .bComment .status_draft,
+.evo_content_block .bComment .status_review,
+.evo_content_block .bComment .status_community,
+.evo_content_block .bComment .status_protected,
+.evo_content_block .bComment .status_private {
 	top: 0px;
 	left: 14px;
 }

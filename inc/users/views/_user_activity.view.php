@@ -49,7 +49,7 @@ if( !$user_profile_only )
 	echo '<span class="floatright">'.$Widget->gen_global_icons().'</span>';
 }
 
-echo '<div>'.get_usertab_header( $edited_User, $user_tab, $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</div>';
+echo '<div>'.get_usertab_header( $edited_User, $user_tab, ( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).get_manual_link( 'user-activity-tab' ) ).'</div>';
 
 // Display IP address from where this user was created
 echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created from IP' ).': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</span></div>';

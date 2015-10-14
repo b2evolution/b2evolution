@@ -76,7 +76,7 @@ if( !empty( $params['trigger_url'] ) )
 
 if( !empty ( $params['initial_hit'] ) )
 { // Hit info
-	echo T_('Initial page').": ".T_('Blog')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
+	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
 	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
 }
 

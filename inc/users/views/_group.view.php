@@ -40,7 +40,7 @@ $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 {	// create new group link
-	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->cols[] = array(

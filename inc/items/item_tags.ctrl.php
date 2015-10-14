@@ -227,6 +227,30 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=itemtags&tag_ID='.$edited_ItemTag->ID.'&action=edit', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'cleanup':
+		// Delete all orphan Tag entries:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tag' );
+
+		// Check that current user has permission to edit tags:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$DB->query( 'DELETE T_items__itemtag FROM T_items__itemtag
+				LEFT JOIN T_items__item ON itag_itm_ID = post_ID
+			 WHERE post_ID IS NULL' );
+		$Messages->add( sprintf( T_('Removed %d associations with non-existing posts.'), $DB->rows_affected ), 'success' );
+
+		$DB->query( 'DELETE T_items__tag FROM T_items__tag
+				LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+			 WHERE itag_itm_ID IS NULL' );
+		$Messages->add( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 

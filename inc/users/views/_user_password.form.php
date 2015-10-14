@@ -83,7 +83,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_text_title = T_( 'Change password' ); // used for js confirmation message on leave the changed form
+	$form_text_title = T_( 'Change password' ).get_manual_link( 'user-password-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'pwdchange', $form_text_title );
 	$form_class = 'fform';
 	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
@@ -117,7 +117,7 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 if( $action != 'view' )
 { // We can edit the values:
 
-	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
+	$Form->begin_fieldset( $is_admin ? T_('Password').get_manual_link( 'user-password-tab' ) : '', array( 'class'=>'fieldset clear' ) );
 
 		// current password is not required:
 		//   - password change requested by email

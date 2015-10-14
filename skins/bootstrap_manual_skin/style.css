@@ -96,77 +96,6 @@ label.control-label[for=post_title] {
 textarea.message_text {
   width: 95%;
 }
-.comment_form h3 {
-  margin: 0;
-}
-.comment_form .panel {
-  margin: 0;
-  border: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.comment_form .panel .panel-body {
-  padding: 0;
-}
-.form-horizontal .form-group,
-.form-horizontal .custom_content {
-  margin-left: 0;
-  margin-right: 0;
-}
-.form-horizontal fieldset {
-  margin-top: 0;
-}
-.form-horizontal input[type=file] {
-  display: inline;
-}
-#comment_date_field input {
-  width: 80px;
-}
-#comment_date_field label {
-  font-weight: normal;
-}
-.form-group[id^="ffield_uploadfile"] .controls {
-  padding-top: 5px;
-}
-.form-group[id^="ffield_uploadfile"] .controls input {
-  line-height: 10px;
-}
-.comment_rating {
-  margin-top: 2px;
-}
-#comment_edit .comment_rating {
-  margin-top: 9px;
-}
-.ratings_table {
-  margin-bottom: 10px;
-}
-.ratings_table .rating_summary {
-  border-spacing: 1px;
-  border-collapse: separate;
-}
-.ratings_table .progress {
-  border-radius: 0;
-  height: 13px;
-}
-#comment_preview {
-  background-color: #FFF;
-}
-#comment_date_field .panel {
-  border: none;
-  box-shadow: none;
-  margin-bottom: 0;
-}
-#comment_date_field .panel .panel-body {
-  padding: 0;
-}
-#comment_date_field .panel .panel-body .control-label {
-  font-weight: bold;
-}
-#comment_date_field .panel .panel-body .controls .form-group {
-  display: inline-block;
-  padding-left: 15px;
-  margin-bottom: 0;
-}
 .evo_post {
   margin-bottom: 2em;
 }
@@ -320,8 +249,8 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
   list-style: none;
   margin: 0;
 }
-.chapters_list .fa,
-.posts_list .fa {
+.chapters_list .link .fa,
+.posts_list .link .fa {
   margin-right: 5px;
   font-size: inherit;
   width: auto !important;
@@ -329,7 +258,7 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 .posts_list h3 {
   display: inline-block;
 }
-.posts_list li > a.btn {
+.posts_list li > .btn-group {
   margin: 0 0 6px 30px;
 }
 ol.breadcrumb {
@@ -350,4 +279,9 @@ ol.breadcrumb {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;
+  white-space: nowrap;
+}
+.evo_post_title .btn-group .btn,
+.cat_title .btn-group .btn {
+  float: none;
 }

@@ -145,20 +145,20 @@ form#user_checkchanges.bComment {
 .bForums.fixed_layout .ft_avatar {
 	width: 80px;
 }
-.forums_table tr:first-child th:first-child,
-.forums_table tr:first-child td:first-child {
+.forums_table > tbody > tr:first-child > th:first-child,
+.forums_table > tbody > tr:first-child > td:first-child {
 	border-top-left-radius: 5px;
 }
-.forums_table tr:first-child th:last-child,
-.forums_table tr:first-child td:last-child {
+.forums_table > tbody > tr:first-child > th:last-child,
+.forums_table > tbody > tr:first-child > td:last-child {
 	border-top-right-radius: 5px;
 }
-.forums_table tr:last-child th:first-child,
-.forums_table tr:last-child td:first-child {
+.forums_table > tbody > tr:last-child > th:first-child,
+.forums_table > tbody > tr:last-child > td:first-child {
 	border-bottom-left-radius: 5px;
 }
-.forums_table tr:last-child th:last-child,
-.forums_table tr:last-child td:last-child {
+.forums_table > tbody > tr:last-child > th:last-child,
+.forums_table > tbody > tr:last-child > td:last-child {
 	border-bottom-right-radius: 5px;
 }
 .forums_table .catselect tr th, .forums_table .catselect tr td,
@@ -193,13 +193,13 @@ form#user_checkchanges.bComment {
 .forums_table th, .forums_table td {
 	border-bottom: 1px solid #D1D2DA;
 }
-.forums_table tr:last-child th, .forums_table tr:last-child td {
+.forums_table > tbody > tr:last-child > th, .forums_table > tbody > tr:last-child > td {
 	border: none;
 }
-.forums_table td {
+.forums_table > tbody > tr > td {
 	padding: 10px 0 10px 20px;
 }
-.forums_table tr td:last-child {
+.forums_table > tbody > tr > td:last-child {
 	padding-right: 20px;
 }
 .forums_table.highlight tr:hover td {
@@ -254,7 +254,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	text-align: center;
 }
 /* Topics table */
-.topics_table td, .topics_table tr:last-child td {
+.topics_table > tbody > tr > td, .topics_table > tbody > tr:last-child > td {
 	border-top: 1px solid #D1D2DA;
 	border-bottom: none;
 }
@@ -555,7 +555,7 @@ ul.legend span.note {
 }
 
 /* Statuses of posts display in table view */
-#styled_content_block span[class*='status_'] {
+.evo_content_block span[class*='status_'] {
 	top: -10px;
 	left: 20px;
 }

@@ -322,8 +322,16 @@ class files_Module extends Module
 			switch( $permtarget->type )
 			{
 				case 'shared':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
 					return $current_User->check_perm( 'shared_root', $permlevel );
 				case 'import':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
 					return $current_User->check_perm( 'import_root', $permlevel );
 				case 'user':
 					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )

@@ -83,7 +83,7 @@ if( $tab == 'skin' && $skinpage != 'selection' )	// If not screen selection => s
 if( ( $tab == 'perm' || $tab == 'permgroup' )
 	&& ( empty($blog) || ! $Blog->advanced_perms ) )
 {	// We're trying to access advanced perms but they're disabled!
-	$tab = 'features';	// the screen where you can enable advanced perms
+	$tab = 'general';	// the screen where you can enable advanced perms
 	if( $action == 'update' )
 	{ // make sure we don't update anything here
 		$action = 'edit';

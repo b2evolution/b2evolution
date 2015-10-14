@@ -164,10 +164,12 @@ class ItemList2 extends ItemListLight
 		$post_title = format_to_post( $post_title );
 		$content = format_to_post( $content );
 
-		$post_ID = param('post_ID', 'integer', 0);
+		$post_ID = param( 'post_ID', 'integer', 0 );
+		$post_parent_ID = intval( param( 'post_parent_ID', 'integer', 0 ) );
 
 		$this->sql = "SELECT
 			$post_ID AS post_ID,
+			$post_parent_ID AS post_parent_ID,
 			$preview_userid AS post_creator_user_ID,
 			$preview_userid AS post_lastedit_user_ID,
 			'$item_issue_date' AS post_datestart,

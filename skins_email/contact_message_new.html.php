@@ -42,7 +42,7 @@ if( !empty( $Blog ) )
 		$Comment = & $CommentCache->get_by_ID( $params['comment_id'] );
 		$Item = & $Comment->get_Item();
 		echo sprintf( T_('Message sent from your <a %s>comment</a> on %s.'),
-			'href="'.$Comment->get_permanent_url( '&' ).'"'.emailskin_style( '.a' ).'',
+			'href="'.$Comment->get_permanent_url( '&', '#comments' ).'"'.emailskin_style( '.a' ).'',
 			'<a href="'.$Item->get_permanent_url( '', '', '&' ).'"'.emailskin_style( '.a' ).'>'.$Item->get( 'title' ).'</a>' );
 	}
 	elseif( !empty( $params['post_id'] ) )

@@ -374,7 +374,7 @@ class AdminUI extends AdminUI_general
 						'block_start' => '<div class="block_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
 																		<span style="float:right">$global_icons$</span>$title$
 																	</div></div></div>
-																	<div class="block_item" id="styled_content_block">',
+																	<div class="block_item evo_content_block">',
 						'block_end' => '</div></div>',
 					);
 
