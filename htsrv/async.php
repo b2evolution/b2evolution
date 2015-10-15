@@ -750,11 +750,19 @@ switch( $action )
 
 			case 'status':
 				// Update task status
-				$new_value = param( 'new_status', 'integer', NULL );
+				$new_value = param( 'new_status', 'string', NULL );
+				// Remove '_' that is used to don't break a sorting by name on jeditable:
+				$new_value = intval( str_replace( '_', '', $new_value ) );
+				set_param( 'new_status', $new_value );
+
 				$Item->set_from_Request( 'pst_ID', 'new_status', true );
 				$Item->dbupdate();
 
 				$new_title = empty( $Item->pst_ID ) ? T_('No status') : $Item->get( 't_extra_status' );
+				if( ! empty( $new_value ) )
+				{	// Add '_' to don't break a sorting by name on jeditable:
+					$new_value = '_'.$new_value;
+				}
 				break;
 		}
 

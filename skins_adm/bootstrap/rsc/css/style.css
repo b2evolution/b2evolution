@@ -334,6 +334,9 @@ div.bPost {
   border-top: 1px solid #f66;
   background-color: #faa;
 }
+#comments_container .editable_comment_content {
+  margin-bottom: 5px;
+}
 #fieldset_wrapper_itemform_meta_cmnt #comments_container {
   border: none;
   margin: 0;
@@ -609,6 +612,9 @@ fieldset ul {
 }
 .dashboard_comments_block .notes {
   margin-top: 1px;
+}
+.dashboard_comments_block__meta .panel-body {
+  background-color: #f7f4ff;
 }
 .chart .label {
   color: #000;

@@ -278,20 +278,17 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 	{ // Loop through comments:
 		$new_comment_IDs[] = $Comment->ID;
 		$index = $index + 1;
-		// Only 5 commens should be visible, set hidden status for the rest
-		$hidden_status = ( $index > 5 ) ? ' hidden_comment' : '';
+		// Only 5 normal comments should be visible, set hidden status for the rest:
+		$hidden_status = ( $index > 5 && ! $Comment->is_meta() ) ? ' hidden_comment' : '';
 
 		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
 
-/* OLD:
-		echo '<div class="floatright"><span class="note status_'.$Comment->status.'"><span>';
-		$Comment->status();
-		echo '</span></span></div>';
-	NEW:
-*/
-		$Comment->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-			) );
+		if( ! $Comment->is_meta() )
+		{	// Display status banner only for normal comments:
+			$Comment->format_status( array(
+					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				) );
+		}
 
 		echo $Comment->get_author( array(
 				'before'      => '<div class="dashboard_comment_avatar">',
@@ -305,13 +302,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			) );
 
 		echo '<h3 class="dashboard_comment_title">';
-		if( ( $Comment->status !== 'draft' ) || ( $Comment->author_user_ID == $current_User->ID ) )
+		if( ! $Comment->is_meta() && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
 		{ // Display Comment permalink icon
 			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
 				'link_text'     => 'login',
+				'linked_type'   => $Comment->is_meta(),
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')
@@ -332,7 +330,15 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
+		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		{ // Put the meta comment content into this container to edit by ajax:
+			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
+		}
 		$Comment->content( 'htmlbody', true );
+		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		{ // End of the container that is used to edit meta comment by ajax:
+			echo '</div>';
+		}
 
 		echo '<div class="dashboard_action_area">';
 		// Display edit button if current user has the rights:
@@ -360,8 +366,10 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '</div>';
 
-		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
+		if( ! $Comment->is_meta() )
+		{	// Display Spam Voting system only for normal comment:
+			$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
+		}
 
 		echo '<div class="clear"></div>';
 		echo '</div>';

@@ -994,6 +994,11 @@ class Comment extends DataObject
 			$params['after'] = '';
 		}
 
+		if( $params['after_user'] == '#' && $this->is_meta() )
+		{	// Don't display a commenter type for meta comment, because only memebers can create them:
+			$params['after_user'] = '';
+		}
+
 		if( !$Blog->get_setting('comments_avatars') && $params['link_text'] == 'avatar' )
 		{ // If avatars are not allowed for this Blog
 			$params['link_text'] = 'name';
@@ -1774,6 +1779,11 @@ class Comment extends DataObject
 				'button_group_class'  => button_class( 'group' ),
 			), $params );
 
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return;
+		}
+
 		global $current_User;
 
 		$this->get_Item();
@@ -1847,6 +1857,11 @@ class Comment extends DataObject
 				'title_empty'           => T_('No votes on helpfulness yet.'),
 				'class'                 => '',
 			), $params );
+
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return;
+		}
 
 		global $current_User;
 
@@ -2896,7 +2911,8 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'author_format' => '%s',
 				'link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-				'thumb_size'    => 'crop-top-32x32' // author's avatar size
+				'thumb_size'    => 'crop-top-32x32', // author's avatar size
+				'linked_type'   => false, // TRUE - to make comment type text as link to permament url
 			), $params );
 
 		$author = sprintf( $params['author_format'], $this->get_author( $params ) );
@@ -2916,10 +2932,15 @@ class Comment extends DataObject
 				break;
 
 			case 'meta': // Display a meta comment:
-				$s = T_('Meta comment from %s');
-				break;
+				$type = T_('Meta comment');
+				if( $params['linked_type'] )
+				{	// Make a comment type as link to permanent url:
+					$type = '<a href="'.$this->get_permanent_url().'">'.$type.'</a>';
+				}
+				return sprintf( T_('%s from %s'), $type, $author );
 		}
-		return sprintf($s, $author);
+
+		return sprintf( $s, $author );
 	}
 
 
@@ -3223,6 +3244,11 @@ class Comment extends DataObject
 				'status'       => NULL,
 				'status_title' => NULL,
 			), $params );
+
+		if( $this->is_meta() )
+		{	// Don't display a status banner of meta comments:
+			return;
+		}
 
 		if( is_null( $params['status'] ) )
 		{ // Use current status of this comment

@@ -63,8 +63,9 @@ else
 
 switch( $action )
 {
-	case 'update' :
-	case 'edit_switchtab' : // this gets set as action by JS, when we switch tabs
+	case 'update':
+	case 'update_workflow': // Update workflow properties from disp=single
+	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		// Load post to edit:
 		$post_ID = param ( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_ItemCache ();
@@ -337,6 +338,37 @@ switch( $action )
 				$redirect_to = $edited_Item->get_permanent_url();
 			}
 		}
+
+		// REDIRECT / EXIT
+		header_redirect( $redirect_to );
+		/* EXITED */
+		break;
+
+	case 'update_workflow':
+		// Update workflow properties from disp=single
+		if( $Blog->get_setting( 'use_workflow' ) )
+		{ // Only if the workflow is enabled on collection
+			param( 'item_st_ID', 'integer', NULL );
+			$edited_Item->set_from_Request( 'pst_ID', 'item_st_ID', true );
+
+			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+			$edited_Item->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+
+			param( 'item_priority', 'integer', NULL );
+			$edited_Item->set_from_Request( 'priority', 'item_priority', true );
+
+			param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL );
+			$edited_Item->set_from_Request( 'datedeadline', 'item_deadline', true );
+
+			// UPDATE POST IN DB:
+			if( $edited_Item->dbupdate() )
+			{ // Display a message on success result:
+				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+			}
+		}
+
+		$redirect_to = $edited_Item->get_permanent_url();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );

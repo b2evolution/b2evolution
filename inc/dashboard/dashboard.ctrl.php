@@ -190,6 +190,66 @@ if( $blog )
 		echo '</div>';
 	}
 
+	if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
+	{
+		/*
+		 * META COMMENTS:
+		 */
+		$CommentList = new CommentList2( $Blog );
+
+		// Filter list:
+		$CommentList->set_filters( array(
+				'types' => array( 'meta' ),
+				'order' => 'DESC',
+				'comments' => 5,
+			) );
+
+		// Set param prefix for URLs:
+		$param_prefix = 'cmnt_meta_';
+		if( !empty( $CommentList->param_prefix ) )
+		{
+			$param_prefix = $CommentList->param_prefix;
+		}
+
+		// Get ready for display (runs the query):
+		$CommentList->display_init();
+
+		if( $CommentList->result_num_rows )
+		{	// We have the meta comments
+
+			load_funcs( 'comments/model/_comment_js.funcs.php' );
+
+			$nb_blocks_displayed++;
+
+			$opentrash_link = get_opentrash_link( true, false, array(
+					'class' => 'btn btn-default'
+				) );
+
+			$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
+			$block_item_Widget->title = $opentrash_link.T_('Latest Meta Comments').
+				' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=meta" style="text-decoration:none">'.
+				'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
+
+			echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
+			echo '<div id="styled_content_block" class="evo_content_block">';
+			echo '<div id="meta_comments_block" class="dashboard_comments_block dashboard_comments_block__meta">';
+
+			$block_item_Widget->disp_template_replaced( 'block_start' );
+
+			echo '<div id="comments_container">';
+
+			// GET LATEST META COMMENTS:
+			show_comments_awaiting_moderation( $Blog->ID, $CommentList );
+
+			echo '</div>';
+
+			$block_item_Widget->disp_template_raw( 'block_end' );
+
+			echo '</div>';
+			echo '</div>';
+		}
+	}
+
 	/*
 	 * RECENT POSTS awaiting moderation
 	 */

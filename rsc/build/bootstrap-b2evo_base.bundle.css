@@ -626,6 +626,20 @@ div.filters .filter_item {
 div.filters .filter_item div {
   margin: 0;
 }
+.evo_comment__meta {
+  border: 2px solid #5133ab;
+}
+.evo_comment__meta:last-child {
+  margin-bottom: 0;
+}
+.evo_comment__meta .panel-heading {
+  border-bottom: 1px solid #5133ab;
+  background-color: #f7f4ff;
+}
+.evo_comment__meta .panel-footer {
+  border-top: 1px solid #5133ab;
+  background-color: #f7f4ff;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -2388,6 +2402,27 @@ input.btn-lg {
   display: inline-block;
   padding-left: 15px;
   margin-bottom: 0;
+}
+.evo_item_workflow_form .evo_item_workflow_form__fields {
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-around;
+  -webkit-justify-content: space-around;
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+}
+.evo_item_workflow_form .evo_item_workflow_form__fields .form-group {
+  display: inline-block;
+}
+.evo_item_workflow_form .evo_item_workflow_form__fields .form-group .control-label {
+  width: auto;
+}
+.evo_item_workflow_form .evo_item_workflow_form__fields .form-group .controls {
+  display: inline-block;
+  width: auto;
+}
+.evo_item_workflow_form .evo_item_workflow_form__fields .btn {
+  margin-bottom: 15px;
 }
 
 /**

@@ -217,7 +217,7 @@ function & get_ItemStatusCache()
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
-		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name' );
+		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_name', NT_('No status') );
 	}
 
 	return $ItemStatusCache;

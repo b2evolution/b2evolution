@@ -1494,6 +1494,15 @@ function attach_browse_tabs( $display_tabs3 = true )
 				'text' => T_('List view'),
 				'href' => $admin_url.'?ctrl=comments&amp;tab3=listview&amp;filter=restore&amp;blog='.$Blog->ID ),
 			) );
+
+		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
+		{	// Initialize menu entry for meta discussion if current user has a permission:
+			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
+				'meta' => array(
+					'text' => T_('Meta discussion'),
+					'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;filter=restore&amp;blog='.$Blog->ID ),
+				) );
+		}
 	}
 }
 
@@ -2540,7 +2549,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			'expiry_statuses' => $expiry_statuses,
 			'comment_ID_list' => $exlude_ID_list,
 			'post_ID' => $item_ID,
-			'order' => 'ASC',//$order,
+			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
 			'comments' => $limit,
 			'page' => $currentpage,
 		) );
@@ -2550,7 +2559,8 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
-			'types' => array( 'comment', 'trackback', 'pingback' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
 		) );
 		$CommentList->restore_filterset();
 	}
@@ -2575,9 +2585,10 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param int comment id
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list
+ * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL )
+function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
 {
 	global $current_User, $localtimenow;
 
@@ -2617,16 +2628,31 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '<div>';
 
 		if( $Comment->is_meta() )
-		{ // Display ID for each meta comment
-			echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+		{ // Meta comment
+			if( $comment_index !== false )
+			{	// Display ID for each meta comment
+				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			}
+
+			if( $display_meta_title )
+			{	// Display a title for meta comment:
+				$comment_Item = & $Comment->get_Item();
+				echo sprintf( T_('<a %s>Meta comment</a> on %s'),
+							'href="'.$Comment->get_permanent_url().'"',
+							'<a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget( 'title' ).'</a>'
+								.' '.$comment_Item->get_permanent_link( '#icon#' ).' &middot; ' );
+			}
 		}
 
-		echo '<div class="bSmallHeadRight">';
-		$Comment->permanent_link( array(
-				'before' => '',
-				'text'   => $Comment->is_meta() ? T_('Meta link') : '#text#'
-			) );
-		echo '</div>';
+		if( ! $Comment->is_meta() )
+		{	// Display permalink oly for normal comments:
+			echo '<div class="bSmallHeadRight">';
+			$Comment->permanent_link( array(
+					'before' => '',
+					'text'   => '#text#'
+				) );
+			echo '</div>';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();
@@ -2661,9 +2687,12 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '</div>';
 
 		echo '<div class="bCommentContent">';
-		$Comment->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-			) );
+		if( ! $Comment->is_meta() )
+		{	// Display status banner only for normal comments:
+			$Comment->format_status( array(
+					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				) );
+		}
 		if( ! $Comment->is_meta() )
 		{ // Don't display the titles for meta comments
 			echo '<div class="bCommentTitle">';
@@ -4011,6 +4040,18 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '</a> ';
 	}
 
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+	{	// Display icon of meta comments Only if current user can views meta comments:
+		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+		if( $metas_count > 0 )
+		{	// If at least one meta comment exists
+			$item_Blog = & $Item->get_Blog();
+			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00' ) )
+				.'</a> ';
+		}
+	}
+
 	$col .= '<a href="'.$item_url.'" class="" title="'.
 								T_('View this post...').'">'.$Item->dget( 'title' ).'</a></strong>';
 
@@ -4352,6 +4393,89 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$r .= '</tr>';
 
 	echo $r;
+}
+
+
+/**
+ * Get title of the item/task cell by field type
+ *
+ * @param string Type of the field: 'priority', 'status', 'assigned'
+ * @param object Item
+ * @param integer Priority
+ * @return string
+ */
+function item_td_task_cell( $type, $Item )
+{
+	global $current_User;
+
+	switch( $type )
+	{
+		case 'priority':
+			$value = $Item->priority;
+			$title = item_priority_title( $Item->priority );
+			break;
+
+		case 'status':
+			$value = '_'.$Item->pst_ID; // The char '_' is used to don't break a sorting by name on jeditable
+			$title = $Item->get( 't_extra_status' );
+			if( empty( $title ) )
+			{
+				$title = T_('No status');
+			}
+			break;
+
+		case 'assigned':
+			$value = $Item->assigned_user_ID;
+			if( empty( $value ) )
+			{
+				$title = T_('No user');
+			}
+			else
+			{
+				$UserCache = & get_UserCache();
+				$User = & $UserCache->get_by_ID( $Item->assigned_user_ID );
+				$title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) );
+			}
+			break;
+
+		default:
+			$value = 0;
+			$title = '';
+	}
+
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{ // Current user can edit this item
+		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
+	}
+	else
+	{ // No perms to edit item, Display only a title
+		return $title;
+	}
+}
+
+
+/**
+ * Get a <td> class of a cell
+ *
+ * @param integer Post ID
+ * @param integer $post_pst_ID
+ * @param string Class name to make this cell editable
+ * @return string
+ */
+function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
+{
+	global $current_User;
+
+	$ItemCache = & get_ItemCache();
+	$Item = & $ItemCache->get_by_ID( $post_ID );
+
+	$class = 'center nowrap tskst_'.$post_pst_ID;
+	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{ // Current user can edit this item, Add a class to edit a priority by click from view list
+		$class .= ' '.$editable_class;
+	}
+
+	return $class;
 }
 
 /**

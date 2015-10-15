@@ -626,6 +626,20 @@ div.filters .filter_item {
 div.filters .filter_item div {
   margin: 0;
 }
+.evo_comment__meta {
+  border: 2px solid #5133ab;
+}
+.evo_comment__meta:last-child {
+  margin-bottom: 0;
+}
+.evo_comment__meta .panel-heading {
+  border-bottom: 1px solid #5133ab;
+  background-color: #f7f4ff;
+}
+.evo_comment__meta .panel-footer {
+  border-top: 1px solid #5133ab;
+  background-color: #f7f4ff;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
