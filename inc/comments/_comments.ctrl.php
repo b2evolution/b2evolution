@@ -638,7 +638,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:

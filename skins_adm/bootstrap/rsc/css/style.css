@@ -598,6 +598,9 @@ fieldset ul {
 .dashboard_comments_block .notes {
   margin-top: 1px;
 }
+.dashboard_comments_block__meta .panel-body {
+  background-color: #f7f4ff;
+}
 .chart .label {
   color: #000;
   font-weight: normal;

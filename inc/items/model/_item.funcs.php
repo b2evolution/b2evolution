@@ -2610,9 +2610,10 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param int comment id
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list
+ * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL )
+function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
 {
 	global $current_User, $localtimenow;
 
@@ -2652,16 +2653,31 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '<div>';
 
 		if( $Comment->is_meta() )
-		{ // Display ID for each meta comment
-			echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+		{ // Meta comment
+			if( $comment_index !== false )
+			{	// Display ID for each meta comment
+				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			}
+
+			if( $display_meta_title )
+			{	// Display a title for meta comment:
+				$comment_Item = & $Comment->get_Item();
+				echo sprintf( T_('<a %s>Meta comment</a> on %s'),
+							'href="'.$Comment->get_permanent_url().'"',
+							'<a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget( 'title' ).'</a>'
+								.' '.$comment_Item->get_permanent_link( '#icon#' ).' &middot; ' );
+			}
 		}
 
-		echo '<div class="bSmallHeadRight">';
-		$Comment->permanent_link( array(
-				'before' => '',
-				'text'   => $Comment->is_meta() ? T_('Meta link') : '#text#'
-			) );
-		echo '</div>';
+		if( ! $Comment->is_meta() )
+		{	// Display permalink oly for normal comments:
+			echo '<div class="bSmallHeadRight">';
+			$Comment->permanent_link( array(
+					'before' => '',
+					'text'   => '#text#'
+				) );
+			echo '</div>';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();

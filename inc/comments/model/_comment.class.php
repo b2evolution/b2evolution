@@ -2899,7 +2899,8 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'author_format' => '%s',
 				'link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-				'thumb_size'    => 'crop-top-32x32' // author's avatar size
+				'thumb_size'    => 'crop-top-32x32', // author's avatar size
+				'linked_type'   => false, // TRUE - to make comment type text as link to permament url
 			), $params );
 
 		$author = sprintf( $params['author_format'], $this->get_author( $params ) );
@@ -2919,10 +2920,15 @@ class Comment extends DataObject
 				break;
 
 			case 'meta': // Display a meta comment:
-				$s = T_('Meta comment from %s');
-				break;
+				$type = T_('Meta comment');
+				if( $params['linked_type'] )
+				{	// Make a comment type as link to permanent url:
+					$type = '<a href="'.$this->get_permanent_url().'">'.$type.'</a>';
+				}
+				return sprintf( T_('%s from %s'), $type, $author );
 		}
-		return sprintf($s, $author);
+
+		return sprintf( $s, $author );
 	}
 
 

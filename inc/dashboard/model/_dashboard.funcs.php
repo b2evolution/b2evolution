@@ -295,13 +295,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			) );
 
 		echo '<h3 class="dashboard_comment_title">';
-		if( ( $Comment->status !== 'draft' ) || ( $Comment->author_user_ID == $current_User->ID ) )
+		if( ! $Comment->is_meta() && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
 		{ // Display Comment permalink icon
 			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
 				'link_text'     => 'login',
+				'linked_type'   => $Comment->is_meta(),
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')

@@ -225,7 +225,7 @@ if( $blog )
 
 			echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 			echo '<div id="styled_content_block" class="evo_content_block">';
-			echo '<div id="meta_comments_block" class="dashboard_comments_block">';
+			echo '<div id="meta_comments_block" class="dashboard_comments_block dashboard_comments_block__meta">';
 
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
