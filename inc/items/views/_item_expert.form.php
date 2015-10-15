@@ -123,7 +123,7 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = T_('New Item');
 		}
 	}
-	$Form->begin_fieldset( $form_title_item_ID.get_manual_link('post_contents_fieldset')
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
 				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
 			array( 'id' => 'itemform_content' ) );
 
@@ -234,7 +234,7 @@ $Form->begin_form( '', '', $params );
 	}
 	// ############################ ADVANCED #############################
 
-	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
 	echo '<table cellspacing="0" class="compose_layout">';
 
@@ -420,14 +420,14 @@ $Form->begin_form( '', '', $params );
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( T_('Additional actions'), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Additional actions').get_manual_link( 'additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
 		<div id="itemform_trackbacks">
 			<label for="trackback_url"><strong><?php echo T_('Trackback URLs') ?>:</strong>
 			<span class="notes"><?php echo T_('(Separate by space)') ?></span></label><br />
-			<input type="text" name="trackback_url" class="large form_text_input" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
+			<input type="text" name="trackback_url" class="large form_text_input form-control" id="trackback_url" value="<?php echo format_to_output( $trackback_url, 'formvalue' ); ?>" />
 		</div>
 		<?php
 
@@ -447,7 +447,7 @@ $Form->begin_form( '', '', $params );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( T_('Meta comments')
+		$Form->begin_fieldset( T_('Meta comments').get_manual_link( 'meta-comments-panel' )
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
@@ -504,7 +504,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties'), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'workflow-properties-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
@@ -553,7 +553,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### PROPERTIES ###################
 
-	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra', 'fold' => true ) );
+	$Form->begin_fieldset( T_('Properties').get_manual_link( 'post-properties-panel' ), array( 'id' => 'itemform_extra', 'fold' => true ) );
 
 	$Form->switch_layout( 'linespan' );
 
@@ -620,7 +620,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers')
+	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
 					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
@@ -634,7 +634,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->allow_comment_statuses() )
 	{
-		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Comments').get_manual_link( 'post-comments-panel' ), array( 'id' => 'itemform_comments', 'fold' => true ) );
 
 		?>
 			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
@@ -676,7 +676,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### GOAL TRACKING ###################
 
-	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'track-item-as-goal' )
+	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )
 					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals&amp;blog='.$Blog->ID, T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_goals', 'fold' => true ) );
 

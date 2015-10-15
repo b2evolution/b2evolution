@@ -4793,6 +4793,51 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template function: Display link to parent of this item.
+	 *
+	 * @param array
+	 */
+	function parent_link( $params = array() )
+	{
+		if( empty( $this->parent_ID ) )
+		{	// No parent
+			return;
+		}
+
+		if( $this->get_type_setting( 'use_parent' ) == 'never' )
+		{	// This item cannot has a parent item, because of item type settings
+			return;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'         => '',
+				'after'          => '',
+				'not_found_text' => '',
+				'format'         => 'htmlbody',
+			), $params );
+
+		// Get parent Item:
+		$parent_Item = $this->get_parent_Item();
+
+		$r = $params['before'];
+
+		if( ! empty( $parent_Item ) )
+		{	// Display a parent post title as link to permanent url
+			$r .= $parent_Item->get_title();
+		}
+		else
+		{	// No parent post found, Display a text to inform about this:
+			$r .= $params['not_found_text'];
+		}
+
+		$r .= $params['after'];
+
+		echo format_to_output( $r, $params['format'] );
+	}
+
+
+	/**
 	 * Template function: Display the number of words in the post
 	 */
 	function wordcount()

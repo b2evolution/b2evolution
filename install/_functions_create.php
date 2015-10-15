@@ -243,22 +243,23 @@ function create_default_data()
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
 	$DB->query( "
-		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html, ityp_perm_level )
-		VALUES ( 1,    'Post',          'Posts',         'single', 1, 'standard' ),
-					 ( 2,    'Custom fields example', 'Posts', 'single', 1, 'standard' ),
-					 ( 100,  'Manual Page',   'Posts',         'single', 0, 'standard' ),
-					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 'standard' ),
-					 ( 1000, 'Page',          'Pages',         'page',   1, 'restricted' ),
-					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1, 'restricted' ),
-					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1, 'restricted' ),
-					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1, 'restricted' ),
-					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1, 'restricted' ),
-					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1, 'restricted' ),
-					 ( 1600, 'Intro-All',     'Intros',        NULL,     1, 'restricted' ),
-					 ( 2000, 'Podcast',       'Podcasts',      'single', 1, 'standard' ),
-					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 'admin' ),
-					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 'admin' ),
-					 ( 5000, 'Reserved',      NULL,            NULL,     1, 'standard' )" );
+		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name, ityp_allow_html, ityp_perm_level, ityp_use_parent )
+		VALUES ( 1,    'Post',          'Posts',         'single', 1, 'standard',   'never' ),
+					 ( 10,   'Custom Fields Example', 'Posts', 'single', 1, 'standard',   'never' ),
+					 ( 20,   'Child Post Example',    'Posts', 'single', 1, 'standard',   'required' ),
+					 ( 100,  'Manual Page',   'Posts',         'single', 0, 'standard',   'never' ),
+					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 'standard',   'never' ),
+					 ( 1000, 'Page',          'Pages',         'page',   1, 'restricted', 'never' ),
+					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 1600, 'Intro-All',     'Intros',        NULL,     1, 'restricted', 'never' ),
+					 ( 2000, 'Podcast',       'Podcasts',      'single', 1, 'standard',   'never' ),
+					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 'admin',      'never' ),
+					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 'admin',      'never' ),
+					 ( 5000, 'Reserved',      NULL,            NULL,     1, 'standard',   'never' )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 2, "First numeric field", "first_numeric_field", "double" ),
@@ -1972,10 +1973,18 @@ function create_demo_contents()
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-		$edited_Item->insert( 1, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
+		$post_custom_fields_ID = $edited_Item->insert( 1, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
 				.T_('<p>This post type defines 4 custom fields.</p>')
 				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
-			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 2 );
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 10 );
+
+		// Insert a post:
+		$now = date('Y-m-d H:i:s',$timestamp++);
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'demo' );
+		$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
+		$edited_Item->insert( 1, T_('Child Post'), T_('<p>This post has a special post type called "Child Post Example".</p>'),
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 20 );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
