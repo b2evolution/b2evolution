@@ -152,6 +152,21 @@ if( $disp == 'single' )
 	?>
 
 	<?php
+		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
+		skin_include( '_item_workflow.inc.php' );
+		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	?>
+
+	<?php
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+			) );
+		// ---------------------- END OF META COMMENTS ---------------------
+	?>
+
+	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
 </div>

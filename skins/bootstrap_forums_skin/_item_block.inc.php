@@ -249,7 +249,19 @@ echo_comment_moderate_js();
 
 	<?php
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
-		skin_include( '_item_meta_comments.inc.php' );
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+				'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+				'comment_post_after'    => '</h4>',
+				'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
+				'comment_status_before' => '</h4></div>',
+				'comment_title_after'   => '</div>',
+				'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+				'comment_avatar_after'  => '</span>',
+				'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+				'comment_text_after'    => '</div>',
+			) );
 		// ---------------------- END OF META COMMENTS ---------------------
 	?>
 </div><!-- ../forums_list single_topic -->

@@ -993,6 +993,11 @@ class Comment extends DataObject
 			$params['after'] = '';
 		}
 
+		if( $params['after_user'] == '#' && $this->is_meta() )
+		{	// Don't display a commenter type for meta comment, because only memebers can create them:
+			$params['after_user'] = '';
+		}
+
 		if( !$Blog->get_setting('comments_avatars') && $params['link_text'] == 'avatar' )
 		{ // If avatars are not allowed for this Blog
 			$params['link_text'] = 'name';

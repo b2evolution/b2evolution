@@ -939,6 +939,11 @@ class Skin extends DataObject
 					{ // Load jquery UI to animate background color on change comment status or on vote:
 						require_js( '#jqueryUI#', 'blog' );
 					}
+
+					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
+					{	// Initialize date picker to select a workflow deadline date:
+						init_datepicker_js( 'blog' );
+					}
 					break;
 
 				case 'disp_users':

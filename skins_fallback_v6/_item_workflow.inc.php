@@ -14,7 +14,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-if( ! empty( $Item ) &&
+global $disp;
+
+if( ( $disp == 'single' || $disp == 'page' ) &&
+    ! empty( $Item ) &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )

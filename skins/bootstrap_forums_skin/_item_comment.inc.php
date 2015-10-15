@@ -55,10 +55,10 @@ if( $current_cat == 0 )
 }
 
 if( ! isset( $comment_template_counter ) )
-{
-$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-if( $disp == 'single' || $disp == 'post' )
-	{ // Increase a number, because Item has 1st number
+{	// Initialize global comment counter:
+	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
+	if( $disp == 'single' || $disp == 'post' )
+	{	// Increase a number, because Item has 1st number:
 		$comment_template_counter++;
 	}
 }
