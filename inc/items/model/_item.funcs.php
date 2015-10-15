@@ -1013,7 +1013,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	if( $show_title_links )
 	{ // Use in Back-office
-		$fieldset_title = $params['categories_name'].get_manual_link( 'item_categories_fieldset' )
+		$fieldset_title = $params['categories_name'].get_manual_link( 'post-categories-panel' )
 			.action_icon( T_('Categories'), 'edit', $admin_url.'?ctrl=chapters&amp;blog='.$blog, T_('Categories'), 3, 4, array( 'class' => 'action_icon pull-right' ) );
 	}
 	else
