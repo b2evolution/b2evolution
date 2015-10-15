@@ -107,6 +107,7 @@ class image_Widget extends ComponentWidget
 					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
 																		'error'=>T_('Invalid filename.') ),
+					'size' => 128,
 				),
 				'width' => array(
 					'label' => T_('Image width'),
@@ -187,7 +188,7 @@ class image_Widget extends ComponentWidget
 		}
 
 		echo '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['image_file'].' alt=""'.$image_attrs.' />'
+							.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt=""'.$image_attrs.' />'
 							.'</a>';
 
 		echo $this->disp_params['block_end'];
