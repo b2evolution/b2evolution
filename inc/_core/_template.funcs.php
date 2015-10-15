@@ -1159,12 +1159,22 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
-				// Colorbox params to display a voting panel
-				$colorbox_voting_params = '{displayVoting: true,
+				// Colorbox params to translate the strings:
+				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
+					previous: "'.TS_('previous').'",
+					next: "'.TS_('next').'",
+					close: "'.TS_('close').'",
+					openNewWindowText: "'.TS_('open in new window').'",
+					slideshowStart: "'.TS_('start slideshow').'",
+					slideshowStop: "'.TS_('stop slideshow').'",';
+				// Colorbox params to display a voting panel:
+				$colorbox_voting_params = '{'.$colorbox_strings_params.'
+					displayVoting: true,
 					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
 					minWidth: 305}';
-				// Colorbox params without voting panel
-				$colorbox_no_voting_params = '{minWidth: 255}';
+				// Colorbox params without voting panel:
+				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
+					minWidth: 255}';
 
 				// Initialize js variables b2evo_colorbox_params* that are used in async loaded colorbox file
 				if( is_logged_in() )
