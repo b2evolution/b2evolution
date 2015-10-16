@@ -391,8 +391,8 @@ class coll_category_list_Widget extends ComponentWidget
 	/**
 	 * Callback: Generate category line when it has children
 	 *
-	 * @param Chapter generic category we want to display
-	 * @param int level of the category in the recursive tree
+	 * @param object Chapter we want to display
+	 * @param integer Level of the category in the recursive tree
 	 * @return string HTML
 	 */
 	function cat_line( $Chapter, $level )

@@ -496,8 +496,6 @@ class _core_Module extends Module
 		$this->check_required_php_version( '_core' );
 
 		load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
-		load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
-		load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
 		load_funcs( 'users/model/_user.funcs.php' );
 		load_funcs( '_core/_template.funcs.php' );
 		load_funcs( '_core/ui/forms/_form.funcs.php');
