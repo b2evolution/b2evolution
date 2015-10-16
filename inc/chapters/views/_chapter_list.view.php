@@ -21,7 +21,7 @@ global $Blog;
 
 global $Settings;
 
-global $GenericCategoryCache;
+global $ChapterCache;
 
 global $line_class;
 
@@ -43,14 +43,14 @@ $line_class = 'odd';
 /**
  * Generate category line when it has children
  *
- * @param Chapter generic category we want to display
- * @param int level of the category in the recursive tree
+ * @param object Chapter we want to display
+ * @param integer Level of the category in the recursive tree
  * @return string HTML
  */
 function cat_line( $Chapter, $level )
 {
 	global $line_class, $permission_to_edit, $current_User, $Settings;
-	global $GenericCategoryCache, $current_default_cat_ID;
+	global $ChapterCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
 
 	global $Session;
@@ -179,8 +179,8 @@ function cat_line( $Chapter, $level )
 /**
  * Generate category line when it has no children
  *
- * @param Chapter generic category we want to display
- * @param int level of the category in the recursive tree
+ * @param object Chapter generic category we want to display
+ * @param integer Level of the category in the recursive tree
  * @return string HTML
  */
 function cat_no_children( $Chapter, $level )
@@ -225,8 +225,8 @@ $Table = new Table();
 
 $Table->title = sprintf( T_('Categories for blog: %s'), $Blog->get_maxlen_name( 50 ).get_manual_link( 'categories-tab' ) );
 
-$Table->global_icon( T_('Refresh'), 'refresh', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-$Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Table->global_icon( T_('Refresh'), 'refresh', regenerate_url( 'action,'.$ChapterCache->dbIDname ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+$Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$ChapterCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 $Table->cols[] = array(
 						'th' => T_('ID'),
@@ -297,7 +297,7 @@ $Table->display_list_start();
 
 	$Table->display_body_start();
 
-	echo $GenericCategoryCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
+	echo $ChapterCache->recurse( $callbacks, $subset_ID, NULL, 0, 0, array( 'sorted' => true ) );
 
 	$Table->display_body_end();
 
