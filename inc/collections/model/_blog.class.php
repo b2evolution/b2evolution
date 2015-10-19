@@ -2303,6 +2303,9 @@ class Blog extends DataObject
 						VALUES ( '.$DB->quote( $default_post_type_ID ).', '.$DB->quote( $this->ID ).' )' );
 			}
 
+			// Enable default item types for the inserted collection:
+			$this->enable_default_item_types();
+
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 		}
 
@@ -3577,6 +3580,67 @@ class Blog extends DataObject
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Enable default item types for the collection
+	 */
+	function enable_default_item_types()
+	{
+		if( empty( $this->ID ) )
+		{	// Collection doesn't exist in DB yet:
+			return;
+		}
+
+		global $DB, $cache_all_item_type_IDs;
+
+		if( ! isset( $cache_all_item_type_IDs ) )
+		{	// Get all item type IDs only first time to save execution time
+			$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
+		}
+
+		// Exclude the following item types depending on collection type:
+		switch( $this->type )
+		{
+			case 'main':
+			case 'photo':
+				$exclude_ityp_IDs = array( 100, 200, 2000, 5000 );
+				break;
+
+			case 'forum':
+				$exclude_ityp_IDs = array( 1, 100, 2000, 5000 );
+				break;
+
+			case 'manual':
+				$exclude_ityp_IDs = array( 1, 200, 2000, 5000 );
+				break;
+
+			case 'std':
+			default:
+				$exclude_ityp_IDs = array( 100, 200, 5000 );
+				break;
+		}
+
+		$insert_sql = 'REPLACE INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
+		$i = 0;
+		foreach( $cache_all_item_type_IDs as $item_type_ID )
+		{
+			if( ! in_array( $item_type_ID, $exclude_ityp_IDs ) )
+			{	// Item type is not excluded
+				if( $i > 0 )
+				{	// Add separator between rows:
+					$insert_sql .= ', ';
+				}
+				$insert_sql .= '( '.$item_type_ID.', '.$this->ID.' )';
+				$i++;
+			}
+		}
+
+		if( $i > 0 )
+		{	// Insert records to enable the default item types for this collection:
+			$DB->query( $insert_sql );
+		}
 	}
 }
 

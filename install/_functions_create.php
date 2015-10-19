@@ -1575,9 +1575,6 @@ function create_demo_contents()
 			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 				VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
 		}
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_home_ID, array( 100, 200, 2000, 5000 ) );
 	}
 
 	if( $install_collection_bloga )
@@ -1599,9 +1596,6 @@ function create_demo_contents()
 			true,
 			'public',
 			$jay_moderator_ID );
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_a_ID, array( 100, 200, 5000 ) );
 	}
 
 	if( $install_collection_blogb )
@@ -1631,9 +1625,6 @@ function create_demo_contents()
 			$b_Blog->set_setting( 'skin2_layout', 'single_column' );
 			$b_Blog->dbupdate();
 		}
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_b_ID, array( 100, 200, 5000 ) );
 	}
 
 	if( $install_collection_photos )
@@ -1652,9 +1643,6 @@ function create_demo_contents()
 			3, // Skin ID
 			'photo', '', 0, 'relative', true, 'public',
 			$dave_blogger_ID );
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_photoblog_ID, array( 100, 200, 2000, 5000 ) );
 	}
 
 	if( $install_collection_forums )
@@ -1670,9 +1658,6 @@ function create_demo_contents()
 			4, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
 			$paul_blogger_ID );
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_forums_ID, array( 1, 100, 2000, 5000 ) );
 	}
 
 	if( $install_collection_manual )
@@ -1688,9 +1673,6 @@ function create_demo_contents()
 			5, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
 			$dave_blogger_ID );
-
-		// Enable item types for blog:
-		enable_item_types_for_blog( $blog_manual_ID, array( 1, 200, 2000, 5000 ) );
 	}
 
 	$BlogCache = & get_BlogCache();
@@ -2931,46 +2913,4 @@ function create_default_posts_location()
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
 	}
 }
-
-
-/**
- * Enable item types for blog
- *
- * @param integer Blog ID
- * @param array Exclude item types (Make these types disabled)
- */
-function enable_item_types_for_blog( $blog_ID, $exclude_ityp_IDs = array() )
-{
-	if( empty( $blog_ID ) )
-	{ // Wrong function calling
-		return;
-	}
-
-	global $DB, $cache_all_item_type_IDs;
-
-	if( ! isset( $cache_all_item_type_IDs ) )
-	{ // Get all item type IDs only first time to save execution time
-		$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
-	}
-
-	$insert_sql = 'REPLACE INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
-	$i = 0;
-	foreach( $cache_all_item_type_IDs as $item_type_ID )
-	{
-		if( ! in_array( $item_type_ID, $exclude_ityp_IDs ) )
-		{ // Item type is not excluded
-			if( $i > 0 )
-			{ // Serator between rows
-				$insert_sql .= ', ';
-			}
-			$insert_sql .= '( '.$item_type_ID.', '.$blog_ID.' )';
-			$i++;
-		}
-	}
-	if( $i > 0 )
-	{ // Insert records to enable the item types for the blog:
-		$DB->query( $insert_sql );
-	}
-}
-
 ?>
