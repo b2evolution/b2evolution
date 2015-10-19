@@ -656,3 +656,14 @@ div.tabs div.selected a {
 	background-color: #F2ECCE;
 	border-bottom-color: #F2ECCE;
 }
+
+.widget_core_coll_about_author ul {
+	margin: 10px -15px -5px;
+	padding: 0;
+	list-style: none;
+}
+.widget_core_coll_about_author ul li {
+	border-top: 1px solid #CCC9B8;
+	background: #F2ECCE;
+	padding: 5px 15px;
+}

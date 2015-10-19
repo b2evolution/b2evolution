@@ -145,12 +145,22 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Item Single */
-	if( ( $blog_id == $blog_a_ID || ( !empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
-	{
-		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 1 );
-		// add blog collection setting to activate additional fields
-		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
-							VALUES ( '.$blog_id.', "show_location_coordinates" , 1 )' );
+	add_basic_widget( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
+	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
+	{ // Item Tags
+		add_basic_widget( $blog_id, 'Item Single', 'coll_item_tags', 'core', 20 );
+	}
+	if( $blog_id == $blog_b_ID )
+	{ // About Author
+		add_basic_widget( $blog_id, 'Item Single', 'coll_about_author', 'core', 25 );
+	}
+	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+	{ // Google Maps
+		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
+	}
+	if( $blog_id == $blog_a_ID || $kind == 'manual' )
+	{ // Small Print
+		add_basic_widget( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
 
 

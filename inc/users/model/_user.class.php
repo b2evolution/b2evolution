@@ -125,6 +125,7 @@ class User extends DataObject
 	/**
 	 * User fields
 	 */
+	var $userfields_loaded = false;
 	var $userfields = array();
 	var $userfields_by_code = array();
 	var $userfields_by_type = array();
@@ -4278,6 +4279,11 @@ class User extends DataObject
 	 */
 	function userfields_load()
 	{
+		if( $this->userfields_loaded )
+		{ // The user fields already were loaded, Don't call DB query twice
+			return;
+		}
+
 		global $DB;
 
 		$userfields = $DB->get_results( '

@@ -51,6 +51,7 @@ $widget_groups = array (
 	'menu_item'    => T_('Menu Item Widgets'),
 	'navigation'   => T_('Navigation Widgets'),
 	'content'      => T_('Content Listing Widgets'),
+	'infoitem'     => T_('Info about a specific Item'),
 	'collection'   => T_('Collection Support Widgets'),
 	'site'         => T_('Site Support Widgets'),
 	'user'         => T_('User Support Widgets'),
@@ -87,6 +88,12 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro',    // Featured/Intro Post 
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
+		),
+	'infoitem' => array(
+			'coll_item_content',
+			'coll_small_print',
+			'coll_item_tags',
+			'coll_about_author',
 		),
 	'collection' => array(
 			'coll_logo',

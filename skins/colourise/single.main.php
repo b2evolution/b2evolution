@@ -57,7 +57,7 @@ skin_include( '_body_header.inc.php' );
 		echo '<div class="evo_content_block">'; // Beginning of posts display
 
 		$item_class_params = array(
-				'item_class'        => 'post',
+				'item_class'        => 'post evo_content_block',
 				'item_type_class'   => 'post_ptyp',
 				'item_status_class' => 'post',
 			);
@@ -87,76 +87,28 @@ skin_include( '_body_header.inc.php' );
 				?></h2>
 
 				<?php
-					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-					skin_include( '_item_content.inc.php', array(
-							'image_size' => 'fit-400x320',
-						) );
-					// Note: You can customize the default item content by copying the generic
-					// /skins/_item_content.inc.php file into the current skin folder.
-					// -------------------------- END OF POST CONTENT -------------------------
+					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="$wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Template params for "Small Print" widget
+						'widget_coll_small_print_before' => '<p class="postmetadata alt"><small>',
+						'widget_coll_small_print_after'  => '</small></p>',
+						// Params for skin file "_item_content.inc.php"
+						'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+					) );
+					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>
-		
-				<p class="postmetadata alt">
-					<small>
-						<?php
-							$Item->author( array(
-									'link_text'    => 'only_avatar',
-									'link_rel'     => 'nofollow',
-									'thumb_size'   => 'crop-top-32x32',
-									'thumb_class'  => 'leftmargin',
-								) );
-						?>
-						<?php
-							if( $Skin->get_setting( 'display_post_date' ) )
-							{	// We want to display the post date:
-								$Item->issue_time( array(
-										'before'      => /* TRANS: date */ T_('This entry was posted on '),
-										'time_format' => 'F jS, Y',
-									) );
-								$Item->issue_time( array(
-										'before'      => /* TRANS: time */ T_('at '),
-										'time_format' => '#short_time',
-									) );
-								$Item->author( array(
-										'before'    => T_('by '),
-										'link_text' => 'preferredname',
-									) );
-							}
-							else
-							{
-								$Item->author( array(
-										'before'    => T_('This entry was posted by '),
-										'link_text' => 'preferredname',
-									) );
-							}
-						?>
-						<?php
-							$Item->categories( array(
-								'before'          => ' '.T_('and is filed under').' ',
-								'after'           => '.',
-								'include_main'    => true,
-								'include_other'   => true,
-								'include_external'=> true,
-								'link_categories' => true,
-							) );
-						?>
-		
-						<?php
-							// List all tags attached to this post:
-							$Item->tags( array(
-									'before' =>         ' '.T_('Tags').': ',
-									'after' =>          ' ',
-									'separator' =>      ', ',
-								) );
-						?>
-						<!-- You can follow any responses to this entry through the RSS feed. -->
-						<?php $Item->edit_link(); ?>
-					</small>
-				</p>
-		
+
 			</div>
-		
-		
+
 			<?php
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
