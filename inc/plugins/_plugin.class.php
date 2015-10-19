@@ -551,6 +551,19 @@ class Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array();
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -592,7 +605,7 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -612,17 +625,17 @@ class Plugin
 			return array();
 		}
 
-		$render_note = $this->get_help_link();
+		$render_note = '';
 		if( empty( $this->code ) )
 		{
-			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
 		}
 		$admin_Plugins = & get_Plugins_admin();
 		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
 		$default_msg_rendering = ( isset( $params['default_msg_rendering'] ) && in_array( $params['default_msg_rendering'], $rendering_options ) ) ? $params['default_msg_rendering'] : 'never';
 		$r = array(
 			'msg_apply_rendering' => array(
-					'label' => sprintf( /* TRANS: Apply <plugin name> (rendering): always/never/stealth... etc */ T_('Apply %s'), $this->name ),
+					'label' => T_('Apply rendering to messages'),
 					'type' => 'select',
 					'options' => $rendering_options,
 					'defaultvalue' => $default_msg_rendering,
@@ -630,7 +643,7 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -3563,7 +3576,8 @@ class Plugin
 			$Plugins->instantiate_Settings( $this, 'Settings' );
 		}
 
-		$value = $this->Settings->get( $parname );
+		// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
+		$value = $this->Settings->get( $parname == 'msg_apply_rendering' ? $parname : 'msg_'.$parname );
 
 		if( ! is_null( $value ) )
 		{ // We have a value for this param:

@@ -40,6 +40,26 @@ class wikilinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'link_without_brackets' => array(
+					'label' => $this->T_('Links without brackets'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
+				)
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -57,15 +77,8 @@ class wikilinks_plugin extends Plugin
 		}
 
 		$default_params = array_merge( $params, $default_values );
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'link_without_brackets' => array(
-					'label' => $this->T_('Links without brackets'),
-					'type' => 'checkbox',
-					'defaultvalue' => 0,
-					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
-				)
-			) );
+
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 

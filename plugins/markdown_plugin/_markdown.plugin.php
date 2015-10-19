@@ -53,6 +53,38 @@ class markdown_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'links' => array(
+					'label' => T_( 'Links' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown link markup.' ),
+					'defaultvalue' => 0,
+				),
+			'images' => array(
+					'label' => T_( 'Images' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown image markup.' ),
+					'defaultvalue' => 0,
+				),
+			'text_styles' => array(
+					'label' => T_( 'Italic & Bold styles' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
+					'defaultvalue' => 0,
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -65,28 +97,7 @@ class markdown_plugin extends Plugin
 				'default_post_rendering' => 'opt-in'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'links' => array(
-						'label' => T_( 'Links' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown link markup.' ),
-						'defaultvalue' => 0,
-					),
-				'images' => array(
-						'label' => T_( 'Images' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown image markup.' ),
-						'defaultvalue' => 0,
-					),
-				'text_styles' => array(
-						'label' => T_( 'Italic & Bold styles' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
-						'defaultvalue' => 0,
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 

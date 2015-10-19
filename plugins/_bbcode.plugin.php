@@ -158,6 +158,67 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 
 	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_msg_setting_definitions( $params ),
+			array(
+				'search_list' => array(
+					'label' => $this->T_( 'Search list for messages'),
+					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
+[i] #\[i](.+?)\[/i]#is
+[s] #\[s](.+?)\[/s]#is
+[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
+[size] #\[size=([0-9]+?)](.+?)\[/size]#is
+[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
+ #\[quote(=?)](.+?)\[/quote]#is
+ #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
+[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
+[indent] #\[indent](.+?)\[/indent]#is
+[list=1] #\[list=1](.+?)\[/list]#is
+[list=a] #\[list=a](.+?)\[/list]#is
+[list] #\[list](.+?)\[/list]#is
+[*] #\[\*](.+?)(\n|\[/list\])#is
+[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
+[clear] #\[clear]#is',
+				),
+				'replace_list' => array(
+					'label' => $this->T_( 'Replace list for messages'),
+					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => '<strong>$1</strong>
+<em>$1</em>
+<span style="text-decoration:line-through">$1</span>
+<span style="color:$1">$2</span>
+<span style="font-size:$1px">$2</span>
+<span style="font-family:$1">$2</span>
+<blockquote>$2</blockquote>
+<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
+<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
+<div class="indented">$1</div>
+<ol type="1">$1</ol>
+<ol type="a">$1</ol>
+<ul>$1</ul>
+<li>$1</li>
+<span style="background-color:$1">$2</span>
+<div class="clear"></div>',
+				),
+			)
+		);
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()

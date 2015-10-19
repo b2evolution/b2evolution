@@ -39,13 +39,18 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	ob_start();
 
 	$plugin_settings = $loop_Plugin->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
-	if( is_array( $plugin_settings ) )
-	{
+	if( is_array( $plugin_settings ) && count( $plugin_settings ) )
+	{	// Print the settings of each plugin in separate fieldset:
+		$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
+		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.T_('Priority').': '.$priority_link.')' );
+
 		foreach( $plugin_settings as $l_name => $l_meta )
 		{
 			// Display form field for this setting:
 			autoform_display_field( $l_name, $l_meta, $Form, 'MsgSettings', $loop_Plugin );
 		}
+
+		$Form->end_fieldset();
 	}
 
 	$plugins_settings_content .= ob_get_contents();
@@ -55,11 +60,11 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 if( !empty( $plugins_settings_content ) )
 {	// Display fieldset only when at least one renderer plugin exists:
-	$Form->begin_fieldset( T_( 'Renderer plugins settings' ).get_manual_link( 'messaging-plugin-settings' ), array( 'id' => 'msgplugins' ) );
+	//$Form->begin_fieldset( T_( 'Renderer plugins settings' ).get_manual_link( 'messaging-plugin-settings' ), array( 'id' => 'msgplugins' ) );
 
 	echo $plugins_settings_content;
 
-	$Form->end_fieldset();
+	//$Form->end_fieldset();
 }
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );

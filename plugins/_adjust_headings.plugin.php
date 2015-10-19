@@ -44,6 +44,32 @@ class adjust_headings_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'level' => array(
+					'label' => T_('Highest level heading'),
+					'type' => 'integer',
+					'size' => 1,
+					'maxlength' => 1,
+					'note' => T_('This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.'),
+					'defaultvalue' => 3,
+					'valid_range' => array(
+						'min' => 1, // from <h1>
+						'max' => 6, // to <h6>
+					),
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -56,22 +82,7 @@ class adjust_headings_plugin extends Plugin
 				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'level' => array(
-						'label' => T_('Highest level heading'),
-						'type' => 'integer',
-						'size' => 1,
-						'maxlength' => 1,
-						'note' => T_('This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.'),
-						'defaultvalue' => 3,
-						'valid_range' => array(
-							'min' => 1, // from <h1>
-							'max' => 6, // to <h6>
-						),
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 

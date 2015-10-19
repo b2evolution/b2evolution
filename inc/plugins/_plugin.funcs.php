@@ -770,6 +770,8 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Settings':
 			// Plugin global settings:
+		case 'MsgSettings':
+			// Plugin messages settings:
 			$error_value = $Obj->PluginSettingsValidateSet( $dummy = array(
 				'name' => $parname,
 				'value' => & $l_value,
@@ -779,8 +781,15 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
 			if( empty( $error_value ) )
-			{
-				$Obj->Settings->set( $parname, $l_value );
+			{	// Set new value:
+				if( $set_type == 'MsgSettings' && $parname != 'msg_apply_rendering' )
+				{	// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
+					$Obj->Settings->set( 'msg_'.$parname, $l_value );
+				}
+				else
+				{	// Global settings:
+					$Obj->Settings->set( $parname, $l_value );
+				}
 			}
 			break;
 

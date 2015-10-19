@@ -84,7 +84,7 @@ switch ( $action )
 					// Loop through settings for this plugin:
 					foreach( $pluginsettings as $set_name => $set_meta )
 					{
-						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'Settings' );
+						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'MsgSettings' );
 					}
 
 					// Let the plugin handle custom fields:
@@ -127,21 +127,24 @@ switch( $tab )
 	case 'templates':
 		// Templates settings:
 		$AdminUI->breadcrumbpath_add( T_('Templates'), '?ctrl=msgsettings&amp;tab=templates' );
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'messages-welcome-after-account-activation' );
 		break;
 
 	case 'renderers':
 		// Renderers settings:
 		$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=msgsettings&amp;tab=renderers' );
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'messaging-plugin-settings' );
 		break;
 
 	default:
 		// General settings:
 		$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=msgsettings' );
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'messages-settings' );
 		break;
 }
-
-// Set an url for manual page:
-$AdminUI->set_page_manual_link( 'messages-settings' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
