@@ -420,7 +420,7 @@ $Form->begin_form( '', '', $params );
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( T_('Additional actions').get_manual_link( 'additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Additional actions').get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -504,7 +504,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'workflow-properties-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
