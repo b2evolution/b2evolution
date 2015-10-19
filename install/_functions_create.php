@@ -1126,7 +1126,6 @@ function create_blog(
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
-		$Blog->set_setting( 'plugin'.$Plugin->ID.'_text_styles', '1' );
 	}
 	if( $kind == 'photo' )
 	{ // Display category directory on front page for photo blogs

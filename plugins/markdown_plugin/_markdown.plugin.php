@@ -206,7 +206,6 @@ class markdown_plugin extends Plugin
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_text_styles', '1' );
 				break;
 		}
 	}
