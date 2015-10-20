@@ -6521,7 +6521,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			ADD ityp_use_parent ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never' AFTER ityp_use_url" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11484' );
+		set_upgrade_checkpoint( '11484' );
+	}
+
+	if( $old_db_version < 11485 )
+	{	// v6.6.6
+
+		task_begin( 'Upgrade table item types... ' );
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD ityp_allow_breaks TINYINT DEFAULT 1 AFTER ityp_allow_html' );
+		$DB->query( 'UPDATE T_items__type
+			SET ityp_allow_breaks = 0,
+			    ityp_allow_featured = 0
+			WHERE ityp_ID >= 1400
+			  AND ityp_ID <= 1600' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11485' );
 	}
 
 	/*

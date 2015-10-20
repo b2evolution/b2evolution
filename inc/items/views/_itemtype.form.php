@@ -83,6 +83,7 @@ $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), a
 	$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, T_('Use title') );
 	$Form->radio( 'ityp_use_text', $edited_Itemtype->use_text, $options, T_('Use text') );
 	$Form->checkbox( 'ityp_allow_html', $edited_Itemtype->allow_html, T_('Allow HTML'), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+	$Form->checkbox( 'ityp_allow_breaks', $edited_Itemtype->allow_breaks, T_('Allow Teaser and Page breaks') );
 	$Form->checkbox( 'ityp_allow_attachments', $edited_Itemtype->allow_attachments, T_('Allow attachments') );
 	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured') );
 $Form->end_fieldset();
