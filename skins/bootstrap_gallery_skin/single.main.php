@@ -221,7 +221,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'gallery_row_end'     => '',
 					'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
 					'gallery_cell_end'    => '</div>',
-					'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 				) );
 		?>
 	</div>

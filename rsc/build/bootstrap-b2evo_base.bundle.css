@@ -2311,6 +2311,10 @@ input.btn-lg {
   padding-left: 15px;
   margin-bottom: 0;
 }
+.evo_post_gallery__image {
+  display: inline-block;
+  margin: 0 1em 1em 0;
+}
 
 /**
  * item_base.css 
@@ -3209,8 +3213,4 @@ div.message_toolbars {
 }
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
-}
-.evo_post_gallery__image {
-  display: inline-block;
-  margin: 0 1em 1em 0;
 }

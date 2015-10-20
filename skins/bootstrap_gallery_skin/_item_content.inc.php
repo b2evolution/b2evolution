@@ -78,7 +78,6 @@ $params = array_merge( array(
 		'gallery_image_limit'      => 1000,
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
-		'gallery_link_rel'         => 'lightbox[p'.$Item->ID.']',
 
 		'before_url_link'          => '<p class="evo_post_link">'.T_('Link:').' ',
 		'after_url_link'           => '</p>',
@@ -198,7 +197,6 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					'gallery_link_rel'    => $params['gallery_link_rel'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
@@ -263,7 +261,6 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					'gallery_link_rel'    => $params['gallery_link_rel'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
@@ -334,7 +331,6 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						'gallery_link_rel'    => $params['gallery_link_rel'],
 						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 						'restrict_to_image_position' => 'aftermore',
 					) );
