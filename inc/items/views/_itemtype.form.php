@@ -79,12 +79,17 @@ $options = array(
 		array( 'never', T_('Never') )
 	);
 
+// Check if current type is intro and set specific params for the fields "ityp_allow_breaks" and "ityp_allow_featured":
+$intro_type_disabled = ItemType::is_intro( $edited_Itemtype->ID );
+$intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
+
 $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );
 	$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, T_('Use title') );
 	$Form->radio( 'ityp_use_text', $edited_Itemtype->use_text, $options, T_('Use text') );
 	$Form->checkbox( 'ityp_allow_html', $edited_Itemtype->allow_html, T_('Allow HTML'), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+	$Form->checkbox( 'ityp_allow_breaks', $edited_Itemtype->allow_breaks, T_('Allow Teaser and Page breaks'), $intro_type_note, '', 1, $intro_type_disabled );
 	$Form->checkbox( 'ityp_allow_attachments', $edited_Itemtype->allow_attachments, T_('Allow attachments') );
-	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured') );
+	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured'), $intro_type_note, '', 1, $intro_type_disabled );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-type-advanced-properties' ), array( 'id' => 'itemtype_advprops' ) );

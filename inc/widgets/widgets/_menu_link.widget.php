@@ -247,7 +247,7 @@ class menu_link_Widget extends ComponentWidget
 						foreach( $Widget_array as $Widget )
 						{
 							$Widget->init_display( $params );
-							if( !empty( $Widget->param_array ) && $Widget->param_array['link_type'] == 'home' )
+							if( isset( $Widget->param_array, $Widget->param_array['link_type'] ) && $Widget->param_array['link_type'] == 'home' )
 							{ // Don't display this menu if 'Blog home' menu item exists with the same url
 								return false;
 							}

@@ -236,7 +236,7 @@ class ItemLight extends DataObject
 	 */
 	function is_intro()
 	{
-		return ($this->ityp_ID >= 1400 && $this->ityp_ID <= 1600);
+		return ItemType::is_intro( $this->ityp_ID );
 	}
 
 

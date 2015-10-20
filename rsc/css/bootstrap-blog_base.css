@@ -878,6 +878,10 @@ input.btn-lg {
   padding-left: 15px;
   margin-bottom: 0;
 }
+.evo_post_gallery__image {
+  display: inline-block;
+  margin: 0 1em 1em 0;
+}
 .evo_item_workflow_form .evo_item_workflow_form__fields {
   display: -webkit-box;
   display: -ms-flexbox;

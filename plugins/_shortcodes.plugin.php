@@ -59,6 +59,11 @@ class shortcodes_plugin extends Plugin
 			return false;
 		}
 
+		if( ! empty( $params['Item'] ) && ( $params['Item']->is_intro() || ! $params['Item']->get_type_setting( 'allow_breaks' ) ) )
+		{	// Teaser and page breaks are not allowed for current item type and for all intro items:
+			return false;
+		}
+
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 

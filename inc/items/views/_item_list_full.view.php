@@ -222,6 +222,16 @@ while( $Item = & $ItemList->get_item() )
 						'after_image'         => '</figure>',
 						'after'               => '</div>',
 						'image_size'          => 'fit-320x320',
+						'before_gallery'      => '<div class="evo_post_gallery">',
+						'after_gallery'       => '</div>',
+						'gallery_table_start' => '',
+						'gallery_table_end'   => '',
+						'gallery_row_start'   => '',
+						'gallery_row_end'     => '',
+						'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+						'gallery_cell_end'    => '</div>',
+						'gallery_image_limit' => 1000,
+						'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
 					) );

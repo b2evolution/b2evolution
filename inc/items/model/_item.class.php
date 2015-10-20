@@ -1466,6 +1466,11 @@ class Item extends ItemLight
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
 
+			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
+			{	// Don't use the content separators for intro items and if it is disabled by item type:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
+
 			return $r;
 		}
 
@@ -1568,6 +1573,11 @@ class Item extends ItemLight
 
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
+
+			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
+			{	// Don't use the content separators for intro items and if it is disabled by item type:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 
@@ -2696,6 +2706,7 @@ class Item extends ItemLight
 				'gallery_image_limit'        => 1000,
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
+				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
