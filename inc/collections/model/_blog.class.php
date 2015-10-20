@@ -404,20 +404,8 @@ class Blog extends DataObject
 			}
 
 			// Collection permissions:
-			$old_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
-			$old_allow_access = $this->get_setting( 'allow_access' );
-			$new_allow_access = param( 'blog_allow_access', 'string', '' );
-			if( $old_allow_access != 'members' && $new_allow_access == 'members' )
-			{ // If 'Allow access' is changed to 'Members' we should activate advanced perms automatically
-				$new_advanced_perms = 1;
-			}
-			if( $old_advanced_perms == 1 && $new_advanced_perms == 0 && $old_allow_access == 'members' )
-			{ // If advanced perms are deselected we should also change 'Allow access' back to 'Logged in users'
-				$new_allow_access = 'users';
-			}
-			$this->set( 'advanced_perms', $new_advanced_perms );
-			$this->set_setting( 'allow_access', $new_allow_access );
+			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
 				$this->set_setting( 'enable_sitemaps', 0 );
