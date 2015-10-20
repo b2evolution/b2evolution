@@ -212,6 +212,15 @@ siteskin_include( '_site_body_header.inc.php' );
 					'after'               => '<div class="clear"></div>',
 					'image_size'          => $Skin->get_setting( 'single_thumb_size' ),
 					'image_align'         => 'middle',
+					'before_gallery'      => '<div class="evo_post_gallery">',
+					'after_gallery'       => '</div>',
+					'gallery_table_start' => '',
+					'gallery_table_end'   => '',
+					'gallery_row_start'   => '',
+					'gallery_row_end'     => '',
+					'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+					'gallery_cell_end'    => '</div>',
+					'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 				) );
 		?>
 	</div>

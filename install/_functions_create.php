@@ -1980,8 +1980,10 @@ function create_demo_contents()
 		$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 		$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
+		$edit_File = new File( 'shared', 0, 'monument-valley' );
+		$edit_File->link_to_Object( $LinkOwner, 3, 'teaser' );
 		$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
-		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
+		$edit_File->link_to_Object( $LinkOwner, 4, 'aftermore' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
