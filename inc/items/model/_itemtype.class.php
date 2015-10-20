@@ -569,6 +569,19 @@ class ItemType extends DataObject
 
 
 	/**
+	 * Check if this post type is used for intro posts
+	 *
+	 * @return boolean
+	 */
+	static function is_intro( $ID = NULL )
+	{
+		global $posttypes_perms;
+
+		return ( isset( $posttypes_perms['intro'] ) && in_array( $ID, $posttypes_perms['intro'] ) );
+	}
+
+
+	/**
 	 * Returns array, which determinate what post types are defaults of the blogs
 	 *
 	 * @return array ( key => Blog ID, value => ItemType ID )
