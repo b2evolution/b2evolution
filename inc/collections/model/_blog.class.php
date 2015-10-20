@@ -2152,6 +2152,18 @@ class Blog extends DataObject
 					$result = ( $this->type == 'forum' ) ? 'review' : 'draft';
 				}
 				break;
+
+			case 'aggregate_coll_IDs':
+				if( ! empty( $result ) && ( $result != '-' ) && ( $result != '*') )
+				{
+					$coll_IDs = explode( ',', $result );
+					if( ! in_array( $this->ID, $coll_IDs ) )
+					{
+						array_push( $coll_IDs, $this->ID );
+						$result = implode( ',', $coll_IDs );
+					}
+				}
+				break;
 		}
 
 		return $result;
