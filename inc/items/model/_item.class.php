@@ -1466,6 +1466,11 @@ class Item extends ItemLight
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
 
+			if( $this->is_intro() )
+			{	// Don't use the content separators for intro items:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
+
 			return $r;
 		}
 
@@ -1568,6 +1573,11 @@ class Item extends ItemLight
 
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
+
+			if( $this->is_intro() )
+			{	// Don't use the content separators for intro items:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 
