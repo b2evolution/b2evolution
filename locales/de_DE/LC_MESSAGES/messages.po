@@ -29344,7 +29344,7 @@ msgid ""
 "<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>\n"
 "\n"
 "<p>If needed, skins can format info pages differently from regular posts.</p>"
-msgstr "<p>Diese Webseite wird mit b2evolution betrieben.</p>\n\n<p>Sie sehen sich gerade eine Infoseite über %\"%s.&\".</p>\n\n<p>Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten im Menu.</p>\n\n<p>Falls nötig, können Skins Infoseiten anders als normale Einträge formatieren.</p>"
+msgstr "<p>Diese Webseite wird mit b2evolution betrieben.</p>\n\n<p>Sie sehen sich gerade eine Infoseite über \"%s\".</p>\n\n<p>Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten im Menu.</p>\n\n<p>Falls nötig, können Skins Infoseiten anders als normale Einträge formatieren.</p>"
 
 #. TRANS: sample ad content
 #: ../../../install/_functions_create.php:1795
