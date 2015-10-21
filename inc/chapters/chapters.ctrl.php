@@ -130,7 +130,7 @@ function get_chapter_redirect_url( $redirect_page, $parent_ID, $chapter_ID = 0 )
 {
 	global $admin_url, $blog;
 
-	if( $redirect_page == 'front' )
+	if( $redirect_page == 'front' || $redirect_page == 'parent' )
 	{ // Get Chapter for front page redirect
 		if( empty( $chapter_ID ) )
 		{ // Chapter ID is invalid, redirect to chapters list
@@ -149,6 +149,15 @@ function get_chapter_redirect_url( $redirect_page, $parent_ID, $chapter_ID = 0 )
 
 	switch( $redirect_page )
 	{
+		case 'parent':
+			// Redirect to parent chapter on front-office:
+			if( $parent_Chapter = & $Chapter->get_parent_Chapter() )
+			{	// If 
+				$redirect_url = $parent_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
+				break;
+			}
+			// else redirect to permanent url of current chapter:
+
 		case 'front':
 			// Redirect to front-office
 			$redirect_url = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
