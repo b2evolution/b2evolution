@@ -710,6 +710,28 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
 
+		if( in_array( 'user', $groups ) )
+		{ // we want to load the user directory settings:
+			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
+			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
+
+			$this->set_setting( 'userdir_login', param( 'userdir_login', 'integer', 0 ) );
+			$this->set_setting( 'userdir_firstname', param( 'userdir_firstname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_lastname', param( 'userdir_lastname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_nickname', param( 'userdir_nickname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_fullname', param( 'userdir_fullname', 'integer', 0 ) );
+
+			$this->set_setting( 'userdir_country', param( 'userdir_country', 'integer', 0 ) );
+			$this->set_setting( 'userdir_country_type', param( 'userdir_country_type', 'string' ) );
+			$this->set_setting( 'userdir_region', param( 'userdir_region', 'integer', 0 ) );
+			$this->set_setting( 'userdir_subregion', param( 'userdir_subregion', 'integer', 0 ) );
+			$this->set_setting( 'userdir_city', param( 'userdir_city', 'integer', 0 ) );
+
+			$this->set_setting( 'userdir_phone', param( 'userdir_phone', 'integer', 0 ) );
+			$this->set_setting( 'userdir_soclinks', param( 'userdir_soclinks', 'integer', 0 ) );
+			$this->set_setting( 'userdir_lastseen', param( 'userdir_lastseen', 'integer', 0 ) );
+		}
+
 		if( in_array( 'other', $groups ) )
 		{ // we want to load the other settings:
 
@@ -720,9 +742,6 @@ class Blog extends DataObject
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
 			$this->set_setting( 'latest_comments_num', get_param( 'latest_comments_num' ) );
-
-			// User directory:
-			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 
 			// Messaging pages:
 			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );

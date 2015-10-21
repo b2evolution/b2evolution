@@ -121,6 +121,7 @@ switch( $action )
 			case 'home':
 			case 'features':
 			case 'comments':
+			case 'user':
 			case 'other':
 			case 'more':
 				if( $edited_Blog->load_from_Request( array( $tab ) ) )
@@ -402,6 +403,13 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->set_page_manual_link( 'comment-features' );
 		break;
 
+	case 'user':
+		$AdminUI->set_path( 'collections', 'features', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+		$AdminUI->breadcrumbpath_add( T_('User directory'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'features-user-directory' );
+		break;
+
 	case 'other':
 		$AdminUI->set_path( 'collections', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
@@ -497,6 +505,9 @@ switch( $AdminUI->get_path(1) )
 				break;
 			case 'comments';
 				$AdminUI->disp_view( 'collections/views/_coll_comments.form.php' );
+				break;
+			case 'user';
+				$AdminUI->disp_view( 'collections/views/_coll_user.form.php' );
 				break;
 			case 'other';
 				$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );

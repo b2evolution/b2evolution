@@ -4632,6 +4632,7 @@ function users_results_block( $params = array() )
 			'display_name'         => true,
 			'display_gender'       => true,
 			'display_country'      => true,
+			'display_country_type' => 'both', // 'both', 'flag', 'name'
 			'display_city'         => false,
 			'display_blogs'        => true,
 			'display_source'       => true,
@@ -4780,6 +4781,7 @@ function users_results( & $UserList, $params = array() )
 			'display_name'       => true,
 			'display_gender'     => true,
 			'display_country'    => true,
+			'display_country_type' => 'both', // 'both', 'flag', 'name'
 			'display_blogs'      => true,
 			'display_source'     => true,
 			'display_regdate'    => true,
@@ -4917,7 +4919,10 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'c.ctry_name',
-				'td' => '%country_flag( #ctry_code#, #ctry_name#, "w16px", "flag", "", false, true, "", false )% $ctry_name$',
+				'td' =>
+				 ( in_array( $params['display_country_type'], array( 'both', 'flag' ) ) ? '%country_flag( #ctry_code#, #ctry_name#, "w16px", "flag", "", false, true, "", false )%' : '' )
+				.( $params['display_country_type'] == 'both' ? ' ' : '' )
+				.( in_array( $params['display_country_type'], array( 'both', 'name' ) ) ? '$ctry_name$' : '' ),
 			);
 	}
 

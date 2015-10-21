@@ -171,8 +171,24 @@ class CollectionSettings extends AbstractSettings
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 
+		// User directory:
+			'userdir_picture' => 1,
+			'image_size_user_list' => 'crop-top-48x48',
+			'userdir_login' => 1,
+			'userdir_firstname' => 0,
+			'userdir_lastname' => 0,
+			'userdir_nickname' => 0,
+			'userdir_fullname' => 1,
+			'userdir_country' => 0,
+			'userdir_country_type' => 'both',
+			'userdir_region' => 0,
+			'userdir_subregion' => 0,
+			'userdir_city' => 1,
+			'userdir_phone' => 0,
+			'userdir_soclinks' => 0,
+			'userdir_lastseen' => 0,
+
 		// Other settings:
-			'image_size_user_list' => 'crop-top-48x48', // Used in disp = users
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
