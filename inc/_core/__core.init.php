@@ -1658,7 +1658,15 @@ class _core_Module extends Module
 							'href' => '?ctrl=email&amp;tab=sent' ),
 						'return' => array(
 							'text' => T_('Returned'),
-							'href' => '?ctrl=email&amp;tab=return' ),
+							'href' => '?ctrl=email&amp;tab=return',
+							'entries' => array(
+								'log' => array(
+									'text' => T_('Log'),
+									'href' => '?ctrl=email&amp;tab=return&amp;tab3=log' ),
+								'settings' => array(
+									'text' => T_('Settings'),
+									'href' => '?ctrl=email&amp;tab=return&amp;tab3=settings' ),
+							) ),
 						'settings' => array(
 							'text' => T_('Settings'),
 							'href' => '?ctrl=email&amp;tab=settings',
@@ -1666,13 +1674,19 @@ class _core_Module extends Module
 								'notifications' => array(
 									'text' => T_('Notifications'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
-								'returned' => array(
-									'text' => T_('Returned emails'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=returned' ),
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
 						) ) ) ) ) );
+
+			if( $current_User->check_perm( 'emails', 'edit' ) )
+			{	// Allow to test a returned email only if user has a permission to edit email settings:
+				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
+						'test' => array(
+							'text' => T_('Test'),
+							'href' => '?ctrl=email&amp;tab=return&amp;tab3=test' ,
+					) ) );
+			}
 		}
 
 		/**** System ****/

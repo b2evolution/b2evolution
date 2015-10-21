@@ -3400,9 +3400,13 @@ class Blog extends DataObject
 			{	// Check permissions to create a new chapter in this blog
 				global $admin_url;
 				$url = $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$this->ID;
-				if( !empty( $cat_ID ) )
-				{	// Add category param to preselect category on the form
+				if( ! empty( $cat_ID ) )
+				{	// Add category param to preselect category on the form:
 					$url = url_add_param( $url, 'cat_parent_ID='.$cat_ID );
+				}
+				if( ! is_admin_page() )
+				{	// Add this param to redirect after saving to parent category permanent url:
+					$url = url_add_param( $url, 'redirect_page=parent' );
 				}
 			}
 		}

@@ -290,10 +290,6 @@ class Chapter extends DataObject
 	 */
 	function load_from_request()
 	{
-		global $DB, $Settings;
-
-		parent::load_from_Request();
-
 		param_string_not_empty( 'cat_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
 
