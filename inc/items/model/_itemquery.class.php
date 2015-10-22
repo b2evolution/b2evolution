@@ -376,7 +376,7 @@ class ItemQuery extends SQL
 		$tags = explode( ',', $tags );
 
 		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-											INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
 	}
 
 
@@ -822,6 +822,8 @@ class ItemQuery extends SQL
 				case 'content':
 					$search_fields[] = $this->dbprefix.'content';
 					break;
+
+				// TODO: add more.
 			}
 		}
 

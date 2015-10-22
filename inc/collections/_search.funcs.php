@@ -240,23 +240,26 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
 	global $DB, $Blog, $posttypes_perms;
 
-	// Exclude search from 'sidebar' type posts and from reserved type with ID 5000
+	// Exclude from search: 'sidebar' type posts and from reserved type with ID 5000
 	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
 	$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );
 
-	// Search between posts
+	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
-			'keyword_scope' => 'title,content',
+			'keyword_scope' => 'title,content', // TODO: add more fields
 			'phrase'        => 'OR',
 			'types'         => '-'.implode( ',', $filter_post_types ),
 			'orderby'       => 'datemodified',
 			'order'         => 'DESC',
 			'posts'         => 1000
 		) );
+
+	// Generate query from filters above and count results:
 	$search_ItemList->query_init();
 
+	// Make a custom search query:
 	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
@@ -265,14 +268,16 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		.$search_ItemList->ItemQuery->get_order_by()
 		.$search_ItemList->ItemQuery->get_limit();
 
+	// Run query:
 	$query_result = $DB->get_results( $search_query, OBJECT, 'Search items query' );
 
+	// Compute scores:
 	$search_result = array();
 	foreach( $query_result as $row )
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, 5 );
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
 		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
@@ -361,7 +366,10 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 	return $search_result;
 }
 
-
+/**
+ * @todo fp> separate chapters from tags in 2 different functions.
+ * I don't know why they are grouped together.
+ */
 function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_parts )
 {
 	global $DB, $Blog;
@@ -446,12 +454,13 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 
 
 /**
- * Create search result and give a score for each object
+ * Perform a scrored search 
+ * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function score_search_result( $search_keywords )
+function perform_scored_search( $search_keywords )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -459,10 +468,10 @@ function score_search_result( $search_keywords )
 		return array();
 	}
 
-	global $Blog, $DB, $posttypes_perms;
+	global $Blog, $DB, $posttypes_perms, $debug;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
-	// Get quoted parts
+	// Get quoted parts parts of the search query
 	$quoted_parts = array();
 	if( preg_match_all( '/(["\'])(?:(?=(\\\\?))\\2.)*?\\1/', $search_keywords, $matches ) )
 	{ // There are quoted search terms
@@ -478,11 +487,16 @@ function score_search_result( $search_keywords )
 		$quoted_parts = array_unique( $quoted_parts );
 	};
 
+	// Remove word separators:
 	$keywords = preg_replace( '/, +/', '', $search_keywords );
 	$keywords = str_replace( ',', ' ', $keywords );
+	// Remove quotes:
 	$keywords = str_replace( '"', ' ', $keywords );
+	// Remove extra white space:
 	$keywords = trim( $keywords );
+	// Split keywords:
 	$keywords = preg_split( '/\s+/', $keywords );
+	// Remove duplicate keywords:
 	$keywords = array_unique( $keywords );
 
 	if( isset( $keywords[0] ) && empty( $keywords[0] ) )
@@ -492,17 +506,37 @@ function score_search_result( $search_keywords )
 	if( empty( $keywords ) && empty( $quoted_parts ) )
 	{ // There is nothing to search for
 		return array();
+// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
+	// Perform search on Items:
 	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
-	$nr_of_items = count( $search_result );
+	if( $debug )
+	{
+		echo '<p class="text-muted">Just found '.count( $search_result ).' Items.</p>';
+		evo_flush();
+	}
 
+	// Perform search on Comments:
 	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $comment_search_result );
+	if( $debug )
+	{
+		echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
+		evo_flush();
+	}
 
+	// Perform search on Chapters & Tags:
+	// fp> why are these grouped together?
 	$cats_and_tags_search_result = search_and_score_chapters_and_tags( $search_keywords, $keywords, $quoted_parts );
 	$search_result = array_merge( $search_result, $cats_and_tags_search_result );
+	if( $debug )
+	{
+		echo '<p class="text-muted">Just found '.count( $cats_and_tags_search_result ).' Catageories and Tags.</p>';
+		evo_flush();
+	}
 
+	// Sort results by score:
 	$score_result = array();
 	foreach( $search_result as $result_item )
 	{
@@ -515,7 +549,7 @@ function score_search_result( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
-		$search_result[0]['nr_of_items'] = $nr_of_items;
+		$search_result[0]['nr_of_items'] = count( $search_result );
 		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
 		$search_result[0]['nr_of_cats_and_tags'] = count( $cats_and_tags_search_result );
 	}
@@ -525,32 +559,67 @@ function score_search_result( $search_keywords )
 
 
 /*
- * Display the search result block
+ * Perform search (after having displayed the first part of the page) & display results.
+ * The search results are cached in the session for faster page by page navigation.
  *
- * @param array Params
+ * @param array Display Params
  */
 function search_result_block( $params = array() )
 {
 	global $Blog, $Session, $debug;
 
-	evo_flush(); // flush displayed data before start searching
-
 	$search_keywords = param( 's', 'string', '', true );
+
+	// Try to load existing search results from Session:
 	$search_params = $Session->get( 'search_params' );
 	$search_result = $Session->get( 'search_result' );
 	$search_result_loaded = false;
-	if( empty( $search_params ) || ( $search_params['search_keywords'] != $search_keywords )
-		|| ( $search_params['search_blog'] != $Blog->ID ) || ( $search_result === NULL ) )
-	{ // this is a new search
-		$search_params = array( 'search_keywords' => $search_keywords, 'search_blog' => $Blog->ID );
-		$search_result = score_search_result( $search_keywords );
+	if( empty( $search_params ) 
+		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
+		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
+		|| ( $search_result === NULL ) )
+	{ // We need to perform a new search:
+		if( $debug )
+		{
+			echo '<p class="text-muted">Starting a new search...</p>';
+		}
+
+		// Flush first part of the page before starting search, which can be long...
+		evo_flush();
+
+		$search_params = array( 
+			'search_keywords' => $search_keywords, 
+			'search_blog' => $Blog->ID 
+		);
+
+		// Perform new search:
+		$search_result = perform_scored_search( $search_keywords );
+		
+		// Save results into session:
 		$Session->set( 'search_params', $search_params );
 		$Session->set( 'search_result', $search_result );
 		$search_result_loaded = true;
 	}
+	else
+	{ // We found the desired saved search results in the Session:
+		if( $debug )
+		{	// Display counts
+			echo '<div class="text-muted">';
+			echo '<p>We found the desired saved search results in the Session:</p>';
+			echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
+			echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
+			echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
+			echo '</div>';
+		}
 
-	// Make sure we are not missing any param:
+		// Flush first part of the page before starting search, which can be long...
+		evo_flush();
+	}
+
+
+	// Make sure we are not missing any display params:
 	$params = array_merge( array(
+			'no_match_message'      =>  '<p class="alert alert-info msg_nothing" style="margin: 2em 0">'.T_('Sorry, we could not find anything matching your request, please try to broaden your search.').'<p>',
 			'title_suffix_post'     => ' ('.T_('Post').')',
 			'title_suffix_comment'  => ' ('.T_('Comment').')',
 			'title_suffix_category' => ' ('.T_('Category').')',
@@ -566,29 +635,15 @@ function search_result_block( $params = array() )
 	$search_result = $Session->get( 'search_result' );
 	if( empty( $search_result ) )
 	{
-		echo '<p class="msg_nothing" style="margin: 2em 0">';
-		echo T_('Sorry, we could not find anything matching your request, please try to broaden your search.');
-		echo '<p>';
+		echo $params['no_match_message'];
 		return;
 	}
 
-	if( $debug )
-	{
-		echo '<div class="muted" style="margin: 2em 0">';
-		echo 'Total processed result items by type:';
-		echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
-		echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
-		echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
-		echo '</div>';
-
-		// show how many items are processed
-		evo_flush();
-	}
-
+	// Prepare pagination:
 	$result_count = count( $search_result );
 	$result_per_page = $Blog->get_setting( 'search_per_page' );
 	if( $result_count > $result_per_page )
-	{
+	{	// We will have multiple search result pages:
 		$current_page = param( 'page', 'integer', 1 );
 		$total_pages = ceil($result_count / $result_per_page);
 		if( $current_page > $total_pages )
@@ -605,23 +660,25 @@ function search_result_block( $params = array() )
 		search_page_links( $page_params );
 	}
 	else
-	{
+	{	// Only one page of results:
 		$current_page = 1;
 		$total_pages = 1;
 	}
 
-	// Set current page indexes
+	// Set current page indexes:
 	$from = ( ( $current_page -1 ) * $result_per_page );
 	$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
+
 
 	// Init caches
 	$ItemCache = & get_ItemCache();
 	$CommentCache = & get_CommentCache();
 	$ChapterCache = & get_ChapterCache();
 
+
 	if( !$search_result_loaded )
 	{ // Search result objects are not loaded into memory yet, load them
-		// Group required object ids by type
+		// Group required object ids by type:
 		$required_ids = array();
 		for( $index = $from; $index < $to; $index++ )
 		{
@@ -636,7 +693,7 @@ function search_result_block( $params = array() )
 			}
 		}
 
-		// Load each required object into the corresponding cache
+		// Load each required object into the corresponding cache:
 		foreach( $required_ids as $type => $object_ids )
 		{
 			switch( $type )
@@ -653,36 +710,46 @@ function search_result_block( $params = array() )
 					$ChapterCache->load_list( $object_ids );
 					break;
 
+				// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+
 				default: // Not handled search result type
 					break;
 			}
 		}
 	}
 
+	// ----------- Display ------------
+
 	echo $params['block_start'];
 
-	// Get best result values
+	// Memorize best scores:
 	$max_percentage = $search_result[0]['percentage'];
 	$max_score = $search_result[0]['score'];
 
+	// Display results for current page:
 	for( $index = $from; $index < $to; $index++ )
 	{
 		$row = $search_result[ $index ];
 		switch( $row['type'] )
 		{
 			case 'item':
+				// Prepare to display an Item:
+
 				$Item = $ItemCache->get_by_ID( $row['ID'], false );
+
 				if( empty( $Item ) )
 				{ // This Item was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
+				
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
 					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
 				);
+				
 				if( $params['use_editor'] )
-				{ // Get editor info to display
+				{ // Get editor info to display:
 					$lastedit_User = & $Item->get_lastedit_User();
 					if( empty( $lastedit_User ) )
 					{ // If editor is not defined yet then use author
@@ -694,7 +761,7 @@ function search_result_block( $params = array() )
 						), $display_params );
 				}
 				else
-				{ // Get author info to display
+				{ // Get author info to display:
 					$creator_User = & $Item->get_creator_User();
 					$display_params = array_merge( array(
 							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
@@ -705,11 +772,15 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'comment':
+				// Prepare to display a Comment:
+
 				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+
 				if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
 				{ // This Comment was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
+
 				$display_params = array(
 					'title'   => $Comment->get_permanent_link( '#item#' ).$params['title_suffix_comment'],
 					'excerpt' => excerpt( $Comment->content ),
@@ -723,7 +794,10 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'category':
+				// Prepare to display a Category:
+
 				$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+
 				if( empty( $Chapter ) )
 				{ // This Chapter was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
@@ -735,6 +809,8 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'tag':
+				// Prepare to display a Tag:
+
 				list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
 				$display_params = array(
 					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
@@ -742,10 +818,15 @@ function search_result_block( $params = array() )
 				);
 				break;
 
-			default: // Other type of result is not implemented
+			default: 
+				// Other type of result is not implemented
+
+				// TODO: maybe find collections (especially in case of aggregation)? users? files?
+
 				continue 2;
 		}
 
+		// Common display params for all types:
 		$display_params['score'] = $row['score'];
 		$display_params['percentage'] = isset( $row['percentage'] ) ? $row['percentage'] : round( $row['score'] * $max_percentage / $max_score );
 		$display_params['scores_map'] = $row['scores_map'];
@@ -753,11 +834,14 @@ function search_result_block( $params = array() )
 		$display_params['best_result'] = $index == 0;
 		$display_params['max_score'] = sprintf( ( floor( $max_score ) != $max_score ) ? '%.2f' : '%d', $max_score );
 		$display_params['max_percentage'] = $max_percentage;
+
+		// Display one search result:
 		display_search_result( array_merge( $params, $display_params ) );
 	}
 
 	echo $params['block_end'];
 
+	// Display pagination:
 	if( $result_count > $result_per_page )
 	{
 		search_page_links( $page_params );
