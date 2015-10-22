@@ -160,7 +160,7 @@ switch( $action )
 		$exit_after_save = ( $action != 'create_edit' );
 
 		// Check if new category was started to create. If yes check if it is valid.
-		check_categories ( $post_category, $post_extracats );
+		check_categories( $post_category, $post_extracats );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
@@ -256,10 +256,7 @@ switch( $action )
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories ( $post_category, $post_extracats );
-
-		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
+		$isset_category = check_categories( $post_category, $post_extracats );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
