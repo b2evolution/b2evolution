@@ -775,8 +775,11 @@ class collections_Module extends Module
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
 							'other' => array(
-								'text' => T_('Other'),
+								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+							'more' => array(
+								'text' => T_('More'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),
 						),
 					),
 					'skin' => array(

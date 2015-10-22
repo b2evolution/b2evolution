@@ -32,48 +32,17 @@ $Form->hidden( 'tab', 'other' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Sitemaps').get_manual_link( 'sitemaps-other' ) );
-	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
-	{
-		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
-	}
-	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
-	{
-		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
-	}
-	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
-						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
+$Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-other' ) );
+	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, T_('Number of results per page'), '', 4 );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-	// TODO: checkbox 'Enable RSS/Atom feeds'
-	// TODO2: which feeds (skins)?
+$Form->begin_fieldset( T_('Latest comments').get_manual_link( 'latest-comments-other' ) );
+	$Form->text( 'latest_comments_num', $edited_Blog->get_setting( 'latest_comments_num' ), 4, T_('Number of comments shown'), '', 4 );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Tracking').get_manual_link( 'tracking-other' ) );
-	$Form->checkbox( 'track_unread_content', $edited_Blog->get_setting( 'track_unread_content' ), T_('Tracking of unread content'), T_('Check this if you want this blog to display special marks in case of unread posts and comments.') );
-$Form->end_fieldset();
 
-if( isset($GLOBALS['files_Module']) )
-{
-	load_funcs( 'files/model/_image.funcs.php' );
-	$params['force_keys_as_values'] = true;
-	
-	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
-			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
-	$Form->end_fieldset();
-		
-	$Form->begin_fieldset( T_('Messaging').get_manual_link( 'messaging-other' ) );
-			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
-	$Form->end_fieldset();
-
-}
-
-
-$Form->begin_fieldset( T_('Archives').get_manual_link( 'archives-other' ) );
+$Form->begin_fieldset( T_('Archive pages').get_manual_link( 'archives-other' ) );
 	$Form->radio( 'archive_mode', $edited_Blog->get_setting( 'archive_mode' ),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
@@ -94,6 +63,21 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-other' ) );
 	$Form->text_input( 'download_delay', $edited_Blog->get_setting( 'download_delay' ), 2, T_('Download delay') );
 $Form->end_fieldset();
+
+
+if( isset($GLOBALS['files_Module']) )
+{
+	load_funcs( 'files/model/_image.funcs.php' );
+	$params['force_keys_as_values'] = true;
+	
+	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
+			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
+	$Form->end_fieldset();
+		
+	$Form->begin_fieldset( T_('Messaging pages').get_manual_link( 'messaging-other' ) );
+			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
+	$Form->end_fieldset();
+}
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

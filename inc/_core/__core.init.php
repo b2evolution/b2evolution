@@ -1073,8 +1073,30 @@ class _core_Module extends Module
 					$blog_param = '&amp;blog='.$Blog->ID;
 
 					$entries['blog']['entries']['features'] = array(
-							'text' => T_('Features').'&hellip;',
+							'text' => T_('Features'),
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
+							'entries' => array(
+									'front' => array(
+											'text' => T_('Front page').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
+										),
+									'posts' => array(
+											'text' => T_('Posts').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+										),
+									'comments' => array(
+											'text' => T_('Comments').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments'.$blog_param,
+										),
+									'other' => array(
+											'text' => T_('Other displays').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
+										),
+									'more' => array(
+											'text' => T_('More').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more'.$blog_param,
+										),
+								)
 						);
 					$entries['blog']['entries']['skin'] = array(
 							'text' => T_('Skin').'&hellip;',
