@@ -953,9 +953,6 @@ switch( $action )
 		// Check if new category was started to create.  If yes check if it is valid.
 		$isset_category = check_categories( $post_category, $post_extracats );
 
-		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
-
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
