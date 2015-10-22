@@ -739,6 +739,7 @@ function search_result_block( $params = array() )
 					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
 				);
+				break;
 
 			default: // Other type of result is not implemented
 				continue 2;
