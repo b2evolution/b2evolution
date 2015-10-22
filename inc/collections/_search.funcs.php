@@ -247,12 +247,13 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	// Search between posts
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
-			'keywords' => $search_term,
-			'phrase' => 'OR',
-			'types'  => '-'.implode( ',', $filter_post_types ),
-			'orderby' => 'datemodified',
-			'order' => 'DESC',
-			'posts' => 1000
+			'keywords'      => $search_term,
+			'keyword_scope' => 'title,content',
+			'phrase'        => 'OR',
+			'types'         => '-'.implode( ',', $filter_post_types ),
+			'orderby'       => 'datemodified',
+			'order'         => 'DESC',
+			'posts'         => 1000
 		) );
 	$search_ItemList->query_init();
 
