@@ -110,6 +110,29 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 
 
 /**
+ * Return a search score for the given text and search keywords
+ *
+ * @param string Text to score
+ * @param string The search keywords to score by
+ * @param integer Score multiplier 
+ * @return integer Result score
+ */
+function score_tags( $tag_name, $search_term, $score_weight = 4 )
+{
+	$score = 0.0;
+	$scores_map = array();
+
+	if( $tag_name == utf8_trim( $search_term ) )
+	{	// We use only EXACT match for post tags:
+		$score = $score_weight;
+		$scores_map['tags'] = $score;
+	}
+
+	return array( 'score' => $score, 'score_weight' => $score_weight, 'map' => $scores_map );
+}
+
+
+/**
  * Return a search score for the given date. Recent dates get higher scores.
  *
  * @param string the date to score
@@ -168,7 +191,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 	switch( $type )
 	{
 		case 'item':
-			$searched_parts = array( 'title', 'content' );
+			$searched_parts = array( 'title', 'content', 'tags' );
 			break;
 
 		case 'comment':
@@ -248,7 +271,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
-			'keyword_scope' => 'title,content', // TODO: add more fields
+			'keyword_scope' => 'title,content,tags', // TODO: add more fields
 			'phrase'        => 'OR',
 			'types'         => '-'.implode( ',', $filter_post_types ),
 			'orderby'       => 'datemodified',
@@ -260,7 +283,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login'
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login, tag_name'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
 		.$search_ItemList->ItemQuery->get_where()
@@ -279,6 +302,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 
 		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
 		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
+		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
@@ -287,6 +311,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
+			+ $scores_map['tags']['score']
 			+ ( isset( $scores_map['creator_login'] ) ? $scores_map['creator_login'] : 0 )
 			+ $scores_map['last_mod_date'];
 
@@ -545,16 +570,16 @@ function perform_scored_search( $search_keywords )
 	}
 
 	// Perform search on Items:
-	$search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+	$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
 	if( $debug )
 	{
-		echo '<p class="text-muted">Just found '.count( $search_result ).' Items.</p>';
+		echo '<p class="text-muted">Just found '.count( $item_search_result ).' Items.</p>';
 		evo_flush();
 	}
 
 	// Perform search on Comments:
 	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $comment_search_result );
+	$search_result = array_merge( $item_search_result, $comment_search_result );
 	if( $debug )
 	{
 		echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
@@ -592,7 +617,7 @@ function perform_scored_search( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
-		$search_result[0]['nr_of_items'] = count( $search_result );
+		$search_result[0]['nr_of_items'] = count( $item_search_result );
 		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
 		$search_result[0]['nr_of_cats'] = count( $cats_search_result );
 		$search_result[0]['nr_of_tags'] = count( $tags_search_result );
@@ -1188,6 +1213,10 @@ function display_score_map( $params )
 
 				case 'all_whole_words':
 					echo '<li>'.sprintf( '%d extra points for all word complete match', $scores ).'</li>';
+					continue;
+
+				case 'tags':
+					echo '<li>'.sprintf( '%d points for tag term match', $scores ).'</li>';
 					continue;
 			}
 
