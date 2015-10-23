@@ -366,33 +366,36 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 	return $search_result;
 }
 
+
 /**
- * @todo fp> separate chapters from tags in 2 different functions.
- * I don't know why they are grouped together.
+ * Search and score chapters
+ *
+ * @param string original search term
+ * @param array all separated words from the search term
+ * @param array all quoted parts from the search term
+ * @param number max possible score
  */
-function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_parts )
+function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 {
 	global $DB, $Blog;
 
-	// Init result array
+	// Init result array:
 	$search_result = array();
 
-	// Set query conditions
+	// Set query conditions:
 	$or = '';
 	$cat_where_condition = '';
-	$tag_where_condition = '';
 	foreach( $keywords as $keyword )
 	{
 		$keyword = $DB->escape( $keyword );
-		$cat_where_condition .= $or.' ( cat_name LIKE \'%'.$keyword.'%\' ) OR ( cat_description LIKE \'%'.$keyword.'%\' )';
-		$tag_where_condition .= $or.' ( tag_name LIKE \'%'.$keyword.'%\' )';
+		$cat_where_condition .= $or.' ( cat_name LIKE \'%'.$keyword.'%\' OR cat_description LIKE \'%'.$keyword.'%\' )';
 		$or = ' OR';
 	}
 
-	// Search between categories
+	// Search between chapters:
 	$ChapterCache = & get_ChapterCache();
 	$ChapterCache->clear();
-	$cat_where_condition = '( cat_blog_ID = '.$DB->quote( $Blog->ID ).' ) AND ('.$cat_where_condition.' )';
+	$cat_where_condition = '( cat_blog_ID = '.$DB->quote( $Blog->ID ).' ) AND ( '.$cat_where_condition.' )';
 	$ChapterCache->load_where( $cat_where_condition );
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
 	{
@@ -414,25 +417,57 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 			+ $scores_map['comment_count'];
 
 		$search_result[] = array(
-			'type' => 'category',
-			'score' => $final_score,
-			'ID' => $iterator_Chapter->ID,
+			'type'       => 'category',
+			'score'      => $final_score,
+			'ID'         => $iterator_Chapter->ID,
 			'scores_map' => $scores_map
 		);
 	}
 
-	// Search between tags
-	$sql = 'SELECT tag_name, COUNT(DISTINCT itag_itm_ID) as post_count
-					FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
-						INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
-						INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-					WHERE cat_blog_ID = '.$DB->quote( $Blog->ID ).' AND '.$tag_where_condition.'
-					GROUP BY tag_name';
-	$tags = $DB->get_assoc( $sql, 'Get tags matching to the search keywords' );
+	return $search_result;
+}
+
+
+/**
+ * Search and score tags
+ *
+ * @param string original search term
+ * @param array all separated words from the search term
+ * @param array all quoted parts from the search term
+ * @param number max possible score
+ */
+function search_and_score_tags( $search_term, $keywords, $quoted_parts )
+{
+	global $DB, $Blog;
+
+	// Init result array:
+	$search_result = array();
+
+	// Set query conditions:
+	$or = '';
+	$tag_where_condition = '';
+	foreach( $keywords as $keyword )
+	{
+		$tag_where_condition .= $or.'tag_name LIKE \'%'.$DB->escape( $keyword ).'%\'';
+		$or = ' OR ';
+	}
+
+	// Search between tags:
+	$tags_SQL = new SQL();
+	$tags_SQL->SELECT( 'tag_name, COUNT(DISTINCT itag_itm_ID) as post_count' );
+	$tags_SQL->FROM( 'T_items__tag' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	$tags_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
+	$tags_SQL->WHERE_and( $tag_where_condition );
+	$tags_SQL->GROUP_BY( 'tag_name' );
+	$tags = $DB->get_assoc( $tags_SQL->get(), 'Get tags matching to the search keywords' );
+
 	foreach( $tags as $tag_name => $post_count )
 	{
 		if( $post_count == 0 )
-		{ // Count only those tags which have at least one post linked to it
+		{	// Count only those tags which have at least one post linked to it, Skip this:
 			continue;
 		}
 
@@ -442,9 +477,9 @@ function search_and_score_chapters_and_tags( $search_term, $keywords, $quoted_pa
 		$final_score = $scores_map['name']['score'] * $post_count;
 
 		$search_result[] = array(
-			'type' => 'tag',
-			'score' => $final_score,
-			'ID' => $tag_name.':'.$post_count,
+			'type'       => 'tag',
+			'score'      => $final_score,
+			'ID'         => $tag_name.':'.$post_count,
 			'scores_map' => $scores_map
 		);
 	}
@@ -526,13 +561,21 @@ function perform_scored_search( $search_keywords )
 		evo_flush();
 	}
 
-	// Perform search on Chapters & Tags:
-	// fp> why are these grouped together?
-	$cats_and_tags_search_result = search_and_score_chapters_and_tags( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $cats_and_tags_search_result );
+	// Perform search on Chapters:
+	$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
+	$search_result = array_merge( $search_result, $cats_search_result );
 	if( $debug )
 	{
-		echo '<p class="text-muted">Just found '.count( $cats_and_tags_search_result ).' Catageories and Tags.</p>';
+		echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
+		evo_flush();
+	}
+
+	// Perform search on Tags:
+	$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
+	$search_result = array_merge( $search_result, $tags_search_result );
+	if( $debug )
+	{
+		echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
 		evo_flush();
 	}
 
@@ -551,7 +594,8 @@ function perform_scored_search( $search_keywords )
 		$search_result[0]['percentage'] = $max_percentage;
 		$search_result[0]['nr_of_items'] = count( $search_result );
 		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
-		$search_result[0]['nr_of_cats_and_tags'] = count( $cats_and_tags_search_result );
+		$search_result[0]['nr_of_cats'] = count( $cats_search_result );
+		$search_result[0]['nr_of_tags'] = count( $tags_search_result );
 	}
 
 	return $search_result;
@@ -608,7 +652,8 @@ function search_result_block( $params = array() )
 			echo '<p>We found the desired saved search results in the Session:</p>';
 			echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
 			echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
-			echo '<li>'.sprintf(  '%d chapters and tags', $search_result[0]['nr_of_cats_and_tags'] ).'</li></ul>';
+			echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
+			echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li></ul>';
 			echo '</div>';
 		}
 
