@@ -533,16 +533,14 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 *
-	 *
-	 * @todo count?
+	 * Generate search query based on set filters and obtain count of results
 	 */
 	function query_init()
 	{
 		global $current_User;
 
 		// Call reset to init the ItemQuery
-		// This way avoid adding the same conditions twice if the ItemQuery was already initialized
+		// This prevents from adding the same conditions twice if the ItemQuery was already initialized
 		$this->reset();
 
 		if( empty( $this->filters ) )
@@ -562,7 +560,7 @@ class ItemListLight extends DataObjectList2
 		// GENERATE THE QUERY:
 
 		/*
-		 * filtering stuff:
+		 * Filtering stuff:
 		 */
 		if( !is_null( $this->Blog ) )
 		{ // Get the posts only for current Blog
@@ -570,11 +568,12 @@ class ItemListLight extends DataObjectList2
 																			$this->filters['cat_focus'], $this->filters['coll_IDs'] );
 		}
 		else // $this->Blog == NULL
-		{ // If we want to get the posts from all blogs
+		{	// If we want to get the posts from all blogs
 			// Save for future use (permission checks..)
 			$this->ItemQuery->blog = 0;
 			$this->ItemQuery->Blog = $this->Blog;
 		}
+
 		$this->ItemQuery->where_tags( $this->filters['tags'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_author_logins( $this->filters['authors_login'] );

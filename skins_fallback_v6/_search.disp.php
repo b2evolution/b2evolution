@@ -45,7 +45,7 @@ skin_widget( array(
 	) );
 // ------------------------- END OF SEARCH FORM WIDGET -------------------------
 
-// Display the search result
+// Perform search (after having displayed the first part of the page) & display results:
 search_result_block( array(
 		'pagination'        => $params['pagination'],
 		'use_editor'        => $params['search_use_editor'],
