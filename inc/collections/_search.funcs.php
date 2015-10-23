@@ -1200,22 +1200,36 @@ function display_score_map( $params )
 			switch( $match_type )
 			{
 				case 'whole_term':
+					// Example: We searched [several images attached] and we matched it in:
+					//  - [This post has several images attached to it]
+					// OR we searched [wild] and we matched it in:
+					//  - [I was bewildered!] 
+					//  - [A wild cat!]
 					echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
 					continue;
 
 				case 'quoted_term_all':
+					// Example: We searched ["images attached" "has several" word] and we matched it in:
+					//  - [This post has several images attached to it]
+					//  - [The comment has several private images attached]
 					echo '<li>'.sprintf( '%d extra points for all quoted term match', $scores ).'</li>';
 					continue;
 
 				case 'all_case_sensitive':
+					// Example: We searched [several Thi ost mage Each] and we matched it in:
+					//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
 					echo '<li>'.sprintf( '%d extra points for all word case sensitive match', $scores ).'</li>';
 					continue;
 
 				case 'all_whole_words':
+					// Example: We searched [several this post images each] and we matched it in:
+					//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
 					echo '<li>'.sprintf( '%d extra points for all word complete match', $scores ).'</li>';
 					continue;
 
 				case 'tags':
+					// Example: We searched [photo album] and we matched it if the post has a tag with name:
+					//  - [photo album]
 					echo '<li>'.sprintf( '%d points for tag term match', $scores ).'</li>';
 					continue;
 			}
@@ -1234,18 +1248,22 @@ function display_score_map( $params )
 				switch( $match_type )
 				{
 					case 'word_case_sensitive_match':
+						// If at least one word from requested phrase is case sensitive matched:
 						echo '<li>Case sensitive mathces</li>';
 						break;
 
 					case 'whole_word_match':
+						// If at least one whole word from requested phrase is case insensitive matched:
 						echo '<li>Whole word mathces</li>';
 						break;
 
 					case 'word_case_insensitive_match':
+						// If at least one word from requested phrase is case insensitive matched:
 						echo '<li>Case insensitive mathces</li>';
 						break;
 
 					case 'word_multiple_occurences':
+						// If at least one word from requested phrase is case insensitive matched at least two times in the content:
 						echo '<li>Extra points for multiple occurrences - Rule: sum( score weight / x ) where x goes from 2 to number of occurrences</li>';
 						break;
 				}
