@@ -6596,7 +6596,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11510' );
+		set_upgrade_checkpoint( '11510' );
+	}
+
+	if( $old_db_version < 11520 )
+	{ // part 3 of 6.7.0
+
+		task_begin( 'Creating table for Poll questions...' );
+		$DB->query( 'CREATE TABLE T_polls__question (
+			pqst_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pqst_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			pqst_question_text VARCHAR(2000) NULL,
+			PRIMARY KEY (pqst_ID)
+		) ENGINE = innodb' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11520' );
 	}
 
 	/*

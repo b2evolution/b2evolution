@@ -501,7 +501,16 @@ $schema_queries = array(
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),
 			INDEX         slg_object (slg_object, slg_object_ID)
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" )
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_polls__question' => array(
+		'Creating table for Poll questions',
+		"CREATE TABLE T_polls__question (
+			pqst_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pqst_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			pqst_question_text VARCHAR(2000) NULL,
+			PRIMARY KEY (pqst_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 );
 
 ?>

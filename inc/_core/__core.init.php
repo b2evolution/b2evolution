@@ -75,6 +75,7 @@ $db_config['aliases'] = array(
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_syslog'                 => $tableprefix.'syslog',
+		'T_polls__question'        => $tableprefix.'polls__question',
 	);
 
 
@@ -124,6 +125,7 @@ $ctrl_mappings = array(
 		'email'            => 'tools/email.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
+		'polls'            => 'polls/polls.ctrl.php',
 	);
 
 
@@ -478,6 +480,25 @@ function & get_CronjobCache()
 
 
 /**
+ * Get the PollCache
+ *
+ * @return PollCache
+ */
+function & get_PollCache()
+{
+	global $PollCache;
+
+	if( ! isset( $PollCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'polls/model/_poll.class.php', 'Poll' );
+		$PollCache = new DataObjectCache( 'Poll', false, 'T_polls__question', 'pqst_', 'pqst_ID', 'pqst_question_text' );
+	}
+
+	return $PollCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module
@@ -528,6 +549,7 @@ class _core_Module extends Module
 				$permslugs = 'edit'; // Slug manager
 				$permtemplates = 'allowed'; // Skin settings
 				$permemails = 'edit'; // Email management
+				$permpolls = 'edit'; // Polls
 				$def_notification = 'full'; // Default notification type: short/full
 				break;
 
@@ -539,6 +561,7 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'view';
+				$permpolls = 'create';
 				$def_notification = 'short';
 				break;
 
@@ -550,6 +573,7 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
+				$permpolls = 'create';
 				$def_notification = 'short';
 				break;
 
@@ -561,6 +585,7 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
+				$permpolls = 'none';
 				$def_notification = 'short';
 				break;
 
@@ -575,6 +600,7 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
+				$permpolls = 'none';
 				$def_notification = 'short';
 				break;
 		}
@@ -594,6 +620,7 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
+			'perm_polls' => $permpolls,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
 			'cross_country_allow_contact' => $cross_country_settings_default
 		 );
@@ -746,6 +773,21 @@ class _core_Module extends Module
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
 				),
+			'perm_polls' => array(
+				'label'      => T_('Polls'),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'additional',
+				'options'    => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'create', T_('Create & Edit owned polls only') ),
+						array( 'view', T_('Create & Edit owned polls + View all') ),
+						array( 'edit', T_('Full Access') )
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => true,
+				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),
 				'user_func'  => 'check_cross_country_user_perm',
@@ -848,6 +890,14 @@ class _core_Module extends Module
 			case 'view':
 				// Users has view perms
 				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'create':
+				// Users has a create permisson:
+				if( $permlevel == 'create' )
 				{
 					$perm = true;
 					break;

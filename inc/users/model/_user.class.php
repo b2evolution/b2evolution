@@ -2267,7 +2267,7 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
-		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files', 'users' );
+		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files', 'users', 'polls' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
