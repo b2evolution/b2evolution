@@ -155,7 +155,7 @@ class AdminUI_general extends Menu
 	 */
 	function init_templates()
 	{
-		global $Hit;
+		global $Hit, $check_browser_version;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -163,8 +163,8 @@ class AdminUI_general extends Menu
 		// Load general JS file:
 		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 
-		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
-		{	// IE < 9
+		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// Display info message if browser IE < 9 version and it is allowed by config var:
 			global $Messages, $debug;
 			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 			if( $debug )
