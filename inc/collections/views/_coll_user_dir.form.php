@@ -28,7 +28,7 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
-$Form->hidden( 'tab', 'user' );
+$Form->hidden( 'tab', 'userdir' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
@@ -58,7 +58,7 @@ $Form->begin_line( T_('Country'), 'userdir_country' );
 		), '', '', array( 'force_keys_as_values' => true ) );
 $Form->end_line();
 $Form->checkbox( 'userdir_region', $edited_Blog->get_setting( 'userdir_region' ), T_('Region') );
-$Form->checkbox( 'userdir_subregion', $edited_Blog->get_setting( 'userdir_subregion' ), T_('Sub-Region') );
+$Form->checkbox( 'userdir_subregion', $edited_Blog->get_setting( 'userdir_subregion' ), T_('Sub-region') );
 $Form->checkbox( 'userdir_city', $edited_Blog->get_setting( 'userdir_city' ), T_('City') );
 
 $Form->checkbox( 'userdir_phone', $edited_Blog->get_setting( 'userdir_phone' ), T_('Phone') );

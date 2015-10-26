@@ -3187,6 +3187,14 @@ div.message_toolbars {
   line-height: 40px;
   display: block;
 }
+.ufld_icon_links.small a {
+  width: 20px;
+  height: 20px;
+}
+.ufld_icon_links.small a .fa {
+  font-size: 10px;
+  line-height: 20px;
+}
 .evo_private_messages_list .messages_navigation {
   padding: 5px;
 }

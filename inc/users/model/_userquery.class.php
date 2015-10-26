@@ -47,11 +47,13 @@ class UserQuery extends SQL
 
 		// Params to build query
 		$params = array_merge( array(
-				'join_group'   => true,
-				'join_session' => false,
-				'join_country' => true,
-				'join_city'    => true,
-				'grouped'      => false,
+				'join_group'     => true,
+				'join_session'   => false,
+				'join_country'   => true,
+				'join_region'    => false,
+				'join_subregion' => false,
+				'join_city'      => true,
+				'grouped'        => false,
 			), $params );
 
 		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
@@ -75,6 +77,18 @@ class UserQuery extends SQL
 			$this->SELECT_add( ', c.ctry_name, c.ctry_code, rc.ctry_name AS reg_ctry_name, rc.ctry_code AS reg_ctry_code' );
 			$this->FROM_add( 'LEFT JOIN T_regional__country AS c ON user_ctry_ID = c.ctry_ID ' );
 			$this->FROM_add( 'LEFT JOIN T_regional__country AS rc ON user_reg_ctry_ID = rc.ctry_ID ' );
+		}
+
+		if( $params['join_region'] )
+		{	// Join Region:
+			$this->SELECT_add( ', rgn_name' );
+			$this->FROM_add( 'LEFT JOIN T_regional__region ON user_rgn_ID = rgn_ID ' );
+		}
+
+		if( $params['join_subregion'] )
+		{	// Join Sub-region:
+			$this->SELECT_add( ', subrg_name' );
+			$this->FROM_add( 'LEFT JOIN T_regional__subregion ON user_subrg_ID = subrg_ID ' );
 		}
 
 		if( $params['join_city'] )

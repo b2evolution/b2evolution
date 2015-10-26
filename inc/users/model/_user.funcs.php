@@ -4628,12 +4628,18 @@ function users_results_block( $params = array() )
 			'display_ID'           => true,
 			'display_avatar'       => true,
 			'display_login'        => true,
+			'display_firstname'    => false,
+			'display_lastname'     => false,
 			'display_nickname'     => true,
 			'display_name'         => true,
 			'display_gender'       => true,
 			'display_country'      => true,
+			'display_region'       => false,
+			'display_subregion'    => false,
 			'display_country_type' => 'both', // 'both', 'flag', 'name'
 			'display_city'         => false,
+			'display_phone'        => false,
+			'display_soclinks'     => false,
 			'display_blogs'        => true,
 			'display_source'       => true,
 			'display_regdate'      => true,
@@ -4676,6 +4682,8 @@ function users_results_block( $params = array() )
 	$UserList = new UserList( $params['filterset_name'], $UserSettings->get('results_per_page'), $params['results_param_prefix'], array(
 			'join_group'          => $params['join_group'],
 			'join_city'           => $params['join_city'],
+			'join_region'         => $params['display_region'],
+			'join_subregion'      => $params['display_subregion'],
 			'join_country'        => $params['join_country'],
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
@@ -4748,8 +4756,10 @@ function users_results_block( $params = array() )
 		}
 	}
 
-	// Display result :
-	$UserList->display( $params['display_params'] );
+	if( count( $UserList->cols ) )
+	{	// Display result only if at least one columns is defined:
+		$UserList->display( $params['display_params'] );
+	}
 
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{ // Newsletter button
@@ -4777,11 +4787,19 @@ function users_results( & $UserList, $params = array() )
 			'display_ID'         => true,
 			'display_avatar'     => true,
 			'display_login'      => true,
+			'display_firstname'  => false,
+			'display_lastname'   => false,
 			'display_nickname'   => true,
 			'display_name'       => true,
+			'order_name'         => 'user_lastname, user_firstname',
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_country_type' => 'both', // 'both', 'flag', 'name'
+			'display_region'     => false,
+			'display_subregion'  => false,
+			'display_city'       => false,
+			'display_phone'      => false,
+			'display_soclinks'   => false,
 			'display_blogs'      => true,
 			'display_source'     => true,
 			'display_regdate'    => true,
@@ -4799,8 +4817,16 @@ function users_results( & $UserList, $params = array() )
 			'avatar_size'        => 'crop-top-48x48',
 			'th_class_login'     => 'shrinkwrap small',
 			'td_class_login'     => 'small',
+			'th_class_nickname'  => 'shrinkwrap small',
+			'td_class_nickname'  => 'small',
+			'th_class_name'      => 'small',
+			'td_class_name'      => 'small',
+			'th_class_country'   => 'shrinkwrap small',
+			'td_class_country'   => 'shrinkwrap small',
 			'th_class_city'      => 'shrinkwrap small',
 			'td_class_city'      => 'shrinkwrap small',
+			'th_class_lastvisit' => 'shrinkwrap small',
+			'td_class_lastvisit' => 'center small',
 		), $params );
 
 	if( $UserList->filters['group'] != -1 )
@@ -4855,7 +4881,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Picture'),
 				'th_class' => $params['th_class_avatar'],
-				'td_class' => $params['th_class_avatar'],
+				'td_class' => $params['td_class_avatar'],
 				'order' => 'has_picture',
 				'default_dir' => 'D',
 				'td' => '%user_td_avatar( #user_ID#, "'.$params['avatar_size'].'" )%',
@@ -4867,9 +4893,27 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Login'),
 				'th_class' => $params['th_class_login'],
-				'td_class' => $params['th_class_login'],
+				'td_class' => $params['td_class_login'],
 				'order' => 'user_login',
 				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
+			);
+	}
+
+	if( $params['display_firstname'] )
+	{	// Display first name:
+		$UserList->cols[] = array(
+				'th' => T_('First name'),
+				'order' => 'user_firstname',
+				'td' => '$user_firstname$',
+			);
+	}
+
+	if( $params['display_lastname'] )
+	{	// Display last name:
+		$UserList->cols[] = array(
+				'th' => T_('Last name'),
+				'order' => 'user_lastname',
+				'td' => '$user_lastname$',
 			);
 	}
 
@@ -4879,24 +4923,28 @@ function users_results( & $UserList, $params = array() )
 		if( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) )
 		{
 			$UserList->cols[] = array(
-									'th' => T_('Nickname'),
-									'th_class' => 'shrinkwrap small',
-									'td_class' => 'small',
-									'order' => 'user_nickname',
-									'td' => '$user_nickname$',
-								);
+					'th' => T_('Nickname'),
+					'th_class' => $params['th_class_nickname'],
+					'td_class' => $params['td_class_nickname'],
+					'order' => 'user_nickname',
+					'td' => '$user_nickname$',
+				);
 		}
 	}
 
 	if( $params['display_name'] )
-	{ // Display name
-		$UserList->cols[] = array(
-				'th' => T_('Name'),
-				'th_class' => 'small',
-				'td_class' => 'small',
-				'order' => 'user_lastname, user_firstname',
+	{	// Display full name:
+		$col = array(
+				'th' => T_('Full name'),
+				'th_class' => $params['th_class_name'],
+				'td_class' => $params['td_class_name'],
 				'td' => '$user_firstname$ $user_lastname$',
 			);
+		if( ! empty( $params['order_name'] ) )
+		{	// Set an order param for full name field:
+			$col['order'] = $params['order_name'];
+		}
+		$UserList->cols[] = $col;
 	}
 
 	if( $params['display_gender'] )
@@ -4916,8 +4964,8 @@ function users_results( & $UserList, $params = array() )
 		load_funcs( 'regional/model/_regional.funcs.php' );
 		$UserList->cols[] = array(
 				'th' => T_('Country'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'shrinkwrap small',
+				'th_class' => $params['th_class_country'],
+				'td_class' => $params['td_class_country'],
 				'order' => 'c.ctry_name',
 				'td' =>
 				 ( in_array( $params['display_country_type'], array( 'both', 'flag' ) ) ? '%country_flag( #ctry_code#, #ctry_name#, "w16px", "flag", "", false, true, "", false )%' : '' )
@@ -4926,14 +4974,54 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_region'] )
+	{	// Display region:
+		$UserList->cols[] = array(
+				'th' => T_('Region'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap',
+				'order' => 'rgn_name',
+				'td' => '$rgn_name$',
+			);
+	}
+
+	if( $params['display_subregion'] )
+	{	// Display sub-region:
+		$UserList->cols[] = array(
+				'th' => T_('Sub-region'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap',
+				'order' => 'subrg_name',
+				'td' => '$subrg_name$',
+			);
+	}
+
 	if( $params['display_city'] )
 	{ // Display city
 		$UserList->cols[] = array(
 				'th' => T_('City'),
 				'th_class' => $params['th_class_city'],
-				'td_class' => $params['th_class_city'],
+				'td_class' => $params['td_class_city'],
 				'order' => 'city_name',
 				'td' => '$city_name$<div class="note">$city_postcode$</div>',
+			);
+	}
+
+	if( $params['display_phone'] )
+	{	// Display phone:
+		$UserList->cols[] = array(
+				'th' => T_('Phone'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%user_td_phone( {Obj} )%',
+			);
+	}
+
+	if( $params['display_soclinks'] )
+	{	// Display social links:
+		$UserList->cols[] = array(
+				'th' => T_('Social links'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%user_td_soclinks( {Obj} )%',
 			);
 	}
 
@@ -5000,8 +5088,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display date of the last visit
 		$UserList->cols[] = array(
 				'th' => T_('Last Visit'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'center small',
+				'th_class' => $params['th_class_lastvisit'],
+				'td_class' => $params['td_class_lastvisit'],
 				'order' => 'user_lastseen_ts',
 				'default_dir' => 'D',
 				'td' => '%mysql2localedate( #user_lastseen_ts#, "M-d" )%',
@@ -5242,6 +5330,57 @@ function user_td_level( $user_ID, $user_level )
 		return $user_level;
 	}
 }
+
+
+/**
+ * Get all phones of the user
+ *
+ * @param object User
+ * @return string
+ */
+function user_td_phone( $User )
+{
+	// Get all fields with type "phone":
+	$phone_fields = $User->userfields_by_type( 'phone', false );
+
+	$r = '';
+	foreach( $phone_fields as $phone_field )
+	{
+		$r .= '<div class="nowrap">'
+				.'<span class="'.$phone_field->ufdf_icon_name.' ufld_'.$phone_field->ufdf_code.' ufld__textcolor"></span> '
+				.$phone_field->uf_varchar
+			.'</div>';
+	}
+
+	return $r;
+}
+/**
+ * Get all social links of the user
+ *
+ * @param object User
+ * @return string
+ */
+function user_td_soclinks( $User )
+{
+	// Get all fields with type "url":
+	$url_fields = $User->userfields_by_type( 'url' );
+
+	$r = '';
+	if( count( $url_fields ) )
+	{
+		$r .= '<div class="ufld_icon_links small">';
+		foreach( $url_fields as $field )
+		{
+			$r .= '<a href="'.$field->uf_varchar.'" class="ufld_'.$field->ufdf_code.' ufld__hoverbgcolor">'
+					.'<span class="'.$field->ufdf_icon_name.'"></span>'
+				.'</a>';
+		}
+		$r .= '</div>';
+	}
+
+	return $r;
+}
+
 
 /**
  * Get user level as link to edit ot as simple text to view

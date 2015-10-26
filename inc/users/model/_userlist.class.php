@@ -53,8 +53,10 @@ class UserList extends DataObjectList2
 	 * @param array Query params:
 	 *                    'join_group'   => true,
 	 *                    'join_session' => false,
-	 *                    'join_country' => true,
-	 *                    'join_city'    => true,
+	 *                    'join_country'   => true,
+	 *                    'join_region'    => false,
+	 *                    'join_subregion' => false,
+	 *                    'join_city'      => true,
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization

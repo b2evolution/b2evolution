@@ -737,30 +737,42 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // User links widget
-.ufld_icon_links a {
-	display: inline-block;
-	text-decoration: none;
-	color: #FFF;
-	background: #ddd;
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	margin: 2px;
-	position: relative;
-	-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	&:hover {
-		.border-radius;
+.ufld_icon_links {
+	a {
+		display: inline-block;
+		text-decoration: none;
 		color: #FFF;
-		background: #23527c;
-		// TODO: use @variable name
+		background: #ddd;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		margin: 2px;
+		position: relative;
+		-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		&:hover {
+			.border-radius;
+			color: #FFF;
+			background: #23527c;
+			// TODO: use @variable name
+		}
+		.fa {
+			font-size: 20px;
+			line-height: 40px;
+			display: block;
+		}
 	}
-	.fa {
-		font-size: 20px;
-		line-height: 40px;
-		display: block;
+	&.small {
+		a {
+			width: 20px;
+			height: 20px;
+			.fa {
+				font-size: 10px;
+				line-height: 20px;
+			}
+		}
 	}
 }
 
