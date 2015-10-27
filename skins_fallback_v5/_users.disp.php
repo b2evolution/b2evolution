@@ -86,7 +86,7 @@ $params = array_merge( array(
 		'th_class_name'        => '',
 		'td_class_name'        => '',
 		'th_class_country'     => 'shrinkwrap',
-		'td_class_country'     => 'nowrap',
+		'td_class_country'     => $Blog->get_setting( 'userdir_country_type' ) == 'flag' ? 'center' : 'nowrap',
 		'th_class_city'        => 'shrinkwrap',
 		'td_class_city'        => 'nowrap',
 		'th_class_lastvisit'   => 'shrinkwrap',
