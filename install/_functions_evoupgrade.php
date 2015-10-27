@@ -6611,6 +6611,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		) ENGINE = innodb' );
 		task_end();
 
+		task_begin( 'Creating table for Poll options...' );
+		$DB->query( 'CREATE TABLE T_polls__option (
+			popt_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			popt_pqst_ID     INT(11) UNSIGNED NOT NULL,
+			popt_option_text VARCHAR(2000) NULL,
+			popt_order       INT(11) NOT NULL,
+			PRIMARY KEY (popt_ID)
+		) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Creating table for Poll answers...' );
+		$DB->query( 'CREATE TABLE T_polls__answer (
+			pans_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pans_pqst_ID INT(11) UNSIGNED NOT NULL,
+			pans_user_ID INT(11) UNSIGNED NOT NULL,
+			pans_popt_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (pans_ID)
+		) ENGINE = innodb' );
+		task_end();
+
 		// set_upgrade_checkpoint( '11520' );
 	}
 

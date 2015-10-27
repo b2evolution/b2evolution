@@ -49,7 +49,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'edit', true );
+		$current_User->check_perm( 'polls', 'view', true, $edited_Poll );
 		break;
  
 	case 'create':
@@ -109,14 +109,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit polls:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'pqst_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:
-			$msg = sprintf( T_('Poll "%s" has been deleted.'), '<b>'.$edited_Poll->dget( 'question_text' ).'</b>' );
+			$msg = sprintf( T_('Poll "%s" has been deleted.'), '<b>'.$edited_Poll->get_name().'</b>' );
 			$edited_Poll->dbdelete();
 			unset( $edited_Poll );
 			forget_param( 'pqst_ID' );
@@ -127,7 +127,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Poll->check_delete( sprintf( T_('Cannot delete poll "%s"'), '<b>'.$edited_Poll->dget( 'question_text' ).'</b>' ), array(), true ) )
+			if( ! $edited_Poll->check_delete( sprintf( T_('Cannot delete poll "%s"'), '<b>'.$edited_Poll->get_name().'</b>' ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}
@@ -143,6 +143,8 @@ $AdminUI->breadcrumbpath_add( T_('Polls'), $admin_url.'?ctrl=polls' );
 if( $action == 'new' || $action == 'edit' )
 {
 	$AdminUI->set_page_manual_link( 'poll-form' );
+	// Init JS to autcomplete the user logins
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 }
 else
 {
@@ -175,7 +177,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Poll->confirm_delete(
-				sprintf( T_('Delete poll "%s"?'), '<b>'.$edited_Poll->dget( 'question_text' ).'</b>' ),
+				sprintf( T_('Delete poll "%s"?'), '<b>'.$edited_Poll->get_name().'</b>' ),
 				'poll', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

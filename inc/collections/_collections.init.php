@@ -662,7 +662,7 @@ class collections_Module extends Module
 					'href' => $admin_url.'?ctrl=itemtags'
 				);
 			}
-			if( $current_User->check_perm( 'polls', 'view' ) )
+			if( $current_User->check_perm( 'polls', 'create' ) )
 			{	// User has an access to view polls:
 				$site_menu['entries']['polls'] = array(
 					'text' => T_('Polls'),

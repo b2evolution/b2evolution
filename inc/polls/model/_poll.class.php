@@ -39,11 +39,33 @@ class Poll extends DataObject
 		parent::DataObject( 'T_polls__question', 'pqst_', 'pqst_ID' );
 
 		if( $db_row != NULL )
-		{
+		{	// Get poll data from DB:
 			$this->ID = $db_row->pqst_ID;
 			$this->owner_user_ID = $db_row->pqst_owner_user_ID;
 			$this->question_text = $db_row->pqst_question_text;
 		}
+		else
+		{	// Set default poll data for new poll:
+			if( is_logged_in() )
+			{
+				global $current_User;
+				$this->set( 'owner_user_ID', $current_User->ID );
+			}
+		}
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_polls__option', 'fk' => 'popt_pqst_ID', 'msg' => T_('%d poll options') ),
+				array( 'table' => 'T_polls__answer', 'fk' => 'pans_pqst_ID', 'msg' => T_('%d poll answers') ),
+			);
 	}
 
 
@@ -54,17 +76,68 @@ class Poll extends DataObject
 	 */
 	function load_from_Request()
 	{
-		if( empty( $this->ID ) )
+		global $current_User;
+
+		// Owner:
+		if( $current_User->check_perm( 'polls', 'edit' ) )
+		{	// Update the owner if current user has a permission to edit all polls:
+			$pqst_owner_login = param( 'pqst_owner_login', 'string', NULL );
+			param_check_not_empty( 'pqst_owner_login', T_('Please enter the owner\'s login.') );
+			if( ! empty( $pqst_owner_login ) )
+			{	// If the login is entered:
+				$UserCache = & get_UserCache();
+				$owner_User = & $UserCache->get_by_login( $pqst_owner_login );
+				if( empty( $owner_User ) )
+				{	// Wrong entered login:
+					param_error( 'pqst_owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $pqst_owner_login ) );
+				}
+				else
+				{	// Set new login:
+					$this->set( 'owner_user_ID', $owner_User->ID );
+					$this->owner_User = & $owner_User;
+				}
+			}
+		}
+		elseif( empty( $this->ID ) )
 		{	// Set onwer user ID on creating new poll:
-			global $current_User;
 			$this->set( 'owner_user_ID', $current_User->ID );
+			$this->owner_User = & $current_User;
 		}
 
 		// Question:
-		$question_text = param( 'question_text', 'string', true );
-		$this->set( 'question_text', $question_text );
+		param( 'pqst_question_text', 'string', false );
+		param_check_not_empty( 'pqst_question_text', T_('Please enter the text for the poll\'s question.') );
+		$this->set_from_Request( 'question_text' );
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Get name of the question. It is a string as first 200 chars of the question text:
+	 *
+	 * @return string
+	 */
+	function get_name()
+	{
+		return strmaxlen( $this->get( 'question_text' ), 200 );
+	}
+
+
+	/**
+	 * Get user object of this poll owner
+	 *
+	 * @return object User
+	 */
+	function & get_owner_User()
+	{
+		if( ! isset( $this->owner_User ) )
+		{	// Get the owner User only first time:
+			$UserCache = & get_UserCache();
+			$this->owner_User = & $UserCache->get_by_ID( $this->owner_user_ID );
+		}
+
+		return $this->owner_User;
 	}
 }
 

@@ -76,6 +76,8 @@ $db_config['aliases'] = array(
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_syslog'                 => $tableprefix.'syslog',
 		'T_polls__question'        => $tableprefix.'polls__question',
+		'T_polls__option'          => $tableprefix.'polls__option',
+		'T_polls__answer'          => $tableprefix.'polls__answer',
 	);
 
 
@@ -775,8 +777,8 @@ class _core_Module extends Module
 				),
 			'perm_polls' => array(
 				'label'      => T_('Polls'),
-				'user_func'  => 'check_core_user_perm',
-				'group_func' => 'check_core_group_perm',
+				'user_func'  => 'check_poll_user_perm',
+				'group_func' => 'check_poll_group_perm',
 				'perm_block' => 'additional',
 				'options'    => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
@@ -894,15 +896,6 @@ class _core_Module extends Module
 					$perm = true;
 					break;
 				}
-
-			case 'create':
-				// Users has a create permisson:
-				if( $permlevel == 'create' )
-				{
-					$perm = true;
-					break;
-				}
-
 		}
 
 		return $perm;
@@ -934,6 +927,72 @@ class _core_Module extends Module
 		// Check if browse/contact users from other countries is allowed
 		return $permvalue == 'allowed';
 	}
+
+	/**
+	 * Check an user permission for the poll. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value, this is the value on the database
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_poll_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return true;
+	}
+
+	/**
+	 * Check a group permission for the poll. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_poll_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+
+		switch ( $permvalue )
+		{
+			case 'edit':
+				// Users has edit perms
+				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// Users has view perms
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'create':
+				// Users has a create permisson:
+				if( $permlevel == 'create' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+
+		if( ! $perm && is_logged_in() && ! empty( $permtarget )
+		    && ( $permlevel == 'edit' || $permlevel == 'view' ) )
+		{	// If this perm level is still not allowed, check if current user is owner of the requested Poll:
+			global $current_User;
+			if( $current_User->ID == $permtarget->owner_user_ID )
+			{	// Current user is owner
+				$perm = true;
+			}
+		}
+
+		return $perm;
+	}
+
 
 	/**
 	 * Build the evobar menu

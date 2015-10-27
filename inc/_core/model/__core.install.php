@@ -511,6 +511,26 @@ $schema_queries = array(
 			pqst_question_text VARCHAR(2000) NULL,
 			PRIMARY KEY (pqst_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_polls__option' => array(
+		'Creating table for Poll options',
+		"CREATE TABLE T_polls__option (
+			popt_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			popt_pqst_ID     INT(11) UNSIGNED NOT NULL,
+			popt_option_text VARCHAR(2000) NULL,
+			popt_order       INT(11) NOT NULL,
+			PRIMARY KEY (popt_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_polls__answer' => array(
+		'Creating table for Poll answers',
+		"CREATE TABLE T_polls__answer (
+			pans_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pans_pqst_ID INT(11) UNSIGNED NOT NULL,
+			pans_user_ID INT(11) UNSIGNED NOT NULL,
+			pans_popt_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (pans_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 );
 
 ?>
