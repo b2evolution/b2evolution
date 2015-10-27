@@ -125,8 +125,8 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
 		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="Vimeo" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -141,7 +141,7 @@ class videoplug_plugin extends Plugin
 				while( 1 )
 				{
 					var valid_video_ID = false;
-					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
+					var p = '<?php echo TS_('Please copy/paste the URL (or video ID) of your video from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
@@ -164,7 +164,6 @@ class videoplug_plugin extends Plugin
 						case 'dailymotion':
 							// Parse video ID from URL:
 							video_ID = video_ID.replace( /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i, '$2' );
-							alert( video_ID );
 							if( video_ID.match( /^[a-z0-9]+$/i ) )
 							{ // valid
 								valid_video_ID = true;
@@ -190,7 +189,7 @@ class videoplug_plugin extends Plugin
 					{
 						break;
 					}
-					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
+					alert( '<?php echo TS_('The URL you provided could not be parsed.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';
