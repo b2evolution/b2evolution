@@ -193,11 +193,12 @@ class OnlineSessions
 		{
 			if( !empty( $user_ID ) && ( $User = & $UserCache->get_by_ID( $user_ID, false ) ) )
 			{
-				// assign by ID so that each user is only counted once (he could use multiple user agents at the same time)
-				$this->_registered_Users[ $user_ID ] = & $User;
-
 				if( $UserSettings->get( 'show_online', $User->ID ) )
-				{
+				{	// Assign by ID so that each user is only counted once (he could use multiple user agents at the same time):
+					$this->_registered_Users[ $user_ID ] = & $User;
+				}
+				else
+				{	// Count this user as guest when he doesn't want to be visible:
 					$this->_count_guests++;
 				}
 			}
