@@ -241,6 +241,27 @@ else
 	$AdminUI->set_page_manual_link( 'polls-list' );
 }
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new_option':
+	case 'create_option':
+	case 'edit_option':
+	case 'update_option':
+		$AdminUI->set_page_manual_link( 'poll-option-form' );
+		break;
+	case 'delete_option':
+	case 'new':
+	case 'create':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'poll-form' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'polls-list' );
+		break;
+}
+
 // Init JS to autcomplete the user logins
 init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 

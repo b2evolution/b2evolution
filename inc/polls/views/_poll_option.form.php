@@ -26,7 +26,7 @@ $Form = new Form( NULL, 'poll_option_checkchanges', 'post', 'compact' );
 $Form->global_icon( T_('Cancel editing!'), 'close', url_add_param( regenerate_url( 'action,popt_ID,blog' ), 'action=edit' ) );
 
 $Form->begin_form( 'fform', sprintf( ( $creating ?  T_('New poll option for question "%s"') : T_('Poll option for question "%s"') ), $edited_Poll->get_name() )
-		.get_manual_link( 'poll-form' ) );
+		.get_manual_link( 'poll-option-form' ) );
 
 	$Form->add_crumb( 'poll' );
 	$Form->hidden( 'action', $creating ? 'create_option' : 'update_option' );

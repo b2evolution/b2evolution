@@ -511,7 +511,7 @@ function & get_PollOptionCache()
 
 	if( ! isset( $PollOptionCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'polls/model/_poll_option.class.php', 'Poll' );
+		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
 		$PollOptionCache = new DataObjectCache( 'PollOption', false, 'T_polls__option', 'popt_', 'popt_ID', 'popt_option_text' );
 	}
 

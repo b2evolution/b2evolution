@@ -29,6 +29,11 @@ class Poll extends DataObject
 	var $question_text;
 
 	/**
+	 * @var array PollOption objects
+	 */
+	var $poll_options;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -138,6 +143,31 @@ class Poll extends DataObject
 		}
 
 		return $this->owner_User;
+	}
+
+
+	/**
+	 * Get all options of this poll
+	 *
+	 * @return array PollOption objects
+	 */
+	function get_poll_options()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating poll doesn't have the options, Return empty array:
+			return array();
+		}
+
+		if( $this->poll_options === NULL )
+		{	// Get options from DB only first time, and store them in cache array:
+			$PollOptionCache = & get_PollOptionCache();
+			$PollOptionCache->clear();
+			$PollOptionCache->load_where( 'popt_pqst_ID = '.$this->ID );
+
+			$this->poll_options = $PollOptionCache->cache;
+		}
+
+		return $this->poll_options;
 	}
 }
 
