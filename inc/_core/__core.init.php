@@ -501,6 +501,25 @@ function & get_PollCache()
 
 
 /**
+ * Get the PollOptionCache
+ *
+ * @return PollOptionCache
+ */
+function & get_PollOptionCache()
+{
+	global $PollOptionCache;
+
+	if( ! isset( $PollOptionCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'polls/model/_poll_option.class.php', 'Poll' );
+		$PollOptionCache = new DataObjectCache( 'PollOption', false, 'T_polls__option', 'popt_', 'popt_ID', 'popt_option_text' );
+	}
+
+	return $PollOptionCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module

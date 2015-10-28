@@ -308,6 +308,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
+				array( 'table'=>'T_polls__answers', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 			);
 	}
 
