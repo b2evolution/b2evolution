@@ -143,13 +143,14 @@ $AdminUI->breadcrumbpath_add( T_('Polls'), $admin_url.'?ctrl=polls' );
 if( $action == 'new' || $action == 'edit' )
 {
 	$AdminUI->set_page_manual_link( 'poll-form' );
-	// Init JS to autcomplete the user logins
-	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 }
 else
 {
 	$AdminUI->set_page_manual_link( 'polls-list' );
 }
+
+// Init JS to autcomplete the user logins
+init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

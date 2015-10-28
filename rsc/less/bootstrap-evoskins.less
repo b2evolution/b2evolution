@@ -388,6 +388,13 @@ div.filters {
 	&.panel-body {
 		padding: 15px;
 	}
+	// Fix style for fields with autocomplete usernames:
+	.twitter-typeahead {
+		vertical-align: middle;
+		.tt-dropdown-menu div {
+			margin-left: 0;
+		}
+	}
 }
 .table_scroll .table {
 	margin-bottom: 0;

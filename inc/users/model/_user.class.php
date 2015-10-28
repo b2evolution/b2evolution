@@ -269,7 +269,7 @@ class User extends DataObject
 				array( 'table'=>'T_blogs', 'fk'=>'blog_owner_user_ID', 'msg'=>T_('%d blogs owned by this user') ),
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
-				array( 'table'=>'T_polls__question', 'fk'=>'pqst_ID', 'msg'=>T_('%d poll questions') ),
+				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d poll questions') ),
 				// Do not delete user private messages
 				//array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has authored %d message(s)') ),
 				//array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('The user is part of %d messaging thread(s)') ),
@@ -337,6 +337,43 @@ class User extends DataObject
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
 					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
 		}
+	}
+
+
+	/**
+	 * Get link to restricted object
+	 *
+	 * Used when try to delete an user which has at least one poll question
+	 *
+	 * @param array restriction
+	 * @return string message with link to objects
+	 */
+	function get_restriction_link( $restriction )
+	{
+		if( $restriction['table'] == 'T_polls__question' )
+		{	// Check restriction for poll questions:
+			global $DB, $current_User, $admin_url;
+
+			// Get a count of poll questions
+			$polls_count_SQL = new SQL();
+			$polls_count_SQL->SELECT( 'COUNT( pqst_ID )' );
+			$polls_count_SQL->FROM( $restriction['table'] );
+			$polls_count_SQL->WHERE( $restriction['fk'].' = '.$this->ID );
+			$polls_count = $DB->get_var( $polls_count_SQL->get(), 0, NULL, 'Get all poll questions of the user to check restriction befor deleting' );
+
+			if( $polls_count > 0 )
+			{	// Display this restriction as link to polls list with filter by this user login:
+				$msg = sprintf( $restriction['msg'], $polls_count );
+				if( is_logged_in() && $current_User->check_perm( 'polls', 'view' ) )
+				{	// Set a link to poll questions list with filter by this user if current user has a perm to view all polls:
+					$msg = '<a href="'.$admin_url.'?ctrl=polls&amp;owner='.$this->login.'">'.$msg.'</a>';
+				}
+				return $msg;
+			}
+		}
+
+		// no restriction
+		return '';
 	}
 
 
