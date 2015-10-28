@@ -141,7 +141,7 @@ class videoplug_plugin extends Plugin
 				while( 1 )
 				{
 					var valid_video_ID = false;
-					var p = '<?php echo TS_('Please copy/paste the URL (or video ID) of your video from %s:') ?>';
+					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
@@ -153,7 +153,7 @@ class videoplug_plugin extends Plugin
 					{
 						case 'youtube':
 							// Parse video ID from URL:
-							video_ID = video_ID.replace( /^(.+\?v=)?([a-z0-9_-]+)$/i, '$2' );
+							video_ID = video_ID.replace( /^(.+\?v=)?([a-z0-9_?=-]+)$/i, '$2' );
 							// Allow HD video code with ?hd=1 at the end
 							if( video_ID.match( /^[a-z0-9_?=-]+$/i ) )
 							{ // valid
@@ -172,7 +172,7 @@ class videoplug_plugin extends Plugin
 
 						case 'vimeo':
 							// Parse video ID from URL:
-							video_ID = video_ID.replace( /^(.+\/)?([0-9]+)$/i, '$2' );
+							video_ID = video_ID.replace( /^(.+\/)?(\d+)$/i, '$2' );
 							if( video_ID.match( /^\d+$/ ) )
 							{ // valid
 								valid_video_ID = true;
@@ -189,7 +189,7 @@ class videoplug_plugin extends Plugin
 					{
 						break;
 					}
-					alert( '<?php echo TS_('The URL you provided could not be parsed.'); ?>' );
+					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';
