@@ -140,7 +140,6 @@ class videoplug_plugin extends Plugin
 			{
 				while( 1 )
 				{
-					var valid_video_ID = false;
 					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
@@ -149,46 +148,54 @@ class videoplug_plugin extends Plugin
 					}
 
 					// Validate Video ID or URL:
+					var regexp_ID = false;
+					var regexp_URL = false;
 					switch( tag )
 					{
 						case 'youtube':
-							// Parse video ID from URL:
-							video_ID = video_ID.replace( /^(.+\?v=)?([a-z0-9_?=-]+)$/i, '$2' );
 							// Allow HD video code with ?hd=1 at the end
-							if( video_ID.match( /^[a-z0-9_?=-]+$/i ) )
-							{ // valid
-								valid_video_ID = true;
-							}
+							regexp_ID = /^[a-z0-9_?=-]+$/i;
+							regexp_URL = /^(.+\?v=)?([a-z0-9_?=-]+)$/i;
 							break;
 
 						case 'dailymotion':
-							// Parse video ID from URL:
-							video_ID = video_ID.replace( /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i, '$2' );
-							if( video_ID.match( /^[a-z0-9]+$/i ) )
-							{ // valid
-								valid_video_ID = true;
-							}
+							regexp_ID = /^[a-z0-9]+$/i;
+							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i;
 							break;
 
 						case 'vimeo':
-							// Parse video ID from URL:
-							video_ID = video_ID.replace( /^(.+\/)?(\d+)$/i, '$2' );
-							if( video_ID.match( /^\d+$/ ) )
-							{ // valid
-								valid_video_ID = true;
-							}
+							regexp_ID = /^\d+$/;
+							regexp_URL = /^(.+\/)?(\d+)$/;
 							break;
 
 						default:
 							// Don't allow unknown video:
-							valid_video_ID = false;
 							break;
 					}
 
-					if( valid_video_ID )
-					{
-						break;
+					if( regexp_ID && regexp_URL )
+					{	// Check the entered data by regexp:
+						if( video_ID.match( regexp_ID ) )
+						{	// Valid video ID
+							break;
+						}
+						else if( video_ID.match( /^https?:\/\// ) )
+						{	// If this is URL, Check to correct format:
+							if( video_ID.match( regexp_URL ) )
+							{	// Valid video URL
+								// Extract ID from URL:
+								video_ID = video_ID.replace( regexp_URL, '$2' );
+								break;
+							}
+							else
+							{	// Display error when URL doesn't match:
+								alert( '<?php echo TS_('The URL you provided could not be parsed.'); ?>' );
+								continue;
+							}
+						}
 					}
+
+					// Display error of wrong entered data:
 					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
 				}
 
