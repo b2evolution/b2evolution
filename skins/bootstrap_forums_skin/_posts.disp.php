@@ -239,6 +239,14 @@ elseif( isset( $current_Chapter ) )
 	<?php
 		// Buttons to post/reply
 		$Skin->display_post_button( $cat );
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Display a warning if current user cannot post a topic because he must activate account:
+			global $Messages;
+			$Messages->clear();
+			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
+				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
+			$Messages->display();
+		}
 
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
