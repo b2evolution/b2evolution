@@ -209,7 +209,25 @@ $Form->begin_form( '', '', $params );
 
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
+	ob_start();
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	$plugin_button = ob_get_flush();
+	if( empty( $plugin_button ) )
+	{	// If button is not displayed by any plugin
+		// Display a current status of HTML allowing for the edited item:
+		echo '<span class="html_status">';
+		if( $edited_Item->get_type_setting( 'allow_html' ) )
+		{
+			echo T_('HTML is allowed');
+		}
+		else
+		{
+			echo T_('HTML is not allowed');
+		}
+		// Display manual link for more info:
+		echo get_manual_link( 'post-allow-html' );
+		echo '</span>';
+	}
 	echo '</div>';
 
 	echo '<div class="pull-right">';

@@ -846,3 +846,7 @@ a.to_top {
 .evo_comment_avatar > a:hover {
   background-color: transparent !important;
 }
+.comments_link__pagination .alert {
+  margin: 0;
+  text-align: left;
+}
