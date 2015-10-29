@@ -338,6 +338,17 @@ function create_default_data()
 		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
 	task_end();
 
+
+	task_begin( 'Creating default polls... ' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
+		VALUES ( 1, "What color is a carrot?" )' );
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+		VALUES ( 1, "Red", 1 ),
+		       ( 1, "Orange", 2 ),
+		       ( 1, "Yellow", 3 ),
+		       ( 1, "Blue", 4 )' );
+	task_end();
+
 	// Update the progress bar status
 	update_install_progress_bar();
 

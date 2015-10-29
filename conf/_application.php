@@ -83,5 +83,6 @@ $modules = array(
 		'sessions',
 		'messaging',
 		'maintenance',
+		'polls',
 	);
 ?>

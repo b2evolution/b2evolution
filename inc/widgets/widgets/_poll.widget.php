@@ -116,23 +116,62 @@ class poll_Widget extends ComponentWidget
 		}
 		else
 		{	// Display a form for voting on poll:
-			echo $Poll->get( 'question_text' );
+			echo '<p>'.$Poll->get( 'question_text' ).'</p>';
 
 			$poll_options = $Poll->get_poll_options();
 			if( count( $poll_options ) )
 			{	// Display a form only if at least one poll option exists:
-				$Form = new Form();
+				if( is_logged_in() )
+				{	// Set form action to vote if current user is logged in:
+					$form_action = get_samedomain_htsrv_url().'action.php?mname=polls';
+				}
+				else
+				{	// Set form action to log in:
+					$form_action = get_login_url( 'poll widget' );
+				}
+
+				$Form = new Form( $form_action );
+
 				$Form->begin_form();
-				echo '<table class="poll_table">';
-				foreach( $poll_options as $PollOption )
+
+				if( is_logged_in() )
+				{	// Set the hidden fields for voting only when user is logged in:
+					$Form->add_crumb( 'polls' );
+					$Form->hidden( 'action', 'vote' );
+					$Form->hidden( 'poll_ID', $Poll->ID );
+				}
+
+				// Get the option ID if current user already voted on this poll question:
+				$user_vote_option_ID = $Poll->get_user_vote();
+
+				echo '<table class="evo_poll__table">';
+				foreach( $poll_options as $poll_option )
 				{
 					echo '<tr>';
-					echo '<td><input type="radio" id="poll_answer_'.$PollOption->ID.'" name="poll_answer" /></td>';
-					echo '<td><label for="poll_answer_'.$PollOption->ID.'">'.$PollOption->get( 'option_text' ).'</label></td>';
+					echo '<td><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
+							.' name="poll_answer" value="'.$poll_option->ID.'"'
+							.( $user_vote_option_ID == $poll_option->ID ? ' checked="checked"' : '' ).' /></td>';
+					echo '<td><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
+					if( $user_vote_option_ID )
+					{	// If current user already voted on this poll, Display the voting results:
+						echo '<td><div class="evo_poll__percent"><div style="width:'.$poll_option->percent.'%"></div></div>'
+							.$poll_option->percent.'%</td>';
+					}
 					echo '</tr>';
 				}
 				echo '</table>';
-				$Form->button( array( 'submit', 'submit', T_('Vote'), 'SaveButton' ) );
+
+				if( is_logged_in() )
+				{	// Display a button to vote:
+					$Form->button( array( 'submit', 'submit',
+							( $user_vote_option_ID ? T_('Change vote') : T_('Vote') ),
+							'SaveButton'.( $user_vote_option_ID ? ' btn-default' : '' ) ) );
+				}
+				else
+				{	// Display a button to log in:
+					$Form->button( array( 'submit', 'submit', T_('Log in'), 'SaveButton btn-success' ) );
+				}
+
 				$Form->end_form();
 			}
 			else

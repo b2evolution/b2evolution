@@ -6627,7 +6627,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			pans_pqst_ID INT(11) UNSIGNED NOT NULL,
 			pans_user_ID INT(11) UNSIGNED NOT NULL,
 			pans_popt_ID INT(11) UNSIGNED NOT NULL,
-			PRIMARY KEY (pans_ID)
+			PRIMARY KEY (pans_ID),
+			UNIQUE pans_pqst_user_ID ( pans_pqst_ID, pans_user_ID )
 		) ENGINE = innodb' );
 		task_end();
 

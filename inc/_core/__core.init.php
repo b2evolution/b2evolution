@@ -75,9 +75,6 @@ $db_config['aliases'] = array(
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_syslog'                 => $tableprefix.'syslog',
-		'T_polls__question'        => $tableprefix.'polls__question',
-		'T_polls__option'          => $tableprefix.'polls__option',
-		'T_polls__answer'          => $tableprefix.'polls__answer',
 	);
 
 
@@ -512,7 +509,7 @@ function & get_PollOptionCache()
 	if( ! isset( $PollOptionCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
-		$PollOptionCache = new DataObjectCache( 'PollOption', false, 'T_polls__option', 'popt_', 'popt_ID', 'popt_option_text' );
+		$PollOptionCache = new DataObjectCache( 'PollOption', false, 'T_polls__option', 'popt_', 'popt_ID', 'popt_option_text', 'popt_order' );
 	}
 
 	return $PollOptionCache;

@@ -160,14 +160,59 @@ class Poll extends DataObject
 
 		if( $this->poll_options === NULL )
 		{	// Get options from DB only first time, and store them in cache array:
-			$PollOptionCache = & get_PollOptionCache();
-			$PollOptionCache->clear();
-			$PollOptionCache->load_where( 'popt_pqst_ID = '.$this->ID );
+			global $DB;
 
-			$this->poll_options = $PollOptionCache->cache;
+			// Get an options count of the edited poll which has at least one answer:
+			$count_SQL = new SQL();
+			$count_SQL->SELECT( 'COUNT( pans_ID )' );
+			$count_SQL->FROM( 'T_polls__answer' );
+			$count_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
+			$poll_options_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get an options count of this poll which has at least one answer' );
+			if( $poll_options_count == 0 )
+			{	// To don't devide by zero
+				$poll_options_count = 1;
+			}
+
+			$SQL = new SQL();
+			$SQL->SELECT( 'popt_ID AS ID, popt_pqst_ID AS pqst_ID, popt_option_text AS option_text,' );
+			//$SQL->SELECT_add( 'COUNT( pans_ID ) AS answers_count,' );
+			$SQL->SELECT_add( 'ROUND( COUNT( pans_ID ) / '.$poll_options_count.' * 100 ) AS percent' );
+			$SQL->FROM( 'T_polls__option' );
+			$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
+			$SQL->WHERE( 'popt_pqst_ID = '.$this->ID );
+			$SQL->GROUP_BY( 'popt_ID' );
+			$SQL->ORDER_BY( 'popt_order' );
+
+			$this->poll_options = $DB->get_results( $SQL->get(), OBJECT, 'Get all options of this poll' );
 		}
 
 		return $this->poll_options;
+	}
+
+
+	/**
+	 * Get a vote of the current user
+	 *
+	 * @return integer|boolean Poll option ID OR FALSE if current user didn't vote on this poll yet
+	 */
+	function get_user_vote()
+	{
+		if( empty( $this->ID ) || ! is_logged_in() )
+		{	// User must be logged in and poll question must exists in DB
+			return false;
+		}
+
+		global $DB, $current_User;
+
+		// Get answer of current user for this poll:
+		$poll_option_SQL = new SQL();
+		$poll_option_SQL->SELECT( 'pans_popt_ID' );
+		$poll_option_SQL->FROM( 'T_polls__answer' );
+		$poll_option_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
+		$poll_option_SQL->WHERE_and( 'pans_user_ID = '.$current_User->ID );
+		$poll_option_ID = $DB->get_var( $poll_option_SQL->get(), 0, NULL, 'Get answer of current user on the poll question' );
+
+		return empty( $poll_option_ID ) ? false : $poll_option_ID;
 	}
 }
 

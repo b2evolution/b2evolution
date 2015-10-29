@@ -142,7 +142,7 @@ if( $edited_Poll->ID > 0 )
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'right nowrap',
 			'order'    => 'answers_percent',
-			'td'       => '$answers_percent$ %',
+			'td'       => '$answers_percent$%',
 		);
 
 	if( $perm_poll_edit )

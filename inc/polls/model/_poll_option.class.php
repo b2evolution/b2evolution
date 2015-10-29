@@ -101,6 +101,28 @@ class PollOption extends DataObject
 	{
 		return strmaxlen( $this->get( 'option_text' ), 200 );
 	}
+
+
+	/**
+	 * Vote on this poll option by current User
+	 *
+	 * @return boolean TRUE on successful voting
+	 */
+	function vote()
+	{
+		global $current_User, $DB;
+
+		if( !is_logged_in() )
+		{	// User must be logged in for voting:
+			return false;
+		}
+
+		// Set new vote or update the previous vote for current user:
+		$result = $DB->query( 'REPLACE INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+				VALUES ( '.$DB->quote( $this->pqst_ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).' )' );
+
+		return $result ? true : false;
+	}
 }
 
 ?>
