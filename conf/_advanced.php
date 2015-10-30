@@ -931,8 +931,8 @@ $outgoing_proxy_password = '';
 
 
 /**
- * Check old browsers like IE and display info message.
- * Set FALSE to don't check and don't inform users if they use old browsers.
+ * Check for old browsers like IE and display info message.
+ * Set to false if you don't want this check and never inform users if they use an old browser.
  */
 $check_browser_version = true;
 
