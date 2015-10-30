@@ -7683,5 +7683,66 @@ class Item extends ItemLight
 
 		return $this->parent_Item;
 	}
+
+
+	/**
+	 * Extract all possible tags from item contents
+	 *
+	 * @return array Tags
+	 */
+	function search_tags_by_content()
+	{
+		global $DB;
+
+		// Concatenate all text item fields:
+		$search_string = $this->get( 'title' ).' '
+			.$this->get( 'content' ).' '
+			.$this->get( 'excerpt').' '
+			.$this->get( 'titletag' ).' '
+			.$this->get_setting( 'metadesc' ).' '
+			.$this->get_setting( 'metakeywords' ).' ';
+		// + all text custom fields:
+		$text_custom_fields = $this->get_type_custom_fields( 'varchar' );
+		foreach( $text_custom_fields as $field_index => $text_custom_field )
+		{
+			$search_string .= $this->get_custom_field_value( $field_index ).' ';
+		}
+
+		// Clear spaces:
+		$search_string = utf8_trim( $search_string );
+
+		if( empty( $search_string ) )
+		{	// This item has no content, so don't try to run a searching:
+			return array();
+		}
+
+		// Get all possible tags that are not related to this item:
+		$other_tags_SQL = new SQL();
+		$other_tags_SQL->SELECT( 'tag_name' );
+		$other_tags_SQL->FROM( 'T_items__tag' );
+		// Get all current tags to exclude from searching:
+		$item_tags = $this->get_tags();
+		if( count( $item_tags ) )
+		{	// If this item has at least one tag, Exclude them:
+			$other_tags_SQL->WHERE( 'tag_name NOT IN ( '.$DB->quote( $item_tags ).' )' );
+		}
+		$other_tags = $DB->get_col( $other_tags_SQL->get(), 0, 'Get all possible tags that are not related to this item' );
+
+		if( count( $other_tags ) == 0 )
+		{	// No tags for searching, Exit here:
+			return array();
+		}
+
+		// Try to find each tag in content as separate word:
+		foreach( $other_tags as $i => $other_tag )
+		{
+			if( ! preg_match( '/\b'.$other_tag.'\b/i', $search_string ) )
+			{	// This tag is not found, Exclude it:
+				unset( $other_tags[ $i ] );
+			}
+		}
+
+		return $other_tags;
+	}
 }
 ?>
