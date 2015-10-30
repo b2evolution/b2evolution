@@ -662,13 +662,6 @@ class collections_Module extends Module
 					'href' => $admin_url.'?ctrl=itemtags'
 				);
 			}
-			if( $current_User->check_perm( 'polls', 'create' ) )
-			{	// User has an access to view polls:
-				$site_menu['entries']['polls'] = array(
-					'text' => T_('Polls'),
-					'href' => $admin_url.'?ctrl=polls'
-				);
-			}
 		}
 
 		$working_blog = get_working_blog();

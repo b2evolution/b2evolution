@@ -124,7 +124,6 @@ $ctrl_mappings = array(
 		'email'            => 'tools/email.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
-		'polls'            => 'polls/polls.ctrl.php',
 	);
 
 
@@ -479,44 +478,6 @@ function & get_CronjobCache()
 
 
 /**
- * Get the PollCache
- *
- * @return PollCache
- */
-function & get_PollCache()
-{
-	global $PollCache;
-
-	if( ! isset( $PollCache ) )
-	{	// Cache doesn't exist yet:
-		load_class( 'polls/model/_poll.class.php', 'Poll' );
-		$PollCache = new DataObjectCache( 'Poll', false, 'T_polls__question', 'pqst_', 'pqst_ID', 'pqst_question_text' );
-	}
-
-	return $PollCache;
-}
-
-
-/**
- * Get the PollOptionCache
- *
- * @return PollOptionCache
- */
-function & get_PollOptionCache()
-{
-	global $PollOptionCache;
-
-	if( ! isset( $PollOptionCache ) )
-	{	// Cache doesn't exist yet:
-		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
-		$PollOptionCache = new DataObjectCache( 'PollOption', false, 'T_polls__option', 'popt_', 'popt_ID', 'popt_option_text', 'popt_order' );
-	}
-
-	return $PollOptionCache;
-}
-
-
-/**
  * _core_Module definition
  */
 class _core_Module extends Module
@@ -567,7 +528,6 @@ class _core_Module extends Module
 				$permslugs = 'edit'; // Slug manager
 				$permtemplates = 'allowed'; // Skin settings
 				$permemails = 'edit'; // Email management
-				$permpolls = 'edit'; // Polls
 				$def_notification = 'full'; // Default notification type: short/full
 				break;
 
@@ -579,7 +539,6 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'view';
-				$permpolls = 'create';
 				$def_notification = 'short';
 				break;
 
@@ -591,7 +550,6 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
-				$permpolls = 'create';
 				$def_notification = 'short';
 				break;
 
@@ -603,7 +561,6 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
-				$permpolls = 'none';
 				$def_notification = 'short';
 				break;
 
@@ -618,7 +575,6 @@ class _core_Module extends Module
 				$permslugs = 'none';
 				$permtemplates = 'denied';
 				$permemails = 'none';
-				$permpolls = 'none';
 				$def_notification = 'short';
 				break;
 		}
@@ -638,7 +594,6 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
-			'perm_polls' => $permpolls,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
 			'cross_country_allow_contact' => $cross_country_settings_default
 		 );
@@ -791,21 +746,6 @@ class _core_Module extends Module
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
 				),
-			'perm_polls' => array(
-				'label'      => T_('Polls'),
-				'user_func'  => 'check_poll_user_perm',
-				'group_func' => 'check_poll_group_perm',
-				'perm_block' => 'additional',
-				'options'    => array(
-						// format: array( radio_button_value, radio_button_label, radio_button_note )
-						array( 'none', T_('No Access') ),
-						array( 'create', T_('Create & Edit owned polls only') ),
-						array( 'view', T_('Create & Edit owned polls + View all') ),
-						array( 'edit', T_('Full Access') )
-					),
-				'perm_type' => 'radiobox',
-				'field_lines' => true,
-				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),
 				'user_func'  => 'check_cross_country_user_perm',
@@ -942,71 +882,6 @@ class _core_Module extends Module
 	{
 		// Check if browse/contact users from other countries is allowed
 		return $permvalue == 'allowed';
-	}
-
-	/**
-	 * Check an user permission for the poll. ( see 'user_func' in get_available_group_permissions() function  )
-	 *
-	 * @param string Requested permission level
-	 * @param string Permission value, this is the value on the database
-	 * @param mixed Permission target (blog ID, array of cat IDs...)
-	 * @return boolean True on success (permission is granted), false if permission is not granted
-	 */
-	function check_poll_user_perm( $permlevel, $permvalue, $permtarget )
-	{
-		return true;
-	}
-
-	/**
-	 * Check a group permission for the poll. ( see 'group_func' in get_available_group_permissions() function )
-	 *
-	 * @param string Requested permission level
-	 * @param string Permission value
-	 * @param mixed Permission target (blog ID, array of cat IDs...)
-	 * @return boolean True on success (permission is granted), false if permission is not granted
-	 */
-	function check_poll_group_perm( $permlevel, $permvalue, $permtarget )
-	{
-		$perm = false;
-
-		switch ( $permvalue )
-		{
-			case 'edit':
-				// Users has edit perms
-				if( $permlevel == 'edit' )
-				{
-					$perm = true;
-					break;
-				}
-
-			case 'view':
-				// Users has view perms
-				if( $permlevel == 'view' )
-				{
-					$perm = true;
-					break;
-				}
-
-			case 'create':
-				// Users has a create permisson:
-				if( $permlevel == 'create' )
-				{
-					$perm = true;
-					break;
-				}
-		}
-
-		if( ! $perm && is_logged_in() && ! empty( $permtarget )
-		    && ( $permlevel == 'edit' || $permlevel == 'view' ) )
-		{	// If this perm level is still not allowed, check if current user is owner of the requested Poll:
-			global $current_User;
-			if( $current_User->ID == $permtarget->owner_user_ID )
-			{	// Current user is owner
-				$perm = true;
-			}
-		}
-
-		return $perm;
 	}
 
 
