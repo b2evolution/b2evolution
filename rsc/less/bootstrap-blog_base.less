@@ -919,19 +919,32 @@ input.btn-lg {
 
 // Poll table:
 .evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
 	td {
-		padding: 5px 10px 5px 0;
+		padding: 2px 10px 2px 0;
+	}
+	tr td:last-child {
+		padding-right: 0;
 	}
 	input[type=radio], label {
 		margin: 0;
 	}
 	.evo_poll__percent {
-		width: 50px;
-		vertical-align: middle;
-		display: inline-block;
-		div {
-			background: #99EE44;
-			height: 12px;
+		width: 100%;
+		padding-right: 2px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
 		}
+	}
+	.evo_poll__selector {
+		width: 5px;
 	}
 }
