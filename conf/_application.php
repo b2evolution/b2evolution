@@ -79,10 +79,10 @@ $online_help_links = true;
 $modules = array(
 		'_core',
 		'collections',  // TODO: installer won't work without this module
+		'polls',
 		'files',
 		'sessions',
 		'messaging',
 		'maintenance',
-		'polls',
 	);
 ?>
