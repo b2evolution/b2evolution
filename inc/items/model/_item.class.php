@@ -5843,7 +5843,8 @@ class Item extends ItemLight
 		}
 		else
 		{	// We want asynchronous post processing. This applies to posts with date in future too.
-			$Messages->add( T_('Scheduling asynchronous notifications...'), 'note' );
+			$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
+					'href="http://b2evolution.net/man/after-each-post-settings"' ), 'warning' );
 
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
