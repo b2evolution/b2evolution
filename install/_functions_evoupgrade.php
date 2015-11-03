@@ -5097,6 +5097,37 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11285' );
 	}
 
+	if( $old_db_version < 11286 )
+	{	// part 16.l trunk aka 14th part of "i6"
+
+		task_begin( 'Upgrade timestamp fields... ' );
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_email__returns
+			MODIFY emret_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_syslog
+			MODIFY slg_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__prerendering
+			MODIFY itpr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_comments__prerendering
+			MODIFY cmpr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__prerendering
+			MODIFY mspr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_users__reports
+			MODIFY urep_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__version
+			MODIFY iver_edit_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__thread
+			MODIFY thrd_datemodified datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__message
+			MODIFY msg_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__contact
+			MODIFY mct_last_contact_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		task_end();
+
+		set_upgrade_checkpoint( '11286' );
+	}
+
 	if( $old_db_version < 11300 )
 	{ // part 17 trunk aka "i7"
 
@@ -6556,6 +6587,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY cmpr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		$DB->query( 'ALTER TABLE T_messaging__prerendering
 			MODIFY mspr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_users__reports
+			MODIFY urep_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__version
+			MODIFY iver_edit_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__thread
+			MODIFY thrd_datemodified datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__message
+			MODIFY msg_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__contact
+			MODIFY mct_last_contact_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11486' );

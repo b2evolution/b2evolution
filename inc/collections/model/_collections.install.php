@@ -261,7 +261,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_ID            INT UNSIGNED NOT NULL,
 			iver_itm_ID        INT UNSIGNED NOT NULL,
 			iver_edit_user_ID  INT UNSIGNED NULL,
-			iver_edit_datetime DATETIME NOT NULL,
+			iver_edit_datetime DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
