@@ -6537,7 +6537,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  AND ityp_ID <= 1600' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11485' );
+		set_upgrade_checkpoint( '11485' );
+	}
+
+	if( $old_db_version < 11486 )
+	{	// part 2 of v6.6.6
+
+		task_begin( 'Upgrade timestamp fields... ' );
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_email__returns
+			MODIFY emret_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_syslog
+			MODIFY slg_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_items__prerendering
+			MODIFY itpr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_comments__prerendering
+			MODIFY cmpr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		$DB->query( 'ALTER TABLE T_messaging__prerendering
+			MODIFY mspr_datemodified TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11486' );
 	}
 
 	/*

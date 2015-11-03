@@ -277,9 +277,10 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
-		( emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
+		( emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
 		VALUES
-		( '.$DB->quote( $user_ID ).',
+		( '.$DB->quote( date2mysql( $servertimenow ) ).',
+		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
 		  '.$DB->quote( utf8_substr( $subject, 0, 255 ) ).',
@@ -293,7 +294,7 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 	{ // Save a report about sending of this message in the table T_email__address
 		// The mail sending is susccess. Update last sent date and increase a counter
 		$DB->query( 'INSERT INTO T_email__address ( emadr_address, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_sent_ts )
-			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ).' )
+			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date2mysql( $servertimenow ) ).' )
 			ON DUPLICATE KEY UPDATE
 			    emadr_sent_count = emadr_sent_count + 1,
 			    emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
