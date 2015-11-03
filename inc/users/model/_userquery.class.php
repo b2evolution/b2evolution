@@ -438,11 +438,9 @@ class UserQuery extends SQL
 			return;
 		}
 
-		$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $org_ID ) );
-
 		// Join Organization table
 		$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
-		$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID ' );
+		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 
 	/**
