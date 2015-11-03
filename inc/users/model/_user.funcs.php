@@ -4929,6 +4929,7 @@ function users_results( & $UserList, $params = array() )
 			'display_login'      => true,
 			'display_nickname'   => true,
 			'display_name'       => true,
+			'display_orgrole'    => true,
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_blogs'      => true,
@@ -4983,7 +4984,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'uorg_accepted',
-				'td' => '%user_td_orgstatus( #user_ID#, #uorg_org_ID#, #uorg_accepted# )%',
+				'td' => '%user_td_orgstatus( #user_ID#, '.$params['org_ID'].' )%',
 			);
 	}
 
@@ -5432,9 +5433,15 @@ function user_td_actions( $user_ID )
  * @param boolean TRUE if the organization is accepted to the user
  * @return string
  */
-function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
+function user_td_orgstatus( $user_ID, $org_ID )
 {
 	global $current_User;
+
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID );
+
+	$organizations = $User->get_organizations_data();
+	$is_accepted = $organizations[$org_ID]['accepted'];
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // Set the spec params for icon if user is admin
