@@ -852,6 +852,8 @@ function dre_limit_by_terminators( $content )
  */
 function dre_get_email_data( $content, $message_text, $headers )
 {
+	global $servertimenow;
+
 	// Extract emails from content:
 	$emails = utf8_strtolower( dre_get_emails( $content ) );
 
@@ -862,11 +864,12 @@ function dre_get_email_data( $content, $message_text, $headers )
 	$error_info = dre_get_error_info( $content );
 
 	$email_returned = array(
-			'address'  => $emails,
-			'errormsg' => $error_info['text'],
-			'message'  => htmlspecialchars( utf8_clean( $message_text ) ),
-			'headers'  => $headers,
-			'errtype'  => $error_info['type']
+			'address'   => $emails,
+			'errormsg'  => $error_info['text'],
+			'timestamp' => date2mysql( $servertimenow ),
+			'message'   => htmlspecialchars( utf8_clean( $message_text ) ),
+			'headers'   => $headers,
+			'errtype'   => $error_info['type']
 		);
 
 	return $email_returned;
@@ -884,7 +887,7 @@ function dre_insert_returned_email( $email_data )
 	global $DB, $dre_emails;
 
 	// INSERT RETURNED DATA INTO DB:
-	$DB->query( 'INSERT INTO T_email__returns ( emret_address, emret_errormsg, emret_message, emret_headers, emret_errtype )
+	$DB->query( 'INSERT INTO T_email__returns ( emret_address, emret_errormsg, emret_timestamp, emret_message, emret_headers, emret_errtype )
 		VALUES ( '.$DB->quote( $email_data ).' )',
 		'Insert info of the returned email' );
 

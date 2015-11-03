@@ -99,7 +99,7 @@ class CollectionSettings extends AbstractSettings
 			'chapter_links'  => 'chapters',				// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
-			'chapter_content'   => 'excerpt',
+			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
 			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
 			'category_prefix'   => '',
