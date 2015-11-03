@@ -4772,6 +4772,7 @@ function users_results_block( $params = array() )
 			'where_status_closed'  => NULL,
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
+			'display_orgrole'      => false,
 			'display_filters'      => true,
 			'display_btn_refresh'  => true,
 			'display_btn_adduser'  => true,
@@ -4929,7 +4930,7 @@ function users_results( & $UserList, $params = array() )
 			'display_login'      => true,
 			'display_nickname'   => true,
 			'display_name'       => true,
-			'display_orgrole'    => true,
+			'display_orgrole'    => false,
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_blogs'      => true,
@@ -5046,6 +5047,17 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => 'small',
 				'order' => 'user_lastname, user_firstname',
 				'td' => '$user_firstname$ $user_lastname$',
+			);
+	}
+
+	if( $params['display_orgrole'] )
+	{ // Display name
+		$UserList->cols[] = array(
+				'th' => T_('Role'),
+				'th_class' => 'shrinkwrap small',
+				'td_class' => 'shrinkwrap small',
+				'order' => 'org_role',
+				'td' => '%user_td_orgrole( #user_ID#, '.$params['org_ID'].' )%',
 			);
 	}
 
@@ -5460,6 +5472,25 @@ function user_td_orgstatus( $user_ID, $org_ID )
 	{ // Organization is not accepted by admin yet
 		return get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
 	}
+}
+
+/**
+ * Get user role for a given organization
+ *
+ * @param boolean TRUE if the organization is accepted to the user
+ * @return string
+ */
+function user_td_orgrole( $user_ID, $org_ID )
+{
+	global $current_User;
+
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID );
+
+	$organizations = $User->get_organizations_data();
+	$role = $organizations[$org_ID]['role'];
+	
+	return $role;
 }
 
 /**
