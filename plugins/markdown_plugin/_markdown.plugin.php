@@ -204,6 +204,7 @@ class markdown_plugin extends Plugin
 			case 'forum':
 			case 'manual':
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
+				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
 				break;
