@@ -434,6 +434,7 @@ function get_request_title( $params = array() )
 			'download_body_text'  => '',
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
+			'tags_text'           => T_('Tags'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -745,6 +746,11 @@ function get_request_title( $params = array() )
 		case 'usercomments':
 			// We are requesting the user comments list:
 			$r[] = $params['usercomments_text'];
+			break;
+
+		case 'tags':
+			// We are requesting the tags directory:
+			$r[] = $params['tags_text'];
 			break;
 
 		case 'posts':

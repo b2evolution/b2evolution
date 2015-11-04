@@ -22,6 +22,7 @@ $menu_link_widget_link_types = array(
 		'search' => T_('Search page'),
 		'arcdir' => T_('Archive directory'),
 		'catdir' => T_('Category directory'),
+		'tags' => T_('Tags'),
 		'postidx' => T_('Post index'),
 		'mediaidx' => T_('Photo index'),
 		'sitemap' => T_('Site Map'),
@@ -286,6 +287,15 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Categories');
 				if( $disp == 'catdir' )
 				{	// Let's display the link as selected
+					$link_class = $this->disp_params['link_selected_class'];
+				}
+				break;
+
+			case 'tags':
+				$url = $current_Blog->get( 'tagsurl' );
+				$text = T_('Tags');
+				if( $disp == 'tags' )
+				{	// Let's display the link as selected:
 					$link_class = $this->disp_params['link_selected_class'];
 				}
 				break;

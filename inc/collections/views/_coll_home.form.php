@@ -39,6 +39,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'comments', T_('Latest Comments') ),
 			array( 'arcdir',   T_('Archive Directory') ),
 			array( 'catdir',   T_('Category Directory') ),
+			array( 'tags',     T_('Tags') ),
 			array( 'help',     T_('Help') ),
 			array( 'mediaidx', T_('Photo Index') ),
 			array( 'msgform',  T_('Sending a message') ),
