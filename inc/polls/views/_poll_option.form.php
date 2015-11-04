@@ -35,7 +35,7 @@ $Form->begin_form( 'fform', sprintf( ( $creating ?  T_('New poll option for ques
 
 	$Form->text_input( 'popt_option_text', $edited_PollOption->get( 'option_text' ), 10, T_('Option'), '', array( 'maxlength' => 2000, 'required' => true, 'class' => 'large' ) );
 
-	$Form->text_input( 'popt_order', $edited_PollOption->get( 'order' ), 10, T_('Order'), '', array( 'required' => true ) );
+	$Form->text_input( 'popt_order', $edited_PollOption->get( 'order' ), 10, T_('Order'), '', array( 'required' => ! $creating ) );
 
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 ?>

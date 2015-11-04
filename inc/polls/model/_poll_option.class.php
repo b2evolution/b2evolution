@@ -79,16 +79,56 @@ class PollOption extends DataObject
 		}
 
 		// Option text:
-		param( 'popt_option_text', 'string', false );
+		param( 'popt_option_text', 'string', '' );
 		param_check_not_empty( 'popt_option_text', T_('Please enter the text for the poll\'s option.') );
 		$this->set_from_Request( 'option_text' );
 
 		// Order:
-		param( 'popt_order', 'integer', false );
-		param_check_not_empty( 'popt_order', T_('Please enter the order for the poll\'s option.') );
+		param( 'popt_order', 'integer', '' );
+		if( $this->ID > 0 )
+		{	// Require an order only for existing poll options:
+			param_check_not_empty( 'popt_order', T_('Please enter the order for the poll\'s option.') );
+		}
 		$this->set_from_Request( 'order' );
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		if( ! $this->get( 'order' ) )
+		{	// If order has not been defined on form:
+
+			// Get max order of the poll options:
+			$order_SQL = new SQL();
+			$order_SQL->SELECT( 'MAX( popt_order )' );
+			$order_SQL->FROM( 'T_polls__option' );
+			$order_SQL->WHERE( 'popt_pqst_ID = '.$this->get( 'pqst_ID' ) );
+			$max_order = $DB->get_var( $order_SQL->get(), 0, NULL, 'Get max order of the poll options' );
+
+			// Set default order as next after max:
+			$this->set( 'order', intval( $max_order ) + 1 );
+		}
+
+		if( parent::dbinsert() )
+		{ // The poll option was inserted successful:
+			$DB->commit();
+			return true;
+		}
+
+		// Could not insert the poll object:
+		$DB->rollback();
+		return false;
 	}
 
 
