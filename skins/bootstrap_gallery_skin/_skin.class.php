@@ -70,6 +70,13 @@ class bootstrap_gallery_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image Viewing')
 				),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'note' => 'px',
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 					'posts_thumb_size' => array(
 						'label' => T_('Thumbnail size for Albums'),
 						'note' => '',
@@ -270,6 +277,13 @@ class bootstrap_gallery_Skin extends Skin
 
 		// Add custom CSS:
 		$custom_css = '';
+
+		// Limit images by max height:
+		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
+		if( $max_image_height > 0 )
+		{
+			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'."\n";
+		}
 
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
