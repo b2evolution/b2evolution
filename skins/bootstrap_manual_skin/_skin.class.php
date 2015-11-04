@@ -62,6 +62,21 @@ class bootstrap_manual_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'section_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Layout Settings')
+				),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'note' => 'px',
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
@@ -189,6 +204,13 @@ class bootstrap_manual_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
+
+		// Limit images by max height:
+		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
+		if( $max_image_height > 0 )
+		{
+			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+		}
 
 		// Initialize a template depending on current page
 		switch( $disp )

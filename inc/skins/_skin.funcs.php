@@ -1553,6 +1553,14 @@ var downloadInterval = setInterval( function()
 				}
 			}
 			break;
+
+		case 'tags':
+			$seo_page_type = 'Tags';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
@@ -1781,6 +1789,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_download'       => '_download.disp.php',
 				'disp_access_denied'  => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_tags'           => '_tags.disp.php',
 			);
 
 		// Add plugin disp handlers:

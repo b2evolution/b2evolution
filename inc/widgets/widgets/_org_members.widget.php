@@ -104,13 +104,6 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
-				'field_code' => array(
-					'label' => T_('Extra Info Field'),
-					'note' => T_('Select what extra user field should be displayed.'),
-					'type' => 'select',
-					'options' => array( '' => T_('None') ) + $user_fields,
-					'defaultvalue' => 'microbio',
-				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
 					'note' => T_('Check this to link each user to his profile.'),
@@ -132,6 +125,18 @@ class org_members_Widget extends ComponentWidget
 							array( 'hovertext', T_('Use for hover text'), 0 ),
 							array( 'hoverbg',   T_('Use for hover background'), 1/* default checked */ ),
 						),
+				),
+				'field_code' => array(
+					'label' => T_('Extra Info Field'),
+					'note' => T_('Select what extra user field should be displayed.'),
+					'type' => 'select',
+					'options' => array( '' => T_('None') ) + $user_fields,
+					'defaultvalue' => 'microbio',
+				),
+				'field_extra_height' => array(
+					'label' => T_('Height of extra info'),
+					'note' => T_('Use this to keep contact cards aligned.'),
+					'defaultvalue' => '6ex',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -239,7 +244,9 @@ class org_members_Widget extends ComponentWidget
 					// Info
 					if( ! empty( $this->disp_params['field_code'] ) && ( $field_values = $org_User->userfield_values_by_code( $this->disp_params['field_code'] ) ) )
 					{
-						echo '<p class="user_field">';
+						echo '<p class="user_field"'
+							.( empty( $this->disp_params['field_extra_height'] ) ? '' : ' style="height:'.$this->disp_params['field_extra_height'].'"' )
+							.'>';
 						foreach( $field_values as $f => $field_value )
 						{
 							if( $f > 0 )

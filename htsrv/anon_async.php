@@ -1132,6 +1132,9 @@ switch( $action )
 			$term = preg_replace( '/^-+/', '', $term );
 		}
 
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
 		$term_is_new_tag = true;
 
 		if( ! empty( $term ) )
