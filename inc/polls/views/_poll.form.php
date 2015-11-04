@@ -51,6 +51,15 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_man
 		$Form->info( T_('Question'), $edited_Poll->get( 'question_text' ) );
 	}
 
+	if( $creating )
+	{	// Suggest to enter 10 answer options on creating new poll:
+		$answer_options = param( 'answer_options', 'array:string', array() );
+		for( $i = 0; $i < 10; $i++ )
+		{
+			$Form->text_input( 'answer_options[]', ( isset( $answer_options[ $i ] ) ? $answer_options[ $i ] : '' ), 10, ( $i == 0 ? T_('Answer options') : '' ), '', array( 'maxlength' => 2000, 'style' => 'width:50%' ) );
+		}
+	}
+
 $buttons = array();
 if( $creating || $perm_poll_edit )
 {	// Display a button to update the poll question only if current user has a permission:

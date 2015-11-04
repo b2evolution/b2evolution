@@ -119,6 +119,53 @@ class Poll extends DataObject
 
 
 	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		if( parent::dbinsert() )
+		{ // The poll was inserted successful:
+
+			// Insert the entered answer options:
+			$answer_options = param( 'answer_options', 'array:string', array() );
+			$answer_option_order = 1;
+			foreach( $answer_options as $answer_option_text )
+			{
+				if( empty( $answer_option_text ) )
+				{	// Skip empty option:
+					continue;
+				}
+
+				$new_PollOption = new PollOption();
+				$new_PollOption->set( 'pqst_ID', $this->ID );
+				$new_PollOption->set( 'option_text', $answer_option_text );
+				$new_PollOption->set( 'order', $answer_option_order );
+				if( ! $new_PollOption->dbinsert() )
+				{	// Rollback if the poll option could not be inserted:
+					$DB->rollback();
+					return false;
+				}
+
+				$answer_option_order++;
+			}
+
+			$DB->commit();
+			return true;
+		}
+
+		// Could not insert the poll object:
+		$DB->rollback();
+		return false;
+	}
+
+
+	/**
 	 * Get name of the question. It is a string as first 200 chars of the question text:
 	 *
 	 * @return string
