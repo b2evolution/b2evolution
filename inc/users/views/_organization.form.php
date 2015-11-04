@@ -41,21 +41,42 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
+	if( $current_User->check_perm( 'orgs', 'edit' ) )
+	{	// Allow to change an owner if current user has a permission to edit all polls:
+		$Form->username( 'org_owner_login', $edited_Organization->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
+	}
+	else
+	{	// Current user has no permission to edit a poll owner, Display the owner as info field:
+		$Form->info( T_('Owner'), get_user_identity_link( NULL, $edited_Organization->owner_user_ID ) );
+	}
+
 	$Form->text_input( 'org_name', $edited_Organization->name, 32, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
 	$Form->text_input( 'org_url', $edited_Organization->url, 32, T_('Url'), '', array( 'maxlength' => 2000 ) );
 
-if( $creating )
-{
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' ) ) );
-}
-else
-{
-	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
-}
+	$Form->radio( 'org_accept', $edited_Organization->get( 'accept' ),
+					array(
+						array( 'yes', T_('Yes, accept immediately') ),
+						array( 'owner', T_('Yes, owner must accept them') ),
+						array( 'no', T_('No') ),
+				), T_('Let members join'), true );
 
+
+$buttons = array();
+if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+{	// Display a button to update the poll question only if current user has a permission:
+	if( $creating )
+	{
+		$buttons[] = array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' );
+		$buttons[] = array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' );
+		$buttons[] = array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' );
+	}
+	else
+	{
+		$buttons[] = array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' );
+	}
+}
+$Form->end_form( $buttons );
 
 if( $edited_Organization->ID > 0 )
 { // Display users of this organization

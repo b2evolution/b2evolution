@@ -17,7 +17,7 @@ global $blog, $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_name, org_url' );
+$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept' );
 $SQL->FROM( 'T_users__organization' );
 
 $count_SQL = new SQL();
@@ -25,13 +25,14 @@ $count_SQL->SELECT( 'SQL_NO_CACHE COUNT( org_ID )' );
 $count_SQL->FROM( 'T_users__organization' );
 
 $Results = new Results( $SQL->get(), 'org_', '-D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results->Cache = get_OrganizationCache();
 
 $Results->title = T_('Organizations').get_manual_link( 'organizations-tab' );
 
 /*
  * Table icons:
  */
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( $current_User->check_perm( 'orgs', 'create', false ) )
 { // create new group link
 	$Results->global_icon( T_('Create a new organization...'), 'new', '?ctrl=organizations&amp;action=new', T_('Add organization').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -44,12 +45,24 @@ $Results->cols[] = array(
 		'td' => '$org_ID$',
 	);
 
+function org_td_name( & $Organization )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'orgs', 'view', false, $Organization ) )
+	{
+		global $admin_url;
+		return '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID='.$Organization->ID.'"><b>'.$Organization->get( 'name' ).'</b></a>';
+	}
+	else
+	{
+		return $Organization->get( 'name' );
+	}
+}
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'org_name',
-		'td' => $current_User->check_perm( 'users', 'edit', false )
-			? '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID=$org_ID$"><b>$org_name$</b></a>'
-			: '$org_name$',
+		'td' => '%org_td_name( {Obj} )%',
 	);
 
 $Results->cols[] = array(
@@ -58,26 +71,37 @@ $Results->cols[] = array(
 		'td' => '~conditional( #org_url# == "", "&nbsp;", "<a href=\"#org_url#\">#org_url#</a>" )~',
 	);
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
+function org_td_actions( & $Organization )
 {
-	function org_actions( & $row )
-	{
-		$r = action_icon( T_('Edit this organization...'), 'edit',
-					regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$row->org_ID.'&amp;action=edit') )
-				.action_icon( T_('Duplicate this organization...'), 'copy',
-					regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$row->org_ID.'&amp;action=new') )
-				.action_icon( T_('Delete this organization!'), 'delete',
-					regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$row->org_ID.'&amp;action=delete&amp;'.url_crumb('organization') ) );
+	global $current_User;
 
-		return $r;
+	$r = '';
+	$perm_org_edit = $current_User->check_perm( 'orgs', 'edit', false, $Organization );
+
+	if( $perm_org_edit )
+	{
+		$r .= action_icon( T_('Edit this organization...'), 'edit',
+			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=edit') );
+	}
+	if( $current_User->check_perm( 'orgs', 'create', false ) )
+	{
+		$r .= action_icon( T_('Duplicate this organization...'), 'copy',
+			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=new') );
+	}
+	if( $perm_org_edit )
+	{
+		$r .= action_icon( T_('Delete this organization!'), 'delete',
+			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=delete&amp;'.url_crumb('organization') ) );
 	}
 
-	$Results->cols[] = array(
-			'th' => T_('Actions'),
-			'td_class' => 'shrinkwrap',
-			'td' => '%org_actions( {row} )%',
-		);
+	return $r;
 }
+
+$Results->cols[] = array(
+		'th' => T_('Actions'),
+		'td_class' => 'shrinkwrap',
+		'td' => '%org_td_actions( {Obj} )%',
+	);
 
 // Display results:
 $Results->display();

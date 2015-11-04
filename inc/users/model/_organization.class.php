@@ -33,6 +33,18 @@ class Organization extends DataObject
 	var $url;
 
 	/**
+	 * Owner ID
+	 * @var integer
+	 */
+	var $owner_user_ID;
+
+	/**
+	 * Accept level
+	 * @var string: 'yes', 'owner', 'no'
+	 */
+	var $accept = 'owner';
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -44,9 +56,19 @@ class Organization extends DataObject
 
 		if( $db_row != NULL )
 		{ // Loading an object from DB:
-			$this->ID   = $db_row->org_ID;
-			$this->name = $db_row->org_name;
-			$this->url  = $db_row->org_url;
+			$this->ID            = $db_row->org_ID;
+			$this->owner_user_ID = $db_row->org_owner_user_ID;
+			$this->name          = $db_row->org_name;
+			$this->url           = $db_row->org_url;
+			$this->accept        = $db_row->org_accept;
+		}
+		else
+		{	// Set default organization data for new object:
+			if( is_logged_in() )
+			{
+				global $current_User;
+				$this->set( 'owner_user_ID', $current_User->ID );
+			}
 		}
 	}
 
@@ -71,6 +93,34 @@ class Organization extends DataObject
 	 */
 	function load_from_Request()
 	{
+		global $current_User;
+
+		// Owner:
+		if( $current_User->check_perm( 'orgs', 'edit' ) )
+		{	// Update the owner if current user has a permission to edit all organizations:
+			$pqst_owner_login = param( 'org_owner_login', 'string', NULL );
+			param_check_not_empty( 'org_owner_login', T_('Please enter the owner\'s login.') );
+			if( ! empty( $pqst_owner_login ) )
+			{	// If the login is entered:
+				$UserCache = & get_UserCache();
+				$owner_User = & $UserCache->get_by_login( $pqst_owner_login );
+				if( empty( $owner_User ) )
+				{	// Wrong entered login:
+					param_error( 'org_owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $pqst_owner_login ) );
+				}
+				else
+				{	// Set new login:
+					$this->set( 'owner_user_ID', $owner_User->ID );
+					$this->owner_User = & $owner_User;
+				}
+			}
+		}
+		elseif( empty( $this->ID ) )
+		{	// Set onwer user ID on creating new poll:
+			$this->set( 'owner_user_ID', $current_User->ID );
+			$this->owner_User = & $current_User;
+		}
+
 		// Name
 		param( 'org_name', 'string' );
 		param_check_not_empty( 'org_name', T_('You must provide a name!') );
@@ -80,6 +130,10 @@ class Organization extends DataObject
 		param( 'org_url', 'string' );
 		param_check_url( 'org_url', 'commenting' );
 		$this->set_from_Request( 'url', 'org_url', true );
+
+		// Accept level:
+		param( 'org_accept', 'string' );
+		$this->set_from_Request( 'accept' );
 
 		return ! param_errors_detected();
 	}
@@ -128,6 +182,23 @@ class Organization extends DataObject
 		}
 
 		return $users;
+	}
+
+
+	/**
+	 * Get user object of this organization owner
+	 *
+	 * @return object User
+	 */
+	function & get_owner_User()
+	{
+		if( ! isset( $this->owner_User ) )
+		{	// Get the owner User only first time:
+			$UserCache = & get_UserCache();
+			$this->owner_User = & $UserCache->get_by_ID( $this->owner_user_ID );
+		}
+
+		return $this->owner_User;
 	}
 }
 

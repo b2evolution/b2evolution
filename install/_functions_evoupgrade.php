@@ -6660,7 +6660,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11510' );
+		set_upgrade_checkpoint( '11510' );
+	}
+
+	if( $old_db_version < 11520 )
+	{ // part 3 of 6.7.0
+
+		task_begin( 'Upgrading user organizations table...' );
+		$DB->query( 'ALTER TABLE T_users__organization
+			ADD COLUMN org_owner_user_ID INT(11) UNSIGNED NOT NULL AFTER org_ID,
+			ADD COLUMN org_accept        ENUM( "yes", "owner", "no" ) COLLATE ascii_general_ci NOT NULL DEFAULT "owner"' );
+		$DB->query( 'UPDATE T_users__organization SET org_owner_user_ID = 1' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11520' );
 	}
 
 	/*

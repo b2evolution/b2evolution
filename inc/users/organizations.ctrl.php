@@ -21,7 +21,7 @@ load_class( 'users/model/_organization.class.php', 'Organization' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+$current_User->check_perm( 'orgs', 'create', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'organizations' );
@@ -46,7 +46,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'create', true );
 
 		if( ! isset( $edited_Organization ) )
 		{ // We don't have a model to use, start with blank object:
@@ -56,12 +56,13 @@ switch( $action )
 		{ // Duplicate object in order no to mess with the cache:
 			$edited_Organization = duplicate( $edited_Organization ); // PHP4/5 abstraction
 			$edited_Organization->ID = 0;
+			$edited_Organization->set( 'owner_user_ID', $current_User->ID );
 		}
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'view', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -77,7 +78,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'create', true );
 
 		// load data from request
 		if( $edited_Organization->load_from_Request() )
@@ -136,7 +137,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -177,7 +178,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -209,8 +210,17 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
 
-// Set an url for manual page:
-$AdminUI->set_page_manual_link( 'organizations' );
+if( $action == 'new' || $action == 'edit' )
+{
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'organization-form' );
+	// Init JS to autcomplete the user logins
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+}
+else
+{	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'organizations' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
