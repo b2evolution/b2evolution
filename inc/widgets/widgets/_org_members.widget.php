@@ -250,10 +250,10 @@ class org_members_Widget extends ComponentWidget
 						foreach( $field_values as $f => $field_value )
 						{
 							if( $f > 0 )
-							{ // New line between each field value
-								echo '<br />';
+							{ // Space between each field value
+								echo ' ';
 							}
-							echo nl2br( $field_value );
+							echo preg_replace( "/[\r\n]+/", ' ', $field_value );
 						}
 						echo '</p>';
 					}
