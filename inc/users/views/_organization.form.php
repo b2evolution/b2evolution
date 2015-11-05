@@ -91,6 +91,7 @@ if( $edited_Organization->ID > 0 )
 			'display_ID'           => false,
 			'display_btn_adduser'  => false,
 			'display_btn_addgroup' => false,
+			'display_btn_adduserorg' => true,
 			'display_blogs'        => false,
 			'display_source'       => false,
 			'display_regdate'      => false,

@@ -29,6 +29,8 @@ $AdminUI->set_path( 'users', 'organizations' );
 // Get action parameter from request:
 param_action( '', true );
 
+param( 'display_mode', 'string', 'normal' );
+
 if( param( 'org_ID', 'integer', '', true ) )
 { // Load organization from cache:
 	$OrganizationCache = & get_OrganizationCache();
@@ -203,32 +205,73 @@ switch( $action )
 			}
 		}
 		break;
+
+	case 'link_user':
+		// Add user to organization:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'organization' );
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+
+		$user_login = param( 'user_login', 'string', NULL );
+		param_check_not_empty( 'user_login', T_('Please enter the user\'s login.') );
+		if( ! empty( $user_login ) )
+		{	// If the login is entered:
+			$UserCache = & get_UserCache();
+			$login_User = & $UserCache->get_by_login( $user_login );
+			if( empty( $login_User ) )
+			{	// Wrong entered login:
+				param_error( 'user_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $user_login ) );
+			}
+		}
+
+		$accepted = param( 'accepted', 'string', 'yes' );
+
+		if( ! param_errors_detected() )
+		{	// Link user only when request has no errors:
+			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted )
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.( $accepted == 'yes' ? '1' : '0' ).' ) ' );
+			if( $result )
+			{	// Display a message after successful linking:
+				$Messages->add( T_('User has been added to the organization.'), 'success' );
+			}
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=organizations&action=edit&org_ID='.$edited_Organization->ID.'&filter=refresh', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
-$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
-
-if( $action == 'new' || $action == 'edit' )
+if( $display_mode != 'js')
 {
-	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'organization-form' );
-	// Init JS to autcomplete the user logins
-	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+	$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
+	$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
+
+	if( $action == 'new' || $action == 'edit' || $action == 'add_user' )
+	{
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'organization-form' );
+		// Init JS to autcomplete the user logins:
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	}
+	else
+	{	// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'organizations' );
+	}
+
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+
+	$AdminUI->disp_payload_begin();
 }
-else
-{	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'organizations' );
-}
-
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
-
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
-
-$AdminUI->disp_payload_begin();
 
 /**
  * Display payload:
@@ -253,6 +296,18 @@ switch( $action )
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		$AdminUI->disp_view( 'users/views/_organization.form.php' );
+		// Init JS for form to add user to organization:
+		echo_user_add_organization_js( $edited_Organization );
+		break;
+
+	case 'add_user':
+		// Form to add user to organization:
+		if( $display_mode == 'js')
+		{	// Do not append Debuglog & Debug JSlog to response!
+			$debug = false;
+			$debug_jslog = false;
+		}
+		$AdminUI->disp_view( 'users/views/_organization_user.form.php' );
 		break;
 
 
@@ -265,10 +320,11 @@ switch( $action )
 		break;
 
 }
+if( $display_mode != 'js')
+{
+	$AdminUI->disp_payload_end();
 
-$AdminUI->disp_payload_end();
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>
