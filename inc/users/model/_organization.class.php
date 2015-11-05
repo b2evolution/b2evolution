@@ -200,6 +200,31 @@ class Organization extends DataObject
 
 		return $this->owner_User;
 	}
+
+
+	/**
+	 * Check if this organization can be auto accepted
+	 *
+	 * @return boolean
+	 */
+	function can_be_autoaccepted()
+	{
+		if( $this->get( 'accept' ) == 'yes' )
+		{	// This organization should be accepted immediately:
+			return true;
+		}
+		else
+		{	// Check permission:
+			global $current_User;
+			if( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $this ) )
+			{	// If current user has a perm to edit this organization then also allow to auto accept it:
+				return true;
+			}
+		}
+
+		// No reason to auto accept this organization for current user:
+		return false;
+	}
 }
 
 ?>

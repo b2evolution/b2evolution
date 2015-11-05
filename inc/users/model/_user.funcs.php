@@ -4318,8 +4318,8 @@ function echo_user_organization_js()
 {
 	global $current_User;
 
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
-	{ // Only admins can change an accept status of organizations
+	if( ! $current_User->check_perm( 'orgs', 'create' ) )
+	{	// Check this min permission, because even owner of one organization can accept it:
 		return;
 	}
 ?>
@@ -4335,7 +4335,7 @@ jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 		data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=<?php echo get_crumb( 'userorg' ); ?>' + params,
 		success: function( result )
 		{
@@ -5285,7 +5285,10 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 {
 	global $current_User;
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	$OrganizationCache = & get_OrganizationCache();
+	$Organization = & $OrganizationCache->get_by_ID( $org_ID );
+
+	if( $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
 	{ // Set the spec params for icon if user is admin
 		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
 	}

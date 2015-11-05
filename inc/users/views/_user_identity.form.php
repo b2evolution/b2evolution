@@ -339,7 +339,9 @@ if( $action != 'view' )
 
 	// Organization select fields:
 	$OrganizationCache = & get_OrganizationCache();
-	$OrganizationCache->load_all();
+	$OrganizationCache->clear();
+	// Load only organizations that allow to join members or own organizations of the current user:
+	$OrganizationCache->load_where( '( org_accept != "no" OR org_owner_user_ID = "'.$current_User->ID.'" )' );
 	$count_all_orgs = count( $OrganizationCache->cache );
 	$count_user_orgs = 0;
 	if( $count_all_orgs > 0 )
@@ -358,9 +360,15 @@ if( $action != 'view' )
 		$add_org_icon_style = ( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs ) ? '' : ';display:none';
 		$org_add_icon = ' '.get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer'.$add_org_icon_style ) );
 
-		$perm_edit_users = $current_User->check_perm( 'users', 'edit' );
 		foreach( $user_orgs as $org_ID => $org_data )
 		{
+			$perm_edit_orgs = false;
+			if( ! empty( $org_ID ) )
+			{	// $org_ID can be 0 for case when user didn't select an organization yet
+				$user_Organization = & $OrganizationCache->get_by_ID( $org_ID );
+				$perm_edit_orgs = $current_User->check_perm( 'orgs', 'edit', false, $user_Organization );
+			}
+
 			// Display a button to remove user from organization
 			$remove_org_icon_style = $org_ID > 0 ? '' : ';display:none';
 			$org_remove_icon = ' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_org', 'style' => 'cursor:pointer'.$remove_org_icon_style ) );
@@ -370,7 +378,7 @@ if( $action != 'view' )
 			$inputstart_icon = '';
 			if( $org_ID > 0 )
 			{ // User is assigned to this organization, Display the accepted status icon
-				if( $perm_edit_users )
+				if( $perm_edit_orgs )
 				{ // Set the spec params for icon if user is admin
 					$accept_icon_params = array( 'style' => 'cursor:pointer', 'rel' => 'org_status_'.( $org_data['accepted'] ? 'y' : 'n' ).'_'.$org_ID.'_'.$edited_User->ID );
 				}
@@ -389,7 +397,7 @@ if( $action != 'view' )
 				$inputstart_icon = $accept_icon.' ';
 			}
 
-			if( $org_ID > 0 && ! $perm_edit_users && $org_data['accepted'] )
+			if( $org_ID > 0 && ! $perm_edit_orgs && $org_data['accepted'] )
 			{ // Display only info of the assigned organization
 				$Form->infostart = $Form->infostart.$inputstart_icon;
 				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'].' &nbsp; ';

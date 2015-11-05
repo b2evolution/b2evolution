@@ -1013,7 +1013,8 @@ switch( $action )
 
 		$OrganizationCache = & get_OrganizationCache();
 		$OrganizationCache->clear();
-		$OrganizationCache->load_all();
+		// Load only organizations that allow to join members or own organizations of the current user:
+		$OrganizationCache->load_where( '( org_accept != "no" OR org_owner_user_ID = "'.$current_User->ID.'" )' );
 
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
@@ -1033,6 +1034,78 @@ switch( $action )
 		$org_suffix .= ' '.get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer' ) );
 		$org_suffix .= ' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_org', 'style' => 'cursor:pointer' ) );
 		$Form->select_input_object( 'organizations[]', 0, $OrganizationCache, T_('Organization'), array( 'allow_none' => $first_org ? true : false, 'field_suffix' => $org_suffix ) );
+
+		break;
+
+	case 'change_user_org_status':
+		// Used in the identity user form to change an accept status of organization by Admin users
+		if( ! is_logged_in() )
+		{ // User must be logged in
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userorg' );
+
+		/**
+		 * This string is value of "rel" attibute of span icon element
+		 * The format of this string is: 'org_status_y_1_2' or 'org_status_n_1_2', where:
+		 *     'y' - organization was accepted by admin,
+		 *     'n' - not accepted
+		 *     '1' - this number is ID of organization - uorg_org_ID from the DB table T_users__user_org
+		 *     '2' - this number is ID of user - uorg_user_ID from the DB table T_users
+		 */
+		$status = explode( '_', param( 'status', 'string' ) );
+
+		// ID of organization
+		$org_ID = isset( $status[3] ) ? intval( $status[3] ) : 0;
+
+		// ID of organization
+		$user_ID = isset( $status[4] ) ? intval( $status[4] ) : 0;
+
+		// Get organization by ID:
+		$OrganizationCache = & get_OrganizationCache();
+		$user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false );
+
+		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 || ! $user_Organization )
+		{ // Incorrect format of status param
+			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
+			break;
+		}
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $user_Organization );
+
+		// Use the glyph or font-awesome icons if it is defined by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( $status[2] == 'y' )
+		{ // Status will be change to "Not accepted"
+			$org_is_accepted = false;
+		}
+		else
+		{ // Status will be change to "Accepted"
+			$org_is_accepted = true;
+		}
+
+		// Change an accept status of organization for edited user
+		$DB->query( 'UPDATE T_users__user_org
+			  SET uorg_accepted = '.$DB->quote( $org_is_accepted ? 1 : 0 ).'
+			WHERE uorg_user_ID = '.$DB->quote( $user_ID ).'
+			  AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+
+		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
+		if( $org_is_accepted )
+		{ // Organization is accepted by admin
+			$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+		}
+		else
+		{ // Organization is not accepted by admin yet
+			$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+		}
+
+		// Display icon with new status
+		echo $accept_icon;
 
 		break;
 
