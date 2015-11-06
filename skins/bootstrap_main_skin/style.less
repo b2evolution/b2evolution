@@ -478,9 +478,14 @@ body.pictured .front_main_content .ufld_icon_links a {
 	}
 	p.user_field {
 		margin-bottom: 40px;
+		line-height: 1.5;
 		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
 		overflow: hidden;
-		white-space: nowrap;
+		// These default properties can be changed by param "Lines of extra info" of the widget "Organization Members":
+		-webkit-line-clamp: 2;
+		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
 	}
 }
 body.pictured .secondary_area .widget_core_org_members {

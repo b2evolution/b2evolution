@@ -133,10 +133,10 @@ class org_members_Widget extends ComponentWidget
 					'options' => array( '' => T_('None') ) + $user_fields,
 					'defaultvalue' => 'microbio',
 				),
-				'field_extra_height' => array(
-					'label' => T_('Height of extra info'),
+				'field_extra_lines' => array(
+					'label' => T_('Lines of extra info'),
 					'note' => T_('Use this to keep contact cards aligned.'),
-					'defaultvalue' => '6ex',
+					'defaultvalue' => '2',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -244,16 +244,19 @@ class org_members_Widget extends ComponentWidget
 					// Info
 					if( ! empty( $this->disp_params['field_code'] ) && ( $field_values = $org_User->userfield_values_by_code( $this->disp_params['field_code'] ) ) )
 					{
+						$field_extra_lines = intval( $this->disp_params['field_extra_lines'] );
 						echo '<p class="user_field"'
-							.( empty( $this->disp_params['field_extra_height'] ) ? '' : ' style="height:'.$this->disp_params['field_extra_height'].'"' )
+							.( empty( $field_extra_lines ) ? '' :
+									' style="height:'.( $field_extra_lines * 1.5 /* line-height */ ).'em;'
+										.'-webkit-line-clamp:'.$field_extra_lines.'"' )
 							.'>';
 						foreach( $field_values as $f => $field_value )
 						{
 							if( $f > 0 )
-							{ // New line between each field value
-								echo '<br />';
+							{ // Space between each field value
+								echo ' ';
 							}
-							echo nl2br( $field_value );
+							echo preg_replace( "/[\r\n]+/", ' ', $field_value );
 						}
 						echo '</p>';
 					}
