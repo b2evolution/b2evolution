@@ -413,11 +413,13 @@ body.pictured .front_main_content .ufld_icon_links a .fa {
 }
 .widget_core_org_members p.user_field {
   margin-bottom: 40px;
+  line-height: 1.5;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  -webkit-line-clamp: 2;
+  height: 3em;
 }
 body.pictured .secondary_area .widget_core_org_members a.user_link {
   color: #000;
