@@ -1114,11 +1114,14 @@ function create_blog(
 	$blog_access_type = 'relative', // Deprecated param for this func, because it is defined in $Blog->dbinsert()
 	$allow_html = true,
 	$in_bloglist = 'public',
-	$owner_user_ID = 1 )
+	$owner_user_ID = 1,
+	$group_ID = NULL )
 {
 	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
+
+	$Blog->set( 'cgrp_ID', $group_ID );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
@@ -1544,6 +1547,16 @@ function create_demo_contents()
 		$install_collection_manual = in_array( 'manual', $collections );
 	}
 
+	task_begin( 'Creating default collection groups... ' );
+	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_parent_ID, cgrp_name )
+		VALUES ( 1, NULL, "Website" ),
+		       ( 2, 1, "Home" ),
+		       ( 3, 1, "Blogs" ),
+		       ( 4, 1, "Community" ),
+		       ( 5, NULL, "Extranet" ),
+		       ( 6, 5, "Home" )' );
+	task_end();
+
 	task_begin( 'Creating default blogs... ' );
 
 	// Store the item IDs in this array in order to create additional comments
@@ -1569,7 +1582,8 @@ function create_demo_contents()
 			$blog_home_access_type,
 			true,
 			'never',
-			$jay_moderator_ID );
+			$jay_moderator_ID,
+			2 );
 
 		if( ! empty( $blog_home_ID ) )
 		{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
@@ -1596,7 +1610,8 @@ function create_demo_contents()
 			$blog_a_access_type,
 			true,
 			'public',
-			$jay_moderator_ID );
+			$jay_moderator_ID,
+			3 );
 	}
 
 	if( $install_collection_blogb )
@@ -1617,7 +1632,8 @@ function create_demo_contents()
 			$blog_b_access_type,
 			true,
 			'public',
-			$paul_blogger_ID );
+			$paul_blogger_ID,
+			3 );
 
 		$BlogCache = & get_BlogCache();
 		if( $b_Blog = $BlogCache->get_by_ID( $blog_b_ID, false, false ) )
@@ -1643,7 +1659,8 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 			3, // Skin ID
 			'photo', '', 0, 'relative', true, 'public',
-			$dave_blogger_ID );
+			$dave_blogger_ID,
+			4 );
 	}
 
 	if( $install_collection_forums )
@@ -1658,7 +1675,8 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			4, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
-			$paul_blogger_ID );
+			$paul_blogger_ID,
+			4 );
 	}
 
 	if( $install_collection_manual )
@@ -1673,7 +1691,8 @@ function create_demo_contents()
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			5, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
-			$dave_blogger_ID );
+			$dave_blogger_ID,
+			6 );
 	}
 
 	$BlogCache = & get_BlogCache();

@@ -47,6 +47,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
+			blog_cgrp_ID         INT(11) UNSIGNED NULL,
 			blog_shortname       varchar(255) NULL default '',
 			blog_name            varchar(255) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
@@ -74,6 +75,15 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_favorite        TINYINT(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_coll_groups' => array(
+		'Creating collection groups table',
+		"CREATE TABLE T_coll_groups (
+			cgrp_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			cgrp_parent_ID INT(11) UNSIGNED NULL,
+			cgrp_name VARCHAR(255) NOT NULL default '',
+			PRIMARY KEY ( cgrp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_settings' => array(

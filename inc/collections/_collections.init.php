@@ -40,6 +40,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
+		'T_coll_groups'              => $tableprefix.'coll_groups',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',

@@ -14,6 +14,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Display all blogs results table
-blogs_all_results_block();
+blogs_all_results_block( array(
+		'grouped' => true
+	) );
 
 ?>

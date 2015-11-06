@@ -1350,6 +1350,7 @@ function blogs_all_results_block( $params = array() )
 			'results_title'        => T_('List of Collections configured on this system').get_manual_link('site-collection-list'),
 			'results_no_text'      => T_('No blog has been created yet!'),
 			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
+			'grouped'              => false,
 		), $params );
 
 	if( !is_logged_in() )
@@ -1387,6 +1388,11 @@ function blogs_all_results_block( $params = array() )
 	$SQL = new SQL();
 	$SQL->SELECT( 'T_blogs.*, user_login' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
+	if( $params['grouped'] )
+	{	// Get collection groups:
+		$SQL->SELECT_add( ', cgrp_parent_ID, cgrp_ID, cgrp_name' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_groups ON cgrp_ID = blog_cgrp_ID' );
+	}
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
@@ -1417,11 +1423,11 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $admin_url;
-		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$blogs_Results->global_icon( T_('New Site').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Site').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
 	// Initialize Results object
-	blogs_results( $blogs_Results );
+	blogs_results( $blogs_Results, $params );
 
 	if( is_ajax_content() )
 	{ // init results param by template name
@@ -1463,6 +1469,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'display_order'    => true,
 			'display_caching'  => true,
 			'display_actions'  => true,
+			'grouped'          => false,
 		), $params );
 
 	if( $params['display_id'] )
@@ -1585,6 +1592,21 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_actions( #blog_ID# )%',
+			);
+	}
+
+	if( $params['grouped'] )
+	{ // Display group rows:
+		$blogs_Results->group_by = 'cgrp_ID';
+
+		$blogs_Results->grp_cols[] = array(
+				'td_class' => 'firstcol lastcol',
+				'td_colspan' => -1, // nb_colds - 1
+				'td' => '$cgrp_name$'
+			);
+		$blogs_Results->grp_cols[] = array(
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_grp_actions( {row} )%',
 			);
 	}
 }
@@ -1956,6 +1978,27 @@ function blog_row_actions( $curr_blog_ID )
 	if( empty($r) )
 	{ // for IE
 		$r = '&nbsp;';
+	}
+
+	return $r;
+}
+
+
+/**
+ * Get available actions for current collection group
+ *
+ * @param object Row
+ * @return string Action links
+ */
+function blog_row_grp_actions( & $row )
+{
+	global $current_User, $admin_url;
+
+	$r = '';
+
+	if( $current_User->check_perm( 'blogs', 'create' ) )
+	{
+		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID, T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn btn-sm btn-primary' ) );
 	}
 
 	return $r;
