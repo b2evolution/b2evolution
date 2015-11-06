@@ -71,7 +71,7 @@ class bootstrap_gallery_Skin extends Skin
 					'label'  => T_('Image Viewing')
 				),
 					'max_image_height' => array(
-						'label' => T_('Max image height'),
+						'label' => T_('Max comment image height'),
 						'note' => 'px',
 						'defaultvalue' => '',
 						'type' => 'integer',
