@@ -85,6 +85,11 @@ if( !empty( $template_action ) )
 			// Upgrade DB to UTF-8
 			db_upgrade_to_utf8_ascii();
 			break;
+
+		case 'cleanup_slugs':
+			// Automatic slugs cleanup:
+			dbm_cleanup_slugs();
+			break;
 	}
 	$block_item_Widget->disp_template_raw( 'block_end' );
 }
@@ -152,6 +157,7 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<li><a href="'.$admin_url.'?ctrl=itemtags&amp;action=cleanup&amp;'.url_crumb('tag').'">'.T_('Find and delete all orphan Tag entries (not used anywhere) - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts (with no matching Category) + Option to delete with related objects - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=cleanup_slugs&amp;'.url_crumb('tools')).'">'.T_('Automatic slugs cleanup - DB only.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comments&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan comment Uploads - Disk &amp; DB.').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_files&amp;'.url_crumb('tools')).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';

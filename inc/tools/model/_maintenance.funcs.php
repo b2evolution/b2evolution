@@ -886,4 +886,53 @@ function dbm_convert_item_content_separators()
 
 	echo "<br />\n";
 }
+
+
+/**
+ * Automatic slugs cleanup
+ */
+function dbm_cleanup_slugs()
+{
+	global $DB;
+
+	// Display process status:
+	echo T_( 'Automatic slugs cleanup' ).'...';
+	evo_flush();
+
+	$slugs_SQL = new SQL();
+	$slugs_SQL->SELECT( 'slug_itm_ID, slug_title' );
+	$slugs_SQL->FROM( 'T_slug' );
+	$slugs_SQL->WHERE( 'slug_type = "item"' );
+	$slugs_SQL->WHERE_and( 'slug_title LIKE "%\_%"' );
+	$slugs = $DB->get_results( $slugs_SQL->get(), OBJECT, 'Get all item slugs with underscore in title' );
+
+	$i = 0;
+	foreach( $slugs as $slug )
+	{
+		// Replace underscores with hyphens:
+		$clean_slug_title = str_replace( '_', '-', $slug->slug_title );
+
+		// Check if a slug already exists with this title:
+		$existing_slug_ID = $DB->get_var( 'SELECT slug_ID FROM T_slug WHERE slug_title = '.$DB->quote( $clean_slug_title ) );
+
+		if( $existing_slug_ID )
+		{	// Don't create a duplicate slug:
+			echo '<br />'.sprintf( T_('The slug "%s" cannot be cleanup because the slug "%s" already exists in DB.'), '<b>'.$slug->slug_title.'</b>', '<b>'.$clean_slug_title.'</b>' );
+		}
+		else
+		{	// Add new slug with replaced underscores:
+			$DB->query( 'INSERT INTO T_slug ( slug_title, slug_type, slug_itm_ID )
+				VALUES ( '.$DB->quote( $clean_slug_title ).', "item", "'.$slug->slug_itm_ID.'" )' );
+		}
+
+		if( $i % 100 )
+		{	// Print out a process dot after 100 prepared slugs:
+			echo ' . ';
+		}
+
+		$i++;
+	}
+
+	echo ' . OK.';
+}
 ?>
