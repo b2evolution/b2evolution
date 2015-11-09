@@ -29,6 +29,7 @@ while( mainlist_get_item() )
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
 			'image_size'   => 'fit-1280x720',
+			'display_info' => false,
 		), $params ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 
@@ -39,15 +40,15 @@ while( mainlist_get_item() )
 		$Form->begin_form();
 		$Form->hidden( 'redirect_to', $redirect_to );
 
-		echo '<p class="center">';
+		echo '<p class="text-center">';
 
 		if( $UserSettings->get( 'terms_accepted', $current_User->ID ) )
 		{	// If current user already accepted:
-			echo '<b>'.T_('You already accepted these terms.').'</b>';
+			echo '<span class="text-success">'.T_('You already accepted these terms.').'</span>';
 		}
 		else
 		{	// Otherwise display a button to accept:
-			$Form->button( array( 'submit', '', T_('Accept'), 'btn-success' ) );
+			$Form->button( array( 'submit', '', T_('Accept'), 'btn-success btn-lg' ) );
 		}
 
 		echo '</p>';

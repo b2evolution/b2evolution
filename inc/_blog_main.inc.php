@@ -596,13 +596,18 @@ if( $disp == 'terms' )
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $p, false );
 
+	if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+	{	// Display the message if current user already accepted the terms:
+		$Messages->add( T_('You already accepted these terms.'), 'success' );
+	}
+
 	// Don't redirect to permanent url of the page:
 	$redir = 'no';
 }
 
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
-    ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    ! in_array( $disp, array( 'terms', 'help', 'activateinfo' ) ) && // Allow these pages
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 
@@ -614,6 +619,7 @@ if( is_logged_in() && // Only for logged in users
 	    $terms_Item = & $ItemCache->get_by_ID( $terms_page_ID, false, false ) &&
 	    $terms_item_Blog = & $terms_Item->get_Blog() )
 	{	// Redirect to view page with terms & conditions if it is defined correctly in settings:
+		$Messages->add( T_('You need to accept the following before you can enter this site.'), 'note' );
 		header_redirect( $terms_item_Blog->get( 'termsurl', array(
 				'url_suffix' => 'redirect_to='.rawurlencode( $ReqURI ),
 				'glue'       => '&',

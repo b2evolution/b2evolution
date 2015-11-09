@@ -133,9 +133,16 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 		case 'terms':
+			if( $disp == 'terms' && ! $Item )
+			{	// Wrong post ID for terms page:
+				$disp = '404';
+				$Messages->add( sprintf( T_('Terms not found. (post ID #%s)'), get_param( 'p' ) ), 'error' );
+				break;
+			}
+
 			if( ( ! $preview ) && ( empty( $Item ) ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
-				debug_die( 'Invalid page URL!' );
+				//debug_die( 'Invalid page URL!' );
 			}
 
 			if( $disp == 'single' )
