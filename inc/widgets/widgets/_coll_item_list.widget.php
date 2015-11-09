@@ -292,18 +292,19 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
-				'item_first_image_before'  => '<div class="item_first_image">',
-				'item_first_image_after'   => '</div>',
-				'item_title_before'        => '<div class="item_title">',
-				'item_title_after'         => '</div>',
-				'item_title_single_before' => '',
-				'item_title_single_after'  => '',
-				'item_excerpt_before'      => '<div class="item_excerpt">',
-				'item_excerpt_after'       => '</div>',
-				'item_content_before'      => '<div class="item_content">',
-				'item_content_after'       => '</div>',
-				'item_images_before'       => '<div class="item_images">',
-				'item_images_after'        => '</div>',
+				'item_first_image_before'      => '<div class="item_first_image">',
+				'item_first_image_after'       => '</div>',
+				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"></div>',
+				'item_title_before'            => '<div class="item_title">',
+				'item_title_after'             => '</div>',
+				'item_title_single_before'     => '',
+				'item_title_single_after'      => '',
+				'item_excerpt_before'          => '<div class="item_excerpt">',
+				'item_excerpt_after'           => '</div>',
+				'item_content_before'          => '<div class="item_content">',
+				'item_content_after'           => '</div>',
+				'item_images_before'           => '<div class="item_images">',
+				'item_images_after'            => '</div>',
 			), $this->disp_params );
 
 		// Create ItemList
@@ -606,11 +607,15 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
-		{ // Display first image before title
+		{ // We want to display first image separately before the title
+			// Display before/after even if there is no image so we can use it as a placeholder.
 			$this->disp_images( array(
-					'before' => $this->disp_params['item_first_image_before'],
-					'after'  => $this->disp_params['item_first_image_after'],
-					'Item'   => $disp_Item,
+					'before'      => $this->disp_params['item_first_image_before'],
+					'after'       => $this->disp_params['item_first_image_after'],
+					'placeholder' => $this->disp_params['item_first_image_placeholder'],
+					'Item'        => $disp_Item,
+					'start'       => 1,
+					'limit'       => 1,
 				), $content_is_displayed );
 		}
 
@@ -660,7 +665,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		    ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
 		{ // Display attached pictures
 			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
 			$this->disp_images( array(
@@ -696,6 +701,7 @@ class coll_item_list_Widget extends ComponentWidget
 		$params = array_merge( array(
 				'before' => '',
 				'after'  => '',
+				'placeholder' => '',
 				'Item'   => NULL,
 				'start'  => 1,
 				'limit'  => 1,
@@ -755,6 +761,11 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $images;
 			echo $params['after'];
 		}
+		else
+		{
+			echo $params['placeholder'];
+		}
+
 	}
 
 
