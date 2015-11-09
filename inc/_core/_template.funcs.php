@@ -435,6 +435,7 @@ function get_request_title( $params = array() )
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
+			'terms_text'          => T_('Terms & Conditions'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -613,6 +614,10 @@ function get_request_title( $params = array() )
 			{
 				$after = $params['title_'.$disp.'_after'];
 			}
+			break;
+
+		case 'terms':
+			$r[] = $params['terms_text'];
 			break;
 	
 		case 'download':

@@ -134,7 +134,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
-	if( $disp != 'front' && $disp != 'download' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 	{
 		// Display message if no post:
 		display_if_empty();

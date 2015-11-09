@@ -1942,6 +1942,10 @@ class Blog extends DataObject
 				$disp_param = 'tags';
 				break;
 
+			case 'termsurl':
+				$disp_param = 'terms';
+				break;
+
 			case 'loginurl':
 			case 'registerurl':
 			case 'lostpasswordurl':

@@ -36,7 +36,7 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' )
+			if( $disp == 'page' || $disp == 'terms' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
 						'types' => '1000',		// pages

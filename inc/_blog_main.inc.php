@@ -588,6 +588,41 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 }
 
 
+if( $disp == 'terms' )
+{	// Display a page of terms & conditions:
+	set_param( 'p', intval( $Settings->get( 'site_terms' ) ) );
+	$c = 0; // Don't display comments
+
+	$ItemCache = & get_ItemCache();
+	$Item = & $ItemCache->get_by_ID( $p, false );
+
+	// Don't redirect to permanent url of the page:
+	$redir = 'no';
+}
+
+// Check if terms & conditions should be accepted by current user:
+if( is_logged_in() && // Only for logged in users
+    ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
+{	// Current user didn't accept the terms yet:
+
+	// Get ID of page with terms & conditions from global settings:
+	$terms_page_ID = intval( $Settings->get( 'site_terms' ) );
+
+	$ItemCache = & get_ItemCache();
+	if( $terms_page_ID &&
+	    $terms_Item = & $ItemCache->get_by_ID( $terms_page_ID, false, false ) &&
+	    $terms_item_Blog = & $terms_Item->get_Blog() )
+	{	// Redirect to view page with terms & conditions if it is defined correctly in settings:
+		header_redirect( $terms_item_Blog->get( 'termsurl', array(
+				'url_suffix' => 'redirect_to='.rawurlencode( $ReqURI ),
+				'glue'       => '&',
+			) ), 303 );
+		// EXIT HERE
+	}
+}
+
+
 /*
  * ______________________ DETERMINE WHICH SKIN TO USE FOR DISPLAY _______________________
  */
@@ -759,6 +794,7 @@ if( !empty( $skin ) )
 					'download'       => 'download.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
 					'tags'           => 'tags.main.php',
+					'terms'          => 'terms.main.php',
 					// All others will default to index.main.php
 				);
 
