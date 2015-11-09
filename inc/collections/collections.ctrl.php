@@ -288,6 +288,9 @@ switch( $action )
 			dbm_delete_pagecache( false );
 		}
 
+		// Terms & Conditions:
+		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
+
 		// Default blog
 		$Settings->set( 'default_blog_ID', param( 'default_blog_ID', 'integer', 0 ) );
 

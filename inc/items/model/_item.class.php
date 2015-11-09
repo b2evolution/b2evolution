@@ -1026,7 +1026,12 @@ class Item extends ItemLight
 	 */
 	function can_see_comments( $display = false )
 	{
-		global $Settings;
+		global $Settings, $disp;
+
+		if( $disp == 'terms' )
+		{	// Don't display the comments on page with terms & conditions:
+			return false;
+		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
 		{ // Comments are not allowed on this post by post type
@@ -1156,7 +1161,12 @@ class Item extends ItemLight
 	 */
 	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array() )
 	{
-		global $current_User;
+		global $current_User, $disp;
+
+		if( $disp == 'terms' )
+		{	// Don't allow comment a page with terms & conditions:
+			return false;
+		}
 
 		$display = ( ! is_null($before_error) );
 

@@ -143,7 +143,7 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 <?php
-if( $disp != 'front' && $disp != 'download' )
+if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 {
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(

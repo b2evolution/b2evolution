@@ -160,7 +160,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
-	if( $disp != 'front' && $disp != 'download' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 	{
 		// ------------------------------------ START OF POSTS ----------------------------------------
 		// Display message if no post:

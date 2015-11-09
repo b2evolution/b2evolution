@@ -63,7 +63,46 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
+		/**
+		 * @var ItemTypeCache
+		 */
+		$ItemTypeCache = & get_ItemTypeCache();
+		$item_type_options =
+			array(
+				'#' => T_('Default'),
+				''  => T_('All'),
+			) + $ItemTypeCache->get_option_array() ;
+
 		$r = array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 60,
+				'defaultvalue' => '',
+			),
+			'title_link' => array(
+				'label' => T_('Link to blog'),
+				'note' => T_('Link the block title to the blog?'),
+				'type' => 'checkbox',
+				'defaultvalue' => false,
+			),
+			'item_visibility' => array(
+				'label' => T_('Item visibility'),
+				'note' => T_('What post statuses should be included in the list?'),
+				'type' => 'radio',
+				'field_lines' => true,
+				'options' => array(
+						array( 'public', T_('show public posts') ),
+						array( 'all', T_('show all posts the current user is allowed to see') ) ),
+				'defaultvalue' => 'all',
+			),
+			'item_type' => array(
+				'label' => T_('Post type'),
+				'note' => T_('What kind of items do you want to list?'),
+				'type' => 'select',
+				'options' => $item_type_options,
+				'defaultvalue' => '#',
+			),
 			'displaycaption' => array(
 				'label' => T_('Display caption'),
 				'note' => T_('Display caption on top of calendar'),
@@ -207,7 +246,14 @@ class calendar_plugin extends Plugin
 		if( !empty($params['title']) )
 		{	// We want to display a title for the widget block:
 			echo $params['block_title_start'];
-			echo $params['title'];
+			if( $params[ 'title_link' ] )
+			{	// Set block title as link to current collection:
+				echo '<a href="'.$Blog->gen_blogurl().'" rel="nofollow">'.$params['title'].'</a>';
+			}
+			else
+			{	// Display a block title as simple text:
+				echo $params['title'];
+			}
 			echo $params['block_title_end'];
 		}
 
@@ -220,9 +266,6 @@ class calendar_plugin extends Plugin
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
 			$Calendar->ItemQuery->where_chapter2( $Blog, $cat_array, $cat_modifier );
-
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
 
 			// Restrict to selected authors:
 			$Calendar->ItemQuery->where_author( $author );
@@ -238,24 +281,37 @@ class calendar_plugin extends Plugin
 
 			// Keyword search stuff:
 			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
-
-			// Exclude pages and intros:
-			$Calendar->ItemQuery->where_types( $types );
 		}
 		else
 		{	// We want to preserve only the minimal context:
 			// * - - Restrict to selected blog/categories:
 			$Calendar->ItemQuery->where_chapter2( $Blog, array(), '' );
 
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
-
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
-
-			// Exclude pages and intros and sidebar stuff:
-			$Calendar->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
 		}
+
+		if( $params['item_visibility'] == 'public' )
+		{	// Get only the public items:
+			$visibility_array = array( 'published' );
+		}
+		else
+		{	// Get the current selected status items:
+			$visibility_array = $show_statuses;
+		}
+		// * Restrict to the statuses we want to show:
+		$Calendar->ItemQuery->where_visibility( $visibility_array );
+
+		if( $params['item_type'] == '#' )
+		{	// Exclude pages and intros and sidebar stuff by default:
+			$item_types = '-'.implode( ',', $posttypes_specialtypes );
+		}
+		elseif( $params['item_type'] != 'all' )
+		{	// Filter by one selected item type:
+			$item_types = $params['item_type'];
+		}
+		// Filter by item types:
+		$Calendar->ItemQuery->where_types( $item_types );
 
 		// DISPLAY:
 		$Calendar->display( );
