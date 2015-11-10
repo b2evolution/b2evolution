@@ -217,7 +217,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $debug, $disp;
+		global $Messages, $debug;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
