@@ -937,6 +937,8 @@ function search_page_links( $params = array() )
 			'page_current_template' => '<b>$page_num$</b>',
 			'page_item_before'      => ' ',
 			'page_item_after'       => '',
+			'page_item_current_before' => ' ',
+			'page_item_current_after'  => '',
 			'prev_text'             => '&lt;&lt;',
 			'next_text'             => '&gt;&gt;',
 			'prev_class'            => '',
@@ -1002,10 +1004,12 @@ function search_page_links( $params = array() )
 	$page_next_i = $current_page + 1;
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-		echo $params['page_item_before'];
+		
 		if( $i == $current_page )
 		{ // Current page
+			echo $params['page_item_current_before'];
 			echo str_replace( '$page_num$', $i, $params['page_current_template'] );
+			echo $params['page_item_current_after'];
 		}
 		else
 		{
@@ -1018,9 +1022,10 @@ function search_page_links( $params = array() )
 			{ // Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
+			echo $params['page_item_before'];
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
+			echo $params['page_item_after'];
 		}
-		echo $params['page_item_after'];
 	}
 
 	if( $page_list_end < $total_pages )

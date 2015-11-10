@@ -79,6 +79,7 @@ $params = array_merge( array(
 		'nav_next_text'         => '&gt;&gt;',
 		'nav_prev_class'        => '',
 		'nav_next_class'        => '',
+		'pagination'            => array(),
 	), $params );
 
 
@@ -260,7 +261,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_top'] && $Blog->get_setting( 'paged_comments' ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -268,7 +269,7 @@ if( $Item->can_see_comments( true ) )
 					'next_text'   => $params['nav_next_text'],
 					'prev_class'  => $params['nav_prev_class'],
 					'next_class'  => $params['nav_next_class'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 
@@ -350,7 +351,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_bottom'] && $Blog->get_setting( 'paged_comments' ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url'    => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -358,7 +359,7 @@ if( $Item->can_see_comments( true ) )
 					'next_text'   => $params['nav_next_text'],
 					'prev_class'  => $params['nav_prev_class'],
 					'next_class'  => $params['nav_next_class'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 		if( $params['nav_bottom_inside'] )
