@@ -66,12 +66,15 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 				T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
 
 	$Form->text_input( 'repath_username', $Settings->get( 'repath_username' ), 25,
-				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255 ) );
+				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{
+		// Disply this fake hidden password field before real because Chrome ignores attribute autocomplete="off"
+		echo '<input type="password" name="password" value="" style="display:none" />';
+		// Real password field:
 		$Form->password_input( 'repath_password', $Settings->get( 'repath_password' ), 25,
-					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.') ) );
+					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.'), 'autocomplete' => 'off' ) );
 	}
 
 	$Form->checkbox( 'repath_ignore_read', $Settings->get( 'repath_ignore_read' ), T_('Ignore emails that have already been read'),
