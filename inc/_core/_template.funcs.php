@@ -396,6 +396,9 @@ function get_request_title( $params = array() )
 			'title_page_disp'     => true,
 			'title_page_before'   => '#',
 			'title_page_after'    => '#',
+			'title_terms_disp'    => true,
+			'title_terms_before'  => '#',
+			'title_terms_after'   => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
 			// Title for each disp:
@@ -438,7 +441,6 @@ function get_request_title( $params = array() )
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
-			'terms_text'          => T_('Terms & Conditions'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -600,6 +602,7 @@ function get_request_title( $params = array() )
 
 		case 'single':
 		case 'page':
+		case 'terms':
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
@@ -617,10 +620,6 @@ function get_request_title( $params = array() )
 			{
 				$after = $params['title_'.$disp.'_after'];
 			}
-			break;
-
-		case 'terms':
-			$r[] = $params['terms_text'];
 			break;
 	
 		case 'download':

@@ -265,6 +265,18 @@ siteskin_include( '_site_body_header.inc.php' );
 							'after_section_title'  => '</h4>',
 							'author_link_text'     => 'preferredname',
 							'comment_image_size'   => 'fit-256x256',
+							// Pagination:
+							'pagination' => array(
+								'block_start'           => '<div class="center"><ul class="pagination">',
+								'block_end'             => '</ul></div>',
+								'page_current_template' => '<span>$page_num$</span>',
+								'page_item_before'      => '<li>',
+								'page_item_after'       => '</li>',
+								'page_item_current_before' => '<li class="active">',
+								'page_item_current_after'  => '</li>',
+								'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+								'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+							),
 						) );
 					// Note: You can customize the default item feedback by copying the generic
 					// /skins/_item_feedback.inc.php file into the current skin folder.

@@ -63,15 +63,23 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		/**
-		 * @var ItemTypeCache
-		 */
+		global $posttypes_specialtypes;
+
+		// Initialize an array for the field "Post type":
 		$ItemTypeCache = & get_ItemTypeCache();
-		$item_type_options =
-			array(
+		$item_types = $ItemTypeCache->get_option_array();
+		$item_type_options = array(
 				'#' => T_('Default'),
 				''  => T_('All'),
-			) + $ItemTypeCache->get_option_array() ;
+			);
+		foreach( $item_types as $item_type_ID => $item_type_name )
+		{
+			if( in_array( $item_type_ID, $posttypes_specialtypes ) )
+			{	// Exclude special item types:
+				continue;
+			}
+			$item_type_options[ $item_type_ID ] = $item_type_name;
+		}
 
 		$r = array(
 			'title' => array(
@@ -102,6 +110,21 @@ class calendar_plugin extends Plugin
 				'type' => 'select',
 				'options' => $item_type_options,
 				'defaultvalue' => '#',
+			),
+			'blog_ID' => array(
+				'label' => T_( 'Collection' ),
+				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
+				'size' => 4,
+				'type' => 'integer',
+				'allow_empty' => true,
+			),
+			'cat_IDs' => array(
+				'label' => T_('Categories'),
+				'note' => T_('List category IDs separated by ,'),
+				'size' => 15,
+				'type' => 'text',
+				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																	'error'   => T_('Invalid list of Category IDs.') ),
 			),
 			'displaycaption' => array(
 				'label' => T_('Display caption'),
@@ -262,10 +285,23 @@ class calendar_plugin extends Plugin
 		// - - Select a specific Item:
 		// $this->ItemQuery->where_ID( $p, $title );
 
+		// Set filter by collection:
+		$blog_ID = empty( $params['blog_ID'] ) ? NULL : $params['blog_ID'];
+
+		
+		if( empty( $params['cat_IDs'] ) )
+		{	// Use default categories filter:
+			$filter_cat_array = ( $Calendar->link_type == 'context' ) ? $cat_array : array();
+		}
+		else
+		{	// Get categories filter from widget settings:
+			$filter_cat_array = sanitize_id_list( $params['cat_IDs'], true );
+		}
+
 		if( $Calendar->link_type == 'context' )
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, $cat_array, $cat_modifier );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, $cat_modifier, 'wide', $blog_ID );
 
 			// Restrict to selected authors:
 			$Calendar->ItemQuery->where_author( $author );
@@ -285,13 +321,13 @@ class calendar_plugin extends Plugin
 		else
 		{	// We want to preserve only the minimal context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, array(), '' );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, '', 'wide', $blog_ID );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 		}
 
-		if( $params['item_visibility'] == 'public' )
+		if( isset( $params['item_visibility'] ) && $params['item_visibility'] == 'public' )
 		{	// Get only the public items:
 			$visibility_array = array( 'published' );
 		}
@@ -302,13 +338,17 @@ class calendar_plugin extends Plugin
 		// * Restrict to the statuses we want to show:
 		$Calendar->ItemQuery->where_visibility( $visibility_array );
 
-		if( $params['item_type'] == '#' )
-		{	// Exclude pages and intros and sidebar stuff by default:
-			$item_types = '-'.implode( ',', $posttypes_specialtypes );
-		}
-		elseif( $params['item_type'] != 'all' )
-		{	// Filter by one selected item type:
-			$item_types = $params['item_type'];
+		$item_types = $types;
+		if( isset( $params['item_type'] ) )
+		{
+			if( $params['item_type'] == '#' )
+			{	// Exclude pages and intros and sidebar stuff by default:
+				$item_types = '-'.implode( ',', $posttypes_specialtypes );
+			}
+			elseif( $params['item_type'] != 'all' )
+			{	// Filter by one selected item type:
+				$item_types = $params['item_type'];
+			}
 		}
 		// Filter by item types:
 		$Calendar->ItemQuery->where_types( $item_types );

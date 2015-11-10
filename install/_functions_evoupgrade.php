@@ -319,7 +319,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	load_funcs('_core/model/db/_upgrade.funcs.php');
 
 	// Force MySQL strict mode:
-	$DB->query( 'SET sql_mode = ""', 'Force MySQL "strict" mode to do not worry about missing defaults until the end of the upgrade.' );
+	$DB->query( 'SET sql_mode = ""', 'REMOVE MySQL "strict" mode in order not to worry about missing defaults until the end of the upgrade.' );
 
 	echo '<p>'.T_('Checking DB schema version...').' ';
 	$old_db_version = get_db_version();

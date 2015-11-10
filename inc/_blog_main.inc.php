@@ -607,7 +607,7 @@ if( $disp == 'terms' )
 
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
-    ! in_array( $disp, array( 'terms', 'help', 'activateinfo' ) ) && // Allow these pages
+    ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 

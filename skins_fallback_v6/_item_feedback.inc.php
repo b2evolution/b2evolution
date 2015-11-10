@@ -84,6 +84,7 @@ $params = array_merge( array(
 		'nav_page_item_after'   => '</li>',
 		'nav_page_current_template' => '<span><b>$page_num$</b></span>',
 		'comments_per_page'     => NULL, // Used instead of blog setting "comments_per_page"
+		'pagination'            => array(),
 	), $params );
 
 
@@ -293,7 +294,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_top'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -304,7 +305,7 @@ if( $Item->can_see_comments( true ) )
 					'page_item_before'      => $params['nav_page_item_before'],
 					'page_item_after'       => $params['nav_page_item_after'],
 					'page_current_template' => $params['nav_page_current_template'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 
@@ -392,7 +393,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_bottom'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url'    => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -403,7 +404,7 @@ if( $Item->can_see_comments( true ) )
 					'page_item_before'      => $params['nav_page_item_before'],
 					'page_item_after'       => $params['nav_page_item_after'],
 					'page_current_template' => $params['nav_page_current_template'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 		if( $params['nav_bottom_inside'] )
