@@ -38,9 +38,11 @@ if( ! is_logged_in() )
 	bad_request_die( T_( 'You are not logged in.' ) );
 }
 
-// Update settings of current user to mark as terms accepted:
-$UserSettings->set( 'terms_accepted', '1', $current_User->ID );
-$UserSettings->dbupdate();
+if( $current_User->must_accept_terms() )
+{	// Update settings of current user to mark as terms accepted:
+	$UserSettings->set( 'terms_accepted', '1', $current_User->ID );
+	$UserSettings->dbupdate();
+}
 
 // Redirect to requested page before viewing terms & conditions:
 header_redirect( $redirect_to );

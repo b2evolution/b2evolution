@@ -18,43 +18,73 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $redirect_to, $UserSettings, $current_User;
 
-// --------------------------------- START OF POSTS -------------------------------------
+// Default params:
+$params = array_merge( array(
+		// Classes for the <div> tag:
+		'item_class'          => 'post',
+		'item_type_class'     => 'post_ptyp',
+		'item_status_class'   => 'post',
+		// Controlling the content:
+		'content_mode'        => 'full', // Use only 'full' on disp=terms
+		'image_size'          => 'fit-400x320',
+		// Part with accept button:
+		'terms_button_before' => '<p class="center">',
+		'terms_button_after'  => '</p>',
+		'terms_info_before'   => '<p class="center green">',
+		'terms_info_after'    => '</p>',
+	), $params );
+
+
 // Display message if no post:
 display_if_empty();
 
-while( mainlist_get_item() )
-{	// For each blog post, do everything below up to the closing curly brace "}"
+if( $Item = & mainlist_get_item() )
+{	// If a post exists for page with terms & conditions:
 
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array_merge( array(
-			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
-			'image_size'   => 'fit-400x320',
-			'display_info' => false,
-		), $params ) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
+	// ---------------------- ITEM BLOCK START ----------------------
 
+	// Temporarily switch to post locale (useful for multilingual blogs):
+	$Item->locale_temp_switch();
+
+	?>
+	<div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
+	<?php
+		// this will create a <section>
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			skin_include( '_item_content.inc.php', $params );
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		// this will end a </section>
+	?>
+	</div>
+	<?php
+
+	// ----------------------- ITEM BLOCK END -----------------------
+
+	// Display a button to accept the terms OR info text if current user already accepted them:
 	if( is_logged_in() )
 	{	// If user is logged in:
-		$Form = new Form( get_samedomain_htsrv_url().'accept_terms.php' );
-
-		$Form->begin_form();
-		$Form->hidden( 'redirect_to', $redirect_to );
-
-		echo '<p class="center">';
 
 		if( $UserSettings->get( 'terms_accepted', $current_User->ID ) )
 		{	// If current user already accepted:
-			echo '<b>'.T_('You already accepted these terms.').'</b>';
+			echo $params['terms_info_before'].T_('You already accepted these terms.').$params['terms_info_after'];
 		}
 		else
 		{	// Otherwise display a button to accept:
-			$Form->button( array( 'submit', '', T_('Accept'), 'btn-success' ) );
+			$Form = new Form( get_samedomain_htsrv_url().'accept_terms.php' );
+			$Form->begin_form();
+			$Form->hidden( 'redirect_to', $redirect_to );
+
+			echo $params['terms_button_before'];
+			$Form->button( array( 'submit', '', T_('Accept'), 'btn-success btn-lg' ) );
+			echo $params['terms_button_after'];
+
+			$Form->end_form();
 		}
-
-		echo '</p>';
-
-		$Form->end_form();
 	}
-} // ---------------------------------- END OF POSTS ------------------------------------
 
+	// Restore previous locale (Blog locale):
+	locale_restore_previous();
+}
 ?>

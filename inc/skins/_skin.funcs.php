@@ -135,6 +135,7 @@ function skin_init( $disp )
 		case 'terms':
 			if( $disp == 'terms' && ! $Item )
 			{	// Wrong post ID for terms page:
+				global $disp;
 				$disp = '404';
 				$Messages->add( sprintf( T_('Terms not found. (post ID #%s)'), get_param( 'p' ) ), 'error' );
 				break;

@@ -35,7 +35,6 @@ $params = array_merge( array(
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'preferredname',
-		'display_info'               => true,
 	), $params );
 
 
@@ -87,7 +86,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 
 	<?php
-	if( $params['display_info'] && ! $Item->is_intro() )
+	if( ! $Item->is_intro() )
 	{ // Don't display the following for intro posts
 	?>
 	<div class="small text-muted">
@@ -152,7 +151,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<footer>
 
 		<?php
-			if( $params['display_info'] && ! $Item->is_intro() )
+			if( ! $Item->is_intro() )
 			{ // List all tags attached to this post:
 				$Item->tags( array(
 						'before'    => '<nav class="small post_tags">',
