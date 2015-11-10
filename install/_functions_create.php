@@ -246,8 +246,8 @@ function create_default_data()
 		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name,
 					 ityp_allow_html, ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent )
 		VALUES ( 1,    'Post',          'Posts',         'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 10,   'Custom Fields Example', 'Posts', 'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 20,   'Child Post Example',    'Posts', 'single', 1, 1, 1, 'standard',   'required' ),
+					 ( 10,   'Post with Custom Fields', 'Posts', 'single', 1, 1, 1, 'standard',   'never' ),
+					 ( 20,   'Child Post',    'Posts',         'single', 1, 1, 1, 'standard',   'required' ),
 					 ( 100,  'Manual Page',   'Posts',         'single', 0, 1, 1, 'standard',   'never' ),
 					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 1, 1, 'standard',   'never' ),
 					 ( 1000, 'Page',          'Pages',         'page',   1, 1, 1, 'restricted', 'never' ),
@@ -263,10 +263,10 @@ function create_default_data()
 					 ( 5000, 'Reserved',      NULL,            NULL,     1, 1, 1, 'standard',   'never' )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-			VALUES ( 2, "First numeric field", "first_numeric_field", "double" ),
-						 ( 2, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 2, "First text field", "first_text_field", "varchar" ),
-						 ( 2, "Define you own labels", "define_you_own_labels", "varchar" )' );
+			VALUES ( 10, "First numeric field", "first_numeric_field", "double" ),
+						 ( 10, "Second numeric field", "second_numeric_field", "double" ),
+						 ( 10, "First text field", "first_text_field", "varchar" ),
+						 ( 10, "Define you own labels", "define_you_own_labels", "varchar" )' );
 	task_end();
 
 
@@ -1956,7 +1956,7 @@ function create_demo_contents()
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
+		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
 				.T_('<p>This post type defines 4 custom fields.</p>')
 				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 10 );
@@ -1966,7 +1966,7 @@ function create_demo_contents()
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-		$edited_Item->insert( $jay_moderator_ID, T_('Child Post'), T_('<p>This post has a special post type called "Child Post Example".</p>'),
+		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 20 );
 
 		// Insert a post:
