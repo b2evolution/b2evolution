@@ -71,9 +71,6 @@ div.front_main_area div.widget_core_coll_item_list .item_first_image_placeholder
   -o-border-radius: 3px;
   border-radius: 3px;
 }
-div.front_main_area div.widget_core_coll_item_list .item_title {
-  display: inline-block;
-}
 div.front_main_area div.widget_core_coll_item_list div.item_title {
   vertical-align: middle;
   display: table-cell;
