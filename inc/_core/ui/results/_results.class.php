@@ -1938,7 +1938,7 @@ class Results extends Table
 	function display_first( $page_url = '' )
 	{
 		if( $this->first() > 1 )
-		{ //the list doesn't contain the first page
+		{ // the list doesn't contain the first page
 			$r = '';
 			if( isset( $this->params['page_item_before'] ) )
 			{
@@ -1955,7 +1955,7 @@ class Results extends Table
 			return $r;
 		}
 		else
-		{ //the list already contains the first page
+		{ // the list already contains the first page
 			return NULL;
 		}
 	}
@@ -2114,16 +2114,16 @@ class Results extends Table
 		for( $i=$min; $i<=$max; $i++)
 		{
 			if( $i == $this->page && isset( $this->params['page_item_current_before'] ) )
-			{
+			{ // current page
 				$list .= $this->params['page_item_current_before'];
 			}
 			elseif( isset( $this->params['page_item_before'] ) )
-			{
+			{ // other page
 				$list .= $this->params['page_item_before'];
 			}
 
 			if( $i == $this->page )
-			{ //no link for the current page
+			{ // no link for the current page
 				if( ! isset( $this->params['page_current_template'] ) )
 				{
 					$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
@@ -2131,7 +2131,7 @@ class Results extends Table
 				$list .= str_replace( '$page_num$', $i, $this->params['page_current_template'] );
 			}
 			else
-			{ //a link for non-current pages
+			{ // a link for non-current pages
 				$list .= '<a href="'
 					.regenerate_url( $this->page_param, ( $i>1 ? $this->page_param.'='.$i : '' ), $page_url ).'"';
 				$attr_rel = array();
