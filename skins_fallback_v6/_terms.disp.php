@@ -80,7 +80,7 @@ if( $Item = & mainlist_get_item() )
 			$Form->hidden( 'redirect_to', $redirect_to );
 
 			echo $params['terms_button_before'];
-			$Form->button( array( 'submit', '', T_('Accept'), 'btn-success btn-lg' ) );
+			$Form->button( array( 'submit', '', T_('I accept these terms'), 'btn-success btn-lg' ) );
 			echo $params['terms_button_after'];
 
 			$Form->end_form();

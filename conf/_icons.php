@@ -1082,6 +1082,7 @@ function get_icon_info( $name )
 			'fa' => 'envelope-square'
 		);
 
+		// Width switcher tool:
 		case 'width_increase': return array(
 			'alt'  => T_('Increase width'),
 			'size' => array( 32, 32 ),

@@ -124,7 +124,7 @@ class Blog extends DataObject
 	/**
 	 * @var boolean TRUE if blog is favorite
 	 */
-	var $favorite;
+	var $favorite = 1;
 
 
 	/**

@@ -68,9 +68,9 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
 				// Unavailable services. Keep them for backwards compatibility
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
+				'<div class="videoblock">The Google video service is not available anymore.</div>',
+				'<div class="videoblock">The Live Video service is not available anymore.</div>',
+				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
 			);
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
@@ -140,7 +140,7 @@ class videoplug_plugin extends Plugin
 			{
 				while( 1 )
 				{
-					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
+					var p = '<?php echo TS_('Copy/paste the URL or the ID of your video from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
@@ -189,14 +189,14 @@ class videoplug_plugin extends Plugin
 							}
 							else
 							{	// Display error when URL doesn't match:
-								alert( '<?php echo TS_('The URL you provided could not be parsed.'); ?>' );
+								alert( '<?php echo TS_('The URL you provided could not be recognized.'); ?>' );
 								continue;
 							}
 						}
 					}
 
 					// Display error of wrong entered data:
-					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
+					alert( '<?php echo TS_('The URL or video ID is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';

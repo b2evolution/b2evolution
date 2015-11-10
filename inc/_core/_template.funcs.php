@@ -1171,12 +1171,12 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
 				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
-					previous: "'.TS_('previous').'",
-					next: "'.TS_('next').'",
-					close: "'.TS_('close').'",
-					openNewWindowText: "'.TS_('open in new window').'",
-					slideshowStart: "'.TS_('start slideshow').'",
-					slideshowStop: "'.TS_('stop slideshow').'",';
+					previous: "'.TS_('Previous').'",
+					next: "'.TS_('Next').'",
+					close: "'.TS_('Close').'",
+					openNewWindowText: "'.TS_('Open in a new window').'",
+					slideshowStart: "'.TS_('Start slideshow').'",
+					slideshowStop: "'.TS_('Stop slideshow').'",';
 				// Colorbox params to display a voting panel:
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
