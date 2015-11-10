@@ -89,6 +89,19 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
+					'font_size' => array(
+						'label' => T_('Font size'),
+						'note' => '',
+						'defaultvalue' => 'default',
+						'options' => array(
+								'default'        => T_('Default (14px)'),
+								'standard'       => T_('Standard (16px)'),
+								'medium'      	 => T_('Medium (18px)'),
+								'large' 		 => T_('Large (20px)'),
+								'very_large'     => T_('Very large (22px)'),
+							),
+						'type' => 'select',
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -204,7 +217,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $debug;
+		global $Messages, $debug, $disp;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -226,7 +239,80 @@ class bootstrap_blog_Skin extends Skin
 		if( $max_image_height > 0 )
 		{
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+		}	
+		
+		// Add custom CSS:
+		$custom_css = '';
+		
+		
+		// Font size customization
+		if( $font_size = $this->get_setting( 'font_size' ) )
+		{
+			switch( $font_size )
+			{
+				case 'default': // When default font size, no CSS entry
+				$custom_css = '';
+				break;
+				
+				case 'standard':// When standard layout
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 38px'." }\n";
+				$custom_css .= '.container h2 { font-size: 32px'." }\n";
+				$custom_css .= '.container h3 { font-size: 26px'." }\n";
+				$custom_css .= '.container h4 { font-size: 18px'." }\n";
+				$custom_css .= '.container h5 { font-size: 16px'." }\n";
+				$custom_css .= '.container h6 { font-size: 14px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+
+				case 'medium': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 40px'." }\n";
+				$custom_css .= '.container h2 { font-size: 34px'." }\n";
+				$custom_css .= '.container h3 { font-size: 28px'." }\n";
+				$custom_css .= '.container h4 { font-size: 20px'." }\n";
+				$custom_css .= '.container h5 { font-size: 18px'." }\n";
+				$custom_css .= '.container h6 { font-size: 16px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 42px'." }\n";
+				$custom_css .= '.container h2 { font-size: 36px'." }\n";
+				$custom_css .= '.container h3 { font-size: 30px'." }\n";
+				$custom_css .= '.container h4 { font-size: 22px'." }\n";
+				$custom_css .= '.container h5 { font-size: 20px'." }\n";
+				$custom_css .= '.container h6 { font-size: 18px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'very_large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 44px'." }\n";
+				$custom_css .= '.container h2 { font-size: 38px'." }\n";
+				$custom_css .= '.container h3 { font-size: 32px'." }\n";
+				$custom_css .= '.container h4 { font-size: 24px'." }\n";
+				$custom_css .= '.container h5 { font-size: 22px'." }\n";
+				$custom_css .= '.container h6 { font-size: 20px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+			}
 		}
+		
+		if( ! empty( $custom_css ) )
+		{ // Function for custom_css:
+		$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+		add_headline( $custom_css );
+		}			
 	}
 
 
