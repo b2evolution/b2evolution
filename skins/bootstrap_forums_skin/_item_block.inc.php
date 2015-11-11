@@ -69,11 +69,11 @@ skin_widget( array(
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 					'block_start'     => '<ul class="pager col-lg-12 post_nav">',
-					'prev_start'      => '<li class="prev-left">',
+					'prev_start'      => '<li class="previous">',
 					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
 					'prev_end'        => '</li>',
 					'separator'       => ' ',
-					'next_start'      => '<li class="next-right">',
+					'next_start'      => '<li class="next">',
 					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
 					'next_end'        => '</li>',
 					'block_end'       => '</ul>',

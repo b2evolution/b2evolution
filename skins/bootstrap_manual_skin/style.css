@@ -109,6 +109,9 @@ div.bSideItem {
 div.bSideItem h4 {
   margin-top: 0;
 }
+.pager {
+  margin-bottom: 0;
+}
 .skin-form .panel-body .panel {
   border: none;
   box-shadow: none;

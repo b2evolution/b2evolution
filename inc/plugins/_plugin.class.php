@@ -3223,7 +3223,7 @@ class Plugin
 
 			// Display additional info for help plugin icon only one time. It is used on plugins.js
 			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-					.sprintf( T_('Click %s to access full documentaion for this plugin'), get_icon( 'help' ) )
+					.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
 				.'</strong></p></div>';
 		}
 		elseif( $target == '$readme' )

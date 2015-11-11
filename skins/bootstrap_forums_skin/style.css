@@ -295,14 +295,8 @@ ul.legend span.note {
   float: none;
 }
 .pager {
-  margin: 0px 0px 15px 0px;
-  padding-right: 0px;
-}
-.pager .prev-left {
-  float: left;
-}
-.pager .next-right {
-  float: right;
+  margin: 0 0 15px 0;
+  padding-right: 0;
 }
 .skin-form .panel-body .panel {
   border: none;

@@ -73,6 +73,12 @@ class bootstrap_manual_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
+					'page_navigation' => array(
+						'label' => T_('Page navigation'),
+						'note' => T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
