@@ -736,3 +736,20 @@ div.bCommentText p {
 img.bCommentAvatar {
 	margin: 4px 6px 4px 0;
 }
+
+/* Arrows to navigate between posts */
+.arrow_right_white, .arrow_right_grey,
+.arrow_left_white, .arrow_left_grey {
+	width: 10px;
+	height: 14px;
+	background: url("img/sprite.png") 0 0 no-repeat;
+}
+.arrow_right_white {
+	background-position: -10px -14px;
+}
+.arrow_right_grey {
+	background-position: -10px 0;
+}
+.arrow_left_white {
+	background-position: 0 -14px;
+}
