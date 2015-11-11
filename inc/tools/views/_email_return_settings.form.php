@@ -62,8 +62,10 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 																		array( 'tls', T_('TLS'), ),
 																	), T_('Encryption method') );
 
-	$Form->checkbox( 'repath_novalidatecert', $Settings->get( 'repath_novalidatecert' ), T_('Do not validate certificate'),
-				T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
+	$Form->radio( 'repath_novalidatecert', $Settings->get( 'repath_novalidatecert' ), array(
+			array( 0, T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 1, T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+		), T_('Certificate validation'), true );
 
 	$Form->text_input( 'repath_username', $Settings->get( 'repath_username' ), 25,
 				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );

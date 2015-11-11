@@ -88,8 +88,10 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-gen
 																		array( 'tls', T_('TLS'), ),
 																	), T_('Encryption method') );
 
-	$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'),
-				T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
+	$Form->radio( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), array(
+			array( 0, T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 1, T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+		), T_('Certificate validation'), true );
 
 	$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 25,
 				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255 ) );
