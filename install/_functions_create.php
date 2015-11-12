@@ -1562,7 +1562,7 @@ function create_demo_contents()
 			'home',
 			T_('Change this as you like'),
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-			1, // Skin ID
+			2, // Skin ID
 			'main',
 			'any',
 			1,
@@ -1589,7 +1589,7 @@ function create_demo_contents()
 			$blog_stub,
 			T_('Tagline for Blog A'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			2, // Skin ID
+			1, // Skin ID
 			'std',
 			'any',
 			1,
@@ -1610,7 +1610,7 @@ function create_demo_contents()
 			$blog_stub,
 			T_('Tagline for Blog B'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			2, // Skin ID
+			1, // Skin ID
 			'std',
 			'',
 			0,

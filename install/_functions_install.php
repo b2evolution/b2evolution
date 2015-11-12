@@ -505,11 +505,11 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	task_begin( 'Installing default skins... ' );
 
-	// Note: Skin #1 will we used by Home
-	skin_install( 'bootstrap_main_skin' );
-
-	// Note: Skin #2 will we used by Blog A and Blog B
+	// Note: Skin #1 will we used by Blog A and Blog B
 	skin_install( 'bootstrap_blog_skin' );
+
+	// Note: Skin #2 will we used by Home
+	skin_install( 'bootstrap_main_skin' );
 
 	// Note: Skin #3 will we used by Photos
 	skin_install( 'bootstrap_gallery_skin' );
