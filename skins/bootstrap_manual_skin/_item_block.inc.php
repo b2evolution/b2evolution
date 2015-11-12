@@ -14,8 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $cat, $Blog;
-global $posttypes_specialtypes;
+global $Item, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -29,47 +28,6 @@ $params = array_merge( array(
 		'disp_comment_form' => true,
 		'item_link_type'    => 'post',
 	), $params );
-
-if( $disp == 'single' )
-{ // Display the breadcrumb path
-	if( empty( $cat ) )
-	{ // Set a category as main of current Item
-		$cat = $Item->main_cat_ID;
-
-		// Display the breadcrumbs only when global $cat is empty before line above
-		// Otherwise it is already displayed in header file
-		skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'breadcrumb_path',
-				// Optional display params
-				'block_start'      => '<ol class="breadcrumb">',
-				'block_end'        => '</ol>',
-				'separator'        => '',
-				'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-				'item_active_mask' => '<li class="active">$title$</li>',
-			) );
-	}
-
-	if( $Skin->get_setting( 'page_navigation' ) )
-	{	// Display navigation between posts in the same category:
-		// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-		item_prevnext_links( array(
-				'block_start'     => '<ul class="pager">',
-				'prev_start'      => '<li class="previous">',
-				'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
-				'prev_end'        => '</li>',
-				'separator'       => ' ',
-				'next_start'      => '<li class="next">',
-				'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
-				'next_end'        => '</li>',
-				'block_end'       => '</ul>',
-				'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
-				'post_navigation' => 'same_category', // force to stay in the same category in this skin
-				'featured'        => false, // don't include the featured posts into navigation list
-			) );
-		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
-	}
-}
 ?>
 
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
