@@ -166,18 +166,29 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'all', T_('Display all pictures') ) ),
 					'defaultvalue' => 'none',
 				),
+				'disp_first_image' => array(
+					'label' => T_('First picture'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'special', T_('Special placement before this') ),
+							array( 'normal', T_('No special treatment (same as other pictures)') ) ),
+					'defaultvalue' => 'normal',
+				),
+				'max_pics' => array(
+					'label' => T_('Max pictures'),
+					'note' => T_('Maximum number of pictures to display after the title.'),
+					'size' => 4,
+					'type' => 'integer',
+					'defaultvalue' => '',
+					'allow_empty' => true,
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
 					'type' => 'select',
 					'options' => get_available_thumb_sizes(),
 					'defaultvalue' => 'crop-80x80',
-				),
-				'disp_first_image' => array(
-					'label' => T_( 'Order' ),
-					'note' => T_( 'Display first image separately and before title.' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
 				),
 				'item_pic_link_type' => array(
 					'label' => T_('Link pictures'),
@@ -405,10 +416,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
-				( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] ) || // display first image
+				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
-				( $this->disp_params['disp_teaser'] ) || // display teaser
-				( $this->disp_params['attached_pics'] == 'all' || ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) ) // display other images
+				( $this->disp_params['disp_teaser'] ) // display teaser
 			);
 
 		// Start to capture display content here in order to solve the issue to don't display empty widget
@@ -606,17 +616,40 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $this->disp_params[$disp_param_prefix.'item_start'];
 		}
 
-		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
+		if( $this->disp_params['disp_first_image'] == 'special' )
+		{	// If we should display first picture before title then get "Cover" images and order them at top:
+			$cover_image_params = array(
+					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
+					'links_sql_select'  => ', CASE '
+							.'WHEN link_position = "cover"      THEN "1" '
+							.'WHEN link_position = "teaser"     THEN "2" '
+							.'WHEN link_position = "teaserperm" THEN "3" '
+							.'WHEN link_position = "teaserlink" THEN "4" '
+							.'WHEN link_position = "aftermore"  THEN "5" '
+							.'WHEN link_position = "inline"     THEN "6" '
+							// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+						.'END AS position_order',
+					'links_sql_orderby' => 'position_order, link_order',
+				);
+		}
+		else
+		{
+			$cover_image_params = array();
+		}
+
+		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] == 'special' )
 		{ // We want to display first image separately before the title
 			// Display before/after even if there is no image so we can use it as a placeholder.
-			$this->disp_images( array(
+			$this->disp_images( array_merge( array(
 					'before'      => $this->disp_params['item_first_image_before'],
 					'after'       => $this->disp_params['item_first_image_after'],
 					'placeholder' => $this->disp_params['item_first_image_placeholder'],
 					'Item'        => $disp_Item,
 					'start'       => 1,
 					'limit'       => 1,
-				), $content_is_displayed );
+				), $cover_image_params ),
+				$content_is_displayed );
 		}
 
 		if( $this->disp_params['disp_title'] )
@@ -665,16 +698,36 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		   ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
-			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
-			$this->disp_images( array(
+			if( $this->disp_params['attached_pics'] == 'first' )
+			{	// Display only one first image:
+				$picture_limit = 1;
+			}
+			else
+			{
+				$max_pics = intval( $this->disp_params['max_pics'] );
+				if( $max_pics > 0 )
+				{	// Limit images after title with widget param:
+					$picture_limit = $max_pics;
+					if( $this->disp_params['disp_first_image'] == 'special' )
+					{	// If first image is already displayed before title, then we should skip this first to get next images:
+						$picture_limit += 1;
+					}
+				}
+				else
+				{	// Don't limit the images:
+					$picture_limit = 1000;
+				}
+			}
+			$this->disp_images( array_merge( array(
 					'before' => $this->disp_params['item_images_before'],
 					'after'  => $this->disp_params['item_images_after'],
 					'Item'   => $disp_Item,
-					'start'  => ( $this->disp_params['disp_first_image'] ? 2 : 1 ), // Skip first image if it is displayed on top
+					'start'  => ( $this->disp_params['disp_first_image'] == 'special' ? 2 : 1 ), // Skip first image if it is displayed on top
 					'limit'  => $picture_limit,
-				), $content_is_displayed );
+				), $cover_image_params ),
+				$content_is_displayed );
 		}
 
 		if( $link_class == $this->disp_params['link_selected_class'] )
@@ -699,26 +752,35 @@ class coll_item_list_Widget extends ComponentWidget
 	function disp_images( $params = array(), & $content_is_displayed )
 	{
 		$params = array_merge( array(
-				'before' => '',
-				'after'  => '',
-				'placeholder' => '',
-				'Item'   => NULL,
-				'start'  => 1,
-				'limit'  => 1,
+				'before'                     => '',
+				'after'                      => '',
+				'placeholder'                => '',
+				'Item'                       => NULL,
+				'start'                      => 1,
+				'limit'                      => 1,
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore,inline',
+				'links_sql_select'           => '',
+				'links_sql_orderby'          => 'link_order',
 			), $params );
+
+		$links_params = array(
+				'sql_select_add' => $params['links_sql_select'],
+				'sql_order_by'   => $params['links_sql_orderby']
+			);
 
 		$disp_Item = & $params['Item'];
 
+		// Get list of ALL attached files:
 		$LinkOwner = new LinkItem( $disp_Item );
 
 		$images = '';
 
-		if( $FileList = $LinkOwner->get_attachment_FileList( $params['limit'], NULL, 'image' ) )
+		if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
 		{	// Get list of attached files
 			$image_num = 1;
-			while( $File = & $FileList->get_next() )
+			while( $Link = & $LinkList->get_next() )
 			{
-				if( $File->is_image() )
+				if( ( $File = & $Link->get_File() ) && $File->is_image() )
 				{	// Get only images
 					if( $image_num < $params['start'] )
 					{ // Skip these first images
