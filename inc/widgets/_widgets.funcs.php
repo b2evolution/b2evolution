@@ -247,7 +247,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	$post_list_params = NULL;
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
-		$post_list_params = array( 'blog_ID' => '', 'limit' => 50 );
+		$post_list_params = array(
+				'blog_ID'          => '',
+				'limit'            => 50,
+				'attached_pics'    => 'first',
+				'disp_first_image' => 'special',
+			);
 	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );
 	if( $kind != 'main' )

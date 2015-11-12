@@ -166,18 +166,21 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'all', T_('Display all pictures') ) ),
 					'defaultvalue' => 'none',
 				),
+				'disp_first_image' => array(
+					'label' => T_('First picture'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'special', T_('Special placement before this') ),
+							array( 'normal', T_('No special treatment (same as other pictures)') ) ),
+					'defaultvalue' => 'normal',
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
 					'type' => 'select',
 					'options' => get_available_thumb_sizes(),
 					'defaultvalue' => 'crop-80x80',
-				),
-				'disp_first_image' => array(
-					'label' => T_( 'Order' ),
-					'note' => T_( 'Display first image separately and before title.' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
 				),
 				'item_pic_link_type' => array(
 					'label' => T_('Link pictures'),
@@ -405,10 +408,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
-				( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] ) || // display first image
+				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
-				( $this->disp_params['disp_teaser'] ) || // display teaser
-				( $this->disp_params['attached_pics'] == 'all' || ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) ) // display other images
+				( $this->disp_params['disp_teaser'] ) // display teaser
 			);
 
 		// Start to capture display content here in order to solve the issue to don't display empty widget
@@ -606,7 +608,7 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $this->disp_params[$disp_param_prefix.'item_start'];
 		}
 
-		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
+		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] == 'special' )
 		{ // We want to display first image separately before the title
 			// Display before/after even if there is no image so we can use it as a placeholder.
 			$this->disp_images( array(
@@ -665,14 +667,14 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		   ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
 			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
 			$this->disp_images( array(
 					'before' => $this->disp_params['item_images_before'],
 					'after'  => $this->disp_params['item_images_after'],
 					'Item'   => $disp_Item,
-					'start'  => ( $this->disp_params['disp_first_image'] ? 2 : 1 ), // Skip first image if it is displayed on top
+					'start'  => ( $this->disp_params['disp_first_image'] == 'special' ? 2 : 1 ), // Skip first image if it is displayed on top
 					'limit'  => $picture_limit,
 				), $content_is_displayed );
 		}
