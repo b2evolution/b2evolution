@@ -175,6 +175,14 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'normal', T_('No special treatment (same as other pictures)') ) ),
 					'defaultvalue' => 'normal',
 				),
+				'max_pics' => array(
+					'label' => T_('Max pictures'),
+					'note' => T_('Maximum number of pictures to display after the title.'),
+					'size' => 4,
+					'type' => 'integer',
+					'defaultvalue' => '',
+					'allow_empty' => true,
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
@@ -692,7 +700,26 @@ class coll_item_list_Widget extends ComponentWidget
 		if( $this->disp_params['attached_pics'] == 'all' ||
 		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
-			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
+			if( $this->disp_params['attached_pics'] == 'first' )
+			{	// Display only one first image:
+				$picture_limit = 1;
+			}
+			else
+			{
+				$max_pics = intval( $this->disp_params['max_pics'] );
+				if( $max_pics > 0 )
+				{	// Limit images after title with widget param:
+					$picture_limit = $max_pics;
+					if( $this->disp_params['disp_first_image'] == 'special' )
+					{	// If first image is already displayed before title, then we should skip this first to get next images:
+						$picture_limit += 1;
+					}
+				}
+				else
+				{	// Don't limit the images:
+					$picture_limit = 1000;
+				}
+			}
 			$this->disp_images( array_merge( array(
 					'before' => $this->disp_params['item_images_before'],
 					'after'  => $this->disp_params['item_images_after'],
