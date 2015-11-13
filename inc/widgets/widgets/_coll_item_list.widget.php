@@ -426,18 +426,16 @@ class coll_item_list_Widget extends ComponentWidget
 		// This variable used to display widget. Will be set to true when content is displayed
 		$content_is_displayed = false;
 
-		if( !$this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
-		{ // Don't display bullets when we show only the pictures
-			$block_css_class = 'nobullets';
-		}
+		// Get extra classes depending on widget settings:
+		$block_css_class = $this->get_widget_extra_class();
 
 		if( empty( $block_css_class ) )
-		{
+		{	// No extra class, Display default wrapper:
 			echo $this->disp_params['block_start'];
 		}
 		else
-		{ // Additional class for widget block
-			echo preg_replace( '/ class="([^"]+)"/', ' class="$1 '.$block_css_class.'"', $this->disp_params['block_start'] );
+		{	// Append extra classes for widget block:
+			echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
 		}
 
 		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
@@ -829,6 +827,88 @@ class coll_item_list_Widget extends ComponentWidget
 			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );
 		}
 
+	}
+
+
+	/**
+	 * Get extra classes depending on widget settings
+	 *
+	 * @return string
+	 */
+	function get_widget_extra_class()
+	{
+		$block_css_class = '';
+
+		if( ! $this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
+		{	// Don't display bullets when we show only the pictures:
+			$block_css_class .= ' nobullets';
+		}
+
+		if( $this->disp_params['item_group_by'] == 'chapter' )
+		{	// If items are grouped by category/chapter:
+			$block_css_class .= ' evo_withgroup';
+		}
+		else
+		{	// No grouping:
+			$block_css_class .= ' evo_nogroup';
+		}
+
+		if( $this->disp_params['disp_title'] )
+		{	// If item title is displayed:
+			$block_css_class .= ' evo_withtitle';
+		}
+		else
+		{	// Item title is hidden:
+			$block_css_class .= ' evo_notitle';
+		}
+
+		if( $this->disp_params['attached_pics'] == 'first' )
+		{	// If only first picture is displayed:
+			$block_css_class .= ' evo_1pic';
+		}
+		elseif( $this->disp_params['attached_pics'] == 'all' )
+		{	// If all item pictures are displayed:
+			$block_css_class .= ' evo_pics';
+		}
+		else
+		{	// Item pictures are hidden:
+			$block_css_class .= ' evo_nopic';
+		}
+
+		if( $this->disp_params['attached_pics'] != 'none' )
+		{	// If at least one picture should be displayed:
+			if( $this->disp_params['disp_first_image'] == 'special' )
+			{	// Special placement for first image:
+				$block_css_class .= ' evo_1pic__special';
+			}
+			else
+			{	// Normal placement for first image:
+				$block_css_class .= ' evo_1pic__normal';
+			}
+
+			// Add class for each image size:
+			$block_css_class .= ' evo_imgsize_'.$this->disp_params['thumb_size'];
+		}
+
+		if( $this->disp_params['disp_excerpt'] )
+		{	// If item excerpt is displayed:
+			$block_css_class .= ' evo_withexcerpt';
+		}
+		else
+		{	// Item excerpt is hidden:
+			$block_css_class .= ' evo_noexcerpt';
+		}
+
+		if( $this->disp_params['disp_teaser'] )
+		{	// If item teaser is displayed:
+			$block_css_class .= ' evo_withteaser';
+		}
+		else
+		{	// Item teaser is hidden:
+			$block_css_class .= ' evo_noteaser';
+		}
+
+		return $block_css_class;
 	}
 
 
