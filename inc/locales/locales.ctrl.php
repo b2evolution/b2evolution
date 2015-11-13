@@ -54,7 +54,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'newdefault_locale', 'string', true );
+		// If default locale has not been selected on form use default locale from config var $default_locale:
+		param( 'newdefault_locale', 'string', $default_locale );
 		$Settings->set( 'default_locale', $newdefault_locale );
 
 		if( ( ! $Messages->has_errors() ) && ( locale_updateDB() ) )

@@ -878,8 +878,8 @@ function locale_updateDB()
 			$lnr = $matches[1];
 			$plocale = $pval;
 
-			if( $templocales[ $plocale ]['enabled'] )
-			{ // Collect previously enabled locales
+			if( $templocales[ $plocale ]['enabled'] || ( $plocale == $current_default_locale && ! isset( $_POST['loc_'.$lnr.'_enabled'] ) ) )
+			{	// Collect previously enabled locales AND if current default locale is not enabled yet:
 				$disabled_locales[ $plocale ] = $plocale;
 			}
 			// checkboxes default to 0
