@@ -506,6 +506,7 @@ function install_basic_skins( $install_mobile_skins = true )
 	task_begin( 'Installing default skins... ' );
 
 	// Note: Skin #1 will we used by Blog A and Blog B
+	// Install this skin firstly in order to use it by default for all collections with wrong skin ID on upgrade process:
 	skin_install( 'bootstrap_blog_skin' );
 
 	// Note: Skin #2 will we used by Home
