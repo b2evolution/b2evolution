@@ -75,7 +75,7 @@ class bootstrap_manual_Skin extends Skin
 					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
-						'note' => T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
+						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
 					),
