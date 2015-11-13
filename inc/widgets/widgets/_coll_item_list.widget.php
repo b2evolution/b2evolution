@@ -305,7 +305,7 @@ class coll_item_list_Widget extends ComponentWidget
 		$this->disp_params = array_merge( array(
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
-				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"></div>',
+				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
 				'item_title_before'            => '<div class="item_title">',
 				'item_title_after'             => '</div>',
 				'item_title_single_before'     => '',
@@ -824,8 +824,9 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $params['after'];
 		}
 		else
-		{
-			echo $params['placeholder'];
+		{	// Display placeholder if no images:
+			// Replace mask $item_permaurl$ with the item permanent URL:
+			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );
 		}
 
 	}
