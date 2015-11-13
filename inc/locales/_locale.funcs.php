@@ -1481,4 +1481,76 @@ function locale_insert_default()
 	}
 }
 
+
+/**
+ * Check default locale and enable if it is not yet
+ * Used after each upgrade process
+ */
+function locale_check_default()
+{
+	global $DB, $Settings, $default_locale, $locales;
+
+	// Get default locale from DB:
+	$current_default_locale = $Settings->get( 'default_locale' );
+
+	if( isset( $locales[ $current_default_locale ] ) && $locales[ $current_default_locale ]['enabled'] )
+	{	// Current default locale is correct and enabled
+		// Nothing to fix, Exit here:
+		return;
+	}
+
+	if( ! isset( $locales[ $current_default_locale ] ) )
+	{	// If current default locale is wrong and doesn't exist anymore then use default locale from config:
+		$current_default_locale = $default_locale;
+		// Fix wrong default locale to correct value:
+		$Settings->set( 'default_locale', $current_default_locale );
+		$Settings->dbupdate();
+	}
+
+	// Get a row of current default locale in order to check if it is enabled:
+	$SQL = new SQL();
+	$SQL->SELECT( 'loc_enabled' );
+	$SQL->FROM( 'T_locales' );
+	$SQL->WHERE( 'loc_locale = '.$DB->quote( $current_default_locale ) );
+	$current_default_locale_enabled = $DB->get_var( $SQL->get() );
+
+	if( $current_default_locale_enabled !== NULL )
+	{	// Current default locale exists in DB
+		if( ! $current_default_locale_enabled )
+		{	// Enable current default locale if it is not enabled yet:
+			$DB->query( 'UPDATE T_locales
+				  SET loc_enabled = 1
+				WHERE loc_locale = '.$DB->quote( $current_default_locale ) );
+		}
+	}
+	else
+	{	// No record of default locale
+
+		// Make sure default transliteration_map is set
+		$transliteration_map = '';
+		if( isset( $locales[ $current_default_locale ]['transliteration_map'] ) && is_array( $locales[ $current_default_locale ]['transliteration_map'] ) )
+		{
+			$transliteration_map = base64_encode( serialize( $locales[ $current_default_locale ]['transliteration_map'] ) );
+		}
+
+		// Insert default locale into DB in order to make it enabled:
+		$DB->query( 'INSERT INTO T_locales '
+			.'( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, '
+			.'loc_startofweek, loc_name, loc_messages, loc_priority, '
+			.'loc_transliteration_map, loc_enabled ) '
+			.'VALUES ( '
+			.$DB->quote( $current_default_locale ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? $locales[ $current_default_locale ]['timefmt'] : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['startofweek'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['name'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['messages'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['priority'] ).', '
+			.$DB->quote( $transliteration_map ).', '
+			.'1 )' );
+	}
+
+}
+
 ?>
