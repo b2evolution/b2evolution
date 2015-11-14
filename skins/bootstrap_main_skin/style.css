@@ -131,6 +131,10 @@ div.front_main_area div.widget_core_coll_item_list img,
 div.front_main_area div.widget_core_coll_post_list img {
   border-radius: 3px;
 }
+div.front_main_area div.widget_core_coll_item_list.evo_withgroup > ul > li,
+div.front_main_area div.widget_core_coll_post_list.evo_withgroup > ul > li {
+  font-size: 17px;
+}
 body.pictured {
   height: 100%;
 }
