@@ -62,6 +62,8 @@ class archives_plugin extends Plugin
 	 * @param array Associative array of parameters. Valid keys are:
 	 *                - 'block_start' : (Default: '<div class="bSideItem">')
 	 *                - 'block_end' : (Default: '</div>')
+	 *                - 'block_body_start' : (Default: '')
+	 *                - 'block_body_end' : (Default: '')
 	 *                - 'title' : (Default: T_('Archives'))
 	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
 	 *                - 'sort_order' : 'date'|'title' (Default: date - used only if the mode is 'postbypost')
@@ -102,52 +104,47 @@ class archives_plugin extends Plugin
 		/**
 		 * Default params:
 		 */
-		// This is what will enclose the block in the skin:
-		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
-		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="bSideItem">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				// This is what will enclose the list:
+				'list_start'        => '<ul>',
+				'list_end'          => "</ul>\n",
+				// This is what will separate the archive links:
+				'line_start'        => '<li>',
+				'line_end'          => "</li>\n",
+				// Archive mode:
+				'mode'              => $Blog->get_setting( 'archive_mode' ),
+				// Link type:
+				'link_type'         => 'canonic',
+				'context_isolation' => $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart',
+				// Add form fields?:
+				'form'              => false,
+				// Number of archive entries to display:
+				'limit'             => 12,
+				// More link text:
+				'more_link'         => T_('More...'),
+			), $params );
 
-		// Title:
-		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
-		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-
-		// Archive mode:
-		if(!isset($params['mode']))
-			$params['mode'] = $Blog->get_setting('archive_mode');
-
-		//Sort order (used only in postbypost mode):
-		if($params['mode'] !='postbypost')
+		// Sort order (used only in postbypost mode):
+		if( $params['mode'] != 'postbypost' )
 		{
 			$params['sort_order'] = 'date';
 		}
-		if(!isset($params['sort_order']))
+		if( ! isset( $params['sort_order'] ) )
 		{
-			$params['sort_order'] = $Blog->get_setting('archives_sort_order');
+			$params['sort_order'] = $Blog->get_setting( 'archives_sort_order' );
 		}
 
-		// Link type:
-		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
-		if(!isset($params['context_isolation'])) $params['context_isolation'] = $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart';
-
-		// Add form fields?:
-		if(!isset($params['form']))
-			$params['form'] = false;
-
-		// Number of archive entries to display:
-		if(!isset($params['limit'])) $params['limit'] = 12;
-
-		// More link text:
-		if(!isset($params['more_link'])) $params['more_link'] = T_('More...');
-
-		// This is what will enclose the list:
-		if(!isset($params['list_start'])) $params['list_start'] = '<ul>';
-		if(!isset($params['list_end'])) $params['list_end'] = "</ul>\n";
-
-		// This is what will separate the archive links:
-		if(!isset($params['line_start'])) $params['line_start'] = '<li>';
-		if(!isset($params['line_end'])) $params['line_end'] = "</li>\n";
-
 		// Daily archive date format?
-		if( (!isset($params['day_date_format'])) || ($params['day_date_format'] == '') )
+		if( ! isset( $params['day_date_format'] ) || $params['day_date_format'] == '' )
 		{
 			$dateformat = locale_datefmt();
 			$params['day_date_format'] = $dateformat;
@@ -164,6 +161,8 @@ class archives_plugin extends Plugin
 			echo $params['title'];
 			echo $params['block_title_end'];
 		}
+
+		echo $params['block_body_start'];
 
 		echo $params['list_start'];
 		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title, $permalink) )
@@ -279,6 +278,8 @@ class archives_plugin extends Plugin
 		}
 
 		echo $params['list_end'];
+
+		echo $params['block_body_end'];
 
 		echo $params['block_end'];
 
