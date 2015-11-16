@@ -1974,6 +1974,9 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 .panel-title a.help_plugin_icon:hover {
   color: #23527c;
 }
+.evo_confirm_delete__title {
+  margin-top: 0;
+}
 .form_add_contacts {
   display: block;
   padding: 5px 0 20px 0;
