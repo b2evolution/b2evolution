@@ -6959,7 +6959,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11510' );
+		set_upgrade_checkpoint( '11510' );
+	}
+
+	if( $old_db_version < 11520 )
+	{ // part 3 of 6.7.0
+
+		task_begin( 'Upgrade table item types... ' );
+		db_add_col( 'T_items__type', 'ityp_usage', 'VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT "post" AFTER ityp_backoffice_tab' );
+		$DB->query( 'UPDATE T_items__type SET
+			ityp_usage = CASE
+				WHEN ( ityp_backoffice_tab = "Pages" OR ityp_name = "Page" ) THEN "page"
+				WHEN ityp_name = "Intro-Front"   THEN "intro-front"
+				WHEN ityp_name = "Intro-Main"    THEN "intro-main"
+				WHEN ityp_name = "Intro-Cat"     THEN "intro-cat"
+				WHEN ityp_name = "Intro-Tag"     THEN "intro-tag"
+				WHEN ityp_name = "Intro-Sub"     THEN "intro-sub"
+				WHEN ityp_name = "Intro-All"     THEN "intro-all"
+				WHEN ityp_name = "Sidebar link"  THEN "special"
+				WHEN ityp_name = "Advertisement" THEN "special"
+				ELSE "post"
+			END' );
+		db_drop_col( 'T_items__type', 'ityp_backoffice_tab' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11520' );
 	}
 
 	/*

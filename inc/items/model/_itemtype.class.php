@@ -25,7 +25,7 @@ class ItemType extends DataObject
 {
 	var $name;
 	var $description;
-	var $backoffice_tab;
+	var $usage;
 	var $template_name;
 	var $use_title = 'required';
 	var $use_url = 'optional';
@@ -88,7 +88,7 @@ class ItemType extends DataObject
 			$this->ID   = $db_row->ityp_ID;
 			$this->name = $db_row->ityp_name;
 			$this->description = $db_row->ityp_description;
-			$this->backoffice_tab = $db_row->ityp_backoffice_tab;
+			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
@@ -174,9 +174,9 @@ class ItemType extends DataObject
 		param( 'ityp_perm_level', 'string' );
 		$this->set_from_Request( 'perm_level' );
 
-		// Back-office tab
-		param( 'ityp_backoffice_tab', 'string' );
-		$this->set_from_Request( 'backoffice_tab', NULL, true );
+		// Usage
+		param( 'ityp_usage', 'string' );
+		$this->set_from_Request( 'usage', NULL, true );
 
 		// Template name
 		param( 'ityp_template_name', 'string' );

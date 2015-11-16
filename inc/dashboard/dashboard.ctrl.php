@@ -444,7 +444,7 @@ if( $blog )
 
  		echo '<li>'.T_('Browse').':<ul>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=type&tab_type=posts&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
+		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=type&tab_type=post&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
 		if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
 		{
 			echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';

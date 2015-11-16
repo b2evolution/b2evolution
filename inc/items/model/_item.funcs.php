@@ -1447,11 +1447,11 @@ function attach_browse_tabs( $display_tabs3 = true )
 	}
 
 	$type_tabs = get_item_type_tabs();
-	foreach( $type_tabs as $type_tab )
+	foreach( $type_tabs as $type_tab => $type_tab_name )
 	{
 		$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
 		$menu_entries[ $type_tab_key ] = array(
-			'text' => T_( $type_tab ),
+			'text' => T_( $type_tab_name ),
 			'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
 		);
 	}
@@ -1522,13 +1522,66 @@ function get_item_type_tabs()
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'DISTINCT( ityp_backoffice_tab )' );
+	$SQL->SELECT( 'DISTINCT( ityp_usage )' );
 	$SQL->FROM( 'T_items__type' );
 	$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
-	$SQL->WHERE( 'ityp_backoffice_tab IS NOT NULL' );
 	$SQL->ORDER_BY( 'ityp_ID' );
 
-	return $DB->get_col( $SQL->get() );
+	$type_usages = $DB->get_col( $SQL->get() );
+
+	$type_tabs = array();
+	foreach( $type_usages as $type_usage )
+	{
+		switch( $type_usage )
+		{
+			case 'post':
+				$type_tabs['post'] = NT_('Post');
+				break;
+			case 'page':
+				$type_tabs['page'] = NT_('Page');
+				break;
+			case 'special':
+				$type_tabs['special'] = NT_('Special');
+				break;
+			case 'intro-front':
+			case 'intro-main':
+			case 'intro-cat':
+			case 'intro-tag':
+			case 'intro-sub':
+			case 'intro-all':
+				$type_tabs['intro'] = NT_('Intros');
+				break;
+		}
+	}
+
+	return $type_tabs;
+}
+
+
+/**
+ * Get item type usage values by tab name
+ *
+ * @return array
+ */
+function get_item_type_usage_by_tab( $tab_name )
+{
+	switch( $tab_name )
+	{
+		case 'post':
+			$type_usages = array( 'post' );
+			break;
+		case 'page':
+			$type_usages = array( 'page' );
+			break;
+		case 'special':
+			$type_usages = array( 'special' );
+			break;
+		case 'intro':
+			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+	}
+
+	return $type_usages;
 }
 
 
@@ -1549,7 +1602,7 @@ function get_item_types_by_tab( $tab_name )
 	$SQL = new SQL();
 	$SQL->SELECT( 'ityp_ID' );
 	$SQL->FROM( 'T_items__type' );
-	$SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_name ) );
+	$SQL->WHERE( 'ityp_usage IN ( '.$DB->quote( get_item_type_usage_by_tab( $tab_name ) ).' )' );
 
 	return implode( ',', $DB->get_col( $SQL->get() ) );
 }
@@ -3922,7 +3975,7 @@ function item_type_global_icons( $object_Widget )
 		$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 		if( ! empty( $tab_type ) )
 		{ // Get item types only by selected back-office tab
-			$item_types_SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_type ) );
+			$item_types_SQL->WHERE( 'ityp_usage IN ( '.$DB->quote( get_item_type_usage_by_tab( $tab_type ) ).' )' );
 		}
 		$item_types_SQL->ORDER_BY( 'fix_order, ityp_ID' );
 		$item_types = $DB->get_results( $item_types_SQL->get() );

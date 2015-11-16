@@ -1123,7 +1123,7 @@ switch( $action )
 			}
 
 			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
 		}
 		else
 		{ // Set default redirect urls (It goes from the item edit form)
@@ -1178,7 +1178,7 @@ switch( $action )
 			$edited_Item->dbupdate();
 
 			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
@@ -1496,7 +1496,7 @@ function init_list_mode()
 			if( $Blog->get( 'type' ) != 'manual' )
 			{	// Display this tab only for manual blogs
 				global $admin_url;
-				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type=posts&filter=restore' );
+				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type=post&filter=restore' );
 			}
 
 			global $ReqURI, $blog;
@@ -1711,7 +1711,7 @@ attach_browse_tabs();
 if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ))
 { // Set a tab type for edited item
 	$tab = 'type';
-	$tab_type = $ItemType->backoffice_tab;
+	$tab_type = $ItemType->usage;
 }
 //pre_dump( 1,1,1,1, )
 if( ! empty( $tab ) && $tab == 'type' )

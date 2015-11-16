@@ -282,7 +282,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			ityp_name              VARCHAR(30) NOT NULL,
 			ityp_description       TEXT NULL DEFAULT NULL,
-			ityp_backoffice_tab    VARCHAR(30) NULL DEFAULT NULL,
+			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
 			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
 			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',

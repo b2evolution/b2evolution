@@ -175,6 +175,14 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
+		'th' => T_('Usage'),
+		'order' => 'ityp_usage',
+		'td' => '$ityp_usage$',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
+	);
+
+$Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ityp_name',
 		'td' => '%get_name_for_itemtype(#ityp_ID#, #ityp_name#)%',
@@ -199,14 +207,6 @@ $Results->cols[] = array(
 		'th' => T_('Perm Level'),
 		'order' => 'ityp_perm_level',
 		'td' => '%ityp_row_perm_level( #ityp_perm_level#, #ityp_ID# )%',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'center',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Back-office tab'),
-		'order' => 'ityp_backoffice_tab',
-		'td' => '$ityp_backoffice_tab$',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
 	);

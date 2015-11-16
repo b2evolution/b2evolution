@@ -53,6 +53,24 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-ty
 		$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 	}
 
+	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, array(
+			T_('In content flow') => array(
+					'post' => T_('Post')
+				),
+			T_('Out of content flow') => array(
+					'page'    => T_('Page'),
+					'special' => T_('Special'),
+				),
+			T_('Intros') => array(
+					'intro-front' => T_('Intro-Front'),
+					'intro-main'  => T_('Intro-Main'),
+					'intro-cat'   => T_('Intro-Cat'),
+					'intro-tag'   => T_('Intro-Tag'),
+					'intro-sub'   => T_('Intro-Sub'),
+					'intro-all'   => T_('Intro-All'),
+				),
+		), T_('Usage'), '', array( 'required' => true ) );
+
 	if( $edited_Itemtype->is_special() )
 	{ // Don't edit a name of special post types
 		$Form->info( T_('Name'), $edited_Itemtype->name );
@@ -68,7 +86,6 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-ty
 			array( 'restricted', T_('Restricted') ),
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
-	$Form->text_input( 'ityp_backoffice_tab', $edited_Itemtype->backoffice_tab, 25, T_('Back-office tab'), T_('Items of this type will be listed in this back-office tab. If empty, items will be found only in the "All" tab.'), array( 'maxlength' => 30 ) );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
 
 $Form->end_fieldset();
