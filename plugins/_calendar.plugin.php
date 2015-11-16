@@ -217,14 +217,17 @@ class calendar_plugin extends Plugin
 		/**
 		 * Default params:
 		 */
-		// This is what will enclose the block in the skin:
-		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
-		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
-
-		// Title:
-		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
-		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-		if(!isset($params['title'])) $params['title'] = '';
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="bSideItem">',
+				'block_end'         => "</div>\n",
+				// This is what will enclose the title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+			), $params );
 
 
 		$Calendar = new Calendar( ${$itemlist_prefix.'m'}, $params );
@@ -279,6 +282,8 @@ class calendar_plugin extends Plugin
 			}
 			echo $params['block_title_end'];
 		}
+
+		echo $params['block_body_start'];
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
@@ -355,6 +360,8 @@ class calendar_plugin extends Plugin
 
 		// DISPLAY:
 		$Calendar->display( );
+
+		echo $params['block_body_end'];
 
 		echo $params['block_end'];
 

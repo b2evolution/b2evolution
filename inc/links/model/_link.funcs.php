@@ -380,7 +380,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$type = $current_File->is_image() ? 'image' : 'file';
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => T_('Insert image into the post'),
-				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \''.format_to_output( addslashes( $current_File->get( 'desc' ) ), 'htmlspecialchars' ).'\' )',
+				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );
 	}
