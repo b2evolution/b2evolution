@@ -65,7 +65,7 @@ class archives_plugin extends Plugin
 	 *                - 'block_body_start' : (Default: '')
 	 *                - 'block_body_end' : (Default: '')
 	 *                - 'title' : (Default: T_('Archives'))
-	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
+	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: 'monthly' )
 	 *                - 'sort_order' : 'date'|'title' (Default: date - used only if the mode is 'postbypost')
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
@@ -120,8 +120,6 @@ class archives_plugin extends Plugin
 				// This is what will separate the archive links:
 				'line_start'        => '<li>',
 				'line_end'          => "</li>\n",
-				// Archive mode:
-				'mode'              => $Blog->get_setting( 'archive_mode' ),
 				// Link type:
 				'link_type'         => 'canonic',
 				'context_isolation' => $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart',
@@ -137,10 +135,6 @@ class archives_plugin extends Plugin
 		if( $params['mode'] != 'postbypost' )
 		{
 			$params['sort_order'] = 'date';
-		}
-		if( ! isset( $params['sort_order'] ) )
-		{
-			$params['sort_order'] = $Blog->get_setting( 'archives_sort_order' );
 		}
 
 		// Daily archive date format?
@@ -307,6 +301,28 @@ class archives_plugin extends Plugin
 				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 12,
+			),
+			'mode' => array(
+				'label' => T_('Archive grouping'),
+				'note' => T_('How do you want to browse the post archives? May also apply to permalinks.'),
+				'type' => 'radio',
+				'options' => array(
+						array( 'monthly', T_('monthly') ),
+						array( 'weekly', T_('weekly') ),
+						array( 'daily', T_('daily') ),
+						array( 'postbypost', T_('post by post') ),
+					),
+				'defaultvalue' => 'monthly',
+			),
+			'sort_order' => array(
+				'label' => T_('Archive sorting'),
+				'note' => T_('How to sort your archives? (only in post by post mode)'),
+				'type' => 'radio',
+				'options' => array(
+						array( 'date', T_('date') ),
+						array( 'title', T_('title') ),
+					),
+				'defaultvalue' => 'date',
 			),
 		);
 		return $r;
