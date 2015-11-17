@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2015-11-10 16:10+0100\n"
-"PO-Revision-Date: 2015-11-10 15:11+0000\n"
+"POT-Creation-Date: 2015-11-17 02:10+0100\n"
+"PO-Revision-Date: 2015-11-17 01:11+0000\n"
 "Last-Translator: Francois Planque\n"
 "Language-Team: French (France) (http://www.transifex.com/fplanque/b2evolution/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -459,78 +459,15 @@ msgstr "Gauche"
 msgid "Right"
 msgstr "Droite"
 
-#: ../../../conf/_icons.php:837 ../conf/_icons.php:847
-#: ../../../inc/_core/_template.funcs.php:1174
-#: ../../../inc/items/model/_item.funcs.php:2816
-#: ../../../inc/messaging/model/_messaging.funcs.php:1795
-#: ../../../inc/skins/model/_skin.class.php:1256
-#: ../skins/asevo/index.main.php:159 ../../../skins/basic/index.main.php:262
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:321
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:498
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:482
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:482
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:504
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:336
-#: ../../../skins/forums/_posts.disp.php:67
-#: ../skins/forums/_posts.disp.php:220
-#: ../../../skins/manual/posts.main.php:260 ../skins/manual/posts.main.php:283
-#: ../../../skins/photoblog/index.main.php:103
-#: ../skins/photoblog/index.main.php:121
-#: ../../../skins/pureforums/_item_block.inc.php:252
-#: ../../../skins/pureforums/_posts.disp.php:170
-#: ../../../skins/pureforums/_posts.disp.php:227
-#: ../../../skins/pureforums/_search.disp.php:52
-#: ../../../skins/pureforums/_skin.class.php:404
-#: ../../../skins_adm/_adminUI_general.class.php:1023
-#: ../../../skins_adm/_adminUI_general.class.php:1103
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:399
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:700
-#: ../../../skins_adm/chicago/_adminUI.class.php:287
-#: ../../../skins_email/account_changed.html.php:32
-#: ../../../skins_email/account_changed.txt.php:34
-msgid "Previous"
-msgstr "Précédente"
-
-#: ../../../conf/_icons.php:842 ../conf/_icons.php:852
-#: ../../../inc/_core/_template.funcs.php:1175
-#: ../../../inc/items/model/_item.funcs.php:2817
-#: ../../../inc/messaging/model/_messaging.funcs.php:1796
-#: ../../../inc/skins/model/_skin.class.php:1257
-#: ../../../install/_functions_install.php:1443
-#: ../skins/asevo/index.main.php:160 ../../../skins/basic/index.main.php:263
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:322
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:499
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:483
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:483
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:505
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:337
-#: ../../../skins/forums/_posts.disp.php:68
-#: ../skins/forums/_posts.disp.php:221
-#: ../../../skins/manual/posts.main.php:261 ../skins/manual/posts.main.php:284
-#: ../../../skins/photoblog/index.main.php:104
-#: ../skins/photoblog/index.main.php:117
-#: ../../../skins/pureforums/_item_block.inc.php:253
-#: ../../../skins/pureforums/_posts.disp.php:171
-#: ../../../skins/pureforums/_posts.disp.php:228
-#: ../../../skins/pureforums/_search.disp.php:53
-#: ../../../skins/pureforums/_skin.class.php:405
-#: ../../../skins_adm/_adminUI_general.class.php:1024
-#: ../../../skins_adm/_adminUI_general.class.php:1104
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:400
-#: ../../../skins_adm/bootstrap/_adminUI.class.php:701
-#: ../../../skins_adm/chicago/_adminUI.class.php:288
-msgid "Next"
-msgstr "Suivante"
-
-#: ../../../conf/_icons.php:858
+#: ../../../conf/_icons.php:838
 msgid "Check all"
 msgstr "Cocher tout"
 
-#: ../../../conf/_icons.php:865
+#: ../../../conf/_icons.php:845
 msgid "Uncheck all"
 msgstr "Décocher tout"
 
-#: ../../../conf/_icons.php:873
+#: ../../../conf/_icons.php:853
 #: ../../../inc/antispam/views/_antispam_tools_bankruptcy.view.php:40
 #: ../../../inc/files/views/_file_browse.view.php:121
 #: ../../../inc/files/views/_file_list.inc.php:473
@@ -539,113 +476,113 @@ msgstr "Décocher tout"
 msgid "Filter"
 msgstr "Filtre"
 
-#: ../../../conf/_icons.php:880
+#: ../../../conf/_icons.php:860
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:214
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:238
 msgid "Reset all filters"
 msgstr "Réinitialiser tous les filtres"
 
-#: ../../../conf/_icons.php:888
+#: ../../../conf/_icons.php:868
 msgid "Allow back"
 msgstr "Autoriser à nouveau"
 
 #. TRANS: Abbrev.
-#: ../../../conf/_icons.php:896 ../conf/_icons.php:904
+#: ../../../conf/_icons.php:876 ../conf/_icons.php:884
 msgid "Ban"
 msgstr "Bannir"
 
-#: ../../../conf/_icons.php:920 ../inc/skins/views/_skin.form.php:88
+#: ../../../conf/_icons.php:900 ../inc/skins/views/_skin.form.php:88
 msgid "XML Feed"
 msgstr "Flux XML"
 
-#: ../../../conf/_icons.php:928 ../inc/comments/model/_comment.funcs.php:563
+#: ../../../conf/_icons.php:908 ../inc/comments/model/_comment.funcs.php:563
 #: ../../../inc/comments/model/_comment.funcs.php:564
 #: ../../../inc/comments/views/_browse_comments.view.php:64
 msgid "Open recycle bin"
 msgstr "Ouvrir la corbeille"
 
-#: ../../../conf/_icons.php:936
+#: ../../../conf/_icons.php:916
 #: ../inc/comments/views/_browse_comments.view.php:59
 msgid "Empty recycle bin"
 msgstr "Vider la corbeille"
 
-#: ../../../conf/_icons.php:946 ../conf/_icons.php:953
+#: ../../../conf/_icons.php:926 ../conf/_icons.php:933
 #: ../../../inc/comments/model/_comment.class.php:1626
 #: ../../../inc/comments/model/_comment.class.php:1766
 msgid "Mark this comment as spam!"
 msgstr "Marquer ce commentaire comme spam!"
 
-#: ../../../conf/_icons.php:960 ../conf/_icons.php:967
+#: ../../../conf/_icons.php:940 ../conf/_icons.php:947
 #: ../../../inc/comments/model/_comment.class.php:1628
 #: ../../../inc/comments/model/_comment.class.php:1768
 msgid "Mark this comment as not sure!"
 msgstr "Marquer ce commentaire comme incertain!"
 
-#: ../../../conf/_icons.php:974 ../conf/_icons.php:981
+#: ../../../conf/_icons.php:954 ../conf/_icons.php:961
 #: ../../../inc/comments/model/_comment.class.php:1630
 #: ../../../inc/comments/model/_comment.class.php:1770
 msgid "Mark this comment as OK!"
 msgstr "Marquer ce commentaire comme OK!"
 
-#: ../../../conf/_icons.php:989 ../conf/_icons.php:997
+#: ../../../conf/_icons.php:969 ../conf/_icons.php:977
 msgid "Thumb Up"
 msgstr "Vote positif"
 
-#: ../../../conf/_icons.php:1005 ../conf/_icons.php:1013
+#: ../../../conf/_icons.php:985 ../conf/_icons.php:993
 msgid "Thumb Down"
 msgstr "Vote Négatif"
 
-#: ../../../conf/_icons.php:1022
+#: ../../../conf/_icons.php:1002
 msgid "Log as a search instead"
 msgstr "Enregistrer plutôt comme une recherche"
 
-#: ../../../conf/_icons.php:1030 ../inc/locales/views/_translation.form.php:43
+#: ../../../conf/_icons.php:1010 ../inc/locales/views/_translation.form.php:43
 #: ../../../inc/messaging/views/_contact_list.view.php:461
 #: ../../../inc/plugins/_plugin.funcs.php:380
 msgid "Add"
 msgstr "Ajouter"
 
-#: ../../../conf/_icons.php:1037 ../inc/plugins/_plugin.funcs.php:330
+#: ../../../conf/_icons.php:1017 ../inc/plugins/_plugin.funcs.php:330
 #: ../../../inc/plugins/_plugin.funcs.php:333
 msgid "Remove"
 msgstr "Enlever"
 
-#: ../../../conf/_icons.php:1046
+#: ../../../conf/_icons.php:1026
 msgid "Action for selected elements"
 msgstr "Action pour les éléments sélectionnés"
 
-#: ../../../conf/_icons.php:1053 ../htsrv/viewfile.php:154
+#: ../../../conf/_icons.php:1033 ../htsrv/viewfile.php:154
 #: ../../../inc/users/model/_user.class.php:4754
 msgid "Rotate this picture 90&deg; to the right"
 msgstr "Faire tourner de 90&deg; vers la droite"
 
-#: ../../../conf/_icons.php:1059 ../htsrv/viewfile.php:152
+#: ../../../conf/_icons.php:1039 ../htsrv/viewfile.php:152
 #: ../../../inc/users/model/_user.class.php:4752
 msgid "Rotate this picture 90&deg; to the left"
 msgstr "Faire tourner de 90&deg; vers la gauche"
 
-#: ../../../conf/_icons.php:1065 ../htsrv/viewfile.php:153
+#: ../../../conf/_icons.php:1045 ../htsrv/viewfile.php:153
 #: ../../../inc/users/model/_user.class.php:4753
 msgid "Rotate this picture 180&deg;"
 msgstr "Faire tourner de 180&deg;"
 
-#: ../../../conf/_icons.php:1071 ../inc/users/model/_user.class.php:4925
+#: ../../../conf/_icons.php:1051 ../inc/users/model/_user.class.php:4925
 msgid "Crop this picture"
 msgstr "Recadrer cette photo"
 
-#: ../../../conf/_icons.php:1078
+#: ../../../conf/_icons.php:1058
 msgid "Email notification"
 msgstr "Notification email"
 
-#: ../../../conf/_icons.php:1087
+#: ../../../conf/_icons.php:1067
 msgid "Increase width"
 msgstr "Augmenter largeur"
 
-#: ../../../conf/_icons.php:1092
+#: ../../../conf/_icons.php:1072
 msgid "Decrease width"
 msgstr "Diminuer largeur"
 
-#: ../../../conf/_icons.php:1098 ../inc/_core/__core.init.php:945
+#: ../../../conf/_icons.php:1078 ../inc/_core/__core.init.php:945
 #: ../../../inc/_core/__core.init.php:977
 #: ../inc/collections/_search.funcs.php:693
 #: ../../../inc/comments/model/_comment.funcs.php:1150
@@ -655,11 +592,11 @@ msgstr "Diminuer largeur"
 msgid "Post"
 msgstr "Post"
 
-#: ../../../conf/_icons.php:1106
+#: ../../../conf/_icons.php:1086
 msgid "Stop"
 msgstr "Stop"
 
-#: ../../../conf/_icons.php:1114
+#: ../../../conf/_icons.php:1094
 msgid "Kill spam"
 msgstr "Tuer spam"
 
@@ -957,13 +894,13 @@ msgstr "action: %s"
 #: ../../../inc/sessions/views/_stats_goalcats.form.php:50
 #: ../../../inc/sessions/views/_stats_refdomains.form.php:43
 #: ../../../inc/sessions/views/_stats_settings.form.php:81
-#: ../../../inc/settings/views/_eblog.form.php:148
+#: ../../../inc/settings/views/_eblog.form.php:156
 #: ../../../inc/settings/views/_xmlrpc.form.php:47
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:65
 #: ../../../inc/skins/views/_skin.form.php:100
 #: ../inc/slugs/views/_slug.form.php:45
 #: ../../../inc/tools/views/_email_address.form.php:54
-#: ../../../inc/tools/views/_email_return_settings.form.php:99
+#: ../../../inc/tools/views/_email_return_settings.form.php:108
 #: ../../../inc/tools/views/_email_settings.form.php:94
 #: ../../../inc/tools/views/_email_smtp.form.php:93
 #: ../../../inc/tools/views/_misc_tools.view.php:112
@@ -1029,7 +966,7 @@ msgstr "Pas de statut"
 #: ../../../inc/_core/ui/results/_resultsel.class.php:304
 #: ../../../inc/collections/views/_coll_advanced.form.php:139
 #: ../../../inc/sessions/_sessions.init.php:93
-#: ../../../inc/settings/views/_eblog.form.php:86
+#: ../../../inc/settings/views/_eblog.form.php:85
 #: ../../../inc/tools/views/_email_return_settings.form.php:60
 #: ../../../inc/tools/views/_email_smtp.form.php:70
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:87
@@ -2084,7 +2021,7 @@ msgstr "Vue Workflow"
 #: ../../../inc/dashboard/dashboard.ctrl.php:540
 #: ../inc/items/items.ctrl.php:415
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:153
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:229
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:235
 #: ../../../skins/manual/posts.main.php:30
 #: ../skins_fallback_v5/_sitemap.disp.php:71
 #: ../../../skins_fallback_v6/_sitemap.disp.php:71
@@ -3175,7 +3112,7 @@ msgstr "Plan du site"
 #: ../../../skins/bootstrap_forums_skin/index.main.php:290
 #: ../../../skins/bootstrap_main_skin/front.main.php:191
 #: ../../../skins/bootstrap_main_skin/index.main.php:271
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:639
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:645
 msgid "Sending a message"
 msgstr "Envoyer un message"
 
@@ -3192,7 +3129,7 @@ msgstr "Se connecter "
 #: ../../../skins/bootstrap_forums_skin/index.main.php:271
 #: ../../../skins/bootstrap_main_skin/front.main.php:170
 #: ../../../skins/bootstrap_main_skin/index.main.php:250
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:615
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:621
 msgid "Register"
 msgstr "S'inscrire"
 
@@ -3203,7 +3140,7 @@ msgstr "S'inscrire"
 #: ../../../skins/bootstrap_forums_skin/index.main.php:278
 #: ../../../skins/bootstrap_main_skin/front.main.php:177
 #: ../../../skins/bootstrap_main_skin/index.main.php:257
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:622
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:628
 #: ../../../skins_adm/login/_validate_form.main.php:25
 msgid "Account activation"
 msgstr "Activation du compte"
@@ -3291,7 +3228,7 @@ msgstr "Commentaires de l'utilisateur"
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:25
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:296
 #: ../../../skins/asevo/_item_block.inc.php:85
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:137
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:115
 #: ../../../skins/colourise/_item_block.inc.php:97
 #: ../../../skins/colourise/single.main.php:147
 #: ../../../skins/dating_mood/_item_block.inc.php:91
@@ -3361,6 +3298,67 @@ msgstr "Enregistrement des changements"
 #: ../../../inc/_core/_template.funcs.php:1173
 msgid "image {current} of {total}"
 msgstr "image {current} sur {total}"
+
+#: ../../../inc/_core/_template.funcs.php:1174
+#: ../../../inc/items/model/_item.funcs.php:2816
+#: ../../../inc/messaging/model/_messaging.funcs.php:1795
+#: ../../../inc/skins/model/_skin.class.php:1256
+#: ../skins/asevo/index.main.php:159 ../../../skins/basic/index.main.php:262
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:321
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:498
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:482
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:482
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:504
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:342
+#: ../../../skins/forums/_posts.disp.php:67
+#: ../skins/forums/_posts.disp.php:220
+#: ../../../skins/manual/posts.main.php:260 ../skins/manual/posts.main.php:283
+#: ../../../skins/photoblog/index.main.php:103
+#: ../skins/photoblog/index.main.php:121
+#: ../../../skins/pureforums/_item_block.inc.php:252
+#: ../../../skins/pureforums/_posts.disp.php:170
+#: ../../../skins/pureforums/_posts.disp.php:227
+#: ../../../skins/pureforums/_search.disp.php:52
+#: ../../../skins/pureforums/_skin.class.php:404
+#: ../../../skins_adm/_adminUI_general.class.php:1023
+#: ../../../skins_adm/_adminUI_general.class.php:1103
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:399
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:700
+#: ../../../skins_adm/chicago/_adminUI.class.php:287
+#: ../../../skins_email/account_changed.html.php:32
+#: ../../../skins_email/account_changed.txt.php:34
+msgid "Previous"
+msgstr "Précédente"
+
+#: ../../../inc/_core/_template.funcs.php:1175
+#: ../../../inc/items/model/_item.funcs.php:2817
+#: ../../../inc/messaging/model/_messaging.funcs.php:1796
+#: ../../../inc/skins/model/_skin.class.php:1257
+#: ../../../install/_functions_install.php:1443
+#: ../skins/asevo/index.main.php:160 ../../../skins/basic/index.main.php:263
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:322
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:499
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:483
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:483
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:505
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:343
+#: ../../../skins/forums/_posts.disp.php:68
+#: ../skins/forums/_posts.disp.php:221
+#: ../../../skins/manual/posts.main.php:261 ../skins/manual/posts.main.php:284
+#: ../../../skins/photoblog/index.main.php:104
+#: ../skins/photoblog/index.main.php:117
+#: ../../../skins/pureforums/_item_block.inc.php:253
+#: ../../../skins/pureforums/_posts.disp.php:171
+#: ../../../skins/pureforums/_posts.disp.php:228
+#: ../../../skins/pureforums/_search.disp.php:53
+#: ../../../skins/pureforums/_skin.class.php:405
+#: ../../../skins_adm/_adminUI_general.class.php:1024
+#: ../../../skins_adm/_adminUI_general.class.php:1104
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:400
+#: ../../../skins_adm/bootstrap/_adminUI.class.php:701
+#: ../../../skins_adm/chicago/_adminUI.class.php:288
+msgid "Next"
+msgstr "Suivante"
 
 #: ../../../inc/_core/_template.funcs.php:1177
 #: ../../../inc/files/model/_file.class.php:1987
@@ -3517,8 +3515,8 @@ msgstr "Nom d'utilisateur (ou adresse email)"
 #: ../../../inc/_core/_template.funcs.php:2366
 #: ../inc/_core/_template.funcs.php:2371
 #: ../../../inc/maintenance/views/_upgrade_svn.form.php:29
-#: ../../../inc/settings/views/_eblog.form.php:98
-#: ../../../inc/tools/views/_email_return_settings.form.php:77
+#: ../../../inc/settings/views/_eblog.form.php:106
+#: ../../../inc/tools/views/_email_return_settings.form.php:86
 #: ../../../inc/tools/views/_phpbb_config.form.php:39
 #: ../../../inc/tools/views/_phpbb_groups.form.php:41
 #: ../../../inc/users/model/_user.funcs.php:2414
@@ -3945,31 +3943,31 @@ msgstr "Cet élément est déjà en première position."
 msgid "This element is already at the bottom."
 msgstr "Cet élément est déjà en dernière position."
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1759
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1796
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1769
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1806
 msgid "Normalizing DB charsets..."
 msgstr "Normalisation des jeux de caractères de la BDD..."
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1774
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1784
 msgid ""
 "All your tables seem to be using UTF-8. You can still run the normalization "
 "tool to make a deep check."
 msgstr "Toutes vos tables semblent utiliser UTF-8. Vous pouvez toujours lancer l'outil de normalization pour effectuer un contrôle approfondi."
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1778
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1788
 msgid "We have detected the following tables as not using UTF-8:"
 msgstr "Nous avons détecté que certaines de vos tables n'utilisaient pas UTF-8:"
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1805
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1815
 #, php-format
 msgid "Normalizing %s..."
 msgstr "Normalisation de %s..."
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1811
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1821
 msgid "Changing default charset of DB..."
 msgstr "Changement du jeu de caractères par défaut de la BD..."
 
-#: ../../../inc/_core/model/db/_upgrade.funcs.php:1815
+#: ../../../inc/_core/model/db/_upgrade.funcs.php:1825
 msgid "Upgrading done!"
 msgstr "Mise à jour terminée!"
 
@@ -5527,7 +5525,6 @@ msgstr "Pour l'ordonnancement manuel des catégories."
 #: ../../../inc/items/views/_itemtype.form.php:250
 #: ../../../inc/users/views/_userfields.view.php:251
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:53
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:177
 msgid "Order"
 msgstr "Ordre"
 
@@ -5926,13 +5923,13 @@ msgid "Created by %s on %s"
 msgstr "Créé par %s le %s"
 
 #: ../../../inc/collections/_search.funcs.php:1118
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:145
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:123
 #: ../../../skins/manual/_item_block.inc.php:128
 msgid " on "
 msgstr "le"
 
 #: ../../../inc/collections/_search.funcs.php:1118
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:144
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:122
 #: ../../../skins/manual/_item_block.inc.php:127
 msgid "Last edit by "
 msgstr "Dernière modification par"
@@ -7496,7 +7493,7 @@ msgstr "Compléter automatiquement les noms d'utilisateurs dans le back-office"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:221
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:221
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:244
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:149
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:155
 #: ../../../skins/colourise/_skin.class.php:110
 #: ../../../skins/dating_mood/_skin.class.php:110
 #: ../../../skins/evocamp/_skin.class.php:104
@@ -7926,7 +7923,7 @@ msgstr "Posts dans les flux"
 
 #: ../../../inc/collections/views/_coll_features.form.php:159
 #: ../../../inc/widgets/widgets/_coll_avatar.widget.php:81
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:170
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:187
 msgid "Image size"
 msgstr "Taille des images"
 
@@ -8498,43 +8495,53 @@ msgid "Archive pages"
 msgstr "Pages d'archives"
 
 #: ../../../inc/collections/views/_coll_other.form.php:47
+#: ../../../plugins/_archives.plugin.php:310
 msgid "monthly"
 msgstr "mensuel"
 
 #: ../../../inc/collections/views/_coll_other.form.php:48
+#: ../../../plugins/_archives.plugin.php:311
 msgid "weekly"
 msgstr "hebdomadaire"
 
 #: ../../../inc/collections/views/_coll_other.form.php:49
+#: ../../../plugins/_archives.plugin.php:312
 msgid "daily"
 msgstr "quotidien"
 
 #: ../../../inc/collections/views/_coll_other.form.php:50
+#: ../../../plugins/_archives.plugin.php:313
 msgid "post by post"
 msgstr "post par post"
 
 #: ../../../inc/collections/views/_coll_other.form.php:51
+#: ../../../plugins/_archives.plugin.php:306
 msgid "Archive grouping"
 msgstr "Groupement des archives"
 
 #: ../../../inc/collections/views/_coll_other.form.php:51
+#: ../../../plugins/_archives.plugin.php:307
 msgid ""
 "How do you want to browse the post archives? May also apply to permalinks."
 msgstr "Comment voulez-vous parcourir les archives des posts? Peut aussi influer sur les permaliens."
 
 #: ../../../inc/collections/views/_coll_other.form.php:57
+#: ../../../plugins/_archives.plugin.php:322
 msgid "date"
 msgstr "date"
 
 #: ../../../inc/collections/views/_coll_other.form.php:58
+#: ../../../plugins/_archives.plugin.php:323
 msgid "title"
 msgstr "titre"
 
 #: ../../../inc/collections/views/_coll_other.form.php:59
+#: ../../../plugins/_archives.plugin.php:318
 msgid "Archive sorting"
 msgstr "Tri des archives"
 
 #: ../../../inc/collections/views/_coll_other.form.php:59
+#: ../../../plugins/_archives.plugin.php:319
 msgid "How to sort your archives? (only in post by post mode)"
 msgstr "Comment trier vos archives? (seulement dans le mode post par post)"
 
@@ -10195,7 +10202,7 @@ msgstr "Info sur les réactions"
 #: ../../../inc/items/views/_item_mass.form.php:173
 #: ../../../inc/messaging/views/_message_list.view.php:339
 #: ../../../inc/messaging/views/_thread.form.php:123
-#: ../../../inc/settings/views/_eblog.form.php:130
+#: ../../../inc/settings/views/_eblog.form.php:138
 #: ../../../skins/forums/_edit.disp.php:361
 #: ../../../skins/forums/_edit_comment.disp.php:159
 #: ../../../skins/forums/_item_comment_form.inc.php:322
@@ -14727,7 +14734,7 @@ msgid "Remove this filter"
 msgstr "Supprimer ce filtre"
 
 #: ../../../inc/items/model/_itemlistlight.class.php:1026
-#: ../../../plugins/_archives.plugin.php:227
+#: ../../../plugins/_archives.plugin.php:220
 msgid "week"
 msgstr "semaine"
 
@@ -14949,7 +14956,7 @@ msgid "Auto-suggest tags as you type (based on existing tags)"
 msgstr "Auto-suggérer des tags pendant que vous tapez (en se basant sur les tags existants)"
 
 #: ../../../inc/items/views/_item_expert.form.php:332
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:195
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:206
 msgid "Excerpt"
 msgstr "Extrait"
 
@@ -15325,7 +15332,7 @@ msgstr "N'importe quel"
 #: ../../../inc/items/views/_item_list_sidebar.view.php:307
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:223
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:278
-#: ../../../plugins/_archives.plugin.php:302 ../skins/basic/index.main.php:269
+#: ../../../plugins/_archives.plugin.php:297 ../skins/basic/index.main.php:269
 msgid "Archives"
 msgstr "Archives"
 
@@ -18106,8 +18113,8 @@ msgstr "Page d'accueil du plugin"
 
 #: ../../../inc/plugins/_plugin.class.php:3226
 #, php-format
-msgid "Click %s to access full documentaion for this plugin"
-msgstr "Cliquez %s pour accéder à la documentation complète pour ce plugin."
+msgid "Click %s to access full documentation for this plugin"
+msgstr "Cliquez %s pour accéder à la documentation complète pour ce plugin"
 
 #: ../../../inc/plugins/_plugin.class.php:3347
 #: ../inc/plugins/plugins.ctrl.php:1002
@@ -18184,7 +18191,7 @@ msgid "The database has been updated."
 msgstr "La base données a été mise à jour."
 
 #: ../../../inc/plugins/_plugin.funcs.php:1133
-#: ../../../install/_functions_evoupgrade.php:6808
+#: ../../../install/_functions_evoupgrade.php:6804
 msgid "The DB schema has been changed since confirmation."
 msgstr "Le schéma de la base de données a changé depuis la confirmation."
 
@@ -18460,7 +18467,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Le plugin requiert les modifications de base de donnée suivantes."
 
 #: ../../../inc/plugins/plugins.ctrl.php:913
-#: ../../../install/_functions_evoupgrade.php:6842
+#: ../../../install/_functions_evoupgrade.php:6838
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
@@ -20342,195 +20349,197 @@ msgid ""
 "database nor will your inbox be altered."
 msgstr "Cochez pour exécuter le post par e-mail en mode test. Rien ne va être posté vers la base de données ni votre boîte de réception ne sera changée."
 
-#: ../../../inc/settings/views/_eblog.form.php:78
+#: ../../../inc/settings/views/_eblog.form.php:77
 #: ../../../inc/tools/views/_email_return_settings.form.php:52
-msgid "IMAP"
-msgstr "IMAP"
-
-#: ../../../inc/settings/views/_eblog.form.php:78
-#: ../../../inc/tools/views/_email_return_settings.form.php:52
-msgid "POP3"
-msgstr "POP3"
-
-#: ../../../inc/settings/views/_eblog.form.php:79
-#: ../../../inc/tools/views/_email_return_settings.form.php:53
-msgid "Choose a method to retrieve the emails."
-msgstr "Choisissez une méthode de récupération des emails."
-
-#. TRANS: E-Mail retrieval method
-#: ../../../inc/settings/views/_eblog.form.php:79
-#: ../../../inc/tools/views/_email_return_settings.form.php:53
-msgid "Retrieval method"
-msgstr "Methode de récupération"
-
-#: ../../../inc/settings/views/_eblog.form.php:81
-#: ../../../inc/tools/views/_email_return_settings.form.php:55
 msgid "Hostname or IP address of your incoming mail server."
 msgstr "Nom ou adresse IP de votre serveur d'emails entrants."
 
-#: ../../../inc/settings/views/_eblog.form.php:81
-#: ../../../inc/tools/views/_email_return_settings.form.php:55
+#: ../../../inc/settings/views/_eblog.form.php:77
+#: ../../../inc/tools/views/_email_return_settings.form.php:52
 msgid "Mail Server"
 msgstr "Serveur d'email"
 
-#: ../../../inc/settings/views/_eblog.form.php:83
-#: ../../../inc/tools/views/_email_return_settings.form.php:57
-#: ../../../inc/tools/views/_email_smtp.form.php:67
-msgid "Port Number"
-msgstr "N° de port"
+#: ../../../inc/settings/views/_eblog.form.php:80
+#: ../../../inc/tools/views/_email_return_settings.form.php:55
+msgid "POP3"
+msgstr "POP3"
 
-#: ../../../inc/settings/views/_eblog.form.php:83
-#: ../../../inc/tools/views/_email_return_settings.form.php:57
-msgid ""
-"Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, "
-"SSL/TLS: 993)."
-msgstr "N° de port de votre serveur d'emails entrants (Valeurs par défaut: POP3:110, IMAP:143, SSL/TLS: 993)."
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:81
+#: ../../../inc/tools/views/_email_return_settings.form.php:56
+msgid "IMAP"
+msgstr "IMAP"
 
-#: ../../../inc/settings/views/_eblog.form.php:87
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:82
+#: ../../../inc/tools/views/_email_return_settings.form.php:57
+msgid "Retrieval method"
+msgstr "Methode de récupération"
+
+#: ../../../inc/settings/views/_eblog.form.php:86
 #: ../../../inc/tools/views/_email_return_settings.form.php:61
 #: ../../../inc/tools/views/_email_smtp.form.php:71
 msgid "SSL"
 msgstr "SSL"
 
-#: ../../../inc/settings/views/_eblog.form.php:88
+#: ../../../inc/settings/views/_eblog.form.php:87
 #: ../../../inc/tools/views/_email_return_settings.form.php:62
 #: ../../../inc/tools/views/_email_smtp.form.php:72
 msgid "TLS"
 msgstr "TLS"
 
-#: ../../../inc/settings/views/_eblog.form.php:89
+#: ../../../inc/settings/views/_eblog.form.php:88
 #: ../../../inc/tools/views/_email_return_settings.form.php:63
 msgid "Encryption method"
 msgstr "Méthode de cryptage"
 
-#: ../../../inc/settings/views/_eblog.form.php:91
-#: ../../../inc/tools/views/_email_return_settings.form.php:65
-msgid "Do not validate certificate"
-msgstr "Ne pas valider le certificat"
-
-#: ../../../inc/settings/views/_eblog.form.php:92
-#: ../../../inc/tools/views/_email_return_settings.form.php:66
+#: ../../../inc/settings/views/_eblog.form.php:96
+#: ../../../inc/tools/views/_email_return_settings.form.php:71
 msgid ""
 "Do not validate the certificate from the TLS/SSL server. Check this if you "
 "are using a self-signed certificate."
 msgstr "Ne pas valider le certificat du serveur TLS/SSL. Cochez cette case si vous utilisez un certificat auto-signé."
 
-#: ../../../inc/settings/views/_eblog.form.php:95
-#: ../../../inc/tools/views/_email_return_settings.form.php:69
+#: ../../../inc/settings/views/_eblog.form.php:97
+#: ../../../inc/tools/views/_email_return_settings.form.php:72
+msgid ""
+"Validate that the certificate from the TLS/SSL server can be trusted. Use "
+"this if you have a correctly signed certificate."
+msgstr "Vérifier que le certificat du serveur TLS/SSL est valide. Utilisez ceci si vous utilisez un certificat correctement signé."
+
+#: ../../../inc/settings/views/_eblog.form.php:98
+#: ../../../inc/tools/views/_email_return_settings.form.php:73
+msgid "Certificate validation"
+msgstr "Validation du certificat"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+#: ../../../inc/tools/views/_email_return_settings.form.php:75
+#: ../../../inc/tools/views/_email_smtp.form.php:67
+msgid "Port Number"
+msgstr "N° de port"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+msgid ""
+"Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, "
+"SSL/TLS: 993)."
+msgstr "N° de port de votre serveur d'emails entrants (Valeurs par défaut: POP3:110, IMAP:143, SSL/TLS: 993)."
+
+#: ../../../inc/settings/views/_eblog.form.php:103
+#: ../../../inc/tools/views/_email_return_settings.form.php:78
 msgid "Account Name"
 msgstr "Nom du Compte"
 
-#: ../../../inc/settings/views/_eblog.form.php:95
-#: ../../../inc/tools/views/_email_return_settings.form.php:69
+#: ../../../inc/settings/views/_eblog.form.php:103
+#: ../../../inc/tools/views/_email_return_settings.form.php:78
 msgid ""
 "User name for authenticating on your mail server. Usually it's your email "
 "address or a part before the @ sign."
 msgstr "Nom d'utilisateur pour l'authentification sur le serveur email. Généralement votre email ou la partie avant le @."
 
-#: ../../../inc/settings/views/_eblog.form.php:98
-#: ../../../inc/tools/views/_email_return_settings.form.php:77
+#: ../../../inc/settings/views/_eblog.form.php:106
+#: ../../../inc/tools/views/_email_return_settings.form.php:86
 msgid "Password for authenticating on your mail server."
 msgstr "Mot de passe pour l'authentification sur le serveur d'emails."
 
-#: ../../../inc/settings/views/_eblog.form.php:100
-#: ../../../inc/tools/views/_email_return_settings.form.php:83
+#: ../../../inc/settings/views/_eblog.form.php:108
+#: ../../../inc/tools/views/_email_return_settings.form.php:92
 msgid "Delete processed emails"
 msgstr "Supprimer emails traités"
 
-#: ../../../inc/settings/views/_eblog.form.php:101
+#: ../../../inc/settings/views/_eblog.form.php:109
 msgid ""
 "Check this if you want processed messages to be deleted form server after "
 "successful processing."
 msgstr "Cochez cette case si vous souhaitez que les messages traités soient supprimés du serveur après que le traitement ait réussi."
 
-#: ../../../inc/settings/views/_eblog.form.php:105
+#: ../../../inc/settings/views/_eblog.form.php:113
 msgid "Posting settings"
 msgstr "Réglages de publication"
 
-#: ../../../inc/settings/views/_eblog.form.php:109
+#: ../../../inc/settings/views/_eblog.form.php:117
 msgid "Default Category ID"
 msgstr "ID de la catégorie par défaut"
 
-#: ../../../inc/settings/views/_eblog.form.php:109
+#: ../../../inc/settings/views/_eblog.form.php:117
 msgid "This is a default category for your posts."
 msgstr "Ceci est une catégorie par défaut pour vos posts."
 
-#: ../../../inc/settings/views/_eblog.form.php:110
+#: ../../../inc/settings/views/_eblog.form.php:118
 #, php-format
 msgid ""
 "You can use the following code in message body to define categories: %s. In "
 "this example 2 will be main category and 5, 47 extra categories."
 msgstr "Vous pouvez utiliser le code suivant dans le corps du message pour définir les catégories: %s. Dans cet exemple 2 seront catégorie principale et 5, 47 des catégories supplémentaires."
 
-#: ../../../inc/settings/views/_eblog.form.php:113
+#: ../../../inc/settings/views/_eblog.form.php:121
 #: ../../../inc/settings/views/_xmlrpc.form.php:42
 msgid "Default title"
 msgstr "Titre par défaut"
 
-#: ../../../inc/settings/views/_eblog.form.php:113
+#: ../../../inc/settings/views/_eblog.form.php:121
 msgid "This is a default title for your posts."
 msgstr "Ceci est un titre par défaut pour vos posts."
 
-#: ../../../inc/settings/views/_eblog.form.php:114
+#: ../../../inc/settings/views/_eblog.form.php:122
 #, php-format
 msgid ""
 "You can use the following code in message body to define post title: %s."
 msgstr "Vous pouvez utiliser le code suivant dans le corps du message pour définir titre du post: %s."
 
-#: ../../../inc/settings/views/_eblog.form.php:116
+#: ../../../inc/settings/views/_eblog.form.php:124
 msgid "Add &lt;img&gt; tags"
 msgstr "Ajouter &lt;img&gt; balises"
 
-#: ../../../inc/settings/views/_eblog.form.php:117
+#: ../../../inc/settings/views/_eblog.form.php:125
 msgid ""
 "Display image attachments using &lt;img&gt; tags (instead of linking them "
 "through file manager)."
 msgstr "Afficher les images jointes en utilisant &lt;img&gt; tags (au lieu de les lier grâce au gestionnaire de fichiers)."
 
-#: ../../../inc/settings/views/_eblog.form.php:120
+#: ../../../inc/settings/views/_eblog.form.php:128
 msgid ""
 "Email subject must start with this prefix to be imported, messages that "
 "don't have this tag will be skipped."
 msgstr "Le sujet des emails doit commencer avec ce préfixe pour être importé. Les messages sans ce tag seront ignorés."
 
-#: ../../../inc/settings/views/_eblog.form.php:120
+#: ../../../inc/settings/views/_eblog.form.php:128
 msgid "Subject Prefix"
 msgstr "Préfixe du sujet"
 
-#: ../../../inc/settings/views/_eblog.form.php:123
-#: ../../../inc/tools/views/_email_return_settings.form.php:90
+#: ../../../inc/settings/views/_eblog.form.php:131
+#: ../../../inc/tools/views/_email_return_settings.form.php:99
 msgid "Body Terminator"
 msgstr "Terminaison du corps"
 
-#: ../../../inc/settings/views/_eblog.form.php:123
+#: ../../../inc/settings/views/_eblog.form.php:131
 msgid ""
 "Starting from this string, everything will be ignored, including this "
 "string."
 msgstr "Tout ce qui se trouve après cette chaine de caractère (comprise) sera ignoré."
 
-#: ../../../inc/settings/views/_eblog.form.php:124
+#: ../../../inc/settings/views/_eblog.form.php:132
 msgid "You can use this to remove signature from message body."
 msgstr "Vous pouvez utiliser ceci pour retirer la signature du corps du message."
 
-#: ../../../inc/settings/views/_eblog.form.php:134
+#: ../../../inc/settings/views/_eblog.form.php:142
 msgid "HTML messages"
 msgstr "Messages HTML"
 
-#: ../../../inc/settings/views/_eblog.form.php:137
+#: ../../../inc/settings/views/_eblog.form.php:145
 msgid "Enable HTML messages"
 msgstr "Autoriser les messages HTML"
 
-#: ../../../inc/settings/views/_eblog.form.php:138
+#: ../../../inc/settings/views/_eblog.form.php:146
 msgid ""
 "Check this if you want HTML messages to be processed and posted in your "
 "blog."
 msgstr "Cochez ceci si vous voulez que les messages HTML soient traités et affichés dans votre blog."
 
-#: ../../../inc/settings/views/_eblog.form.php:140
+#: ../../../inc/settings/views/_eblog.form.php:148
 msgid "Limit allowed tags"
 msgstr "Limiter les tags autorisés"
 
-#: ../../../inc/settings/views/_eblog.form.php:141
+#: ../../../inc/settings/views/_eblog.form.php:149
 msgid ""
 "Check this if you want to limit allowed HTML tags to the following list:"
 msgstr "Cochez ceci si vous souhaitez limiter les balises HTML autorisées à la liste suivante:"
@@ -20836,8 +20845,8 @@ msgstr "Prévisualiser le blog avec cette skin dans une nouvelle fenêtre."
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:487
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:508
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:509
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:340
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:341
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:346
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:347
 #: ../../../skins/pureforums/_skin.class.php:408
 #: ../../../skins/pureforums/_skin.class.php:409
 #: ../../../skins_adm/_adminUI_general.class.php:1027
@@ -22696,43 +22705,49 @@ msgstr "(Actuellement chargée)"
 msgid "(currently NOT loaded)"
 msgstr "(Actuellement NON chargée)"
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:80
+#: ../../../inc/tools/views/_email_return_settings.form.php:75
+msgid ""
+"Port number of your incoming mail server (Defaults: IMAP4/SSL: 993, IMAP4 "
+"with or without TLS: 143, POP3/SSL: 995, POP3 with or without TLS: 110)."
+msgstr "N° de port de votre serveur d'emails entrants (Valeurs par défaut: IMAP4/SSL: 993, IMAP4 avec ou sans TLS: 143, POP3/SSL: 995, POP3 avec ou sans TLS: 110)."
+
+#: ../../../inc/tools/views/_email_return_settings.form.php:89
 msgid "Ignore emails that have already been read"
 msgstr "Ignorer les emails déjà lus"
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:81
+#: ../../../inc/tools/views/_email_return_settings.form.php:90
 msgid ""
 "Check this in order not to re-process emails that already have the \"seen\" "
 "flag on the server."
 msgstr "Cochez ceci afin de ne pas re-traiter les emails qui ont déjà le flag \"vu\" sur le serveur."
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:84
+#: ../../../inc/tools/views/_email_return_settings.form.php:93
 msgid ""
 "Check this if you want processed messages to be deleted from server after "
 "successful processing."
 msgstr "Cochez cette case si vous souhaitez que les messages traités soient supprimés du serveur après que le traitement ait réussi."
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:86
+#: ../../../inc/tools/views/_email_return_settings.form.php:95
 msgid "Strings to match in titles to identify return path emails"
 msgstr "Les chaînes de caractères correspondants dans les titres pour identifier le chemin de retour des e-mails"
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:87
+#: ../../../inc/tools/views/_email_return_settings.form.php:96
 msgid ""
 "Any email that has any of these strings in the title will be detected by "
 "b2evolution as the returned emails"
 msgstr "Tout email qui contient une de ces chaînes de caractères dans le titre sera classé par b2evolution dans les emails retournés"
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:90
+#: ../../../inc/tools/views/_email_return_settings.form.php:99
 msgid ""
 "Starting from any of these strings, everything will be ignored, including "
 "these strings."
 msgstr "Tout ce qui se trouve après n'importe laquelle de ces chaines de caractère sera ignoré (chaine comprise)."
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:92
+#: ../../../inc/tools/views/_email_return_settings.form.php:101
 msgid "Error message decoding configuration"
 msgstr "Configuration de décodage de message d'erreur"
 
-#: ../../../inc/tools/views/_email_return_settings.form.php:93
+#: ../../../inc/tools/views/_email_return_settings.form.php:102
 msgid ""
 "The first letter means one of the following:<br />S: Spam suspicion<br />P: "
 "Permament error<br />T: Temporary error<br />C: Configuration error<br />U: "
@@ -25324,7 +25339,7 @@ msgstr "Afficher le sexe dans le back-office"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:209
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:209
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:232
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:137
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:143
 #: ../../../skins/colourise/_skin.class.php:98
 #: ../../../skins/dating_mood/_skin.class.php:98
 #: ../skins/evocamp/_skin.class.php:92
@@ -25351,7 +25366,7 @@ msgstr "Affichage des noms d'utilisateur dans le back-office"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:215
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:215
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:238
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:143
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:149
 #: ../../../skins/colourise/_skin.class.php:104
 #: ../../../skins/dating_mood/_skin.class.php:104
 #: ../../../skins/evocamp/_skin.class.php:98
@@ -25373,7 +25388,7 @@ msgstr "Cochez pour activer les bubble tips sur les noms d'utilisateur"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:214
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:214
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:237
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:142
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:148
 #: ../../../skins/colourise/_skin.class.php:103
 #: ../../../skins/dating_mood/_skin.class.php:103
 #: ../../../skins/evocamp/_skin.class.php:97
@@ -27409,7 +27424,7 @@ msgstr "Le widget a été activé."
 
 #: ../../../inc/widgets/widgets.ctrl.php:400
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:177
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:218
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:229
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:110
 #: ../../../inc/widgets/widgets/_content_hierarchy.widget.php:75
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:181
@@ -27524,7 +27539,7 @@ msgstr "Liste des catégories; un clic filtre sur la catégorie désignée."
 #: ../../../inc/widgets/widgets/_user_login.widget.php:88
 #: ../../../inc/widgets/widgets/_user_register.widget.php:86
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:47
-#: ../../../plugins/_archives.plugin.php:299
+#: ../../../plugins/_archives.plugin.php:294
 #: ../plugins/_calendar.plugin.php:86
 msgid "Block title"
 msgstr "Titre du bloc"
@@ -27641,7 +27656,7 @@ msgstr "Filtrer les catégories"
 #: ../../../inc/widgets/widgets/_user_login.widget.php:89
 #: ../../../inc/widgets/widgets/_user_register.widget.php:87
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:48
-#: ../../../plugins/_archives.plugin.php:300
+#: ../../../plugins/_archives.plugin.php:295
 #: ../plugins/_calendar.plugin.php:87
 msgid "Title to display in your skin."
 msgstr "Titre à afficher dans votre skin."
@@ -27669,14 +27684,14 @@ msgstr "Sélection aléatoire"
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:60
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:136
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:112
-#: ../../../plugins/_archives.plugin.php:305
+#: ../../../plugins/_archives.plugin.php:300
 msgid "Max items"
 msgstr "Nombre d'items max"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:61
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:137
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:113
-#: ../../../plugins/_archives.plugin.php:306
+#: ../../../plugins/_archives.plugin.php:301
 msgid "Maximum number of items to display."
 msgstr "Le nombre maximum d'éléments à afficher."
 
@@ -27909,26 +27924,26 @@ msgstr "Les posts d'intro ne sont jamais liés à leur URL de permalien"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:68
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:152
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:187
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:198
 msgid "Automatic"
 msgstr "Automatique"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:69
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:98
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:153
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:188
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:199
 msgid "Item permalink"
 msgstr "Permalien de l'item"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:70
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:154
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:189
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:200
 msgid "Item URL"
 msgstr "URL item"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:71
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:155
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:190
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:201
 msgid "Nowhere"
 msgstr "Nulle part"
 
@@ -27937,7 +27952,7 @@ msgid "Image Size"
 msgstr "Taille d'image"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:77
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:171
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:188
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:83
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:57
 msgid "Cropping and sizing of thumbnails"
@@ -27957,12 +27972,12 @@ msgid "Display all"
 msgstr "Afficher tous"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:93
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:183
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:194
 msgid "Link pictures"
 msgstr "Lier images"
 
 #: ../../../inc/widgets/widgets/_coll_featured_intro.widget.php:94
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:184
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:195
 msgid "Where should pictures be linked to?"
 msgstr "Où devraient-être reliées les images?"
 
@@ -28094,39 +28109,56 @@ msgstr "Afficher la première image"
 msgid "Display all pictures"
 msgstr "Afficher toutes les images"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:178
-msgid "Display first image separately and before title."
-msgstr "Afficher la première image séparément et avant le titre"
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:170
+msgid "First picture"
+msgstr "Première image"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:196
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:174
+msgid "Special placement before title"
+msgstr "Placement spécial avant le titre"
+
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:175
+msgid "No special treatment (same as other pictures)"
+msgstr "Pas de traitement spécial (identique aux autres images)"
+
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:179
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:76
+msgid "Max pictures"
+msgstr "Maximum d'images"
+
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:180
+msgid "Maximum number of pictures to display after the title."
+msgstr "Nombre maximum d'images à afficher après le titre."
+
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:207
 msgid "Display excerpt for each item."
 msgstr "Afficher un extrait pour chaque item."
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:201
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:212
 msgid "Content teaser"
 msgstr "Accroche de contenu"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:204
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:215
 msgid "Display content teaser for each item."
 msgstr "Afficher l'accroche de contenu pour chaque item."
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:207
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:218
 msgid "Max Words"
 msgstr "Max Mots"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:210
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:221
 msgid "Max number of words for the teasers."
 msgstr "Le nombre maximum de mots pour les accroches."
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:241
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:252
 msgid "Universal Item list"
 msgstr "Liste universelle d'item"
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:259
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:270
 msgid "Can list Items (Posts/Pages/Links...) in a variety of ways."
 msgstr "Peut lister les items (Posts/Pages/Liens...) de diverses façons."
 
-#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:287
+#: ../../../inc/widgets/widgets/_coll_item_list.widget.php:298
 msgid "The requested Blog doesn't exist any more!"
 msgstr "Le blog demandé n'existe plus!"
 
@@ -28664,7 +28696,7 @@ msgstr "URL de destination des liens de type \"URL\"."
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:116
 #: ../../../skins/bootstrap_main_skin/index.main.php:110
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:99
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:169
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:175
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:103
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:103
 #: ../../../skins/bootstrap_manual_skin/index.main.php:97
@@ -28853,10 +28885,6 @@ msgstr "Lien vers le profil utilisateur courant, incluant la photo de profil"
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:53
 msgid "Random Users"
 msgstr "Utilisateurs au hasard"
-
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:76
-msgid "Max pictures"
-msgstr "Maximum d'images"
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:77
 msgid "Maximum number of pictures to display."
@@ -30038,22 +30066,22 @@ msgstr "Il semble que les noms stub suivants soient utilisés plus d'une fois:  
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr "Je ne peux pas upgrader tant que vous ne lez avez pas rendus uniques. Camp BD: [%s]"
 
-#: ../../../install/_functions_evoupgrade.php:6793
+#: ../../../install/_functions_evoupgrade.php:6789
 msgid "The database schema is up to date."
 msgstr "Le schéma de base de données est à jour."
 
-#: ../../../install/_functions_evoupgrade.php:6832
+#: ../../../install/_functions_evoupgrade.php:6828
 msgid "Upgrade database"
 msgstr "Mise à jour de la base de données!"
 
-#: ../../../install/_functions_evoupgrade.php:6840
+#: ../../../install/_functions_evoupgrade.php:6836
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen if you've been using development versions directly "
 "off GitHub..."
 msgstr "Le numero de version est correct, mais nous avons détecté des changements dans le schéma de la base. Celà peut arriver si vous avez utilisé des versions de développement provenant de GitHub..."
 
-#: ../../../install/_functions_evoupgrade.php:6851
+#: ../../../install/_functions_evoupgrade.php:6847
 msgid "Try to Repair/Upgrade database now!"
 msgstr "Essayez de Réparer/Mettre à jour la base de données maintenant!"
 
@@ -30843,20 +30871,20 @@ msgstr "Ce skin tag affiche la liste des archives de posts."
 msgid "Archives can be grouped monthly, daily, weekly or post by post."
 msgstr "Les archives peuvent être groupées par mois, jour, semaine ou post par post."
 
-#: ../../../plugins/_archives.plugin.php:139
+#: ../../../plugins/_archives.plugin.php:131
 msgid "More..."
 msgstr "Suite..."
 
-#: ../../../plugins/_archives.plugin.php:193
-#: ../plugins/_calendar.plugin.php:725
+#: ../../../plugins/_archives.plugin.php:186
+#: ../plugins/_calendar.plugin.php:732
 msgid "View monthly archive"
 msgstr "Voir l'archive du mois"
 
-#: ../../../plugins/_archives.plugin.php:218
+#: ../../../plugins/_archives.plugin.php:211
 msgid "View daily archive"
 msgstr "Voir les archives quotidiennes"
 
-#: ../../../plugins/_archives.plugin.php:235
+#: ../../../plugins/_archives.plugin.php:228
 msgid "View weekly archive"
 msgstr "Voir les archives hebdomadaires"
 
@@ -31117,47 +31145,47 @@ msgstr "Naviguer dans les années"
 msgid "Display double arrows for yearly navigation?"
 msgstr "Afficher des doubles flèches pour la navigation par année?"
 
-#: ../../../plugins/_calendar.plugin.php:575
-#: ../plugins/_calendar.plugin.php:577
+#: ../../../plugins/_calendar.plugin.php:582
+#: ../plugins/_calendar.plugin.php:584
 #, php-format
 msgid "%d posts"
 msgstr "%d posts"
 
-#: ../../../plugins/_calendar.plugin.php:576
-#: ../plugins/_calendar.plugin.php:578
+#: ../../../plugins/_calendar.plugin.php:583
+#: ../plugins/_calendar.plugin.php:585
 msgid "1 post"
 msgstr "1 post"
 
-#: ../../../plugins/_calendar.plugin.php:797
+#: ../../../plugins/_calendar.plugin.php:804
 msgid "Current"
 msgstr "Courant"
 
-#: ../../../plugins/_calendar.plugin.php:1070
+#: ../../../plugins/_calendar.plugin.php:1077
 #, php-format
 msgid "Previous year (%04d-%02d)"
 msgstr "Année précédente (%04d-%02d)"
 
-#: ../../../plugins/_calendar.plugin.php:1071
+#: ../../../plugins/_calendar.plugin.php:1078
 #, php-format
 msgid "Previous year (%04d)"
 msgstr "Année précédente (%04d)"
 
-#: ../../../plugins/_calendar.plugin.php:1121
+#: ../../../plugins/_calendar.plugin.php:1128
 #, php-format
 msgid "Previous month (%04d-%02d)"
 msgstr "Mois précédent (%04d-%02d)"
 
-#: ../../../plugins/_calendar.plugin.php:1174
+#: ../../../plugins/_calendar.plugin.php:1181
 #, php-format
 msgid "Next month (%04d-%02d)"
 msgstr "Mois suivant (%04d-%02d)"
 
-#: ../../../plugins/_calendar.plugin.php:1226
+#: ../../../plugins/_calendar.plugin.php:1233
 #, php-format
 msgid "Next year (%04d-%02d)"
 msgstr "Année suivante (%04d-%02d)"
 
-#: ../../../plugins/_calendar.plugin.php:1227
+#: ../../../plugins/_calendar.plugin.php:1234
 #, php-format
 msgid "Next year (%04d)"
 msgstr "Année suivante (%04d)"
@@ -31512,7 +31540,7 @@ msgid ""
 msgstr "Ce plugin affiche une bare d'outils permettant d'insérer rapidement des codes courts."
 
 #: ../../../plugins/_shortcodes.plugin.php:85
-#: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:83
+#: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:97
 msgid "Teaser break"
 msgstr "Séparateur de Teaser"
 
@@ -31629,7 +31657,7 @@ msgstr "secondes. Après combien de temps d'inactivité un utilisateur peut-êtr
 msgid "Who's Online?"
 msgstr "Qui est en ligne?"
 
-#: ../../../plugins/_whosonline.plugin.php:305
+#: ../../../plugins/_whosonline.plugin.php:309
 msgid "Guest Users:"
 msgstr "Visiteurs:"
 
@@ -32654,7 +32682,7 @@ msgid ""
 "This plugin allows to horizontally scroll through blocks of wide content."
 msgstr "Ce plugin permet de scroller horizontalement à travers des blocs de contenu larges."
 
-#: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:112
+#: ../../../plugins/widescroll_plugin/_widescroll.plugin.php:126
 msgid "Wide scroll:"
 msgstr "Scroll large:"
 
@@ -32751,8 +32779,8 @@ msgstr "Envoyer un messager au propriétaire de ce blog..."
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:157
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:179
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:182
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:82
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:85
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:88
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:91
 #: ../../../skins/colourise/_skin.class.php:55
 #: ../../../skins/dating_mood/_skin.class.php:55
 #: ../skins/evocamp/_skin.class.php:49
@@ -32772,7 +32800,7 @@ msgstr "Zoom images Colorbox"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:158
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:158
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:183
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:86
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:92
 #: ../../../skins/colourise/_skin.class.php:56
 #: ../../../skins/dating_mood/_skin.class.php:56
 #: ../skins/evocamp/_skin.class.php:50
@@ -32793,7 +32821,7 @@ msgstr "Cochez pour activer le zoom sur images par javascript (en utilisant le s
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:163
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:163
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:188
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:91
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:97
 #: ../../../skins/colourise/_skin.class.php:61
 #: ../../../skins/dating_mood/_skin.class.php:61
 #: ../skins/evocamp/_skin.class.php:55
@@ -32824,9 +32852,9 @@ msgstr "Votes sur les images des Posts"
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:189
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:201
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:213
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:92
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:104
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:116
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:98
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:110
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:122
 #: ../../../skins/colourise/_skin.class.php:62
 #: ../skins/colourise/_skin.class.php:74
 #: ../../../skins/colourise/_skin.class.php:86
@@ -32878,9 +32906,9 @@ msgstr "Cochez ceci pour activer les boutons de votre AJAX dans la fenêtre de z
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:194
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:206
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:218
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:97
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:109
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:121
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:103
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:115
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:127
 #: ../../../skins/colourise/_skin.class.php:67
 #: ../skins/colourise/_skin.class.php:79
 #: ../../../skins/colourise/_skin.class.php:91
@@ -32933,9 +32961,9 @@ msgstr "Afficher les Votes"
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:195
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:207
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:219
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:98
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:110
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:122
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:104
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:116
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:128
 #: ../../../skins/colourise/_skin.class.php:68
 #: ../skins/colourise/_skin.class.php:80
 #: ../../../skins/colourise/_skin.class.php:92
@@ -32977,7 +33005,7 @@ msgstr "Cochez pour afficher le nombre de \"j'aime\" et \"je n'aime pas\""
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:175
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:175
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:200
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:103
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:109
 #: ../../../skins/colourise/_skin.class.php:73
 #: ../../../skins/dating_mood/_skin.class.php:73
 #: ../skins/evocamp/_skin.class.php:67
@@ -32998,7 +33026,7 @@ msgstr "Votes sur les images des Commentaires"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:187
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:187
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:212
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:115
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:121
 #: ../../../skins/colourise/_skin.class.php:85
 #: ../../../skins/dating_mood/_skin.class.php:85
 #: ../skins/evocamp/_skin.class.php:79
@@ -33019,7 +33047,7 @@ msgstr "Votes sur les photos de profil"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:208
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:208
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:231
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:136
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:142
 #: ../../../skins/colourise/_skin.class.php:97
 #: ../../../skins/dating_mood/_skin.class.php:97
 #: ../skins/evocamp/_skin.class.php:91
@@ -33040,7 +33068,7 @@ msgstr "Afficher le sexe"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:220
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:220
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:243
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:148
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:154
 #: ../../../skins/colourise/_skin.class.php:109
 #: ../../../skins/dating_mood/_skin.class.php:109
 #: ../../../skins/evocamp/_skin.class.php:103
@@ -33081,7 +33109,7 @@ msgstr "Compléter automatiquement les noms d'utilisateurs"
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:88
 #: ../../../skins/bootstrap_main_skin/index.main.php:87
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:77
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:167
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:173
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:76
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:76
 #: ../../../skins/bootstrap_manual_skin/index.main.php:75
@@ -33111,7 +33139,7 @@ msgstr "Entête"
 #: ../../../skins/bootstrap_blog_skin/index.main.php:273
 #: ../../../skins/bootstrap_forums_skin/index.main.php:362
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:278
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:170
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:176
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:216
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:207
 #: ../../../skins/bootstrap_manual_skin/index.main.php:205
@@ -33212,7 +33240,7 @@ msgstr "Ce post n'a pas de %s pour le moment..."
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:63
 #: ../../../skins/bootstrap_main_skin/index.main.php:67
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:57
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:168
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:174
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:51
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:51
 #: ../../../skins/bootstrap_manual_skin/index.main.php:55
@@ -33294,7 +33322,7 @@ msgstr "Hauteur d'image max"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:205
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:205
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:228
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:133
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:139
 msgid "Username options"
 msgstr "Noms d'utilisateurs"
 
@@ -33303,7 +33331,7 @@ msgstr "Noms d'utilisateurs"
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:232
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:232
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:255
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:160
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:166
 msgid "When access is denied or requires login..."
 msgstr "Lorsque l'accès est refusé ou nécessite uen identification..."
 
@@ -33312,7 +33340,7 @@ msgstr "Lorsque l'accès est refusé ou nécessite uen identification..."
 #: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:235
 #: ../../../skins/bootstrap_gallery_skin/_skin.class.php:235
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:258
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:163
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:169
 msgid "Display on login screen"
 msgstr "Afficher sur l'écran d'identification"
 
@@ -33338,12 +33366,12 @@ msgstr "Afficher sur l'écran d'identification"
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:263
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:264
 #: ../../../skins/bootstrap_main_skin/_skin.class.php:265
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:167
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:168
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:169
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:170
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:171
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:172
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:173
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:174
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:175
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:176
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:177
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:178
 #, php-format
 msgid "\"%s\" container"
 msgstr "Container \"%s\""
@@ -33354,7 +33382,7 @@ msgstr "Container \"%s\""
 #: ../../../skins/bootstrap_blog_skin/index.main.php:311
 #: ../../../skins/bootstrap_forums_skin/index.main.php:400
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:315
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:171
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:177
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:258
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:249
 #: ../../../skins/bootstrap_manual_skin/index.main.php:242
@@ -33386,7 +33414,7 @@ msgstr "Barre latérale 2"
 #: ../../../skins/bootstrap_main_skin/front.main.php:241
 #: ../../../skins/bootstrap_main_skin/index.main.php:299
 #: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:374
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:172
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:178
 #: ../../../skins/bootstrap_manual_skin/access_denied.main.php:322
 #: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:313
 #: ../../../skins/bootstrap_manual_skin/index.main.php:301
@@ -33416,7 +33444,7 @@ msgstr "Pied de page"
 #: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:157
 #: ../../../skins/bootstrap_main_skin/front.main.php:157
 #: ../../../skins/bootstrap_main_skin/index.main.php:237
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:602
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:608
 #: ../../../skins_adm/login/_login_form.main.php:38
 msgid "Log in to your account"
 msgstr "Connectez-vous à votre compte"
@@ -33432,7 +33460,7 @@ msgstr "Pas de réponses pour l'instant..."
 #: ../../../skins/bootstrap_gallery_legacy/_posts.disp.php:33
 #: ../../../skins/bootstrap_gallery_skin/_catdir.disp.php:42
 #: ../../../skins/bootstrap_gallery_skin/_posts.disp.php:33
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:84
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:62
 #: ../../../skins/manual/_item_block.inc.php:69
 #: ../../../skins_fallback_v6/_item_block.inc.php:79
 msgid "Edit Intro"
@@ -34161,14 +34189,14 @@ msgstr "Commentaire de"
 msgid "Comments on this chapter"
 msgstr "Commentaires sur ce chapitre"
 
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:100
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:78
 #: ../../../skins/bootstrap_manual_skin/_posts.disp.php:69
 #: ../../../skins/manual/_item_block.inc.php:85
 #: ../skins/manual/posts.main.php:165
 msgid "Edit Cat"
 msgstr "Modifier Cat"
 
-#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:151
+#: ../../../skins/bootstrap_manual_skin/_item_block.inc.php:129
 #: ../../../skins/manual/_item_block.inc.php:134
 msgid "View history"
 msgstr "Voir l'historique"
@@ -34187,6 +34215,20 @@ msgstr "Ajouter un sous-chapitre ici"
 #: ../../../skins/manual/posts.main.php:227
 msgid "Add a page here"
 msgstr "Ajouter une page ici"
+
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:77
+msgid "Page navigation"
+msgstr "Navigation de pages"
+
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:78
+msgid "(EXPERIMENTAL)"
+msgstr "(EXPERIMENTAL)"
+
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:78
+msgid ""
+"Check this to show previous/next page links to navigate inside the "
+"<b>current</b> chapter."
+msgstr "Cochez ceci pour montrer des liens de navigation suivant/précédent à l'intérieur du chapitre <b>courant</b>"
 
 #: ../../../skins/colourise/_item_block.inc.php:77
 msgid "Filed under"
