@@ -22,9 +22,9 @@
  *	[comments on | off]
  *	[status publish | pending | draft | private]
  *	[slug some-url-name]
- *	[end] – everything after this shortcode is ignored (i.e. signatures)
- *	[more] – more tag
- *	[nextpage] – pagination
+ *	[end] - everything after this shortcode is ignored (i.e. signatures)
+ *	[more] - more tag
+ *	[nextpage] - pagination
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -69,9 +69,9 @@ if( ! $mbox = pbm_connect() )
 }
 
 // Read messages from server
-pbm_msg('Reading messages from server');
+pbm_msg( 'Reading messages from server', true );
 $imap_obj = imap_check( $mbox );
-pbm_msg('Found '.$imap_obj->Nmsgs.' messages');
+pbm_msg( 'Found '.$imap_obj->Nmsgs.' messages', true );
 
 if( $imap_obj->Nmsgs == 0 )
 {
@@ -86,7 +86,7 @@ pbm_process_messages( $mbox, $imap_obj->Nmsgs );
 if( ! $Settings->get('eblog_test_mode') && count($del_cntr) > 0 )
 {	// We want to delete processed emails from server
 	imap_expunge( $mbox );
-	pbm_msg( sprintf('Deleted %d processed message(s) from inbox.', $del_cntr) );
+	pbm_msg( sprintf( 'Deleted %d processed message(s) from inbox.', $del_cntr ), true );
 }
 
 imap_close( $mbox );
