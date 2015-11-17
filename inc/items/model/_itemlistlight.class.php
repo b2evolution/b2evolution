@@ -134,7 +134,8 @@ class ItemListLight extends DataObjectList2
 				'author_assignee' => NULL,
 				'lc' => 'all',									// Filter on requested locale
 				'keywords' => NULL,
-				'phrase' => 'AND',
+				'keyword_scope' => 'title,content', // What fields are used for searching: 'title', 'content'
+				'phrase' => 'AND', // 'OR', 'AND', 'sentence'(or '1')
 				'exact' => 0,
 				'post_ID' => NULL,
 				'post_ID_list' => NULL,
@@ -274,6 +275,7 @@ class ItemListLight extends DataObjectList2
 			 * Restrict by keywords
 			 */
 			memorize_param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
+			memorize_param( $this->param_prefix.'scope', 'string', $this->default_filters['keyword_scope'], $this->filters['keyword_scope'] ); // Scope of search string
 			memorize_param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], $this->filters['phrase'] ); // Search for sentence or for words
 			memorize_param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], $this->filters['exact'] );     // Require exact match of title or contents
 
@@ -433,6 +435,7 @@ class ItemListLight extends DataObjectList2
 		 * Restrict by keywords
 		 */
 		$this->filters['keywords'] = param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], true );         // Search string
+		$this->filters['keyword_scope'] = param( $this->param_prefix.'scope', 'string', $this->default_filters['keyword_scope'], true ); // Scope of search string
 		$this->filters['phrase'] = param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); 		// Search for sentence or for words
 		$this->filters['exact'] = param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
 
@@ -530,16 +533,14 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 *
-	 *
-	 * @todo count?
+	 * Generate search query based on set filters and obtain count of results
 	 */
 	function query_init()
 	{
 		global $current_User;
 
 		// Call reset to init the ItemQuery
-		// This way avoid adding the same conditions twice if the ItemQuery was already initialized
+		// This prevents from adding the same conditions twice if the ItemQuery was already initialized
 		$this->reset();
 
 		if( empty( $this->filters ) )
@@ -559,7 +560,7 @@ class ItemListLight extends DataObjectList2
 		// GENERATE THE QUERY:
 
 		/*
-		 * filtering stuff:
+		 * Filtering stuff:
 		 */
 		if( !is_null( $this->Blog ) )
 		{ // Get the posts only for current Blog
@@ -567,11 +568,12 @@ class ItemListLight extends DataObjectList2
 																			$this->filters['cat_focus'], $this->filters['coll_IDs'] );
 		}
 		else // $this->Blog == NULL
-		{ // If we want to get the posts from all blogs
+		{	// If we want to get the posts from all blogs
 			// Save for future use (permission checks..)
 			$this->ItemQuery->blog = 0;
 			$this->ItemQuery->Blog = $this->Blog;
 		}
+
 		$this->ItemQuery->where_tags( $this->filters['tags'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_author_logins( $this->filters['authors_login'] );
@@ -581,7 +583,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 		$this->ItemQuery->where_types( $this->filters['types'] );
-		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$this->ItemQuery->where_ID_list( $this->filters['post_ID_list'] );
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
@@ -812,7 +814,7 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
-		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],

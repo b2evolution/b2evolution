@@ -16,16 +16,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Chapter
  */
-global $edited_GenericCategory;
-/**
- * @var Chapter
- */
-$edited_Chapter = & $edited_GenericCategory;
+global $edited_Chapter;
 
 /**
- * @var GenericCategoryCache
+ * @var ChapterCache
  */
-global $GenericCategoryCache;
+global $ChapterCache;
 
 global $Settings, $action, $subset_ID;
 
@@ -55,7 +51,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 	$Form->info( T_('Collection'), $edited_Blog->get_maxlen_name().$move );
 
 	$Form->select_input_options( 'cat_parent_ID',
-				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );
+				$ChapterCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );
 
 	$Form->text_input( 'cat_name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 

@@ -631,6 +631,7 @@ switch( $action )
 		$CommentList->set_default_filters( array(
 				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
 				//'comments' => $UserSettings->get( 'results_per_page' ),
+				'order' => 'DESC',
 			) );
 
 		$CommentList->load_from_Request();

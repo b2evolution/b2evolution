@@ -122,6 +122,7 @@ switch( $action )
 			case 'features':
 			case 'comments':
 			case 'other':
+			case 'more':
 				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
@@ -404,8 +405,15 @@ switch( $AdminUI->get_path(1) )
 	case 'other':
 		$AdminUI->set_path( 'collections', 'features', $tab );
 		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
-		$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Other displays'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->set_page_manual_link( 'features-others' );
+		break;
+
+	case 'more':
+		$AdminUI->set_path( 'collections', 'features', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+		$AdminUI->breadcrumbpath_add( T_('More'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'features-more' );
 		break;
 
 	case 'skin':
@@ -492,6 +500,9 @@ switch( $AdminUI->get_path(1) )
 				break;
 			case 'other';
 				$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );
+				break;
+			case 'more';
+				$AdminUI->disp_view( 'collections/views/_coll_more.form.php' );
 				break;
 			default:
 				$AdminUI->disp_view( 'collections/views/_coll_home.form.php' );

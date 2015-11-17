@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit;
+		global $Messages, $debug, $Hit, $check_browser_version;
 
 		// This is included before controller specifc require_css() calls:
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
@@ -91,8 +91,8 @@ class AdminUI extends AdminUI_general
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 		init_fontawesome_icons( 'fontawesome-glyphicons' );
 
-		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
-		{	// IE < 9
+		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// Display info message if browser IE < 9 version and it is allowed by config var:
 			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 			if( $debug )
 			{

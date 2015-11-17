@@ -178,6 +178,7 @@ span.flag {
   font-size: 6px;
   display: inline-block !important;
   margin-bottom: -2px;
+  box-sizing: content-box;
 }
 span.icon {
   background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
@@ -2311,6 +2312,10 @@ input.btn-lg {
   padding-left: 15px;
   margin-bottom: 0;
 }
+.evo_post_gallery__image {
+  display: inline-block;
+  margin: 0 1em 1em 0;
+}
 
 /**
  * item_base.css 
@@ -2862,6 +2867,9 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 }
 .panel-title a.help_plugin_icon:hover {
   color: #23527c;
+}
+.evo_confirm_delete__title {
+  margin-top: 0;
 }
 .form_add_contacts {
   display: block;

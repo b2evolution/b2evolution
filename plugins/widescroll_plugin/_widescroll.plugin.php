@@ -44,8 +44,22 @@ class widescroll_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
-		return parent::get_coll_setting_definitions( $default_params );
+		$default_params = array(
+				'default_comment_rendering' => 'never'
+			);
+
+		if( isset( $params['blog_type'] ) )
+		{	// Set the default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+				case 'manual':
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
 	}
 
 

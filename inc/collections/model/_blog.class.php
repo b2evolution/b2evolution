@@ -124,7 +124,7 @@ class Blog extends DataObject
 	/**
 	 * @var boolean TRUE if blog is favorite
 	 */
-	var $favorite = 0;
+	var $favorite = 1;
 
 
 	/**
@@ -404,20 +404,8 @@ class Blog extends DataObject
 			}
 
 			// Collection permissions:
-			$old_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
-			$old_allow_access = $this->get_setting( 'allow_access' );
-			$new_allow_access = param( 'blog_allow_access', 'string', '' );
-			if( $old_allow_access != 'members' && $new_allow_access == 'members' )
-			{ // If 'Allow access' is changed to 'Members' we should activate advanced perms automatically
-				$new_advanced_perms = 1;
-			}
-			if( $old_advanced_perms == 1 && $new_advanced_perms == 0 && $old_allow_access == 'members' )
-			{ // If advanced perms are deselected we should also change 'Allow access' back to 'Logged in users'
-				$new_allow_access = 'users';
-			}
-			$this->set( 'advanced_perms', $new_advanced_perms );
-			$this->set_setting( 'allow_access', $new_allow_access );
+			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
 				$this->set_setting( 'enable_sitemaps', 0 );
@@ -703,7 +691,7 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'comments', $groups ) )
-		{ // we want to load the workflow checkboxes:
+		{ // we want to load the comments settings:
 			// load moderation statuses
 			$moderation_statuses = get_visibility_statuses( 'moderation' );
 			$blog_moderation_statuses = array();
@@ -723,19 +711,38 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'other', $groups ) )
-		{ // we want to load the workflow checkboxes:
-			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
+		{ // we want to load the other settings:
 
+			// Search results:
+			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
+			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
+
+			// Latest comments :
+			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
+			$this->set_setting( 'latest_comments_num', get_param( 'latest_comments_num' ) );
+
+			// User directory:
+			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
+
+			// Messaging pages:
+			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
+
+			// Archive pages:
+			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+		}
+
+		if( in_array( 'more', $groups ) )
+		{ // we want to load more settings:
+
+			// Tracking:
+			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
+
+			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
-			// Tracking unread content
-			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
-
-			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
-			$this->set_setting( 'image_size_messaging', param( 'image_size_messaging', 'string' ) );
-
-			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+			// Sitemaps:
+			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
 		}
 
 		if( param( 'allow_comments', 'string', NULL ) !== NULL )
@@ -1931,6 +1938,14 @@ class Blog extends DataObject
 				$disp_param = 'users';
 				break;
 
+			case 'tagsurl':
+				$disp_param = 'tags';
+				break;
+
+			case 'termsurl':
+				$disp_param = 'terms';
+				break;
+
 			case 'loginurl':
 			case 'registerurl':
 			case 'lostpasswordurl':
@@ -2152,6 +2167,18 @@ class Blog extends DataObject
 					$result = ( $this->type == 'forum' ) ? 'review' : 'draft';
 				}
 				break;
+
+			case 'aggregate_coll_IDs':
+				if( ! empty( $result ) && ( $result != '-' ) && ( $result != '*') )
+				{
+					$coll_IDs = explode( ',', $result );
+					if( ! in_array( $this->ID, $coll_IDs ) )
+					{
+						array_push( $coll_IDs, $this->ID );
+						$result = implode( ',', $coll_IDs );
+					}
+				}
+				break;
 		}
 
 		return $result;
@@ -2302,6 +2329,9 @@ class Blog extends DataObject
 									 ( itc_ityp_ID, itc_coll_ID )
 						VALUES ( '.$DB->quote( $default_post_type_ID ).', '.$DB->quote( $this->ID ).' )' );
 			}
+
+			// Enable default item types for the inserted collection:
+			$this->enable_default_item_types();
 
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 		}
@@ -3292,9 +3322,13 @@ class Blog extends DataObject
 			{	// Check permissions to create a new chapter in this blog
 				global $admin_url;
 				$url = $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$this->ID;
-				if( !empty( $cat_ID ) )
-				{	// Add category param to preselect category on the form
+				if( ! empty( $cat_ID ) )
+				{	// Add category param to preselect category on the form:
 					$url = url_add_param( $url, 'cat_parent_ID='.$cat_ID );
+				}
+				if( ! is_admin_page() )
+				{	// Add this param to redirect after saving to parent category permanent url:
+					$url = url_add_param( $url, 'redirect_page=parent' );
 				}
 			}
 		}
@@ -3577,6 +3611,67 @@ class Blog extends DataObject
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Enable default item types for the collection
+	 */
+	function enable_default_item_types()
+	{
+		if( empty( $this->ID ) )
+		{	// Collection doesn't exist in DB yet:
+			return;
+		}
+
+		global $DB, $cache_all_item_type_IDs;
+
+		if( ! isset( $cache_all_item_type_IDs ) )
+		{	// Get all item type IDs only first time to save execution time
+			$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
+		}
+
+		// Exclude the following item types depending on collection type:
+		switch( $this->type )
+		{
+			case 'main':
+			case 'photo':
+				$exclude_ityp_IDs = array( 100, 200, 2000, 5000 );
+				break;
+
+			case 'forum':
+				$exclude_ityp_IDs = array( 1, 100, 2000, 5000 );
+				break;
+
+			case 'manual':
+				$exclude_ityp_IDs = array( 1, 200, 2000, 5000 );
+				break;
+
+			case 'std':
+			default:
+				$exclude_ityp_IDs = array( 100, 200, 5000 );
+				break;
+		}
+
+		$insert_sql = 'REPLACE INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
+		$i = 0;
+		foreach( $cache_all_item_type_IDs as $item_type_ID )
+		{
+			if( ! in_array( $item_type_ID, $exclude_ityp_IDs ) )
+			{	// Item type is not excluded
+				if( $i > 0 )
+				{	// Add separator between rows:
+					$insert_sql .= ', ';
+				}
+				$insert_sql .= '( '.$item_type_ID.', '.$this->ID.' )';
+				$i++;
+			}
+		}
+
+		if( $i > 0 )
+		{	// Insert records to enable the default item types for this collection:
+			$DB->query( $insert_sql );
+		}
 	}
 }
 

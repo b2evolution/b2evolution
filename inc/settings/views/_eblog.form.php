@@ -74,13 +74,12 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-gen
 	$Form->checkbox_input( 'eblog_test_mode', $eblog_test_mode_value, T_('Test Mode'),
 				array( 'note' => T_('Check to run Post by Email in test mode. Nothing will be posted to the database nor will your inbox be altered.' ) ) );
 
-	// sam2kb> TODO: javascript to preset default eblog_server_port when eblog_method and/or eblog_encrypt change
-	$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3' => T_('POP3'), 'imap' => T_('IMAP'), ), // TRANS: E-Mail retrieval method
-		T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
-
 	$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 25, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
-	$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, SSL/TLS: 993).'), array( 'maxlength' => 6 ) );
+	$Form->radio( 'eblog_method', $Settings->get('eblog_method'), array(
+			array( 'pop3', T_('POP3'), ),// TRANS: E-Mail retrieval method
+			array( 'imap', T_('IMAP'), ),// TRANS: E-Mail retrieval method
+		), T_('Retrieval method') );
 
 	$Form->radio( 'eblog_encrypt', $Settings->get('eblog_encrypt'), array(
 																		array( 'none', T_('None'), ),
@@ -88,8 +87,17 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-gen
 																		array( 'tls', T_('TLS'), ),
 																	), T_('Encryption method') );
 
-	$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'),
-				T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
+	$eblog_novalidatecert_params = array( 'lines' => true );
+	if( $Settings->get('eblog_encrypt') == 'none' )
+	{
+		$eblog_novalidatecert_params['disabled'] = 'disabled';
+	}
+	$Form->radio_input( 'eblog_novalidatecert', $Settings->get( 'eblog_novalidatecert' ), array(
+			array( 'value' => 0, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 'value' => 1, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+		), T_('Certificate validation'), $eblog_novalidatecert_params );
+
+	$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, SSL/TLS: 993).'), array( 'maxlength' => 6 ) );
 
 	$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 25,
 				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255 ) );
@@ -149,3 +157,34 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 }
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( 'input[name="eblog_method"], input[name="eblog_encrypt"]' ).click( function()
+	{	// Change default port depending on selected retrieval and encryption methods:
+		var method = jQuery( 'input[name="eblog_method"]:checked' ).val();
+		var encrypt = jQuery( 'input[name="eblog_encrypt"]:checked' ).val();
+
+		if( method == 'pop3' )
+		{
+			jQuery( 'input[name="eblog_server_port"]' ).val( encrypt == 'ssl' ? '995' : '110' );
+		}
+		else if( method == 'imap' )
+		{
+			jQuery( 'input[name="eblog_server_port"]' ).val( encrypt == 'ssl' ? '993' : '143' );
+		}
+	} );
+
+	jQuery( 'input[name="eblog_encrypt"]' ).click( function()
+	{	// Enable/Disable "Certificate validation" options depending on encryption method
+		if( jQuery( this ).val() == 'none' )
+		{
+			jQuery( 'input[name="eblog_novalidatecert"]' ).attr( 'disabled', 'disabled' );
+		}
+		else
+		{
+			jQuery( 'input[name="eblog_novalidatecert"]' ).removeAttr( 'disabled' );
+		}
+	} )
+} );
+</script>

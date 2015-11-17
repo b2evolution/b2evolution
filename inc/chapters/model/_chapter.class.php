@@ -14,16 +14,35 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'generic/model/_genericcategory.class.php', 'GenericCategory' );
-
 
 /**
  * Chapter Class
  *
  * @package evocore
  */
-class Chapter extends GenericCategory
+class Chapter extends DataObject
 {
+	/**
+	 * Name of Chapter
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	var $name;
+
+	var $parent_ID;
+	/**
+	 * To display parent name in form
+	 */
+	var $parent_name;
+
+	/**
+	 * Category children list
+	 */
+	var $children = array();
+
+	var $children_sorted = false;
+
 	/**
 	 * @var integer
 	 */
@@ -75,14 +94,17 @@ class Chapter extends GenericCategory
 	function Chapter( $db_row = NULL, $subset_ID = NULL )
 	{
 		// Call parent constructor:
-		parent::GenericCategory( 'T_categories', 'cat_', 'cat_ID', $db_row );
+		parent::DataObject( 'T_categories', 'cat_', 'cat_ID' );
 
-		if( is_null($db_row) )
+		if( is_null( $db_row ) )
 		{	// We are creating an object here:
 			$this->set( 'blog_ID', $subset_ID );
 		}
 		else
 		{	// Wa are loading an object:
+			$this->ID = $db_row->cat_ID;
+			$this->name = $db_row->cat_name;
+			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
@@ -268,9 +290,13 @@ class Chapter extends GenericCategory
 	 */
 	function load_from_request()
 	{
-		global $DB, $Settings;
+		param_string_not_empty( 'cat_name', T_('Please enter a name.') );
+		$this->set_from_Request( 'name' );
 
-		parent::load_from_Request();
+		if( param( 'cat_parent_ID', 'integer', -1 ) !== -1 )
+		{	// Set parent ID:
+			$this->set_from_Request( 'parent_ID' );
+		}
 
 		// Check url name
 		param( 'cat_urlname', 'string' );
@@ -590,6 +616,18 @@ class Chapter extends GenericCategory
 
 
 	/**
+	 * Get name of Chapter
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
+	 */
+	function get_name( $format = 'htmlbody' )
+	{
+		return $this->dget( 'name', $format );
+	}
+
+
+	/**
 	 * Check if this category has at least one post
 	 *
 	 * @return boolean
@@ -765,6 +803,46 @@ class Chapter extends GenericCategory
 		}
 
 		return $path_name;
+	}
+
+
+	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+ 			case 'parent_ID':
+				return $this->set_param( $parname, 'string', $parvalue, true );
+
+			case 'name':
+			case 'urlname':
+			case 'description':
+			default:
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
+		}
+	}
+
+
+	/**
+	 * Add a child
+	 *
+	 * @param object Chapter
+	 */
+	function add_child_category( & $Chapter )
+	{
+		if( !isset( $this->children[ $Chapter->ID ] ) )
+		{	// Add only if it was not added yet:
+			$this->children[ $Chapter->ID ] = & $Chapter;
+		}
 	}
 }
 

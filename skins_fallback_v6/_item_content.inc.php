@@ -66,6 +66,12 @@ $params = array_merge( array(
 
 		'before_gallery'           => '<div class="evo_post_gallery">',
 		'after_gallery'            => '</div>',
+		'gallery_table_start'      => '',
+		'gallery_table_end'        => '',
+		'gallery_row_start'        => '',
+		'gallery_row_end'          => '',
+		'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+		'gallery_cell_end'         => '</div>',
 		'gallery_image_size'       => 'crop-80x80',
 		'gallery_image_limit'      => 1000,
 		'gallery_colls'            => 5,
@@ -76,6 +82,10 @@ $params = array_merge( array(
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
 		'url_link_target'          => '', // Link target attribute e.g. '_blank'
+
+		'parent_link_before'       => '<p class="evo_post_parent">'.T_('Parent').': ',
+		'parent_link_after'        => '</p>',
+		'parent_link_not_found'    => '<i>'.T_('Item not found.').'</i>',
 
 		'before_more_link'         => '<p class="evo_post_more_link">',
 		'after_more_link'          => '</p>',
@@ -179,6 +189,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['excerpt_image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -225,6 +241,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -247,6 +269,13 @@ switch( $content_mode )
 					'url_template'  => $params['url_link_url_template'],
 					'target'        => $params['url_link_target'],
 					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
+				) );
+
+			// Parent link, if the post has one:
+			$Item->parent_link( array(
+					'before'         => $params['parent_link_before'],
+					'after'          => $params['parent_link_after'],
+					'not_found_text' => $params['parent_link_not_found'],
 				) );
 
 			// Display CONTENT (at least the TEASER part):
@@ -289,6 +318,12 @@ switch( $content_mode )
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
 						'after_gallery'       => $params['after_gallery'],
+						'gallery_table_start' => $params['gallery_table_start'],
+						'gallery_table_end'   => $params['gallery_table_end'],
+						'gallery_row_start'   => $params['gallery_row_start'],
+						'gallery_row_end'     => $params['gallery_row_end'],
+						'gallery_cell_start'  => $params['gallery_cell_start'],
+						'gallery_cell_end'    => $params['gallery_cell_end'],
 						'gallery_image_size'  => $params['gallery_image_size'],
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],

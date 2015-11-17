@@ -14,8 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $cat;
-global $posttypes_specialtypes;
+global $Item, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -29,27 +28,6 @@ $params = array_merge( array(
 		'disp_comment_form' => true,
 		'item_link_type'    => 'post',
 	), $params );
-
-if( $disp == 'single' )
-{ // Display the breadcrumb path
-	if( empty( $cat ) )
-	{ // Set a category as main of current Item
-		$cat = $Item->main_cat_ID;
-
-		// Display the breadcrumbs only when global $cat is empty before line above
-		// Otherwise it is already displayed in header file
-		skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'breadcrumb_path',
-				// Optional display params
-				'block_start'      => '<ol class="breadcrumb">',
-				'block_end'        => '</ol>',
-				'separator'        => '',
-				'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-				'item_active_mask' => '<li class="active">$title$</li>',
-			) );
-	}
-}
 ?>
 
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">

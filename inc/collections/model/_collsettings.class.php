@@ -99,7 +99,7 @@ class CollectionSettings extends AbstractSettings
 			'chapter_links'  => 'chapters',				// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
-			'chapter_content'   => 'excerpt',
+			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
 			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
 			'category_prefix'   => '',
@@ -174,6 +174,8 @@ class CollectionSettings extends AbstractSettings
 		// Other settings:
 			'image_size_user_list' => 'crop-top-48x48', // Used in disp = users
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_per_page'      => 20, // Number of results per page on disp=search
+			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',

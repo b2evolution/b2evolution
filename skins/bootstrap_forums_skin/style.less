@@ -157,11 +157,7 @@ ol.breadcrumb {
 			}
 		}
 		.ft_count {
-			font-size: 90%;
 			margin-top: 8px;
-			a {
-				font-size: 16px;
-			}
 		}
 	}
 	.ft_status {
@@ -179,7 +175,7 @@ ol.breadcrumb {
 	.ft_count {
 		margin-top: 5px;
 		font-size: 90%;
-		a {
+		a, div {
 			font-size: 16px;
 		}
 	}
@@ -339,14 +335,8 @@ ul.legend {
 
 // Post navigation
 .pager {
-	margin: 0px 0px 15px 0px;
-	padding-right: 0px;
-	.prev-left {
-		float: left;
-	}
-	.next-right {
-		float: right;
-	}	
+	margin: 0 0 15px 0;
+	padding-right: 0;
 }
 
 // Login/Register forms:
@@ -946,4 +936,10 @@ a.to_top {
 }
 .evo_comment_avatar > a:hover {
 	background-color: transparent !important;
+}
+
+// Fix styles for message that appears instead of a button to post when user must activate account:
+.comments_link__pagination .alert {
+	margin: 0;
+	text-align: left;
 }

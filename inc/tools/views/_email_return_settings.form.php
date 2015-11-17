@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the general settings.
+ * This file implements the form to edit settings for returned emails.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -24,10 +24,6 @@ global $current_User;
  */
 global $Settings;
 
-global $baseurl, $admin_url;
-
-global $repath_test_output, $action;
-
 
 $Form = new Form( NULL, 'settings_checkchanges' );
 
@@ -35,35 +31,9 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
-$Form->hidden( 'tab', 'settings' );
+$Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
-
-if( $current_User->check_perm( 'emails', 'edit' ) )
-{
-	$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'return-path-configuration' ) );
-
-		$url = '?ctrl=email&amp;tab=settings&amp;tab3=returned&amp;'.url_crumb('emailsettings').'&amp;action=';
-		$Form->info_field( T_('Perform tests'),
-					'<a href="'.$url.'test_1">['.T_('server connection').']</a>&nbsp;&nbsp;'.
-					'<a href="'.$url.'test_2">['.T_('get one returned email').']</a>&nbsp;&nbsp;'.
-					'<a href="'.$url.'test_3">['.T_('Paste an error message/returned email').']</a>' );
-
-		if( $action == 'test_3' )
-		{ // Display a textarea to fill a sample error message
-			$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), '', 50 );
-			$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Test'), 'SaveButton' ) ) );
-		}
-
-		if( !empty( $repath_test_output ) )
-		{
-			echo '<div style="margin-top:25px"></div>';
-			// Display scrollable div
-			echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$repath_test_output.'</div>';
-		}
-
-	$Form->end_fieldset();
-}
 
 $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_link('return-path-configuration') );
 
@@ -79,12 +49,12 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 	$Form->checkbox_input( 'repath_enabled', $Settings->get('repath_enabled'), T_('Enabled'),
 		array( 'note' => sprintf(T_('Note: This feature needs the php_imap extension %s.' ), $imap_extenssion_status ) ) );
 
-	$Form->select_input_array( 'repath_method', $Settings->get('repath_method'), array( 'pop3' => T_('POP3'), 'imap' => T_('IMAP'), ), // TRANS: E-Mail retrieval method
-		T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
-
 	$Form->text_input( 'repath_server_host', $Settings->get('repath_server_host'), 25, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
-	$Form->text_input( 'repath_server_port', $Settings->get('repath_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, SSL/TLS: 993).'), array( 'maxlength' => 6 ) );
+	$Form->radio( 'repath_method', $Settings->get('repath_method'), array(
+			array( 'pop3', T_('POP3'), ),// TRANS: E-Mail retrieval method
+			array( 'imap', T_('IMAP'), ),// TRANS: E-Mail retrieval method
+		), T_('Retrieval method') );
 
 	$Form->radio( 'repath_encrypt', $Settings->get('repath_encrypt'), array(
 																		array( 'none', T_('None'), ),
@@ -92,16 +62,28 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 																		array( 'tls', T_('TLS'), ),
 																	), T_('Encryption method') );
 
-	$Form->checkbox( 'repath_novalidatecert', $Settings->get( 'repath_novalidatecert' ), T_('Do not validate certificate'),
-				T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
+	$repath_novalidatecert_params = array( 'lines' => true );
+	if( $Settings->get('repath_encrypt') == 'none' )
+	{
+		$repath_novalidatecert_params['disabled'] = 'disabled';
+	}
+	$Form->radio_input( 'repath_novalidatecert', $Settings->get( 'repath_novalidatecert' ), array(
+			array( 'value' => 0, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 'value' => 1, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+		), T_('Certificate validation'), $repath_novalidatecert_params );
+
+	$Form->text_input( 'repath_server_port', $Settings->get('repath_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: IMAP4/SSL: 993, IMAP4 with or without TLS: 143, POP3/SSL: 995, POP3 with or without TLS: 110).'), array( 'maxlength' => 6 ) );
 
 	$Form->text_input( 'repath_username', $Settings->get( 'repath_username' ), 25,
-				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255 ) );
+				T_('Account Name'), T_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{
+		// Disply this fake hidden password field before real because Chrome ignores attribute autocomplete="off"
+		echo '<input type="password" name="password" value="" style="display:none" />';
+		// Real password field:
 		$Form->password_input( 'repath_password', $Settings->get( 'repath_password' ), 25,
-					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.') ) );
+					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.'), 'autocomplete' => 'off' ) );
 	}
 
 	$Form->checkbox( 'repath_ignore_read', $Settings->get( 'repath_ignore_read' ), T_('Ignore emails that have already been read'),
@@ -121,11 +103,40 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 
 $Form->end_fieldset();
 
-
-
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( 'input[name="repath_method"], input[name="repath_encrypt"]' ).click( function()
+	{	// Change default port depending on selected retrieval and encryption methods:
+		var method = jQuery( 'input[name="repath_method"]:checked' ).val();
+		var encrypt = jQuery( 'input[name="repath_encrypt"]:checked' ).val();
+
+		if( method == 'pop3' )
+		{
+			jQuery( 'input[name="repath_server_port"]' ).val( encrypt == 'ssl' ? '995' : '110' );
+		}
+		else if( method == 'imap' )
+		{
+			jQuery( 'input[name="repath_server_port"]' ).val( encrypt == 'ssl' ? '993' : '143' );
+		}
+	} );
+
+	jQuery( 'input[name="repath_encrypt"]' ).click( function()
+	{	// Enable/Disable "Certificate validation" options depending on encryption method
+		if( jQuery( this ).val() == 'none' )
+		{
+			jQuery( 'input[name="repath_novalidatecert"]' ).attr( 'disabled', 'disabled' );
+		}
+		else
+		{
+			jQuery( 'input[name="repath_novalidatecert"]' ).removeAttr( 'disabled' );
+		}
+	} )
+} );
+</script>

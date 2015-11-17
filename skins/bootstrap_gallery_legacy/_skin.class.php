@@ -70,6 +70,13 @@ class bootstrap_gallery_legacy_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image Viewing')
 				),
+					'max_image_height' => array(
+						'label' => T_('Max comment image height'),
+						'note' => 'px',
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 					'posts_thumb_size' => array(
 						'label' => T_('Thumbnail size for Albums'),
 						'note' => '',
@@ -271,6 +278,13 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		// Add custom CSS:
 		$custom_css = '';
 
+		// Limit images by max height:
+		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
+		if( $max_image_height > 0 )
+		{
+			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'."\n";
+		}
+
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
@@ -460,9 +474,11 @@ class bootstrap_gallery_legacy_Skin extends Skin
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => '<div class="center">$page_size$</div>',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before' => '<li>',
 						'page_item_after' => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',

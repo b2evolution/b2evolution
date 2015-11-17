@@ -32,6 +32,7 @@ class ItemType extends DataObject
 	var $use_parent = 'never';
 	var $use_text = 'optional';
 	var $allow_html = 1;
+	var $allow_breaks = 1;
 	var $allow_attachments = 1;
 	var $use_excerpt = 'optional';
 	var $use_title_tag = 'optional';
@@ -94,6 +95,7 @@ class ItemType extends DataObject
 			$this->use_parent = $db_row->ityp_use_parent;
 			$this->use_text = $db_row->ityp_use_text;
 			$this->allow_html = $db_row->ityp_allow_html;
+			$this->allow_breaks = $db_row->ityp_allow_breaks;
 			$this->allow_attachments = $db_row->ityp_allow_attachments;
 			$this->use_excerpt = $db_row->ityp_use_excerpt;
 			$this->use_title_tag = $db_row->ityp_use_title_tag;
@@ -199,6 +201,10 @@ class ItemType extends DataObject
 		// Allow HTML
 		param( 'ityp_allow_html', 'integer', 0 );
 		$this->set_from_Request( 'allow_html' );
+
+		// Allow Teaser and Page breaks
+		param( 'ityp_allow_breaks', 'integer', 0 );
+		$this->set_from_Request( 'allow_breaks' );
 
 		// Allow attachments
 		param( 'ityp_allow_attachments', 'integer', 0 );
@@ -559,6 +565,19 @@ class ItemType extends DataObject
 		}
 
 		return in_array( $ID, $posttypes_reserved_IDs );
+	}
+
+
+	/**
+	 * Check if this post type is used for intro posts
+	 *
+	 * @return boolean
+	 */
+	static function is_intro( $ID = NULL )
+	{
+		global $posttypes_perms;
+
+		return ( isset( $posttypes_perms['intro'] ) && in_array( $ID, $posttypes_perms['intro'] ) );
 	}
 
 

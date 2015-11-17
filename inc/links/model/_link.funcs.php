@@ -96,7 +96,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	if( $creating )
 	{ // Creating new Item
-		$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Attach existing files').'</a>';
+		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Attach existing files').'</a>';
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
 
@@ -120,7 +120,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$iframe_name = 'attach_'.generate_random_key( 16 );
 	}
 
-	$fieldset_title .= ' '.get_manual_link('post-attachments-fieldset').' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
+	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
@@ -375,7 +375,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$type = $current_File->is_image() ? 'image' : 'file';
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => T_('Insert image into the post'),
-				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \''.format_to_output( addslashes( $current_File->get( 'desc' ) ), 'htmlspecialchars' ).'\' )',
+				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );
 	}

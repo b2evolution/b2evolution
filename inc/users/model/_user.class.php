@@ -3122,7 +3122,7 @@ class User extends DataObject
 			{ // both user has permission to send or receive private message and not the same user
 				// check if current_User is allowed to create a new conversation with this user.
 				$blocked_contact = check_blocked_contacts( array( $this->ID ) );
-				if( empty( $blocked_contact ) )
+				if( empty( $blocked_contact ) && ! $current_User->must_accept_terms() )
 				{ // user is allowed to send pm to this user, and he didn't reached his new thread limit yet
 					return 'PM';
 				}
@@ -6186,6 +6186,35 @@ class User extends DataObject
 		$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 
 		return $DB->get_var( $SQL->get() );
+	}
+
+
+	/**
+	 * Check if user must accept terms & conditions
+	 *
+	 * @return boolean
+	 */
+	function must_accept_terms()
+	{
+		global $UserSettings, $Settings;
+
+		if( $UserSettings->get( 'terms_accepted', $this->ID ) )
+		{	// This user already accepted the terms:
+			return false;
+		}
+
+		// Get ID of page with terms & conditions from global settings:
+		$terms_page_ID = intval( $Settings->get( 'site_terms' ) );
+
+		$ItemCache = & get_ItemCache();
+		if( $terms_page_ID && $terms_Item = & $ItemCache->get_by_ID( $terms_page_ID, false, false ) )
+		{	// The post for terms is defined and user still must accept it:
+			return true;
+		}
+		else
+		{	// No terms for this site:
+			return false;
+		}
 	}
 }
 

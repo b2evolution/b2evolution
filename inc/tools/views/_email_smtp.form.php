@@ -73,12 +73,15 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 																	), T_('Encryption Method') );
 
 	$Form->text_input( 'smtp_server_username', $Settings->get( 'smtp_server_username' ), 25,
-				T_('SMTP Username'), T_('User name for authenticating on your SMTP server.'), array( 'maxlength' => 255 ) );
+				T_('SMTP Username'), T_('User name for authenticating on your SMTP server.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{
+		// Disply this fake hidden password field before real because Chrome ignores attribute autocomplete="off"
+		echo '<input type="password" name="password" value="" style="display:none" />';
+		// Real password field:
 		$Form->password_input( 'smtp_server_password', $Settings->get( 'smtp_server_password' ), 25,
-					T_('SMTP Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your SMTP server.') ) );
+					T_('SMTP Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your SMTP server.'), 'autocomplete' => 'off' ) );
 	}
 
 $Form->end_fieldset();

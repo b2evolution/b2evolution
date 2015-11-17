@@ -35,7 +35,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Hit, $Messages;
+		global $Hit, $Messages, $check_browser_version;
 
 		// This is included before controller specifc require_css() calls:
 		require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
@@ -63,8 +63,8 @@ class AdminUI extends AdminUI_general
 				'class_outerdiv' => 'action_messages',
 			) );
 
-		if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
-		{	// IE < 9
+		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// Display info message if browser IE < 9 version and it is allowed by config var:
 			global $debug;
 			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 			if( $debug )

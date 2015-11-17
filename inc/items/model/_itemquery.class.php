@@ -40,6 +40,7 @@ class ItemQuery extends SQL
 	var $timestamp_min;
 	var $timestamp_max;
 	var $keywords;
+	var $keyword_scope;
 	var $phrase;
 	var $exact;
 	var $featured;
@@ -375,7 +376,7 @@ class ItemQuery extends SQL
 		$tags = explode( ',', $tags );
 
 		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-											INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
 	}
 
 
@@ -789,62 +790,113 @@ class ItemQuery extends SQL
 	 * Restrict with keywords
 	 *
 	 * @param string Keyword search string
-	 * @param mixed Search for entire phrase or for individual words
-	 * @param mixed Require exact match of title or contents
+	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
+	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
+	 * @param string Scope of keyword search string: 'title', 'content'
 	 */
-	function where_keywords( $keywords, $phrase, $exact )
+	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
 		global $DB;
 
-		$this->keywords = $keywords;
+		$this->keywords = utf8_trim( $keywords );
+		$this->keyword_scope = $keyword_scope;
 		$this->phrase = $phrase;
 		$this->exact = $exact;
 
-		if( empty($keywords) )
-		{
+		if( empty( $keywords ) )
+		{ // Nothing to search, Exit here:
 			return;
 		}
 
-		$search = '';
+		$search_sql = array();
 
-		if( $exact )
-		{	// We want exact match of title or contents
-			$n = '';
-		}
-		else
-		{ // The words/sentence are/is to be included in in the title or the contents
-			$n = '%';
-		}
-
-		if( ($phrase == '1') or ($phrase == 'sentence') )
-		{ // Sentence search
-			$keywords = $DB->escape(trim($keywords));
-			$search .= '('.$this->dbprefix.'title LIKE \''. $n. $keywords. $n. '\') OR ('.$this->dbprefix.'content LIKE \''. $n. $keywords. $n.'\')';
-		}
-		else
-		{ // Word search
-			if( strtoupper( $phrase ) == 'OR' )
-				$swords = 'OR';
-			else
-				$swords = 'AND';
-
-			// puts spaces instead of commas
-			$keywords = preg_replace('/, +/', ',', $keywords);
-			$keywords = str_replace(',', ' ', $keywords);
-			$keywords = str_replace('"', ' ', $keywords);
-			$keywords = trim($keywords);
-			$keyword_array = preg_split( '/\s+/', $keywords );
-			$join = '';
-			for ( $i = 0; $i < count($keyword_array); $i++)
+		// Determine what fields should be used in search:
+		$search_fields = array();
+		$keyword_scopes = explode( ',', $keyword_scope );
+		foreach( $keyword_scopes as $keyword_scope )
+		{
+			switch( $keyword_scope )
 			{
-				$search .= ' '. $join. ' ( ('.$this->dbprefix.'title LIKE \''. $n. $DB->escape($keyword_array[$i]). $n. '\')
-																OR ('.$this->dbprefix.'content LIKE \''. $n. $DB->escape($keyword_array[$i]). $n.'\') ) ';
-				$join = $swords;
+				case 'title':
+					$search_fields[] = $this->dbprefix.'title';
+					break;
+
+				case 'content':
+					$search_fields[] = $this->dbprefix.'content';
+					break;
+
+				case 'tags':
+					$this->FROM_add( 'LEFT JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+					$this->FROM_add( 'LEFT JOIN T_items__tag ON itag_tag_ID = tag_ID' );
+					$this->GROUP_BY( 'post_ID' );
+					// Tags are always an EXACT match:
+					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				// TODO: add more.
 			}
 		}
 
-		//echo $search;
-		$this->WHERE_and( $search );
+		if( empty( $search_fields ) && empty( $search_sql ) )
+		{	// No correct fields to search, Exit here:
+			return;
+		}
+
+		// Set sql operator depending on parameter:
+		if( in_array( strtolower( $phrase ), array( 'or', '1', 'sentence' ) ) )
+		{
+			$operator_sql = 'OR';
+		}
+		else
+		{
+			$operator_sql =  'AND';
+		}
+
+		if( ! empty( $search_fields ) )
+		{	// Do search if at least one field is requested:
+
+			if( $exact )
+			{	// We want exact match of each search field:
+				$mask = '';
+			}
+			else
+			{	// The words/sentence are/is to be included in the each search field:
+				$mask = '%';
+			}
+
+			if( $phrase == '1' || $phrase == 'sentence' )
+			{	// Sentence search:
+				foreach( $search_fields as $search_field )
+				{
+					$search_sql[] = $search_field.' LIKE '.$DB->quote( $mask.$keywords.$mask );
+				}
+			}
+			else
+			{	// Word search:
+
+				// Put spaces instead of commas:
+				$keywords = preg_replace( '/, +/', ',', $keywords );
+				$keywords = utf8_trim( str_replace( array( ',', '"' ), ' ', $keywords ) );
+
+				// Split by each word:
+				$keywords = preg_split( '/\s+/', $keywords );
+
+				foreach( $keywords as $keyword )
+				{
+					$search_field_sql = array();
+					foreach( $search_fields as $search_field )
+					{
+						$search_field_sql[] = $search_field.' LIKE '.$DB->quote( $mask.$keyword.$mask );
+					}
+					$search_sql[] = '( '.implode( ' OR ', $search_field_sql ).' )';
+				}
+			}
+		}
+
+		// Concat the searches:
+		$search_sql = '( '.implode( ' '.$operator_sql.' ', $search_sql ).' )';
+
+		$this->WHERE_and( $search_sql );
 	}
 
 

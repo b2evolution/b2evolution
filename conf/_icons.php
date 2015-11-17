@@ -833,26 +833,6 @@ function get_icon_info( $name )
 			'fa' => 'arrow-up',
 			'color' => '#303030'
 		);
-		case 'arrow_left_white': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 256 )
-		);
-		case 'arrow_right_white': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 256 )
-		);
-		case 'arrow_left_grey': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 224 )
-		);
-		case 'arrow_right_grey': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 224 )
-		);
 
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
@@ -1082,6 +1062,7 @@ function get_icon_info( $name )
 			'fa' => 'envelope-square'
 		);
 
+		// Width switcher tool:
 		case 'width_increase': return array(
 			'alt'  => T_('Increase width'),
 			'size' => array( 32, 32 ),

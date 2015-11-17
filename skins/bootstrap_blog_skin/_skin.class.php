@@ -82,6 +82,13 @@ class bootstrap_blog_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'note' => 'px',
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -213,6 +220,13 @@ class bootstrap_blog_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
+
+		// Limit images by max height:
+		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
+		if( $max_image_height > 0 )
+		{
+			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+		}
 	}
 
 
@@ -299,9 +313,11 @@ class bootstrap_blog_Skin extends Skin
 					                  /* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
 					'footer_text_single' => '<div class="center">$page_size$</div>',
 					'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before' => '<li>',
 						'page_item_after' => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text' => T_('Previous'),
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',

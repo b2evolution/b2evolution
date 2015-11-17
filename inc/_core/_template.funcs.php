@@ -396,6 +396,9 @@ function get_request_title( $params = array() )
 			'title_page_disp'     => true,
 			'title_page_before'   => '#',
 			'title_page_after'    => '#',
+			'title_terms_disp'    => true,
+			'title_terms_before'  => '#',
+			'title_terms_after'   => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
 			'arcdir_text'         => T_('Archive Directory'),
@@ -434,6 +437,7 @@ function get_request_title( $params = array() )
 			'download_body_text'  => '',
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
+			'tags_text'           => T_('Tags'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -595,6 +599,7 @@ function get_request_title( $params = array() )
 
 		case 'single':
 		case 'page':
+		case 'terms':
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
@@ -745,6 +750,11 @@ function get_request_title( $params = array() )
 		case 'usercomments':
 			// We are requesting the user comments list:
 			$r[] = $params['usercomments_text'];
+			break;
+
+		case 'tags':
+			// We are requesting the tags directory:
+			$r[] = $params['tags_text'];
 			break;
 
 		case 'posts':
@@ -1159,12 +1169,22 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
-				// Colorbox params to display a voting panel
-				$colorbox_voting_params = '{displayVoting: true,
+				// Colorbox params to translate the strings:
+				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
+					previous: "'.TS_('Previous').'",
+					next: "'.TS_('Next').'",
+					close: "'.TS_('Close').'",
+					openNewWindowText: "'.TS_('Open in a new window').'",
+					slideshowStart: "'.TS_('Start slideshow').'",
+					slideshowStop: "'.TS_('Stop slideshow').'",';
+				// Colorbox params to display a voting panel:
+				$colorbox_voting_params = '{'.$colorbox_strings_params.'
+					displayVoting: true,
 					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
 					minWidth: 305}';
-				// Colorbox params without voting panel
-				$colorbox_no_voting_params = '{minWidth: 255}';
+				// Colorbox params without voting panel:
+				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
+					minWidth: 255}';
 
 				// Initialize js variables b2evo_colorbox_params* that are used in async loaded colorbox file
 				if( is_logged_in() )

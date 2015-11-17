@@ -2973,6 +2973,10 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
+.evo_post_gallery__image {
+  display: inline-block;
+  margin: 0 1ex 1ex 0;
+}
 
 /**
  * item_base.css 

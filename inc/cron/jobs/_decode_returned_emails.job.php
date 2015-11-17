@@ -22,9 +22,9 @@
  *	[comments on | off]
  *	[status publish | pending | draft | private]
  *	[slug some-url-name]
- *	[end] – everything after this shortcode is ignored (i.e. signatures)
- *	[more] – more tag
- *	[nextpage] – pagination
+ *	[end] - everything after this shortcode is ignored (i.e. signatures)
+ *	[more] - more tag
+ *	[nextpage] - pagination
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -57,15 +57,15 @@ if( isset($GLOBALS['files_Module']) )
 	load_funcs( 'files/model/_file.funcs.php');
 }
 
-if( ! $mbox = dre_connect() )
+if( ! $mbox = dre_connect( true ) )
 {	// We couldn't connect to the mail server
 	return 2; // error
 }
 
 // Read messages from server
-dre_msg('Reading messages from server');
+dre_msg( T_('Reading messages from server'), true );
 $imap_obj = imap_check( $mbox );
-dre_msg('Found '.$imap_obj->Nmsgs.' messages');
+dre_msg( sprintf( T_('Found %d messages'), intval( $imap_obj->Nmsgs ) ), true );
 
 if( $imap_obj->Nmsgs == 0 )
 {
@@ -75,12 +75,12 @@ if( $imap_obj->Nmsgs == 0 )
 }
 
 // Create posts
-dre_process_messages( $mbox, $imap_obj->Nmsgs );
+dre_process_messages( $mbox, $imap_obj->Nmsgs, true );
 
-if( count($del_cntr) > 0 )
+if( count( $del_cntr ) > 0 )
 {	// We want to delete processed emails from server
 	imap_expunge( $mbox );
-	dre_msg( sprintf('Deleted %d processed message(s) from inbox.', $del_cntr) );
+	dre_msg( sprintf( T_('Deleted %d processed message(s) from inbox.'), $del_cntr ), true );
 }
 
 imap_close( $mbox );

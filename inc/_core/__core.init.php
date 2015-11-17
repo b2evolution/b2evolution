@@ -496,8 +496,6 @@ class _core_Module extends Module
 		$this->check_required_php_version( '_core' );
 
 		load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
-		load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
-		load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
 		load_funcs( 'users/model/_user.funcs.php' );
 		load_funcs( '_core/_template.funcs.php' );
 		load_funcs( '_core/ui/forms/_form.funcs.php');
@@ -1075,8 +1073,30 @@ class _core_Module extends Module
 					$blog_param = '&amp;blog='.$Blog->ID;
 
 					$entries['blog']['entries']['features'] = array(
-							'text' => T_('Features').'&hellip;',
+							'text' => T_('Features'),
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
+							'entries' => array(
+									'front' => array(
+											'text' => T_('Front page').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=home'.$blog_param,
+										),
+									'posts' => array(
+											'text' => T_('Posts').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+										),
+									'comments' => array(
+											'text' => T_('Comments').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments'.$blog_param,
+										),
+									'other' => array(
+											'text' => T_('Other displays').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
+										),
+									'more' => array(
+											'text' => T_('More').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more'.$blog_param,
+										),
+								)
 						);
 					$entries['blog']['entries']['skin'] = array(
 							'text' => T_('Skin').'&hellip;',
@@ -1638,7 +1658,15 @@ class _core_Module extends Module
 							'href' => '?ctrl=email&amp;tab=sent' ),
 						'return' => array(
 							'text' => T_('Returned'),
-							'href' => '?ctrl=email&amp;tab=return' ),
+							'href' => '?ctrl=email&amp;tab=return',
+							'entries' => array(
+								'log' => array(
+									'text' => T_('Log'),
+									'href' => '?ctrl=email&amp;tab=return&amp;tab3=log' ),
+								'settings' => array(
+									'text' => T_('Settings'),
+									'href' => '?ctrl=email&amp;tab=return&amp;tab3=settings' ),
+							) ),
 						'settings' => array(
 							'text' => T_('Settings'),
 							'href' => '?ctrl=email&amp;tab=settings',
@@ -1646,13 +1674,19 @@ class _core_Module extends Module
 								'notifications' => array(
 									'text' => T_('Notifications'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
-								'returned' => array(
-									'text' => T_('Returned emails'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=returned' ),
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
 						) ) ) ) ) );
+
+			if( $current_User->check_perm( 'emails', 'edit' ) )
+			{	// Allow to test a returned email only if user has a permission to edit email settings:
+				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
+						'test' => array(
+							'text' => T_('Test'),
+							'href' => '?ctrl=email&amp;tab=return&amp;tab3=test' ,
+					) ) );
+			}
 		}
 
 		/**** System ****/

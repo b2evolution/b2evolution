@@ -101,7 +101,14 @@ class coll_search_form_Widget extends ComponentWidget
 					'size' => 5,
 					'defaultvalue' => '',
 				),
-			), parent::get_param_definitions( $params )	);
+			), parent::get_param_definitions( $params ) );
+
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget uses the selected items:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
 
 		return $r;
 	}

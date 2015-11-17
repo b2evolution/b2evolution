@@ -914,8 +914,18 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 					if( $existing_default != $want_default ) // DEFAULT is case-sensitive
 					{ // Add a query to change the column's default value
+						$item_queries = array();
+						if( $existing_default == 'CURRENT_TIMESTAMP' )
+						{	// MySQL command "SET DEFAULT" does NOT upgrade a column with default value CURRENT_TIMESTAMP by some reason,
+							// So we must use the command "MODIFY" to update a column completely:
+							$item_queries[] = 'ALTER TABLE '.$table.' MODIFY '.$column_definition;
+						}
+						else
+						{	// Use "SET DEFAULT" for all other normal column types:
+							$item_queries[] = 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set;
+						}
 						$items[$table_lowered][] = array(
-							'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set),
+							'queries' => $item_queries,
 							'note' => "Changed default value of {$table}.<strong>{$tablefield->Field}</strong> from $existing_default to $want_default_set",
 							'type' => 'change_default' );
 					}

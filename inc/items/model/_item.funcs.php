@@ -36,7 +36,7 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' )
+			if( $disp == 'page' || $disp == 'terms' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
 						'types' => '1000',		// pages
@@ -1013,7 +1013,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	if( $show_title_links )
 	{ // Use in Back-office
-		$fieldset_title = $params['categories_name'].get_manual_link( 'item_categories_fieldset' )
+		$fieldset_title = $params['categories_name'].get_manual_link( 'post-categories-panel' )
 			.action_icon( T_('Categories'), 'edit', $admin_url.'?ctrl=chapters&amp;blog='.$blog, T_('Categories'), 3, 4, array( 'class' => 'action_icon pull-right' ) );
 	}
 	else
@@ -2143,7 +2143,7 @@ function check_categories( & $post_category, & $post_extracats )
 	global $Messages, $Blog, $blog;
 
 	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
-	$GenericCategoryCache = & get_ChapterCache();
+	$ChapterCache = & get_ChapterCache();
 
 	if( $post_category == -1 )
 	{ // no main cat select
@@ -2177,10 +2177,10 @@ function check_categories( & $post_category, & $post_extracats )
 		}
 		if( $post_category )
 		{ // If main cat is not a new category, and has been autoselected
-			$GenericCategory = & $GenericCategoryCache->get_by_ID( $post_category );
-			$post_category_Blog = $GenericCategory->get_Blog();
+			$Chapter = & $ChapterCache->get_by_ID( $post_category );
+			$post_category_Blog = $Chapter->get_Blog();
 			$Messages->add( sprintf( T_('The main category for this post has been automatically set to "%s" (Blog "%s")'),
-				$GenericCategory->get_name(), $post_category_Blog->get( 'name') ), 'warning' );
+				$Chapter->get_name(), $post_category_Blog->get( 'name') ), 'warning' );
 		}
 	}
 
@@ -2207,14 +2207,14 @@ function check_categories( & $post_category, & $post_extracats )
 			return true;
 		}
 
-		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
-		$new_GenericCategory->set( 'name', $category_name );
-		if( $new_GenericCategory->dbinsert() !== false )
+		$new_Chapter = & $ChapterCache->new_obj( NULL, $blog );	// create new category object
+		$new_Chapter->set( 'name', $category_name );
+		if( $new_Chapter->dbinsert() !== false )
 		{
 			$Messages->add( T_('New category created.'), 'success' );
 			if( ! $post_category ) // if new category is main category
 			{
-				$post_category = $new_GenericCategory->ID;	// set the new ID
+				$post_category = $new_Chapter->ID;	// set the new ID
 			}
 
 			if( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' )
@@ -2227,10 +2227,10 @@ function check_categories( & $post_category, & $post_extracats )
 				{
 					unset($post_extracats[0]);
 				}
-				$post_extracats[] = $new_GenericCategory->ID;
+				$post_extracats[] = $new_Chapter->ID;
 			}
 
-			$GenericCategoryCache->add($new_GenericCategory);
+			$ChapterCache->add( $new_Chapter );
 		}
 		else
 		{
@@ -2247,8 +2247,8 @@ function check_categories( & $post_category, & $post_extracats )
 		{
 			if( get_catblog( $cat ) != $post_category_blog )
 			{ // this cat is not from main category blog, it has to be ingnored
-				$GenericCategory = & $GenericCategoryCache->get_by_ID( $cat );
-				$ignored_cats = $ignored_cats.$GenericCategory->get_name().', ';
+				$Chapter = & $ChapterCache->get_by_ID( $cat );
+				$ignored_cats = $ignored_cats.$Chapter->get_name().', ';
 				unset( $post_extracats[$key] );
 			}
 		}

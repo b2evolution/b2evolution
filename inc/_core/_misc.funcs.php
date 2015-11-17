@@ -2696,6 +2696,11 @@ function bad_request_die( $additional_info = '' )
 		header_http_response('400 Bad Request');
 	}
 
+	if( ! function_exists( 'T_' ) )
+	{	// Load locale funcs to initialize function "T_" because it is used below:
+		load_funcs( 'locales/_locale.funcs.php' );
+	}
+
 	echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 	echo '<h3 style="color:#f00;">'.T_('Bad Request!').'</h3>';
 	echo '<p>'.T_('The parameters of your request are invalid.').'</p>';
@@ -6557,12 +6562,15 @@ function is_ajax_content( $template_name = '' )
  */
 function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL )
 {
+	global $servertimenow;
+
 	$Syslog = new Syslog();
 	$Syslog->set_user();
 	$Syslog->set( 'type', $log_type );
 	$Syslog->set_origin( $origin_type, $origin_ID );
 	$Syslog->set_object( $object_type, $object_ID );
 	$Syslog->set_message( $message );
+	$Syslog->set( 'timestamp', date2mysql( $servertimenow ) );
 	$Syslog->dbinsert();
 }
 

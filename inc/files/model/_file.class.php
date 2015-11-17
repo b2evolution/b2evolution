@@ -1211,10 +1211,17 @@ class File extends DataObject
 		$params = array_merge( array(
 				'before_gallery'        => '<div class="bGallery">',
 				'after_gallery'         => '</div>',
+				'gallery_table_start'   => '',//'<table cellpadding="0" cellspacing="3" border="0" class="image_index">',
+				'gallery_table_end'     => '',//'</table>',
+				'gallery_row_start'     => '',//"\n<tr>",
+				'gallery_row_end'       => '',//"\n</tr>",
+				'gallery_cell_start'    => '<div class="evo_post_gallery__image">',//"\n\t".'<td valign="top"><div class="bGallery-thumbnail">',
+				'gallery_cell_end'      => '</div>',//'</div></td>',
 				'gallery_image_size'    => 'crop-80x80',
 				'gallery_image_limit'   => 1000,
 				'gallery_colls'         => 5,
-				'gallery_order'			=> '', // 'ASC', 'DESC', 'RAND'
+				'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
+				'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
 			), $params );
 
 		if( ! $this->is_dir() )
@@ -1227,32 +1234,32 @@ class File extends DataObject
 		}
 
 		$r = $params['before_gallery'];
-		$r .= '<table cellpadding="0" cellspacing="3" border="0" class="image_index">';
+		$r .= $params['gallery_table_start'];
 
 		$count = 0;
 		foreach( $FileList as $l_File )
 		{
 			// We're linking to the original image, let lighbox (or clone) quick in:
 			$link_title = '#title#'; // This title will be used by lightbox (colorbox for instance)
-			$link_rel = 'lightbox[g'.$this->ID.']'; // Make one "gallery" per directory.
+			if( $params['gallery_link_rel'] == '#' )
+			{	// Make one "gallery" per directory:
+				$params['gallery_link_rel'] = 'lightbox[g'.$this->ID.']';
+			}
 
-			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], 'original', $link_title, $link_rel );
+			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], 'original', $link_title, $params['gallery_link_rel'] );
 
-			if( $count % $params['gallery_colls'] == 0 ) $r .= "\n<tr>";
+			if( $count % $params['gallery_colls'] == 0 ) $r .= $params['gallery_row_start'];
 			$count++;
-			$r .= "\n\t".'<td valign="top">';
-			// ======================================
-			// Individual table cell
 
-			$r .= '<div class="bGallery-thumbnail">'.$img_tag.'</div>';
+			$r .= $params['gallery_cell_start'];
+			$r .= $img_tag;
+			$r .= $params['gallery_cell_end'];
 
-			// ======================================
-			$r .= '</td>';
-			if( $count % $params['gallery_colls'] == 0 ) $r .= "\n</tr>";
+			if( $count % $params['gallery_colls'] == 0 ) $r .= $params['gallery_row_end'];
 		}
-		if( $count && ( $count % $params['gallery_colls'] != 0 ) ) $r .= "\n</tr>";
+		if( $count && ( $count % $params['gallery_colls'] != 0 ) ) $r .= $params['gallery_row_end'];
 
-		$r .= '</table>';
+		$r .= $params['gallery_table_end'];
 		$r .= $params['after_gallery'];
 
 		return $r;

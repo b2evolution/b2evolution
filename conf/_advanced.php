@@ -930,6 +930,13 @@ $outgoing_proxy_username = '';
 $outgoing_proxy_password = '';
 
 
+/**
+ * Check for old browsers like IE and display info message.
+ * Set to false if you don't want this check and never inform users if they use an old browser.
+ */
+$check_browser_version = true;
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;

@@ -141,11 +141,7 @@ ol.breadcrumb {
   background-color: transparent !important;
 }
 .forums_list .posts_panel .ft_count {
-  font-size: 90%;
   margin-top: 8px;
-}
-.forums_list .posts_panel .ft_count a {
-  font-size: 16px;
 }
 .forums_list .ft_status {
   width: 30px;
@@ -163,7 +159,8 @@ ol.breadcrumb {
   margin-top: 5px;
   font-size: 90%;
 }
-.forums_list .ft_count a {
+.forums_list .ft_count a,
+.forums_list .ft_count div {
   font-size: 16px;
 }
 .forums_list .ft_date {
@@ -310,14 +307,8 @@ ul.legend span.note {
   float: none;
 }
 .pager {
-  margin: 0px 0px 15px 0px;
-  padding-right: 0px;
-}
-.pager .prev-left {
-  float: left;
-}
-.pager .next-right {
-  float: right;
+  margin: 0 0 15px 0;
+  padding-right: 0;
 }
 .skin-form .panel-body .panel {
   border: none;
@@ -868,4 +859,8 @@ a.to_top {
 }
 .evo_comment_avatar > a:hover {
   background-color: transparent !important;
+}
+.comments_link__pagination .alert {
+  margin: 0;
+  text-align: left;
 }

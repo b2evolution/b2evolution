@@ -81,6 +81,7 @@ class ItemTag extends DataObject
 	{
 		// Name
 		$tag_name = param( 'tag_name', 'string', true );
+		param_check_regexp( 'tag_name', '/^[^,]+$/', T_('Tags cannot contain commas.') );
 		$this->set( 'name', $tag_name );
 		if( $existing_tag_ID = $this->dbexists( 'tag_name', $tag_name ) )
 		{ // Other tag already exists with the same name:

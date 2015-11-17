@@ -2534,6 +2534,12 @@ function check_allow_new_email( $limit_setting, $last_email_setting, $user_ID )
 {
 	global $UserSettings, $servertimenow;
 
+	if( empty( $UserSettings ) )
+	{	// Initialize $UserSettings object (for example, it must be done when cron_exec.php is called in CLI mode):
+		load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+		$UserSettings = new UserSettings();
+	}
+
 	$limit = $UserSettings->get( $limit_setting, $user_ID );
 	if( $limit == 0 )
 	{ // user doesn't allow this kind of emails at all

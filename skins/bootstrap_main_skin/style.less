@@ -54,31 +54,117 @@ div.front_main_area {
 		margin: 30px 0;
 	}
 
-	// Universal item list:
-	div.widget_core_coll_item_list {
-		// We want to display the first image cleanly before the title
-		// This may need further tweaking...
-		ul {
-			padding: 0;
-			margin-left: 0;
+	// Universal item widget and Recent Posts widget specific styles:
+	div.widget_core_coll_item_list, div.widget_core_coll_post_list {
+		// If "Display first picture" and "Special treatment"
+		&.evo_1pic__special {
+			ul {
+				padding: 0;
+				margin-left: 0;
+				li {
+					list-style: none;
+					height: auto;
+					display: table;
+					clear: both;
+					margin: 5px 0;
+					padding: 0;
+					vertical-align: middle;
+					// Placeholder for item list when "Display first picture" but no picture to show
+					.item_first_image_placeholder {
+						display: table;
+						text-align: center;
+						vertical-align: middle;
+						float: left;
+						height: 80px;
+						width: 80px;
+						background: #f5f5f5;
+						margin-right: 6px;
+						-webkit-border-radius: 3px;
+						-moz-border-radius: 3px;
+						-ms-border-radius: 3px;
+						-o-border-radius: 3px;
+						border-radius: 3px;
+						&:before {
+							font-family: FontAwesome;
+							display: table-cell;
+							vertical-align: middle;
+							content: '\f0f6';
+							color: #ddd;
+							font-size: 40px;
+						}
+					}
+					div.item_title {
+						vertical-align: middle;
+						display: table-cell;
+						height: 100%;
+					}
+				}
+			}	
 		}
-		li {
-			clear: both;
-			list-style: none;
-			height: 80px;
-			margin: 5px 0;
-			padding: 0;
+		// If "Display all pictures" and "No special treatment"
+		&.evo_pics {
+			.item_images {			
+				clear: both;
+				img {
+					margin-right: 6px;
+					margin-top: 6px;
+				}
+			}
+		}
+		// If "Display all pictures" and "Special treatment" 
+		// THIS NEEDS EDITING!!!!
+		&.evo_pics.evo_1pic__special {
+			.item_images {
+			}
+		}
+		// With excerpt
+		&.evo_withexcerpt, &.evo_withteaser {
+			// Special treatment - remove bullets
+			&.evo_1pic__special ul li {
+				list-style: none;	
+				display: table;				
+			}
+			ul li {
+				height: auto;
+				width: 100%;
+				display: list-item;
+				clear: both;
+				margin: 15px 0;
+				padding: 0;
+				vertical-align: middle;
+				div.item_title {
+					vertical-align: middle;
+					display: block !important;
+					height: auto !important;
+					width: 100%;
+					margin-bottom: 6px;
+				}
+			}
 		}
 		div.item_first_image {
 			float: left; 
 			margin-right: 6px;
 		}
-		div.item_title {
-			vertical-align: middle;
-			line-height: 80px;
-		}
 		img {
 			border-radius: 3px;
+		}
+		// If grouped, bigger group title
+		&.evo_withgroup > ul > li {
+			font-size: 17px;
+		}
+	}
+	
+	
+	div.widget_core_coll_item_list {
+		// We want to display the first image cleanly before the title
+		// This may need further tweaking...
+		ul {
+			//padding: 0;
+			//margin-left: 0;
+		}
+		li {
+			// list-style: none;
+			// height: 80px;
 		}
 	}
 }
@@ -478,6 +564,14 @@ body.pictured .front_main_content .ufld_icon_links a {
 	}
 	p.user_field {
 		margin-bottom: 40px;
+		line-height: 1.5;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		// These default properties can be changed by param "Lines of extra info" of the widget "Organization Members":
+		-webkit-line-clamp: 2;
+		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
 	}
 }
 body.pictured .secondary_area .widget_core_org_members {

@@ -154,7 +154,7 @@ $schema_queries = array(
 			urep_reporter_ID    int(11) unsigned NOT NULL,
 			urep_status         enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci,
 			urep_info           varchar(240),
-			urep_datetime		datetime NOT NULL,
+			urep_datetime       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -423,7 +423,7 @@ $schema_queries = array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
 			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_timestamp TIMESTAMP NOT NULL,
+			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			emlog_result    ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
@@ -439,7 +439,7 @@ $schema_queries = array(
 			emret_ID        INT(10) UNSIGNED NOT NULL auto_increment,
 			emret_address   VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			emret_errormsg  VARCHAR(255) DEFAULT NULL,
-			emret_timestamp TIMESTAMP NOT NULL,
+			emret_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emret_headers   TEXT DEFAULT NULL,
 			emret_message   TEXT DEFAULT NULL,
 			emret_errtype   CHAR(1) COLLATE ascii_general_ci NOT NULL DEFAULT 'U',
@@ -490,7 +490,7 @@ $schema_queries = array(
 		'Creating system log table',
 		"CREATE TABLE T_syslog (
 			slg_ID        INT NOT NULL AUTO_INCREMENT,
-			slg_timestamp TIMESTAMP NOT NULL,
+			slg_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			slg_user_ID   INT UNSIGNED NULL,
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,

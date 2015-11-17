@@ -290,20 +290,20 @@ switch( $action )
 						// Check permissions:
 						$current_User->check_perm( 'blog_cats', '', true, $blog );
 
-						$GenericCategoryCache = & get_ChapterCache();
-						$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
-						$new_GenericCategory->set( 'name', $new_categories[ $fileNum ] );
-						if( $new_GenericCategory->dbinsert() !== false )
+						$ChapterCache = & get_ChapterCache();
+						$new_Chapter = & $ChapterCache->new_obj( NULL, $blog );	// create new category object
+						$new_Chapter->set( 'name', $new_categories[ $fileNum ] );
+						if( $new_Chapter->dbinsert() !== false )
 						{ // Category is created successfully
 							$Messages->add( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success' );
-							$GenericCategoryCache->clear();
+							$ChapterCache->clear();
 						}
 						else
 						{ // Error on creating new category
 							$Messages->add( sprintf( T_('New category %s creation failed.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'error' );
 							continue; // Skip this post
 						}
-						$cat_Array[ $fileNum ] = $new_GenericCategory->ID;
+						$cat_Array[ $fileNum ] = $new_Chapter->ID;
 						break;
 				}
 				$edited_Item->set( 'main_cat_ID', intval( $cat_Array[ $fileNum ] ) );
@@ -952,9 +952,6 @@ switch( $action )
 
 		// Check if new category was started to create.  If yes check if it is valid.
 		$isset_category = check_categories( $post_category, $post_extracats );
-
-		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );

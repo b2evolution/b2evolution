@@ -69,11 +69,11 @@ skin_widget( array(
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 					'block_start'     => '<ul class="pager col-lg-12 post_nav">',
-					'prev_start'      => '<li class="prev-left">',
+					'prev_start'      => '<li class="previous">',
 					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
 					'prev_end'        => '</li>',
 					'separator'       => ' ',
-					'next_start'      => '<li class="next-right">',
+					'next_start'      => '<li class="next">',
 					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
 					'next_end'        => '</li>',
 					'block_end'       => '</ul>',
@@ -219,7 +219,7 @@ skin_widget( array(
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array ( 
+		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
 			'disp_section_title'    => false,
 			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
@@ -232,7 +232,7 @@ skin_widget( array(
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
-		) );
+		) ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 

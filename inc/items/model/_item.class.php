@@ -1026,7 +1026,12 @@ class Item extends ItemLight
 	 */
 	function can_see_comments( $display = false )
 	{
-		global $Settings;
+		global $Settings, $disp;
+
+		if( $disp == 'terms' )
+		{	// Don't display the comments on page with terms & conditions:
+			return false;
+		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
 		{ // Comments are not allowed on this post by post type
@@ -1156,7 +1161,12 @@ class Item extends ItemLight
 	 */
 	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array() )
 	{
-		global $current_User;
+		global $current_User, $disp;
+
+		if( $disp == 'terms' )
+		{	// Don't allow comment a page with terms & conditions:
+			return false;
+		}
 
 		$display = ( ! is_null($before_error) );
 
@@ -1466,6 +1476,11 @@ class Item extends ItemLight
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
 
+			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
+			{	// Don't use the content separators for intro items and if it is disabled by item type:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
+
 			return $r;
 		}
 
@@ -1568,6 +1583,11 @@ class Item extends ItemLight
 
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
 			$r = $this->check_and_clear_inline_files( $r );
+
+			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
+			{	// Don't use the content separators for intro items and if it is disabled by item type:
+				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+			}
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 
@@ -2696,6 +2716,7 @@ class Item extends ItemLight
 				'gallery_image_limit'        => 1000,
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
+				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
@@ -4793,6 +4814,51 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template function: Display link to parent of this item.
+	 *
+	 * @param array
+	 */
+	function parent_link( $params = array() )
+	{
+		if( empty( $this->parent_ID ) )
+		{	// No parent
+			return;
+		}
+
+		if( $this->get_type_setting( 'use_parent' ) == 'never' )
+		{	// This item cannot has a parent item, because of item type settings
+			return;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'         => '',
+				'after'          => '',
+				'not_found_text' => '',
+				'format'         => 'htmlbody',
+			), $params );
+
+		// Get parent Item:
+		$parent_Item = $this->get_parent_Item();
+
+		$r = $params['before'];
+
+		if( ! empty( $parent_Item ) )
+		{	// Display a parent post title as link to permanent url
+			$r .= $parent_Item->get_title();
+		}
+		else
+		{	// No parent post found, Display a text to inform about this:
+			$r .= $params['not_found_text'];
+		}
+
+		$r .= $params['after'];
+
+		echo format_to_output( $r, $params['format'] );
+	}
+
+
+	/**
 	 * Template function: Display the number of words in the post
 	 */
 	function wordcount()
@@ -5787,7 +5853,8 @@ class Item extends ItemLight
 		}
 		else
 		{	// We want asynchronous post processing. This applies to posts with date in future too.
-			$Messages->add( T_('Scheduling asynchronous notifications...'), 'note' );
+			$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
+					'href="http://b2evolution.net/man/after-each-post-settings"' ), 'warning' );
 
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );

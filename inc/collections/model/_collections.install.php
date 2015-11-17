@@ -240,7 +240,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			itpr_content_prerendered      MEDIUMTEXT NULL,
-			itpr_datemodified             TIMESTAMP NOT NULL,
+			itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -251,7 +251,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			cmpr_content_prerendered      MEDIUMTEXT NULL,
-			cmpr_datemodified             TIMESTAMP NOT NULL,
+			cmpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -261,7 +261,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_ID            INT UNSIGNED NOT NULL,
 			iver_itm_ID        INT UNSIGNED NOT NULL,
 			iver_edit_user_ID  INT UNSIGNED NULL,
-			iver_edit_datetime DATETIME NOT NULL,
+			iver_edit_datetime DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
@@ -289,6 +289,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_use_parent        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_text          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_allow_html        TINYINT DEFAULT 1,
+			ityp_allow_breaks      TINYINT DEFAULT 1,
 			ityp_allow_attachments TINYINT DEFAULT 1,
 			ityp_use_excerpt       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_use_title_tag     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',

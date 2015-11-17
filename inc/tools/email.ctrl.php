@@ -100,7 +100,7 @@ switch( $action )
 				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
 				break;
 
-			case 'returned':
+			case 'settings':
 				// Settings to decode the returned emails:
 				param( 'repath_enabled', 'boolean', 0 );
 				$Settings->set( 'repath_enabled', $repath_enabled );
@@ -223,7 +223,7 @@ switch( $action )
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=email&tab=settings&tab3='.$tab3, 303 ); // Will EXIT
+					header_redirect( '?ctrl=email&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 			}
@@ -403,17 +403,47 @@ switch( $tab )
 			init_datepicker_js();
 		}
 
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'email-returned' );
+		if( empty( $tab3 ) )
+		{	// Set default tab3 for first tab:
+			$tab3 = 'log';
+		}
+
+		switch( $tab3 )
+		{
+			case 'log':
+				$AdminUI->breadcrumbpath_add( T_('Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-returned' );
+				break;
+
+			case 'settings':
+				$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'return-path-configuration' );
+				break;
+
+			case 'test':
+				// Check permission:
+				$current_User->check_perm( 'emails', 'edit', true );
+
+				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'return-path-configuration' );
+				break;
+		}
 		break;
 
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab='.$tab );
 
-		if( empty($tab3) )
+		if( empty( $tab3 ) )
 		{
 			$tab3 = 'notifications';
 		}
+
 		switch( $tab3 )
 		{
 			case 'notifications':
@@ -421,13 +451,6 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-notification-settings' );
-				break;
-
-			case 'returned':
-				$AdminUI->breadcrumbpath_add( T_('Returned emails'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'return-path-configuration' );
 				break;
 
 			case 'smtp':
@@ -485,30 +508,44 @@ switch( $tab )
 
 	case 'return':
 		load_funcs('cron/model/_decode_returned_emails.funcs.php');
-		$emret_ID = param( 'emret_ID', 'integer', 0 );
-		if( $emret_ID > 0 )
-		{	// Display a details of selected email
-			$MailReturn = $DB->get_row( '
-				SELECT *
-				  FROM T_email__returns
-				 WHERE emret_ID = '.$DB->quote( $emret_ID ) );
-			if( $MailReturn )
-			{	// The returned email exists with selected ID
-				$AdminUI->disp_view( 'tools/views/_email_return_details.view.php' );
+
+		switch( $tab3 )
+		{
+			case 'settings':
+				// Display a settings of the returned emails:
+				$AdminUI->disp_view( 'tools/views/_email_return_settings.form.php' );
 				break;
-			}
+
+			case 'test':
+				// Display a form to test a returned email:
+				$AdminUI->disp_view( 'tools/views/_email_return_test.form.php' );
+				break;
+
+			case 'log':
+			default:
+				// Display a list of the returnted emails:
+				$emret_ID = param( 'emret_ID', 'integer', 0 );
+				if( $emret_ID > 0 )
+				{	// Display a details of selected email
+					$MailReturn = $DB->get_row( '
+						SELECT *
+							FROM T_email__returns
+						 WHERE emret_ID = '.$DB->quote( $emret_ID ) );
+					if( $MailReturn )
+					{	// The returned email exists with selected ID
+						$AdminUI->disp_view( 'tools/views/_email_return_details.view.php' );
+						break;
+					}
+				}
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_return.view.php' );
+				break;
 		}
-		// Display a list of email logs:
-		$AdminUI->disp_view( 'tools/views/_email_return.view.php' );
 		break;
 
 	case 'settings':
 		switch( $tab3 )
 		{
-			case 'returned':
-				$AdminUI->disp_view( 'tools/views/_email_returned.form.php' );
-				break;
-
 			case 'smtp':
 				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
 				break;
@@ -517,7 +554,6 @@ switch( $tab )
 			default:
 				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
 		}
-		
 		break;
 
 }

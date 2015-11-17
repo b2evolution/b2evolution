@@ -63,7 +63,69 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
+		global $posttypes_specialtypes;
+
+		// Initialize an array for the field "Post type":
+		$ItemTypeCache = & get_ItemTypeCache();
+		$item_types = $ItemTypeCache->get_option_array();
+		$item_type_options = array(
+				'#' => T_('Default'),
+				''  => T_('All'),
+			);
+		foreach( $item_types as $item_type_ID => $item_type_name )
+		{
+			if( in_array( $item_type_ID, $posttypes_specialtypes ) )
+			{	// Exclude special item types:
+				continue;
+			}
+			$item_type_options[ $item_type_ID ] = $item_type_name;
+		}
+
 		$r = array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 60,
+				'defaultvalue' => '',
+			),
+			'title_link' => array(
+				'label' => T_('Link to blog'),
+				'note' => T_('Link the block title to the blog?'),
+				'type' => 'checkbox',
+				'defaultvalue' => false,
+			),
+			'item_visibility' => array(
+				'label' => T_('Item visibility'),
+				'note' => T_('What post statuses should be included in the list?'),
+				'type' => 'radio',
+				'field_lines' => true,
+				'options' => array(
+						array( 'public', T_('show public posts') ),
+						array( 'all', T_('show all posts the current user is allowed to see') ) ),
+				'defaultvalue' => 'all',
+			),
+			'item_type' => array(
+				'label' => T_('Post type'),
+				'note' => T_('What kind of items do you want to list?'),
+				'type' => 'select',
+				'options' => $item_type_options,
+				'defaultvalue' => '#',
+			),
+			'blog_ID' => array(
+				'label' => T_( 'Collection' ),
+				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
+				'size' => 4,
+				'type' => 'integer',
+				'allow_empty' => true,
+			),
+			'cat_IDs' => array(
+				'label' => T_('Categories'),
+				'note' => T_('List category IDs separated by ,'),
+				'size' => 15,
+				'type' => 'text',
+				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																	'error'   => T_('Invalid list of Category IDs.') ),
+			),
 			'displaycaption' => array(
 				'label' => T_('Display caption'),
 				'note' => T_('Display caption on top of calendar'),
@@ -155,14 +217,17 @@ class calendar_plugin extends Plugin
 		/**
 		 * Default params:
 		 */
-		// This is what will enclose the block in the skin:
-		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
-		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
-
-		// Title:
-		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
-		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-		if(!isset($params['title'])) $params['title'] = '';
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="bSideItem">',
+				'block_end'         => "</div>\n",
+				// This is what will enclose the title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+			), $params );
 
 
 		$Calendar = new Calendar( ${$itemlist_prefix.'m'}, $params );
@@ -207,22 +272,41 @@ class calendar_plugin extends Plugin
 		if( !empty($params['title']) )
 		{	// We want to display a title for the widget block:
 			echo $params['block_title_start'];
-			echo $params['title'];
+			if( $params[ 'title_link' ] )
+			{	// Set block title as link to current collection:
+				echo '<a href="'.$Blog->gen_blogurl().'" rel="nofollow">'.$params['title'].'</a>';
+			}
+			else
+			{	// Display a block title as simple text:
+				echo $params['title'];
+			}
 			echo $params['block_title_end'];
 		}
+
+		echo $params['block_body_start'];
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
 		// - - Select a specific Item:
 		// $this->ItemQuery->where_ID( $p, $title );
 
+		// Set filter by collection:
+		$blog_ID = empty( $params['blog_ID'] ) ? NULL : $params['blog_ID'];
+
+		
+		if( empty( $params['cat_IDs'] ) )
+		{	// Use default categories filter:
+			$filter_cat_array = ( $Calendar->link_type == 'context' ) ? $cat_array : array();
+		}
+		else
+		{	// Get categories filter from widget settings:
+			$filter_cat_array = sanitize_id_list( $params['cat_IDs'], true );
+		}
+
 		if( $Calendar->link_type == 'context' )
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, $cat_array, $cat_modifier );
-
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, $cat_modifier, 'wide', $blog_ID );
 
 			// Restrict to selected authors:
 			$Calendar->ItemQuery->where_author( $author );
@@ -238,27 +322,46 @@ class calendar_plugin extends Plugin
 
 			// Keyword search stuff:
 			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
-
-			// Exclude pages and intros:
-			$Calendar->ItemQuery->where_types( $types );
 		}
 		else
 		{	// We want to preserve only the minimal context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, array(), '' );
-
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, '', 'wide', $blog_ID );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
-
-			// Exclude pages and intros and sidebar stuff:
-			$Calendar->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
 		}
+
+		if( isset( $params['item_visibility'] ) && $params['item_visibility'] == 'public' )
+		{	// Get only the public items:
+			$visibility_array = array( 'published' );
+		}
+		else
+		{	// Get the current selected status items:
+			$visibility_array = $show_statuses;
+		}
+		// * Restrict to the statuses we want to show:
+		$Calendar->ItemQuery->where_visibility( $visibility_array );
+
+		$item_types = $types;
+		if( isset( $params['item_type'] ) )
+		{
+			if( $params['item_type'] == '#' )
+			{	// Exclude pages and intros and sidebar stuff by default:
+				$item_types = '-'.implode( ',', $posttypes_specialtypes );
+			}
+			elseif( $params['item_type'] != 'all' )
+			{	// Filter by one selected item type:
+				$item_types = $params['item_type'];
+			}
+		}
+		// Filter by item types:
+		$Calendar->ItemQuery->where_types( $item_types );
 
 		// DISPLAY:
 		$Calendar->display( );
+
+		echo $params['block_body_end'];
 
 		echo $params['block_end'];
 

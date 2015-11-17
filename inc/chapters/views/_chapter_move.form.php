@@ -16,11 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Chapter
  */
-global $edited_GenericCategory;
-/**
- * @var Chapter
- */
-$edited_Chapter = & $edited_GenericCategory;
+global $edited_Chapter;
 
 /**
  * @var BlogCache

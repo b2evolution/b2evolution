@@ -86,9 +86,15 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'terms':
 		case 'download':
 		case 'feedback-popup':
 			// We need to load posts for this display:
+
+			if( $disp == 'terms' )
+			{	// Initialize the redirect param to know what page redirect after accepting of terms:
+				param( 'redirect_to', 'url', '' );
+			}
 
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 			// Init the MainList object:
@@ -126,9 +132,18 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+		case 'terms':
+			if( $disp == 'terms' && ! $Item )
+			{	// Wrong post ID for terms page:
+				global $disp;
+				$disp = '404';
+				$Messages->add( sprintf( T_('Terms not found. (post ID #%s)'), get_param( 'p' ) ), 'error' );
+				break;
+			}
+
 			if( ( ! $preview ) && ( empty( $Item ) ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
-				debug_die( 'Invalid page URL!' );
+				//debug_die( 'Invalid page URL!' );
 			}
 
 			if( $disp == 'single' )
@@ -1550,6 +1565,14 @@ var downloadInterval = setInterval( function()
 				}
 			}
 			break;
+
+		case 'tags':
+			$seo_page_type = 'Tags';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
@@ -1567,9 +1590,9 @@ var downloadInterval = setInterval( function()
 			break;
 	}
 
-	global $Hit;
-	if( $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
-	{ // IE < 9
+	global $Hit, $check_browser_version;
+	if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+	{	// Display info message if browser IE < 9 version and it is allowed by config var:
 		global $debug;
 		$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
 		if( $debug )
@@ -1778,6 +1801,8 @@ function skin_include( $template_name, $params = array() )
 				'disp_download'       => '_download.disp.php',
 				'disp_access_denied'  => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_tags'           => '_tags.disp.php',
+				'disp_terms'          => '_terms.disp.php',
 			);
 
 		// Add plugin disp handlers:
