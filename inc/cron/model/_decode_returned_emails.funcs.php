@@ -158,7 +158,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		{	// Check if we can read this message or we should skip this:
 			if( isset( $msg_statuses[ $index - 1 ] ) && $msg_statuses[ $index - 1 ]->seen == 1 )
 			{	// Skip this message because it has already been read:
-				dre_msg( T_('Ignore this message because it has aleady been read.'), $cron );
+				dre_msg( T_('Ignoring this message because it has aleady been read.'), $cron );
 				continue;
 			}
 			else
@@ -216,7 +216,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
 			{	// error:
-				dre_msg( sprintf( T_('MIME message analyse error: %s'), $mimeParser->error ), $cron );
+				dre_msg( sprintf( T_('MIME message analyze error: %s'), $mimeParser->error ), $cron );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;

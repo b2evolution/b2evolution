@@ -194,7 +194,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
 			{	// error:
-				pbm_msg( sprintf( T_('MIME message analyse error: %s'), $mimeParser->error ), $cron );
+				pbm_msg( sprintf( T_('MIME message analyze error: %s'), $mimeParser->error ), $cron );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
