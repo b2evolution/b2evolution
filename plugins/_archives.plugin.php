@@ -120,6 +120,8 @@ class archives_plugin extends Plugin
 				// This is what will separate the archive links:
 				'line_start'        => '<li>',
 				'line_end'          => "</li>\n",
+				// Archive mode:
+				'mode'              => $Blog->get_setting( 'archive_mode' ),
 				// Link type:
 				'link_type'         => 'canonic',
 				'context_isolation' => $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart',
