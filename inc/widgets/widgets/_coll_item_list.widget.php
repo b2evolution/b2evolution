@@ -171,7 +171,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
-							array( 'special', T_('Special placement before this') ),
+							array( 'special', T_('Special placement before title') ),
 							array( 'normal', T_('No special treatment (same as other pictures)') ) ),
 					'defaultvalue' => 'normal',
 				),
