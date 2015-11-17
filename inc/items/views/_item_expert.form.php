@@ -345,7 +345,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
 	{ // Display url
-		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
+		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' || $edited_Item->get_type_setting( 'use_url' ) == 'required_podcast' ) ? $required_star : '';
 		echo '<tr><td class="label"><label for="post_url">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
 		echo '<td class="input" width="97%">';
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );

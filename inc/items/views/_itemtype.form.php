@@ -44,14 +44,7 @@ $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) )
 
 $Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-type-form') : T_('Post type').get_manual_link('item-type-form') );
 
-	if( $creating )
-	{
-		$Form->text_input( 'new_ityp_ID', get_param( 'new_ityp_ID' ), 8, T_('ID'), '', array( 'maxlength'=> 10, 'required'=>true ) );
-	}
-	else
-	{
-		$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
-	}
+	$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 
 	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, array(
 			T_('In content flow') => array(
@@ -112,7 +105,12 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-type-advanced-properties' ), array( 'id' => 'itemtype_advprops' ) );
 	$Form->radio( 'ityp_use_tags', $edited_Itemtype->use_tags, $options, T_('Use tags') );
 	$Form->radio( 'ityp_use_excerpt', $edited_Itemtype->use_excerpt, $options, T_('Use excerpt') );
-	$Form->radio( 'ityp_use_url', $edited_Itemtype->use_url, $options, T_('Use URL') );
+	$Form->radio( 'ityp_use_url', $edited_Itemtype->use_url, array(
+			array( 'required', T_('Required') ),
+			array( 'required_podcast', T_('Required & treat as Podcast media') ),
+			array( 'optional', T_('Optional') ),
+			array( 'never', T_('Never') )
+		), T_('Use URL') );
 	$Form->radio( 'ityp_use_parent', $edited_Itemtype->use_parent, $options, T_('Use Parent ID') );
 	$Form->radio( 'ityp_use_title_tag', $edited_Itemtype->use_title_tag, $options, htmlspecialchars( T_('Use <title> tag') ) );
 	$Form->radio( 'ityp_use_meta_desc', $edited_Itemtype->use_meta_desc, $options, htmlspecialchars( T_('Use <meta> description') ) );

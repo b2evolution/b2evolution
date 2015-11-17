@@ -152,13 +152,6 @@ class ItemType extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// get new ID
-		if( param( 'new_ityp_ID', 'string', NULL ) !== NULL )
-		{
-			param_check_number( 'new_ityp_ID', T_('ID must be a number.'), true );
-			$this->set_from_Request( 'ID', 'new_ityp_ID' );
-		}
-
 		// Name
 		if( ! $this->is_special() )
 		{ // Update the name only of not special post types

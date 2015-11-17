@@ -245,21 +245,21 @@ function create_default_data()
 	$DB->query( "
 		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_usage, ityp_template_name,
 					 ityp_allow_html, ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent )
-		VALUES ( 1,    'Post',          'post',           'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 10,   'Post with Custom Fields', 'post', 'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 20,   'Child Post',    'post',           'single', 1, 1, 1, 'standard',   'required' ),
-					 ( 100,  'Manual Page',   'post',           'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 200,  'Forum Topic',   'post',           'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 1000, 'Page',          'page',           'page',   1, 1, 1, 'restricted', 'never' ),
-					 ( 1400, 'Intro-Front',   'intro-front',    NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1500, 'Intro-Main',    'intro-main',     NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1520, 'Intro-Cat',     'intro-cat',      NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1530, 'Intro-Tag',     'intro-tag',      NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1570, 'Intro-Sub',     'intro-sub',      NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1600, 'Intro-All',     'intro-all',      NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 2000, 'Podcast',       'post',           'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 3000, 'Sidebar link',  'special',        NULL,     1, 1, 1, 'admin',      'never' ),
-					 ( 4000, 'Advertisement', 'special',        NULL,     1, 1, 1, 'admin',      'never' )" );
+		VALUES ( 1,  'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never' ),
+					 ( 2,  'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never' ),
+					 ( 3,  'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required' ),
+					 ( 4,  'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never' ),
+					 ( 5,  'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never' ),
+					 ( 6,  'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never' ),
+					 ( 7,  'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 8,  'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 9,  'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 10, 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 11, 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 12, 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never' ),
+					 ( 13, 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never' ),
+					 ( 14, 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never' ),
+					 ( 15, 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never' )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 10, "First numeric field", "first_numeric_field", "double" ),

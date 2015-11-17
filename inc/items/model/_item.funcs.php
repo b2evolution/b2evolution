@@ -1532,29 +1532,49 @@ function get_item_type_tabs()
 	$type_tabs = array();
 	foreach( $type_usages as $type_usage )
 	{
-		switch( $type_usage )
-		{
-			case 'post':
-				$type_tabs['post'] = NT_('Post');
-				break;
-			case 'page':
-				$type_tabs['page'] = NT_('Page');
-				break;
-			case 'special':
-				$type_tabs['special'] = NT_('Special');
-				break;
-			case 'intro-front':
-			case 'intro-main':
-			case 'intro-cat':
-			case 'intro-tag':
-			case 'intro-sub':
-			case 'intro-all':
-				$type_tabs['intro'] = NT_('Intros');
-				break;
+		if( $type_tab = get_tab_by_item_type_usage( $type_usage ) )
+		{	// Only if tab exists for current item type usage:
+			$type_tabs[ $type_tab[0] ] = $type_tab[1];
 		}
 	}
 
 	return $type_tabs;
+}
+
+
+/**
+ * Get tab name by item type usage value
+ *
+ * @return array|boolean 
+ */
+function get_tab_by_item_type_usage( $type_usage )
+{
+	switch( $type_usage )
+	{
+		case 'post':
+			$type_tab = array( 'post', NT_('Post') );
+			break;
+		case 'page':
+			$type_tab = array( 'page', NT_('Page') );
+			break;
+		case 'special':
+			$type_tab = array( 'special', NT_('Special') );
+			break;
+		case 'intro-front':
+		case 'intro-main':
+		case 'intro-cat':
+		case 'intro-tag':
+		case 'intro-sub':
+		case 'intro-all':
+			$type_tab = array( 'intro', NT_('Intros') );
+			break;
+
+		default:
+			// Unknown item type usage:
+			return false;
+	}
+
+	return $type_tab;
 }
 
 

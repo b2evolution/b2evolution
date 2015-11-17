@@ -285,7 +285,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
 			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
-			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_use_url           ENUM( 'required', 'required_podcast', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_use_parent        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_text          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_allow_html        TINYINT DEFAULT 1,

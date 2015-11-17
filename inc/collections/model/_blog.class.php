@@ -318,8 +318,7 @@ class Blog extends DataObject
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
-					WHERE ityp_ID = 200
-					  AND ityp_name = "Forum Topic"' );
+					WHERE ityp_name = "Forum Topic"' );
 				if( $forum_topic_type_ID )
 				{ // Set default post type as "Forum Topic"
 					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
@@ -342,8 +341,7 @@ class Blog extends DataObject
 				global $DB;
 				$manual_page_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
-					WHERE ityp_ID = 100
-					  AND ityp_name = "Manual Page"' );
+					WHERE ityp_name = "Manual Page"' );
 				if( $manual_page_type_ID )
 				{ // Set default post type as "Manual Page"
 					$this->set_setting( 'default_post_type', $manual_page_type_ID );
@@ -3722,20 +3720,24 @@ class Blog extends DataObject
 		{
 			case 'main':
 			case 'photo':
-				$exclude_ityp_IDs = array( 100, 200, 2000, 5000 );
+				// Don't enable item types: "Manual Page", "Forum Topic", "Podcast Episode"
+				$exclude_ityp_IDs = array( 4, 5, 13 );
 				break;
 
 			case 'forum':
-				$exclude_ityp_IDs = array( 1, 100, 2000, 5000 );
+				// Don't enable item types: "Post", "Manual Page", "Podcast Episode"
+				$exclude_ityp_IDs = array( 1, 4, 13 );
 				break;
 
 			case 'manual':
-				$exclude_ityp_IDs = array( 1, 200, 2000, 5000 );
+				// Don't enable item types: "Post", "Forum Topic", "Podcast Episode"
+				$exclude_ityp_IDs = array( 1, 5, 13 );
 				break;
 
 			case 'std':
 			default:
-				$exclude_ityp_IDs = array( 100, 200, 5000 );
+				// Don't enable item types: "Manual Page", "Forum Topic"
+				$exclude_ityp_IDs = array( 4, 5 );
 				break;
 		}
 

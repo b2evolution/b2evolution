@@ -493,32 +493,19 @@ switch( $action )
 		// Trackback addresses (never saved into item)
 		param( 'trackback_url', 'string', '' );
 
-		// Page title:
-		switch( param( 'item_typ_ID', 'integer', 1 ) )
-		{
-			case 1000:
-				$title = T_('New page');
-				break;
+		// Item type ID:
+		param( 'item_typ_ID', 'integer', 1 );
 
-			case 1600:
-				$title = T_('New intro');
-				break;
-
-			case 2000:
-				$title = T_('New podcast episode');
-				break;
-
-			case 3000:
-				$title = T_('New link');
-				break;
-
-			case 4000:
-				$title = T_('New advertisement');
-				break;
-
-			default:
-				$title = T_('New post');
-				break;
+		// Initialize a page title depending on item type:
+		if( empty( $item_typ_ID ) )
+		{	// No selected item type, use default:
+			$title = T_('New post');
+		}
+		else
+		{	// Get item type to set a pge title:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+			$title = sprintf( T_('New %s'), $ItemType->get_name() );
 		}
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_typ_ID );
@@ -570,33 +557,10 @@ switch( $action )
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave ( $post_category, $post_extracats );
 
-		// Page title:
-		switch( $edited_Item->ityp_ID )
-		{
-			case 1000:
-				$title = T_('Duplicate page');
-				break;
-
-			case 1600:
-				$title = T_('Duplicate intro');
-				break;
-
-			case 2000:
-				$title = T_('Duplicate podcast episode');
-				break;
-
-			case 3000:
-				$title = T_('Duplicate link');
-				break;
-
-			case 4000:
-				$title = T_('Duplicate advertisement');
-				break;
-
-			default:
-				$title = T_('Duplicate post');
-				break;
-		}
+		// Initialize a page title depending on item type:
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemType = & $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+		$title = sprintf( T_('Duplicate %s'), $ItemType->get_name() );
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=copy&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
@@ -1708,12 +1672,19 @@ switch( $action )
 attach_browse_tabs();
 
 
-if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ))
-{ // Set a tab type for edited item
+if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ) )
+{	// Set a tab type for edited/viewed item:
 	$tab = 'type';
-	$tab_type = $ItemType->usage;
+	if( $tab_type = get_tab_by_item_type_usage( $ItemType->usage ) )
+	{	// Only if tab exists for current item type usage:
+		$tab_type = $tab_type[0];
+	}
+	else
+	{
+		$tab_type = 'all';
+	}
 }
-//pre_dump( 1,1,1,1, )
+
 if( ! empty( $tab ) && $tab == 'type' )
 { // Set a path from dynamic tabs
 	$AdminUI->append_path_level( 'type_'.str_replace( ' ', '_', utf8_strtolower( $tab_type ) ) );
