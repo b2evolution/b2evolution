@@ -6991,6 +6991,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_items__type
 			  SET ityp_use_url = "required_podcast"
 			WHERE ityp_ID = "2000"' );
+		// Delete the reserved item type:
+		$DB->query( 'DELETE FROM T_items__type
+			WHERE ityp_ID = "5000"' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11520' );

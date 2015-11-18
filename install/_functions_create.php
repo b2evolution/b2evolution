@@ -243,23 +243,24 @@ function create_default_data()
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
 	$DB->query( "
-		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_usage, ityp_template_name,
-					 ityp_allow_html, ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent )
-		VALUES ( 1,  'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 2,  'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 3,  'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required' ),
-					 ( 4,  'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 5,  'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 6,  'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never' ),
-					 ( 7,  'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 8,  'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 9,  'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 10, 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 11, 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 12, 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 13, 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 14, 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never' ),
-					 ( 15, 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never' )" );
+		INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html,
+					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url )
+		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
+					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'required_podcast' ),
+					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
+					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional' ),
+					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional' ),
+					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional' ),
+					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
+					 ( 'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
+					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional' ),
+					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional' )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 10, "First numeric field", "first_numeric_field", "double" ),

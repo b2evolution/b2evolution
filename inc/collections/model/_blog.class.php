@@ -285,6 +285,16 @@ class Blog extends DataObject
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				$this->set_setting( 'front_disp', 'posts' );
+
+				// Try to find post type "Photo Album" in DB:
+				global $DB;
+				$photo_album_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Photo Album"' );
+				if( $photo_album_type_ID )
+				{	// Set default post type as "Photo Album":
+					$this->set_setting( 'default_post_type', $photo_album_type_ID );
+				}
 				break;
 
 			case 'group':
@@ -3708,52 +3718,70 @@ class Blog extends DataObject
 			return;
 		}
 
-		global $DB, $cache_all_item_type_IDs;
+		global $DB, $cache_all_item_type_data;
 
-		if( ! isset( $cache_all_item_type_IDs ) )
-		{	// Get all item type IDs only first time to save execution time
-			$cache_all_item_type_IDs = $DB->get_col( 'SELECT ityp_ID FROM T_items__type' );
+		if( ! isset( $cache_all_item_type_data ) )
+		{	// Get all item type data only first time to save execution time:
+			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name FROM T_items__type' );
 		}
 
-		// Exclude the following item types depending on collection type:
+		// Decide what "post" item type we can enable depending on collection kind:
 		switch( $this->type )
 		{
 			case 'main':
+				$default_post_types = array( 'Post' );
+				break;
+
 			case 'photo':
-				// Don't enable item types: "Manual Page", "Forum Topic", "Podcast Episode"
-				$exclude_ityp_IDs = array( 4, 5, 13 );
+				$default_post_types = array( 'Photo Album' );
 				break;
 
 			case 'forum':
-				// Don't enable item types: "Post", "Manual Page", "Podcast Episode"
-				$exclude_ityp_IDs = array( 1, 4, 13 );
+				$default_post_types = array( 'Forum Topic' );
 				break;
 
 			case 'manual':
-				// Don't enable item types: "Post", "Forum Topic", "Podcast Episode"
-				$exclude_ityp_IDs = array( 1, 5, 13 );
+				$default_post_types = array( 'Manual Page' );
 				break;
 
-			case 'std':
-			default:
-				// Don't enable item types: "Manual Page", "Forum Topic"
-				$exclude_ityp_IDs = array( 4, 5 );
+			default: // 'std'
+				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
 				break;
+		}
+
+		$enable_post_types = array();
+		foreach( $cache_all_item_type_data as $item_type )
+		{
+			if( $item_type->ityp_usage == 'post' && 
+			    in_array( $item_type->ityp_name, $default_post_types ) )
+			{	// This "post" item type can be enabled:
+				$enable_post_types[] = $item_type->ityp_ID;
+			}
+		}
+
+		if( empty( $enable_post_types ) )
+		{	// Display a warning if we cannot find the default post types for current collection kind:
+			global $Messages;
+			$Messages->add( sprintf( T_('The expected item type(s) named %s have not been found. All item types have been enabled for this collection.'), '"'.implode( '", "', $default_post_types ).'"' ), 'warning' );
 		}
 
 		$insert_sql = 'REPLACE INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID ) VALUES ';
 		$i = 0;
-		foreach( $cache_all_item_type_IDs as $item_type_ID )
+		foreach( $cache_all_item_type_data as $item_type )
 		{
-			if( ! in_array( $item_type_ID, $exclude_ityp_IDs ) )
-			{	// Item type is not excluded
-				if( $i > 0 )
-				{	// Add separator between rows:
-					$insert_sql .= ', ';
-				}
-				$insert_sql .= '( '.$item_type_ID.', '.$this->ID.' )';
-				$i++;
+			if( $item_type->ityp_usage == 'post' &&
+			    ! empty( $enable_post_types ) &&
+			    ! in_array( $item_type->ityp_ID, $enable_post_types ) )
+			{	// Skip this item type for current collection kind:
+				continue;
 			}
+
+			if( $i > 0 )
+			{	// Add separator between rows:
+				$insert_sql .= ', ';
+			}
+			$insert_sql .= '( '.$item_type->ityp_ID.', '.$this->ID.' )';
+			$i++;
 		}
 
 		if( $i > 0 )
