@@ -1146,8 +1146,7 @@ switch( $action )
 				 ORDER BY tag_name', ARRAY_A );
 			/* Yura: Here I added "COLLATE utf8_general_ci" because:
 			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
-			 * It also allows to find "ee" when we type in "éè".
-			 * BUT it does NOT allow to find "éè" when we type in "ee".
+			 * It also allows to find "ee" when we type in "éè" and otherwise.
 			 */
 
 			// Check if current term is not an existing tag
