@@ -5053,21 +5053,34 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_typ_ID = 1,
+		$item_type_name = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type
 		$item_st_ID = NULL,
 		$post_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_typ_ID == 1 )
-		{ // Try to set default post type ID from blog setting
+		if( $item_type_name == '#' )
+		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
 			    $Blog = & $Chapter->get_Blog() )
-			{ // Use default post type what used for the blog
+			{	// Use default post type what used for the blog:
 				$item_typ_ID = $Blog->get_setting( 'default_post_type' );
 			}
+		}
+		else
+		{	// Try to get item type by requested name:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name, false, false ) )
+			{	// Item type exists in DB by requested name, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+		}
+
+		if( empty( $item_typ_ID ) )
+		{	// Use first item type by default for wrong request:
+			$item_typ_ID = 1;
 		}
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
