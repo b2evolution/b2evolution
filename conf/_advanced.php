@@ -888,8 +888,8 @@ $library_cdn_urls = array(
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
-		//'#videojs#' => array( 'http://vjs.zencdn.net/c/video.js' ),
-		//'#videojs_css#' => array( 'http://vjs.zencdn.net/c/video-js.css' ),
+		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
+		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
 		'#fontawesome#' => array('//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'),
 	);
 
