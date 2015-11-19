@@ -372,7 +372,6 @@ class ArchiveList extends Results
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $s, $sentence, $exact;
-		global $posttypes_specialtypes;
 
 		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
@@ -436,7 +435,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Include all types except pages, intros and sidebar links:
-			$this->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
+			$this->ItemQuery->where_itemtype_usage( 'post' );
 		}
 
 
@@ -485,7 +484,7 @@ class ArchiveList extends Results
 				$archives_list = new ItemListLight( $Blog , $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $this->total_rows );
 				$archives_list->set_filters( array(
 						'visibility_array' => array( 'published' ),  // We only want to advertised published items
-						'types' =>  '-'.implode(',',$posttypes_specialtypes),	// Include all types except pages, intros and sidebar links
+						'itemtype_usage' => 'post', // Include all types with usage "post"
 					) );
 
 				if($sort_order == 'title')

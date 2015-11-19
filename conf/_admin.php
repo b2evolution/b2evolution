@@ -55,21 +55,4 @@ $posttypes_perms = array(
 		4000, // (Sidebar) Advertisement
 	),
 );
-
-
-/**
- * Post types that should not appear in the normal post stream
- */
-$posttypes_specialtypes = array_merge( $posttypes_perms['page'], $posttypes_perms['intro'], $posttypes_perms['sidebar'] );
-
-/**
- * Post types that should not have a permanent URL
- */
-$posttypes_nopermanentURL = array_merge( $posttypes_perms['sidebar'], array( 1400, 1500 ) );
-
-/**
- * Post types that should have a permanent URL as url of their main chapter
- */
-$posttypes_catpermanentURL = array_diff( $posttypes_perms['intro'], array( 1400, 1500 ) );
-
 ?>

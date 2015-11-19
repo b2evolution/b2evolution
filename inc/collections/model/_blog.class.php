@@ -3339,10 +3339,10 @@ class Blog extends DataObject
 	 * @param integer Category ID
 	 * @param string Post title
 	 * @param string Post urltitle
-	 * @param integer Post type ID
+	 * @param string Post type usage
 	 * @return string Url to write a new Post
 	 */
-	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type_ID = 0 )
+	function get_write_item_url( $cat_ID = 0, $post_title = '', $post_urltitle = '', $post_type_usage = '' )
 	{
 		$url = '';
 
@@ -3386,9 +3386,14 @@ class Blog extends DataObject
 				{ // Append a post urltitle
 					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
 				}
-				if( !empty( $post_type_ID ) )
+				if( ! empty( $post_type_usage ) )
 				{ // Append a post type ID
-					$url = url_add_param( $url, 'item_typ_ID='.$post_type_ID );
+					global $DB;
+					$post_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_usage = '.$DB->quote( $post_type_usage ) );
+					if( ! empty( $post_type_ID ) )
+					{
+						$url = url_add_param( $url, 'item_typ_ID='.$post_type_ID );
+					}
 				}
 			}
 		}

@@ -950,7 +950,7 @@ class test_plugin extends Plugin
 			if( $disp == 'page' )
 			{	// Get pages:
 				$params['MainList']->set_default_filters( array(
-						'types' => '1000',		// pages
+						'itemtype_usage' => 'page', // pages
 					) );
 			}
 
@@ -959,7 +959,7 @@ class test_plugin extends Plugin
 				$this->msg( 'TEST plugin: InitMainList() method allows us to search in both posts and pages.', 'note' );
 
 				$params['MainList']->set_default_filters( array(
-						'types' => '1,1000',
+						'itemtype_usage' => 'post,page'
 					) );
 			}
 

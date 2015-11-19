@@ -263,10 +263,10 @@ function create_default_data()
 					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional' )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-			VALUES ( 10, "First numeric field", "first_numeric_field", "double" ),
-						 ( 10, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 10, "First text field", "first_text_field", "varchar" ),
-						 ( 10, "Define you own labels", "define_you_own_labels", "varchar" )' );
+			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
+						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
+						 ( 3, "First text field", "first_text_field", "varchar" ),
+						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" )' );
 	task_end();
 
 

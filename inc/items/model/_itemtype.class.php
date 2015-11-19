@@ -566,11 +566,9 @@ class ItemType extends DataObject
 	 *
 	 * @return boolean
 	 */
-	static function is_intro( $ID = NULL )
+	function is_intro()
 	{
-		global $posttypes_perms;
-
-		return ( isset( $posttypes_perms['intro'] ) && in_array( $ID, $posttypes_perms['intro'] ) );
+		return in_array( $this->usage, array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) );
 	}
 
 

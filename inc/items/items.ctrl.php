@@ -1446,7 +1446,7 @@ function init_list_mode()
 	{
 		case 'full':
 			$ItemList->set_default_filters( array(
-					'types' => NULL, // All types (suited for tab with full posts)
+					'itemtype_usage' => NULL // All types
 				) );
 			// $AdminUI->breadcrumbpath_add( T_('All items'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 
@@ -1475,7 +1475,7 @@ function init_list_mode()
 		case 'type':
 			// Filter a posts list by type
 			$ItemList->set_default_filters( array(
-					'types' => get_item_types_by_tab( $tab_type ),
+					'itemtype_usage' => implode( ',', get_item_type_usage_by_tab( $tab_type ) ),
 				) );
 			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
 			break;

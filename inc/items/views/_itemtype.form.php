@@ -90,7 +90,7 @@ $options = array(
 	);
 
 // Check if current type is intro and set specific params for the fields "ityp_allow_breaks" and "ityp_allow_featured":
-$intro_type_disabled = ItemType::is_intro( $edited_Itemtype->ID );
+$intro_type_disabled = $edited_Itemtype->is_intro();
 $intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
 
 $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );

@@ -843,7 +843,7 @@ function get_highest_publish_status( $type, $blog, $with_label = true )
  */
 function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false )
 {
-	global $DB, $localtimenow, $posttypes_specialtypes;
+	global $DB, $localtimenow;
 
 	$BlogCache = & get_BlogCache();
 
@@ -873,14 +873,15 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 
 	$tags_SQL->WHERE( $where_cat_clause );
 	$tags_SQL->WHERE_and( 'post_status = "published"' );
 	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
 	if( $skip_intro_posts )
-	{ // Skip "Intro" posts
-		$tags_SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.implode( ', ', $posttypes_specialtypes ).' )' );
+	{	// Skip "Intro", "Page" and other special posts:
+		$tags_SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 	}
 
 	if( ! empty( $filter_list ) )

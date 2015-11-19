@@ -109,7 +109,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type'] = '1000';	// Use post types 1000 (pages) only
+		$params['item_type_usage'] = 'page';	// Use post types usage "page" only
 
 		parent::init_display( $params );
 	}

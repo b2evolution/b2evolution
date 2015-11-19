@@ -174,10 +174,36 @@ $Results->cols[] = array(
 		'td_class' => 'center',
 	);
 
+function ityp_row_usage( $item_type_usage )
+{
+	switch( $item_type_usage )
+	{
+		case 'post':
+			return T_('Post');
+		case 'page':
+			return T_('Page');
+		case 'intro-front':
+			return T_('Intro-Front');
+		case 'intro-main':
+			return T_('Intro-Main');
+		case 'intro-cat':
+			return T_('Intro-Cat');
+		case 'intro-tag':
+			return T_('Intro-Tag');
+		case 'intro-sub':
+			return T_('Intro-Sub');
+		case 'intro-all':
+			return T_('Intro-All');
+		case 'special':
+			return T_('Special');
+		default:
+			return $item_type_usage;
+	}
+}
 $Results->cols[] = array(
 		'th' => T_('Usage'),
 		'order' => 'ityp_usage',
-		'td' => '$ityp_usage$',
+		'td' => '%ityp_row_usage( #ityp_usage# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap',
 	);

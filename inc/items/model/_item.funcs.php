@@ -39,7 +39,7 @@ function init_MainList( $items_nb_limit )
 			if( $disp == 'page' || $disp == 'terms' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
-						'types' => '1000',		// pages
+						'itemtype_usage' => 'page' // pages
 					) );
 			}
 
@@ -233,13 +233,13 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 			if( $restrict_disp == 'front' )
 			{	// Special Front page:
 				// Use Intro-Front posts
-				$restrict_to_types = '1400';
+				$restrict_to_types_usage = 'intro-front';
 			}
 			else
 			{	// Default front page displaying posts:
 				// The competing intro-* types are: 'main' and 'all':
 				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-				$restrict_to_types = '1500,1600';
+				$restrict_to_types_usage = 'intro-main,intro-all';
 			}
 		}
 		else
@@ -251,25 +251,25 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 				case 'posts-subcat':
 					// The competing intro-* types are: 'cat' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1520,1600';
+					$restrict_to_types_usage = 'intro-cat,intro-all';
 					break;
 
 				case 'posts-tag':
 					// The competing intro-* types are: 'tag' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1530,1600';
+					$restrict_to_types_usage = 'intro-tag,intro-all';
 					break;
 
 				default:
 					// The competing intro-* types are: 'sub' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1570,1600';
+					$restrict_to_types_usage = 'intro-sub,intro-all';
 			}
 		}
 
 		$FeaturedList->set_filters( array(
 				'coll_IDs' => $coll_IDs,
-				'types' => $restrict_to_types,
+				'itemtype_usage' => $restrict_to_types_usage,
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
@@ -1606,29 +1606,6 @@ function get_item_type_usage_by_tab( $tab_name )
 
 
 /**
- * Get post type IDs by tab name
- *
- * @return string Item IDs separated by comma
- */
-function get_item_types_by_tab( $tab_name )
-{
-	global $DB;
-
-	if( empty( $tab_name ) )
-	{
-		return '';
-	}
-
-	$SQL = new SQL();
-	$SQL->SELECT( 'ityp_ID' );
-	$SQL->FROM( 'T_items__type' );
-	$SQL->WHERE( 'ityp_usage IN ( '.$DB->quote( get_item_type_usage_by_tab( $tab_name ) ).' )' );
-
-	return implode( ',', $DB->get_col( $SQL->get() ) );
-}
-
-
-/**
  * Allow to select status/visibility
  *
  * @param object Form
@@ -2501,33 +2478,6 @@ function echo_show_comments_changed( $comment_type )
 				item_id = -1;
 			}
 			refresh_item_comments( item_id, 1, '<?php echo $comment_type; ?>' );
-		} );
-	</script>
-<?php
-}
-
-
-/**
- * Make location fields are not required for special posts
- */
-function echo_onchange_item_type_js()
-{
-	global $posttypes_specialtypes;
-
-?>
-	<script type="text/javascript">
-		var item_special_types = [<?php echo implode( ',', $posttypes_specialtypes ) ?>];
-		jQuery( '#item_typ_ID' ).change( function()
-		{
-			for( var i in item_special_types )
-			{
-				if( item_special_types[i] == jQuery( this ).val() )
-				{
-					jQuery( '#item_locations' ).addClass( 'not_required' );
-					return true;
-				}
-			}
-			jQuery( '#item_locations' ).removeClass( 'not_required' );
 		} );
 	</script>
 <?php

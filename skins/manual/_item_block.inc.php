@@ -15,7 +15,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $Item, $cat;
-global $posttypes_specialtypes;
 
 // Default params:
 $params = array_merge( array(
@@ -76,7 +75,7 @@ if( $disp == 'single' )
 			'text'   => '#icon#',
 			'class'  => 'roundbutton',
 		) );
-	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
+	if( $Item->is_intro() )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )

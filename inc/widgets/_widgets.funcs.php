@@ -199,9 +199,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 			if( $blog_id == $blog_home_ID )
 			{ // Advertisements, Install only for blog #1 home blog
+				$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
 				add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 70, array(
 						'title' => 'Advertisement (Demo)',
-						'item_type' => 4000,
+						'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
 						'blog_ID' => $blog_id,
 						'order_by' => 'RAND',
 						'limit' => 1,
@@ -219,7 +220,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			}
 			if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
 			{
-				add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_home_ID, 'item_type' => '3000' ) );
+				$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
+				add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array(
+						'blog_ID' => $blog_home_ID,
+						'item_type' => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
+					) );
 			}
 		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );

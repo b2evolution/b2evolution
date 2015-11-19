@@ -524,12 +524,11 @@ elseif( !empty($preview) )
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	// if( in_array( $Item->ityp_ID, $posttypes_specialtypes ) )
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
 	}
-	elseif( $Item->ityp_ID == 1000 )
+	elseif( $Item->get_type_setting( 'usage' ) == 'page' )
 	{
 		$disp = 'page';
 	}

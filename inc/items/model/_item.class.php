@@ -5796,7 +5796,7 @@ class Item extends ItemLight
 	 */
 	function handle_post_processing( $just_created, $verbose = true )
 	{
-		global $Settings, $Messages, $localtimenow, $posttypes_nopermanentURL;
+		global $Settings, $Messages, $localtimenow;
 
 		if( $just_created )
 		{ // we must try to send moderation notifications for the newly created posts
@@ -5844,7 +5844,16 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
+		if( $ItemType = & $this->get_ItemType() )
+		{	// Get type usage of this item:
+			$item_type_usage = $ItemType->get( 'usage' );
+		}
+		else
+		{	// Use default item type usage:
+			$item_type_usage = 'post';
+		}
+
+		if( in_array( $item_type_usage, array( 'intro-front', 'intro-main', 'special' ) ) )
 		{
 			// TODO: discard any notification that may be pending!
 			if( $verbose )
@@ -7534,40 +7543,6 @@ class Item extends ItemLight
 				return empty( $attr_href ) ? '' : $attr_href;
 				break;
 		}
-	}
-
-
-	/**
-	 * Get the ItemType object for the Item.
-	 *
-	 * @return object ItemType
-	 */
-	function & get_ItemType()
-	{
-		if( empty( $this->ItemType ) )
-		{
-			$ItemTypeCache = & get_ItemTypeCache();
-			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
-		}
-
-		return $this->ItemType;
-	}
-
-
-	/**
-	 * Get setting of the post type
-	 *
-	 * @param string Setting name
-	 * @return string Setting value
-	 */
-	function get_type_setting( $setting_name )
-	{
-		if( ! $this->get_ItemType() )
-		{ // Unknown post type
-			return false;
-		}
-
-		return $this->ItemType->get( $setting_name );
 	}
 
 

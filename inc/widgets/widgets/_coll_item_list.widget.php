@@ -357,6 +357,11 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['types'] = $this->disp_params['item_type'];
 		}
 
+		if( isset( $this->disp_params['item_type_usage'] ) )
+		{	// Not "default", restrict to a specific type usage (or '' for all):
+			$filters['itemtype_usage'] = $this->disp_params['item_type_usage'];
+		}
+
 		if( $this->disp_params['follow_mainlist'] == 'tags' )
 		{	// Restrict to Item tagged with some tag used in the Mainlist:
 

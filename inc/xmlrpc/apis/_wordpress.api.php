@@ -220,7 +220,7 @@ function wp_getpagelist( $m )
 			'visibility_array' => $statuses,
 			'order' => 'DESC',
 			'unit' => 'posts',
-			'types' => '1000',
+			'itemtype_usage' => 'page',
 		) );
 
 	// Run the query:
@@ -289,7 +289,7 @@ function wp_getpages( $m )
 
 	$items = xmlrpc_get_items( array(
 			'limit' => $limit,
-			'types' => '1000',
+			'itemtype_usage' => 'page',
 		), $Blog );
 
 	if( empty($items) )
