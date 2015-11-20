@@ -108,7 +108,7 @@ class coll_link_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type_usage'] = 'page';	// Use post types usage "special" only
+		$params['item_type_usage'] = 'special';	// Use post types usage "special" only
 
 		parent::init_display( $params );
 	}
