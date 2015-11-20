@@ -124,7 +124,7 @@ switch( $action )
 
 			if( empty( $Blog ) || empty( $widget ) )
 			{ // Don't use a quick registration if the request goes from not blog page
-				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
 
@@ -133,7 +133,7 @@ switch( $action )
 			    $user_register_Widget->code != 'user_register' ||
 			    $user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
 			{ // Wrong or hacked request!
-				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
 
