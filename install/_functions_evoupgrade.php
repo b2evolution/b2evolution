@@ -5908,7 +5908,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb' );
 
-		global $posttypes_perms;
 		// Create post types for each blog that has at aleast one custom field
 		$SQL = new SQL();
 		$SQL->SELECT( '*' );
@@ -5991,14 +5990,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							WHERE post_ityp_ID = 1
 							  AND post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
 
-						if( ! empty( $posttypes_perms['page'] ) )
-						{ // Find the Pages that have at least one defined custom field:
+							// Find the Pages that have at least one defined custom field:
 							$pages_SQL = new SQL();
 							$pages_SQL->SELECT( 'post_ID' );
 							$pages_SQL->FROM( 'T_items__item' );
 							$pages_SQL->FROM_add( 'INNER JOIN T_items__item_settings ON post_ID = iset_item_ID' );
+							$pages_SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 							$pages_SQL->WHERE( 'post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
-							$pages_SQL->WHERE_and( 'post_ityp_ID IN ( '.implode( ', ', $posttypes_perms['page'] ).' )' );
+							$pages_SQL->WHERE_and( 'ityp_usage = "page"' );
 							$pages_SQL->WHERE_and( 'iset_name LIKE '.$DB->quote( 'custom_double_%' )
 							                  .' OR iset_name LIKE '.$DB->quote( 'custom_varchar_%' ) );
 							$pages_SQL->WHERE_and( 'iset_value != ""' );
@@ -6040,7 +6039,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 								$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$page_type_max_ID.'
 									WHERE post_ID IN ( '.implode( ', ', $pages_IDs ).' )' );
 							}
-						}
 					}
 					// Insert custom fields for standard posts (not pages)
 					foreach( $c_fields as $c_field )
@@ -6083,18 +6081,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{ // Set it from first non reserved post type
 				if( ! isset( $first_item_type ) )
 				{
-					$reserved_types = array();
-					foreach( $posttypes_perms as $r_types )
-					{
-						$reserved_types = array_merge( $reserved_types, $r_types );
-					}
 					$SQL = new SQL();
 					$SQL->SELECT( 'ityp_ID' );
 					$SQL->FROM( 'T_items__type' );
-					if( ! empty( $reserved_types ) )
-					{
-						$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $reserved_types ).' )' );
-					}
+					$SQL->WHERE( 'ityp_usage = "post"' );
 					$SQL->ORDER_BY( 'ityp_ID' );
 					$SQL->LIMIT( '1' );
 					$first_item_type = $DB->get_var( $SQL->get() );;

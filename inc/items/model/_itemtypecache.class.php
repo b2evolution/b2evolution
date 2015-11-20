@@ -65,22 +65,18 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	function get_option_list_usable_only( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
-		global $posttypes_reserved_IDs;
-
-		// Compile an array of post type IDs to exclude:
-		$exclude_posttype_IDs = $posttypes_reserved_IDs;
-
-		return $this->get_option_list( $default, $allow_none, $method, $exclude_posttype_IDs );
+		return $this->get_option_list( $default, $allow_none, $method );
 	}
 
 	/**
 	 * For use by Universal Item List widget
+	 *
+	 * @param array IDs to ignore.
+	 * @return array
 	 */
-	function get_option_array()
+	function get_option_array( $ignore_IDs = array() )
 	{
-		global $posttypes_reserved_IDs;
-
-		return parent::get_option_array( 'get_name', $posttypes_reserved_IDs );
+		return parent::get_option_array( 'get_name', $ignore_IDs );
 	}
 }
 

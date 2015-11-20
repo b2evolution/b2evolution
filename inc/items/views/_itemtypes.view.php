@@ -48,8 +48,8 @@ function get_actions_for_itemtype( $id )
 							.$action;
 	}
 
-	if( ! ItemType::is_special( $id ) && ! in_array( $id, $default_ids ) )
-	{ // Delete only the not reserved and not default post types
+	if( ! in_array( $id, $default_ids ) )
+	{	// Delete only the not default post types:
 		$action .= action_icon( T_('Delete this Post Type!'), 'delete',
 									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
 	}

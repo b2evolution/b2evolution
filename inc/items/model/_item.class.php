@@ -578,7 +578,7 @@ class Item extends ItemLight
 	function load_from_Request( $editing = false, $creating = false )
 	{
 		global $default_locale, $current_User, $localtimenow;
-		global $posttypes_reserved_IDs, $item_typ_ID;
+		global $item_typ_ID;
 
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
@@ -905,13 +905,10 @@ class Item extends ItemLight
 
 		// LOCATION (COUNTRY -> CITY):
 		load_funcs( 'regional/model/_regional.funcs.php' );
-		// Check if this item has a special post type. Location is not required for special posts.
-		$not_special_post = ! $this->is_special();
 		if( $this->country_visible() )
 		{ // Save country
 			$country_ID = param( 'item_ctry_ID', 'integer', 0 );
 			$country_is_required = $this->get_type_setting( 'use_country' ) == 'required'
-					&& $not_special_post
 					&& countries_exist();
 			param_check_number( 'item_ctry_ID', T_('Please select a country'), $country_is_required );
 			$this->set_from_Request( 'ctry_ID', 'item_ctry_ID', true );
@@ -921,7 +918,6 @@ class Item extends ItemLight
 		{ // Save region
 			$region_ID = param( 'item_rgn_ID', 'integer', 0 );
 			$region_is_required = $this->get_type_setting( 'use_region' ) == 'required'
-					&& $not_special_post
 					&& regions_exist( $country_ID );
 			param_check_number( 'item_rgn_ID', T_('Please select a region'), $region_is_required );
 			$this->set_from_Request( 'rgn_ID', 'item_rgn_ID', true );
@@ -931,7 +927,6 @@ class Item extends ItemLight
 		{ // Save subregion
 			$subregion_ID = param( 'item_subrg_ID', 'integer', 0 );
 			$subregion_is_required = $this->get_type_setting( 'use_sub_region' ) == 'required'
-					&& $not_special_post
 					&& subregions_exist( $region_ID );
 			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), $subregion_is_required );
 			$this->set_from_Request( 'subrg_ID', 'item_subrg_ID', true );
@@ -941,7 +936,6 @@ class Item extends ItemLight
 		{ // Save city
 			param( 'item_city_ID', 'integer', 0 );
 			$city_is_required = $this->get_type_setting( 'use_city' ) == 'required'
-					&& $not_special_post
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );

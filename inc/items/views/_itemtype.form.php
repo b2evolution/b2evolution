@@ -30,8 +30,8 @@ $Form = new Form( NULL, 'itemtype_checkchanges' );
 if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
-	if( ! $edited_Itemtype->is_special() && ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{ // Allow delete post type only if it is not default of blogs
+	if( ! in_array( $edited_Itemtype->ID, $default_ids ) )
+	{	// Allow delete post type only if it is not default of blogs:
 		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
@@ -64,14 +64,8 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-ty
 				),
 		), T_('Usage'), '', array( 'required' => true ) );
 
-	if( $edited_Itemtype->is_special() )
-	{ // Don't edit a name of special post types
-		$Form->info( T_('Name'), $edited_Itemtype->name );
-	}
-	else
-	{ // Display a field to edit a name
-		$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
-	}
+	// Display a field to edit a name:
+	$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
 
 	$Form->textarea_input( 'ityp_description', $edited_Itemtype->description, 2, T_('Description'), array( 'cols' => 47 ) );
 	$Form->radio( 'ityp_perm_level', $edited_Itemtype->perm_level, array(

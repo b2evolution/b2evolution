@@ -153,11 +153,8 @@ class ItemType extends DataObject
 	function load_from_Request()
 	{
 		// Name
-		if( ! $this->is_special() )
-		{ // Update the name only of not special post types
-			param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
-			$this->set_from_Request( 'name' );
-		}
+		param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
+		$this->set_from_Request( 'name' );
 
 		// Description
 		param( 'ityp_description', 'text' );
@@ -515,6 +512,8 @@ class ItemType extends DataObject
 	/**
 	 *  Returns array, which determinate the lower and upper limit of protected ID's
 	 *
+	 * @deprecated
+	 *
 	 *  @return array
 	 */
 	function get_special_range()
@@ -525,6 +524,8 @@ class ItemType extends DataObject
 
 	/**
 	 * Check if this post type is special( reserved in system )
+	 *
+	 * @deprecated
 	 *
 	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
@@ -545,19 +546,14 @@ class ItemType extends DataObject
 	/**
 	 * Check if this post type is reserved
 	 *
+	 * @deprecated
+	 *
 	 * @param integer Use this param ID of post type when object is not created
 	 * @return boolean
 	 */
 	static function is_reserved( $ID = NULL )
 	{
-		global $posttypes_reserved_IDs;
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return in_array( $ID, $posttypes_reserved_IDs );
+		return false;
 	}
 
 
