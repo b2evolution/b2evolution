@@ -466,7 +466,7 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 
 	if( !$subject_is_correct )
 	{ // Subject is not match to identify return email
-		dre_msg( sprintf( T_('Subject prefix is not %s, skip this email'), '"'.implode( '", "', $repath_subjects ).'"' ), $cron );
+		dre_msg( sprintf( T_('Subject prefix is not "%s", skip this email'), implode( '", "', $repath_subjects ) ), $cron );
 		return false;
 	}
 
