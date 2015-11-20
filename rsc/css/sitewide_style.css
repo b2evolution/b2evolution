@@ -30,7 +30,9 @@ body {
 	padding: 0;
 }
 .sitewide_header a,
-.sitewide_footer a {
+.sitewide_footer a,
+/* Don't use a color for user names in the header site menu: */
+.sitewide_header .swhead_item.user {
 	color: #ccc;
 	border: none;
 }
