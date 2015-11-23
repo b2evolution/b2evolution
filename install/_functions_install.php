@@ -520,16 +520,12 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #5 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
-	skin_install( 'asevo' );
-	skin_install( 'dating_mood' );
-	skin_install( 'evocamp' );
-	skin_install( 'evopress' );
-	skin_install( 'forums' );
-	skin_install( 'manual' );
-	skin_install( 'photoalbums' );
-	skin_install( 'photoblog' );
-	skin_install( 'pixelgreen' );
-	skin_install( 'pureforums' );
+	// skin_install( 'asevo' );
+	// skin_install( 'dating_mood' );
+	// skin_install( 'evopress' );
+	// skin_install( 'photoalbums' );
+	// skin_install( 'photoblog' );
+	// skin_install( 'pureforums' );
 	if( $install_mobile_skins )
 	{
 		skin_install( 'touch' );
