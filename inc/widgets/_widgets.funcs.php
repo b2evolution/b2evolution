@@ -249,7 +249,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array(
 				'blog_ID'          => '',
-				'limit'            => 50,
+				'limit'            => 5,
 				'attached_pics'    => 'first',
 				'disp_first_image' => 'special',
 			);
