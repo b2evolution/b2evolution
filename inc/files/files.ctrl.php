@@ -625,7 +625,15 @@ switch( $action )
 		param( 'zipname', 'string', '' );
 		param( 'exclude_sd', 'integer', 0 );
 
-		if( empty($zipname) )
+		// Check extenssion of the entered file name
+		param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must be ended in .ZIP') );
+
+		if( param_errors_detected() )
+		{	// Stop download if errors detected:
+			break;
+		}
+
+		if( empty( $zipname ) )
 		{
 			if( param( 'action_invoked', 'integer', 0 ) )
 			{ // Action was invoked, add "hint"
@@ -642,7 +650,7 @@ switch( $action )
 			break;
 		}
 
-		// Downloading
+		// Load class to work with ZIP files:
 		load_class( '_ext/_zip_archives.php', 'zip_file' );
 
 		$arraylist = $selected_Filelist->get_array( 'get_name' );
@@ -653,6 +661,7 @@ switch( $action )
 			'recurse' => (1 - $exclude_sd),
 		);
 
+		// Create ZIP archive:
 		$zipfile = new zip_file( $zipname );
 		$zipfile->set_options( $options );
 		$zipfile->add_files( $arraylist, array( '_evocache' ) );
@@ -667,6 +676,7 @@ switch( $action )
 			break;
 		}
 
+		// Download ZIP archive:
 		$zipfile->download_file();
 		exit(0);
 		/* EXITED! */
