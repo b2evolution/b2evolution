@@ -1,0 +1,4 @@
+[submodule "skins/horizon_blog_skin"]
+	path = skins/horizon_blog_skin
+	url = https://github.com/b2evolution/horizon_blog_skin.git
+	fetchrecursesubmodules = true
