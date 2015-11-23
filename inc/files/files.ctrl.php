@@ -609,11 +609,15 @@ $fm_Filelist->sort( $fm_order, $fm_orderasc );
 switch( $action )
 {
 	case 'download':
+	case 'create_zip':
 		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		// TODO: use "inmemory"=>false, so that you can download bigger archives faster!
 
-		$action_title = T_('Download');
+		if( $action == 'create_zip' )
+		{	// Check permission for action to create new ZIP archive:
+			$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		}
 
 		if( !$selected_Filelist->count() )
 		{
@@ -625,6 +629,7 @@ switch( $action )
 		param( 'zipname', 'string', '' );
 		param( 'exclude_sd', 'integer', 0 );
 		param( 'action_invoked', 'integer', 0 );
+		param( 'delete_files', 'integer', 0 ); // Only for action "create_zip"
 
 		if( $action_invoked )
 		{	// Action was invoked, check felds:
@@ -661,7 +666,8 @@ switch( $action )
 
 		$options = array (
 			'basedir' => $fm_Filelist->get_ads_list_path(),
-			'inmemory' => 1,
+			// Keep zip archive in memory only ifor download action:
+			'inmemory' => ( $action == 'download' ),
 			'recurse' => (1 - $exclude_sd),
 		);
 
@@ -673,17 +679,62 @@ switch( $action )
 
 		if( $zipfile->error )
 		{
-			foreach($zipfile->error as $v)
+			foreach( $zipfile->error as $v )
 			{
 				$Messages->add( $v, 'error' );
 			}
 			break;
 		}
 
-		// Download ZIP archive:
-		$zipfile->download_file();
-		exit(0);
-		/* EXITED! */
+		if( $action == 'download' )
+		{	// Download ZIP archive:
+			$zipfile->download_file();
+			exit(0);
+			/* EXITED! */
+		}
+		else // $action == 'create_zip'
+		{	// Display a message after successful creating of ZIP archive:
+			$Messages->add( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success' );
+
+			if( $delete_files )
+			{	// We should delete the files after creating ZIP archive:
+
+				$selected_Filelist->restart();
+
+				// Delete files, It is possible only file has no links:
+				$selected_Filelist->load_meta();
+				while( $l_File = & $selected_Filelist->get_next() )
+				{
+					// Check if there are delete restrictions on this file:
+					$restriction_Messages = $l_File->check_relations( 'delete_restrictions', array(), true );
+
+					if( $restriction_Messages->count() )
+					{ // There are restrictions:
+						$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+							.$restriction_Messages->display( NULL, NULL, false, false ) );
+						// Skip this file
+						continue;
+					}
+
+					if( $l_File->unlink() )
+					{
+						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+						$fm_Filelist->remove( $l_File );
+					}
+					else
+					{
+						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+					}
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
 
 
 	case 'rename':
@@ -1697,6 +1748,10 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			$AdminUI->disp_view( 'files/views/_file_download.form.php' );
 			break;
 
+		case 'create_zip':
+			$AdminUI->disp_view( 'files/views/_file_create_zip.form.php' );
+			break;
+
 		case 'edit_perms':
 			// Filesystem permissions for specific files
 			$AdminUI->disp_view( 'files/views/_file_permissions.form.php' );
@@ -1720,28 +1775,6 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			// Display settings dialog:
 			$AdminUI->disp_view( 'files/views/_file_browse_set.form.php' );
 			break;
-
-		case 'download':
-			// Deferred action message:
-			if( isset($action_title) )
-			{
-				echo "\n<h2>$action_title</h2>\n";
-			}
-
-			if( isset($action_msg) )
-			{
-				echo $action_msg;
-
-				if( isset( $js_focus ) )
-				{ // we want to auto-focus a field
-					echo '
-					<script type="text/javascript">
-						<!--
-						'.$js_focus.'.focus();
-						// -->
-					</script>';
-				}
-			}
 	}
 }
 
