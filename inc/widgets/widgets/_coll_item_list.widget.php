@@ -136,7 +136,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_( 'Max items' ),
 					'note' => T_( 'Maximum number of items to display.' ),
 					'size' => 4,
-					'defaultvalue' => 20,
+					'defaultvalue' => 10,
 				),
 				'disp_title' => array(
 					'label' => T_( 'Titles' ),
