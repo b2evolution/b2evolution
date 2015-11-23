@@ -624,29 +624,33 @@ switch( $action )
 
 		param( 'zipname', 'string', '' );
 		param( 'exclude_sd', 'integer', 0 );
+		param( 'action_invoked', 'integer', 0 );
 
-		// Check extenssion of the entered file name
-		param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must be ended in .ZIP') );
-
-		if( param_errors_detected() )
-		{	// Stop download if errors detected:
-			break;
+		if( $action_invoked )
+		{	// Action was invoked, check felds:
+			// ZIP file name should not be empty:
+			param_check_not_empty( 'zipname', T_('Please provide the name of the archive.') );
+			if( ! empty( $zipname ) )
+			{ // Check extenssion of the entered file name:
+				param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must be ended in .ZIP') );
+			}
 		}
 
 		if( empty( $zipname ) )
 		{
-			if( param( 'action_invoked', 'integer', 0 ) )
-			{ // Action was invoked, add "hint"
-				param_error( 'zipname', T_('Please provide the name of the archive.') );
-			}
 			if( $selected_Filelist->count() == 1 )
-			{
+			{	// Auto suggest ZIP file name as name of the single file:
 				$only_File = $selected_Filelist->get_array();
 				$only_File = $only_File[0];
 
 				// TODO: once we support additional formats, use the default extension here:
 				$zipname = $only_File->get_name().'.zip';
 			}
+			break;
+		}
+
+		if( param_errors_detected() )
+		{	// Stop download if errors detected:
 			break;
 		}
 
