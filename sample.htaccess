@@ -50,7 +50,7 @@ AcceptPathInfo On
 	# RewriteBase /
 
 	# Redirect to REST API controller:
-	RewriteRule ^api/v(\d+)/(.+)$ api/api.php?api_version=$1&api_request=$2 [QSA]
+	RewriteRule ^api/v(\d+)/(.+)$ api/api.php?api_version=$1&api_request=$2 [QSA,L]
 
 	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d
