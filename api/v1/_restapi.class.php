@@ -143,6 +143,8 @@ class RestApi
 	 */
 	private function module_collections()
 	{
+		global $Blog;
+
 		if( ! isset( $this->args[1] ) )
 		{	// Wrong request because collection name is not defined:
 			$this->halt( 'Collection name is not defined' );
@@ -153,7 +155,7 @@ class RestApi
 		$coll_urlname = $this->args[1];
 
 		$BlogCache = & get_BlogCache();
-		if( ( $Blog = & $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
+		if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 		{	// Collection is not detected in DB by requested url name:
 			$this->halt( 'No collection found in DB by requested url name', 'unknown_collection' );
 			// Exit here.
@@ -175,29 +177,29 @@ class RestApi
 		}
 
 		// Call collection controller to prepare current request:
-		$this->{'controller_coll_'.$coll_controller}( $Blog );
+		$this->{'controller_coll_'.$coll_controller}();
 	}
 
 
 	/**
 	 * Call collection controller to prepare request for posts
-	 *
-	 * @param object Collection object
 	 */
-	private function controller_coll_posts( & $Blog )
+	private function controller_coll_posts()
 	{
+		global $Blog;
+
 		// Get additional params:
-		$page = param( 'page', 'integer', 1 );
-		$per_page = param( 'per_page', 'integer', 10 );
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 10 );
 
 		// Try to get a post ID:
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
-		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $per_page, 'ItemCache', 'api_' );
+		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', 'api_' );
 
 		$items_list_filter = array(
 				'types' => NULL, // Get all item types
-				'page'  => $page, // Page number
+				'page'  => $api_page, // Page number
 			);
 
 		if( $post_ID )
@@ -245,6 +247,204 @@ class RestApi
 				$this->halt( 'No posts found for requested collection', 'no_posts', 200 );
 				// Exit here.
 			}
+		}
+	}
+
+
+	/**
+	 * Call collection controller to search the chapters, posts, comments and tags
+	 */
+	private function controller_coll_search()
+	{
+		global $Blog, $Session;
+
+		// Get additional params:
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 10 );
+
+		// Load the search functions:
+		load_funcs( 'collections/_search.funcs.php' );
+
+		// Set a search string:
+		$search_keywords = empty( $this->args[3] ) ? '' : urldecode( $this->args[3] );
+
+		// Try to load existing search results from Session:
+		$search_params = $Session->get( 'search_params' );
+		$search_result = $Session->get( 'search_result' );
+		$search_result_loaded = false;
+		if( empty( $search_params ) 
+			|| ( $search_params['search_keywords'] != $search_keywords ) // We had saved search results but for a different search string
+			|| ( $search_params['search_blog'] != $Blog->ID ) // We had saved search results but for a different collection
+			|| ( $search_result === NULL ) )
+		{	// We need to perform a new search:
+			$search_params = array(
+				'search_keywords' => $search_keywords, 
+				'search_blog'     => $Blog->ID,
+			);
+
+			// Perform new search:
+			$search_result = perform_scored_search( $search_keywords );
+
+			// Save results into session:
+			$Session->set( 'search_params', $search_params );
+			$Session->set( 'search_result', $search_result );
+			$search_result_loaded = true;
+		}
+
+		$search_result = $Session->get( 'search_result' );
+		if( empty( $search_result ) )
+		{	// Nothing found:
+			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 200 );
+			// Exit here.
+		}
+
+		// Prepare pagination:
+		$result_count = count( $search_result );
+		$result_per_page = $api_per_page;
+		if( $result_count > $result_per_page )
+		{	// We will have multiple search result pages:
+			$current_page = $api_page;
+			if( $current_page < 1 )
+			{
+				$current_page = 1;
+			}
+			$total_pages = ceil( $result_count / $result_per_page );
+			if( $api_page > $total_pages )
+			{
+				$current_page = $total_pages;
+			}
+		}
+		else
+		{	// Only one page of results:
+			$current_page = 1;
+			$total_pages = 1;
+		}
+
+		// Set current page indexes:
+		$from = ( ( $current_page -1 ) * $result_per_page );
+		$to = ( $current_page < $total_pages ) ? ( $from + $result_per_page ) : ( $result_count );
+
+		// Init caches
+		$ItemCache = & get_ItemCache();
+		$CommentCache = & get_CommentCache();
+		$ChapterCache = & get_ChapterCache();
+
+		if( ! $search_result_loaded )
+		{	// Search result objects are not loaded into memory yet, load them:
+			// Group required object ids by type:
+			$required_ids = array();
+			for( $index = $from; $index < $to; $index++ )
+			{
+				$row = $search_result[ $index ];
+				if( isset( $required_ids[ $row['type'] ] ) )
+				{
+					$required_ids[ $row['type'] ][] = $row['ID'];
+				}
+				else
+				{
+					$required_ids[ $row['type'] ] = array( $row['ID'] );
+				}
+			}
+
+			// Load each required object into the corresponding cache:
+			foreach( $required_ids as $type => $object_ids )
+			{
+				switch( $type )
+				{
+					case 'item':
+						$ItemCache->load_list( $object_ids );
+						break;
+
+					case 'comment':
+						$CommentCache->load_list( $object_ids );
+						break;
+
+					case 'category':
+						$ChapterCache->load_list( $object_ids );
+						break;
+
+					// TODO: we'll probably load "tag" objects once we support tag-synonyms.
+
+					default: // Not handled search result type
+						break;
+				}
+			}
+		}
+
+		// Get results for current page:
+		for( $index = $from; $index < $to; $index++ )
+		{
+			$row = $search_result[ $index ];
+
+			$result_data = array(
+					'kind' => $row['type'],
+					'id'   => $row['ID'],
+				);
+
+			switch( $row['type'] )
+			{
+				case 'item':
+					// Prepare to display an Item:
+
+					$Item = $ItemCache->get_by_ID( $row['ID'], false );
+
+					if( empty( $Item ) )
+					{ // This Item was deleted, since the search process was executed
+						continue 2; // skip from switch and skip to the next item in loop
+					}
+
+					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
+					$result_data['desc'] = $Item->get_excerpt2();
+					break;
+
+				case 'comment':
+					// Prepare to display a Comment:
+
+					$Comment = $CommentCache->get_by_ID( $row['ID'], false );
+
+					if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
+					{ // This Comment was deleted, since the search process was executed
+						continue 2; // skip from switch and skip to the next item in loop
+					}
+
+					$comment_Item = & $Comment->get_Item();
+					$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
+					$result_data['desc'] = excerpt( $Comment->content );
+					break;
+
+				case 'category':
+					// Prepare to display a Category:
+
+					$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
+
+					if( empty( $Chapter ) )
+					{ // This Chapter was deleted, since the search process was executed
+						continue 2; // skip from switch and skip to the next item in loop
+					}
+
+					$result_data['title'] = $Chapter->get_name();
+					$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
+					break;
+
+				case 'tag':
+					// Prepare to display a Tag:
+
+					list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
+
+					$result_data['title'] = $tag_name;
+					$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
+					break;
+
+				default: 
+					// Other type of result is not implemented
+
+					// TODO: maybe find collections (especially in case of aggregation)? users? files?
+
+					continue 2;
+			}
+
+			// Add data of the searched thing to response:
+			$this->add_response( $result_data );
 		}
 	}
 }
