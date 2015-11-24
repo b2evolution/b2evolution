@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>REST API demo page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link type="text/css" rel="stylesheet" href="../rsc/css/bootstrap/bootstrap.min.css">
+<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+<script type="text/javascript">
+/**
+ * Print out an error of fail request
+ *
+ * @param string Object selector
+ * @param object Error data: 'message', 'code', 'data.status'
+ */
+function rest_api_print_error( obj_selector, error )
+{
+	jQuery( obj_selector ).html( '<h4 class="text-danger">' + error.message + '</h4>'
+		+ '<div><b>Code:</b> ' + error.code + '</div>'
+		+ '<div><b>Status:</b> ' + error.data.status + '</div>' );
+}
+
+
+/**
+ * Execute REST API request
+ *
+ * @param string URL
+ * @param string Object selector
+ * @param function Function on success request
+ */
+function rest_api_request( url, obj_selector, func )
+{
+	jQuery.ajax(
+	{
+		url: '../api/v1/' + url
+	} )
+	.then( func, function( jqXHR )
+	{	// Error request, Display the error data:
+		rest_api_print_error( obj_selector, jqXHR.responseJSON );
+	} );
+}
+
+// Load all public collections on page loading:
+jQuery( document ).ready( function()
+{
+	rest_api_request( 'collections', '#collections_list', function( data )
+	{	// Display the collections list in first column on success request:
+		var r = '<ul class="collections_list">';
+		for( var c in data )
+		{
+			var coll = data[c];
+			r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
+		}
+		r += '</ul>';
+		jQuery( '#collections_list' ).html( r );
+	} );
+} );
+
+// Load the posts of the selected collection:
+jQuery( document ).on( 'click', '.collections_list a', function()
+{
+	jQuery( '#api_column_2' ).html( 'loading...' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var coll_name = jQuery( this ).html();
+
+	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_column_2', function( data )
+	{	// Display the posts in second column on success request:
+		var r = '<h2>' + coll_name + '</h2>' +
+			'<ul class="posts_list">';
+		for( var p in data )
+		{
+			var post = data[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>';
+		jQuery( '#api_column_2' ).html( r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Load the data of the selected post:
+jQuery( document ).on( 'click', '.posts_list a', function()
+{
+	jQuery( '#api_column_3' ).html( 'loading...' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var post_id = jQuery( this ).data( 'id' );
+	var post_title = jQuery( this ).html();
+
+	rest_api_request( 'collections/' + coll_urlname + '/posts/' + post_id, '#api_column_3', function( data )
+	{	// Display the post data in third column on success request:
+		jQuery( '#api_column_3' ).html( '<h2>' + data.title + '</h2>' + data.content );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+</script>
+</head>
+<body>
+	<div class="container">
+
+		<div class="col-lg-4" id="api_column_1">
+			<h2>Collections</h2>
+			<div id="collections_list">loading...</div>
+		</div>
+
+		<div class="col-lg-4" id="api_column_2"></div>
+
+		<div class="col-lg-4" id="api_column_3"></div>
+
+	</div>
+</body>
+</html>

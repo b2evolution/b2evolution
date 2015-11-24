@@ -220,6 +220,7 @@ class RestApi
 		{ // Add each collection row in the response array:
 			$this->add_response( array(
 					'id'        => $Blog->ID,
+					'urlname'   => $Blog->get( 'urlname' ),
 					'kind'      => $Blog->get( 'type' ),
 					'shortname' => $Blog->get( 'shortname' ),
 					'name'      => $Blog->get( 'name' ),
@@ -271,7 +272,7 @@ class RestApi
 					'urltitle'  => $Item->get( 'urltitle' ),
 					'type'      => $Item->get_type_setting( 'name' ),
 					'title'     => $Item->get( 'title' ),
-					'content'   => $Item->get( 'content' ),
+					'content'   => $Item->get_prerendered_content( 'htmlbody' ),
 					'excerpt'   => $Item->get( 'excerpt' ),
 				);
 			if( $post_ID )
