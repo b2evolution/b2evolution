@@ -161,6 +161,27 @@ class RestApi
 			// Exit here.
 		}
 
+		// Check access to the requested collection:
+		$allow_access = $Blog->get_setting( 'allow_access' );
+		if( $allow_access != 'public' )
+		{	// If the collection is not public:
+			if( ! is_logged_in() )
+			{	// Only logged in users have an access to the collection:
+				$this->halt( T_('You need to log in before you can access this section.'), 'access_requires_login', 403 );
+				// Exit here.
+			}
+			elseif( $allow_access == 'members' )
+			{	// Check if current user is member of the collection:
+				global $current_User;
+
+				if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+				{	// Current user cannot access to the collection:
+					$this->halt( T_('You are not a member of this section, therefore you are not allowed to access it.'), 'access_denied', 403 );
+					// Exit here.
+				}
+			}
+		}
+
 		if( ! isset( $this->args[2] ) )
 		{	// Wrong request because collection controller is not defined:
 			$this->halt( 'Collection controller is not defined' );
