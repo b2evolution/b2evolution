@@ -248,6 +248,7 @@ class RestApi
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', 'api_' );
 
 		$items_list_filter = array(
+// fp> yura: why do we need 'types' => NULL ???
 				'types' => NULL, // Get all item types
 				'page'  => $api_page, // Page number
 			);
