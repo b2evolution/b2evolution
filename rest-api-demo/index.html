@@ -43,21 +43,21 @@ function rest_api_request( url, obj_selector, func )
 // Load all public collections on page loading:
 jQuery( document ).ready( function()
 {
-	rest_api_request( 'collections', '#collections_list', function( data )
+	rest_api_request( 'collections', '#api_collections_list', function( data )
 	{	// Display the collections list in first column on success request:
-		var r = '<ul class="collections_list">';
+		var r = '<ul>';
 		for( var c in data )
 		{
 			var coll = data[c];
 			r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
 		}
 		r += '</ul>';
-		jQuery( '#collections_list' ).html( r );
+		jQuery( '#api_collections_list' ).html( r );
 	} );
 } );
 
 // Load the posts of the selected collection:
-jQuery( document ).on( 'click', '.collections_list a', function()
+jQuery( document ).on( 'click', '#api_collections_list a', function()
 {
 	jQuery( '#api_column_2' ).html( 'loading...' );
 	jQuery( '#api_column_3' ).html( '' );
@@ -68,13 +68,22 @@ jQuery( document ).on( 'click', '.collections_list a', function()
 	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_column_2', function( data )
 	{	// Display the posts in second column on success request:
 		var r = '<h2>' + coll_name + '</h2>' +
-			'<ul class="posts_list">';
+			'<form class="form-inline" id="api_search__form" data-urlname="' + coll_urlname + '" style="margin-bottom:10px">' +
+				'<div class="input-group">' +
+					'<input type="text" id="api_search__input" class="form-control">' +
+					'<span class="input-group-btn"><button id="api_search__submit" class="btn btn-primary">Search</button></span>' +
+				'</div> ' +
+				'<button id="api_search__clear" class="btn btn-default">Clear</button>' +
+			'</form>' +
+			'<div id="api_posts_list">' +
+				'<ul>';
 		for( var p in data )
 		{
 			var post = data[p];
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
-		r += '</ul>';
+		r += '</ul>' +
+			'</div>';
 		jQuery( '#api_column_2' ).html( r );
 	} );
 
@@ -83,7 +92,7 @@ jQuery( document ).on( 'click', '.collections_list a', function()
 } );
 
 // Load the data of the selected post:
-jQuery( document ).on( 'click', '.posts_list a', function()
+jQuery( document ).on( 'click', '#api_posts_list a', function()
 {
 	jQuery( '#api_column_3' ).html( 'loading...' );
 
@@ -99,6 +108,69 @@ jQuery( document ).on( 'click', '.posts_list a', function()
 	// To prevent link default event:
 	return false;
 } );
+
+// Submit a search form:
+jQuery( document ).on( 'submit', '#api_search__form', function()
+{
+	jQuery( '#api_posts_list' ).html( 'loading...' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var search_keyword = jQuery( '#api_search__input' ).val();
+
+	rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#api_posts_list', function( data )
+	{	// Display the post data in third column on success request:
+		if( typeof( data.code ) != 'undefined' )
+		{
+			rest_api_print_error( '#api_posts_list', data );
+			return;
+		}
+
+		var r = '<ul>';
+		for( var s in data )
+		{
+			var search_item = data[s];
+			if( search_item.kind == 'item' )
+			{ // item: (Display this as link to load data in third column)
+				r += '<li>' + search_item.kind + ': <a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a></li>';
+			}
+			else
+			{	// category, comment, tag:
+				r += '<li>' + search_item.kind + ': ' + search_item.title + '</li>';
+			}
+		}
+		r += '</ul>';
+		jQuery( '#api_posts_list' ).html( r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Clear the search results:
+jQuery( document ).on( 'click', '#api_search__clear', function()
+{
+	jQuery( '#api_posts_list' ).html( 'loading...' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( '#api_search__form' ).data( 'urlname' );
+
+	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_posts_list', function( data )
+	{	// Display the posts in second column on success request:
+		var r = '<ul>';
+		for( var p in data )
+		{
+			var post = data[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>';
+		jQuery( '#api_posts_list' ).html( r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
 </script>
 </head>
 <body>
@@ -106,7 +178,7 @@ jQuery( document ).on( 'click', '.posts_list a', function()
 
 		<div class="col-lg-4" id="api_column_1">
 			<h2>Collections</h2>
-			<div id="collections_list">loading...</div>
+			<div id="api_collections_list">loading...</div>
 		</div>
 
 		<div class="col-lg-4" id="api_column_2"></div>
