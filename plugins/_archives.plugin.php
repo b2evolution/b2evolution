@@ -138,6 +138,10 @@ class archives_plugin extends Plugin
 		{
 			$params['sort_order'] = 'date';
 		}
+		if( ! isset( $params['sort_order'] ) )
+		{	// Set default sort order:
+			$params['sort_order'] = $Blog->get_setting( 'archives_sort_order' );
+		}
 
 		// Daily archive date format?
 		if( ! isset( $params['day_date_format'] ) || $params['day_date_format'] == '' )
