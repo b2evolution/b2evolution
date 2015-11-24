@@ -145,51 +145,49 @@ class RestApi
 	{
 		global $Blog;
 
-		if( ! isset( $this->args[1] ) )
-		{	// Wrong request because collection name is not defined:
-			$this->halt( 'Collection name is not defined' );
-			// Exit here.
-		}
+		// Collection controller ('list' by default):
+		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
 
-		// Collection urlname:
-		$coll_urlname = $this->args[1];
+		if( $coll_controller != 'list' )
+		{	// Initialize data for request of the selected collection:
 
-		$BlogCache = & get_BlogCache();
-		if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
-		{	// Collection is not detected in DB by requested url name:
-			$this->halt( 'No collection found in DB by requested url name', 'unknown_collection' );
-			// Exit here.
-		}
-
-		// Check access to the requested collection:
-		$allow_access = $Blog->get_setting( 'allow_access' );
-		if( $allow_access != 'public' )
-		{	// If the collection is not public:
-			if( ! is_logged_in() )
-			{	// Only logged in users have an access to the collection:
-				$this->halt( T_('You need to log in before you can access this section.'), 'access_requires_login', 403 );
+			if( ! isset( $this->args[1] ) )
+			{	// Wrong request because collection name is not defined:
+				$this->halt( 'Collection name is not defined' );
 				// Exit here.
 			}
-			elseif( $allow_access == 'members' )
-			{	// Check if current user is member of the collection:
-				global $current_User;
 
-				if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
-				{	// Current user cannot access to the collection:
-					$this->halt( T_('You are not a member of this section, therefore you are not allowed to access it.'), 'access_denied', 403 );
+			// Collection urlname:
+			$coll_urlname = $this->args[1];
+
+			$BlogCache = & get_BlogCache();
+			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
+			{	// Collection is not detected in DB by requested url name:
+				$this->halt( 'No collection found in DB by requested url name', 'unknown_collection' );
+				// Exit here.
+			}
+
+			// Check access to the requested collection:
+			$allow_access = $Blog->get_setting( 'allow_access' );
+			if( $allow_access != 'public' )
+			{	// If the collection is not public:
+				if( ! is_logged_in() )
+				{	// Only logged in users have an access to the collection:
+					$this->halt( T_('You need to log in before you can access this section.'), 'access_requires_login', 403 );
 					// Exit here.
+				}
+				elseif( $allow_access == 'members' )
+				{	// Check if current user is member of the collection:
+					global $current_User;
+
+					if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+					{	// Current user cannot access to the collection:
+						$this->halt( T_('You are not a member of this section, therefore you are not allowed to access it.'), 'access_denied', 403 );
+						// Exit here.
+					}
 				}
 			}
 		}
-
-		if( ! isset( $this->args[2] ) )
-		{	// Wrong request because collection controller is not defined:
-			$this->halt( 'Collection controller is not defined' );
-			// Exit here.
-		}
-
-		// Collection controller:
-		$coll_controller = $this->args[2];
 
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
 		{	// Unknown controller:
@@ -199,6 +197,36 @@ class RestApi
 
 		// Call collection controller to prepare current request:
 		$this->{'controller_coll_'.$coll_controller}();
+	}
+
+
+	/**
+	 * Call collection controller to list the public collections
+	 */
+	private function controller_coll_list()
+	{
+		// Load only public collections for current user:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_public();
+
+		if( empty( $BlogCache->cache ) )
+		{	// No collections found:
+			$this->halt( 'No collections found', 'no_collections', 200 );
+			// Exit here.
+		}
+
+		foreach( $BlogCache->cache as $Blog )
+		{ // Add each collection row in the response array:
+			$this->add_response( array(
+					'id'        => $Blog->ID,
+					'kind'      => $Blog->get( 'type' ),
+					'shortname' => $Blog->get( 'shortname' ),
+					'name'      => $Blog->get( 'name' ),
+					'tagline'   => $Blog->get( 'tagline' ),
+					'desc'      => $Blog->get( 'longdesc' ),
+				) );
+		}
 	}
 
 
@@ -264,7 +292,7 @@ class RestApi
 				// Exit here.
 			}
 			else
-			{	// Wrong post request:
+			{	// No posts found:
 				$this->halt( 'No posts found for requested collection', 'no_posts', 200 );
 				// Exit here.
 			}
