@@ -321,13 +321,17 @@ class autolinks_plugin extends Plugin
 		$word = $data[0];
 		$url = isset( $data[3] ) ? $data[3] : NULL;
 		if( $url == '-' || empty( $url ) )
-		{	// Remove URL (useful to remove some defs on a specific site):
+		{ // Remove URL (useful to remove some defs on a specific site):
 			unset( $this->link_array[0][$word] );
 			unset( $this->link_array[$coll_ID][$word] );
 		}
 		else
 		{
-			$this->link_array[$coll_ID][$word] = array( $data[1], $url );
+			if( ! isset( $this->link_array[ $coll_ID ][ $word ] ) )
+			{ // Initialize array only first time to store several previous words for each word:
+				$this->link_array[ $coll_ID ][ $word ] = array();
+			}
+			$this->link_array[ $coll_ID ][ $word ][ $data[1] ] = $url;
 		}
 	}
 
@@ -527,10 +531,20 @@ class autolinks_plugin extends Plugin
 
 		if( isset( $this->replacement_link_array[ $lword ] ) )
 		{ // There is an autolink definition with the current word
-			// An optional previous required word (allows to create groups of 2 words)
-			$previous = $this->replacement_link_array[ $lword ][0];
-			// Url for current word
-			$url = 'http://'.$this->replacement_link_array[ $lword ][1];
+			if( ! empty( $this->previous_lword ) && isset( $this->replacement_link_array[ $lword ][ $this->previous_lword ] ) )
+			{ // Set an previous word and url from config array:
+				// An optional previous required word (allows to create groups of 2 words)
+				$previous = $this->previous_lword;
+				// Url for current word
+				$url = 'http://'.$this->replacement_link_array[ $lword ][ $this->previous_lword ];
+			}
+			else
+			{ // No previous word, it is a single word
+				foreach( $this->replacement_link_array[ $lword ] as $previous => $url )
+				{ // Initialize an optional previous required word and url as first of the current word
+					break;
+				}
+			}
 
 			if( in_array( $url, $this->already_linked_array ) || in_array( $lword, $this->already_linked_usernames ) )
 			{ // Do not repeat link to same destination:
