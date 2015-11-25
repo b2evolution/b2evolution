@@ -446,6 +446,7 @@ class RestApi
 
 					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
 					$result_data['desc'] = $Item->get_excerpt2();
+					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 					break;
 
 				case 'comment':
@@ -461,6 +462,7 @@ class RestApi
 					$comment_Item = & $Comment->get_Item();
 					$result_data['title'] = $comment_Item->get_title( array( 'link_type' => 'none' ) );
 					$result_data['desc'] = excerpt( $Comment->content );
+					$result_data['permalink'] = $Comment->get_permanent_url( '&' );
 					break;
 
 				case 'category':
@@ -475,6 +477,7 @@ class RestApi
 
 					$result_data['title'] = $Chapter->get_name();
 					$result_data['desc'] = excerpt( $Chapter->get( 'description' ) );
+					$result_data['permalink'] = $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
 					break;
 
 				case 'tag':
@@ -484,6 +487,7 @@ class RestApi
 
 					$result_data['title'] = $tag_name;
 					$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
+					$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
 					break;
 
 				default: 
