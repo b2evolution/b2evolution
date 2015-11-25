@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link type="text/css" rel="stylesheet" href="../rsc/css/bootstrap/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="../rsc/css/font-awesome.min.css">
 <link type="text/css" rel="stylesheet" href="style.css">
 <script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
 <script type="text/javascript">
@@ -121,7 +122,7 @@ jQuery( document ).on( 'click', '#api_collections_list a', function()
 } );
 
 // Load the data of the selected post:
-jQuery( document ).on( 'click', '#api_posts_list a', function()
+jQuery( document ).on( 'click', '#api_posts_list a:not([target])', function()
 {
 	rest_api_start_loading( '#api_column_3' );
 
@@ -159,14 +160,17 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 		for( var s in data )
 		{
 			var search_item = data[s];
+			r += '<li>' + search_item.kind + ': ';
+			r += '<a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
 			if( search_item.kind == 'item' )
 			{ // item: (Display this as link to load data in third column)
-				r += '<li>' + search_item.kind + ': <a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a></li>';
+				r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
 			}
 			else
 			{	// category, comment, tag:
-				r += '<li>' + search_item.kind + ': ' + search_item.title + '</li>';
+				r += search_item.title;
 			}
+			r += '</li>';
 		}
 		r += '</ul>';
 		rest_api_end_loading( '#api_posts_list', r );
