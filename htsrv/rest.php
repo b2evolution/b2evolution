@@ -28,17 +28,8 @@ $debug = 0;
 $api_version = param( 'api_version', 'integer', 1 );
 $api_request = param( 'api_request', 'string', '' );
 
-
 // Load class to work with REST API:
-$class_file_name = dirname( __FILE__ ).'/v'.$api_version.'/_restapi.class.php';
-if( file_exists( $class_file_name ) )
-{	// Load file to work with requested version:
-	load_class( '../api/v'.$api_version.'/_restapi.class.php', 'RestApi' );
-}
-else
-{	// Wrong version request, Load first version by default:
-	load_class( '../api/v1/_restapi.class.php', 'RestApi' );
-}
+load_class( 'rest/_restapi.class.php', 'RestApi' );
 
 // Initialize REST API object for current request:
 $RestApi = new RestApi( $api_request );
