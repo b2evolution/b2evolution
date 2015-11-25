@@ -516,7 +516,7 @@ function generate_random_ip()
  */
 function generate_hit_stat( $days, $min_interval, $max_interval, $display_process = false )
 {
-	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url;
+	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url, $is_api_request;
 
 	load_class('items/model/_itemlistlight.class.php', 'ItemListLight');
 	load_class('sessions/model/_hit.class.php', 'Hit');
@@ -600,6 +600,16 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				'link' => $htsrv_url.'anon_async.php',
 				'blog_id' => $blog_id
 			);
+
+		$links[] = array(
+				'link' => '/api/v1/collections/'.$listBlog->urlname.'/posts',
+				'blog_id' => $blog_id
+			);
+
+		$links[] = array(
+				'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
+				'blog_id' => $blog_id
+			);
 	}
 
 	$referes = array('http://www.fake-referer1.com',
@@ -677,7 +687,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	if( empty( $users_count ) )
 	{
 		$Messages->add( 'Cannot generate statistics without valid users.' );
-		break;
+		return;
 	}
 
 	// Calculate the period of testing
@@ -729,7 +739,6 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 
-
 		if ($cur_seesion['sess_ID'] == -1)
 		{ // This session needs initialization:
 			$cur_seesion['sess_start_ts'] = $time_shift - 1;
@@ -748,6 +757,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 			$cur_seesion['sess_ID'] = $DB->insert_id;
 			$sessions[$rand_i] = $cur_seesion;
+
+			// Check if current url is api request:
+			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
 
 			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 			$Test_hit->log();
@@ -827,6 +839,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						$link = array('link' => '/htsrv/login.php',
 							'blog_id' => 1);
 
+						// This is NOT api request:
+						$is_api_request = false;
+
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $link);
 
 						$Test_hit->log();
@@ -842,6 +857,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					}
 					else
 					{
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+
 						if (mt_rand(0, 100) < 50)
 						{ // robot hit
 							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], $cur_seesion['robot']);
@@ -857,12 +875,19 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				{
 					if (mt_rand(0, 100) < 10)
 					{ // Test hit to admin page
+
+						// This is NOT api request:
+						$is_api_request = false;
+
 						$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $admin_link, NULL, 1);
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $admin_url;
 					}
 					else
 					{
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
@@ -873,6 +898,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			{
 				// Update session
 				$cur_seesion['sess_lastseen_ts'] = $time_shift;
+
+				// Check if current url is api request:
+				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
 
 				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 				$Test_hit->log();
@@ -902,6 +930,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 	}
+
+	// Reset this back to from test values:
+	$is_api_request = false;
 
 	return $insert_data_count;
 }

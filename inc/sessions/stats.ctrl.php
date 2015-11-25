@@ -271,6 +271,13 @@ switch( $tab )
 				$AdminUI->set_page_manual_link( 'browser-hits-summary' );
 				break;
 
+			case 'api':
+				$AdminUI->breadcrumbpath_add( T_('API'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'api-hits-summary' );
+				break;
+
 			case 'robot':
 				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
@@ -448,6 +455,10 @@ switch( $AdminUI->get_path(1) )
 		{
 			case 'browser':
 				$AdminUI->disp_view( 'sessions/views/_stats_browserhits.view.php' );
+				break;
+
+			case 'api':
+				$AdminUI->disp_view( 'sessions/views/_stats_api.view.php' );
 				break;
 
 			case 'robot':

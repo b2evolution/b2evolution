@@ -12,8 +12,15 @@
  */
 
 
-// Initialize config and main functions:
+// Initialize config:
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this an API request?
+ */
+$is_api_request = true;
+
+// Initialize main functions:
 require_once $inc_path.'_main.inc.php';
 
 

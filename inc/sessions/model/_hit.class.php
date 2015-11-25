@@ -47,7 +47,7 @@ class Hit
 	/**
 	 * The type of hit.
 	 *
-	 * 'standard'|'rss'|'admin'|'ajax'|'service'
+	 * 'standard'|'rss'|'admin'|'ajax'|'service'|'api'
 	 *
 	 * @var string
 	 */
@@ -873,9 +873,13 @@ class Hit
 
 		if( empty( $this->hit_type ) )
 		{
-			global $Skin;
+			global $Skin, $is_api_request;
 
-			if( ( isset( $Skin ) && $Skin->type == 'feed' ) || ! empty( $this->test_rss ) )
+			if( ! empty( $is_api_request ) )
+			{	// This is an API request:
+				$this->hit_type = 'api';
+			}
+			elseif( ( isset( $Skin ) && $Skin->type == 'feed' ) || ! empty( $this->test_rss ) )
 			{
 				$this->hit_type = 'rss';
 			}

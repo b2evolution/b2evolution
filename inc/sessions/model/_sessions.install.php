@@ -75,7 +75,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_disp              VARCHAR(30) DEFAULT NULL,
 			hit_ctrl              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_action            VARCHAR(30) DEFAULT NULL,
-			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,

@@ -6959,7 +6959,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11510' );
+		set_upgrade_checkpoint( '11510' );
+	}
+
+	if( $old_db_version < 11520 )
+	{ // part 3 of 6.7.0
+
+		task_begin( 'Upgrading hitlog table...' );
+		$DB->query( "ALTER TABLE T_hitlog
+			MODIFY COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL" );
+		task_end();
+
+		// set_upgrade_checkpoint( '11520' );
 	}
 
 	/*
