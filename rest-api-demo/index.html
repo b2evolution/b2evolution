@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link type="text/css" rel="stylesheet" href="../rsc/css/bootstrap/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="style.css">
 <script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
 <script type="text/javascript">
 /**
@@ -15,7 +16,7 @@
  */
 function rest_api_print_error( obj_selector, error )
 {
-	jQuery( obj_selector ).html( '<h4 class="text-danger">' + error.message + '</h4>'
+	rest_api_end_loading( obj_selector, '<h4 class="text-danger">' + error.message + '</h4>'
 		+ '<div><b>Code:</b> ' + error.code + '</div>'
 		+ '<div><b>Status:</b> ' + error.data.status + '</div>' );
 }
@@ -40,9 +41,37 @@ function rest_api_request( url, obj_selector, func )
 	} );
 }
 
+
+/**
+ * Set style during loading new content
+ *
+ * @param string Object selector
+ */
+function rest_api_start_loading( obj_selector )
+{
+	jQuery( obj_selector ).addClass( 'api_loading' )
+		.append( '<div class="dots-loader">loading...</div>' );
+}
+
+
+/**
+ * Remove style after loading new content
+ *
+ * @param string Object selector
+ * @param string New content
+ */
+function rest_api_end_loading( obj_selector, content )
+{
+	jQuery( obj_selector ).removeClass( 'api_loading' )
+		.html( content )
+		.find( '.dots-loader' ).remove();
+}
+
+
 // Load all public collections on page loading:
 jQuery( document ).ready( function()
 {
+	rest_api_start_loading( '#api_collections_list' );
 	rest_api_request( 'collections', '#api_collections_list', function( data )
 	{	// Display the collections list in first column on success request:
 		var r = '<ul>';
@@ -52,14 +81,14 @@ jQuery( document ).ready( function()
 			r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
 		}
 		r += '</ul>';
-		jQuery( '#api_collections_list' ).html( r );
+		rest_api_end_loading( '#api_collections_list', r );
 	} );
 } );
 
 // Load the posts of the selected collection:
 jQuery( document ).on( 'click', '#api_collections_list a', function()
 {
-	jQuery( '#api_column_2' ).html( 'loading...' );
+	rest_api_start_loading( '#api_column_2' );
 	jQuery( '#api_column_3' ).html( '' );
 
 	var coll_urlname = jQuery( this ).data( 'urlname' );
@@ -84,7 +113,7 @@ jQuery( document ).on( 'click', '#api_collections_list a', function()
 		}
 		r += '</ul>' +
 			'</div>';
-		jQuery( '#api_column_2' ).html( r );
+		rest_api_end_loading( '#api_column_2', r );
 	} );
 
 	// To prevent link default event:
@@ -94,7 +123,7 @@ jQuery( document ).on( 'click', '#api_collections_list a', function()
 // Load the data of the selected post:
 jQuery( document ).on( 'click', '#api_posts_list a', function()
 {
-	jQuery( '#api_column_3' ).html( 'loading...' );
+	rest_api_start_loading( '#api_column_3' );
 
 	var coll_urlname = jQuery( this ).data( 'urlname' );
 	var post_id = jQuery( this ).data( 'id' );
@@ -102,7 +131,7 @@ jQuery( document ).on( 'click', '#api_posts_list a', function()
 
 	rest_api_request( 'collections/' + coll_urlname + '/posts/' + post_id, '#api_column_3', function( data )
 	{	// Display the post data in third column on success request:
-		jQuery( '#api_column_3' ).html( '<h2>' + data.title + '</h2>' + data.content );
+		rest_api_end_loading( '#api_column_3', '<h2>' + data.title + '</h2>' + data.content );
 	} );
 
 	// To prevent link default event:
@@ -112,7 +141,7 @@ jQuery( document ).on( 'click', '#api_posts_list a', function()
 // Submit a search form:
 jQuery( document ).on( 'submit', '#api_search__form', function()
 {
-	jQuery( '#api_posts_list' ).html( 'loading...' );
+	rest_api_start_loading( '#api_posts_list' );
 	jQuery( '#api_column_3' ).html( '' );
 
 	var coll_urlname = jQuery( this ).data( 'urlname' );
@@ -140,7 +169,7 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 			}
 		}
 		r += '</ul>';
-		jQuery( '#api_posts_list' ).html( r );
+		rest_api_end_loading( '#api_posts_list', r );
 	} );
 
 	// To prevent link default event:
@@ -150,7 +179,7 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 // Clear the search results:
 jQuery( document ).on( 'click', '#api_search__clear', function()
 {
-	jQuery( '#api_posts_list' ).html( 'loading...' );
+	rest_api_start_loading( '#api_posts_list' );
 	jQuery( '#api_column_3' ).html( '' );
 
 	var coll_urlname = jQuery( '#api_search__form' ).data( 'urlname' );
@@ -164,7 +193,7 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
 		r += '</ul>';
-		jQuery( '#api_posts_list' ).html( r );
+		rest_api_end_loading( '#api_posts_list', r );
 	} );
 
 	// To prevent link default event:
@@ -176,14 +205,14 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 <body>
 	<div class="container">
 
-		<div class="col-lg-4" id="api_column_1">
+		<div class="col-lg-3 col-sm-6 col-xs-12" id="api_column_1">
 			<h2>Collections</h2>
 			<div id="api_collections_list">loading...</div>
 		</div>
 
-		<div class="col-lg-4" id="api_column_2"></div>
+		<div class="col-lg-4 col-sm-6 col-xs-12" id="api_column_2"></div>
 
-		<div class="col-lg-4" id="api_column_3"></div>
+		<div class="col-lg-5 col-sm-12 col-xs-12" id="api_column_3"></div>
 
 	</div>
 </body>
