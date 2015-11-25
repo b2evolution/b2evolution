@@ -835,7 +835,7 @@ class Hit
 		}
 		else
 		{
-			$blog_ID = $this->test_uri['blog_id'];
+			$blog_ID = isset( $this->test_uri['blog_id'] ) ? $this->test_uri['blog_id'] : NULL;
 			$ReqURI = $this->test_uri['link'];
 		}
 

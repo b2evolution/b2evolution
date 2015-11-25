@@ -28,8 +28,17 @@ if( isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST' )
 $_COOKIE = array();
 
 
+// Initialize config:
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this an API request?
+ */
+$is_api_request = true;
+
+// Initialize main functions:
 require_once $inc_path.'_main.inc.php';
+
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 if( CANUSEXMLRPC !== TRUE || ! $Settings->get('general_xmlrpc') )

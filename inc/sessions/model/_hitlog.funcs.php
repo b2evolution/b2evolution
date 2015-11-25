@@ -527,8 +527,8 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	$blogs_id = $BlogCache->load_public();
 
-	foreach ($blogs_id as $blog_id)
-	{ // handle all public blogs
+	foreach( $blogs_id as $blog_id )
+	{	// Handle all public blogs:
 			$listBlog = & $BlogCache->get_by_ID($blog_id);
 		if (empty($listBlog))
 		{
@@ -549,7 +549,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$linkblog_cat_array = array();
 		$linkblog_cat_modifier = '';
 
-		compile_cat_array($linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID);
+		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID );
 
 		$filters['cat_array'] = $linkblog_cat_array;
 		$filters['cat_modifier'] = $linkblog_cat_modifier;
@@ -560,16 +560,16 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		// Get the items list of current blog
 		$ItemList->query();
 
-		if (!$ItemList->result_num_rows)
-		{ // Nothing to display:
+		if( ! $ItemList->result_num_rows )
+		{	// Nothing to display:
 			continue;
 		}
 
-		while ($Item = & $ItemList->get_category_group())
+		while( $Item = & $ItemList->get_category_group() )
 		{
 			// Open new cat:
 			$Chapter = & $Item->get_main_Chapter();
-			while ($Item = & $ItemList->get_item())
+			while( $Item = & $ItemList->get_item() )
 			{
 				$links[] = array('link' => '/' . $listBlog->siteurl . '/' . $Chapter->get_url_path() . $Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
 					'blog_id' => $blog_id);
@@ -610,7 +610,20 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
 				'blog_id' => $blog_id
 			);
+
+		$links[] = array(
+				'link' => '/xmlsrv/xmlrpc.php?blog='.$listBlog->ID,
+				'blog_id' => $blog_id
+			);
 	}
+
+	$links[] = array(
+			'link' => '/api/v1/collections',
+		);
+
+	$links[] = array(
+			'link' => '/xmlsrv/xmlrpc.php'
+		);
 
 	$referes = array('http://www.fake-referer1.com',
 		'http://www.fake-referer2.com',
@@ -759,7 +772,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			$sessions[$rand_i] = $cur_seesion;
 
 			// Check if current url is api request:
-			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 			$Test_hit->log();
@@ -858,7 +871,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					else
 					{
 						// Check if current url is api request:
-						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 						if (mt_rand(0, 100) < 50)
 						{ // robot hit
@@ -886,7 +899,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 					else
 					{
 						// Check if current url is api request:
-						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 						$Test_hit->log();
@@ -900,7 +913,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				$cur_seesion['sess_lastseen_ts'] = $time_shift;
 
 				// Check if current url is api request:
-				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 );
+				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
 				$Test_hit->log();
