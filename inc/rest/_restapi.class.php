@@ -238,28 +238,22 @@ class RestApi
 	{
 		global $Blog;
 
-		// Get additional params:
-		$api_page = param( 'page', 'integer', 1 );
+		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
-		// Try to get a post ID:
+		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/posts/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', 'api_' );
 
-		$items_list_filter = array(
-// fp> yura: why do we need 'types' => NULL ???
-				'types' => NULL, // Get all item types
-				'page'  => $api_page, // Page number
-			);
-
 		if( $post_ID )
 		{	// Get only one requested post:
-			$items_list_filter['post_ID'] = $post_ID;
+			$ItemList2->set_filters( array( 'post_ID' => $post_ID ) );
 		}
-
-		// Filter items list:
-		$ItemList2->set_filters( $items_list_filter );
+		else
+		{	// Load all available params from request to filter the posts list:
+			$ItemList2->load_from_Request( false );
+		}
 
 		// Run the items list query:
 		$ItemList2->query();
