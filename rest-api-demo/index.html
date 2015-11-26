@@ -17,9 +17,17 @@
  */
 function rest_api_print_error( obj_selector, error )
 {
-	rest_api_end_loading( obj_selector, '<h4 class="text-danger">' + error.message + '</h4>'
+	if( typeof( error.code ) == 'undefined' )
+	{	// Unknown non-json response:
+		var error_text = '<h4 class="text-danger">Unknown error: ' + error + '</h4>';
+	}
+	else
+	{	// JSON error data accepted:
+		var error_text ='<h4 class="text-danger">' + error.message + '</h4>'
 		+ '<div><b>Code:</b> ' + error.code + '</div>'
-		+ '<div><b>Status:</b> ' + error.data.status + '</div>' );
+		+ '<div><b>Status:</b> ' + error.data.status + '</div>';
+	}
+	rest_api_end_loading( obj_selector, error_text );
 }
 
 
@@ -38,7 +46,7 @@ function rest_api_request( url, obj_selector, func )
 	} )
 	.then( func, function( jqXHR )
 	{	// Error request, Display the error data:
-		rest_api_print_error( obj_selector, jqXHR.responseJSON );
+		rest_api_print_error( obj_selector, typeof( jqXHR.responseJSON ) == 'undefined' ? jqXHR.statusText : jqXHR.responseJSON );
 	} );
 }
 
@@ -151,7 +159,7 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 	rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#api_posts_list', function( data )
 	{	// Display the post data in third column on success request:
 		if( typeof( data.code ) != 'undefined' )
-		{
+		{	// Error code was responsed:
 			rest_api_print_error( '#api_posts_list', data );
 			return;
 		}
