@@ -2537,7 +2537,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request;
 
 	$params = array_merge( array(
 		'status'     => '500 Internal Server Error',
@@ -2549,7 +2549,21 @@ function debug_die( $additional_info = '', $params = array() )
 		$additional_info = $params['debug_info'];
 	}
 
-	if( $is_cli )
+	if( $is_api_request )
+	{	// REST API or XMLRPC request:
+
+		// Set JSON content type:
+		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+		header_http_response( $params['status'] );
+
+		echo json_encode( array(
+				'error_status' => $params['status'],
+				'error_info'   => $additional_info,
+			) );
+
+		die(1); // Error code 1. Note: This will still call the shutdown function.
+	}
+	elseif( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occurred!')." ==\n";
 		echo T_('If this error persists, please report it to the administrator.')."\n";
@@ -2685,7 +2699,22 @@ function debug_die( $additional_info = '', $params = array() )
  */
 function bad_request_die( $additional_info = '' )
 {
-	global $debug, $baseurl;
+	global $debug, $baseurl, $is_api_request;
+
+	if( $is_api_request )
+	{	// REST API or XMLRPC request:
+
+		// Set JSON content type:
+		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+		header_http_response( '400 Bad Request' );
+
+		echo json_encode( array(
+				'error_status' => '400 Bad Request',
+				'error_info'   => $additional_info,
+			) );
+
+		die(2); // Error code 2. Note: this will still call the shutdown function.
+	}
 
 	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
