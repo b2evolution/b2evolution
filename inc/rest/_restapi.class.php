@@ -244,7 +244,7 @@ class RestApi
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/posts/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
-		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', 'api_' );
+		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', '' );
 
 		if( $post_ID )
 		{	// Get only one requested post:
