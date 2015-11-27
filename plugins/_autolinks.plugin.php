@@ -252,6 +252,42 @@ class autolinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'stealth' ) );
+		return array_merge( parent::get_email_setting_definitions( $default_params ),
+			array(
+				// No follow settings in messages:
+				'autolink_nofollow_exist' => array(
+						'label' => T_( 'No follow in messages' ),
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_explicit' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_auto' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
+						'defaultvalue' => 0,
+					),
+			)
+		);
+	}
+
+
+	/**
 	 * Lazy load global definitions array
 	 *
 	 * @param object Blog

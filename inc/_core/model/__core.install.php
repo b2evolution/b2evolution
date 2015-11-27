@@ -291,7 +291,7 @@ $schema_queries = array(
 		'Creating plugin settings table',
 		"CREATE TABLE T_pluginsettings (
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL,
 			pset_value TEXT NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

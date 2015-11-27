@@ -172,6 +172,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$error_value = NULL;
 				break;
 
+			case 'EmailSettings':
+				$set_value = $Obj->get_email_setting( $parname );
+				$error_value = NULL;
+				break;
+
 			case 'Skin':
 				$set_value = $Obj->get_setting( $parname );
 				$error_value = NULL;
@@ -772,6 +777,8 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			// Plugin global settings:
 		case 'MsgSettings':
 			// Plugin messages settings:
+		case 'EmailSettings':
+			// Plugin emails settings:
 			$error_value = $Obj->PluginSettingsValidateSet( $dummy = array(
 				'name' => $parname,
 				'value' => & $l_value,
@@ -785,6 +792,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				if( $set_type == 'MsgSettings' && $parname != 'msg_apply_rendering' )
 				{	// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
 					$Obj->Settings->set( 'msg_'.$parname, $l_value );
+				}
+				elseif( $set_type == 'EmailSettings' && $parname != 'email_apply_rendering' )
+				{	// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+					$Obj->Settings->set( 'email_'.$parname, $l_value );
 				}
 				else
 				{	// Global settings:

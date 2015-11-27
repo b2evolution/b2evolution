@@ -647,6 +647,44 @@ class Plugin
 	}
 
 
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return array();
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_email_rendering = ( isset( $params['default_email_rendering'] ) && in_array( $params['default_email_rendering'], $rendering_options ) ) ? $params['default_email_rendering'] : 'never';
+		$r = array(
+			'email_apply_rendering' => array(
+					'label' => T_('Apply rendering to emails'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_email_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
   /**
    * Get definitions for widget specific editable params
    *
@@ -2243,6 +2281,8 @@ class Plugin
 	{
 	}
 
+	// }}}
+
 	// PluginMsgSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's messages settings.
@@ -2250,6 +2290,18 @@ class Plugin
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
 	function PluginMsgSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
+	// PluginEmailSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's messages settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginEmailSettingsUpdateAction()
 	{
 	}
 
@@ -3586,6 +3638,38 @@ class Plugin
 
 		// Try default values:
 		$params = $this->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{ // We have a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+	/**
+	 * Get a email specific param value
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_email_setting( $parname )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+		$value = $this->Settings->get( $parname == 'email_apply_rendering' ? $parname : 'email_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$params = $this->get_email_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;

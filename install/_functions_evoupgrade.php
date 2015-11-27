@@ -6580,6 +6580,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
+		set_upgrade_checkpoint( '11510' );
+	}
+
+	if( $old_db_version < 11520 )
+	{ // part 3 of 6.7.0
+
+		task_begin( 'Upgrading plugin settings table...' );
+		$DB->query( 'ALTER TABLE T_pluginsettings
+			MODIFY pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
 		// set_upgrade_checkpoint( '11510' );
 	}
 

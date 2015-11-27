@@ -148,6 +148,20 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 
 
 	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'stealth' ) );
+		return parent::get_email_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * - Split text into blocks, using $block_tags pattern.
 	 *
 	 * @param string Text

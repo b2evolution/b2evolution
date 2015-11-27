@@ -35,6 +35,38 @@ class bbcode_plugin extends Plugin
 	var $post_replace_list;
 	var $comment_search_list;
 	var $comment_replace_list;
+	var $default_search_list = '[b] #\[b](.+?)\[/b]#is
+[i] #\[i](.+?)\[/i]#is
+[s] #\[s](.+?)\[/s]#is
+[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
+[size] #\[size=([0-9]+?)](.+?)\[/size]#is
+[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
+ #\[quote(=?)](.+?)\[/quote]#is
+ #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
+[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
+[indent] #\[indent](.+?)\[/indent]#is
+[list=1] #\[list=1](.+?)\[/list]#is
+[list=a] #\[list=a](.+?)\[/list]#is
+[list] #\[list](.+?)\[/list]#is
+[*] #\[\*](.+?)(\n|\[/list\])#is
+[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
+[clear] #\[clear]#is';
+	var $default_replace_list = '<strong>$1</strong>
+<em>$1</em>
+<span style="text-decoration:line-through">$1</span>
+<span style="color:$1">$2</span>
+<span style="font-size:$1px">$2</span>
+<span style="font-family:$1">$2</span>
+<blockquote>$2</blockquote>
+<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
+<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
+<div class="indented">$1</div>
+<ol type="1">$1</ol>
+<ol type="a">$1</ol>
+<ul>$1</ul>
+<li>$1</li>
+<span style="background-color:$1">$2</span>
+<div class="clear"></div>';
 
 
 	/**
@@ -66,22 +98,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
-[i] #\[i](.+?)\[/i]#is
-[s] #\[s](.+?)\[/s]#is
-[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
-[size] #\[size=([0-9]+?)](.+?)\[/size]#is
-[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
- #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
-[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
-[indent] #\[indent](.+?)\[/indent]#is
-[list=1] #\[list=1](.+?)\[/list]#is
-[list=a] #\[list=a](.+?)\[/list]#is
-[list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
-[clear] #\[clear]#is',
+					'defaultvalue' => $this->default_search_list,
 				),
 				'coll_post_replace_list' => array(
 					'label' => $this->T_( 'Replace list for posts'),
@@ -89,22 +106,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '<strong>$1</strong>
-<em>$1</em>
-<span style="text-decoration:line-through">$1</span>
-<span style="color:$1">$2</span>
-<span style="font-size:$1px">$2</span>
-<span style="font-family:$1">$2</span>
-<blockquote>$2</blockquote>
-<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
-<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
-<div class="indented">$1</div>
-<ol type="1">$1</ol>
-<ol type="a">$1</ol>
-<ul>$1</ul>
-<li>$1</li>
-<span style="background-color:$1">$2</span>
-<div class="clear"></div>',
+					'defaultvalue' => $this->default_replace_list,
 				),
 				'coll_comment_search_list' => array(
 					'label' => $this->T_( 'Search list for comments'),
@@ -112,22 +114,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
-[i] #\[i](.+?)\[/i]#is
-[s] #\[s](.+?)\[/s]#is
-[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
-[size] #\[size=([0-9]+?)](.+?)\[/size]#is
-[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
- #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
-[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
-[indent] #\[indent](.+?)\[/indent]#is
-[list=1] #\[list=1](.+?)\[/list]#is
-[list=a] #\[list=a](.+?)\[/list]#is
-[list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
-[clear] #\[clear]#is',
+					'defaultvalue' => $this->default_search_list,
 				),
 				'coll_comment_replace_list' => array(
 					'label' => $this->T_( 'Replace list for comments'),
@@ -135,22 +122,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '<strong>$1</strong>
-<em>$1</em>
-<span style="text-decoration:line-through">$1</span>
-<span style="color:$1">$2</span>
-<span style="font-size:$1px">$2</span>
-<span style="font-family:$1">$2</span>
-<blockquote>$2</blockquote>
-<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
-<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
-<div class="indented">$1</div>
-<ol type="1">$1</ol>
-<ol type="a">$1</ol>
-<ul>$1</ul>
-<li>$1</li>
-<span style="background-color:$1">$2</span>
-<div class="clear"></div>',
+					'defaultvalue' => $this->default_replace_list,
 				),
 			)
 		);
@@ -173,22 +145,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
-[i] #\[i](.+?)\[/i]#is
-[s] #\[s](.+?)\[/s]#is
-[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
-[size] #\[size=([0-9]+?)](.+?)\[/size]#is
-[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
- #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
-[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
-[indent] #\[indent](.+?)\[/indent]#is
-[list=1] #\[list=1](.+?)\[/list]#is
-[list=a] #\[list=a](.+?)\[/list]#is
-[list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
-[clear] #\[clear]#is',
+					'defaultvalue' => $this->default_search_list,
 				),
 				'replace_list' => array(
 					'label' => $this->T_( 'Replace list for messages'),
@@ -196,22 +153,38 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '<strong>$1</strong>
-<em>$1</em>
-<span style="text-decoration:line-through">$1</span>
-<span style="color:$1">$2</span>
-<span style="font-size:$1px">$2</span>
-<span style="font-family:$1">$2</span>
-<blockquote>$2</blockquote>
-<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
-<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
-<div class="indented">$1</div>
-<ol type="1">$1</ol>
-<ol type="a">$1</ol>
-<ul>$1</ul>
-<li>$1</li>
-<span style="background-color:$1">$2</span>
-<div class="clear"></div>',
+					'defaultvalue' => $this->default_replace_list,
+				),
+			)
+		);
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_email_setting_definitions( $params ),
+			array(
+				'search_list' => array(
+					'label' => $this->T_( 'Search list for messages'),
+					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_search_list,
+				),
+				'replace_list' => array(
+					'label' => $this->T_( 'Replace list for messages'),
+					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_replace_list,
 				),
 			)
 		);

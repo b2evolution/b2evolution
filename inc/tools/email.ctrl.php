@@ -100,6 +100,46 @@ switch( $action )
 				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
 				break;
 
+			case 'renderers':
+				// Update email renderers settings:
+				load_funcs('plugins/_plugin.funcs.php');
+
+				$Plugins->restart();
+				while( $loop_Plugin = & $Plugins->get_next() )
+				{
+					$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+					if( empty( $pluginsettings ) )
+					{
+						continue;
+					}
+
+					// Loop through settings for this plugin:
+					foreach( $pluginsettings as $set_name => $set_meta )
+					{
+						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'EmailSettings' );
+					}
+
+					// Let the plugin handle custom fields:
+					// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+
+					if( $ok_to_update === false )
+					{	// The plugin has said they should not get updated, Rollback settings:
+						$loop_Plugin->Settings->reset();
+					}
+					else
+					{	// Update message settings of the Plugin:
+						$loop_Plugin->Settings->dbupdate();
+					}
+				}
+
+				$Messages->add( T_('Settings updated.'), 'success' );
+
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=email&tab=settings&tab3='.$tab3, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+				break;
+
 			case 'returned':
 				// Settings to decode the returned emails:
 				param( 'repath_enabled', 'boolean', 0 );
@@ -423,6 +463,13 @@ switch( $tab )
 				$AdminUI->set_page_manual_link( 'email-notification-settings' );
 				break;
 
+			case 'renderers':
+				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
+				break;
+
 			case 'returned':
 				$AdminUI->breadcrumbpath_add( T_('Returned emails'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
@@ -523,6 +570,10 @@ switch( $tab )
 	case 'settings':
 		switch( $tab3 )
 		{
+			case 'renderers':
+				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
+				break;
+
 			case 'returned':
 				$AdminUI->disp_view( 'tools/views/_email_returned.form.php' );
 				break;

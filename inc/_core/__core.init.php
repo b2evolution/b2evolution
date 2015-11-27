@@ -1666,6 +1666,9 @@ class _core_Module extends Module
 								'notifications' => array(
 									'text' => T_('Notifications'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
+								'renderers' => array(
+									'text' => T_('Renderers'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
 								'returned' => array(
 									'text' => T_('Returned emails'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=returned' ),
