@@ -33,16 +33,12 @@ $Form->begin_fieldset( T_('HTML message').get_manual_link( 'creating-an-email-ca
 	$Form->textarea_input( 'ecmp_email_html', $edited_EmailCampaign->get( 'email_html' ), 20, T_('HTML Message'), array( 'required' => true ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletter recipients') );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_users_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
-$Form->end_fieldset();
-
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save HTML message'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save & continue').' >>', 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save_edit]', T_('Save & edit'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save_preview]', T_('Save & preview'), 'PreviewButton' );
 }
 $Form->end_form( $buttons );
 

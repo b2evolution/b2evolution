@@ -35,7 +35,7 @@ $Form->begin_fieldset( T_('Plain-text message').get_manual_link( 'creating-an-em
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails in order to extract text from html
 		$Form->output = false;
-		$button_to_extract = $Form->button( array( 'submit', 'actionArray[extract_html]', T_('Extract from HTML'), 'SaveButton' ) );
+		$button_to_extract = $Form->button( array( 'submit', 'actionArray[extract_html]', T_('Extract from HTML'), 'SmallButton' ) );
 		$Form->output = true;
 	}
 	else
@@ -45,16 +45,12 @@ $Form->begin_fieldset( T_('Plain-text message').get_manual_link( 'creating-an-em
 	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('Plain-text Message'), array( 'required' => true, 'input_prefix' => $button_to_extract ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletter recipients') );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_users_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
-$Form->end_fieldset();
-
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save Plain-text message'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save & continue').' >>', 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save_edit]', T_('Save & edit'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save_preview]', T_('Save & preview'), 'PreviewButton' );
 }
 $Form->end_form( $buttons );
 

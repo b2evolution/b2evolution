@@ -67,7 +67,9 @@ switch( $action )
 
 	case 'switchtab':
 	case 'save':
-		// Save Campaign
+	case 'save_edit':
+	case 'save_preview':
+		// Save Campaign:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'campaign' );
@@ -93,10 +95,22 @@ switch( $action )
 		// Redirect so that a reload doesn't write to the DB twice:
 		$redirect_tab_type = 'current';
 		if( $action == 'save' )
-		{
+		{	// Save & continue to next step:
 			$tab = $current_tab;
 			$redirect_tab_type = 'next';
 		}
+		elseif( $action == 'save_edit' )
+		{	// Save & edit this again:
+			$tab = $current_tab;
+			$redirect_tab_type = 'current';
+		}
+		elseif( $action == 'save_preview' )
+		{	// Save & preview:
+			$tab = 'send';
+			$redirect_tab_type = 'current';
+		}
+
+		// Redirect after saving:
 		header_redirect( get_campaign_tab_url( $tab, $edited_EmailCampaign->ID, $redirect_tab_type ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
