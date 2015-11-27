@@ -159,10 +159,16 @@ class markdown_plugin extends Plugin
 			$images_enabled = $this->get_coll_setting( 'images', $item_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
-		{ // We are rendering Message now, Use FALSE by default because we don't have the settings
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
+		{	// We are rendering Message now:
+			$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+			$links_enabled = $this->get_msg_setting( 'links' );
+			$images_enabled = $this->get_msg_setting( 'images' );
+		}
+		elseif( ! empty( $params['EmailCampaign'] ) )
+		{	// We are rendering EmailCampaign now:
+			$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+			$links_enabled = $this->get_email_setting( 'links' );
+			$images_enabled = $this->get_email_setting( 'images' );
 		}
 		else
 		{ // Unknown call, Don't render this case
@@ -255,7 +261,7 @@ class markdown_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog );
 	}
 
 
@@ -293,7 +299,7 @@ class markdown_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog );
 	}
 
 
@@ -308,7 +314,24 @@ class markdown_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{ // Print toolbar on screen
-			return $this->DisplayCodeToolbar( NULL, $params );
+			return $this->DisplayCodeToolbar( 'msg' );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( 'email' );
 		}
 		return false;
 	}
@@ -317,9 +340,10 @@ class markdown_plugin extends Plugin
 	/**
 	 * Display Toolbar
 	 *
+	 * @param string Setting type: 'coll', 'msg', 'email'
 	 * @param object Blog
 	 */
-	function DisplayCodeToolbar( $Blog = NULL, $params = array() )
+	function DisplayCodeToolbar( $type = 'coll', $Blog = NULL )
 	{
 		global $Hit;
 
@@ -328,17 +352,28 @@ class markdown_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $Blog ) )
-		{ // Use FALSE by default because we don't have the settings for Message
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
-		}
-		else
-		{ // Get plugin setting values depending on Blog
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $Blog );
+		switch( $type )
+		{
+			case 'msg':
+				// Get plugin setting values for messages:
+				$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+				$links_enabled = $this->get_msg_setting( 'links' );
+				$images_enabled = $this->get_msg_setting( 'images' );
+				break;
+
+			case 'email':
+				// Get plugin setting values for emails:
+				$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+				$links_enabled = $this->get_email_setting( 'links' );
+				$images_enabled = $this->get_email_setting( 'images' );
+				break;
+
+			default:
+				// Get plugin setting values for current collection:
+				$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
+				$links_enabled = $this->get_coll_setting( 'links', $Blog );
+				$images_enabled = $this->get_coll_setting( 'images', $Blog );
+				break;
 		}
 
 		// Load js to work with textarea

@@ -237,6 +237,25 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( !empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters

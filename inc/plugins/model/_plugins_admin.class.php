@@ -142,6 +142,8 @@ class Plugins_admin extends Plugins
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
 				'RenderItemAttachment' => 'Renders item attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
+				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
 
 
 				// fp> rename to "DispRender"
@@ -157,6 +159,7 @@ class Plugins_admin extends Plugins
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
 				'FilterMsgContent' => 'Filters the content of a message.',
+				'FilterEmailContent' => 'Filters the content of an email.',
 
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
@@ -183,6 +186,7 @@ class Plugins_admin extends Plugins
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',
 				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
 				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
+				'DisplayEmailToolbar' => 'Display a toolbar on the email form',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormBefore' => 'Called when displaying the "Register" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
@@ -445,6 +449,7 @@ class Plugins_admin extends Plugins
 		{ // All Plugin from 'rendering' groups handle the FilterCommentContent
 			$plugin_class_methods[] = 'FilterCommentContent';
 			$plugin_class_methods[] = 'FilterMsgContent';
+			$plugin_class_methods[] = 'FilterEmailContent';
 		}
 
 		if( ! function_exists('token_get_all') )
@@ -1042,7 +1047,6 @@ class Plugins_admin extends Plugins
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
-				break;
 			}
 
 			return true;

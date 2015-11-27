@@ -301,6 +301,23 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->display_toolbar();
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters

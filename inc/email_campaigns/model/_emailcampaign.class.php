@@ -46,6 +46,11 @@ class EmailCampaign extends DataObject
 	var $users = NULL;
 
 	/**
+	 * @var string
+	 */
+	var $renderers;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -55,7 +60,11 @@ class EmailCampaign extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_email__campaign', 'ecmp_', 'ecmp_ID', 'date_ts' );
 
-		if( $db_row != NULL )
+		if( $db_row == NULL )
+		{
+			$this->set_renderers( array( 'default' ) );
+		}
+		else
 		{
 			$this->ID = $db_row->ecmp_ID;
 			$this->date_ts = $db_row->ecmp_date_ts;
@@ -64,6 +73,7 @@ class EmailCampaign extends DataObject
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
+			$this->renderers = $db_row->ecmp_renderers;
 		}
 	}
 
@@ -77,7 +87,39 @@ class EmailCampaign extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
+				array( 'table'=>'T_email__campaign_prerendering', 'fk'=>'ecpr_ecmp_ID', 'msg'=>T_('%d prerendered content') ),
 			);
+	}
+
+
+	/**
+	 * Update email campaign
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
+	{
+		global $Plugins, $DB;
+
+		$dbchanges = $this->dbchanges;
+
+		$DB->begin();
+
+		if( ( $r = parent::dbupdate() ) !== false )
+		{
+			if( isset( $dbchanges['ecmp_email_html'] ) || isset( $dbchanges['ecmp_email_html'] ) )
+			{	// Delete prerendered content if html content has been updated:
+				$this->delete_prerendered_content();
+			}
+
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $r;
 	}
 
 
@@ -213,6 +255,14 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'email_text' );
 		}
 
+		// Renderers:
+		if( param( 'renderers_displayed', 'integer', 0 ) )
+		{	// use "renderers" value only if it has been displayed (may be empty):
+			global $Plugins;
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'EmailCampaign' => & $this ) );
+			$this->set_renderers( $renderers );
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -285,7 +335,7 @@ class EmailCampaign extends DataObject
 	{
 		$newsletter_params = array(
 				'include_greeting' => false,
-				'message_html'     => $this->get( 'email_html' ),
+				'message_html'     => $this->get_html_content(),
 				'message_text'     => $this->get( 'email_text' ),
 			);
 
@@ -389,6 +439,160 @@ class EmailCampaign extends DataObject
 		}
 
 		$DB->commit();
+	}
+
+
+	/**
+	 * Get the list of validated renderers for this EmailCampaign. This includes stealth plugins etc.
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+			$this->renderers_validated = $Plugins->validate_renderer_list( $this->get_renderers(), array( 'EmailCampaign' => & $this ) );
+		}
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get the list of renderers for this Message.
+	 * @return array
+	 */
+	function get_renderers()
+	{
+		return explode( '.', $this->renderers );
+	}
+
+
+	/**
+	 * Set the renderers of the Message.
+	 *
+	 * @param array List of renderer codes.
+	 * @return boolean true, if it has been set; false if it has not changed
+	 */
+	function set_renderers( $renderers )
+	{
+		return $this->set_param( 'renderers', 'string', implode( '.', $renderers ) );
+	}
+
+
+	/**
+	 * Get the prerendered content. If it has not been generated yet, it will.
+	 *
+	 * NOTE: This calls {@link Message::dbupdate()}, if renderers get changed (from Plugin hook).
+	 *       (not for preview though)
+	 *
+	 * @param string Format, see {@link format_to_output()}.
+	 *        Only "htmlbody", "entityencoded", "xml" and "text" get cached.
+	 * @return string
+	 */
+	function get_prerendered_content( $format  = 'htmlbody' )
+	{
+		global $Plugins, $DB;
+
+		$use_cache = $this->ID && in_array( $format, array( 'htmlbody', 'entityencoded', 'xml', 'text' ) );
+		if( $use_cache )
+		{	// the format/comment can be cached:
+			$email_renderers = $this->get_renderers_validated();
+			if( empty( $email_renderers ) )
+			{
+				return format_to_output( $this->email_html, $format );
+			}
+			$email_renderers = implode( '.', $email_renderers );
+			$cache_key = $format.'/'.$email_renderers;
+
+			$EmailCampaignPrerenderingCache = & get_EmailCampaignPrerenderingCache();
+
+			if( isset( $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key] ) )
+			{	// already in PHP cache
+				$r = $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key];
+				// Save memory, typically only accessed once:
+				unset( $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key] );
+			}
+			else
+			{	// try loading into Cache:
+				if( ! isset( $EmailCampaignPrerenderingCache[$format] ) )
+				{	// only do the prefetch loading once:
+					$EmailCampaignPrerenderingCache[$format] = array();
+
+					$SQL = new SQL();
+					$SQL->SELECT( 'ecpr_ecmp_ID, ecpr_format, ecpr_renderers, ecpr_content_prerendered' );
+					$SQL->FROM( 'T_email__campaign_prerendering' );
+					$SQL->WHERE( 'ecpr_ecmp_ID = '.$this->ID );
+					$SQL->WHERE_and( 'ecpr_format = '.$DB->quote( $format ) );
+					$rows = $DB->get_results( $SQL->get(), OBJECT, 'Preload prerendered emails content ('.$format.')' );
+					foreach( $rows as $row )
+					{
+						$row_cache_key = $row->ecpr_format.'/'.$row->ecpr_renderers;
+
+						if( ! isset( $EmailCampaignPrerenderingCache[$format][$row->ecpr_ecmp_ID] ) )
+						{	// init list:
+							$EmailCampaignPrerenderingCache[$format][$row->ecpr_ecmp_ID] = array();
+						}
+
+						$EmailCampaignPrerenderingCache[$format][$row->ecpr_ecmp_ID][$row_cache_key] = $row->ecpr_content_prerendered;
+					}
+
+					// Get the value for current Comment:
+					if( isset( $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key] ) )
+					{
+						$r = $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key];
+						// Save memory, typically only accessed once:
+						unset( $EmailCampaignPrerenderingCache[$format][$this->ID][$cache_key] );
+					}
+				}
+			}
+		}
+
+		if( ! isset( $r ) )
+		{
+			$data = $this->email_html;
+			$Plugins->trigger_event( 'FilterEmailContent', array( 'data' => & $data, 'EmailCampaign' => $this ) );
+			$r = format_to_output( $data, $format );
+
+			if( $use_cache )
+			{	// save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above):
+				global $servertimenow;
+				$DB->query( 'REPLACE INTO T_email__campaign_prerendering ( ecpr_ecmp_ID, ecpr_format, ecpr_renderers, ecpr_content_prerendered, ecpr_datemodified )
+					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $email_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered email content' );
+			}
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Unset any prerendered content for this email (in PHP cache).
+	 */
+	function delete_prerendered_content()
+	{
+		global $DB;
+
+		// Delete DB rows.
+		$DB->query( 'DELETE FROM T_email__campaign_prerendering WHERE ecpr_ecmp_ID = '.$this->ID );
+
+		// Delete cache.
+		$EmailCampaignPrerenderingCache = & get_EmailCampaignPrerenderingCache();
+		foreach( array_keys( $EmailCampaignPrerenderingCache ) as $format )
+		{
+			unset( $EmailCampaignPrerenderingCache[$format][$this->ID] );
+		}
+	}
+
+
+	/**
+	 * Template function: get html content of email
+	 *
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return string
+	 */
+	function get_html_content( $format = 'htmlbody' )
+	{
+		return $this->get_prerendered_content( $format );
 	}
 }
 

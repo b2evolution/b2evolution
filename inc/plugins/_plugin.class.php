@@ -2061,6 +2061,62 @@ class Plugin
 	// }}}
 
 
+	// Email form events: {{{
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: called to filter the email's content
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object
+	 */
+	function FilterEmailContent( & $params )
+	{
+		if( $this->group == 'rendering' )
+		{	// All plugin from 'rendering' group has a 'email_apply_rendering' setting
+			$EmailCampaign = & $params['EmailCampaign'];
+			if( in_array( $this->code, $EmailCampaign->get_renderers_validated() ) )
+			{ // Always allow rendering for $EmailCampaign
+				$render_params = array_merge(  array( 'data' => & $EmailCampaign->email_html ), $params );
+				$this->RenderEmailAsHtml( $render_params );
+			}
+		}
+	}
+
+	/**
+	 * Event handler: Called when rendering email contents as HTML. (CACHED)
+	 *
+	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
+	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAsHtml( $params );
+	}
+
+	// }}}
+
+
 	// Caching events: {{{
 
 	/**

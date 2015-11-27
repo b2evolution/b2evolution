@@ -227,18 +227,23 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	function RenderMessageAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Blog = NULL;
-		if( !isset( $this->msg_search_list ) )
-		{
-			$this->msg_search_list = $this->prepare_search_list( 'coll_comment_search_list', $Blog, true );
-		}
+		$content = replace_content_outcode( $this->get_msg_setting( 'search_list' ), $this->get_msg_setting( 'replace_list' ), $content, array( $this, 'parse_bbcode' ) );
 
-		if( !isset( $this->msg_replace_list ) )
-		{
-			$this->msg_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_comment_replace_list', $Blog, true ) ) );
-		}
+		return true;
+	}
 
-		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, array( $this, 'parse_bbcode' ) );
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+		$content = replace_content_outcode( $this->get_email_setting( 'search_list' ), $this->get_email_setting( 'replace_list' ), $content, array( $this, 'parse_bbcode' ) );
 
 		return true;
 	}
@@ -472,7 +477,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				$Item = $params['Item'];
 				$item_Blog = & $Item->get_Blog();
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $item_Blog );
-				$allow_null_blog = false;
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
 				break;
 
 			case 'Comment':
@@ -489,13 +494,17 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					$item_Blog = & $comment_Item->get_Blog();
 				}
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
-				$allow_null_blog = false;
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
 				break;
 
 			case 'Message':
-				$search_list_setting_name = 'coll_comment_search_list';
 				$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
-				$allow_null_blog = true;
+				$search_list = trim( $this->get_msg_setting( 'search_list' ) );
+				break;
+
+			case 'EmailCampaign':
+				$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+				$search_list = trim( $this->get_email_setting( 'search_list' ) );
 				break;
 
 			default:
@@ -508,8 +517,6 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		{	// Don't display a toolbar if plugin is disabled
 			return false;
 		}
-
-		$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
 
 		if( empty( $search_list ) )
 		{	// No list defined
@@ -762,6 +769,23 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	function DisplayMessageToolbar( & $params )
 	{
 		if( $this->get_msg_setting( 'msg_apply_rendering' ) )
+		{
+			$params['target_type'] = 'EmailCampaign';
+			return $this->DisplayCodeToolbar( $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		if( $this->get_email_setting( 'email_apply_rendering' ) )
 		{
 			$params['target_type'] = 'Message';
 			return $this->DisplayCodeToolbar( $params );

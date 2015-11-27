@@ -191,7 +191,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'emails', 'edit', true );
 
-		$email_html = $edited_EmailCampaign->get( 'email_html' );
+		$email_html = $edited_EmailCampaign->get_html_content();
 
 		// Convert HTML to Plain Text
 		$email_text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>[^<]*<\/a>/i', ' [ $1 ] ', $email_html );

@@ -243,6 +243,24 @@ XX(      graydead.gif
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		if( $this->get_email_setting( 'email_apply_rendering' )
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
+		{
+			return $this->display_smiley_bar();
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display the smiley toolbar
 	 *
 	 * @return boolean did we display a toolbar?

@@ -43,7 +43,7 @@ $Form->begin_fieldset( T_('Review and Send').get_manual_link( 'creating-an-email
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	echo '<div style="overflow:auto">'.mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User ).'</div>';
+	echo '<div style="overflow:auto">'.mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get_html_content(), 'include_greeting' => false ), $current_User ).'</div>';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';

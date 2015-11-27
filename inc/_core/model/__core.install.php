@@ -475,6 +475,7 @@ $schema_queries = array(
 			ecmp_email_html  TEXT NULL,
 			ecmp_email_text  TEXT NULL,
 			ecmp_sent_ts     TIMESTAMP NULL,
+			ecmp_renderers   VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			PRIMARY KEY      (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -486,6 +487,17 @@ $schema_queries = array(
 			csnd_emlog_ID INT(11) UNSIGNED NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_email__campaign_prerendering' => array(
+		'Creating email campaign prerendering cache table',
+		"CREATE TABLE T_email__campaign_prerendering (
+			ecpr_ecmp_ID              INT(11) UNSIGNED NOT NULL,
+			ecpr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
+			ecpr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecpr_content_prerendered MEDIUMTEXT NULL,
+			ecpr_datemodified        TIMESTAMP NOT NULL,
+			PRIMARY KEY (ecpr_ecmp_ID, ecpr_format)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_syslog' => array(
 		'Creating system log table',
