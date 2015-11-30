@@ -25,11 +25,8 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( T_('HTML message').get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
-	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
-	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
-	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
+$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->get( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
+	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 
 	ob_start();
 	echo '<div class="email_toolbars">';
@@ -40,11 +37,11 @@ $Form->begin_fieldset( T_('HTML message').get_manual_link( 'creating-an-email-ca
 
 	$form_inputstart = $Form->inputstart;
 	$Form->inputstart .= $email_toolbar;
-	$Form->textarea_input( 'ecmp_email_html', $edited_EmailCampaign->get( 'email_html' ), 20, T_('HTML Message'), array( 'required' => true ) );
+	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('HTML Message'), array( 'required' => true ) );
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins:
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_html" );</script>';
+	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
 
 	// Display renderers
 	$current_renderers = !empty( $edited_EmailCampaign ) ? $edited_EmailCampaign->get_renderers_validated() : array( 'default' );
@@ -59,8 +56,6 @@ $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save & continue').' >>', 'SaveButton' );
-	$buttons[] = array( 'submit', 'actionArray[save_edit]', T_('Save & edit'), 'SaveButton' );
-	$buttons[] = array( 'submit', 'actionArray[save_preview]', T_('Save & preview'), 'PreviewButton' );
 }
 $Form->end_form( $buttons );
 

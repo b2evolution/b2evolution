@@ -6593,17 +6593,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrading email campaigns table... ' );
 		db_add_col( 'T_email__campaign', 'ecmp_renderers', 'VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
-		task_end();
-
-		task_begin( 'Creating table for email campaign prerendering cache... ' );
-		$DB->query( "CREATE TABLE T_email__campaign_prerendering (
-			ecpr_ecmp_ID             INT(11) UNSIGNED NOT NULL,
-			ecpr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			ecpr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			ecpr_content_prerendered MEDIUMTEXT NULL,
-			ecpr_datemodified        TIMESTAMP NOT NULL,
-			PRIMARY KEY (ecpr_ecmp_ID, ecpr_format)
-		) ENGINE = innodb" );
+		db_add_col( 'T_email__campaign', 'ecmp_email_plaintext', 'TEXT NULL AFTER ecmp_email_text' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11520' );
