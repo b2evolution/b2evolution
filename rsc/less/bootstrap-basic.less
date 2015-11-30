@@ -436,7 +436,7 @@ table.widget_grid .note {
 // ---------------- //
 
 
-// Disp=user style fixes
+// Table style fixes:
 .table_scroll table.table tr td {
 	vertical-align: middle;
 	&.firstcol.shrinkwrap {
@@ -445,6 +445,10 @@ table.widget_grid .note {
 			.border-radius;
 		}
 	}
+}
+// Align top all cells of messages table:
+.disp_messages .table_scroll table.table tr td {
+	vertical-align: top;
 }
 // ---------------- //
 

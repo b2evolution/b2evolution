@@ -1491,6 +1491,9 @@ table.widget_grid div {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
+.disp_messages .table_scroll table.table tr td {
+  vertical-align: top;
+}
 .ufld_icon_links {
   text-align: center;
 }
