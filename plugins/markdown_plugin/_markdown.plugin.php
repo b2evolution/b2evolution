@@ -204,7 +204,8 @@ class markdown_plugin extends Plugin
 			case 'forum':
 			case 'manual':
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
+				// yura: Disable this plugin by default because it creates an issue on loading comment form by AJAX:
+				// $params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
 				break;
@@ -547,7 +548,7 @@ class markdown_plugin extends Plugin
 				}
 			}
 			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
-			document.write( '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="X" />' );
+			document.write( '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />' );
 			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
 		}
 
@@ -625,7 +626,7 @@ class markdown_plugin extends Plugin
 		</script><?php
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">markdown_toolbar( '<?php echo T_('Markdown').': '; ?>' );</script><?php
+		?><script type="text/javascript">markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 		echo $this->get_template( 'toolbar_after' );
 
 		return true;
