@@ -235,10 +235,20 @@ class EmailCampaign extends DataObject
 			// Save original message:
 			$this->set_from_Request( 'email_text' );
 
+			// This must get triggered before any internal validation and must pass all relevant params.
+			$email_text = $this->get( 'email_text' );
+			$Plugins->trigger_event( 'EmailFormSent', array(
+					'content'         => & $email_text,
+					'dont_remove_pre' => true,
+					'renderers'       => $this->get_renderers_validated(),
+				) );
+
 			// Save prerendered message:
-			$data = $this->get( 'email_text' );
-			$Plugins->trigger_event( 'FilterEmailContent', array( 'data' => & $data, 'EmailCampaign' => $this ) );
-			$this->set( 'email_html', format_to_output( $data ) );
+			$Plugins->trigger_event( 'FilterEmailContent', array(
+					'data'          => & $email_text,
+					'EmailCampaign' => $this
+				) );
+			$this->set( 'email_html', format_to_output( $email_text ) );
 
 			// Save plain-text message:
 			$email_plaintext = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>[^<]*<\/a>/i', ' [ $1 ] ', $this->get( 'email_html' ) );

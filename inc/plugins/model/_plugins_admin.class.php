@@ -161,6 +161,8 @@ class Plugins_admin extends Plugins
 				'FilterMsgContent' => 'Filters the content of a message.',
 				'FilterEmailContent' => 'Filters the content of an email.',
 
+				'EmailFormSent' => 'Called when the email form has been submitted.',
+
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',

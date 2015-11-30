@@ -2076,6 +2076,19 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 *
+	 * Use this to filter input
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'content': the message text (by reference)
+	 */
+	function EmailFormSent( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called to filter the email's content
 	 *
 	 * @param array Associative array of parameters
@@ -2088,7 +2101,7 @@ class Plugin
 			$EmailCampaign = & $params['EmailCampaign'];
 			if( in_array( $this->code, $EmailCampaign->get_renderers_validated() ) )
 			{ // Always allow rendering for $EmailCampaign
-				$render_params = array_merge(  array( 'data' => & $EmailCampaign->email_html ), $params );
+				$render_params = array_merge( array( 'data' => & $EmailCampaign->email_text ), $params );
 				$this->RenderEmailAsHtml( $render_params );
 			}
 		}
