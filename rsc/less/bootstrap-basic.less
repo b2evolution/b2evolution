@@ -712,7 +712,7 @@ div.debug td.odd {
 	background-color: #eee;
 }
 // ---------------- //
-// Disp=user style fixes
+// Table style fixes:
 .table_scroll table.table tr td {
 	vertical-align: middle;
 	&.firstcol.shrinkwrap {
@@ -721,6 +721,10 @@ div.debug td.odd {
 			.border-radius;
 		}
 	}
+}
+// Align top all cells of messages table:
+.disp_messages .table_scroll table.table tr td {
+	vertical-align: top;
 }
 // ---------------- //
 
