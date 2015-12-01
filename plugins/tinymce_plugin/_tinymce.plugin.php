@@ -770,10 +770,10 @@ class tinymce_plugin extends Plugin
 		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
 
+		$content_css = '';
 		if( ! empty( $Blog ) )
 		{	// Load the appropriate ITEM/POST styles depending on the blog's skin:
 			// Note: we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
-			$content_css = '';
 			$blog_skin_ID = $Blog->get_skin_ID();
 			if( ! empty( $blog_skin_ID ) )
 			{
