@@ -253,7 +253,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	 *
 	 * NOTE: Use default coll settings of comments as messages settings
 	 *
-	 * @see Plugin::RenderMessageAsHtml()
+	 * @see Plugin::RenderEmailAsHtml()
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
@@ -794,7 +794,8 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		if( $this->get_msg_setting( 'msg_apply_rendering' ) )
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
 			$params['target_type'] = 'Message';
 			return $this->DisplayCodeToolbar( $params );
@@ -811,7 +812,8 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
-		if( $this->get_email_setting( 'email_apply_rendering' ) )
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
 			$params['target_type'] = 'EmailCampaign';
 			return $this->DisplayCodeToolbar( $params );

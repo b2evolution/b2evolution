@@ -122,6 +122,48 @@ class adjust_headings_plugin extends Plugin
 
 
 	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Get setting level for messages:
+		$this->setting_level = $this->get_msg_setting( 'level' );
+
+		// Adjust headings:
+		$content = $this->do_adjust_headings( $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Get setting level for emails:
+		$this->setting_level = $this->get_email_setting( 'level' );
+
+		// Adjust headings:
+		$content = $this->do_adjust_headings( $content );
+
+		return true;
+	}
+
+
+	/**
 	 * Do the same as for HTML.
 	 *
 	 * @see RenderItemAsHtml()

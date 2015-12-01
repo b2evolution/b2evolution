@@ -205,6 +205,34 @@ class infodots_plugin extends Plugin
 
 
 	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		// This plugin cannot works with messages:
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// This plugin cannot works with emails:
+		return true;
+	}
+
+
+	/**
 	 *
 	 * Render comments if required
 	 *

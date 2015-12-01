@@ -232,7 +232,8 @@ XX(      graydead.gif
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		if( $this->get_msg_setting( 'msg_apply_rendering' )
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
@@ -250,7 +251,8 @@ XX(      graydead.gif
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
-		if( $this->get_email_setting( 'email_apply_rendering' )
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
