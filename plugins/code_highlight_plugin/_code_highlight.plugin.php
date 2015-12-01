@@ -449,6 +449,23 @@ class code_highlight_plugin extends Plugin
 	}
 
 
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in email:
+			$this->FilterItemContents( $params );
+			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
+			{	// remove <pre>:
+				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
+			}
+		}
+	}
+
+
 	function BeforeCommentFormInsert( $params )
 	{
 		$Comment = & $params['Comment'];

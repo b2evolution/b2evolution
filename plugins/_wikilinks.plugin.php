@@ -109,7 +109,9 @@ class wikilinks_plugin extends Plugin
 		}
 		$item_Blog = & $Item->get_Blog();
 
-		return $this->render_content( $content, $item_Blog );
+		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $item_Blog );
+
+		return $this->render_content( $content );
 	}
 
 
@@ -124,7 +126,26 @@ class wikilinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		return $this->render_content( $content, NULL, true );
+		$this->setting_link_without_brackets = $this->get_msg_setting( 'link_without_brackets' );
+
+		return $this->render_content( $content );
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		$this->setting_link_without_brackets = $this->get_email_setting( 'link_without_brackets' );
+
+		return $this->render_content( $content );
 	}
 
 
@@ -134,11 +155,9 @@ class wikilinks_plugin extends Plugin
 	 * @todo get rid of global $blog
 	 *
 	 * @param string Content
-	 * @param object Blog
-	 * @param boolean Allow empty Blog
-	 * return boolean
+	 * @return boolean
 	 */
-	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	function render_content( & $content )
 	{
 		global $ItemCache, $admin_url, $blog, $evo_charset;
 
@@ -185,7 +204,7 @@ class wikilinks_plugin extends Plugin
 		$search_wikiwords = array();
 		$replace_links = array();
 
-		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog, $allow_null_blog ) )
+		if( $this->setting_link_without_brackets )
 		{	// Create the links from standalone WikiWords
 
 			// STANDALONE WIKIWORDS:

@@ -115,8 +115,6 @@ class escapecode_plugin extends Plugin
 	 */
 	function EmailFormSent( & $params )
 	{
-		global $Settings;
-
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
 		{ // Do escape html entities only when html is allowed for content and plugin is enabled

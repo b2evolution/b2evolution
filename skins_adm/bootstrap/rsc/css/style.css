@@ -1406,3 +1406,7 @@ table.diff td.diff-title-addedline {
 #skin_wrapper .email_wrap .user img {
   top: -1px;
 }
+#skin_wrapper .email_wrap ul {
+  margin: 0 0 10px 25px;
+  list-style: disc;
+}

@@ -99,6 +99,19 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in message:
+			$this->FilterItemContents( $params );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -244,6 +257,21 @@ class prism_plugin extends Plugin
 
 		require_js( $this->get_plugin_url().'/js/prism.min.js', true );
 		require_css( $this->get_plugin_url().'/css/prism.min.css', true );
+	}
+
+
+	/**
+	 * @see Plugin::AdminEndHtmlHead()
+	 */
+	function AdminEndHtmlHead()
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( $this->get_plugin_url().'/js/prism.min.js', 'relative' );
+			require_css( $this->get_plugin_url().'/css/prism.min.css', 'relative' );
+		}
 	}
 
 
