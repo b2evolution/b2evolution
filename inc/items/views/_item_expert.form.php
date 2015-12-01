@@ -209,7 +209,12 @@ $Form->begin_form( '', '', $params );
 
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Item',
+			'target_object' => $edited_Item,
+			'content_id'    => 'itemform_post_content',
+			'edit_layout'   => 'expert',
+		) );
 	echo '</div>';
 
 	echo '<div class="pull-right">';

@@ -28,6 +28,7 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 
+	// Plugin toolbars:
 	ob_start();
 	echo '<div class="email_toolbars">';
 	// CALL PLUGINS NOW:
@@ -35,10 +36,28 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	echo '</div>';
 	$email_toolbar = ob_get_clean();
 
+	// Plugin buttons:
+	ob_start();
+	echo '<div class="edit_actions">';
+	echo '<div class="pull-left">';
+	// CALL PLUGINS NOW:
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'EmailCampaign',
+			'target_object' => $edited_EmailCampaign,
+			'content_id'    => 'ecmp_email_text',
+			'edit_layout'   => 'expert',
+		) );
+	echo '</div>';
+	echo '</div>';
+	$email_plugin_buttons = ob_get_clean();
+
 	$form_inputstart = $Form->inputstart;
+	$form_inputend = $Form->inputend;
 	$Form->inputstart .= $email_toolbar;
+	$Form->inputend = $email_plugin_buttons.$Form->inputend;
 	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('HTML Message'), array( 'required' => true ) );
 	$Form->inputstart = $form_inputstart;
+	$Form->inputend = $form_inputend;
 
 	// set b2evoCanvas for plugins:
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
