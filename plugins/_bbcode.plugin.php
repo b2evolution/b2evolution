@@ -477,7 +477,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				$Item = $params['Item'];
 				$item_Blog = & $Item->get_Blog();
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $item_Blog );
-				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
 				break;
 
 			case 'Comment':
@@ -494,7 +494,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					$item_Blog = & $comment_Item->get_Blog();
 				}
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
-				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
 				break;
 
 			case 'Message':
