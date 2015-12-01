@@ -34,8 +34,7 @@ if( !empty( $template_action ) && $template_action == 'send_campaign' )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Review and Send').get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->info( T_('Name'), $edited_EmailCampaign->get( 'name' ) );
+$Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->info( T_('Email title'), $edited_EmailCampaign->get( 'email_title' ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
 	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
@@ -43,7 +42,10 @@ $Form->begin_fieldset( T_('Review and Send').get_manual_link( 'creating-an-email
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	echo '<div style="overflow:auto">'.mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User ).'</div>';
+	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false ), $current_User );
+	// Clear all html tags that may break styles of main html page:
+	$html_mail_template = preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $html_mail_template );
+	echo '<div style="overflow:auto">'.$html_mail_template.'</div>';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';

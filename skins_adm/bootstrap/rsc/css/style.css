@@ -1390,3 +1390,19 @@ table.diff td.diff-title-addedline {
 #iframe_wrapper .results_compact.panel .table-bordered tr:first-child td {
   border-top: none;
 }
+.timestamp {
+  white-space: nowrap;
+  text-align: center;
+}
+.timestamp .time {
+  font-size: 84%;
+}
+.compact_data {
+  white-space: nowrap;
+}
+#skin_wrapper .email_wrap p {
+  margin: 2ex 0;
+}
+#skin_wrapper .email_wrap .user img {
+  top: -1px;
+}

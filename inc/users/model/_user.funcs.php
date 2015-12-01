@@ -4662,7 +4662,7 @@ function users_results_block( $params = array() )
 		}
 	}
 
-	global $DB, $UserSettings, $Settings, $action, $admin_url;
+	global $DB, $UserSettings, $Settings, $action, $admin_url, $action;
 
 	// query which groups have users (in order to prevent deletion of groups which have users)
 	global $usedgroups; // We need this in a callback below
@@ -4739,7 +4739,7 @@ function users_results_block( $params = array() )
 	{
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add user
-			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4, array( 'class' => 'action_icon '.( $action == 'newsletter' ? 'btn-default' :  'btn-primary' ) ) );
 		}
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add group
@@ -4751,10 +4751,9 @@ function users_results_block( $params = array() )
 	$UserList->display( $params['display_params'] );
 
 	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
-	{ // Newsletter button
-		global $admin_url;
+	{	// Display newsletter button:
 		echo '<p class="center">';
-		echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn btn-default" />';
+		echo '<input type="button" value="'.T_('Send newsletter to the current selection').'" onclick="location.href=\''.$admin_url.'?ctrl=campaigns&amp;action=users&amp;'.url_crumb( 'campaign' ).'\'" class="btn '.( $action == 'newsletter' ? 'btn-primary' :  'btn-default' ).'" />';
 		echo '</p>';
 	}
 }

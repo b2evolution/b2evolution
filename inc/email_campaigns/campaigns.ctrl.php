@@ -61,7 +61,7 @@ switch( $action )
 		$Messages->add( T_('The email campaign was created. Please select the recipients.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -106,10 +106,8 @@ switch( $action )
 	case 'change_users':
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
-		$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
-
 		// Redirect to select users:
-		header_redirect( '?ctrl=users', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -338,7 +336,7 @@ switch( $action )
 			case 'compose':
 				if( $edited_EmailCampaign->get( 'email_text' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_text', '<p>Hello $login$!</p>'."\r\n\r\n".'<p>This is our newsletter...</p>' );
+					$edited_EmailCampaign->set( 'email_text', 'Hello $login$!'."\r\n\r\n".'This is our newsletter...' );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
 				break;
