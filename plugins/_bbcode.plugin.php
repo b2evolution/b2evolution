@@ -35,6 +35,10 @@ class bbcode_plugin extends Plugin
 	var $post_replace_list;
 	var $comment_search_list;
 	var $comment_replace_list;
+	var $msg_search_list;
+	var $msg_replace_list;
+	var $email_search_list;
+	var $email_replace_list;
 	var $default_search_list = '[b] #\[b](.+?)\[/b]#is
 [i] #\[i](.+?)\[/i]#is
 [s] #\[s](.+?)\[/s]#is
@@ -201,14 +205,14 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		$content = & $params['data'];
 		$Item = $params['Item'];
 		$item_Blog = & $Item->get_Blog();
-		if( !isset( $this->post_search_list ) )
-		{
-			$this->post_search_list = $this->prepare_search_list( 'coll_post_search_list', $item_Blog );
+		if( ! isset( $this->post_search_list ) )
+		{	// Init post search list only first time:
+			$this->post_search_list = $this->prepare_search_list( $this->get_coll_setting( 'coll_post_search_list', $item_Blog ) );
 		}
 
-		if( !isset( $this->post_replace_list ) )
-		{
-			$this->post_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) ) );
+		if( ! isset( $this->post_replace_list ) )
+		{	// Init post replace list only first time:
+			$this->post_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) );
 		}
 
 		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, array( $this, 'parse_bbcode' ) );
@@ -227,7 +231,18 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	function RenderMessageAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$content = replace_content_outcode( $this->get_msg_setting( 'search_list' ), $this->get_msg_setting( 'replace_list' ), $content, array( $this, 'parse_bbcode' ) );
+
+		if( ! isset( $this->msg_search_list ) )
+		{	// Init message search list only first time:
+			$this->msg_search_list = $this->prepare_search_list( $this->get_msg_setting( 'search_list' ) );
+		}
+
+		if( ! isset( $this->msg_replace_list ) )
+		{	// Init message replace list only first time:
+			$this->msg_replace_list = $this->prepare_replace_list( $this->get_msg_setting( 'replace_list' ) );
+		}
+
+		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, array( $this, 'parse_bbcode' ) );
 
 		return true;
 	}
@@ -243,7 +258,18 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	function RenderEmailAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$content = replace_content_outcode( $this->get_email_setting( 'search_list' ), $this->get_email_setting( 'replace_list' ), $content, array( $this, 'parse_bbcode' ) );
+
+		if( ! isset( $this->email_search_list ) )
+		{	// Init email search list only first time:
+			$this->email_search_list = $this->prepare_search_list( $this->get_email_setting( 'search_list' ) );
+		}
+
+		if( ! isset( $this->email_replace_list ) )
+		{	// Init email replace list only first time:
+			$this->email_replace_list = $this->prepare_replace_list( $this->get_email_setting( 'replace_list' ) );
+		}
+
+		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, array( $this, 'parse_bbcode' ) );
 
 		return true;
 	}
@@ -425,13 +451,13 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		{ // apply_comment_rendering is set to always render
 			$content = & $params['data'];
 			if( !isset( $this->comment_search_list ) )
-			{
-				$this->comment_search_list = $this->prepare_search_list( 'coll_comment_search_list', $item_Blog );
+			{	// Init comment search list only first time:
+				$this->comment_search_list = $this->prepare_search_list( $this->get_coll_setting( 'coll_comment_search_list', $item_Blog ) );
 			}
 
 			if( !isset( $this->comment_replace_list ) )
-			{
-				$this->comment_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) ) );
+			{	// Init comment replace list only first time:
+				$this->comment_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) );
 			}
 
 			$content = replace_content_outcode( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
@@ -770,7 +796,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	{
 		if( $this->get_msg_setting( 'msg_apply_rendering' ) )
 		{
-			$params['target_type'] = 'EmailCampaign';
+			$params['target_type'] = 'Message';
 			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
@@ -787,7 +813,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	{
 		if( $this->get_email_setting( 'email_apply_rendering' ) )
 		{
-			$params['target_type'] = 'Message';
+			$params['target_type'] = 'EmailCampaign';
 			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
@@ -797,30 +823,40 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	/**
 	 * Prepare a search list
 	 *
-	 * @param string Setting name of search list (' post_search_list', 'comment_search_list' )
-	 * @param object Blog
-	 * @param boolean Allow empty Blog
-	 * @return array Search list
+	 * @param string String value of a search list
+	 * @return array The search list as array
 	 */
-	function prepare_search_list( $setting_name, $Blog = NULL, $allow_null_blog = false )
+	function prepare_search_list( $search_list_string )
 	{
-		$search_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( $setting_name, $Blog, $allow_null_blog ) ) );
+		$search_list_array = explode( "\n", str_replace( "\r", '', $search_list_string ) );
 
-		foreach( $search_list as $l => $line )
+		foreach( $search_list_array as $l => $line )
 		{	// Remove button name from regexp string
 			$line = explode( ' ', $line, 2 );
 			$regexp = $line[1];
 			if( empty( $regexp ) )
 			{	// Bad format of search string
-				unset( $search_list[ $l ] );
+				unset( $search_list_array[ $l ] );
 			}
 			else
 			{	// Replace this line with regexp value (to delete a button name)
-				$search_list[ $l ] = $regexp;
+				$search_list_array[ $l ] = $regexp;
 			}
 		}
 
-		return $search_list;
+		return $search_list_array;
+	}
+
+
+	/**
+	 * Prepare a replace list
+	 *
+	 * @param string String value of a replace list
+	 * @return array The replace list as array
+	 */
+	function prepare_replace_list( $replace_list_string )
+	{
+		return explode( "\n", str_replace( "\r", '', $replace_list_string ) );
 	}
 }
 
