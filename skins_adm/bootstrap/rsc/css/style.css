@@ -1400,8 +1400,8 @@ table.diff td.diff-title-addedline {
 .compact_data {
   white-space: nowrap;
 }
-#skin_wrapper .email_wrap p {
-  margin: 2ex 0;
+#skin_wrapper .email_wrap .email_payload p:first-child {
+  margin-top: 10px;
 }
 #skin_wrapper .email_wrap .user img {
   top: -1px;
