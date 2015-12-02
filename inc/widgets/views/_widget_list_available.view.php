@@ -94,6 +94,7 @@ $core_componentwidget_defs = array(
 			'coll_small_print',
 			'coll_item_tags',
 			'coll_about_author',
+			'coll_seen_by',
 		),
 	'collection' => array(
 			'coll_logo',

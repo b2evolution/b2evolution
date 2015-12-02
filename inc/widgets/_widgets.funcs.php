@@ -162,6 +162,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Small Print
 		add_basic_widget( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
+	// Seen by
+	add_basic_widget( $blog_id, 'Item Single', 'coll_seen_by', 'core', 50 );
 
 
 	/* Page Top */
