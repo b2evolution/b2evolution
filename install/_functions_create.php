@@ -2911,4 +2911,68 @@ function create_default_posts_location()
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
 	}
 }
+
+
+/**
+ * Create default email campaigns
+ */
+function create_default_email_campaigns()
+{
+	global $DB;
+
+	task_begin( 'Creating default email campaigns... ' );
+	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+	$EmailCampaign = new EmailCampaign();
+	$EmailCampaign->set( 'name', T_('Markdown Example') );
+	$EmailCampaign->set( 'email_title', T_('Markdown Example') );
+	$EmailCampaign->set( 'email_text', T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.') );
+
+	if( $EmailCampaign->dbinsert() )
+	{	// Add recipients after successfull email campaign creating:
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		if( ! empty( $user_IDs ) )
+		{	// Only if we have found the users in DB
+			$EmailCampaign->add_users( $user_IDs );
+		}
+	}
+
+	task_end();
+}
 ?>

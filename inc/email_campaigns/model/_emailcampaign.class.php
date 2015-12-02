@@ -99,13 +99,17 @@ class EmailCampaign extends DataObject
 
 	/**
 	 * Add users for this campaign in DB
+	 *
+	 * @param array|NULL Array of user IDs, NULL - to get user IDs from current filterset of users list
 	 */
-	function add_users()
+	function add_users( $new_users_IDs = NULL )
 	{
 		global $DB;
 
-		// Get user IDs from current filterset of users list
-		$new_users_IDs = get_filterset_user_IDs();
+		if( $new_users_IDs === NULL )
+		{	// Get user IDs from current filterset of users list:
+			$new_users_IDs = get_filterset_user_IDs();
+		}
 
 		if( count( $new_users_IDs ) )
 		{ // Users are found in the filterset
@@ -200,6 +204,68 @@ class EmailCampaign extends DataObject
 
 
 	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true
+	 */
+	function dbinsert()
+	{
+		$this->update_message_fields();
+
+		return parent::dbinsert();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate(  )
+	{
+		$this->update_message_fields();
+
+		return parent::dbupdate();
+	}
+
+
+	/**
+	 * Update the message fields:
+	 *     - email_html - Result of the rendered plugins from email_text
+	 *     - email_plaintext - Text extraction from email_html
+	 */
+	function update_message_fields()
+	{
+		global $Plugins;
+
+		$email_text = $this->get( 'email_text' );
+
+		// This must get triggered before any internal validation and must pass all relevant params.
+		$Plugins->trigger_event( 'EmailFormSent', array(
+				'content'         => & $email_text,
+				'dont_remove_pre' => true,
+				'renderers'       => $this->get_renderers_validated(),
+			) );
+
+		// Save prerendered message:
+		$Plugins->trigger_event( 'FilterEmailContent', array(
+				'data'          => & $email_text,
+				'EmailCampaign' => $this
+			) );
+		$this->set( 'email_html', format_to_output( $email_text ) );
+
+		// Save plain-text message:
+		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
+		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+		$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+		$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
+		$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -234,32 +300,8 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_email_text', 'html', NULL ) !== NULL )
-		{	// Email message:
-			// Save original message:
+		{	// Save original message:
 			$this->set_from_Request( 'email_text' );
-
-			// This must get triggered before any internal validation and must pass all relevant params.
-			$email_text = $this->get( 'email_text' );
-			$Plugins->trigger_event( 'EmailFormSent', array(
-					'content'         => & $email_text,
-					'dont_remove_pre' => true,
-					'renderers'       => $this->get_renderers_validated(),
-				) );
-
-			// Save prerendered message:
-			$Plugins->trigger_event( 'FilterEmailContent', array(
-					'data'          => & $email_text,
-					'EmailCampaign' => $this
-				) );
-			$this->set( 'email_html', format_to_output( $email_text ) );
-
-			// Save plain-text message:
-			$email_plaintext = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>[^<]*<\/a>/i', ' [ $1 ] ', $this->get( 'email_html' ) );
-			$email_plaintext = str_replace(
-				array( "\n", "\r", '</p><p>', '<p>',  '</p>', '<br>', '<br />', '<br/>' ),
-				array( '',   '',   "\n\n",    "\n\n", "\n\n", "\n",   "\n",     "\n" ),
-				$email_plaintext );
-			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
 		}
 
 		return ! param_errors_detected();
