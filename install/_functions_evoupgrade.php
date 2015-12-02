@@ -6970,7 +6970,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11520' );
+		set_upgrade_checkpoint( '11520' );
+	}
+
+	if( $old_db_version < 11530 )
+	{ // part 4 of 6.7.0
+
+		task_begin( 'Update  plugins table...' );
+		$DB->query( 'UPDATE T_plugins
+			  SET plug_classname = "shortlinks_plugin"
+			WHERE plug_classname = "wikilinks_plugin"' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11530' );
 	}
 
 	/*

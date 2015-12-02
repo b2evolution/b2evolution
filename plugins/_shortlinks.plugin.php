@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Wiki links plugin for b2evolution
+ * This file implements the Short Links plugin for b2evolution
  *
  * Creates wiki links
  *
@@ -17,10 +17,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @package plugins
  */
-class wikilinks_plugin extends Plugin
+class shortlinks_plugin extends Plugin
 {
 	var $code = 'b2evWiLi';
-	var $name = 'Wiki Links';
+	var $name = 'Short Links';
 	var $priority = 35;
 	var $version = '5.0.0';
 	var $group = 'rendering';
@@ -48,7 +48,7 @@ class wikilinks_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			);
 
 		if( !empty( $params['blog_type'] ) && $params['blog_type'] != 'forum' )
@@ -66,6 +66,20 @@ class wikilinks_plugin extends Plugin
 					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
 				)
 			) );
+	}
+
+
+	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
+		return parent::get_msg_setting_definitions( $default_params );
 	}
 
 
