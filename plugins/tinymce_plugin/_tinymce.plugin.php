@@ -885,9 +885,12 @@ class tinymce_plugin extends Plugin
 
 			case 'EmailCampaign':
 				// Save an edit state for email campaign edit form:
-
-				$this->Settings->set( 'use_tinymce_email'.intval( $params['email'] ), intval( $params['on'] ) );
-				$this->Settings->dbupdate();
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $params['email'] ), false, false ) )
+				{
+					$EmailCampaign->set( 'use_wysiwyg', intval( $params['on'] ) );
+					$EmailCampaign->dbupdate();
+				}
 				break;
 		}
 	}
@@ -931,7 +934,11 @@ class tinymce_plugin extends Plugin
 
 			case 'EmailCampaign':
 				// Get an edit state for email campaign edit form:
-				return $this->Settings->get( 'use_tinymce_email'.intval( $params['email'] ) );
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $params['email'] ), false, false ) )
+				{
+					return $EmailCampaign->get( 'use_wysiwyg' );
+				}
 		}
 
 		return 0;

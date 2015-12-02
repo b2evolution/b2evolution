@@ -6592,8 +6592,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading email campaigns table... ' );
-		db_add_col( 'T_email__campaign', 'ecmp_renderers', 'VARCHAR(255) COLLATE ascii_general_ci NOT NULL' );
-		db_add_col( 'T_email__campaign', 'ecmp_email_plaintext', 'TEXT NULL AFTER ecmp_email_text' );
+		$DB->query( 'ALTER TABLE T_email__campaign
+			ADD COLUMN ecmp_email_plaintext TEXT NULL AFTER ecmp_email_text,
+			ADD COLUMN ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			ADD COLUMN ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11520' );

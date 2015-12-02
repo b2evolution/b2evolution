@@ -39,6 +39,8 @@ class EmailCampaign extends DataObject
 
 	var $sent_ts;
 
+	var $use_wysiwyg = 0;
+
 	/**
 	 * @var array|NULL User IDs which assigned for this email campaign
 	 *   'all'    - All users which assigned to this campaign
@@ -77,6 +79,7 @@ class EmailCampaign extends DataObject
 			$this->email_plaintext = $db_row->ecmp_email_plaintext;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
 			$this->renderers = $db_row->ecmp_renderers;
+			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 		}
 	}
 
