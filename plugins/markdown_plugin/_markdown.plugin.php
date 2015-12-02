@@ -94,7 +94,7 @@ class markdown_plugin extends Plugin
 	{
 		$default_params = array_merge( $params, array(
 				'default_comment_rendering' => 'never',
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			) );
 
 		return parent::get_coll_setting_definitions( $default_params );
@@ -110,7 +110,7 @@ class markdown_plugin extends Plugin
 	function get_msg_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
 		return parent::get_msg_setting_definitions( $default_params );
 	}
 
@@ -124,7 +124,7 @@ class markdown_plugin extends Plugin
 	function get_email_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
 		return parent::get_email_setting_definitions( $default_params );
 	}
 
@@ -219,7 +219,6 @@ class markdown_plugin extends Plugin
 		{
 			case 'forum':
 			case 'manual':
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
 				break;

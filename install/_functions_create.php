@@ -1123,7 +1123,6 @@ function create_blog(
 
 	if( ( $kind == 'forum' || $kind == 'manual' ) && ( $Plugin = & $Plugins->get_by_code( 'b2evMark' ) ) !== false )
 	{ // Initialize special Markdown plugin settings for Forums and Manual blogs
-		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
 	}
