@@ -1,0 +1,829 @@
+<?php
+/**
+ * This file implements the Short Links plugin for b2evolution
+ *
+ * Creates wiki links
+ *
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * @package plugins
+ * @ignore
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * @package plugins
+ */
+class shortlinks_plugin extends Plugin
+{
+	var $code = 'b2evWiLi';
+	var $name = 'Short Links';
+	var $priority = 35;
+	var $version = '5.0.0';
+	var $group = 'rendering';
+	var $short_desc;
+	var $long_desc;
+	var $help_topic = 'wiki-links-plugin';
+	var $number_of_installs = 1;
+
+	/**
+	 * Init
+	 */
+	function PluginInit( & $params )
+	{
+		$this->short_desc = T_('Wiki Links converter');
+		$this->long_desc = T_('You can create links with [[CamelCase]] or ((CamelCase)) which will try to link to the category or the post with the slug "camel-case". See manual for more.');
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_values = array(
+				'default_post_rendering' => 'opt-out'
+			);
+
+		if( !empty( $params['blog_type'] ) && $params['blog_type'] != 'forum' )
+		{	// Set the default settings depends on blog type
+			$default_values['default_comment_rendering'] = 'never';
+		}
+
+		$default_params = array_merge( $params, $default_values );
+		return array_merge( parent::get_coll_setting_definitions( $default_params ),
+			array(
+				'link_without_brackets' => array(
+					'label' => $this->T_('Links without brackets'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
+				)
+			) );
+	}
+
+
+	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
+		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Perform rendering
+	 *
+	 * @param array Associative array of parameters
+	 *   'data': the data (by reference). You probably want to modify this.
+	 *   'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 * @return boolean true if we can render something for the required output format
+	 */
+	function RenderItemAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		if( !empty( $params['Item'] ) )
+		{ // Get Item from params
+			$Item = & $params['Item'];
+		}
+		elseif( !empty( $params['Comment'] ) )
+		{ // Get Item from Comment
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+		}
+		else
+		{ // Item and Comment are not defined, Exit here
+			return;
+		}
+		$item_Blog = & $Item->get_Blog();
+
+		return $this->render_content( $content, $item_Blog );
+	}
+
+
+	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		return $this->render_content( $content, NULL, true );
+	}
+
+
+	/**
+	 * Render content of Item, Comment, Message
+	 *
+	 * @todo get rid of global $blog
+	 *
+	 * @param string Content
+	 * @param object Blog
+	 * @param boolean Allow empty Blog
+	 * return boolean
+	 */
+	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	{
+		global $ItemCache, $admin_url, $blog, $evo_charset;
+
+		$regexp_modifier = '';
+		if( $evo_charset == 'utf-8' )
+		{ // Add this modifier to work with UTF-8 strings correctly
+			$regexp_modifier = 'u';
+		}
+
+		// Regular links:
+		$search = array(
+			// [[http://url]] :
+			'#\[\[((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\]\]#i',
+			// [[http://url text]] :
+			'#\[\[((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\]\]#i',
+			// ((http://url)) :
+			'#\(\(((https?|mailto)://((?:[^<>{}\s\]]|,(?!\s))+?))\)\)#i',
+			// ((http://url text)) :
+			'#\(\(((https?|mailto)://([^<>{}\s\]]+)) ([^\n\r]+?)\)\)#i',
+		);
+		$replace = array(
+			'<a href="$1">$1</a>',
+			'<a href="$1">$4</a>',
+			'<a href="$1">$1</a>',
+			'<a href="$1">$4</a>'
+		);
+
+		$content = replace_content_outcode( $search, $replace, $content );
+
+/* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
+	$ret = preg_replace("#([\n ])aim:([^,< \n\r]+)#i", "\\1<a href=\"aim:goim?screenname=\\2\\3&message=Hello\">\\2\\3</a>", $ret);
+
+	$ret = preg_replace("#([\n ])icq:([^,< \n\r]+)#i", "\\1<a href=\"http://wwp.icq.com/scripts/search.dll?to=\\2\\3\">\\2\\3</a>", $ret);
+
+	$ret = preg_replace("#([\n ])www\.([a-z0-9\-]+)\.([a-z0-9\-.\~]+)((?:/[^,< \n\r]*)?)#i", "\\1<a href=\"http://www.\\2.\\3\\4\">www.\\2.\\3\\4</a>", $ret);
+
+	$ret = preg_replace("#([\n ])([a-z0-9\-_.]+?)@([^,< \n\r]+)#i", "\\1<a href=\"mailto:\\2@\\3\">\\2@\\3</a>", $ret); */
+
+		// To use function replace_special_chars()
+		load_funcs('locales/_charset.funcs.php');
+
+		// WIKIWORDS:
+
+		$search_wikiwords = array();
+		$replace_links = array();
+
+		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog, $allow_null_blog ) )
+		{	// Create the links from standalone WikiWords
+
+			// STANDALONE WIKIWORDS:
+			$search = '/
+					(?<= \s | ^ )													# Lookbehind for whitespace
+					([\p{Lu}]+[\p{Ll}0-9_]+([\p{Lu}]+[\p{L}0-9_]+)+)	# WikiWord or WikiWordLong
+					(?= [\.,:;!\?] \s | \s | $ )											# Lookahead for whitespace or punctuation
+				/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
+
+			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
+			{
+				// Construct array of wikiwords to look up in post urltitles
+				$wikiwords = array();
+				foreach( $matches as $match )
+				{
+					// Convert the WikiWord to an urltitle
+					$WikiWord = $match[0];
+					$Wiki_Word = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1-$2', $WikiWord );
+					$wiki_word = utf8_strtolower( $Wiki_Word );
+					// echo '<br />Match: [', $WikiWord, '] -> [', $wiki_word, ']';
+					$wiki_word = replace_special_chars( $wiki_word );
+					$wikiwords[ $WikiWord ] = $wiki_word;
+				}
+
+				// Lookup all urltitles at once in DB and preload cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_urltitle_array( $wikiwords );
+
+				// Construct arrays for replacing wikiwords by links:
+				foreach( $wikiwords as $WikiWord => $wiki_word )
+				{
+					// WikiWord
+					$search_wikiwords[] = '/
+						(?<= \s | ^ ) 						# Lookbehind for whitespace or start
+						(?<! <span\ class="NonExistentWikiWord"> )
+						'.$WikiWord.'							# Specific WikiWord to replace
+						(?= [\.,:;!\?] \s | \s | $ )							# Lookahead for whitespace or end of string
+						/sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+
+					// Find matching Item:
+					if( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+					{ // Item Found
+						$permalink = $Item->get_permanent_url();
+
+						// WikiWord
+						$replace_links[] = '<a href="'.$permalink.'">'.$Item->get( 'title' ).'</a>';
+
+					}
+					else
+					{ // Item not found
+
+						$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+
+						// WikiWord
+						$replace_links[] = '<span class="NonExistentWikiWord">'.$WikiWord.$create_link.'</span>';
+
+					}
+				}
+			}
+		}
+
+		// BRACKETED WIKIWORDS:
+		$search = '/
+				(?<= \(\( | \[\[ )										# Lookbehind for (( or [[
+				([\p{L}0-9#]+[\p{L}0-9#_\-]*)									# Anything from Wikiword to WikiWordLong
+				(?= ( \s .*? )? ( \)\) | \]\] ) )			# Lookahead for )) or ]]
+			/x'.$regexp_modifier;	// x = extended (spaces + comments allowed)
+
+		if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER) )
+		{
+			// Construct array of wikiwords to look up in post urltitles
+			$wikiwords = array();
+			foreach( $matches as $match )
+			{
+				// Convert the WikiWord to an urltitle
+				$WikiWord = $match[0];
+				if( preg_match( '/^[\p{Ll}0-9#_\-]+$/'.$regexp_modifier, $WikiWord ) )
+				{	// This WikiWord already matches a slug format
+					$Wiki_Word = $WikiWord;
+					$wiki_word = $Wiki_Word;
+				}
+				else
+				{	// Convert WikiWord to slug format
+					$Wiki_Word = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', $WikiWord );
+					$wiki_word = utf8_strtolower( $Wiki_Word );
+				}
+				// Remove additional params from $wiki_word, it should be cleared. We keep the params in $WikiWord and parse them below.
+				$wiki_word = preg_replace( '/^([^#]+)(#.+)?$/i', '$1', $wiki_word );
+				$wiki_word = replace_special_chars( $wiki_word );
+				$wikiwords[ $WikiWord ] = $wiki_word;
+			}
+
+			// Lookup all urltitles at once in DB and preload cache:
+			$ChapterCache = & get_ChapterCache();
+			$ChapterCache->load_urlname_array( $wikiwords );
+			$ItemCache = & get_ItemCache();
+			$ItemCache->load_urltitle_array( $wikiwords );
+
+			// Construct arrays for replacing wikiwords by links:
+			foreach( $wikiwords as $WikiWord => $wiki_word )
+			{
+				// Parse wiki word to find additional param for atrr "id"
+				$url_params = '';
+				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
+				if( isset( $WikiWord_match[3] ) )
+				{ // wiki word has attr "id"
+					$url_params .= '#'.$WikiWord_match[3];
+				}
+
+				// Fix for regexp
+				$WikiWord = str_replace( '#', '\#', $WikiWord );
+
+				// [[WikiWord text]]
+				$search_wikiwords[] = '*
+					\[\[
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\s (.+?)
+					\]\]
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// ((WikiWord text))
+				$search_wikiwords[] = '*
+					\(\(
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\s (.+?)
+					\)\)
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// [[Wikiword]]
+				$search_wikiwords[] = '*
+					\[\[
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\]\]
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// ((Wikiword))
+				$search_wikiwords[] = '*
+					\(\(
+					'.$WikiWord.'							# Specific WikiWord to replace
+					\)\)
+					*sx';	// s = dot matches newlines, x = extended (spaces + comments allowed)
+
+				// Use title of wiki word without attribute part
+				$WikiWord = $WikiWord_match[1];
+
+				// Find matching Chapter or Item:
+				$permalink = '';
+				$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
+				$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
+				if( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
+				{ // Chapter is found
+					$permalink = $Chapter->get_permanent_url();
+					$existing_link_text = $Chapter->get( 'name' );
+				}
+				elseif( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+				{ // Item is found
+					$permalink = $Item->get_permanent_url();
+					$existing_link_text = $Item->get( 'title' );
+				}
+
+				if( !empty( $permalink ) )
+				{ // Chapter or Item are found
+					// [[WikiWord text]]
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
+
+					// ((WikiWord text))
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">$1</a>';
+
+					// [[Wikiword]]
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$existing_link_text.'</a>';
+
+					// ((Wikiword))
+					$replace_links[] = '<a href="'.$permalink.$url_params.'">'.$link_text.'</a>';
+				}
+				else
+				{ // Chapter and Item are not found
+					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+
+					// [[WikiWord text]]
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
+
+					// ((WikiWord text))
+					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
+
+					// [[Wikiword]]
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
+
+					// ((Wikiword))
+					$replace_links[] = '<span class="NonExistentWikiWord">'.$link_text.$create_link.'</span>';
+				}
+			}
+		}
+
+		// echo '<br />---';
+
+		// pre_dump( $search_wikiwords );
+
+		$content = replace_content_outcode( $search_wikiwords, $replace_links, $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Display a toolbar
+	 *
+	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
+	 *       (dynamically created) .js src file. Then we could use cache headers
+	 *       to let the browser cache it.
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function AdminDisplayToolbar( & $params )
+	{
+		if( ! empty( $params['Item'] ) )
+		{	// Item is set, get Blog from post:
+			$edited_Item = & $params['Item'];
+			$Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
+		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen:
+		return $this->DisplayCodeToolbar( $Blog );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		if( ! empty( $params['Comment'] ) )
+		{	// Comment is set, get Blog from comment:
+			$Comment = & $params['Comment'];
+			if( ! empty( $Comment->item_ID ) )
+			{
+				$comment_Item = & $Comment->get_Item();
+				$Blog = & $comment_Item->get_Blog();
+			}
+		}
+
+		if( empty( $Blog ) )
+		{	// Comment is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen
+		return $this->DisplayCodeToolbar( $Blog );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( NULL, $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Display Toolbar
+	 *
+	 * @param object Blog
+	 */
+	function DisplayCodeToolbar( $Blog = NULL, $params = array() )
+	{
+		global $Hit, $baseurl;
+
+		if( $Hit->is_lynx() )
+		{	// let's deactivate toolbar on Lynx, because they don't work there:
+			return false;
+		}
+
+		// Load js to work with textarea:
+		require_js( 'functions.js', 'blog', true, true );
+
+		// Load css for modal window:
+		require_css( $this->get_plugin_url().'/shortlinks.css', 'relative', NULL, NULL, '#', true );
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+
+		?><script type="text/javascript">
+		//<![CDATA[
+		function shortlinks_toolbar( title )
+		{
+			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
+			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+
+			document.write( '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />' );
+
+			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+		}
+
+		/**
+		 * Load main modal window to select collection and posts
+		 */
+		function shortlinks_load_window()
+		{
+			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
+				'<?php echo TS_('Link to a Post'); ?>', // Window title
+				[ '-', 'shortlinks_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Insert [[post-url-name]]"
+				true );
+
+			// Load collections:
+			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>' );
+
+			// To prevent link default event:
+			return false;
+		}
+
+		/**
+		 * Get an error of fail request
+		 *
+		 * @param string Object selector
+		 * @param object Error data: 'message', 'code', 'data.status'
+		 */
+		function shortlinks_api_print_error( obj_selector, error )
+		{
+			if( typeof( error ) != 'string' && typeof( error.code ) == 'undefined' )
+			{
+				error = typeof( error.responseJSON ) == 'undefined' ? error.statusText : error.responseJSON;
+			}
+
+			if( typeof( error.code ) == 'undefined' )
+			{	// Unknown non-json response:
+				var error_text = '<h4 class="text-danger">Unknown error: ' + error + '</h4>';
+			}
+			else
+			{	// JSON error data accepted:
+				var error_text ='<h4 class="text-danger">' + error.message + '</h4>'
+				+ '<div><b>Code:</b> ' + error.code + '</div>'
+				+ '<div><b>Status:</b> ' + error.data.status + '</div>';
+			}
+
+			shortlinks_end_loading( obj_selector, error_text );
+		}
+
+		/**
+		 * Execute REST API request
+		 *
+		 * @param string URL
+		 * @param string Object selector
+		 * @param function Function on success request
+		 */
+		function shortlinks_api_request( url, obj_selector, func )
+		{
+			shortlinks_start_loading( obj_selector );
+
+			jQuery.ajax(
+			{
+				url: '<?php echo $baseurl; ?>api/v1/' + url
+			} )
+			.then( func, function( jqXHR )
+			{	// Error request, Display the error data:
+				shortlinks_api_print_error( obj_selector, jqXHR );
+			} );
+		}
+
+		/**
+		 * Set style during loading new content
+		 *
+		 * @param string Object selector
+		 */
+		function shortlinks_start_loading( obj_selector )
+		{
+			jQuery( obj_selector ).addClass( 'shortlinks_loading' )
+				.append( '<div class="shortlinks_loader">loading...</div>' );
+		}
+
+		/**
+		 * Remove style after loading new content
+		 *
+		 * @param string Object selector
+		 * @param string New content
+		 */
+		function shortlinks_end_loading( obj_selector, content )
+		{
+			jQuery( obj_selector ).removeClass( 'shortlinks_loading' )
+				.html( content )
+				.find( '.shortlinks_loader' ).remove();
+		}
+
+
+		/**
+		 * Load all available collections for current user:
+		 *
+		 * @param string Current collection urlname
+		 * @param string Search keyword
+		 */
+		function shortlinks_load_colls( current_coll_urlname, search_keyword )
+		{
+			shortlinks_api_request( 'collections', '#shortlinks_wrapper', function( data )
+			{	// Display the colllections on success request:
+				var coll_urlname = '';
+				var coll_name = '';
+
+				// Initialize html code to view the loaded collections:
+				var r = '<div id="shortlinks_colls_list">'
+					+ '<h2><?php echo TS_('Collections'); ?></h2>'
+					+ '<ul>';
+				for( var c in data )
+				{
+					var coll = data[c];
+					r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
+					if( coll_urlname == '' || coll.urlname == current_coll_urlname )
+					{	// Set these vars to load posts of the selected or first collection:
+						coll_urlname = coll.urlname;
+						coll_name = coll.name;
+					}
+				}
+				r += '</ul>'
+					+ '</div>'
+					+ '<div id="shortlinks_posts_block"></div>';
+
+				shortlinks_end_loading( '#shortlinks_wrapper', r );
+
+				if( coll_urlname != '' )
+				{	// Load posts list of the current or first collection:
+					if( typeof( search_keyword ) == 'undefined' || search_keyword == '' )
+					{	// Load all posts:
+						shortlinks_load_coll_posts( coll_urlname, coll_name );
+					}
+					else
+					{	// Load the searched posts:
+						shortlinks_display_search_form( coll_urlname, coll_name, search_keyword );
+						shortlinks_load_coll_search( coll_urlname, search_keyword );
+					}
+				}
+			} );
+		}
+
+		/**
+		 * Load posts list with search form of the collection:
+		 *
+		 * @param string Collection urlname
+		 * @param string Collection name
+		 * @param string Predefined Search keyword
+		 */
+		function shortlinks_display_search_form( coll_urlname, coll_name, search_keyword )
+		{
+			var r = '<h2>' + coll_name + '</h2>' +
+				'<form class="form-inline" id="shortlinks_search__form" data-urlname="' + coll_urlname + '">' +
+					'<div class="input-group">' +
+						'<input type="text" id="shortlinks_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
+						'<span class="input-group-btn"><button id="shortlinks_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
+					'</div> ' +
+					'<button id="shortlinks_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
+				'</form>' +
+				'<div id="shortlinks_posts_list"></div>';
+
+			jQuery( '#shortlinks_posts_block' ).html( r );
+		}
+
+		/**
+		 * Load posts list with search form of the collection:
+		 *
+		 * @param string Collection urlname
+		 * @param string Collection name
+		 * @param string Search keyword
+		 */
+		function shortlinks_load_coll_posts( coll_urlname, coll_name )
+		{
+			shortlinks_display_search_form( coll_urlname, coll_name );
+
+			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?orderby=last_touched_ts&order=DESC&types=', '#shortlinks_posts_list', function( data )
+			{	// Display the posts on success request:
+				var r = '<ul>';
+				for( var p in data )
+				{
+					var post = data[p];
+					r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+				}
+				r += '</ul>';
+				shortlinks_end_loading( '#shortlinks_posts_list', r );
+			} );
+		}
+
+		/**
+		 * Load the searched posts list:
+		 *
+		 * @param string Collection urlname
+		 * @param string Collection name
+		 * @param string Search keyword
+		 */
+		function shortlinks_load_coll_search( coll_urlname, search_keyword )
+		{
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#shortlinks_posts_list', function( data )
+			{	// Display the post data in third column on success request:
+				if( typeof( data.code ) != 'undefined' )
+				{	// Error code was responsed:
+					shortlinks_api_print_error( '#shortlinks_posts_list', data );
+					return;
+				}
+
+				var r = '<ul>';
+				for( var s in data )
+				{
+					var search_item = data[s];
+					if( search_item.kind != 'item' )
+					{	// Dsiplay only items and skip all other:
+						continue;
+					}
+					r += '<li>';
+					//r += '<a href="' + search_item.permalink + '" target="_blank"><?php echo get_icon( 'permalink' ); ?></a> ';
+					r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+					r += '</li>';
+				}
+				r += '</ul>';
+				shortlinks_end_loading( '#shortlinks_posts_list', r );
+			} );
+		}
+
+		// Load the posts of the selected collection:
+		jQuery( document ).on( 'click', '#shortlinks_colls_list a', function()
+		{
+			shortlinks_load_coll_posts( jQuery( this ).data( 'urlname' ), jQuery( this ).html() );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Submit a search form:
+		jQuery( document ).on( 'submit', '#shortlinks_search__form', function()
+		{
+			var coll_urlname = jQuery( this ).data( 'urlname' );
+			var search_keyword = jQuery( '#shortlinks_search__input' ).val();
+
+			shortlinks_load_coll_search( coll_urlname, search_keyword );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Clear the search results:
+		jQuery( document ).on( 'click', '#shortlinks_search__clear', function()
+		{
+			shortlinks_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Load the data of the selected post:
+		jQuery( document ).on( 'click', '#shortlinks_posts_list a:not([target])', function()
+		{
+			var coll_urlname = jQuery( this ).data( 'urlname' );
+			var post_id = jQuery( this ).data( 'id' );
+			var search_keyword = jQuery( '#shortlinks_search__input' ).val();
+
+			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?p=' + post_id + '&types=', '#shortlinks_wrapper', function( data )
+			{	// Display the post data on success request:
+				var post = data[0];
+				shortlinks_end_loading( '#shortlinks_wrapper', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
+				// Display the buttons to back and insert a post link to textarea
+				var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+					jQuery( '.shortlinks_post_buttons' ) :
+					jQuery( '#shortlinks_post_view' );
+				buttons_side_obj.after( '<button id="shortlinks_btn_back" data-collurl="' + coll_urlname + '" data-search="' + search_keyword + '"  class="btn btn-default"><?php echo TS_('Back'); ?></button>'
+					+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
+			} );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Insert a post link to textarea:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert', function()
+		{
+			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
+				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+			}
+			// Insert tag text in area:
+			textarea_wrap_selection( b2evoCanvas, '[[' + jQuery( this ).data( 'urltitle' ) + ']]', '', 0 );
+			// Close main modal window:
+			closeModalWindow();
+		} );
+
+		// Back to previous list:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back', function()
+		{
+			// Load page with previous data:
+			shortlinks_load_colls( jQuery( this ).data( 'collurl' ), jQuery( this ).data( 'search' ) );
+
+			// Remove action buttons:
+			jQuery( this ).remove();
+			jQuery( '#shortlinks_btn_insert' ).remove();
+		} );
+		//]]>
+		</script><?php
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'shortlinks_toolbar' ) );
+		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
+		echo $this->get_template( 'toolbar_after' );
+
+		return true;
+	}
+}
+?>
