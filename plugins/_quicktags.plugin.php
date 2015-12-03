@@ -215,23 +215,26 @@ class quicktags_plugin extends Plugin
 				,'<?php echo TS_('A href [Alt-A]') ?>'
 			); // special case
 
-		function b2evoShowButton(button, i)
+		function b2evoGetButton(button, i)
 		{
+			var r = '';
 			if( button.id == 'b2evo_img' )
 			{
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertImage|b2evoCanvas" value="' + button.display + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertImage|b2evoCanvas" value="' + button.display + '" />';
 			}
 			else if( button.id == 'b2evo_link' )
 			{
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertLink|b2evoCanvas|'+i+'" value="' + button.display + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertLink|b2evoCanvas|'+i+'" value="' + button.display + '" />';
 			}
 			else
 			{	// Normal buttons:
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
 			}
+
+			return r;
 		}
 
 		// Memorize a new open tag
@@ -289,19 +292,21 @@ class quicktags_plugin extends Plugin
 
 		function b2evoToolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
 			for (var i = 0; i < b2evoButtons.length; i++)
 			{
-				b2evoShowButton( b2evoButtons[i], i );
+				r += b2evoGetButton( b2evoButtons[i], i );
 				if( b2evoButtons[i].grp_pos == 'last' && i > 0 && i < b2evoButtons.length - 1 )
 				{ // Separator between groups
-					document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
+					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
 				}
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
-			document.write( '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />');
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+				+ '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />'
+				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		/**
@@ -393,9 +398,9 @@ class quicktags_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'quicktags_toolbar' ) );
-		?><script type="text/javascript">b2evoToolbar( '<?php echo 'HTML: '; ?>' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">b2evoToolbar( '<?php echo 'HTML: '; ?>' );</script><?php
 
 		return true;
 	}
