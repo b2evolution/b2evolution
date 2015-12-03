@@ -91,15 +91,17 @@ class shortcodes_plugin extends Plugin
 
 		function shortcodes_toolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
 			for( var i = 0; i < shortcodes_buttons.length; i++ )
 			{
 				var button = shortcodes_buttons[i];
-				document.write( '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
+				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function shortcodes_insert_tag( canvas_field, i )
@@ -114,9 +116,9 @@ class shortcodes_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'shortcodes_toolbar' ) );
-		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
 
 		return true;
 	}

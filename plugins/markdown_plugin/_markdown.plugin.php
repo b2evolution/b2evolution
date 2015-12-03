@@ -537,7 +537,7 @@ class markdown_plugin extends Plugin
 			}
 		}
 
-		function markdown_toolbar( title, toolbar_selector )
+		function markdown_toolbar( title )
 		{
 			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
 				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
@@ -553,7 +553,7 @@ class markdown_plugin extends Plugin
 				+ '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
 				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
 
-			jQuery( toolbar_selector ).append( r );
+			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function markdown_insert_tag( field, i )
@@ -631,7 +631,7 @@ class markdown_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>', '.<?php echo $this->code ?>_toolbar' );</script><?php
+		?><script type="text/javascript">markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 
 		return true;
 	}

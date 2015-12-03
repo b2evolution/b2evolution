@@ -670,8 +670,8 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		</script><?php
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">bbToolbar();</script><?php
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">bbToolbar();</script><?php
 
 		return true;
 	}
