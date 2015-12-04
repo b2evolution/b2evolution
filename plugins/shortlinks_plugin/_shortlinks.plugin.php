@@ -731,7 +731,7 @@ class shortlinks_plugin extends Plugin
 		{
 			shortlinks_display_search_form( coll_urlname, coll_name );
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?orderby=datemodified&order=DESC&types=', '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC', '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data )
@@ -816,7 +816,7 @@ class shortlinks_plugin extends Plugin
 			var post_id = jQuery( this ).data( 'id' );
 			var search_keyword = jQuery( '#shortlinks_search__input' ).val();
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?p=' + post_id + '&types=', '#shortlinks_wrapper', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items?p=' + post_id, '#shortlinks_wrapper', function( data )
 			{	// Display the post data on success request:
 				var post = data[0];
 				shortlinks_end_loading( '#shortlinks_wrapper', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
