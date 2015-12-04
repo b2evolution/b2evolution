@@ -124,12 +124,7 @@ class coll_seen_by_Widget extends ComponentWidget
 
 		// Get all memebers of the current collection:
 		$UserCache = & get_UserCache();
-		$UserCache->clear();
 		$UserCache->load_blogmembers( $Blog->ID );
-
-		// Don't forget a collection owner:
-		$coll_owner_User = & $Blog->get_owner_User();
-		$UserCache->add( $coll_owner_User );
 
 		// Get IDs of all collection members:
 		$member_user_IDs = array_keys( $UserCache->cache );
