@@ -2139,12 +2139,11 @@ function display_ajax_form( $params )
 
 	// Needs json_encode function to create json type params
 	$json_params = evo_json_encode( $params );
-	$ajax_loader = '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
+
+	// Display loader gif until the ajax call returns:
+	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
 	?>
 	<script type="text/javascript">
-		// display loader gif until the ajax call returns
-		document.write( <?php echo "'".$ajax_loader."'"; ?> );
-
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
 
