@@ -503,6 +503,23 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( NULL, $params );
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display Toolbar
 	 *
 	 * @param object Blog

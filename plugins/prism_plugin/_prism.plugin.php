@@ -329,7 +329,7 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars for message.
+	 * Event handler: Called when displaying editor toolbars for email.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
