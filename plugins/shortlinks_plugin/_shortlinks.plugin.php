@@ -731,7 +731,7 @@ class shortlinks_plugin extends Plugin
 		{
 			shortlinks_display_search_form( coll_urlname, coll_name );
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?orderby=last_touched_ts&order=DESC&types=', '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/posts?orderby=datemodified&order=DESC&types=', '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data )
