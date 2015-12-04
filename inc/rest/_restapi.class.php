@@ -241,7 +241,7 @@ class RestApi
 		global $Blog;
 
 		// Get param to limit number posts per page:
-		$api_per_page = param( 'per_page', 'integer', 100 );
+		$api_per_page = param( 'per_page', 'integer', 10 );
 
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/posts/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
