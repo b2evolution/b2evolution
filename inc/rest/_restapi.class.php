@@ -232,14 +232,16 @@ class RestApi
 
 
 	/**
-	 * Call collection controller to prepare request for posts
+	 * Call collection controller to prepare request for items with ANY types
+	 *
+	 * @param array Force filters of request
 	 */
-	private function controller_coll_posts()
+	private function controller_coll_items( $force_filters = array() )
 	{
 		global $Blog;
 
 		// Get param to limit number posts per page:
-		$api_per_page = param( 'per_page', 'integer', 10 );
+		$api_per_page = param( 'per_page', 'integer', 100 );
 
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/posts/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
@@ -248,11 +250,21 @@ class RestApi
 
 		if( $post_ID )
 		{	// Get only one requested post:
-			$ItemList2->set_filters( array( 'post_ID' => $post_ID ) );
+			$ItemList2->set_filters( array( 'post_ID' => $post_ID ), true, true );
 		}
 		else
 		{	// Load all available params from request to filter the posts list:
 			$ItemList2->load_from_Request( false );
+		}
+
+		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
+		{	// Allow all post types by default for this request:
+			$ItemList2->set_filters( array( 'types' => '' ), true, true );
+		}
+
+		if( ! empty( $force_filters ) )
+		{	// Force filters:
+			$ItemList2->set_filters( $force_filters, true, true );
 		}
 
 		// Run the items list query:
@@ -293,6 +305,19 @@ class RestApi
 				// Exit here.
 			}
 		}
+	}
+
+
+	/**
+	 * Call collection controller to prepare request for items ONLY with item type "post"
+	 */
+	private function controller_coll_posts()
+	{
+		global $posttypes_specialtypes;
+
+		$this->controller_coll_items( array(
+				'types' => '-'.implode( ',', $posttypes_specialtypes ), // Keep content post types, Exclude pages, intros, sidebar links and ads
+			) );
 	}
 
 
