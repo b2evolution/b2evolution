@@ -1124,8 +1124,7 @@ function create_blog(
 
 	if( ( $kind == 'forum' || $kind == 'manual' ) && ( $Plugin = & $Plugins->get_by_code( 'b2evMark' ) ) !== false )
 	{ // Initialize special Markdown plugin settings for Forums and Manual blogs
-		// yura: Disable this plugin by default because it creates an issue on loading comment form by AJAX:
-		// $Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_comment_rendering', 'opt-out' );
+		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_comment_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
 	}
