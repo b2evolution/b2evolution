@@ -6982,7 +6982,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			WHERE plug_classname = "wikilinks_plugin"' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11530' );
+		set_upgrade_checkpoint( '11530' );
 	}
 
 	if( $old_db_version < 11540 )
