@@ -664,18 +664,20 @@ class shortlinks_plugin extends Plugin
 				// Initialize html code to view the loaded collections:
 				var r = '<div id="shortlinks_colls_list">'
 					+ '<h2><?php echo TS_('Collections'); ?></h2>'
-					+ '<ul>';
+					+ '<select class="form-control">';
 				for( var c in data )
 				{
 					var coll = data[c];
-					r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
+					r += '<option value="' + coll.urlname + '"'
+						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
+						+ coll.name + '</option>';
 					if( coll_urlname == '' || coll.urlname == current_coll_urlname )
 					{	// Set these vars to load posts of the selected or first collection:
 						coll_urlname = coll.urlname;
 						coll_name = coll.name;
 					}
 				}
-				r += '</ul>'
+				r += '</select>'
 					+ '</div>'
 					+ '<div id="shortlinks_posts_block"></div>';
 
@@ -778,9 +780,9 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Load the posts of the selected collection:
-		jQuery( document ).on( 'click', '#shortlinks_colls_list a', function()
+		jQuery( document ).on( 'change', '#shortlinks_colls_list select', function()
 		{
-			shortlinks_load_coll_posts( jQuery( this ).data( 'urlname' ), jQuery( this ).html() );
+			shortlinks_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
 
 			// To prevent link default event:
 			return false;
@@ -822,7 +824,7 @@ class shortlinks_plugin extends Plugin
 				var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 					jQuery( '.shortlinks_post_buttons' ) :
 					jQuery( '#shortlinks_post_view' );
-				buttons_side_obj.after( '<button id="shortlinks_btn_back" data-collurl="' + coll_urlname + '" data-search="' + search_keyword + '"  class="btn btn-default"><?php echo TS_('Back'); ?></button>'
+				buttons_side_obj.after( '<button id="shortlinks_btn_back" data-collurl="' + coll_urlname + '" data-search="' + search_keyword + '"  class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
 					+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
 			} );
 
