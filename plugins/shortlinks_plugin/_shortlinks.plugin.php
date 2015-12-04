@@ -546,14 +546,16 @@ class shortlinks_plugin extends Plugin
 		//<![CDATA[
 		function shortlinks_toolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>'
 
-			document.write( '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
+				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />' );
+				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />'
 
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+				jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		/**
@@ -854,9 +856,9 @@ class shortlinks_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => 'shortlinks_toolbar' ) );
-		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
 
 		return true;
 	}
