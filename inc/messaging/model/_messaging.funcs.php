@@ -371,9 +371,23 @@ function get_messaging_sub_entries( $is_admin )
 	if( $is_admin && $current_User->check_perm( 'options', 'edit' ) )
 	{
 		$messaging_sub_entries[ 'msgsettings' ] = array(
-													'text' => T_('Settings'),
-													'href' => $url.'msgsettings'
-												);
+				'text' => T_('Settings'),
+				'href' => $url.'msgsettings',
+				'entries' => array(
+						'general' => array(
+								'text' => T_('General'),
+								'href' => $url.'msgsettings',
+							),
+						'templates' => array(
+								'text' => T_('Templates'),
+								'href' => $url.'msgsettings&amp;tab=templates',
+							),
+						'renderers' => array(
+								'text' => T_('Renderers'),
+								'href' => $url.'msgsettings&amp;tab=renderers',
+							),
+					),
+			);
 	}
 	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 	{

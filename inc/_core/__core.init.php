@@ -459,6 +459,24 @@ function & get_EmailCampaignCache()
 
 
 /**
+ * Get the EmailCampaignPrerenderingCache
+ *
+ * @return EmailCampaignPrerenderingCache
+ */
+function & get_EmailCampaignPrerenderingCache()
+{
+	global $EmailCampaignPrerenderingCache;
+
+	if( ! isset( $EmailCampaignPrerenderingCache ) )
+	{	// Cache doesn't exist yet:
+		$EmailCampaignPrerenderingCache = array();
+	}
+
+	return $EmailCampaignPrerenderingCache;
+}
+
+
+/**
  * Get the CronjobCache
  *
  * @return CronjobCache
@@ -1102,10 +1120,6 @@ class _core_Module extends Module
 							'text' => T_('Skin').'&hellip;',
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
 						);
-					$entries['blog']['entries']['plugin_settings'] = array(
-							'text' => T_('Plugins').'&hellip;',
-							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings'.$blog_param,
-						);
 					$entries['blog']['entries']['widgets'] = array(
 							'text' => T_('Widgets').'&hellip;',
 							'href' => $admin_url.'?ctrl=widgets'.$blog_param,
@@ -1146,6 +1160,10 @@ class _core_Module extends Module
 									'seo' => array(
 										'text' => T_('SEO').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
+									),
+									'renderers' => array(
+										'text' => T_('Renderers').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers'.$blog_param,
 									),
 								)
 						);
@@ -1674,6 +1692,9 @@ class _core_Module extends Module
 								'notifications' => array(
 									'text' => T_('Notifications'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
+								'renderers' => array(
+									'text' => T_('Renderers'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),

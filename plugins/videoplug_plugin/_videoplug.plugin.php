@@ -79,7 +79,6 @@ class videoplug_plugin extends Plugin
 	}
 
 
-
 	/**
 	 * Perform rendering for XML feeds
 	 *
@@ -89,6 +88,7 @@ class videoplug_plugin extends Plugin
 	{
 		return $this->RenderItemAsHtml( $params );
 	}
+
 
 	/**
 	 * Display a toolbar in admin.
@@ -119,6 +119,54 @@ class videoplug_plugin extends Plugin
 		{ // This is too complex for inskin mode, don't display it:
 			return false;
 		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar()
+	{
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 

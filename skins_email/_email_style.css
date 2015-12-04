@@ -1,13 +1,13 @@
-img{
+.email_wrap img{
 	border: none;
 }
-img.avatar_before_login{
+.email_wrap img.avatar_before_login{
 	margin-right: 2px;
 }
-a.user {
+.email_wrap a.user {
 	text-decoration: none;
 }
-.user img{
+.email_wrap .user img{
 	position: relative;
 	top: 2px;
 }

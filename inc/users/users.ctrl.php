@@ -366,6 +366,14 @@ if( !$Messages->has_errors() )
 			header_redirect( $admin_url.'?ctrl=user&user_tab=activity&user_ID='.$edited_User->ID );
 			/* EXITED */
 			break;
+
+		case 'newsletter':
+			// This is a redirect from email campaign controller to select the recipients:
+
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
+			break;
 	}
 }
 

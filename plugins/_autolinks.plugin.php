@@ -112,6 +112,34 @@ class autolinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'autolink_defs_coll_db' => array(
+					'label' => T_( 'Custom autolink definitions' ),
+					'type' => 'html_textarea',
+					'rows' => 15,
+					'note' => $this->T_( 'Enter custom definitions above.' ),
+					'defaultvalue' => '',
+				),
+			'autolink_username' => array(
+					'label' => T_( 'Autolink usernames' ),
+					'type' => 'checkbox',
+					// TRANS: the user can type in any username after "@" but it's typically only lowercase letters and no spaces.
+					'note' => $this->T_( '@username will link to the user profile page' ),
+					'defaultvalue' => 0,
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -120,8 +148,6 @@ class autolinks_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
-				'autolink_defs_coll_db'              => '',
-				'autolink_username'                  => 1,
 				'autolink_post_nofollow_exist'       => 0,
 				'autolink_post_nofollow_explicit'    => 0,
 				'autolink_post_nofollow_auto'        => 0,
@@ -146,20 +172,6 @@ class autolinks_plugin extends Plugin
 		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'stealth' ) );
 		return array_merge( parent::get_coll_setting_definitions( $default_params ),
 			array(
-				'autolink_defs_coll_db' => array(
-						'label' => T_( 'Custom autolink definitions' ),
-						'type' => 'html_textarea',
-						'rows' => 15,
-						'note' => $this->T_( 'Enter custom definitions above.' ),
-						'defaultvalue' => $default_values['autolink_defs_coll_db'],
-					),
-				'autolink_username' => array(
-						'label' => T_( 'Autolink usernames' ),
-						'type' => 'checkbox',
-						// TRANS: the user can type in any username after "@" but it's typically only lowercase letters and no spaces.
-						'note' => $this->T_( '@username will link to the user profile page' ),
-						'defaultvalue' => $default_values['autolink_username'],
-					),
 				// No follow in posts
 				'autolink_post_nofollow_exist' => array(
 						'label' => T_( 'No follow in posts' ),
@@ -213,7 +225,65 @@ class autolinks_plugin extends Plugin
 	{
 		// set params to allow rendering for messages by default
 		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'stealth' ) );
-		return parent::get_msg_setting_definitions( $default_params );
+		return array_merge( parent::get_msg_setting_definitions( $default_params ),
+			array(
+				// No follow settings in messages:
+				'autolink_nofollow_exist' => array(
+						'label' => T_( 'No follow in messages' ),
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_explicit' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_auto' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
+						'defaultvalue' => 0,
+					),
+			)
+		);
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'stealth' ) );
+		return array_merge( parent::get_email_setting_definitions( $default_params ),
+			array(
+				// No follow settings in messages:
+				'autolink_nofollow_exist' => array(
+						'label' => T_( 'No follow in messages' ),
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_explicit' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
+						'defaultvalue' => 0,
+					),
+				'autolink_nofollow_auto' => array(
+						'label' => '',
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
+						'defaultvalue' => 0,
+					),
+			)
+		);
 	}
 
 
@@ -221,9 +291,8 @@ class autolinks_plugin extends Plugin
 	 * Lazy load global definitions array
 	 *
 	 * @param object Blog
-	 * @param boolean Allow empty Blog
 	 */
-	function load_link_array( $Blog, $allow_null_blog = false )
+	function load_link_array( $Blog )
 	{
 		global $plugins_path;
 
@@ -251,7 +320,7 @@ class autolinks_plugin extends Plugin
 		if( !isset($this->link_array[$coll_ID]) )
 		{	// This blog is not loaded yet:
 			$this->link_array[$coll_ID] = array();
-			$text = $this->get_coll_setting( 'autolink_defs_coll_db', $Blog, $allow_null_blog );
+			$text = $this->setting_autolink_defs_coll_db;
 			if( !empty($text) )
 			{	// Load local user defintions:
 				$this->read_textfield( $text, $coll_ID );
@@ -355,16 +424,19 @@ class autolinks_plugin extends Plugin
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )
 		{	// Comment is rendering
-			$this->setting_nofollow_exist = 'autolink_comment_nofollow_exist';
-			$this->setting_nofollow_explicit = 'autolink_comment_nofollow_explicit';
-			$this->setting_nofollow_auto = 'autolink_comment_nofollow_auto';
+			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_comment_nofollow_exist', $item_Blog );
+			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_comment_nofollow_explicit', $item_Blog );
+			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_comment_nofollow_auto', $item_Blog );
 		}
 		else
 		{	// Item is rendering
-			$this->setting_nofollow_exist = 'autolink_post_nofollow_exist';
-			$this->setting_nofollow_explicit = 'autolink_post_nofollow_explicit';
-			$this->setting_nofollow_auto = 'autolink_post_nofollow_auto';
+			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_post_nofollow_exist', $item_Blog );
+			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_post_nofollow_explicit', $item_Blog );
+			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_post_nofollow_auto', $item_Blog );
 		}
+
+		$this->setting_autolink_defs_coll_db = $this->get_coll_setting( 'autolink_defs_coll_db', $item_Blog );
+		$this->setting_autolink_username = $this->get_coll_setting( 'autolink_username', $item_Blog );
 
 		return $this->render_content( $content, $item_Blog );
 	}
@@ -382,11 +454,35 @@ class autolinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Message is rendering
-		$this->setting_nofollow_exist = 'autolink_comment_nofollow_exist';
-		$this->setting_nofollow_explicit = 'autolink_comment_nofollow_explicit';
-		$this->setting_nofollow_auto = 'autolink_comment_nofollow_auto';
+		$this->setting_nofollow_exist = $this->get_msg_setting( 'autolink_nofollow_exist' );
+		$this->setting_nofollow_explicit = $this->get_msg_setting( 'autolink_nofollow_explicit' );
+		$this->setting_nofollow_auto = $this->get_msg_setting( 'autolink_nofollow_auto' );
+		$this->setting_autolink_defs_coll_db = $this->get_msg_setting( 'autolink_defs_coll_db' );
+		$this->setting_autolink_username = $this->get_msg_setting( 'autolink_username' );
 
-		return $this->render_content( $content, NULL, true );
+		return $this->render_content( $content );
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Email is rendering
+		$this->setting_nofollow_exist = $this->get_email_setting( 'autolink_nofollow_exist' );
+		$this->setting_nofollow_explicit = $this->get_email_setting( 'autolink_nofollow_explicit' );
+		$this->setting_nofollow_auto = $this->get_email_setting( 'autolink_nofollow_auto' );
+		$this->setting_autolink_defs_coll_db = $this->get_email_setting( 'autolink_defs_coll_db' );
+		$this->setting_autolink_username = $this->get_email_setting( 'autolink_username' );
+
+		return $this->render_content( $content );
 	}
 
 
@@ -395,23 +491,22 @@ class autolinks_plugin extends Plugin
 	 *
 	 * @param string Content
 	 * @param object Blog
-	 * @param boolean Allow empty Blog
 	 * return boolean
 	 */
-	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	function render_content( & $content, $item_Blog = NULL )
 	{
 		// Prepare existing links
-		$content = $this->prepare_existing_links( $content, $item_Blog, $allow_null_blog );
+		$content = $this->prepare_existing_links( $content );
 
 		// reset already linked usernames
 		$this->already_linked_usernames = array();
-		if( ( !empty( $item_Blog ) || $allow_null_blog ) && $this->get_coll_setting( 'autolink_username', $item_Blog, $allow_null_blog ) )
-		{	// Replace @usernames with user identity link
+		if( $this->setting_autolink_username )
+		{	// Replace @usernames with user identity link:
 			$content = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $content, array( $this, 'replace_usernames' ) );
 		}
 
 		// load global defs
-		$this->load_link_array( $item_Blog, $allow_null_blog );
+		$this->load_link_array( $item_Blog );
 
 		// reset already linked:
 		$this->already_linked_array = array();
@@ -421,8 +516,8 @@ class autolinks_plugin extends Plugin
 		}
 
 		$link_attrs = '';
-		if( ( !empty( $item_Blog ) || $allow_null_blog ) && $this->get_coll_setting( $this->setting_nofollow_explicit, $item_Blog, $allow_null_blog ) )
-		{	// Add attribute rel="nofollow" for auto-links
+		if( $this->setting_nofollow_explicit )
+		{	// Add attribute rel="nofollow" for auto-links:
 			$link_attrs .= ' rel="nofollow"';
 		}
 
@@ -513,8 +608,8 @@ class autolinks_plugin extends Plugin
 		global $Blog;
 
 		$link_attrs = '';
-		if( !empty( $Blog ) && $this->get_coll_setting( $this->setting_nofollow_auto, $Blog ) )
-		{	// Add attribute rel="nofollow" for auto-links
+		if( $this->setting_nofollow_auto )
+		{	// Add attribute rel="nofollow" for auto-links:
 			$link_attrs .= ' rel="nofollow"';
 		}
 
@@ -597,14 +692,12 @@ class autolinks_plugin extends Plugin
 	 * Prepare existing links
 	 *
 	 * @param string Text
-	 * @param object Blog
-	 * @param boolean Allow empty Blog
 	 * @return string Prepared text
 	 */
-	function prepare_existing_links( $text, $Blog = NULL, $allow_null_blog = false )
+	function prepare_existing_links( $text )
 	{
-		if( ( !empty( $Blog ) || $allow_null_blog ) && $this->get_coll_setting( $this->setting_nofollow_exist, $Blog, $allow_null_blog ) )
-		{	// Add attribute rel="nofollow" for preexisting links
+		if( $this->setting_nofollow_exist )
+		{	// Add attribute rel="nofollow" for preexisting links:
 			// Remove all existing attributes "rel" from tag <a>
 			$text = preg_replace( '#<a([^>]*) rel="([^"]+?)"([^>]*)>#is', '<a$1$3>', $text );
 			// Add rel="nofollow"
@@ -639,8 +732,8 @@ class autolinks_plugin extends Plugin
 			// Add this for rel attribute in order to activate bubbletips on usernames
 			$link_attr_rel = 'bubbletip_user_%user_ID%';
 
-			if( $this->get_coll_setting( $this->setting_nofollow_auto, $Blog ) )
-			{	// Add attribute rel="nofollow" for auto-links
+			if( $this->setting_nofollow_auto )
+			{	// Add attribute rel="nofollow" for auto-links:
 				$link_attr_rel .= ' nofollow';
 			}
 			$link_attrs = ' rel="'.$link_attr_rel.'"';

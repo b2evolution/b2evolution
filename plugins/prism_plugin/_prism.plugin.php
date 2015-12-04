@@ -99,6 +99,19 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in message:
+			$this->FilterItemContents( $params );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -248,6 +261,21 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * @see Plugin::AdminEndHtmlHead()
+	 */
+	function AdminEndHtmlHead()
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( $this->get_plugin_url().'/js/prism.min.js', 'relative' );
+			require_css( $this->get_plugin_url().'/css/prism.min.css', 'relative' );
+		}
+	}
+
+
+	/**
 	 * Event handler: Called when displaying editor toolbars.
 	 *
 	 * @param array Associative array of parameters
@@ -292,6 +320,23 @@ class prism_plugin extends Plugin
 	function DisplayMessageToolbar( & $params )
 	{
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->display_toolbar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
 			return $this->display_toolbar();

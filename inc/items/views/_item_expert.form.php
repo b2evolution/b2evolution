@@ -210,7 +210,12 @@ $Form->begin_form( '', '', $params );
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
 	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Item',
+			'target_object' => $edited_Item,
+			'content_id'    => 'itemform_post_content',
+			'edit_layout'   => 'expert',
+		) );
 	$plugin_button = ob_get_flush();
 	if( empty( $plugin_button ) )
 	{	// If button is not displayed by any plugin
@@ -639,7 +644,7 @@ $Form->begin_form( '', '', $params );
 	// ################### TEXT RENDERERS ###################
 
 	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
-					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)

@@ -1510,3 +1510,31 @@ table.diff {
 		}
 	}
 }
+
+// Format date columns:
+.timestamp {
+	white-space: nowrap;
+	text-align: center;
+}
+.timestamp .time {
+	font-size: 84%;
+}
+.compact_data {
+	white-space: nowrap;
+}
+
+// Style fixes for email preview from back-office:
+#skin_wrapper {
+	.email_wrap {
+		.email_payload > p:first-child {
+			margin-top: 10px;
+		}
+		.user img {
+			top: -1px;
+		}
+		ul {
+			margin: 0 0 10px 25px;
+			list-style: disc;
+		}
+	}
+}

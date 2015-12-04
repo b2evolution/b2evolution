@@ -6985,6 +6985,24 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// set_upgrade_checkpoint( '11530' );
 	}
 
+	if( $old_db_version < 11540 )
+	{ // part 5 of 6.7.0
+
+		task_begin( 'Upgrading plugin settings table...' );
+		$DB->query( 'ALTER TABLE T_pluginsettings
+			MODIFY pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL' );
+		task_end();
+
+		task_begin( 'Upgrading email campaigns table... ' );
+		$DB->query( 'ALTER TABLE T_email__campaign
+			ADD COLUMN ecmp_email_plaintext TEXT NULL AFTER ecmp_email_text,
+			ADD COLUMN ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			ADD COLUMN ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0' );
+		task_end();
+
+		// set_upgrade_checkpoint( '11540' );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

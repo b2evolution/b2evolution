@@ -35,7 +35,11 @@ class EmailCampaign extends DataObject
 
 	var $email_text;
 
+	var $email_plaintext;
+
 	var $sent_ts;
+
+	var $use_wysiwyg = 0;
 
 	/**
 	 * @var array|NULL User IDs which assigned for this email campaign
@@ -44,6 +48,11 @@ class EmailCampaign extends DataObject
 	 *   'wait'   - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 */
 	var $users = NULL;
+
+	/**
+	 * @var string
+	 */
+	var $renderers;
 
 	/**
 	 * Constructor
@@ -55,7 +64,11 @@ class EmailCampaign extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_email__campaign', 'ecmp_', 'ecmp_ID', 'date_ts' );
 
-		if( $db_row != NULL )
+		if( $db_row == NULL )
+		{
+			$this->set_renderers( array( 'default' ) );
+		}
+		else
 		{
 			$this->ID = $db_row->ecmp_ID;
 			$this->date_ts = $db_row->ecmp_date_ts;
@@ -63,7 +76,10 @@ class EmailCampaign extends DataObject
 			$this->email_title = $db_row->ecmp_email_title;
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
+			$this->email_plaintext = $db_row->ecmp_email_plaintext;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
+			$this->renderers = $db_row->ecmp_renderers;
+			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 		}
 	}
 
@@ -83,13 +99,17 @@ class EmailCampaign extends DataObject
 
 	/**
 	 * Add users for this campaign in DB
+	 *
+	 * @param array|NULL Array of user IDs, NULL - to get user IDs from current filterset of users list
 	 */
-	function add_users()
+	function add_users( $new_users_IDs = NULL )
 	{
 		global $DB;
 
-		// Get user IDs from current filterset of users list
-		$new_users_IDs = get_filterset_user_IDs();
+		if( $new_users_IDs === NULL )
+		{	// Get user IDs from current filterset of users list:
+			$new_users_IDs = get_filterset_user_IDs();
+		}
 
 		if( count( $new_users_IDs ) )
 		{ // Users are found in the filterset
@@ -184,12 +204,76 @@ class EmailCampaign extends DataObject
 
 
 	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true
+	 */
+	function dbinsert()
+	{
+		$this->update_message_fields();
+
+		return parent::dbinsert();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate(  )
+	{
+		$this->update_message_fields();
+
+		return parent::dbupdate();
+	}
+
+
+	/**
+	 * Update the message fields:
+	 *     - email_html - Result of the rendered plugins from email_text
+	 *     - email_plaintext - Text extraction from email_html
+	 */
+	function update_message_fields()
+	{
+		global $Plugins;
+
+		$email_text = $this->get( 'email_text' );
+
+		// This must get triggered before any internal validation and must pass all relevant params.
+		$Plugins->trigger_event( 'EmailFormSent', array(
+				'content'         => & $email_text,
+				'dont_remove_pre' => true,
+				'renderers'       => $this->get_renderers_validated(),
+			) );
+
+		// Save prerendered message:
+		$Plugins->trigger_event( 'FilterEmailContent', array(
+				'data'          => & $email_text,
+				'EmailCampaign' => $this
+			) );
+		$this->set( 'email_html', format_to_output( $email_text ) );
+
+		// Save plain-text message:
+		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
+		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+		$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+		$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
+		$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
 	 */
 	function load_from_Request()
 	{
+		global $Plugins;
+
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
 		{ // Name
 			param_string_not_empty( 'ecmp_name', T_('Please enter a campaign name.') );
@@ -208,8 +292,15 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'email_html' );
 		}
 
-		if( param( 'ecmp_email_text', 'text', NULL ) !== NULL )
-		{ // Email Plain- Text message
+		// Renderers:
+		if( param( 'renderers_displayed', 'integer', 0 ) )
+		{	// use "renderers" value only if it has been displayed (may be empty):
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'EmailCampaign' => & $this ) );
+			$this->set_renderers( $renderers );
+		}
+
+		if( param( 'ecmp_email_text', 'html', NULL ) !== NULL )
+		{	// Save original message:
 			$this->set_from_Request( 'email_text' );
 		}
 
@@ -242,20 +333,11 @@ class EmailCampaign extends DataObject
 			$result = false;
 		}
 
-		if( empty( $this->email_html ) )
-		{ // Email html message is empty
-			if( $display_messages )
-			{
-				$Messages->add( T_('Please enter an HTML message.'), 'error' );
-			}
-			$result = false;
-		}
-
 		if( empty( $this->email_text ) )
-		{ // Email text message is empty
+		{	// Email message is empty:
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter a plain-text message.'), 'error' );
+				$Messages->add( T_('Please enter a text message.'), 'error' );
 			}
 			$result = false;
 		}
@@ -286,7 +368,7 @@ class EmailCampaign extends DataObject
 		$newsletter_params = array(
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
-				'message_text'     => $this->get( 'email_text' ),
+				'message_text'     => $this->get( 'email_plaintext' ),
 			);
 
 		if( $mode == 'test' )
@@ -389,6 +471,43 @@ class EmailCampaign extends DataObject
 		}
 
 		$DB->commit();
+	}
+
+
+	/**
+	 * Get the list of validated renderers for this EmailCampaign. This includes stealth plugins etc.
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+			$this->renderers_validated = $Plugins->validate_renderer_list( $this->get_renderers(), array( 'EmailCampaign' => & $this ) );
+		}
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get the list of renderers for this Message.
+	 * @return array
+	 */
+	function get_renderers()
+	{
+		return explode( '.', $this->renderers );
+	}
+
+
+	/**
+	 * Set the renderers of the Message.
+	 *
+	 * @param array List of renderer codes.
+	 * @return boolean true, if it has been set; false if it has not changed
+	 */
+	function set_renderers( $renderers )
+	{
+		return $this->set_param( 'renderers', 'string', implode( '.', $renderers ) );
 	}
 }
 

@@ -237,6 +237,25 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( !empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+		return false;
+	}
+
+
+	/**
 	 * Display a toolbar in admin
 	 *
 	 * @param array Associative array of parameters
@@ -424,6 +443,23 @@ class code_highlight_plugin extends Plugin
 			$this->FilterItemContents( $params );
 			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
 			{ // remove <pre>
+				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
+			}
+		}
+	}
+
+
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in email:
+			$this->FilterItemContents( $params );
+			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
+			{	// remove <pre>:
 				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
 			}
 		}

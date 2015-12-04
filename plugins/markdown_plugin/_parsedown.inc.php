@@ -426,7 +426,7 @@ class Parsedown
 					
 					if( isset( $element['ordered'] ) || isset( $return_data['last'] ) ) # first
 					{ // Start new list if it is new list or if previous was interrupted with paragraph
-						$list_type = $element['ordered'] ? 'ol' : 'ul';
+						$list_type = ! empty( $element['ordered'] ) ? 'ol' : 'ul';
 
 						$markup .= '<'.$list_type.'>'."\n";
 					}

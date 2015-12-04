@@ -180,7 +180,7 @@ switch( $action )
 				}
 				break;
 
-			case 'plugin_settings':
+			case 'renderers':
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
 
@@ -418,7 +418,7 @@ switch( $AdminUI->get_path(1) )
 
 	case 'skin':
 		$AdminUI->set_path( 'collections', 'skin', 'current_skin' );
-		$AdminUI->breadcrumbpath_add( T_('Skins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		if( $skinpage == 'selection' )
 		{
 			$AdminUI->breadcrumbpath_add( T_('Skin selection'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab.'&amp;skinpage=selection' );
@@ -429,11 +429,6 @@ switch( $AdminUI->get_path(1) )
 			$AdminUI->breadcrumbpath_add( T_('Skins for this blog'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		}
 		$AdminUI->set_page_manual_link( 'skins-for-this-blog' );
-		break;
-
-	case 'plugin_settings':
-		$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-		$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
 		break;
 
 	case 'urls':
@@ -448,6 +443,13 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 		$AdminUI->breadcrumbpath_add( T_('SEO'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->set_page_manual_link( 'seo-settings' );
+		break;
+
+	case 'renderers':
+		$AdminUI->set_path( 'collections', 'settings', $tab );
+		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
+		$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
 		break;
 
 	case 'advanced':
@@ -521,10 +523,6 @@ switch( $AdminUI->get_path(1) )
 		}
 		break;
 
-	case 'plugin_settings':
-		$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
-		break;
-
 	case 'settings':
 		switch( $AdminUI->get_path(2) )
 		{
@@ -544,6 +542,9 @@ switch( $AdminUI->get_path(1) )
 				break;
 			case 'seo':
 				$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
+				break;
+			case 'renderers':
+				$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
 				break;
 			case 'advanced':
 				$AdminUI->disp_view( 'collections/views/_coll_advanced.form.php' );

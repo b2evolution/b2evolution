@@ -291,7 +291,7 @@ $schema_queries = array(
 		'Creating plugin settings table',
 		"CREATE TABLE T_pluginsettings (
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL,
 			pset_value TEXT NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -468,14 +468,17 @@ $schema_queries = array(
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID          INT NOT NULL AUTO_INCREMENT,
-			ecmp_date_ts     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name        VARCHAR(255) NOT NULL,
-			ecmp_email_title VARCHAR(255) NULL,
-			ecmp_email_html  TEXT NULL,
-			ecmp_email_text  TEXT NULL,
-			ecmp_sent_ts     TIMESTAMP NULL,
-			PRIMARY KEY      (ecmp_ID)
+			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
+			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			ecmp_name            VARCHAR(255) NOT NULL,
+			ecmp_email_title     VARCHAR(255) NULL,
+			ecmp_email_html      TEXT NULL,
+			ecmp_email_text      TEXT NULL,
+			ecmp_email_plaintext TEXT NULL,
+			ecmp_sent_ts         TIMESTAMP NULL,
+			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
+			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(

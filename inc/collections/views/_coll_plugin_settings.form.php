@@ -48,7 +48,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 		$Form->add_crumb( 'collection' );
 		$Form->hidden_ctrl();
-		$Form->hidden( 'tab', 'plugin_settings' );
+		$Form->hidden( 'tab', 'renderers' );
 		$Form->hidden( 'action', 'update' );
 		$Form->hidden( 'blog', $Blog->ID );
 

@@ -40,6 +40,26 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'link_without_brackets' => array(
+					'label' => $this->T_('Links without brackets'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
+				)
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -48,7 +68,7 @@ class shortlinks_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
-				'default_post_rendering' => 'opt-out'
+				'default_post_rendering' => 'opt-in'
 			);
 
 		if( !empty( $params['blog_type'] ) && $params['blog_type'] != 'forum' )
@@ -57,29 +77,8 @@ class shortlinks_plugin extends Plugin
 		}
 
 		$default_params = array_merge( $params, $default_values );
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'link_without_brackets' => array(
-					'label' => $this->T_('Links without brackets'),
-					'type' => 'checkbox',
-					'defaultvalue' => 0,
-					'note' => $this->T_('Enable this to create the links from words like WikiWord without brackets [[]]'),
-				)
-			) );
-	}
 
-
-	/**
-	 * Define here default message settings that are to be made available in the backoffice.
-	 *
-	 * @param array Associative array of parameters.
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 */
-	function get_msg_setting_definitions( & $params )
-	{
-		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
-		return parent::get_msg_setting_definitions( $default_params );
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -110,7 +109,9 @@ class shortlinks_plugin extends Plugin
 		}
 		$item_Blog = & $Item->get_Blog();
 
-		return $this->render_content( $content, $item_Blog );
+		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $item_Blog );
+
+		return $this->render_content( $content );
 	}
 
 
@@ -125,7 +126,26 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		return $this->render_content( $content, NULL, true );
+		$this->setting_link_without_brackets = $this->get_msg_setting( 'link_without_brackets' );
+
+		return $this->render_content( $content );
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		$this->setting_link_without_brackets = $this->get_email_setting( 'link_without_brackets' );
+
+		return $this->render_content( $content );
 	}
 
 
@@ -135,11 +155,9 @@ class shortlinks_plugin extends Plugin
 	 * @todo get rid of global $blog
 	 *
 	 * @param string Content
-	 * @param object Blog
-	 * @param boolean Allow empty Blog
-	 * return boolean
+	 * @return boolean
 	 */
-	function render_content( & $content, $item_Blog = NULL, $allow_null_blog = false )
+	function render_content( & $content )
 	{
 		global $ItemCache, $admin_url, $blog, $evo_charset;
 
@@ -186,7 +204,7 @@ class shortlinks_plugin extends Plugin
 		$search_wikiwords = array();
 		$replace_links = array();
 
-		if( $this->get_coll_setting( 'link_without_brackets', $item_Blog, $allow_null_blog ) )
+		if( $this->setting_link_without_brackets )
 		{	// Create the links from standalone WikiWords
 
 			// STANDALONE WIKIWORDS:

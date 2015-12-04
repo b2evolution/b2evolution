@@ -551,6 +551,19 @@ class Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array();
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -592,7 +605,7 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -612,17 +625,17 @@ class Plugin
 			return array();
 		}
 
-		$render_note = $this->get_help_link();
+		$render_note = '';
 		if( empty( $this->code ) )
 		{
-			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
 		}
 		$admin_Plugins = & get_Plugins_admin();
 		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
 		$default_msg_rendering = ( isset( $params['default_msg_rendering'] ) && in_array( $params['default_msg_rendering'], $rendering_options ) ) ? $params['default_msg_rendering'] : 'never';
 		$r = array(
 			'msg_apply_rendering' => array(
-					'label' => sprintf( /* TRANS: Apply <plugin name> (rendering): always/never/stealth... etc */ T_('Apply %s'), $this->name ),
+					'label' => T_('Apply rendering to messages'),
 					'type' => 'select',
 					'options' => $rendering_options,
 					'defaultvalue' => $default_msg_rendering,
@@ -630,7 +643,45 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return array();
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_email_rendering = ( isset( $params['default_email_rendering'] ) && in_array( $params['default_email_rendering'], $rendering_options ) ) ? $params['default_email_rendering'] : 'never';
+		$r = array(
+			'email_apply_rendering' => array(
+					'label' => T_('Apply rendering to emails'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_email_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -2010,6 +2061,75 @@ class Plugin
 	// }}}
 
 
+	// Email form events: {{{
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 *
+	 * Use this to filter input
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'content': the message text (by reference)
+	 */
+	function EmailFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called to filter the email's content
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object
+	 */
+	function FilterEmailContent( & $params )
+	{
+		if( $this->group == 'rendering' )
+		{	// All plugin from 'rendering' group has a 'email_apply_rendering' setting
+			$EmailCampaign = & $params['EmailCampaign'];
+			if( in_array( $this->code, $EmailCampaign->get_renderers_validated() ) )
+			{ // Always allow rendering for $EmailCampaign
+				$render_params = array_merge( array( 'data' => & $EmailCampaign->email_text ), $params );
+				$this->RenderEmailAsHtml( $render_params );
+			}
+		}
+	}
+
+	/**
+	 * Event handler: Called when rendering email contents as HTML. (CACHED)
+	 *
+	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
+	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAsHtml( $params );
+	}
+
+	// }}}
+
+
 	// Caching events: {{{
 
 	/**
@@ -2230,6 +2350,8 @@ class Plugin
 	{
 	}
 
+	// }}}
+
 	// PluginMsgSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's messages settings.
@@ -2237,6 +2359,18 @@ class Plugin
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
 	function PluginMsgSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
+	// PluginEmailSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's messages settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginEmailSettingsUpdateAction()
 	{
 	}
 
@@ -3563,7 +3697,8 @@ class Plugin
 			$Plugins->instantiate_Settings( $this, 'Settings' );
 		}
 
-		$value = $this->Settings->get( $parname );
+		// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
+		$value = $this->Settings->get( $parname == 'msg_apply_rendering' ? $parname : 'msg_'.$parname );
 
 		if( ! is_null( $value ) )
 		{ // We have a value for this param:
@@ -3572,6 +3707,38 @@ class Plugin
 
 		// Try default values:
 		$params = $this->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{ // We have a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+	/**
+	 * Get a email specific param value
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_email_setting( $parname )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+		$value = $this->Settings->get( $parname == 'email_apply_rendering' ? $parname : 'email_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$params = $this->get_email_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;

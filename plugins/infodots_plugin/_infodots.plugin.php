@@ -54,6 +54,27 @@ class infodots_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'coll_min_width' => array(
+					'label' => T_('Min width'),
+					'type' => 'integer',
+					'size' => 4,
+					'defaultvalue' => 400,
+					'note' => T_('Enter the minimum pixel width an image must have for dots to be displayed.')
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
@@ -65,17 +86,7 @@ class infodots_plugin extends Plugin
 				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'coll_min_width' => array(
-						'label' => 'Min width',
-						'type' => 'integer',
-						'size' => 4,
-						'defaultvalue' => 400,
-						'note' => T_('Enter the minimum pixel width an image must have for dots to be displayed.')
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -190,6 +201,34 @@ class infodots_plugin extends Plugin
 	function RenderItemAsXml( & $params )
 	{
 		$this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		// This plugin cannot works with messages:
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// This plugin cannot works with emails:
+		return true;
 	}
 
 

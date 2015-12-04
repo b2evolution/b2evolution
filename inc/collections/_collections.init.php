@@ -783,7 +783,7 @@ class collections_Module extends Module
 						),
 					),
 					'skin' => array(
-						'text' => T_('Skins'),
+						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
 							'current_skin' => array(
@@ -792,9 +792,6 @@ class collections_Module extends Module
 							)
 						),
 					),
-					'plugin_settings' => array(
-						'text' => T_('Plugins'),
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
@@ -812,6 +809,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
+							'renderers' => array(
+								'text' => T_('Renderers'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$blog, ),
 						),
 					),
 				) );
