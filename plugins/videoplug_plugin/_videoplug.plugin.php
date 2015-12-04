@@ -99,9 +99,44 @@ class videoplug_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		if( !empty( $params['Item'] ) )
-		{	// Item is set, get Blog from post
+		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
 			$Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
+		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			$comment_Item = & $Comment->get_Item();
+			$Blog = & $comment_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
@@ -113,13 +148,23 @@ class videoplug_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
-		if( empty( $apply_rendering ) || $apply_rendering == 'never' || $params['edit_layout'] == 'inskin' )
-		{ // This is too complex for inskin mode, don't display it:
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar()
+	{
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );

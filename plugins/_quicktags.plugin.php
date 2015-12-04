@@ -47,19 +47,78 @@ class quicktags_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit, $edited_Item;
+		switch( $params['target_type'] )
+		{
+			case 'Item':
+				$Item = & $params['Item'];
 
-		if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
-		{ // Only when HTML is allowed in post
+				if( empty( $Item ) || ! $Item->get_type_setting( 'allow_html' ) )
+				{	// Only when HTML is allowed in post:
+					return false;
+				}
+				break;
+
+			case 'Comment':
+				$Comment = & $params['Comment'];
+				if( $Comment )
+				{	// Get a post of the comment:
+					$comment_Item = & $Comment->get_Item();
+				}
+
+				if( empty( $comment_Item ) || ! $comment_Item->get_type_setting( 'allow_html' ) )
+				{	// Only when HTML is allowed in post:
+					return false;
+				}
+				break;
+
+			default:
+				// Unknown target:
+				return false;
+		}
+
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			$comment_Item = & $Comment->get_Item();
+		}
+
+		if( empty( $comment_Item ) || ! $comment_Item->get_type_setting( 'allow_html' ) )
+		{	// Only when HTML is allowed in post:
 			return false;
 		}
 
-		$simple = ( $params['edit_layout'] == 'inskin' );
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar( & $params )
+	{
+		global $Hit;
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
+
+		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
