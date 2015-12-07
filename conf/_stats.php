@@ -322,6 +322,14 @@ $hit_type_color = array(
 	'api'              => '5BC0DE'
 );
 
+$hit_method_color = array(
+	'GET'    => '000000',
+	'POST'   => 'FFBB00',
+	'PUT'    => 'ff00ff',
+	'DELETE' => 'FF0000',
+	'HEAD'   => '00CCFF',
+);
+
 $user_gender_color = array(
 	'women_active'       => '990066',
 	'women_notactive'    => 'c72290',

@@ -189,6 +189,12 @@ class Hit
 	var $hit_response_code = 200;
 
 	/**
+	 * Hit request method: 'unknown', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND', 'VIEW'
+	 * This is value of $_SERVER['REQUEST_METHOD']
+	 */
+	var $method;
+
+	/**
 	 * Hit action
 	 */
 	var $action;
@@ -896,6 +902,18 @@ class Hit
 			}
 		}
 
+		if( empty( $this->method ) )
+		{	// Initialize a request method:
+			if( isset( $_SERVER['REQUEST_METHOD'] ) && in_array( $_SERVER['REQUEST_METHOD'], array( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND', 'VIEW' ) ) )
+			{	// Current request method is allowed
+				$this->method = $_SERVER['REQUEST_METHOD'];
+			}
+			else
+			{	// Unknown method
+				$this->method = 'unknown';
+			}
+		}
+
 		// Insert a hit into DB table:
 		$sql_insert_fields = array(
 				'hit_datetime'          => 'FROM_UNIXTIME( '.$localtimenow.' )',
@@ -914,7 +932,8 @@ class Hit
 				'hit_remote_addr'       => $DB->quote( $this->IP ),
 				'hit_agent_type'        => $DB->quote( $this->get_agent_type() ),
 				'hit_agent_ID'          => $DB->quote( $this->get_agent_ID() ),
-				'hit_response_code'     => $DB->quote( $this->hit_response_code )
+				'hit_response_code'     => $DB->quote( $this->hit_response_code ),
+				'hit_method'            => $DB->quote( $this->method )
 			);
 
 		if( empty( $this->test_mode ) )

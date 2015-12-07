@@ -125,7 +125,7 @@ function hits_results_block( $params = array() )
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, sess_device, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_action, hit_coll_ID, hit_referer, hit_remote_addr,'
-		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_agent_ID' );
+		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_method, hit_agent_ID' );
 	$SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 		.' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
 		.' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID'
@@ -658,6 +658,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			'gendvice'
 		);
 
+	$request_methods = array( 'GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'unknown' );
+	$request_methods_count = count( $request_methods ) - 1;
+
 	$robots = array();
 	foreach( $user_agents as $lUserAgent )
 	{
@@ -738,6 +741,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$rand_i = mt_rand(0, $users_count - 1);
 		$rand_link = mt_rand(0, $links_count - 1);
 		$cur_seesion = $sessions[$rand_i];
+		$rand_request_method = $request_methods[ mt_rand( 0, $request_methods_count - 1 ) ];
 
 
 		if (strstr($links[$rand_link]['link'], '$keywords$'))
@@ -775,6 +779,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+			$Test_hit->method = $rand_request_method;
 			$Test_hit->log();
 		}
 		else
@@ -857,12 +862,16 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $link);
 
+						$Test_hit->method = $rand_request_method;
+
 						$Test_hit->log();
 
 						$link = array('link' => '/htsrv/login.php?redirect_to=fake_stat',
 							'blog_id' => 1);
 
 						$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'] + 3, 1, $link);
+
+						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
@@ -881,6 +890,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						{ // rss/atom hit
 							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1);
 						}
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 					}
 				}
@@ -893,6 +903,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						$is_api_request = false;
 
 						$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $admin_link, NULL, 1);
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $admin_url;
 					}
@@ -902,6 +913,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
 					}
@@ -916,6 +928,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
 
 				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+				$Test_hit->method = $rand_request_method;
 				$Test_hit->log();
 
 

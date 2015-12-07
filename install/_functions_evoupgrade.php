@@ -7000,7 +7000,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			ADD COLUMN ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0' );
 		task_end();
 
-		// set_upgrade_checkpoint( '11540' );
+		set_upgrade_checkpoint( '11540' );
+	}
+
+	if( $old_db_version < 11550 )
+	{ // part 6 of 6.7.0
+
+		task_begin( 'Upgrading hitlog table...' );
+		db_add_col( 'T_hitlog', 'hit_method', "ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
+		task_end();
+
+		// set_upgrade_checkpoint( '11550' );
 	}
 
 	/*

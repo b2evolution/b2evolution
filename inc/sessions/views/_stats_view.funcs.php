@@ -173,6 +173,16 @@ function hits_results( & $Results, $params = array() )
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
 		);
+	$Results->cols[] = array(
+			'th' => T_('HTTP meth'),
+			'order' => 'hit_method',
+			'td' => '$hit_method$',
+			'td_class' => 'shrinkwrap compact_data',
+			'extra' => array(
+					'style' => '%hit_method_style( "#hit_method#" )%',
+					'format_to_output'=> false
+				)
+		);
 
 	$Results->cols[] = array(
 			'th' => T_('Remote IP'),
@@ -608,5 +618,31 @@ function hit_iprange_status_color( $IP_address )
 	}
 
 	return aipr_status_color( $ip_range_status );
+}
+
+
+/**
+ * Get style for hit method cell
+ *
+ * @param string Hit request method
+ * @return string Method style
+ */
+function hit_method_style( $hit_method )
+{
+	global $hit_method_color;
+
+	// Purple color for non traditional methods:
+	$bg_color = '551A8B';
+
+	if( isset( $hit_method_color[ $hit_method ] ) )
+	{	// Get background color from config array:
+		$bg_color = $hit_method_color[ $hit_method ];
+	}
+
+	$style = 'background-color: #'.$bg_color.';'
+		// Use contrast text color depending on background color:
+		.'color: #'.get_contrast_color( $bg_color );
+
+	return $style;
 }
 ?>

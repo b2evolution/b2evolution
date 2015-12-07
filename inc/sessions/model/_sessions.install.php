@@ -87,6 +87,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			hit_agent_ID          SMALLINT UNSIGNED NULL DEFAULT NULL,
 			hit_response_code     SMALLINT DEFAULT NULL,
+			hit_method            ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			PRIMARY KEY              ( hit_ID ),
 			INDEX hit_coll_ID        ( hit_coll_ID ),
 			INDEX hit_uri            ( hit_uri ),
