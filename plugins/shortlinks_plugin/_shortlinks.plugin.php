@@ -526,7 +526,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function DisplayCodeToolbar( $Blog = NULL, $params = array() )
 	{
-		global $Hit, $baseurl;
+		global $Hit, $baseurl, $debug;
 
 		if( $Hit->is_lynx() )
 		{	// let's deactivate toolbar on Lynx, because they don't work there:
@@ -594,9 +594,14 @@ class shortlinks_plugin extends Plugin
 			}
 			else
 			{	// JSON error data accepted:
-				var error_text ='<h4 class="text-danger">' + error.message + '</h4>'
-				+ '<div><b>Code:</b> ' + error.code + '</div>'
-				+ '<div><b>Status:</b> ' + error.data.status + '</div>';
+				var error_text ='<h4 class="text-danger">' + error.message + '</h4>';
+				<?php
+				if( $debug )
+				{ // Display additional error info in debug mode only:
+				?>
+				error_text += '<div><b>Code:</b> ' + error.code + '</div>'
+					+ '<div><b>Status:</b> ' + error.data.status + '</div>';
+				<?php } ?>
 			}
 
 			shortlinks_end_loading( obj_selector, error_text );
@@ -652,9 +657,8 @@ class shortlinks_plugin extends Plugin
 		 * Load all available collections for current user:
 		 *
 		 * @param string Current collection urlname
-		 * @param string Search keyword
 		 */
-		function shortlinks_load_colls( current_coll_urlname, search_keyword )
+		function shortlinks_load_colls( current_coll_urlname )
 		{
 			shortlinks_api_request( 'collections', '#shortlinks_wrapper', function( data )
 			{	// Display the colllections on success request:
@@ -679,21 +683,14 @@ class shortlinks_plugin extends Plugin
 				}
 				r += '</select>'
 					+ '</div>'
-					+ '<div id="shortlinks_posts_block"></div>';
+					+ '<div id="shortlinks_posts_block"></div>'
+					+ '<div id="shortlinks_post_block"></div>';
 
 				shortlinks_end_loading( '#shortlinks_wrapper', r );
 
 				if( coll_urlname != '' )
 				{	// Load posts list of the current or first collection:
-					if( typeof( search_keyword ) == 'undefined' || search_keyword == '' )
-					{	// Load all posts:
-						shortlinks_load_coll_posts( coll_urlname, coll_name );
-					}
-					else
-					{	// Load the searched posts:
-						shortlinks_display_search_form( coll_urlname, coll_name, search_keyword );
-						shortlinks_load_coll_search( coll_urlname, search_keyword );
-					}
+					shortlinks_load_coll_posts( coll_urlname, coll_name );
 				}
 			} );
 		}
@@ -729,7 +726,10 @@ class shortlinks_plugin extends Plugin
 		 */
 		function shortlinks_load_coll_posts( coll_urlname, coll_name )
 		{
-			shortlinks_display_search_form( coll_urlname, coll_name );
+			if( typeof( coll_name ) != 'undefined' )
+			{
+				shortlinks_display_search_form( coll_urlname, coll_name );
+			}
 
 			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC', '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
@@ -805,6 +805,9 @@ class shortlinks_plugin extends Plugin
 		{
 			shortlinks_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
 
+			// Clear search input field:
+			jQuery( '#shortlinks_search__input' ).val( '' );
+
 			// To prevent link default event:
 			return false;
 		} );
@@ -814,19 +817,35 @@ class shortlinks_plugin extends Plugin
 		{
 			var coll_urlname = jQuery( this ).data( 'urlname' );
 			var post_id = jQuery( this ).data( 'id' );
-			var search_keyword = jQuery( '#shortlinks_search__input' ).val();
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/items?p=' + post_id, '#shortlinks_wrapper', function( data )
-			{	// Display the post data on success request:
-				var post = data[0];
-				shortlinks_end_loading( '#shortlinks_wrapper', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
-				// Display the buttons to back and insert a post link to textarea
-				var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
-					jQuery( '.shortlinks_post_buttons' ) :
-					jQuery( '#shortlinks_post_view' );
-				buttons_side_obj.after( '<button id="shortlinks_btn_back" data-collurl="' + coll_urlname + '" data-search="' + search_keyword + '"  class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-					+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
-			} );
+			// Hide the lists of collectionss and posts:
+			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).hide();
+
+			// Show the post preview block, because it can be hidded after prevous preview:
+			jQuery( '#shortlinks_post_block' ).show();
+
+			if( jQuery( '#shortlinks_post_block' ).data( 'post' ) == post_id )
+			{	// If user loads the same post, just display the cached content to save ajax calls:
+				// Show the action buttons:
+				jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).show();
+			}
+			else
+			{	// Load new post:
+				jQuery( '#shortlinks_post_block' ).html( '' ); // Clear previous cached content
+				shortlinks_api_request( 'collections/' + coll_urlname + '/items?p=' + post_id, '#shortlinks_post_block', function( data )
+				{	// Display the post data on success request:
+					var post = data[0];
+					jQuery( '#shortlinks_post_block' ).data( 'post', post.id );
+					shortlinks_end_loading( '#shortlinks_post_block', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
+					// Display the buttons to back and insert a post link to textarea
+					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+						jQuery( '.shortlinks_post_buttons' ) :
+						jQuery( '#shortlinks_post_view' );
+					jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).remove();
+					buttons_side_obj.after( '<button id="shortlinks_btn_back" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
+				} );
+			}
 
 			// To prevent link default event:
 			return false;
@@ -848,12 +867,11 @@ class shortlinks_plugin extends Plugin
 		// Back to previous list:
 		jQuery( document ).on( 'click', '#shortlinks_btn_back', function()
 		{
-			// Load page with previous data:
-			shortlinks_load_colls( jQuery( this ).data( 'collurl' ), jQuery( this ).data( 'search' ) );
+			// Show the lists of collectionss and posts:
+			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).show();
 
-			// Remove action buttons:
-			jQuery( this ).remove();
-			jQuery( '#shortlinks_btn_insert' ).remove();
+			// Hide the post preview block and action buttons:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
 		} );
 		//]]>
 		</script><?php
