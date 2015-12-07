@@ -479,7 +479,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 
 	// Search between tags:
 	$tags_SQL = new SQL();
-	$tags_SQL->SELECT( 'tag_name, COUNT(DISTINCT itag_itm_ID) as post_count' );
+	$tags_SQL->SELECT( 'tag_ID, tag_name, COUNT( DISTINCT itag_itm_ID ) AS post_count' );
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
@@ -487,25 +487,26 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 	$tags_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 	$tags_SQL->WHERE_and( $tag_where_condition );
 	$tags_SQL->GROUP_BY( 'tag_name' );
-	$tags = $DB->get_assoc( $tags_SQL->get(), 'Get tags matching to the search keywords' );
+	$tags = $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags matching to the search keywords' );
 
-	foreach( $tags as $tag_name => $post_count )
+	foreach( $tags as $tag )
 	{
-		if( $post_count == 0 )
+		if( $tag->post_count == 0 )
 		{	// Count only those tags which have at least one post linked to it, Skip this:
 			continue;
 		}
 
 		$scores_map = array();
-		$scores_map['name'] = score_text( $tag_name, $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['post_count'] = $post_count;
-		$final_score = $scores_map['name']['score'] * $post_count;
+		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['post_count'] = $tag->post_count;
+		$final_score = $scores_map['name']['score'] * $tag->post_count;
 
 		$search_result[] = array(
 			'type'       => 'tag',
 			'score'      => $final_score,
-			'ID'         => $tag_name.':'.$post_count,
-			'scores_map' => $scores_map
+			'ID'         => $tag->tag_ID,
+			'name'       => $tag->tag_name.','.$tag->post_count,
+			'scores_map' => $scores_map,
 		);
 	}
 
@@ -881,7 +882,7 @@ function search_result_block( $params = array() )
 			case 'tag':
 				// Prepare to display a Tag:
 
-				list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
+				list( $tag_name, $post_count ) = explode( ',', $row['name'] );
 				$display_params = array(
 					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
