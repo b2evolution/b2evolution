@@ -502,7 +502,7 @@ class RestApi
 				case 'tag':
 					// Prepare to display a Tag:
 
-					list( $tag_name, $post_count ) = explode( ':', $row['ID'] );
+					list( $tag_name, $post_count ) = explode( ',', $row['name'] );
 
 					$result_data['title'] = $tag_name;
 					$result_data['desc'] = sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name );
