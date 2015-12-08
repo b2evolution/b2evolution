@@ -7010,7 +7010,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_hitlog', 'hit_method', "ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11660' );
+		set_upgrade_checkpoint( '11660' );
 	}
 
 	if( $old_db_version < 11670 )
