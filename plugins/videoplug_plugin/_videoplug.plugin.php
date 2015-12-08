@@ -91,7 +91,9 @@ class videoplug_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar in admin.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -113,8 +115,7 @@ class videoplug_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
 		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
@@ -161,7 +162,7 @@ class videoplug_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?

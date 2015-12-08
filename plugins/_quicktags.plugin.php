@@ -37,7 +37,9 @@ class quicktags_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -47,33 +49,11 @@ class quicktags_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		switch( $params['target_type'] )
-		{
-			case 'Item':
-				$Item = & $params['Item'];
+		$Item = & $params['Item'];
 
-				if( empty( $Item ) || ! $Item->get_type_setting( 'allow_html' ) )
-				{	// Only when HTML is allowed in post:
-					return false;
-				}
-				break;
-
-			case 'Comment':
-				$Comment = & $params['Comment'];
-				if( $Comment )
-				{	// Get a post of the comment:
-					$comment_Item = & $Comment->get_Item();
-				}
-
-				if( empty( $comment_Item ) || ! $comment_Item->get_type_setting( 'allow_html' ) )
-				{	// Only when HTML is allowed in post:
-					return false;
-				}
-				break;
-
-			default:
-				// Unknown target:
-				return false;
+		if( empty( $Item ) || ! $Item->get_type_setting( 'allow_html' ) )
+		{	// Only when HTML is allowed in post:
+			return false;
 		}
 
 		return $this->DisplayCodeToolbar( $params );
@@ -81,7 +61,7 @@ class quicktags_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?

@@ -133,7 +133,9 @@ class widescroll_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -162,18 +164,12 @@ class widescroll_plugin extends Plugin
 			}
 		}
 
-		if( ! empty( $params['Comment'] ) )
-		{	// We editing a Comment, Check if HTML is allowed for the comments of current Blog:
-			$allow_HTML = $Blog->get_setting( 'allow_html_comment' );
-		}
-
 		if( ! $allow_HTML )
-		{	// Only when HTML is allowed in post/comment
+		{	// Only when HTML is allowed in post
 			return false;
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
 		{ // Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
@@ -193,7 +189,7 @@ class widescroll_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?

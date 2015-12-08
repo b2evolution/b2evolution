@@ -177,7 +177,6 @@ $Form->begin_form( '', '', $params );
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
 		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-				'target_type' => 'Item',
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
 			) );

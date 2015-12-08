@@ -932,10 +932,11 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'target_type': either 'Comment' or 'Item'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a toolbar?
@@ -1654,7 +1655,7 @@ class Plugin
 	// Feedback (Comment/Trackback) events: {{{
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?

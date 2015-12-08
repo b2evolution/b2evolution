@@ -130,11 +130,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<div class="edit_toolbars">
 	<?php // --------------------------- TOOLBARS ------------------------------------
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-				'target_type' => 'Comment',
-				'edit_layout' => NULL,
-				'Comment' => $edited_Comment,
-			) );
+		$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $edited_Comment, 'Item' => & $comment_Item ) );
 	?>
 	</div>
 

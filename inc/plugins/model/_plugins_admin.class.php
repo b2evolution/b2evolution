@@ -89,7 +89,7 @@ class Plugins_admin extends Plugins
 				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
 				'AdminDisplayEditorButton' => 'Display action buttons on the edit screens in the back-office',
 				'DisplayEditorButton' => 'Display action buttons on the edit screen in the front-office',
-				'AdminDisplayToolbar' => 'Display a toolbar on the edit screens',
+				'AdminDisplayToolbar' => 'Display a toolbar on the post/item form',
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
 				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
@@ -182,7 +182,7 @@ class Plugins_admin extends Plugins
 				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
 				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
-				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
+				'DisplayCommentToolbar' => 'Display a toolbar on the feedback/comment form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
 				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',

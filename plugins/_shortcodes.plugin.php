@@ -37,7 +37,9 @@ class shortcodes_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -47,19 +49,14 @@ class shortcodes_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit, $edited_Comment;
-
-		if( ! empty( $edited_Comment ) )
-		{ // Don't display the toolbars on edit comment form
-			return false;
-		}
+		global $Hit;
 
 		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
 
-		if( ! empty( $params['Item'] ) && ( $params['Item']->is_intro() || ! $params['Item']->get_type_setting( 'allow_breaks' ) ) )
+		if( empty( $params['Item'] ) || $params['Item']->is_intro() || ! $params['Item']->get_type_setting( 'allow_breaks' ) )
 		{	// Teaser and page breaks are not allowed for current item type and for all intro items:
 			return false;
 		}

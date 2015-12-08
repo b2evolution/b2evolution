@@ -466,13 +466,16 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		$params['target_type'] = 'Item';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -539,8 +542,8 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				break;
 		}
 
-		if( $apply_rendering == 'never' )
-		{	// Don't display a toolbar if plugin is disabled
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Don't display a toolbar if plugin is disabled:
 			return false;
 		}
 
@@ -745,44 +748,15 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-		if( !empty( $params['Comment'] ) )
-		{ // Comment is set, get Blog from comment
-			$Comment = & $params['Comment'];
-			if( !empty( $Comment->item_ID ) )
-			{
-				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
-			}
-		}
-
-		if( !empty( $params['Item'] ) )
-		{	// Get Blog from Item
-			$comment_Item = & $params['Item'];
-			$Blog = & $comment_Item->get_Blog();
-		}
-
-		if( empty( $Blog ) )
-		{ // Comment is not set, try global Blog
-			global $Blog;
-			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
-				return false;
-			}
-		}
-
-		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) )
-		{
-			$params['target_type'] = 'Comment';
-			return $this->DisplayCodeToolbar( $params );
-		}
-		return false;
+		$params['target_type'] = 'Comment';
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -794,13 +768,8 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
-		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
-		{
-			$params['target_type'] = 'Message';
-			return $this->DisplayCodeToolbar( $params );
-		}
-		return false;
+		$params['target_type'] = 'Message';
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 

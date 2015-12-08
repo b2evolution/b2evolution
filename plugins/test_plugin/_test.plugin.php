@@ -339,7 +339,9 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @see Plugin::AdminDisplayToolbar()
 	 * @param array Associative array of parameters
