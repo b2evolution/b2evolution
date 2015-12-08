@@ -6903,8 +6903,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11486' );
 	}
 
-	if( $old_db_version < 11490 )
-	{ // part 18.t trunk aka 21th part of "i7"
+	if( $old_db_version < 11600 )
+	{	// part 1 of 6.7.0
 
 		// Update the assets urls to 'relative' type of the blogs that have absolute base url:
 		// (All other blogs will have the 'basic' url type by default)
@@ -6937,44 +6937,44 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE clog_status clog_status enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started'" );
 		task_end();
 
-		set_upgrade_checkpoint( '11490' );
+		set_upgrade_checkpoint( '11600' );
 	}
 
-	if( $old_db_version < 11500 )
-	{ // part 1 of 6.7.0
+	if( $old_db_version < 11610 )
+	{	// part 2 of 6.7.0
 
 		task_begin( 'Upgrading cron tasks table...' );
 		$DB->query( 'ALTER TABLE T_cron__task
 			ADD COLUMN ctsk_repeat_variation int(10) unsigned DEFAULT 0 AFTER ctsk_repeat_after' );
 		task_end();
 
-		set_upgrade_checkpoint( '11500' );
+		set_upgrade_checkpoint( '11610' );
 	}
 
-	if( $old_db_version < 11510 )
-	{ // part 2 of 6.7.0
+	if( $old_db_version < 11620 )
+	{	// part 3 of 6.7.0
 
 		task_begin( 'Upgrading email log table...' );
 		$DB->query( 'ALTER TABLE T_email__log
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		task_end();
 
-		set_upgrade_checkpoint( '11510' );
+		set_upgrade_checkpoint( '11620' );
 	}
 
-	if( $old_db_version < 11520 )
-	{ // part 3 of 6.7.0
+	if( $old_db_version < 11630 )
+	{	// part 4 of 6.7.0
 
 		task_begin( 'Upgrading hitlog table...' );
 		$DB->query( "ALTER TABLE T_hitlog
 			MODIFY COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL" );
 		task_end();
 
-		set_upgrade_checkpoint( '11520' );
+		set_upgrade_checkpoint( '11630' );
 	}
 
-	if( $old_db_version < 11530 )
-	{ // part 4 of 6.7.0
+	if( $old_db_version < 11640 )
+	{	// part 5 of 6.7.0
 
 		task_begin( 'Update  plugins table...' );
 		$DB->query( 'UPDATE T_plugins
@@ -6982,11 +6982,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			WHERE plug_classname = "wikilinks_plugin"' );
 		task_end();
 
-		set_upgrade_checkpoint( '11530' );
+		set_upgrade_checkpoint( '11640' );
 	}
 
-	if( $old_db_version < 11540 )
-	{ // part 5 of 6.7.0
+	if( $old_db_version < 11650 )
+	{	// part 6 of 6.7.0
 
 		task_begin( 'Upgrading plugin settings table...' );
 		$DB->query( 'ALTER TABLE T_pluginsettings
@@ -7000,17 +7000,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			ADD COLUMN ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0' );
 		task_end();
 
-		set_upgrade_checkpoint( '11540' );
+		set_upgrade_checkpoint( '11650' );
 	}
 
-	if( $old_db_version < 11550 )
-	{ // part 6 of 6.7.0
+	if( $old_db_version < 11660 )
+	{	// part 7 of 6.7.0
 
 		task_begin( 'Upgrading hitlog table...' );
 		db_add_col( 'T_hitlog', 'hit_method', "ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
 		task_end();
 
-		// set_upgrade_checkpoint( '11550' );
+		// set_upgrade_checkpoint( '11660' );
 	}
 
 	/*
