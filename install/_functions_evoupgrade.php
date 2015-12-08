@@ -64,6 +64,63 @@ function set_upgrade_checkpoint( $version )
 
 
 /**
+ * Start upgrade task
+ *
+ * @param integer Version of DB at checkpoint
+ * @param string Task title
+ * @return boolean TRUE if task has been started
+ */
+function upg_task_start( $version, $title = '' )
+{
+	global $old_db_version, $upgrade_db_version;
+
+	if( $old_db_version < $version )
+	{	// Only if current DB version is older than current requested
+
+		// Set upgrade version to use this in function upg_task_end():
+		$upgrade_db_version = $version;
+
+		if( ! empty( $title ) )
+		{	// Start task (Display a title):
+			task_begin( $title );
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+/**
+ * End upgrade task
+ *
+ * @param boolean TRUE to print out a result of task ending
+ */
+function upg_task_end( $print_result = true )
+{
+	global $upgrade_db_version;
+
+	if( ! empty( $upgrade_db_version ) )
+	{	// Only if the upgrade task is not ended yet:
+
+		if( $print_result )
+		{	// Print out the end of task:
+			task_end();
+		}
+
+		// Create a DB version checkpoint:
+		set_upgrade_checkpoint( $upgrade_db_version );
+
+		// Unset the current version because task is ended:
+		unset( $upgrade_db_version );
+	}
+}
+
+
+/**
  * @return boolean Does a given index key name exist in DB?
  */
 function db_index_exists( $table, $index_name )
@@ -6903,12 +6960,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11486' );
 	}
 
-	if( $old_db_version < 11600 )
+	if( upg_task_start( 11600, 'Updating blogs settings...' ) )
 	{	// part 1 of 6.7.0
 
 		// Update the assets urls to 'relative' type of the blogs that have absolute base url:
 		// (All other blogs will have the 'basic' url type by default)
-		task_begin( 'Updating blogs settings...' );
 		$blogs_abs_url_SQL = new SQL();
 		$blogs_abs_url_SQL->SELECT( 'blog_ID' );
 		$blogs_abs_url_SQL->FROM( 'T_blogs' );
@@ -6930,91 +6986,70 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'REPLACE INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
 				VALUES '.$blogs_abs_url_values );
 		}
-		task_end();
 
-		task_begin( 'Upgrading cron logs table... ' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11605, 'Upgrading cron logs table...' ) )
+	{	// part 2 of 6.7.0
 		$DB->query( "ALTER TABLE T_cron__log
 			CHANGE clog_status clog_status enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started'" );
-		task_end();
-
-		set_upgrade_checkpoint( '11600' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11610 )
-	{	// part 2 of 6.7.0
-
-		task_begin( 'Upgrading cron tasks table...' );
+	if( upg_task_start( 11610, 'Upgrading cron tasks table...' ) )
+	{	// part 3 of 6.7.0
 		$DB->query( 'ALTER TABLE T_cron__task
 			ADD COLUMN ctsk_repeat_variation int(10) unsigned DEFAULT 0 AFTER ctsk_repeat_after' );
-		task_end();
-
-		set_upgrade_checkpoint( '11610' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11620 )
-	{	// part 3 of 6.7.0
-
-		task_begin( 'Upgrading email log table...' );
+	if( upg_task_start( 11620, 'Upgrading email log table...' ) )
+	{	// part 4 of 6.7.0
 		$DB->query( 'ALTER TABLE T_email__log
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
-		task_end();
-
-		set_upgrade_checkpoint( '11620' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11630 )
-	{	// part 4 of 6.7.0
-
-		task_begin( 'Upgrading hitlog table...' );
+	if( upg_task_start( 11630, 'Upgrading hitlog table...' ) )
+	{	// part 5 of 6.7.0
 		$DB->query( "ALTER TABLE T_hitlog
 			MODIFY COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL" );
-		task_end();
-
-		set_upgrade_checkpoint( '11630' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11640 )
-	{	// part 5 of 6.7.0
-
-		task_begin( 'Update  plugins table...' );
+	if( upg_task_start( 11640, 'Update plugins table...' ) )
+	{	// part 6 of 6.7.0
 		$DB->query( 'UPDATE T_plugins
 			  SET plug_classname = "shortlinks_plugin"
 			WHERE plug_classname = "wikilinks_plugin"' );
-		task_end();
-
-		set_upgrade_checkpoint( '11640' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11650 )
-	{	// part 6 of 6.7.0
-
-		task_begin( 'Upgrading plugin settings table...' );
+	if( upg_task_start( 11650, 'Upgrading plugin settings table...' ) )
+	{	// part 7 of 6.7.0
 		$DB->query( 'ALTER TABLE T_pluginsettings
 			MODIFY pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL' );
-		task_end();
+		upg_task_end();
+	}
 
-		task_begin( 'Upgrading email campaigns table... ' );
+	if( upg_task_start( 11655, 'Upgrading email campaigns table...' ) )
+	{	// part 8 of 6.7.0
 		$DB->query( 'ALTER TABLE T_email__campaign
 			ADD COLUMN ecmp_email_plaintext TEXT NULL AFTER ecmp_email_text,
 			ADD COLUMN ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			ADD COLUMN ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0' );
-		task_end();
-
-		set_upgrade_checkpoint( '11650' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11660 )
-	{	// part 7 of 6.7.0
-
-		task_begin( 'Upgrading hitlog table...' );
+	if( upg_task_start( 11660, 'Upgrading hitlog table...' ) )
+	{	// part 9 of 6.7.0
 		db_add_col( 'T_hitlog', 'hit_method', "ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
-		task_end();
-
-		set_upgrade_checkpoint( '11660' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11670 )
-	{	// part 8 of 6.7.0
+	if( upg_task_start( 11670 ) )
+	{	// part 10 of 6.7.0
 
 		/* ---- Install basic widgets for container "Item Single": ---- START */
 		global $basic_widgets_insert_sql_rows;
@@ -7048,7 +7083,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				$params = $DB->quote( $params );
 			}
 
-		$basic_widgets_insert_sql_rows[] = '( '
+			$basic_widgets_insert_sql_rows[] = '( '
 				.$blog_ID.', '
 				.$DB->quote( $container_name ).', '
 				.$order.', '
@@ -7089,7 +7124,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		/* ---- Install basic widgets for container "Item Single": ---- END */
 
-		// set_upgrade_checkpoint( '11670' );
+		upg_task_end( false );
 	}
 
 	/*
