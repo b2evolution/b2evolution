@@ -35,7 +35,8 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
-$Form->hidden( 'tab', 'settings' );
+$Form->hidden( 'tab', get_param( 'tab' ) );
+$Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
@@ -52,7 +53,7 @@ if( $Settings->get( 'smtp_enabled' ) )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_( 'Email notifications' ).get_manual_link( 'email-notification-settings' ) );
+$Form->begin_fieldset( T_( 'Email envelope' ).get_manual_link( 'email-notification-settings' ) );
 	// Set notes for notifications sender settings which shows the users custom settings information
 	$notification_sender_email_note = '';
 	$notification_sender_name_note = '';

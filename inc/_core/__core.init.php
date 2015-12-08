@@ -1347,6 +1347,9 @@ class _core_Module extends Module
 								'campaigns' => array(
 									'text' => T_('Campaigns').'&hellip;',
 									'href' => $admin_url.'?ctrl=campaigns' ),
+								'settings' => array(
+									'text' => T_('Settings').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
 								'blocked' => array(
 									'text' => T_('Addresses').'&hellip;',
 									'href' => $admin_url.'?ctrl=email' ),
@@ -1356,9 +1359,6 @@ class _core_Module extends Module
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
 								)
 						);
 				}
@@ -1668,37 +1668,49 @@ class _core_Module extends Module
 						'campaigns' => array(
 							'text' => T_('Campaigns'),
 							'href' => '?ctrl=campaigns' ),
-						'blocked' => array(
-							'text' => T_('Addresses'),
-							'href' => '?ctrl=email' ),
+						'settings' => array(
+							'text' => T_('Settings'),
+							'href' => '?ctrl=email&amp;tab=settings',
+							'entries' => array(
+								'renderers' => array(
+									'text' => T_('Renderers'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
+								'envelope' => array(
+									'text' => T_('Envelope'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),
+								'smtp' => array(
+									'text' => T_('SMTP gateway'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
+							) ),
 						'sent' => array(
 							'text' => T_('Sent'),
-							'href' => '?ctrl=email&amp;tab=sent' ),
+							'href' => '?ctrl=email&amp;tab=sent',
+							'entries' => array(
+								'log' => array(
+									'text' => T_('Send Log'),
+									'href' => '?ctrl=email&amp;tab=sent' ),
+								'envelope' => array(
+									'text' => T_('Envelope'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=envelope' ),
+								'smtp' => array(
+									'text' => T_('SMTP gateway'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=smtp' ),
+							) ),
 						'return' => array(
 							'text' => T_('Returned'),
 							'href' => '?ctrl=email&amp;tab=return',
 							'entries' => array(
 								'log' => array(
-									'text' => T_('Log'),
+									'text' => T_('Return Log'),
 									'href' => '?ctrl=email&amp;tab=return&amp;tab3=log' ),
 								'settings' => array(
-									'text' => T_('Settings'),
+									'text' => T_('POP/IMAP Settings'),
 									'href' => '?ctrl=email&amp;tab=return&amp;tab3=settings' ),
 							) ),
-						'settings' => array(
-							'text' => T_('Settings'),
-							'href' => '?ctrl=email&amp;tab=settings',
-							'entries' => array(
-								'notifications' => array(
-									'text' => T_('Notifications'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=notifications' ),
-								'renderers' => array(
-									'text' => T_('Renderers'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
-								'smtp' => array(
-									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
-						) ) ) ) ) );
+						'addresses' => array(
+							'text' => T_('Addresses'),
+							'href' => '?ctrl=email' ),
+						) ) ) );
 
 			if( $current_User->check_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email only if user has a permission to edit email settings:

@@ -28,12 +28,13 @@ load_funcs('tools/model/_email.funcs.php');
 
 param_action();
 
-$tab = param( 'tab', 'string', 'blocked', true );
+$tab = param( 'tab', 'string', 'addresses', true );
+$tab2 = param( 'tab2', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
 
-if( $tab == 'blocked' )
+if( $tab == 'addresses' )
 {	// Email addresses
 	if( param( 'emadr_ID', 'integer', '', true) )
 	{	// Load Email Address object
@@ -58,7 +59,7 @@ switch( $action )
 
 		switch( $tab3 )
 		{
-			case 'notifications':
+			case 'envelope':
 				/* Email service preferences: */
 
 				if( $Settings->get( 'smtp_enabled' ) )
@@ -71,7 +72,7 @@ switch( $action )
 					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 				}
 
-				/* Email notifications: */
+				/* Email envelope: */
 
 				// Sender email address
 				$sender_email = param( 'notification_sender_email', 'string', '' );
@@ -263,7 +264,7 @@ switch( $action )
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=email&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
+					header_redirect( '?ctrl=email&tab='.$tab.'&tab2='.$tab2.'&tab3='.$tab3, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 			}
@@ -414,6 +415,8 @@ switch( $tab )
 	case 'sent':
 		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
+		$tab3 = 'log';
+
 		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
 		if( empty( $emlog_ID ) )
 		{ // Initialize date picker on list page
@@ -424,7 +427,7 @@ switch( $tab )
 		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
-	case 'blocked':
+	case 'addresses':
 		$AdminUI->breadcrumbpath_add( T_('Addresses'), '?ctrl=email&amp;tab='.$tab );
 		if( !isset( $edited_EmailAddress ) )
 		{ // List page with email addresses
@@ -451,21 +454,14 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'log':
-				$AdminUI->breadcrumbpath_add( T_('Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('Return Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-returned' );
 				break;
 
-			case 'renderers':
-				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
-				break;
-
 			case 'settings':
-				$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('POP/IMAP Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				if( $Settings->get( 'repath_enabled' ) )
 				{ // If the decoding the returned emails is enabled
@@ -504,15 +500,21 @@ switch( $tab )
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab='.$tab );
 
+		if( $tab2 == 'sent' )
+		{	// The settings are opened from from tab "Sent"
+			$orig_tab = $tab;
+			$tab = $tab2;
+		}
+
 		if( empty( $tab3 ) )
-		{
-			$tab3 = 'notifications';
+		{	// Default tab3 for this case:
+			$tab3 = 'renderers';
 		}
 
 		switch( $tab3 )
 		{
-			case 'notifications':
-				$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+			case 'envelope':
+				$AdminUI->breadcrumbpath_add( T_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-notification-settings' );
@@ -524,12 +526,23 @@ switch( $tab )
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
 				break;
+
+			case 'renderers':
+				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
+				break;
 		}
 
 		break;
 }
 
 $AdminUI->set_path( 'email', $tab, $tab3 );
+if( ! empty( $orig_tab ) )
+{	// Restore original tab:
+	$tab = $orig_tab;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -561,7 +574,7 @@ switch( $tab )
 		$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		break;
 
-	case 'blocked':
+	case 'addresses':
 		if( isset( $edited_EmailAddress ) )
 		{	// Display form to create/edit an email address
 			$AdminUI->disp_view( 'tools/views/_email_address.form.php' );
@@ -611,17 +624,17 @@ switch( $tab )
 	case 'settings':
 		switch( $tab3 )
 		{
-			case 'renderers':
-				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
+			case 'envelope':
+				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
 				break;
 
 			case 'smtp':
 				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
 				break;
 
-			case 'notifications':
+			case 'renderers':
 			default:
-				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
 		}
 		break;
 

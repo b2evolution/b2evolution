@@ -35,7 +35,8 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
-$Form->hidden( 'tab', 'settings' );
+$Form->hidden( 'tab', get_param( 'tab' ) );
+$Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
@@ -43,7 +44,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 {
 	$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'smtp-gateway-settings' ) );
 
-		$url = '?ctrl=email&amp;tab=settings&amp;tab3=smtp&amp;'.url_crumb('emailsettings').'&amp;action=';
+		$url = '?ctrl=email&amp;tab='.get_param( 'tab' ).'&amp;tab2='.get_param( 'tab2' ).'&amp;tab3='.get_param( 'tab3' ).'&amp;'.url_crumb('emailsettings').'&amp;action=';
 		$Form->info_field( T_('Perform tests'),
 					'<a href="'.$url.'test_smtp">['.T_('server connection').']</a>&nbsp;&nbsp;' );
 
