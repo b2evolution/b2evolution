@@ -172,14 +172,18 @@ XX(      graydead.gif
 
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		if( $this->UserSettings->get('use_toolbar') )
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
+		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		{
 			return $this->display_smiley_bar();
 		}
@@ -188,7 +192,7 @@ XX(      graydead.gif
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -214,9 +218,10 @@ XX(      graydead.gif
 			}
 		}
 
-		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog )
-		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
-			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
+		    && ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
+		    || ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
 			return $this->display_smiley_bar();
 		}
@@ -232,7 +237,8 @@ XX(      graydead.gif
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		if( $this->get_msg_setting( 'msg_apply_rendering' )
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{

@@ -89,11 +89,7 @@ $Form->begin_form( 'inskin', '', $display_params );
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-			'target_type' => 'Comment',
-			'edit_layout' => NULL,
-			'Comment' => $edited_Comment,
-		) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $edited_Comment, 'Item' => & $comment_Item ) );
 	echo '</div>';
 	$plugins_toolbar = ob_get_clean();
 
