@@ -7013,6 +7013,85 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// set_upgrade_checkpoint( '11660' );
 	}
 
+	if( $old_db_version < 11670 )
+	{	// part 8 of 6.7.0
+
+		/* ---- Install basic widgets for container "Item Single": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_11670( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+		$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$collections = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs ORDER BY blog_ID' );
+		foreach( $collections as $coll_ID => $coll_type )
+		{
+			task_begin( 'Installing default "Item Single" widgets for collection #'.$coll_ID.'... ' );
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_content', 'core', 20 );
+			if( $coll_type != 'forum' )
+			{	// Item Tags:
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_tags', 'core', 30 );
+			}
+			if( $coll_type == 'std' )
+			{	// About Author:
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_about_author', 'core', 40 );
+			}
+			if( $coll_type == 'std' || $coll_type == 'manual' )
+			{	// Small Print:
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
+			}
+			// Seen by:
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_seen_by', 'core', 60, NULL,
+				// Disable this widget for "forum" collections by default:
+				$coll_type == 'forum' ? 0 : 1 );
+			task_end();
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for container "Item Single": ---- END */
+
+		// set_upgrade_checkpoint( '11670' );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
