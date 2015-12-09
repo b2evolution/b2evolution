@@ -307,6 +307,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
+				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 			);
 	}
 
@@ -401,6 +402,12 @@ class User extends DataObject
 				{
 					$this->set_Group( $edited_user_Group );
 				}
+			}
+
+			if( $is_admin_form )
+			{	// Save secondary groups for this user:
+				$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', array() );
+				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
 			}
 
 			param( 'edited_user_source', 'string', true );
@@ -6149,6 +6156,88 @@ class User extends DataObject
 				WHERE uorg_user_ID = '.$this->ID.'
 					AND uorg_org_ID IN ( '.implode( ', ', $delete_org_IDs ).' )' );
 		}
+	}
+
+
+	/**
+	 * Update user's secondary groups in DB
+	 *
+	 * @param array Secondary group IDs
+	 */
+	function update_secondary_groups( $secondary_group_IDs )
+	{
+		global $DB, $current_User;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in for this action:
+			return;
+		}
+
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
+
+		if( ! $has_full_access && ! $has_moderate_access )
+		{	// Use has no permission to edit users:
+			return;
+		}
+
+		// Clear current secondary groups of this user:
+		$DB->query( 'DELETE FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$this->ID );
+
+		$GroupCache = & get_GroupCache();
+
+		if( count( $secondary_group_IDs ) )
+		{	// Update new secondary groups:
+			$new_secondary_grp_IDs = array();
+
+			foreach( $secondary_group_IDs as $secondary_group_ID )
+			{
+				if( ! empty( $secondary_group_ID ) )
+				{
+					if( /* User can change to any group: */
+							$has_full_access ||
+							/* User can change only to group with level lower than own group level: */
+							( $has_moderate_access &&
+								( $edited_user_secondary_Group = $GroupCache->get_by_ID( $secondary_group_ID, false, false ) ) &&
+								$edited_user_secondary_Group->get( 'level' ) < $current_User->get_Group()->get( 'level' )
+							)
+						)
+					{	// We can add this secondary group because current user has a permission:
+						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
+						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
+						{	// Add except of primary user group and the duplicates:
+							$new_secondary_grp_IDs[] = $secondary_group_ID;
+						}
+					}
+				}
+			}
+
+			if( ! empty( $new_secondary_grp_IDs ) )
+			{	// Insert new secondary groups:
+				$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID )
+					VALUES ( '.$this->ID.', '.implode( ' ), ( '.$this->ID.', ', $new_secondary_grp_IDs ).' )' );
+			}
+		}
+	}
+
+
+	/**
+	 * Get IDs of secondary groups
+	 *
+	 * @return array Secondary group IDs
+	 */
+	function get_secondary_group_IDs()
+	{
+		global $DB;
+
+		$secondary_groups_SQL = new SQL();
+		$secondary_groups_SQL->SELECT( 'sug_grp_ID' );
+		$secondary_groups_SQL->FROM( 'T_users__secondary_user_groups' );
+		$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+
+		$secondary_group_IDs = $DB->get_col( $secondary_groups_SQL->get(), 0, 'Get all IDs of secondary groups for the user #'.$this->ID );
+
+		return $secondary_group_IDs;
 	}
 
 

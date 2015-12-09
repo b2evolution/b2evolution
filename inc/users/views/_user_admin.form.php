@@ -64,28 +64,49 @@ $Form->begin_fieldset( T_('User permissions').get_manual_link('user-admin-permis
 
 $edited_User->get_Group();
 $level_fieldnote = '[0 - 10]';
+$status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
+
+// Load group cache for this page:
+$GroupCache = & get_GroupCache();
+if( ! $current_User->check_perm( 'users', 'edit' ) )
+{	// Show the limited list for moderators:
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
+	$GroupCache->all_loaded = true;
+}
 
 if( $edited_User->ID == 1 )
-{	// This is Admin user
+{	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
-	$Form->info( T_('Account status'), T_( 'Autoactivated' ) );
-	$Form->info( T_('User group'), $edited_User->Group->dget('name') );
+	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
+	$Form->info( T_('Primary user group'), $edited_User->Group->dget('name') );
+}
+else
+{	// Allow to change status and primary group for non-admin users:
+	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, T_('Primary user group') );
+}
 
+// Secondary user groups:
+$user_secondary_group_IDs = $edited_User->get_secondary_group_IDs();
+if( empty( $user_secondary_group_IDs ) )
+{	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
+	$user_secondary_group_IDs[] = 0;
+}
+foreach( $user_secondary_group_IDs as $s => $user_secondary_group_ID )
+{
+	$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $s ? '' : T_('Secondary user groups'), array(
+			'allow_none' => true,
+			'field_suffix' => get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) )
+		) );
+}
+
+if( $edited_User->ID == 1 )
+{	// This is Admin user, Don't allow to change level:
 	$Form->info_field( T_('User level'), $edited_User->get('level'), array( 'note' => $level_fieldnote ) );
 }
 else
-{
-	$status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
-	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$GroupCache = & get_GroupCache();
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
-	{ // Show the limited list for moderators
-		$GroupCache->clear();
-		$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
-		$GroupCache->all_loaded = true;
-	}
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, T_('User group') );
-
+{	// Allow to change level for non-admin users:
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $level_fieldnote, array( 'required' => true ) );
 }
 
@@ -468,6 +489,23 @@ jQuery( '#edited_user_status' ).change( function()
 	{
 		jQuery( '#user_status_icon' ).html( '' );
 	}
+} );
+
+jQuery( document ).on( 'click', '.add_secondary_group', function()
+{	// Add new select element for new secondary group:
+	var current_fieldset = jQuery( this ).closest( '[id^=ffield_edited_user_secondary_grp_ID]' );
+	if( current_fieldset.length == 0 )
+	{	// Fieldset is not found:
+		return;
+	}
+
+	// Clone current fieldset to add one new:
+	var new_fieldset = current_fieldset.clone();
+	new_fieldset.find( 'label' ).html( '' ); // Don't display a duplicated labels
+	new_fieldset.find( 'option' ).removeAttr( 'selected' ); // Reset selected option to
+
+	// Add new fieldset after current:
+	current_fieldset.after( new_fieldset );
 } );
 
 <?php

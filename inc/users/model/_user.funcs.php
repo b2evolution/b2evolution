@@ -5037,7 +5037,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_group'] && $UserList->filters['group'] == -1 )
 	{ // List is ungrouped, Display column with group name
 		$UserList->cols[] = array(
-				'th' => T_('Group'),
+				'th' => T_('Primary Group'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',

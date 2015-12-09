@@ -1018,7 +1018,8 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
-			'fa' => 'plus-circle'
+			'fa' => 'plus-circle',
+			'color' => '#0C0'
 		);
 		case 'minus': return array(
 			'alt'  => T_('Remove'),

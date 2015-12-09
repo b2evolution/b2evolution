@@ -68,6 +68,7 @@ $db_config['aliases'] = array(
 		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
 		'T_users__organization'    => $tableprefix.'users__organization',
 		'T_users__user_org'        => $tableprefix.'users__user_org',
+		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',

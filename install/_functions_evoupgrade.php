@@ -7127,6 +7127,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 11650, 'Creating table for secondary user groups...' ) )
+	{	// part 11 of 6.7.0
+		$DB->query( 'CREATE TABLE T_users__secondary_user_groups (
+				sug_user_ID INT(11) UNSIGNED NOT NULL,
+				sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY ( sug_user_ID, sug_grp_ID )
+			) ENGINE = innodb' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
