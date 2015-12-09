@@ -873,6 +873,9 @@ class shortlinks_plugin extends Plugin
 
 			// Hide the post preview block and action buttons:
 			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
+
+			// To prevent link default event:
+			return false;
 		} );
 		//]]>
 		</script><?php

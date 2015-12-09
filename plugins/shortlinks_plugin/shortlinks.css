@@ -1,6 +1,11 @@
 #shortlinks_wrapper {
 	max-width: 1170px;
 	background: #FFF;
+	text-align: left;
+	padding: 8px;
+}
+.modal-body #shortlinks_wrapper {
+	padding: 0;
 }
 #shortlinks_search__form {
 	margin-bottom: 10px;
@@ -8,6 +13,7 @@
 
 .shortlinks_loading {
 	position: relative;
+	min-width: 64px;
 	min-height: 64px;
 }
 .shortlinks_loading:before {
