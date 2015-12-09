@@ -224,6 +224,13 @@ switch( $action )
 				}
 				break;
 
+			case 'other':
+				/* Campaign sending: */
+
+				// Chunk Size:
+				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+				break;
+
 			default:
 				// Invalid tab3
 				break 2;
@@ -526,7 +533,15 @@ switch( $tab )
 				}
 				break;
 
+			case 'other':
+				$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-other-settings' );
+				break;
+
 			case 'renderers':
+			default:
 				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
@@ -629,6 +644,10 @@ switch( $tab )
 
 			case 'smtp':
 				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
+				break;
+
+			case 'other':
+				$AdminUI->disp_view( 'tools/views/_email_other.form.php' );
 				break;
 
 			case 'renderers':

@@ -61,6 +61,8 @@ class GeneralSettings extends AbstractSettings
 		'notification_long_name' => '', // notification emails will use this as long site name
 		'notification_logo' => '', // notification emails will use this as url to site logo
 
+		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
+
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
 		'fm_enable_roots_blog' => '1',

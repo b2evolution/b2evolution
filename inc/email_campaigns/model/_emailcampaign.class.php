@@ -403,7 +403,7 @@ class EmailCampaign extends DataObject
 	 */
 	function send_all_emails( $display_messages = true )
 	{
-		global $DB, $localtimenow, $mail_log_insert_ID;
+		global $DB, $localtimenow, $mail_log_insert_ID, $Settings;
 
 		// Send emails only for users which still don't accept emails
 		$user_IDs = $this->get_users( 'wait' );
@@ -424,8 +424,16 @@ class EmailCampaign extends DataObject
 			$UserCache = & get_UserCache();
 		}
 
-		foreach( $user_IDs as $user_ID )
+		// Get chunk size to limit a sending at a time:
+		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
+
+		foreach( $user_IDs as $u => $user_ID )
 		{
+			if( $email_campaign_chunk_size > 0 && $u >= $email_campaign_chunk_size )
+			{	// Stop the sending because of chunk size:
+				break;
+			}
+
 			$result = $this->send_email( $user_ID );
 
 			if( $result )
@@ -471,6 +479,16 @@ class EmailCampaign extends DataObject
 		}
 
 		$DB->commit();
+
+		$wait_count = count( $this->users['wait'] );
+		if( $wait_count > 0 )
+		{	// Some recipients still wait this newsletter:
+			echo '<br /><p class="orange">'.sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients have not been sent to yet.'), $email_campaign_chunk_size, $wait_count ).'</p>';
+		}
+		else
+		{	// All recipients received this bewsletter:
+			echo '<br /><p class="green">'.T_('Campaign has been sent to all recipients.').'</p>';
+		}
 	}
 
 

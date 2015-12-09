@@ -1681,6 +1681,9 @@ class _core_Module extends Module
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
+								'other' => array(
+									'text' => T_('Other'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=other' ),
 							) ),
 						'sent' => array(
 							'text' => T_('Sent'),
