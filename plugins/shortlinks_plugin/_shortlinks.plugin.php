@@ -68,17 +68,40 @@ class shortlinks_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			);
-
-		if( !empty( $params['blog_type'] ) && $params['blog_type'] != 'forum' )
-		{	// Set the default settings depends on blog type
-			$default_values['default_comment_rendering'] = 'never';
-		}
 
 		$default_params = array_merge( $params, $default_values );
 
 		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
+		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
+		return parent::get_email_setting_definitions( $default_params );
 	}
 
 
