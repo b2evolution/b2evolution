@@ -290,7 +290,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 						if( isset( $elements_regexp ) )
 						{ // Array contains elements which must match to the given regular expression
-							if( preg_match( $elements_regexp, $var_value ) )
+							if( ( $strict_typing == 'allow_empty' && empty( $var_value ) )
+							    || preg_match( $elements_regexp, $var_value ) )
 							{ // OK match, set the corresponding type
 								settype( $globals_var[$i][$j], $elements_type );
 							}
