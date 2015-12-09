@@ -7004,21 +7004,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11620, 'Upgrading email log table...' ) )
+	if( upg_task_start( 11615, 'Upgrading email log table...' ) )
 	{	// part 4 of 6.7.0
 		$DB->query( 'ALTER TABLE T_email__log
 			MODIFY emlog_result ENUM( "ok", "error", "blocked", "simulated" ) COLLATE ascii_general_ci NOT NULL DEFAULT "ok"' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11630, 'Upgrading hitlog table...' ) )
+	if( upg_task_start( 11620, 'Upgrading hitlog table...' ) )
 	{	// part 5 of 6.7.0
 		$DB->query( "ALTER TABLE T_hitlog
 			MODIFY COLUMN hit_type ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL" );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11640, 'Update plugins table...' ) )
+	if( upg_task_start( 11625, 'Update plugins table...' ) )
 	{	// part 6 of 6.7.0
 		$DB->query( 'UPDATE T_plugins
 			  SET plug_classname = "shortlinks_plugin"
@@ -7026,14 +7026,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11650, 'Upgrading plugin settings table...' ) )
+	if( upg_task_start( 11630, 'Upgrading plugin settings table...' ) )
 	{	// part 7 of 6.7.0
 		$DB->query( 'ALTER TABLE T_pluginsettings
 			MODIFY pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11655, 'Upgrading email campaigns table...' ) )
+	if( upg_task_start( 11635, 'Upgrading email campaigns table...' ) )
 	{	// part 8 of 6.7.0
 		$DB->query( 'ALTER TABLE T_email__campaign
 			ADD COLUMN ecmp_email_plaintext TEXT NULL AFTER ecmp_email_text,
@@ -7042,13 +7042,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11660, 'Upgrading hitlog table...' ) )
+	if( upg_task_start( 11640, 'Upgrading hitlog table...' ) )
 	{	// part 9 of 6.7.0
 		db_add_col( 'T_hitlog', 'hit_method', "ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL" );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11670 ) )
+	if( upg_task_start( 11645 ) )
 	{	// part 10 of 6.7.0
 
 		/* ---- Install basic widgets for container "Item Single": ---- START */
@@ -7149,12 +7149,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		echo "Calling modules for individual upgrades...<br>\n";
 		evo_flush();
 		modules_call_method( 'upgrade_b2evo_tables' );
-
-		// Just in case, make sure the db schema version is up to date at the end.
-		if( $old_db_version != $new_db_version )
-		{ // Update DB schema version to $new_db_version
-			set_upgrade_checkpoint( $new_db_version );
-		}
 
 		// We're going to need some environment in order to init caches and create profile picture links...
 		if( ! is_object( $Settings ) )
