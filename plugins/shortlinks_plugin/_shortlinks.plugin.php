@@ -572,6 +572,20 @@ class shortlinks_plugin extends Plugin
 			// Load collections:
 			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>' );
 
+			// Set max-height to keep the action buttons on screen:
+			var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
+			var modal_height = jQuery( window ).height() - 20;
+			if( modal_window.hasClass( 'modal-body' ) )
+			{	// Extract heights of header and footer:
+				modal_height -= 55 + 64 +
+					parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
+			}
+			modal_window.css( {
+				'display': 'block',
+				'overflow': 'auto',
+				'max-height': modal_height
+			} );
+
 			// To prevent link default event:
 			return false;
 		}
