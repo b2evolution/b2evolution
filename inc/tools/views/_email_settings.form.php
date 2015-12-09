@@ -40,19 +40,6 @@ $Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-if( $Settings->get( 'smtp_enabled' ) )
-{ // Only when SMTP gateway is enabled
-	$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
-
-	$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
-				array( 'mail', T_('Regular PHP "mail" function'), ),
-				array( 'smtp', T_('SMTP gateway'), ),
-			), T_('Primary email service'), true );
-	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
-
-	$Form->end_fieldset();
-}
-
 $Form->begin_fieldset( T_( 'Email envelope' ).get_manual_link( 'email-notification-settings' ) );
 	// Set notes for notifications sender settings which shows the users custom settings information
 	$notification_sender_email_note = '';

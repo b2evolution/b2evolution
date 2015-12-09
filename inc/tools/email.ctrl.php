@@ -60,18 +60,6 @@ switch( $action )
 		switch( $tab3 )
 		{
 			case 'envelope':
-				/* Email service preferences: */
-
-				if( $Settings->get( 'smtp_enabled' ) )
-				{ // Only when SMTP gateway is enabled
-
-					// Preferred email service
-					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
-
-					// Force email sending
-					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
-				}
-
 				/* Email envelope: */
 
 				// Sender email address
@@ -191,6 +179,12 @@ switch( $action )
 			case 'smtp':
 				// SMTP gateway settings:
 
+				// Preferred email service
+				$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
+
+				// Force email sending
+				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
+
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
 				// Enabled
@@ -245,7 +239,7 @@ switch( $action )
 				}
 				$Messages->add( T_('Settings updated.'), 'success' );
 
-				if( $Settings->get( 'smtp_enabled' ) )
+				if( $tab3 == 'smtp' && $Settings->get( 'smtp_enabled' ) )
 				{ // Check if connection is available
 					global $smtp_connection_result;
 					// Test SMTP connection
@@ -525,6 +519,11 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
+
+				if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'smtp_enabled' ) )
+				{	// Display this error when primary email service is SMTP but it is not enabled:
+					$Messages->add( T_('Your external SMTP Server is not enabled.'), 'error' );
+				}
 				break;
 
 			case 'renderers':

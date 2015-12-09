@@ -58,6 +58,18 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	$Form->end_fieldset();
 }
 
+
+$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
+
+$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
+			array( 'mail', T_('Regular PHP "mail" function'), ),
+			array( 'smtp', T_('External SMTP Server defined below'), ),
+		), T_('Primary email service'), true );
+$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-gateway-settings') );
 
 	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled'),
