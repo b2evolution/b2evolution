@@ -360,6 +360,9 @@ class RestApi
 		// Get additional params:
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
+		// What types search: 'all', 'item', 'comment', 'category', 'tag'
+		// Use separator comma to use several kinds:
+		$api_kind = param( 'kind', 'string', 'all' );
 
 		// Load the search functions:
 		load_funcs( 'collections/_search.funcs.php' );
@@ -382,7 +385,7 @@ class RestApi
 			);
 
 			// Perform new search:
-			$search_result = perform_scored_search( $search_keywords );
+			$search_result = perform_scored_search( $search_keywords, $api_kind );
 
 			// Save results into session:
 			$Session->set( 'search_params', $search_params );

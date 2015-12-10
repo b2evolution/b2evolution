@@ -519,9 +519,11 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
+ * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
+ *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords )
+function perform_scored_search( $search_keywords, $search_types = 'all' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -570,39 +572,66 @@ function perform_scored_search( $search_keywords )
 // TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
-	// Perform search on Items:
-	$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $item_search_result ).' Items.</p>';
-		evo_flush();
+	if( $search_types == 'all' )
+	{	// Search all result types:
+		$search_type_item = true;
+		$search_type_comment = true;
+		$search_type_category = true;
+		$search_type_tag = true;
+	}
+	else
+	{	// Check what types should be searched:
+		$search_types = explode( ',', $search_types );
+		$search_type_item = in_array( 'item', $search_types );
+		$search_type_comment = in_array( 'comment', $search_types );
+		$search_type_category = in_array( 'category', $search_types );
+		$search_type_tag = in_array( 'tag', $search_types );
 	}
 
-	// Perform search on Comments:
-	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $item_search_result, $comment_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
-		evo_flush();
+	$search_result = array();
+
+	if( $search_type_item )
+	{	// Perform search on Items:
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+		$search_result = $item_search_result;
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $item_search_result ).' Items.</p>';
+			evo_flush();
+		}
 	}
 
-	// Perform search on Chapters:
-	$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $cats_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
-		evo_flush();
+	if( $search_type_comment )
+	{	// Perform search on Comments:
+		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $comment_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
+			evo_flush();
+		}
 	}
 
-	// Perform search on Tags:
-	$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $tags_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
-		evo_flush();
+	if( $search_type_category )
+	{	// Perform search on Chapters:
+		$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $cats_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_tag )
+	{	// Perform search on Tags:
+		$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $tags_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
+			evo_flush();
+		}
 	}
 
 	// Sort results by score:
@@ -618,10 +647,22 @@ function perform_scored_search( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
-		$search_result[0]['nr_of_items'] = count( $item_search_result );
-		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
-		$search_result[0]['nr_of_cats'] = count( $cats_search_result );
-		$search_result[0]['nr_of_tags'] = count( $tags_search_result );
+		if( $search_type_item )
+		{
+			$search_result[0]['nr_of_items'] = count( $item_search_result );
+		}
+		if( $search_type_comment )
+		{
+			$search_result[0]['nr_of_comments'] = count( $comment_search_result );
+		}
+		if( $search_type_category )
+		{
+			$search_result[0]['nr_of_cats'] = count( $cats_search_result );
+		}
+		if( $search_type_tag )
+		{
+			$search_result[0]['nr_of_tags'] = count( $tags_search_result );
+		}
 	}
 
 	return $search_result;

@@ -832,9 +832,9 @@ class shortlinks_plugin extends Plugin
 		 */
 		function shortlinks_load_coll_search( coll_urlname, search_keyword, page )
 		{
-			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '?page=' + page;
+			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '?kind=item' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the post data in third column on success request:
 				if( typeof( data.code ) != 'undefined' )
 				{	// Error code was responsed:
