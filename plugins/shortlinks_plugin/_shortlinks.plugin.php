@@ -772,9 +772,9 @@ class shortlinks_plugin extends Plugin
 			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC', '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
-				for( var p in data )
+				for( var p in data.items )
 				{
-					var post = data[p];
+					var post = data.items[p];
 					r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 				}
 				r += '</ul>';
@@ -800,9 +800,9 @@ class shortlinks_plugin extends Plugin
 				}
 
 				var r = '<ul>';
-				for( var s in data )
+				for( var s in data.results )
 				{
-					var search_item = data[s];
+					var search_item = data.results[s];
 					if( search_item.kind != 'item' )
 					{	// Dsiplay only items and skip all other:
 						continue;
@@ -870,9 +870,8 @@ class shortlinks_plugin extends Plugin
 			else
 			{	// Load new post:
 				jQuery( '#shortlinks_post_block' ).html( '' ); // Clear previous cached content
-				shortlinks_api_request( 'collections/' + coll_urlname + '/items?p=' + post_id, '#shortlinks_post_block', function( data )
+				shortlinks_api_request( 'collections/' + coll_urlname + '/items/' + post_id, '#shortlinks_post_block', function( post )
 				{	// Display the post data on success request:
-					var post = data[0];
 					jQuery( '#shortlinks_post_block' ).data( 'post', post.id );
 					shortlinks_end_loading( '#shortlinks_post_block', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
 					// Display the buttons to back and insert a post link to textarea

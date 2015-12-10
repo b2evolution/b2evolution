@@ -115,9 +115,10 @@ jQuery( document ).on( 'click', '#api_collections_list a', function()
 			'</form>' +
 			'<div id="api_posts_list">' +
 				'<ul>';
-		for( var p in data )
+
+		for( var p in data.items )
 		{
-			var post = data[p];
+			var post = data.items[p];
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
 		r += '</ul>' +
@@ -165,9 +166,9 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 		}
 
 		var r = '<ul>';
-		for( var s in data )
+		for( var s in data.results )
 		{
-			var search_item = data[s];
+			var search_item = data.results[s];
 			r += '<li>' + search_item.kind + ': ';
 			r += '<a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
 			if( search_item.kind == 'item' )

@@ -111,8 +111,9 @@ class RestApi
 	 *
 	 * @param string Key or Value ( if second param is NULL )
 	 * @param mixed Value
+	 * @param string Type of new added item: 'string', 'array'
 	 */
-	private function add_response( $key, $value = NULL )
+	private function add_response( $key, $value = NULL, $type = 'string' )
 	{
 		if( $value === NULL )
 		{	// Use auto key:
@@ -120,7 +121,21 @@ class RestApi
 		}
 		else
 		{	// Use defined key:
-			$this->response[ $key ] = $value;
+			switch( $type )
+			{
+				case 'array':
+					if( ! isset( $this->response[ $key ] ) || ! is_array( $this->response[ $key ] ) )
+					{	// Initialize array:
+						$this->response[ $key ] = array();
+					}
+					// Add new item to array:
+					$this->response[ $key ][] = $value;
+					break;
+
+				default:
+					// string
+					$this->response[ $key ] = $value;
+			}
 		}
 	}
 
@@ -243,7 +258,7 @@ class RestApi
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
-		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/posts/<id>":
+		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', '' );
@@ -270,10 +285,12 @@ class RestApi
 		// Run the items list query:
 		$ItemList2->query();
 
+		$items = array();
+
 		// Add each post row in the response array:
 		while( $Item = & $ItemList2->get_next() )
 		{
-			$item_data = array(
+			$items[] = array(
 					'id'        => $Item->ID,
 					'datestart' => $Item->get( 'datestart' ),
 					'urltitle'  => $Item->get( 'urltitle' ),
@@ -282,14 +299,22 @@ class RestApi
 					'content'   => $Item->get_prerendered_content( 'htmlbody' ),
 					'excerpt'   => $Item->get( 'excerpt' ),
 				);
-			if( $post_ID )
-			{	// If only one post is requested then response should as one level array with post fields:
-				$this->response = $item_data;
+		}
+
+		if( $post_ID )
+		{	// If only one post is requested then response should as one level array with post fields:
+			if( isset( $items[0] ) )
+			{
+				$this->response = $items[0];
 			}
-			else
-			{	// Add data of each post in separate array in response:
-				$this->add_response( $item_data );
-			}
+		}
+		else
+		{	// Add data of each post in separate array in response:
+			$this->add_response( 'found', $ItemList2->total_rows );
+			$this->add_response( 'page', $ItemList2->page );
+			$this->add_response( 'page_size', $ItemList2->limit );
+			$this->add_response( 'pages_total', $ItemList2->total_pages );
+			$this->add_response( 'items', $items );
 		}
 
 		if( empty( $this->response ) )
@@ -441,6 +466,11 @@ class RestApi
 			}
 		}
 
+		$this->add_response( 'found', $result_count );
+		$this->add_response( 'page', $current_page );
+		$this->add_response( 'page_size', $result_per_page );
+		$this->add_response( 'pages_total', $total_pages );
+
 		// Get results for current page:
 		for( $index = $from; $index < $to; $index++ )
 		{
@@ -518,7 +548,7 @@ class RestApi
 			}
 
 			// Add data of the searched thing to response:
-			$this->add_response( $result_data );
+			$this->add_response( 'results', $result_data, 'array' );
 		}
 	}
 }
