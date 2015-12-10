@@ -370,7 +370,7 @@ class Comment extends DataObject
 		if( ! isset($this->Item) )
 		{
 			$ItemCache = & get_ItemCache();
-			$this->Item = & $ItemCache->get_by_ID( $this->item_ID, false );
+			$this->Item = & $ItemCache->get_by_ID( $this->item_ID, false, false );
 		}
 
 		return $this->Item;

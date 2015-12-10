@@ -136,8 +136,10 @@ class videoplug_plugin extends Plugin
 		$Comment = & $params['Comment'];
 		if( $Comment )
 		{	// Get a post of the comment:
-			$comment_Item = & $Comment->get_Item();
-			$Blog = & $comment_Item->get_Blog();
+			if( $comment_Item = & $Comment->get_Item() )
+			{
+				$Blog = & $comment_Item->get_Blog();
+			}
 		}
 
 		if( empty( $Blog ) )
