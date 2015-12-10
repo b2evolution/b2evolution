@@ -403,7 +403,7 @@ class EmailCampaign extends DataObject
 	 */
 	function send_all_emails( $display_messages = true )
 	{
-		global $DB, $localtimenow, $mail_log_insert_ID, $Settings;
+		global $DB, $localtimenow, $mail_log_insert_ID, $Settings, $Messages;
 
 		// Send emails only for users which still don't accept emails
 		$user_IDs = $this->get_users( 'wait' );
@@ -480,15 +480,18 @@ class EmailCampaign extends DataObject
 
 		$DB->commit();
 
+		$Messages->clear();
 		$wait_count = count( $this->users['wait'] );
 		if( $wait_count > 0 )
 		{	// Some recipients still wait this newsletter:
-			echo '<br /><p class="orange">'.sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients have not been sent to yet.'), $email_campaign_chunk_size, $wait_count ).'</p>';
+			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients have not been sent to yet.'), $email_campaign_chunk_size, $wait_count ), 'warning' );
 		}
 		else
 		{	// All recipients received this bewsletter:
-			echo '<br /><p class="green">'.T_('Campaign has been sent to all recipients.').'</p>';
+			$Messages->add( T_('Campaign has been sent to all recipients.'), 'success' );
 		}
+		echo '<br />';
+		$Messages->display();
 	}
 
 
