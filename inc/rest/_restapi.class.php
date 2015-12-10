@@ -111,9 +111,9 @@ class RestApi
 	 *
 	 * @param string Key or Value ( if second param is NULL )
 	 * @param mixed Value
-	 * @param string Type of new added item: 'string', 'array'
+	 * @param string Type of new added item: 'raw', 'integer', 'array'
 	 */
-	private function add_response( $key, $value = NULL, $type = 'string' )
+	private function add_response( $key, $value = NULL, $type = 'raw' )
 	{
 		if( $value === NULL )
 		{	// Use auto key:
@@ -132,8 +132,12 @@ class RestApi
 					$this->response[ $key ][] = $value;
 					break;
 
+				case 'integer':
+					$this->response[ $key ] = intval( $value );
+					break;
+
 				default:
-					// string
+					// raw (does nothing)
 					$this->response[ $key ] = $value;
 			}
 		}
@@ -234,7 +238,7 @@ class RestApi
 		foreach( $BlogCache->cache as $Blog )
 		{ // Add each collection row in the response array:
 			$this->add_response( array(
-					'id'        => $Blog->ID,
+					'id'        => intval( $Blog->ID ),
 					'urlname'   => $Blog->get( 'urlname' ),
 					'kind'      => $Blog->get( 'type' ),
 					'shortname' => $Blog->get( 'shortname' ),
@@ -291,7 +295,7 @@ class RestApi
 		while( $Item = & $ItemList2->get_next() )
 		{
 			$items[] = array(
-					'id'        => $Item->ID,
+					'id'        => intval( $Item->ID ),
 					'datestart' => $Item->get( 'datestart' ),
 					'urltitle'  => $Item->get( 'urltitle' ),
 					'type'      => $Item->get_type_setting( 'name' ),
@@ -310,10 +314,10 @@ class RestApi
 		}
 		else
 		{	// Add data of each post in separate array in response:
-			$this->add_response( 'found', $ItemList2->total_rows );
-			$this->add_response( 'page', $ItemList2->page );
-			$this->add_response( 'page_size', $ItemList2->limit );
-			$this->add_response( 'pages_total', $ItemList2->total_pages );
+			$this->add_response( 'found', $ItemList2->total_rows, 'integer' );
+			$this->add_response( 'page', $ItemList2->page, 'integer' );
+			$this->add_response( 'page_size', $ItemList2->limit, 'integer' );
+			$this->add_response( 'pages_total', $ItemList2->total_pages, 'integer' );
 			$this->add_response( 'items', $items );
 		}
 
@@ -466,10 +470,10 @@ class RestApi
 			}
 		}
 
-		$this->add_response( 'found', $result_count );
-		$this->add_response( 'page', $current_page );
-		$this->add_response( 'page_size', $result_per_page );
-		$this->add_response( 'pages_total', $total_pages );
+		$this->add_response( 'found', $result_count, 'integer' );
+		$this->add_response( 'page', $current_page, 'integer' );
+		$this->add_response( 'page_size', $result_per_page, 'integer' );
+		$this->add_response( 'pages_total', $total_pages, 'integer' );
 
 		// Get results for current page:
 		for( $index = $from; $index < $to; $index++ )
@@ -478,7 +482,7 @@ class RestApi
 
 			$result_data = array(
 					'kind' => $row['type'],
-					'id'   => $row['ID'],
+					'id'   => intval( $row['ID'] ),
 				);
 
 			switch( $row['type'] )
