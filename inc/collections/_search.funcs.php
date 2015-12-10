@@ -71,7 +71,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 			$score += $scores_map['word_case_sensitive_match'][$word];
 		}
 
-		if( $word_match_count = preg_match_all( '/\b'.$word.'\b/i', $text, $matches ) )
+		if( $word_match_count = preg_match_all( '/\b'.preg_quote( $word, '/' ).'\b/i', $text, $matches ) )
 		{ // Every word match gives one more score
 			$scores_map['whole_word_match'][$word] = $score_weight;
 			$score += $scores_map['whole_word_match'][$word];
@@ -81,7 +81,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 			$all_whole_word_match = false;
 		}
 
-		if( $any_match_count = preg_match_all( '/'.$word.'/i', $text, $matches ) )
+		if( $any_match_count = preg_match_all( '/'.preg_quote( $word, '/' ).'/i', $text, $matches ) )
 		{ // Every word match gives one more score
 			$scores_map['word_case_insensitive_match'][$word] = $score_weight;
 			$score += $scores_map['word_case_insensitive_match'][$word];
