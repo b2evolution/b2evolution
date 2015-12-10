@@ -100,6 +100,14 @@ class User extends DataObject
 	var $Group;
 
 	/**
+	 * Array of the references to groups
+	 * @see User::get_secondary_groups()
+	 * @var secondary_groups
+	 * @access protected
+	 */
+	var $secondary_groups;
+
+	/**
 	 * Country lazy filled
 	 *
 	 * @var country
@@ -395,11 +403,8 @@ class User extends DataObject
 				$this->set_from_Request( 'level', 'edited_user_level', true );
 
 				$edited_user_Group = $GroupCache->get_by_ID( param( 'edited_user_grp_ID', 'integer' ) );
-				if( /* User can change to any group: */
-				    $has_full_access ||
-				    /* User can change only to group with level lower than own group level: */
-				    ( $has_moderate_access && $edited_user_Group->get( 'level' ) < $current_User->get_Group()->get( 'level' ) ) )
-				{
+				if( $edited_user_Group->can_be_assigned() )
+				{	// Update group only if current user has a permission for this:
 					$this->set_Group( $edited_user_Group );
 				}
 			}
@@ -6181,8 +6186,24 @@ class User extends DataObject
 			return;
 		}
 
-		// Clear current secondary groups of this user:
-		$DB->query( 'DELETE FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$this->ID );
+		$old_secondary_groups = $this->get_secondary_groups();
+		if( ! empty( $old_secondary_groups ) )
+		{	// Check each old secondary group if it can be deleted by current user:
+			$delete_old_secondary_groups = array();
+			foreach( $old_secondary_groups as $o => $old_secondary_Group )
+			{
+				if( $old_secondary_Group->can_be_assigned() )
+				{	// Current user can delete only this group:
+					$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
+				}
+			}
+			if( ! empty( $delete_old_secondary_group_IDs ) )
+			{	// Clear secondary groups only which can be touched by currrent user:
+				$DB->query( 'DELETE FROM T_users__secondary_user_groups
+					WHERE sug_user_ID = '.$this->ID.'
+					  AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
+			}
+		}
 
 		$GroupCache = & get_GroupCache();
 
@@ -6194,14 +6215,8 @@ class User extends DataObject
 			{
 				if( ! empty( $secondary_group_ID ) )
 				{
-					if( /* User can change to any group: */
-							$has_full_access ||
-							/* User can change only to group with level lower than own group level: */
-							( $has_moderate_access &&
-								( $edited_user_secondary_Group = $GroupCache->get_by_ID( $secondary_group_ID, false, false ) ) &&
-								$edited_user_secondary_Group->get( 'level' ) < $current_User->get_Group()->get( 'level' )
-							)
-						)
+					if( $edited_user_secondary_Group = & $GroupCache->get_by_ID( $secondary_group_ID, false, false ) &&
+					    $edited_user_secondary_Group->can_be_assigned() )
 					{	// We can add this secondary group because current user has a permission:
 						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
 						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
@@ -6222,22 +6237,36 @@ class User extends DataObject
 
 
 	/**
-	 * Get IDs of secondary groups
+	 * Get secondary groups
 	 *
-	 * @return array Secondary group IDs
+	 * @return array Secondary groups array of Group objects
 	 */
-	function get_secondary_group_IDs()
+	function get_secondary_groups()
 	{
-		global $DB;
+		if( ! is_array( $this->secondary_groups ) )
+		{	// Initialize the secondary groups:
+			global $DB;
 
-		$secondary_groups_SQL = new SQL();
-		$secondary_groups_SQL->SELECT( 'sug_grp_ID' );
-		$secondary_groups_SQL->FROM( 'T_users__secondary_user_groups' );
-		$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+			// Get all secondary group IDs of this user:
+			$secondary_groups_SQL = new SQL();
+			$secondary_groups_SQL->SELECT( 'sug_grp_ID' );
+			$secondary_groups_SQL->FROM( 'T_users__secondary_user_groups' );
+			$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+			$secondary_group_IDs = $DB->get_col( $secondary_groups_SQL->get(), 0, 'Get all IDs of secondary groups for the user #'.$this->ID );
 
-		$secondary_group_IDs = $DB->get_col( $secondary_groups_SQL->get(), 0, 'Get all IDs of secondary groups for the user #'.$this->ID );
+			if( empty( $secondary_group_IDs ) )
+			{	// This user has no secondary groups, Return an empty array:
+				$this->secondary_groups = array();
+			}
+			else
+			{	// Load group objects in cache:
+				$GroupCache = & get_GroupCache();
+				$GroupCache->clear();
+				$this->secondary_groups = $GroupCache->load_list( $secondary_group_IDs );
+			}
+		}
 
-		return $secondary_group_IDs;
+		return $this->secondary_groups;
 	}
 
 

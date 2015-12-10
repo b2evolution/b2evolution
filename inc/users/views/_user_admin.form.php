@@ -66,15 +66,6 @@ $edited_User->get_Group();
 $level_fieldnote = '[0 - 10]';
 $status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
 
-// Load group cache for this page:
-$GroupCache = & get_GroupCache();
-if( ! $current_User->check_perm( 'users', 'edit' ) )
-{	// Show the limited list for moderators:
-	$GroupCache->clear();
-	$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
-	$GroupCache->all_loaded = true;
-}
-
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
@@ -83,23 +74,59 @@ if( $edited_User->ID == 1 )
 }
 else
 {	// Allow to change status and primary group for non-admin users:
+	$GroupCache = & get_GroupCache();
+	if( ! $current_User->check_perm( 'users', 'edit' ) )
+	{	// Show the limited list for moderators:
+		$GroupCache->clear();
+		$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
+		$GroupCache->all_loaded = true;
+	}
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
 	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, T_('Primary user group') );
 }
 
 // Secondary user groups:
-$user_secondary_group_IDs = $edited_User->get_secondary_group_IDs();
-if( empty( $user_secondary_group_IDs ) )
+$user_secondary_groups = $edited_User->get_secondary_groups();
+if( empty( $user_secondary_groups ) )
 {	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
-	$user_secondary_group_IDs[] = 0;
+	$user_secondary_groups[] = 0;
 }
-foreach( $user_secondary_group_IDs as $s => $user_secondary_group_ID )
+// Reload group cache for the selects below to exclude groups that are not available for current user:
+$GroupCache = & get_GroupCache();
+if( ! $current_User->check_perm( 'users', 'edit' ) )
+{	// Show the limited list for moderators:
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
+	$GroupCache->all_loaded = true;
+}
+foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
-	$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $s ? '' : T_('Secondary user groups'), array(
-			'allow_none' => true,
-			'field_suffix' => get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) )
-		) );
+	$field_title = $s ? '' : T_('Secondary user groups');
+	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
+
+	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
+	{	// Current user has a permission to assign this group:
+		$user_secondary_group_ID = empty( $user_secondary_Group ) ? 0 : $user_secondary_Group->ID;
+		$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $field_title, array(
+				'allow_none' => true,
+				'field_suffix' => $field_add_icon
+			) );
+	}
+	else
+	{	// Current user has no permission to assign this group:
+		$Form->info_field( $field_title, $user_secondary_Group->get_name().' '.$field_add_icon, array(
+				// Use this param to add html attribute "id" for the fieldset in order to add new group by JS:
+				'name' => 'edited_user_secondary_grp_ID_'.$user_secondary_Group->ID
+			) );
+	}
 }
+// Use this hidden select element as template for JS code to add new secondary groups:
+echo '<div id="template_secondary_group_block" style="display:none">';
+$Form->select_input_object( 'template_secondary_group_select', 0, $GroupCache, '', array(
+		'allow_none' => true,
+		'field_suffix' => $field_add_icon
+	) );
+echo '</div>';
 
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change level:
@@ -493,16 +520,13 @@ jQuery( '#edited_user_status' ).change( function()
 
 jQuery( document ).on( 'click', '.add_secondary_group', function()
 {	// Add new select element for new secondary group:
-	var current_fieldset = jQuery( this ).closest( '[id^=ffield_edited_user_secondary_grp_ID]' );
-	if( current_fieldset.length == 0 )
-	{	// Fieldset is not found:
-		return;
-	}
+	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );
 
-	// Clone current fieldset to add one new:
-	var new_fieldset = current_fieldset.clone();
-	new_fieldset.find( 'label' ).html( '' ); // Don't display a duplicated labels
-	new_fieldset.find( 'option' ).removeAttr( 'selected' ); // Reset selected option to
+	// Clone template fieldset to add one new:
+	var new_fieldset = jQuery( '#ffield_template_secondary_group_select' ).clone();
+
+	// Set correct field name that is used on form submit:
+	new_fieldset.find( 'select' ).attr( 'name', 'edited_user_secondary_grp_ID[]' );
 
 	// Add new fieldset after current:
 	current_fieldset.after( new_fieldset );

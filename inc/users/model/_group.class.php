@@ -512,6 +512,42 @@ class Group extends DataObject
 
 		$DB->commit();
 	}
+
+
+	/**
+	 * Check if this group can be assigned by current user
+	 *
+	 * @return boolean TRUE if current use can assign this group to users
+	 */
+	function can_be_assigned()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() )
+		{	// User must be assigned:
+			return false;
+		}
+
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{	// Allow to assing any group if current user has full access to edit users:
+			return true;
+		}
+
+		if( ! $current_User->check_perm( 'users', 'moderate' ) )
+		{	// User must has a permission at least to modearate the users:
+			return false;
+		}
+
+		$user_Group = & $current_User->get_Group();
+
+		if( ! $user_Group )
+		{	// User's group must be defined:
+			return false;
+		}
+
+		// Current user can assign this group if his group level is more than level of this group
+		return ( $this->get( 'level' ) < $user_Group->get( 'level' ) );
+	}
 }
 
 ?>
