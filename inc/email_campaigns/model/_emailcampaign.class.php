@@ -427,9 +427,10 @@ class EmailCampaign extends DataObject
 		// Get chunk size to limit a sending at a time:
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
 
-		foreach( $user_IDs as $u => $user_ID )
+		$email_success_count = 0;
+		foreach( $user_IDs as $user_ID )
 		{
-			if( $email_campaign_chunk_size > 0 && $u >= $email_campaign_chunk_size )
+			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
 			{	// Stop the sending because of chunk size:
 				break;
 			}
@@ -451,6 +452,7 @@ class EmailCampaign extends DataObject
 					{
 						unset( $this->users['wait'][ $wait_user_ID_key ] );
 					}
+					$email_success_count++;
 				}
 			}
 
