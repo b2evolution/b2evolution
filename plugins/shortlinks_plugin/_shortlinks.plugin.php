@@ -690,6 +690,44 @@ class shortlinks_plugin extends Plugin
 				.find( '.shortlinks_loader' ).remove();
 		}
 
+		/**
+		 * Build a pagination from response data
+		 *
+		 * @param array Response data
+		 * @param string Search keyword
+		 * @return string Pagination
+		 */
+		function shortlinks_get_pagination( data, search_keyword )
+		{
+			var r = '';
+
+			if( typeof( data.pages_total ) == 'undefined' || data.pages_total < 2 )
+			{	// No page for this request:
+				return r;
+			}
+
+			var search_keyword_attr = typeof( search_keyword ) == 'undefined' ? '' :
+				' data-search="' + search_keyword.replace( '"', '\"' ) + '"';
+
+			r += '<ul class="shortlinks_pagination"' + search_keyword_attr + '>';
+			for( p = 1; p <= data.pages_total; p++ )
+			{
+				r += '<li>';
+				if( data.page == p )
+				{	// Current page:
+					r += '<b>' + p + '</b>';
+				}
+				else
+				{
+					r += '<a href="#" data-page="' + p + '">' + p + '</a>';
+				}
+				r += '</li>';
+			}
+			r += '</ul>';
+
+			return r;
+		}
+
 
 		/**
 		 * Load all available collections for current user:
@@ -760,16 +798,18 @@ class shortlinks_plugin extends Plugin
 		 *
 		 * @param string Collection urlname
 		 * @param string Collection name
-		 * @param string Search keyword
+		 * @param integer Page
 		 */
-		function shortlinks_load_coll_posts( coll_urlname, coll_name )
+		function shortlinks_load_coll_posts( coll_urlname, coll_name, page )
 		{
-			if( typeof( coll_name ) != 'undefined' )
+			if( typeof( coll_name ) != 'undefined' && coll_name !== false )
 			{
 				shortlinks_display_search_form( coll_urlname, coll_name );
 			}
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC', '#shortlinks_posts_list', function( data )
+			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data.items )
@@ -778,6 +818,7 @@ class shortlinks_plugin extends Plugin
 					r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 				}
 				r += '</ul>';
+				r += shortlinks_get_pagination( data );
 				shortlinks_end_loading( '#shortlinks_posts_list', r );
 			} );
 		}
@@ -786,12 +827,14 @@ class shortlinks_plugin extends Plugin
 		 * Load the searched posts list:
 		 *
 		 * @param string Collection urlname
-		 * @param string Collection name
 		 * @param string Search keyword
+		 * @param integer Page
 		 */
-		function shortlinks_load_coll_search( coll_urlname, search_keyword )
+		function shortlinks_load_coll_search( coll_urlname, search_keyword, page )
 		{
-			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#shortlinks_posts_list', function( data )
+			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '?page=' + page;
+
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the post data in third column on success request:
 				if( typeof( data.code ) != 'undefined' )
 				{	// Error code was responsed:
@@ -813,6 +856,7 @@ class shortlinks_plugin extends Plugin
 					r += '</li>';
 				}
 				r += '</ul>';
+				r += shortlinks_get_pagination( data, search_keyword );
 				shortlinks_end_loading( '#shortlinks_posts_list', r );
 			} );
 		}
@@ -851,7 +895,7 @@ class shortlinks_plugin extends Plugin
 		} );
 
 		// Load the data of the selected post:
-		jQuery( document ).on( 'click', '#shortlinks_posts_list a:not([target])', function()
+		jQuery( document ).on( 'click', '#shortlinks_posts_list a[data-id]', function()
 		{
 			var coll_urlname = jQuery( this ).data( 'urlname' );
 			var post_id = jQuery( this ).data( 'id' );
@@ -909,6 +953,25 @@ class shortlinks_plugin extends Plugin
 
 			// Hide the post preview block and action buttons:
 			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Switch page:
+		jQuery( document ).on( 'click', '.shortlinks_pagination a', function()
+		{
+			var coll_selector = jQuery( '#shortlinks_colls_list select' );
+			var pages_list = jQuery( this ).closest( '.shortlinks_pagination' );
+
+			if( pages_list.data( 'search' ) == '' )
+			{	// Load posts/items for selected page:
+				shortlinks_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
+			}
+			else
+			{	// Load search list for selected page:
+				shortlinks_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
+			}
 
 			// To prevent link default event:
 			return false;

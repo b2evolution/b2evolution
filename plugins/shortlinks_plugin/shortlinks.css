@@ -10,6 +10,15 @@
 #shortlinks_search__form {
 	margin-bottom: 10px;
 }
+.shortlinks_pagination {
+	list-style: none;
+	text-align: center;
+}
+.shortlinks_pagination li {
+	list-style: none;
+	display: inline-block;
+	margin: 5px;
+}
 
 .shortlinks_loading {
 	position: relative;
