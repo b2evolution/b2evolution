@@ -6694,68 +6694,66 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		set_upgrade_checkpoint( '11430' );
 	}
 
-	if( $old_db_version < 11440 )
-	{ // part 18.n trunk aka 16th part of "i7"
-
-		task_begin( 'Upgrading base domains table...' );
+	if( upg_task_start( 11440, 'Upgrading base domains table...' ) )
+	{	// part of 6.5.0
 		$DB->query( "ALTER TABLE T_basedomains
 			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
-		task_end();
-
-		set_upgrade_checkpoint( '11440' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11450 )
-	{ // part 18.o trunk aka 17th part of "i7"
-
-		task_begin( 'Upgrading blog-group permissions table...' );
+	if( upg_task_start( 11450, 'Upgrading blog-group permissions table...' ) )
+	{	// part of 6.6.0
 		$DB->query( "ALTER TABLE T_coll_group_perms
 			ADD COLUMN bloggroup_perm_item_type ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard' AFTER bloggroup_perm_poststatuses,
 			DROP COLUMN bloggroup_perm_page,
 			DROP COLUMN bloggroup_perm_intro,
 			DROP COLUMN bloggroup_perm_podcast,
 			DROP COLUMN bloggroup_perm_sidebar" );
-		task_end();
+		upg_task_end();
+	}
 
-		task_begin( 'Upgrading blog-user permissions table...' );
+	if( upg_task_start( 11453, 'Upgrading blog-user permissions table...' ) )
+	{	// part of 6.6.0
 		$DB->query( "ALTER TABLE T_coll_user_perms
 			ADD COLUMN bloguser_perm_item_type ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard' AFTER bloguser_perm_poststatuses,
 			DROP COLUMN bloguser_perm_page,
 			DROP COLUMN bloguser_perm_intro,
 			DROP COLUMN bloguser_perm_podcast,
 			DROP COLUMN bloguser_perm_sidebar" );
-		task_end();
-
-		task_begin( 'Upgrade post types table... ' );
-		$DB->query( "ALTER TABLE T_items__type
-			ADD COLUMN ityp_perm_level ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard'" );
-		task_end();
-
-		set_upgrade_checkpoint( '11450' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11460 )
-	{ // part 18.p trunk aka 18th part of "i7"
+	if( upg_task_start( 11456, 'Upgrade post types table...' ) )
+	{	// part of 6.6.0
+		$DB->query( "ALTER TABLE T_items__type
+			ADD COLUMN ityp_perm_level ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard'" );
+		upg_task_end();
+	}
 
-		task_begin( 'Creating table for PostType-to-Collection relationships...' );
+	if( upg_task_start( 11460, 'Creating table for PostType-to-Collection relationships...' ) )
+	{	// part of 6.6.0
 		$DB->query( "CREATE TABLE T_items__type_coll (
 			itc_ityp_ID int(11) unsigned NOT NULL,
 			itc_coll_ID int(11) unsigned NOT NULL,
 			PRIMARY KEY (itc_ityp_ID, itc_coll_ID),
 			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )
 		) ENGINE = innodb" );
-		task_end();
+		upg_task_end();
+	}
 
-		task_begin( 'Updating collection permissions... ' );
+	if( upg_task_start( 11463, 'Updating collection permissions...' ) )
+	{	// part of 6.6.0
 		$DB->query( 'UPDATE T_coll_group_perms
 			  SET bloggroup_perm_item_type = "restricted"
 			WHERE bloggroup_perm_item_type = "standard"' );
 		$DB->query( 'UPDATE T_coll_user_perms
 			  SET bloguser_perm_item_type = "restricted"
 			WHERE bloguser_perm_item_type = "standard"' );
-		task_end();
+		upg_task_end();
+	}
 
-		task_begin( 'Updating post types table... ' );
+	if( upg_task_start( 11466, 'Updating post types table...' ) )
+	{	// part of 6.6.0
 		$DB->query( 'UPDATE T_items__type SET
 			ityp_perm_level = CASE
 				WHEN ityp_ID = "1"    THEN "standard"
@@ -6773,29 +6771,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHEN ityp_ID = "4000" THEN "admin"
 				ELSE ityp_perm_level
 			END' );
-		task_end();
-
-		set_upgrade_checkpoint( '11460' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11470 )
-	{ // part 18.r trunk aka 19th part of "i7"
-
-		task_begin( 'Updating widgets table... ' );
+	if( upg_task_start( 11470, 'Updating widgets table...' ) )
+	{	// part of 6.6.0
 		// Disable all widgets of Menu container for all "Main" collections
 		$DB->query( 'UPDATE '.$tableprefix.'widget
 			INNER JOIN T_blogs ON blog_ID = wi_coll_ID AND blog_type = "main"
 			  SET wi_enabled = 0
 			WHERE wi_sco_name = "Menu"' );
-		task_end();
-
-		set_upgrade_checkpoint( '11470' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11480 )
-	{ // part 18.s trunk aka 20th part of "i7"
-
-		task_begin( 'Updating table for PostType-to-Collection relationships... ' );
+	if( upg_task_start( 11480, 'Updating table for PostType-to-Collection relationships...' ) )
+	{	// part of 6.6.1
 		// Get all collections:
 		$collections_SQL = new SQL();
 		$collections_SQL->SELECT( 'blog_ID, blog_type' );
@@ -6841,14 +6831,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				( itc_ityp_ID, itc_coll_ID )
 				VALUES '.implode( ', ', $posttypes_collections ) );
 		}
-		task_end();
-
-		set_upgrade_checkpoint( '11480' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11482 )
-	{ // v6.6.3
-		task_begin( 'Updating default post types for forums and manual collections... ' );
+	if( upg_task_start( 11482, 'Updating default post types for forums and manual collections...' ) )
+	{	// part of 6.6.3
 		$item_types = array(
 				'manual' => array( 'ID' => 100, 'name' => 'Manual Page' ),
 				'forum'  => array( 'ID' => 200, 'name' => 'Forum Topic' ),
@@ -6879,15 +6866,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
 				VALUES '.implode( ',', $update_default_type_sql ) );
 		}
-		task_end();
-
-		set_upgrade_checkpoint( '11482' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11483 )
-	{ // v6.6.4
-
-		task_begin( 'Updating general settings...' );
+	if( upg_task_start( 11483, 'Updating general settings...' ) )
+	{	// part of 6.6.4
 		$DB->query( 'UPDATE T_settings
 				SET set_value = '.$DB->quote( 'no' ).'
 			WHERE set_name = '.$DB->quote( 'newusers_canregister' ).'
@@ -6897,26 +6880,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Updating user settings...' );
 		$DB->query( 'ALTER TABLE T_users__usersettings CHANGE COLUMN uset_name uset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
 		$DB->query( 'ALTER TABLE T_pluginusersettings CHANGE COLUMN puset_name puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL' );
- 		task_end();
-
-		set_upgrade_checkpoint( '11483' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11484 )
-	{ // part 2 of v6.6.4
-
-		task_begin( 'Upgrade table item types... ' );
+	if( upg_task_start( 11484, 'Upgrade table item types...' ) )
+	{	// part of 6.6.4
 		$DB->query( "ALTER TABLE T_items__type
 			ADD ityp_use_parent ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never' AFTER ityp_use_url" );
-		task_end();
-
-		set_upgrade_checkpoint( '11484' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11485 )
-	{	// v6.6.6
-
-		task_begin( 'Upgrade table item types... ' );
+	if( upg_task_start( 11485, 'Upgrade table item types...' ) )
+	{	// part of 6.6.6
 		$DB->query( 'ALTER TABLE T_items__type
 			ADD ityp_allow_breaks TINYINT DEFAULT 1 AFTER ityp_allow_html' );
 		$DB->query( 'UPDATE T_items__type
@@ -6924,15 +6899,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			    ityp_allow_featured = 0
 			WHERE ityp_ID >= 1400
 			  AND ityp_ID <= 1600' );
-		task_end();
-
-		set_upgrade_checkpoint( '11485' );
+		upg_task_end();
 	}
 
-	if( $old_db_version < 11486 )
-	{	// part 2 of v6.6.6
-
-		task_begin( 'Upgrade timestamp fields... ' );
+	if( upg_task_start( 11486, 'Upgrade timestamp fields...' ) )
+	{	// part of 6.6.6
 		$DB->query( 'ALTER TABLE T_email__log
 			MODIFY emlog_timestamp TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		$DB->query( 'ALTER TABLE T_email__returns
@@ -6955,9 +6926,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			MODIFY msg_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
 		$DB->query( 'ALTER TABLE T_messaging__contact
 			MODIFY mct_last_contact_datetime datetime NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
-		task_end();
-
-		set_upgrade_checkpoint( '11486' );
+		upg_task_end();
 	}
 
 	if( upg_task_start( 11600, 'Updating blogs settings...' ) )
