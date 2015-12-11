@@ -11,6 +11,11 @@ body {
   position: relative;
   padding-bottom: 73px;
 }
+.text-dimmed {
+  font-size: 84%;
+  color: #999;
+  font-weight: normal;
+}
 .header,
 .footer {
   padding-right: 15px;
