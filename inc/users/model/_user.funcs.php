@@ -5041,7 +5041,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '$grp_name$ ($grp_level$)',
+				'td' => '%user_td_grp_name( #user_ID#, #grp_name#, #grp_level#, #secondary_groups_count# )%',
 			);
 	}
 
@@ -5141,6 +5141,45 @@ function user_td_grp_actions( & $row )
 	}
 	return $r;
 }
+
+
+/**
+ * Get info about group for cell of users table
+ *
+ * @param integer User ID
+ * @param string Group name
+ * @param string Group level
+ * @param integer A count of secondary groups
+ * @return string
+ */
+function user_td_grp_name( $user_ID, $group_name, $group_level, $secondary_groups_count )
+{
+	global $current_User;
+
+	// Group name:
+	$r = $group_name;
+
+	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
+	{	// Make a link to update the groups if current user can moderate this user:
+		global $admin_url;
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'">'.$r.'</a>';
+	}
+
+	// Group level:
+	$r .= ' ('.$group_level.')';
+
+	$secondary_groups_count = intval( $secondary_groups_count );
+	if( $secondary_groups_count > 0 )
+	{	// Display a count of secondary groups if at least one is assigned for user:
+		$r .= '<div class="dimmed">'
+			// TRANS: Count of secondary user groups
+			.sprintf( T_('+ %d secondary'), $secondary_groups_count )
+			.'</div>';
+	}
+
+	return $r;
+}
+
 
 function user_td_avatar( $user_ID, $thumb_size = 'crop-top-48x48' )
 {
