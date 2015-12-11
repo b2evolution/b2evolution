@@ -4,6 +4,16 @@
 .evo_container__page_top .ufld_icon_links {
   text-align: right;
 }
+@media (min-width: 992px) {
+  .evo_container__sidebar_single {
+    margin-top: 249px;
+  }
+}
+@media (min-width: 1200px) {
+  .evo_container__sidebar_single {
+    margin-top: 244px;
+  }
+}
 .evo_container__footer {
   text-align: right;
   color: #A1A9B7;

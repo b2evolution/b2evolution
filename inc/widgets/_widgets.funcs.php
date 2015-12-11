@@ -168,6 +168,13 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		$kind == 'forum' ? 0 : 1 );
 
 
+	/* Sidebar Single */
+	if( $kind == 'forum' )
+	{
+		add_basic_widget( $blog_id, 'Sidebar Single', 'coll_related_post_list', 'core', 1 );
+	}
+
+
 	/* Page Top */
 	add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
 
