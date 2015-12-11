@@ -2400,21 +2400,36 @@ class User extends DataObject
 				/* continue */
 			case 'blog_admin': // This is what the owner does not have access to!
 
-				// Group may grant VIEW access, FULL access:
-				$this->get_Group();
-				$group_permlevel = ( $permlevel == 'view' ||  $permlevel == 'any' ) ? $permlevel : 'editall';
-				if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
-				{ // If group grants a global permission:
-					$perm = true;
-					break;
+				if( $perm_target_ID > 0 )
+				{	// Check user perm for this blog:
+					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
+					if( $perm )
+					{	// If user permission is allowed then we don't need to check the user groups permissions:
+						break;
+					}
 				}
 
-				if( $perm_target_ID > 0 )
-				{ // Check user perm for this blog:
-					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
-					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
+				// Get all user's groups(primary & secondary):
+				$user_groups = $this->get_groups();
+
+				// Group may grant VIEW access, FULL access:
+				$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? $permlevel : 'editall';
+				foreach( $user_groups as $user_Group )
+				{	// Find first user group that allows the required permission:
+					if( $user_Group->check_perm( 'blogs', $group_permlevel ) )
+					{	// If group grants a global permission:
+						$perm = true;
+						break;
+					}
+
+					if( $perm_target_ID > 0 )
+					{	// Check groups for permissions to this specific blog:
+						$perm = $user_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
+					}
+
+					if( $perm )
+					{	// If at least one group allows the permission, then don't check other groups:
+						break;
 					}
 				}
 
@@ -6267,6 +6282,23 @@ class User extends DataObject
 		}
 
 		return $this->secondary_groups;
+	}
+
+
+	/**
+	 * Get primary & secondary user's groups
+	 *
+	 * @return array All user's groups array of Group objects
+	 */
+	function get_groups()
+	{
+		$primary_group = $this->get_Group();
+		$secondary_groups = $this->get_secondary_groups();
+
+		// Prepend primary group to secondary groups:
+		array_unshift( $secondary_groups, $primary_group );
+
+		return $secondary_groups;
 	}
 
 
