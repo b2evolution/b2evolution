@@ -428,6 +428,7 @@ class EmailCampaign extends DataObject
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
 
 		$email_success_count = 0;
+		$email_skip_count = 0;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -435,31 +436,42 @@ class EmailCampaign extends DataObject
 				break;
 			}
 
+			if( ! ( $User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+			{	// Skip wrong recipient user:
+				continue;
+			}
+
+			// Send email to user:
 			$result = $this->send_email( $user_ID );
 
-			if( $result )
-			{ // Email newsletter was sent for user successfully
-				if( !empty( $mail_log_insert_ID ) )
-				{ // ID of last inserted mail log is defined in function mail_log()
-					$DB->query( 'UPDATE T_email__campaign_send
-							SET csnd_emlog_ID = '.$DB->quote( $mail_log_insert_ID ).'
-						WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-							AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+			if( empty( $mail_log_insert_ID ) )
+			{	// ID of last inserted mail log is defined in function mail_log()
+				// If it was not inserted we cannot mark this user as received this newsletter:
+				$result = false;
+			}
 
-					// Update arrays where we store which users accepted email and who waiting it now
-					$this->users['accept'][] = $user_ID;
-					if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
-					{
-						unset( $this->users['wait'][ $wait_user_ID_key ] );
-					}
-					$email_success_count++;
+			if( $result )
+			{	// Email newsletter was sent for user successfully:
+				$DB->query( 'UPDATE T_email__campaign_send
+						SET csnd_emlog_ID = '.$DB->quote( $mail_log_insert_ID ).'
+					WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
+						AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+
+				// Update arrays where we store which users accepted email and who waiting it now:
+				$this->users['accept'][] = $user_ID;
+				if( ( $wait_user_ID_key = array_search( $user_ID, $this->users['wait'] ) ) !== false )
+				{
+					unset( $this->users['wait'][ $wait_user_ID_key ] );
 				}
+				$email_success_count++;
+			}
+			else
+			{	// This email sending was skipped:
+				$email_skip_count++;
 			}
 
 			if( $display_messages )
-			{ // Print the messages
-				$User = & $UserCache->get_by_ID( $user_ID, false, false );
-
+			{	// Print the messages:
 				if( $result === true )
 				{ // Success
 					echo sprintf( T_('Email was sent to user: %s'), $User->get_identity_link() ).'<br />';
@@ -486,7 +498,8 @@ class EmailCampaign extends DataObject
 		$wait_count = count( $this->users['wait'] );
 		if( $wait_count > 0 )
 		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients have not been sent to yet.'), $email_campaign_chunk_size, $wait_count ), 'warning' );
+			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
 		}
 		else
 		{	// All recipients received this bewsletter:
