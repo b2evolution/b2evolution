@@ -329,8 +329,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// use as a form value: escapes &, quotes and < > but leaves code alone
-			$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
 			break;
 
 		case 'xml':
@@ -5000,7 +5000,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 		if( $format_to_output )
 		{
-			$r .= ' '.$l_attr.'="'.htmlspecialchars($l_value).'"';
+			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
 		}
 		else
 		{
