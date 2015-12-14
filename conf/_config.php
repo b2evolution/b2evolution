@@ -43,12 +43,6 @@ elseif( file_exists(dirname(__FILE__).'/umaintenance.html') )
  */
 define( 'EVO_CONFIG_LOADED', true );
 
-if( ! defined( 'ENT_HTML5' ) )
-{	// Define flag for function htmlspecialchars():
-	// It is available by default since php 5.4.0
-	define( 'ENT_HTML5', 48 );
-}
-
 // basic settings
 if( file_exists(dirname(__FILE__).'/_basic_config.php') )
 {	// Use configured base config:
