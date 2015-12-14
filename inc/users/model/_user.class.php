@@ -2247,7 +2247,9 @@ class User extends DataObject
 
 
 	/**
-	 * Check permission for this user
+	 * Check a specific permission for this User.
+	 * This is the MAIN permission check function that you should call to check any permission.
+	 * This function will delegate to other functions when appropriate.
 	 *
 	 * @param string Permission name, can be one of:
 	 *                - 'edit_timestamp'
@@ -2360,6 +2362,8 @@ class User extends DataObject
 				}
 				break;
 
+			// Permissions on a collection:
+			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
 			case 'blog_post_statuses':
@@ -2391,44 +2395,44 @@ class User extends DataObject
 			case 'blog_item_type_restricted':
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
-				// Blog permission to edit its properties...
+				// The owner of a collection has automatic permission to so many things: 
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
 					break;
 				}
 				/* continue */
-			case 'blog_admin': // This is what the owner does not have access to!
+			case 'blog_admin': // This is what the collection owner does not have automatic access to!
 
 				if( $perm_target_ID > 0 )
-				{	// Check user perm for this blog:
+				{	// Check advanced user permissions on the target collection:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
 					if( $perm )
-					{	// If user permission is allowed then we don't need to check the user groups permissions:
+					{	// If user permission is granted then we don't need to check the advanced usergroup permissions:
 						break;
 					}
 				}
 
-				// Get all user's groups(primary & secondary):
+				// Get all usergroups (primary & secondary):
 				$user_groups = $this->get_groups();
 
 				// Group may grant VIEW access, FULL access:
 				$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? $permlevel : 'editall';
 				foreach( $user_groups as $user_Group )
-				{	// Find first user group that allows the required permission:
+				{	// Find first user group that globally allows the required permission:
 					if( $user_Group->check_perm( 'blogs', $group_permlevel ) )
-					{	// If group grants a global permission:
+					{	// If usergroup grants a global permission:
 						$perm = true;
 						break;
 					}
 
 					if( $perm_target_ID > 0 )
-					{	// Check groups for permissions to this specific blog:
+					{	// Check advanced usergroup permissions on the target collection:
 						$perm = $user_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
 					}
 
 					if( $perm )
-					{	// If at least one group allows the permission, then don't check other groups:
+					{	// If we found one usergroup which grants the permission, then don't continue to check other groups:
 						break;
 					}
 				}
