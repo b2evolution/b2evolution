@@ -615,11 +615,6 @@ function check_smtp_mailer()
 		return T_( 'PHP version must be 5.2 or higher to enable SMTP gateway.' );
 	}
 
-	if( ! function_exists( 'proc_open' ) )
-	{ // Swift Mailer requires proc_* functions
-		return T_( 'The proc_* PHP functions are not available on this server.' );
-	}
-
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
 	$smtp_server_port = $Settings->get( 'smtp_server_port' );
 	if( empty( $smtp_server_host ) || empty( $smtp_server_port ) )
