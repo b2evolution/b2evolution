@@ -297,7 +297,7 @@ class Skin extends DataObject
 		// Go through all files in the skin directory:
 		while( ( $file = readdir( $dir ) ) !== false )
 		{
-			if( in_array( $file, $exclude_files ) )
+			if( is_array( $exclude_files ) && in_array( $file, $exclude_files ) )
 			{ // Skip this file
 				continue;
 			}
