@@ -13,11 +13,15 @@
 .shortlinks_pagination {
 	list-style: none;
 	text-align: center;
+	padding: 0;
+	margin: 0;
 }
 .shortlinks_pagination li {
 	list-style: none;
 	display: inline-block;
-	margin: 5px;
+}
+.shortlinks_pagination a, .shortlinks_pagination span {
+	padding: 2px;
 }
 
 .shortlinks_loading {

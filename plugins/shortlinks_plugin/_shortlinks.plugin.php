@@ -709,20 +709,81 @@ class shortlinks_plugin extends Plugin
 			var search_keyword_attr = typeof( search_keyword ) == 'undefined' ? '' :
 				' data-search="' + search_keyword.replace( '"', '\"' ) + '"';
 
-			r += '<ul class="shortlinks_pagination"' + search_keyword_attr + '>';
-			for( p = 1; p <= data.pages_total; p++ )
+			var current_page = data.page;
+			var total_pages = data.pages_total;
+			var page_list_span = 11; // Number of visible pages on navigation line
+			var page_list_start, page_list_end;
+
+			// Initialize a start of pages list:
+			if( current_page <= parseInt( page_list_span / 2 ) )
+			{	// the current page number is small
+				page_list_start = 1;
+			}
+			else if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+			{	// the current page number is big
+				page_list_start = Math.max( 1, total_pages - page_list_span + 1 );
+			}
+			else
+			{	// the current page number can be centered
+				page_list_start = current_page - parseInt( page_list_span / 2 );
+			}
+
+			// Initialize an end of pages list:
+			if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+			{ //the current page number is big
+				page_list_end = total_pages;
+			}
+			else
 			{
-				r += '<li>';
-				if( data.page == p )
+				page_list_end = Math.min( total_pages, page_list_start + page_list_span - 1 );
+			}
+
+			r += '<ul class="shortlinks_pagination pagination"' + search_keyword_attr + '>';
+
+			if( current_page > 1 )
+			{	// A link to previous page:
+				r += '<li><a href="#" data-page="' + ( current_page - 1 ) + '">&lt;&lt;</a></li>';
+			}
+
+			if( page_list_start > 1 )
+			{ // The pages list doesn't contain the first page
+				// Display a link to first page:
+				r += '<li><a href="#" data-page="1">1</a></li>';
+
+				if( page_list_start > 2 )
+				{ // Display a link to previous pages range:
+					r += '<li><a href="#" data-page="' + Math.ceil( page_list_start / 2 ) + '">...</a></li>';
+				}
+			}
+
+			for( p = page_list_start; p <= page_list_end; p++ )
+			{
+				if( current_page == p )
 				{	// Current page:
-					r += '<b>' + p + '</b>';
+					r += '<li class="active"><span>' + p + '</span></li>';
 				}
 				else
 				{
-					r += '<a href="#" data-page="' + p + '">' + p + '</a>';
+					r += '<li><a href="#" data-page="' + p + '">' + p + '</a></li>';
 				}
-				r += '</li>';
 			}
+
+			if( page_list_end < total_pages )
+			{	// The pages list doesn't contain the last page
+				if( page_list_end < total_pages - 1 )
+				{	// Display a link to next pages range:
+					r += '<li><a href="#" data-page="' + ( page_list_end + Math.floor( ( total_pages - page_list_end ) / 2 ) ) + '">...</a></li>';
+				}
+
+				// Display a link to last page:
+				r += '<li><a href="#" data-page="' + total_pages + '">' + total_pages + '</a></li>';
+			}
+
+			if( current_page < total_pages )
+			{	// A link to next page:
+				r += '<li><a href="#" data-page="' + ( current_page + 1 ) + '">&gt;&gt;</a></li>';
+			}
+
 			r += '</ul>';
 
 			return r;
@@ -964,7 +1025,7 @@ class shortlinks_plugin extends Plugin
 			var coll_selector = jQuery( '#shortlinks_colls_list select' );
 			var pages_list = jQuery( this ).closest( '.shortlinks_pagination' );
 
-			if( pages_list.data( 'search' ) == '' )
+			if( pages_list.data( 'search' ) == undefined )
 			{	// Load posts/items for selected page:
 				shortlinks_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
 			}
