@@ -289,36 +289,72 @@ class RestApi
 		// Run the items list query:
 		$ItemList2->query();
 
-		$items = array();
-
-		// Add each post row in the response array:
-		while( $Item = & $ItemList2->get_next() )
-		{
-			$items[] = array(
-					'id'        => intval( $Item->ID ),
-					'datestart' => $Item->get( 'datestart' ),
-					'urltitle'  => $Item->get( 'urltitle' ),
-					'type'      => $Item->get_type_setting( 'name' ),
-					'title'     => $Item->get( 'title' ),
-					'content'   => $Item->get_prerendered_content( 'htmlbody' ),
-					'excerpt'   => $Item->get( 'excerpt' ),
-				);
-		}
-
-		if( $post_ID )
-		{	// If only one post is requested then response should as one level array with post fields:
-			if( isset( $items[0] ) )
-			{
-				$this->response = $items[0];
-			}
-		}
-		else
-		{	// Add data of each post in separate array in response:
+		if( ! $post_ID )
+		{	// Add data of posts list to response:
 			$this->add_response( 'found', $ItemList2->total_rows, 'integer' );
 			$this->add_response( 'page', $ItemList2->page, 'integer' );
 			$this->add_response( 'page_size', $ItemList2->limit, 'integer' );
 			$this->add_response( 'pages_total', $ItemList2->total_pages, 'integer' );
-			$this->add_response( 'items', $items );
+		}
+
+		// Add each post row in the response array:
+		while( $Item = & $ItemList2->get_next() )
+		{
+			// Get all(1000) item attachemnts:
+			$attachments = array();
+			$LinkOwner = new LinkItem( $Item );
+			if( $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+			{
+				while( $Link = & $LinkList->get_next() )
+				{
+					if( ! ( $File = & $Link->get_File() ) )
+					{	// No File object
+						global $Debuglog;
+						$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+						continue;
+					}
+
+					if( ! $File->exists() )
+					{	// File doesn't exist
+						global $Debuglog;
+						$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+						continue;
+					}
+
+					$attachments[] = array(
+							'link_ID'  => intval( $Link->ID ),
+							'file_ID'  => intval( $File->ID ),
+							'type'     => strval( $File->is_dir() ? 'dir' : $File->type ),
+							'position' => $Link->get( 'position' ),
+							'name'     => $File->get_name(),
+							'url'      => $File->get_url(),
+							'title'    => strval( $File->get( 'title' ) ),
+							'alt'      => strval( $File->get( 'alt' ) ),
+							'desc'     => strval( $File->get( 'desc' ) ),
+						);
+				}
+			}
+
+			// Initialize data for each item:
+			$item_data = array(
+					'id'          => intval( $Item->ID ),
+					'datestart'   => $Item->get( 'datestart' ),
+					'urltitle'    => $Item->get( 'urltitle' ),
+					'type'        => $Item->get_type_setting( 'name' ),
+					'title'       => $Item->get( 'title' ),
+					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
+					'excerpt'     => $Item->get( 'excerpt' ),
+					'attachments' => $attachments,
+				);
+
+			if( $post_ID )
+			{	// If only one post is requested then response should as one level array with post fields:
+				$this->response = $item_data;
+			}
+			else
+			{	// Add data of each post in separate array of response:
+				$this->add_response( 'items', $item_data, 'array' );
+			}
 		}
 
 		if( empty( $this->response ) )
