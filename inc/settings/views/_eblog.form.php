@@ -93,8 +93,8 @@ $Form->begin_fieldset( T_('General settings').get_manual_link('post-by-email-gen
 		$eblog_novalidatecert_params['disabled'] = 'disabled';
 	}
 	$Form->radio_input( 'eblog_novalidatecert', $Settings->get( 'eblog_novalidatecert' ), array(
-			array( 'value' => 0, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
-			array( 'value' => 1, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+			array( 'value' => 1, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 'value' => 0, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
 		), T_('Certificate validation'), $eblog_novalidatecert_params );
 
 	$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, SSL/TLS: 993).'), array( 'maxlength' => 6 ) );

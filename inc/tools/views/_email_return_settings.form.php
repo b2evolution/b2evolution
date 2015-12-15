@@ -68,8 +68,8 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 		$repath_novalidatecert_params['disabled'] = 'disabled';
 	}
 	$Form->radio_input( 'repath_novalidatecert', $Settings->get( 'repath_novalidatecert' ), array(
-			array( 'value' => 0, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
-			array( 'value' => 1, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+			array( 'value' => 1, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 'value' => 0, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
 		), T_('Certificate validation'), $repath_novalidatecert_params );
 
 	$Form->text_input( 'repath_server_port', $Settings->get('repath_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: IMAP4/SSL: 993, IMAP4 with or without TLS: 143, POP3/SSL: 995, POP3 with or without TLS: 110).'), array( 'maxlength' => 6 ) );
