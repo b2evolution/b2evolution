@@ -187,6 +187,7 @@ class GeneralSettings extends AbstractSettings
 		'repath_method' => 'imap',
 		'repath_encrypt' => 'none',
 		'repath_server_port' => 143,
+		'repath_imap_folder' => 'INBOX',
 		'repath_subject' => 'Returned mail:
 Mail delivery failed:
 Undelivered Mail Returned to Sender

@@ -155,6 +155,9 @@ switch( $action )
 				param( 'repath_password', 'string', true );
 				$Settings->set( 'repath_password', $repath_password );
 
+				param( 'repath_imap_folder', 'string', true );
+				$Settings->set( 'repath_imap_folder', $repath_imap_folder );
+
 				param( 'repath_ignore_read', 'boolean', 0 );
 				$Settings->set( 'repath_ignore_read', $repath_ignore_read );
 

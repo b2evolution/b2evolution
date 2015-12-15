@@ -98,11 +98,14 @@ function dre_connect( $cron = false )
 	}
 
 	if( $Settings->get('repath_novalidatecert') )
-	{
+	{	// Don't validate certificate:
 		$mailserver .= '/novalidate-cert';
 	}
 
-	$mailserver .= '}INBOX';
+	$mailserver .= '}';
+
+	// Select messages only from this IMAP folder:
+	$mailserver .= $Settings->get( 'repath_imap_folder' );
 
 	// Connect to mail server (one retry)
 	$mbox = @imap_open( $mailserver, $Settings->get('repath_username'), $Settings->get('repath_password'), NULL, 1 );
