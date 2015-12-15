@@ -978,11 +978,36 @@ class shortlinks_plugin extends Plugin
 				shortlinks_api_request( 'collections/' + coll_urlname + '/items/' + post_id, '#shortlinks_post_block', function( post )
 				{	// Display the post data on success request:
 					jQuery( '#shortlinks_post_block' ).data( 'post', post.id );
-					shortlinks_end_loading( '#shortlinks_post_block', '<h2>' + post.title + '</h2>' + '<div id="shortlinks_post_view">' + post.content + '</div>' );
+
+					// Item title:
+					var item_content = '<h2>' + post.title + '</h2>';
+					// Item attachments, Only images and on teaser positions:
+					if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
+					{
+						item_content += '<div id="shortlinks_post_attachments">';
+						for( var a in post.attachments )
+						{
+							var attachment = post.attachments[a];
+							if( attachment.type == 'image' &&
+									( attachment.position == 'teaser' ||
+										attachment.position == 'teaserperm' ||
+										attachment.position == 'teaserlink' )
+								)
+							{
+								item_content += '<img src="' + attachment.url + '" />';
+							}
+						}
+						item_content += '</div>';
+					}
+					// Item content:
+					item_content += '<div id="shortlinks_post_content">' + post.content + '</div>';
+
+					shortlinks_end_loading( '#shortlinks_post_block', item_content );
+
 					// Display the buttons to back and insert a post link to textarea
 					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 						jQuery( '.shortlinks_post_buttons' ) :
-						jQuery( '#shortlinks_post_view' );
+						jQuery( '#shortlinks_post_content' );
 					jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).remove();
 					buttons_side_obj.after( '<button id="shortlinks_btn_back" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
 						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
