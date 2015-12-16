@@ -4,7 +4,11 @@
 .container > div:empty {
 	border: none;
 }
-
+#api_post_attachments img {
+	display: block;
+	max-width: 100%;
+	margin: 5px auto;
+}
 
 .api_loading {
 	position: relative;
