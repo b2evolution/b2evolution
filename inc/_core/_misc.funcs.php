@@ -7364,23 +7364,4 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 
 	return $r;
 }
-
-
-/**
- * Get black/white color depending on background color,
- * in order to see clearly the text on colored background
- *
- * @param string Background Color in format FFFFFF
- * @returns string Color: FFF or 000
- */
-function get_contrast_color( $hexcolor )
-{
-	$r = hexdec( substr( $hexcolor, 0, 2 ) );
-	$g = hexdec( substr( $hexcolor, 2, 2 ) );
-	$b = hexdec( substr( $hexcolor, 4, 2 ) );
-
-	$yiq = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
-
-	return ( $yiq >= 128 ) ? '000' : 'FFF';
-}
 ?>

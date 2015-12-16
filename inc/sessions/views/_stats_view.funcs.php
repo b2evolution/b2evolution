@@ -632,16 +632,14 @@ function hit_method_style( $hit_method )
 	global $hit_method_color;
 
 	// Purple color for non traditional methods:
-	$bg_color = '551A8B';
+	$color = '551A8B';
 
 	if( isset( $hit_method_color[ $hit_method ] ) )
 	{	// Get background color from config array:
-		$bg_color = $hit_method_color[ $hit_method ];
+		$color = $hit_method_color[ $hit_method ];
 	}
 
-	$style = 'background-color: #'.$bg_color.';'
-		// Use contrast text color depending on background color:
-		.'color: #'.get_contrast_color( $bg_color );
+	$style = 'color: #'.$color;
 
 	return $style;
 }
