@@ -986,7 +986,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
 {
-	static $required_js;
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
 
 	if( isset( $dequeued_headlines[ $js_file ] ) )
@@ -2120,13 +2120,19 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number;
+	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number, $required_js;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
 		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
+	}
+
+	if( ! empty( $required_js ) )
+	{	// Send all loaded JS files to ajax request in order to don't load them twice:
+		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
+		$params['required_js'] = $required_js;
 	}
 
 	if( empty( $ajax_form_number ) )

@@ -26,6 +26,8 @@ global $skins_path, $ads_current_skin_path, $disp, $ctrl;
 param( 'action', 'string', '' );
 $item_ID = param( 'p', 'integer' );
 $blog_ID = param( 'blog', 'integer' );
+// Initialize this array in order to don't load JS files twice in they have been already loaded on parent page:
+$required_js = param( 'required_js', 'array:string', array(), false, true );
 
 // Make sure the async responses are never cached:
 header_nocache();
