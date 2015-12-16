@@ -310,6 +310,20 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 
+		if( ! $Blog->get( 'advanced_perms' ) )
+		{	// If only collection simple permissions are enabled then only owner can be member:
+			if( $cache_name = 'blogmembers' )
+			{
+				if( $owner_User = & $Blog->get_owner_User() )
+				{	// Add collection owner to the cache:
+					$this->add( $owner_User );
+				}
+			}
+
+			// Exit here, because the code below is only for case when advanced permissions are enabled:
+			return true;
+		}
+
 		// Get users which are members of the blog:
 		$user_perms_SQL = new SQL();
 		$user_perms_SQL->SELECT( 'T_users.*' );
@@ -330,13 +344,26 @@ class UserCache extends DataObjectCache
 		$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
 		$group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
 
-		// Union two sql queries to execute one query and save an order as one list
+		if( $load_members )
+		{	// Get users which groups have a setting to view ALL collection:
+			$group_setting_SQL = new SQL();
+			$group_setting_SQL->SELECT( 'T_users.*' );
+			$group_setting_SQL->FROM( 'T_users' );
+			$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+			$group_setting_SQL->WHERE( 'grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall"' );
+		}
+
+		// Union two sql queries to execute one query and save an order as one list:
 		$users_sql = '( '.$user_perms_SQL->get().' )'
 			.' UNION '
-			.'( '.$group_perms_SQL->get().' )'
-			.' ORDER BY user_login';
+			.'( '.$group_perms_SQL->get().' )';
+		if( $load_members )
+		{
+			$users_sql .= ' UNION ( '.$group_setting_SQL->get().' )';
+		}
+		$users_sql .= ' ORDER BY user_login';
 		if( $limit > 0 )
-		{ // Limit the users
+		{	// Limit the users:
 			$users_sql .= ' LIMIT '.$limit;
 		}
 

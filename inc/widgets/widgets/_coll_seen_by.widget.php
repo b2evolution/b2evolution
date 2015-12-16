@@ -116,18 +116,23 @@ class coll_seen_by_Widget extends ComponentWidget
 			return;
 		}
 
+		// Get all memebers of the current collection:
+		$UserCache = & get_UserCache();
+		$UserCache->load_blogmembers( $Blog->ID );
+
+		if( empty( $UserCache->cache ) )
+		{	// Don't display this widget if the collection has no members:
+			return;
+		}
+
+		// Get IDs of all collection members:
+		$member_user_IDs = array_keys( $UserCache->cache );
+
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-
-		// Get all memebers of the current collection:
-		$UserCache = & get_UserCache();
-		$UserCache->load_blogmembers( $Blog->ID );
-
-		// Get IDs of all collection members:
-		$member_user_IDs = array_keys( $UserCache->cache );
 
 		// Get post read statuses for all collection members of the current Item:
 		$SQL = new SQL();
