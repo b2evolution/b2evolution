@@ -17,12 +17,16 @@ global $blog, $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept' );
+$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept, user_login, COUNT( uorg_user_ID ) AS members_count' );
 $SQL->FROM( 'T_users__organization' );
+$SQL->FROM_add( 'INNER JOIN T_users ON org_owner_user_ID = user_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_org_ID = org_ID' );
+$SQL->GROUP_BY( 'org_ID' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT( org_ID )' );
 $count_SQL->FROM( 'T_users__organization' );
+$count_SQL->FROM_add( 'INNER JOIN T_users ON org_owner_user_ID = user_ID' );
 
 $Results = new Results( $SQL->get(), 'org_', '-D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 $Results->Cache = get_OrganizationCache();
@@ -52,7 +56,7 @@ function org_td_name( & $Organization )
 	if( $current_User->check_perm( 'orgs', 'view', false, $Organization ) )
 	{
 		global $admin_url;
-		return '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID='.$Organization->ID.'"><b>'.$Organization->get( 'name' ).'</b></a>';
+		return '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID='.$Organization->ID.'&amp;filter=refresh"><b>'.$Organization->get( 'name' ).'</b></a>';
 	}
 	else
 	{
@@ -65,10 +69,31 @@ $Results->cols[] = array(
 		'td' => '%org_td_name( {Obj} )%',
 	);
 
+function org_td_owner( & $Organization )
+{
+	$owner_User = & $Organization->get_owner_User();
+	return $owner_User->get_identity_link();
+}
+$Results->cols[] = array(
+		'th'       => T_('Owner'),
+		'td'       => '%org_td_owner( {Obj} )%',
+		'order'    => 'user_login',
+		'th_class' => 'shrinkwrap',
+	);
+
 $Results->cols[] = array(
 		'th' => T_('Url'),
 		'order' => 'org_url',
 		'td' => '~conditional( #org_url# == "", "&nbsp;", "<a href=\"#org_url#\">#org_url#</a>" )~',
+	);
+
+$Results->cols[] = array(
+		'th'          => T_('Members'),
+		'td'          => '$members_count$',
+		'order'       => 'members_count',
+		'default_dir' => 'D',
+		'th_class'    => 'shrinkwrap',
+		'td_class'    => 'right',
 	);
 
 function org_td_actions( & $Organization )
@@ -81,12 +106,12 @@ function org_td_actions( & $Organization )
 	if( $perm_org_edit )
 	{
 		$r .= action_icon( T_('Edit this organization...'), 'edit',
-			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=edit') );
+			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=edit&amp;filter=refresh' ) );
 	}
 	if( $current_User->check_perm( 'orgs', 'create', false ) )
 	{
 		$r .= action_icon( T_('Duplicate this organization...'), 'copy',
-			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=new') );
+			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=new' ) );
 	}
 	if( $perm_org_edit )
 	{

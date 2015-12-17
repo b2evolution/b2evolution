@@ -6081,7 +6081,7 @@ class User extends DataObject
 	 */
 	function update_organizations( $organization_IDs, $organization_roles = array(), $force_accept = false )
 	{
-		global $DB, $current_User;
+		global $DB, $current_User, $Messages;
 
 		$OrganizationCache = & get_OrganizationCache();
 
@@ -6105,7 +6105,11 @@ class User extends DataObject
 				continue;
 			}
 
-			if( in_array( $organization_ID, $curr_org_IDs ) )
+			if( isset( $insert_orgs[ $organization_ID ] ) )
+			{	// Don't join this user to same organization twice:
+				$Messages->add( sprintf( T_('User cannot be joined to the same organization &laquo;%s&raquo; twice.'), $user_Organization->get_name() ), 'error' );
+			}
+			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
 				if( $perm_edit_orgs || ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{ // Update if current user has permission or it is not accepted yet by admin

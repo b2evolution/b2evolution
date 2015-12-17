@@ -216,7 +216,7 @@ switch( $action )
 		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		$user_login = param( 'user_login', 'string', NULL );
-		param_check_not_empty( 'user_login', T_('Please enter the user\'s login.') );
+		param_check_not_empty( 'user_login', T_('Please enter the login of the user you wish to add.') );
 		if( ! empty( $user_login ) )
 		{	// If the login is entered:
 			$UserCache = & get_UserCache();
@@ -228,14 +228,15 @@ switch( $action )
 		}
 
 		$accepted = param( 'accepted', 'string', 'yes' );
+		$role = param( 'role', 'string', '' );
 
 		if( ! param_errors_detected() )
 		{	// Link user only when request has no errors:
-			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted )
-				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.( $accepted == 'yes' ? '1' : '0' ).' ) ' );
+			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role )
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.( $accepted == 'yes' ? '1' : '0' ).', '.$DB->quote( $role ).' ) ' );
 			if( $result )
 			{	// Display a message after successful linking:
-				$Messages->add( T_('User has been added to the organization.'), 'success' );
+				$Messages->add( T_('Member has been added to the organization.'), 'success' );
 			}
 		}
 

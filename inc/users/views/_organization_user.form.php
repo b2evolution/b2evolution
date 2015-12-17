@@ -39,6 +39,8 @@ $Form->begin_form( 'fform' );
 					array( 'no', T_('Not Accepted') ),
 			), T_('Membership'), true );
 
+	$Form->text_input( 'role', '', 32, T_('Role'), '', array( 'maxlength' => 255 ) );
+
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:

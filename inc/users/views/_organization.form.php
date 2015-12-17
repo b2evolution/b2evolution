@@ -79,12 +79,12 @@ if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
 $Form->end_form( $buttons );
 
 if( $edited_Organization->ID > 0 )
-{ // Display users of this organization
+{	// Display members of this organization:
 	users_results_block( array(
 			'org_ID'               => $edited_Organization->ID,
 			'filterset_name'       => 'orgusr_'.$edited_Organization->ID,
 			'results_param_prefix' => 'orgusr_',
-			'results_title'        => T_('Users of this organization').get_manual_link('users_and_groups'),
+			'results_title'        => T_('Members of this organization').get_manual_link( 'organization-members' ),
 			'results_order'        => '/uorg_accepted/D',
 			'page_url'             => get_dispctrl_url( 'organizations', 'action=edit&amp;org_ID='.$edited_Organization->ID ),
 			'display_orgstatus'    => true,

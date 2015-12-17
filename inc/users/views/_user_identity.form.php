@@ -400,7 +400,7 @@ if( $action != 'view' )
 			if( $org_ID > 0 && ! $perm_edit_orgs && $org_data['accepted'] )
 			{ // Display only info of the assigned organization
 				$Form->infostart = $Form->infostart.$inputstart_icon;
-				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'].' &nbsp; ';
+				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
 				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
 				$Form->info_field( T_('Organization'), $org_data['name'], array(
 						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
