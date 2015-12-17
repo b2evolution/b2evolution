@@ -663,6 +663,10 @@ fieldset ul {
   width: 100%;
   max-width: 100%;
 }
+#itemform_adv_props .input-group ul.token-input-list-facebook {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
 #itemform_comments label {
   width: auto;
   margin-right: 5px;

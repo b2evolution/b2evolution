@@ -113,6 +113,7 @@ switch( $action )
 	// Note: we need to *not* use $p in the cases above or it will conflict with the list display
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
+	case 'extract_tags':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -146,7 +147,7 @@ switch( $action )
 
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
-		$exit_after_save = ( $action != 'update_edit' );
+		$exit_after_save = ( $action != 'update_edit' && $action != 'extract_tags' );
 		break;
 
 	case 'update_type':
@@ -933,6 +934,7 @@ switch( $action )
 	case 'update_edit':
 	case 'update':
 	case 'update_publish':
+	case 'extract_tags':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
@@ -1010,6 +1012,15 @@ switch( $action )
 		$edited_Item->handle_post_processing( false, $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
+
+		if( $action == 'extract_tags' )
+		{	// Extract all possible tags from item contents:
+			$searched_tags = $edited_Item->search_tags_by_content();
+			// Append new searched tags to existing item's tags:
+			$item_tags .= ','.implode( ',', $searched_tags );
+			// Clear temp commas:
+			$item_tags = utf8_trim( $item_tags, ',' );
+		}
 
 		// Delete Item from Session
 		delete_session_Item( $edited_Item->ID );
@@ -1585,6 +1596,7 @@ switch( $action )
 	case 'update': // on error
 	case 'update_publish': // on error
 	case 'history':
+	case 'extract_tags':
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
@@ -1597,6 +1609,7 @@ switch( $action )
 			case 'update': // on error
 			case 'update_publish': // on error
 			case 'history':
+			case 'extract_tags':
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
 					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
@@ -1759,7 +1772,7 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	init_autocomplete_usernames_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish' ) ) )
+if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -1783,6 +1796,7 @@ switch( $action )
 	case 'update':
 	case 'update_edit':
 	case 'update_publish':
+	case 'extract_tags':
 		$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 		break;
 	case 'edit_type':
@@ -1834,6 +1848,7 @@ switch( $action )
 	case 'update_edit':
 	case 'update':	// on error
 	case 'update_publish':	// on error
+	case 'extract_tags':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 

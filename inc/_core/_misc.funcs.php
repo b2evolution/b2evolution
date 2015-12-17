@@ -4858,6 +4858,7 @@ function is_create_action( $action )
 		// The following one's a bit far fetched, but can happen if we have no sheet display:
 		case 'unlink':
 		case 'view':
+		case 'extract':
 			return false;
 
 		default:

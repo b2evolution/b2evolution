@@ -320,7 +320,18 @@ $Form->begin_form( '', '', $params );
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
 				.T_('Auto-suggest tags as you type (based on existing tags)').$link_to_tags_manager
 			.'</label>';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array(
+				'maxlength' => 255,
+				'style'     => 'width: 100%;',
+				'input_prefix' => '<div class="input-group">',
+				'input_suffix' => '<span class="input-group-btn">'
+						.'<input class="btn btn-primary" type="button" name="actionArray[extract_tags]"'
+							.' onclick="return b2edit_confirm( \''.TS_('This will save your changes, then analyze your post to find existing tags. Are you sure?').'\','
+							.' \''.$admin_url.'?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'\','
+							.' \'extract_tags\' );"'
+							.' value="'.format_to_output( T_('Extract'), 'htmlattr' ).'" />'
+					.'</span></div>',
+			) );
 		echo '</td></tr>';
 	}
 	else
