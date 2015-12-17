@@ -240,7 +240,7 @@ if( !$Messages->has_errors() )
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
 
-				if( ! $edited_User->check_delete( $msg ) )
+				if( ! $edited_User->check_delete( $msg, array(), true ) )
 				{ // There are restrictions:
 					$action = 'view';
 				}

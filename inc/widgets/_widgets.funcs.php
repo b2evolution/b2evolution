@@ -280,6 +280,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Don't install the "Recent Commnets" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
+	if( $blog_id == $blog_b_ID )
+	{	// Install widget "Poll" only for Blog B on install:
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
+	}
 
 
 	/* Front Page Secondary Area */

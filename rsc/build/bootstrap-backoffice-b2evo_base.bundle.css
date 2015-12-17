@@ -1920,6 +1920,12 @@ div.filters .block {
 div.filters.panel-body {
   padding: 15px;
 }
+div.filters .twitter-typeahead {
+  vertical-align: middle;
+}
+div.filters .twitter-typeahead .tt-dropdown-menu div {
+  margin-left: 0;
+}
 .table_scroll .table {
   margin-bottom: 0;
 }

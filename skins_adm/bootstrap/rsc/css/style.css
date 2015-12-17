@@ -1418,3 +1418,14 @@ table.diff td.diff-title-addedline {
   margin: 0 0 10px 25px;
   list-style: disc;
 }
+.evo_poll__percent_bar {
+  width: 100px;
+  margin-right: 2px;
+  vertical-align: middle;
+  display: inline-block;
+}
+.evo_poll__percent_bar > div {
+  background: #ffcc66;
+  height: 12px;
+  min-width: 1px;
+}

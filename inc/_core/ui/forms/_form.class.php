@@ -1203,14 +1203,11 @@ class Form extends Widget
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '' )
+	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
-		$field_params = array();
-
-		if( !empty($field_note) )
-		{
-			$field_params['note'] = $field_note;
-		}
+		$field_params = array_merge( array(
+				'note' => $field_note
+			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 

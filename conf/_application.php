@@ -36,7 +36,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 11650;
+$new_db_version = 11670;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -79,6 +79,7 @@ $online_help_links = true;
 $modules = array(
 		'_core',
 		'collections',  // TODO: installer won't work without this module
+		'polls',
 		'files',
 		'sessions',
 		'messaging',

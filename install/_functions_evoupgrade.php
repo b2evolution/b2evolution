@@ -7105,6 +7105,64 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11655, 'Creating table for Poll questions...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'CREATE TABLE T_polls__question (
+			pqst_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pqst_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			pqst_question_text VARCHAR(2000) NULL,
+			PRIMARY KEY (pqst_ID)
+		) ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11660, 'Creating table for Poll options...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'CREATE TABLE T_polls__option (
+			popt_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			popt_pqst_ID     INT(11) UNSIGNED NOT NULL,
+			popt_option_text VARCHAR(2000) NULL,
+			popt_order       INT(11) NOT NULL,
+			PRIMARY KEY (popt_ID)
+		) ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11665, 'Creating table for Poll answers...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'CREATE TABLE T_polls__answer (
+			pans_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			pans_pqst_ID INT(11) UNSIGNED NOT NULL,
+			pans_user_ID INT(11) UNSIGNED NOT NULL,
+			pans_popt_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (pans_ID),
+			UNIQUE pans_pqst_user_ID ( pans_pqst_ID, pans_user_ID )
+		) ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11670, 'Creating default polls...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
+			VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+		$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+			VALUES ( 1, "Multiple blogs",          1 ),
+						 ( 1, "Photo Galleries",         2 ),
+						 ( 1, "Forums",                  3 ),
+						 ( 1, "Online Manuals",          4 ),
+						 ( 1, "Newsletters / E-mailing", 5 ),
+						 ( 1, "Easy Maintenance",        6 )' );
+		$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+			VALUES ( 1, 5, 1 ),
+						 ( 1, 6, 2 ),
+						 ( 1, 7, 2 ),
+						 ( 1, 2, 2 ),
+						 ( 1, 3, 3 ),
+						 ( 1, 4, 3 ),
+						 ( 1, 1, 6 )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -119,6 +119,7 @@ $core_componentwidget_defs = array(
 			'online_users',
 			'member_count',
 			'mobile_skin_switcher',
+			'poll'
 		),
 );
 

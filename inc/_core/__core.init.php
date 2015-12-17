@@ -891,7 +891,6 @@ class _core_Module extends Module
 					$perm = true;
 					break;
 				}
-
 		}
 
 		return $perm;
@@ -988,6 +987,7 @@ class _core_Module extends Module
 		// Check if browse/contact users from other countries is allowed
 		return $permvalue == 'allowed';
 	}
+
 
 	/**
 	 * Build the evobar menu

@@ -506,7 +506,7 @@ $schema_queries = array(
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),
 			INDEX         slg_object (slg_object, slg_object_ID)
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" )
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 );
 
 ?>
