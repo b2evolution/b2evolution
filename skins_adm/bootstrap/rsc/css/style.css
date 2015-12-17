@@ -1390,3 +1390,14 @@ table.diff td.diff-title-addedline {
 #iframe_wrapper .results_compact.panel .table-bordered tr:first-child td {
   border-top: none;
 }
+.evo_poll__percent_bar {
+  width: 100px;
+  margin-right: 2px;
+  vertical-align: middle;
+  display: inline-block;
+}
+.evo_poll__percent_bar > div {
+  background: #ffcc66;
+  height: 12px;
+  min-width: 1px;
+}

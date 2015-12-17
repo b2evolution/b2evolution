@@ -238,6 +238,30 @@ class Poll extends DataObject
 
 
 	/**
+	 * Get max percent of poll options
+	 *
+	 * @return integer Max percent
+	 */
+	function get_max_poll_options_percent()
+	{
+		// Get all poll options:
+		$poll_options = $this->get_poll_options();
+
+		$max_percent = 0;
+
+		foreach( $poll_options as $poll_option )
+		{	// Find max percent in all poll options:
+			if( $poll_option->percent > $max_percent )
+			{
+				$max_percent = $poll_option->percent;
+			}
+		}
+
+		return $max_percent;
+	}
+
+
+	/**
 	 * Get a vote of the current user
 	 *
 	 * @return integer|boolean Poll option ID OR FALSE if current user didn't vote on this poll yet

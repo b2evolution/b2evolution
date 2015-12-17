@@ -144,6 +144,11 @@ class poll_Widget extends ComponentWidget
 				// Get the option ID if current user already voted on this poll question:
 				$user_vote_option_ID = $Poll->get_user_vote();
 
+				if( $user_vote_option_ID )
+				{	// Get max percent:
+					$max_poll_options_percent = $Poll->get_max_poll_options_percent();
+				}
+
 				echo '<table class="evo_poll__table">';
 				foreach( $poll_options as $poll_option )
 				{
@@ -151,10 +156,12 @@ class poll_Widget extends ComponentWidget
 					echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
 							.' name="poll_answer" value="'.$poll_option->ID.'"'
 							.( $user_vote_option_ID == $poll_option->ID ? ' checked="checked"' : '' ).' /></td>';
-					echo '<td><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
+					echo '<td class="evo_poll__title"><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
 					if( $user_vote_option_ID )
 					{	// If current user already voted on this poll, Display the voting results:
-						echo '<td class="evo_poll__percent"><div><div style="width:'.$poll_option->percent.'%"></div></div></td>';
+						// Calculate a percent for style relating on max percent:
+						$style_percent = $max_poll_options_percent > 0 ? ceil( $poll_option->percent / $max_poll_options_percent * 100 ) : 0;
+						echo '<td class="evo_poll__percent_bar"><div><div style="width:'.$style_percent.'%"></div></div></td>';
 						echo '<td>'.$poll_option->percent.'%</td>';
 					}
 					echo '</tr>';

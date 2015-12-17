@@ -146,12 +146,29 @@ if( $edited_Poll->ID > 0 )
 			'td'       => '$answers_count$',
 		);
 
+	/**
+	 * Get the Poll percent with bar
+	 *
+	 * @param object Poll
+	 * @return string
+	 */
+	function poll_option_td_percent( $poll_option_percent, $max_percent )
+	{
+		// Calculate a percent for style relating on max percent:
+		$style_percent = $max_percent > 0 ? ceil( $poll_option_percent / $max_percent * 100 ) : 0;
+
+		$r = '<div class="evo_poll__percent_bar"><div style="width:'.$style_percent.'%"></div></div>';
+
+		$r .= $poll_option_percent.'%';
+
+		return $r;
+	}
 	$Results->cols[] = array(
 			'th'       => '%',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'right nowrap',
+			'td_class' => 'nowrap',
 			'order'    => 'answers_percent',
-			'td'       => '$answers_percent$%',
+			'td'       => '%poll_option_td_percent( #answers_percent#, '.$edited_Poll->get_max_poll_options_percent().' )%',
 		);
 
 	if( $perm_poll_edit )

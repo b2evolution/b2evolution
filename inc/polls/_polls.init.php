@@ -267,7 +267,7 @@ class polls_Module extends Module
 
 		if( ! is_logged_in() )
 		{	// User must be logged in
-			debug_die( 'User must be logged in to proceed with polls voting!' );
+			debug_die( 'User must be logged in to vote!' );
 		}
 
 		// Load classes:
@@ -294,7 +294,7 @@ class polls_Module extends Module
 				$Poll = & $PollCache->get_by_ID( $poll_ID, false, false );
 				if( ! $Poll )
 				{	// The requested poll doesn't exist in DB:
-					$Messages->add( T_('Wrong poll request!'), 'error' );
+					$Messages->add( 'Wrong poll request!', 'error' );
 					break;
 				}
 
@@ -303,14 +303,14 @@ class polls_Module extends Module
 				$PollOption = & $PollOptionCache->get_by_ID( $poll_option_ID, false, false );
 				if( ! $PollOption || $PollOption->pqst_ID != $Poll->ID )
 				{	// The requested poll option doesn't exist in DB:
-					$Messages->add( T_('Wrong poll request!'), 'error' );
+					$Messages->add( 'Wrong poll request!', 'error' );
 					break;
 				}
 
 				// Vote on the poll by current User:
 				if( $PollOption->vote() )
 				{	// Successful voting:
-					$Messages->add( T_('You have been voted on the poll.'), 'success' );
+					$Messages->add( T_('You have voted on the poll.'), 'success' );
 				}
 				break;
 		}

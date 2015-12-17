@@ -921,20 +921,23 @@ input.btn-lg {
 .evo_poll__table label {
   margin: 0;
 }
-.evo_poll__table .evo_poll__percent {
+.evo_poll__table .evo_poll__percent_bar {
   width: 100%;
   padding-right: 2px;
 }
-.evo_poll__table .evo_poll__percent > div {
+.evo_poll__table .evo_poll__percent_bar > div {
   width: 100%;
   vertical-align: middle;
   display: inline-block;
 }
-.evo_poll__table .evo_poll__percent > div > div {
+.evo_poll__table .evo_poll__percent_bar > div > div {
   background: #ffcc66;
   height: 12px;
   min-width: 1px;
 }
 .evo_poll__table .evo_poll__selector {
   width: 5px;
+}
+.evo_poll__table .evo_poll__title {
+  white-space: nowrap;
 }

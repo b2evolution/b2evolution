@@ -999,3 +999,16 @@ div.block_item div.bComment.bCommentmeta p, div.block_item div.bComment.bComment
 	text-align: center;
 	color: #aaa;
 }
+
+/* Poll option percent: */
+.evo_poll__percent_bar {
+	width: 100px;
+	margin-right: 2px;
+	vertical-align: middle;
+	display: inline-block;
+}
+.evo_poll__percent_bar > div {
+	background: #ffcc66;
+	height: 12px;
+	min-width: 1px;
+}
