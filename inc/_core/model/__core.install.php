@@ -183,9 +183,11 @@ $schema_queries = array(
 	'T_users__organization' => array(
 		'Creating table for User organizations',
 		"CREATE TABLE T_users__organization (
-			org_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			org_name VARCHAR(255) NOT NULL,
-			org_url  VARCHAR(2000) NULL,
+			org_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			org_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			org_name          VARCHAR(255) NOT NULL,
+			org_url           VARCHAR(2000) NULL,
+			org_accept        ENUM( 'yes', 'owner', 'no' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner',
 			PRIMARY KEY ( org_ID ),
 			UNIQUE org_name ( org_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

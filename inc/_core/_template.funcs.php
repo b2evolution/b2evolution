@@ -1589,29 +1589,40 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			// Use typeahead library of bootstrap
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
-				jQuery( "input.autocomplete_login" ).typeahead( null,
+				jQuery( "input.autocomplete_login" ).on( "added",function()
 				{
-					displayKey: "login",
-					source: function ( query, cb )
+					jQuery( "input.autocomplete_login" ).each( function()
 					{
-						jQuery.ajax(
+						if( jQuery( this ).hasClass( "tt-input" ) || jQuery( this ).hasClass( "tt-hint" ) )
+						{	// Skip this field because typeahead is initialized before:
+							return;
+						}
+						jQuery( this ).typeahead( null,
 						{
-							url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-							type: "post",
-							data: { q: query, data_type: "json" },
-							dataType: "JSON",
-							success: function( logins )
+							displayKey: "login",
+							source: function ( query, cb )
 							{
-								var json = new Array();
-								for( var l in logins )
+								jQuery.ajax(
 								{
-									json.push( { login: logins[ l ] } );
-								}
-								cb( json );
+									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
+									type: "post",
+									data: { q: query, data_type: "json" },
+									dataType: "JSON",
+									success: function( logins )
+									{
+										var json = new Array();
+										for( var l in logins )
+										{
+											json.push( { login: logins[ l ] } );
+										}
+										cb( json );
+									}
+								} );
 							}
 						} );
-					}
+					} );
 				} );
+				jQuery( "input.autocomplete_login" ).trigger( "added" );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
 				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'

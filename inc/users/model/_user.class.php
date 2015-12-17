@@ -269,6 +269,7 @@ class User extends DataObject
 				array( 'table'=>'T_blogs', 'fk'=>'blog_owner_user_ID', 'msg'=>T_('%d blogs owned by this user') ),
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
+				array( 'table'=>'T_users__organization', 'fk'=>'org_owner_user_ID', 'msg'=>T_('%d organizations') ),
 				// Do not delete user private messages
 				//array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has authored %d message(s)') ),
 				//array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('The user is part of %d messaging thread(s)') ),
@@ -2267,7 +2268,7 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
-		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files', 'users' );
+		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files', 'users', 'orgs' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -6080,9 +6081,9 @@ class User extends DataObject
 	 */
 	function update_organizations( $organization_IDs, $organization_roles = array(), $force_accept = false )
 	{
-		global $DB, $current_User;
+		global $DB, $current_User, $Messages;
 
-		$perm_edit_users = ( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) );
+		$OrganizationCache = & get_OrganizationCache();
 
 		$curr_orgs = $this->get_organizations_data();
 		$curr_org_IDs = array_keys( $curr_orgs );
@@ -6095,9 +6096,22 @@ class User extends DataObject
 			{ // Organization is not selected, Skip it
 				continue;
 			}
-			if( in_array( $organization_ID, $curr_org_IDs ) )
+
+			// Get organization ang perm if current user can edit it:
+			$user_Organization = & $OrganizationCache->get_by_ID( $organization_ID );
+			$perm_edit_orgs = ( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) );
+			if( ! $perm_edit_orgs && $user_Organization->get( 'accept' ) == 'no' )
+			{	// Skip this if current user cannot edit the organization and it has a setting to deny a member joining:
+				continue;
+			}
+
+			if( isset( $insert_orgs[ $organization_ID ] ) )
+			{	// Don't join this user to same organization twice:
+				$Messages->add( sprintf( T_('User cannot be joined to the same organization &laquo;%s&raquo; twice.'), $user_Organization->get_name() ), 'error' );
+			}
+			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
-				if( $perm_edit_users || ! $curr_orgs[ $organization_ID ]['accepted'] )
+				if( $perm_edit_orgs || ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{ // Update if current user has permission or it is not accepted yet by admin
 					$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
 					$n++;
@@ -6127,9 +6141,17 @@ class User extends DataObject
 				else
 				{ // If we are inserting - Set the accept status depends on user perms or func params
 					$insert_orgs_accepted = '0';
-					if( $force_accept || $perm_edit_users )
-					{ // If admin adds new organization for other users and for himself, it must be autoaccepted
+					if( $force_accept )
+					{	// Force the accept status for this request:
 						$insert_orgs_accepted = '1';
+					}
+					else
+					{	// Check if it can be autoaccepted:
+						$user_Organization = & $OrganizationCache->get_by_ID( $insert_org_ID );
+						if( $user_Organization->can_be_autoaccepted() )
+						{	// This organization can be autoaccepted:
+							$insert_orgs_accepted = '1';
+						}
 					}
 				}
 				if( $o > 0 )

@@ -182,6 +182,7 @@ function create_default_data()
 	if( $create_sample_contents )
 	{ // Only when demo content is installing
 		$Organization = new Organization();
+		$Organization->set( 'owner_user_ID', '1' );
 		$Organization->set( 'name', 'Company XYZ' );
 		$Organization->set( 'url', 'http://b2evolution.net/' );
 		if( $Organization->dbinsert() )

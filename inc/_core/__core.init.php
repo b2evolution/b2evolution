@@ -547,6 +547,7 @@ class _core_Module extends Module
 				$permtemplates = 'allowed'; // Skin settings
 				$permemails = 'edit'; // Email management
 				$def_notification = 'full'; // Default notification type: short/full
+				$permorgs = 'edit';
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
@@ -558,6 +559,7 @@ class _core_Module extends Module
 				$permtemplates = 'denied';
 				$permemails = 'view';
 				$def_notification = 'short';
+				$permorgs = 'create';
 				break;
 
 			case 3:		// Editors (group ID 3) have permission by default:
@@ -569,6 +571,7 @@ class _core_Module extends Module
 				$permtemplates = 'denied';
 				$permemails = 'none';
 				$def_notification = 'short';
+				$permorgs = 'create';
 				break;
 
 			case 4: 	// Normal Users (group ID 4) have permission by default:
@@ -580,6 +583,7 @@ class _core_Module extends Module
 				$permtemplates = 'denied';
 				$permemails = 'none';
 				$def_notification = 'short';
+				$permorgs = 'none';
 				break;
 
 			// case 5:		// Misbehaving/Suspect users (group ID 5) have permission by default:
@@ -594,6 +598,7 @@ class _core_Module extends Module
 				$permtemplates = 'denied';
 				$permemails = 'none';
 				$def_notification = 'short';
+				$permorgs = 'none';
 				break;
 		}
 
@@ -613,7 +618,8 @@ class _core_Module extends Module
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
-			'cross_country_allow_contact' => $cross_country_settings_default
+			'cross_country_allow_contact' => $cross_country_settings_default,
+			'perm_orgs' => $permorgs,
 		 );
 	}
 
@@ -780,6 +786,21 @@ class _core_Module extends Module
 				'perm_type' => 'checkbox',
 				'note' => T_('Allow to contact users from other countries'),
 				),
+			'perm_orgs' => array(
+				'label'      => T_('Organizations'),
+				'user_func'  => 'check_orgs_user_perm',
+				'group_func' => 'check_orgs_group_perm',
+				'perm_block' => 'additional',
+				'options'    => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'create', T_('Create & Edit owned organizations only') ),
+						array( 'view', T_('Create & Edit owned organizations + View all') ),
+						array( 'edit', T_('Full Access') )
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => true,
+				),
 			);
 		return $permissions;
 	}
@@ -871,6 +892,71 @@ class _core_Module extends Module
 					break;
 				}
 
+		}
+
+		return $perm;
+	}
+
+	/**
+	 * Check an user permission for the organization. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value, this is the value on the database
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_orgs_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return true;
+	}
+
+	/**
+	 * Check a group permission for the organization. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_orgs_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+
+		switch ( $permvalue )
+		{
+			case 'edit':
+				// Users has edit perms
+				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// Users has view perms
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'create':
+				// Users has a create permisson:
+				if( $permlevel == 'create' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+
+		if( ! $perm && is_logged_in() && ! empty( $permtarget )
+		    && ( $permlevel == 'edit' || $permlevel == 'view' ) )
+		{	// If this perm level is still not allowed, check if current user is owner of the requested Poll:
+			global $current_User;
+			if( $current_User->ID == $permtarget->owner_user_ID )
+			{	// Current user is owner
+				$perm = true;
+			}
 		}
 
 		return $perm;
@@ -1622,9 +1708,6 @@ class _core_Module extends Module
 					'groups' => array(
 						'text' => T_('Groups'),
 						'href' => '?ctrl=groups' ),
-					'organizations' => array(
-						'text' => T_('Organizations'),
-						'href' => '?ctrl=organizations' ),
 					'stats' => array(
 						'text' => T_('Stats'),
 						'href' => '?ctrl=users&amp;tab=stats' ),
@@ -1656,6 +1739,15 @@ class _core_Module extends Module
 		}
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
+
+		if( $current_User->check_perm( 'orgs', 'create' ) )
+		{	// Display a menu item for organizations if user has a perm at least to create own organization:
+			$AdminUI->add_menu_entries( array( 'users' ), array(
+					'organizations' => array(
+						'text' => T_('Organizations'),
+						'href' => '?ctrl=organizations' )
+				), 'groups' );
+		}
 
 		/**** Emails ****/
 		$perm_emails = $current_User->check_perm( 'emails', 'view' );

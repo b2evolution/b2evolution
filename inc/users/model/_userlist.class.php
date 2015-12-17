@@ -487,10 +487,10 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
 		$this->UserQuery->where_level( $this->filters['level_min'], $this->filters['level_max'] );
 		if( isset( $this->filters['org'] ) || isset( $this->query_params['where_org_ID'] ) )
-        { // Filter by organization ID
+		{	// Filter by organization ID:
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
-        }
+		}
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;

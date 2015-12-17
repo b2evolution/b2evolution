@@ -7096,6 +7096,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 11650, 'Upgrading user organizations table...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'ALTER TABLE T_users__organization
+			ADD COLUMN org_owner_user_ID INT(11) UNSIGNED NOT NULL AFTER org_ID,
+			ADD COLUMN org_accept        ENUM( "yes", "owner", "no" ) COLLATE ascii_general_ci NOT NULL DEFAULT "owner"' );
+		$DB->query( 'UPDATE T_users__organization SET org_owner_user_ID = 1' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -4324,8 +4324,8 @@ function echo_user_organization_js()
 {
 	global $current_User;
 
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
-	{ // Only admins can change an accept status of organizations
+	if( ! $current_User->check_perm( 'orgs', 'create' ) )
+	{	// Check this min permission, because even owner of one organization can accept it:
 		return;
 	}
 ?>
@@ -4341,7 +4341,7 @@ jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 		data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=<?php echo get_crumb( 'userorg' ); ?>' + params,
 		success: function( result )
 		{
@@ -4352,6 +4352,35 @@ jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 </script>
 <?php
 }
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to add user to organization
+ *
+ * @param object Organization
+ */
+function echo_user_add_organization_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to add user to organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_add_user_to_organization = \''.TS_('Add user to organization').get_manual_link( 'add-user-organization' ).'\';
+		var evo_js_lang_add = \''.TS_('Add').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
 
 /**
  * Check invitation code and display error on incorrect code
@@ -4631,6 +4660,7 @@ function users_results_block( $params = array() )
 			'display_btn_refresh'  => true,
 			'display_btn_adduser'  => true,
 			'display_btn_addgroup' => true,
+			'display_btn_adduserorg' => false,
 			'display_ID'           => true,
 			'display_avatar'       => true,
 			'display_login'        => true,
@@ -4747,9 +4777,22 @@ function users_results_block( $params = array() )
 		{ // Display a button to add user
 			$UserList->global_icon( T_('Create a new user...'), 'new', $admin_url.'?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4, array( 'class' => 'action_icon '.( $action == 'newsletter' ? 'btn-default' :  'btn-primary' ) ) );
 		}
-		if( $params['display_btn_adduser'] )
+		if( $params['display_btn_addgroup'] )
 		{ // Display a button to add group
 			$UserList->global_icon( T_('Create a new group...'), 'new', $admin_url.'?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4 );
+		}
+	}
+
+	if( $params['display_btn_adduserorg'] && ! empty( $params['org_ID'] ) && is_logged_in() )
+	{	// Display a button to add user to the organization:
+		$OrganizationCache = & get_OrganizationCache();
+		if( $Organization = & $OrganizationCache->get_by_ID( $params['org_ID'], false, false ) &&
+		    $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+		{	// If current user has a perm to edit the organization:
+			$UserList->global_icon( T_('Add user'), 'new', '#', T_('Add user'), 3, 4, array(
+					'class'   => 'action_icon btn-primary',
+					'onclick' => 'return user_add_org( '.intval( $params['org_ID'] ).' )'
+				) );
 		}
 	}
 
@@ -5290,8 +5333,11 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 {
 	global $current_User;
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{ // Set the spec params for icon if user is admin
+	$OrganizationCache = & get_OrganizationCache();
+	$Organization = & $OrganizationCache->get_by_ID( $org_ID );
+
+	if( $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+	{	// Set the spec params for icon if user can edit the organization:
 		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
 	}
 	else
