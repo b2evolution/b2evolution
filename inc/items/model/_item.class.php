@@ -3001,16 +3001,6 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_audio() )
-			{ // Player for audio file:
-				$r_file[$i]  = '<div class="podplayer">';
-				$r_file[$i] .= $this->get_player( $File->get_url() );
-				$r_file[$i] .= '</div>';
-				$i++;
-				$params = $temp_params;
-				continue;
-			}
-
 			// A link to download a file:
 
 			// Just icon with download icon
