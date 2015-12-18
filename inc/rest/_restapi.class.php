@@ -669,4 +669,58 @@ class RestApi
 			$this->add_response( 'users', $user_data, 'array' );
 		}
 	}
+
+
+	/**
+	 * Call module to prepare request for tags
+	 */
+	private function module_tags()
+	{
+		global $DB;
+
+		$term = param( 's', 'string' );
+
+		if( substr( $term, 0, 1 ) == '-' )
+		{	// Prevent chars '-' in first position:
+			$term = preg_replace( '/^-+/', '', $term );
+		}
+
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
+		$term_is_new_tag = true;
+
+		$tags = array();
+
+		$tags_SQL = new SQL();
+		$tags_SQL->SELECT( 'tag_name AS id, tag_name AS name' );
+		$tags_SQL->FROM( 'T_items__tag' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->ORDER_BY( 'tag_name' );
+		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
+
+		// Check if current term is not an existing tag:
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
+
+		$this->add_response( 'tags', $tags );
+	}
 }
