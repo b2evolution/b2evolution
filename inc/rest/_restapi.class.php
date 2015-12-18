@@ -594,4 +594,73 @@ class RestApi
 			$this->add_response( 'results', $result_data, 'array' );
 		}
 	}
+
+
+	/**
+	 * Call module to prepare request for users
+	 */
+	private function module_users()
+	{
+		global $DB, $thumbnail_sizes;
+
+		// Get request params:
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 0 );
+		$api_avatar = param( 'avatar', 'string', 'no' );
+
+		// Initialize SQL to get users:
+		$users_SQL = new SQL();
+		$users_SQL->SELECT( '*' );
+		$users_SQL->FROM( 'T_users' );
+
+		// Get a count of users:
+		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
+
+		// Set page params:
+		$count_pages = empty( $api_per_page ) ? 1 : ceil( $count_users / $api_per_page );
+		if( empty( $api_page ) )
+		{	// Force wrong page number to first:
+			$api_page = 1;
+		}
+		if( $api_page > $count_pages )
+		{	// Don't allow page number more than total pages:
+			$api_page = $count_pages;
+		}
+		if( $api_per_page > 0 )
+		{	// Limit users by current page:
+			$users_SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+		}
+
+		// Load users in cache by SQL:
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$UserCache->load_by_sql( $users_SQL );
+
+		if( empty( $UserCache->cache ) )
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 200 );
+			// Exit here.
+		}
+
+		$this->add_response( 'found', $count_users, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
+		$this->add_response( 'pages_total', $count_pages, 'integer' );
+
+		foreach( $UserCache->cache as $User )
+		{
+			$user_data = array(
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+				);
+
+			if( isset( $thumbnail_sizes[ $api_avatar ] ) )
+			{	// Get avatar if the requested size exists in the system:
+				$user_data['avatar'] = $User->get_avatar_imgtag( $api_avatar );
+			}
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'items', $user_data, 'array' );
+		}
+	}
 }
