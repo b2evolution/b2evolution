@@ -21,7 +21,7 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins;
+global $DB, $action, $Plugins, $restapi_url;
 
 global $Blog;
 
@@ -151,33 +151,34 @@ jQuery( document ).ready( function()
 } );
 
 jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo get_samedomain_htsrv_url(); ?>anon_async.php?action=get_recipients',
+	'<?php echo $restapi_url; ?>users?avatar=crop-top-32x32',
 	{
 		theme: 'facebook',
-		queryParam: 'term',
-		propertyToSearch: 'title',
+		queryParam: 'suggest',
+		propertyToSearch: 'login',
 		preventDuplicates: true,
 		prePopulate: <?php echo evo_json_encode( $recipients_selected ) ?>,
 		hintText: '<?php echo TS_('Type in a username') ?>',
 		noResultsText: '<?php echo TS_('No results') ?>',
 		searchingText: '<?php echo TS_('Searching...') ?>',
-		tokenFormatter: function( item )
+		jsonContainer: 'users',
+		tokenFormatter: function( user )
 		{
 			return '<li>' +
-					item.title +
-					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + item.id + '" />' +
-					'<input type="hidden" name="thrd_recipients_array[title][]" value="' + item.title + '" />' +
+					user.login +
+					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
+					'<input type="hidden" name="thrd_recipients_array[title][]" value="' + user.login + '" />' +
 				'</li>';
 		},
-		resultsFormatter: function( item )
+		resultsFormatter: function( user )
 		{
-			var title = item.title;
-			if( item.fullname != null && item.fullname !== undefined )
+			var title = user.login;
+			if( user.fullname != null && user.fullname !== undefined )
 			{
-				title += '<br />' + item.fullname;
+				title += '<br />' + user.fullname;
 			}
 			return '<li>' +
-					item.picture +
+					user.avatar +
 					'<div>' +
 						title +
 					'</div><span></span>' +

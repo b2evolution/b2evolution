@@ -806,7 +806,7 @@ class tinymce_plugin extends Plugin
 
 		// Autocomplete options
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options[] = 'autocomplete_options_url: htsrv_url + "anon_async.php?action=autocomplete_usernames"';
+		$init_options[] = 'autocomplete_options_url: restapi_url + "users"';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,

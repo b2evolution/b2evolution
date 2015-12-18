@@ -147,12 +147,12 @@
 						dataType: "JSON",
 						url: autocomplete_data.optionsUrl,
 						cache: false,
-						data: "q=" + wordLessTrigger,
+						data: "suggest=" + wordLessTrigger,
 						success: function (data) {
-							if( data ) {
+							if( data && typeof( data.users ) != 'undefined' ) {
 								var options = [];
-								for( var i in data ) {
-									options.push(data[i]);
+								for( var i in data.users ) {
+									options.push(data.users[i].login);
 								}
 								autocomplete_data.options = options;
 

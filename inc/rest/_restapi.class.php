@@ -607,11 +607,16 @@ class RestApi
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 0 );
 		$api_avatar = param( 'avatar', 'string', 'no' );
+		$api_suggest = param( 'suggest', 'string', '' );
 
 		// Initialize SQL to get users:
 		$users_SQL = new SQL();
 		$users_SQL->SELECT( '*' );
 		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $api_suggest ) )
+		{	// Filter by login:
+			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( '%'.$api_suggest.'%' ) );
+		}
 
 		// Get a count of users:
 		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
@@ -650,6 +655,7 @@ class RestApi
 		foreach( $UserCache->cache as $User )
 		{
 			$user_data = array(
+					'id'       => $User->ID,
 					'login'    => $User->get( 'login' ),
 					'fullname' => $User->get( 'fullname' ),
 				);
@@ -660,7 +666,7 @@ class RestApi
 			}
 
 			// Add data of each user in separate array of response:
-			$this->add_response( 'items', $user_data, 'array' );
+			$this->add_response( 'users', $user_data, 'array' );
 		}
 	}
 }

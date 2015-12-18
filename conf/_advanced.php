@@ -480,6 +480,12 @@ $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
+ * URL of the REST API.
+ * @global string $restapi_url
+ */
+$restapi_url = $baseurl.'api/v1/'; // You should not need to change this
+
+/**
  * Location of the RSC folder.
  *
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
