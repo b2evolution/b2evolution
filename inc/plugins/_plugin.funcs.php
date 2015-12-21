@@ -288,6 +288,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'array':
+		case 'array:integer':
+		case 'array:array:integer':
+		case 'array:string':
+		case 'array:array:string':
+		case 'array:regexp':
 			$has_array_type = true;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
@@ -509,7 +514,7 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 			}
 			else
 			{
-				if( isset($v['type']) && $v['type'] == 'array' )
+				if( isset($v['type']) && strpos( $v['type'], 'array' ) === 0 )
 				{
 					$set_node[$k] = array();
 				}
@@ -674,6 +679,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		switch( $parmeta['type'] )
 		{
 			case 'array':
+			case 'array:integer':
+			case 'array:array:integer':
+			case 'array:string':
+			case 'array:array:string':
+			case 'array:regexp':
 				// this settings has a type
 				$l_param_type = $parmeta['type'];
 				break;
@@ -706,7 +716,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && $parmeta['type'] == 'array' )
+	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
 	{ // make keys (__key__) in arrays unique and remove them
 		handle_array_keys_in_plugin_settings($l_value);
 	}
