@@ -1,13 +1,60 @@
+body { 
+	font-family: 'Raleway', sans-serif;
+	font-size: 16px;
+}
+h1 {
+	font-weight: 900;
+	color: #7c7c7c;
+	text-align: center;
+	letter-spacing: 0.8px;
+}
+h1 span {
+	color: #FAA72D
+}
+a {
+	color: #2baa78 !important;
+}
+
+.form-inline .input-group, #api_search__clear {
+	margin-bottom: 10px;
+}
+#api_search__input {
+	box-shadow: none;
+	border-right: 0;
+}
+#api_search__input:focus {
+	border: 1px solid #33B481;
+	border-right: 0;
+}
+#api_search__submit {
+	background: #2baa78;
+	border: 1px solid #33B481;
+	margin-left: 0;	
+}
+#api_search__submit:hover {
+	background: #23A06E;
+}
+h4.api_documentation {
+	text-align: center;
+	font-size: 16px;
+}
+h4.api_documentation:before, h4.api_documentation:after {
+	content: ' - ';
+}
+
 .container > div {
-	border: 1px solid #999;
+	border: 10px solid #fff;
+	background: rgba(0,0,0,0.02);
+    border-radius: 13px;
+	padding: 0 20px 10px 20px;
 }
 .container > div:empty {
-	border: none;
+	display: none;
 }
 #api_post_attachments img {
 	display: block;
 	max-width: 100%;
-	margin: 5px auto;
+	margin: 20px auto;
 }
 
 .api_loading {
