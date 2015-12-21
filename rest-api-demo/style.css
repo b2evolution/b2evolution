@@ -4,15 +4,21 @@ body {
 }
 h1 {
 	font-weight: 900;
+	font-family: 'Open Sans', sans-serif;
 	color: #7c7c7c;
 	text-align: center;
 	letter-spacing: 0.8px;
+	margin-top: 30px;
 }
 h1 span {
 	color: #FAA72D
 }
 a {
 	color: #2baa78 !important;
+}
+
+.container {
+	margin-top: 50px;
 }
 
 .form-inline .input-group, #api_search__clear {
@@ -37,6 +43,7 @@ a {
 h4.api_documentation {
 	text-align: center;
 	font-size: 16px;
+	margin-bottom: 30px;
 }
 h4.api_documentation:before, h4.api_documentation:after {
 	content: ' - ';
@@ -44,7 +51,7 @@ h4.api_documentation:before, h4.api_documentation:after {
 
 .container > div {
 	border: 10px solid #fff;
-	background: rgba(0,0,0,0.02);
+	background: #fafafa;
     border-radius: 13px;
 	padding: 0 20px 10px 20px;
 }
@@ -64,7 +71,8 @@ h4.api_documentation:before, h4.api_documentation:after {
 .api_loading:before {
 	content: "";
 	position: absolute;
-	background: #FFF;
+	background: #fafafa;
+	
 	width: 100%;
 	height: 100%;
 	opacity: 0.5;
