@@ -2425,8 +2425,12 @@ class User extends DataObject
 				// Get secondary usergroups:
 				$secondary_groups = $this->get_secondary_groups();
 
+				// Store secondary group IDs in this array to know what advanced permissions must be loaded:
+				$secondary_group_IDs = array();
+
+				// Find first secondary group that globally allows the required permission:
 				foreach( $secondary_groups as $secondary_Group )
-				{	// Find first user group that globally allows the required permission:
+				{
 					if( $secondary_Group->check_perm( 'blogs', $group_permlevel ) )
 					{	// Secondary usergroup grants a global permission:
 						$perm = true;
@@ -2434,17 +2438,39 @@ class User extends DataObject
 						break 2;
 					}
 
-					if( $perm_target_ID > 0 && $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
-					{	// Secondary advanced usergroup permissions on the target collection grant the requested permission:
-						$perm = true;
-						// Stop checking other perms:
-						break 2;
+					if( $perm_target_ID > 0 && ! isset( $secondary_Group->blog_post_statuses[ $perm_target_ID ] ) )
+					{	// We must load advanced permissions for this secondary group below in single query:
+						$secondary_group_IDs[] = $secondary_Group->ID;
 					}
 				}
 
-				if( $perm_target_ID > 0 && $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
-				{	// Advanced user permissions on the target collection grant the requested permission:
-					$perm = true;
+				if( $perm_target_ID > 0 )
+				{
+					if( count( $secondary_group_IDs ) )
+					{	// Load advanced usergroup permissions of ALL secondary groups in single query:
+						$coll_advanced_perms = NULL;
+						load_blog_advanced_perms( $coll_advanced_perms, $perm_target_ID, $secondary_group_IDs, 'bloggroup' );
+					}
+
+					// Find first secondary group that advanced permissions allow the required permission:
+					foreach( $secondary_groups as $secondary_Group )
+					{
+						if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
+						{	// Set advanced usergroup permissions from loaded above array:
+							$secondary_Group->blog_post_statuses[ $perm_target_ID ] = $coll_advanced_perms[ $secondary_Group->ID ];
+						}
+						if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+						{	// Secondary advanced usergroup permissions on the target collection grant the requested permission:
+							$perm = true;
+							// Stop checking other perms:
+							break 2;
+						}
+					}
+
+					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
+					{	// Advanced user permissions on the target collection grant the requested permission:
+						$perm = true;
+					}
 				}
 
 				break;
