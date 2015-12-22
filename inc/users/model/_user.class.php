@@ -2404,37 +2404,47 @@ class User extends DataObject
 				/* continue */
 			case 'blog_admin': // This is what the collection owner does not have automatic access to!
 
-				if( $perm_target_ID > 0 )
-				{	// Check advanced user permissions on the target collection:
-					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
-					if( $perm )
-					{	// If user permission is granted then we don't need to check the advanced usergroup permissions:
-						break;
+				// Group may grant VIEW access, FULL access:
+				$group_permlevel = ( $permlevel == 'view' ||  $permlevel == 'any' ) ? $permlevel : 'editall';
+
+				$primary_Group = & $this->get_Group();
+				if( $primary_Group->check_perm( 'blogs', $group_permlevel ) )
+				{	// Primary usergroup grants a global permission:
+					$perm = true;
+					// Stop checking other perms:
+					break;
+				}
+
+				if( $perm_target_ID > 0 && $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+				{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+					$perm = true;
+					// Stop checking other perms:
+					break;
+				}
+
+				// Get secondary usergroups:
+				$secondary_groups = $this->get_secondary_groups();
+
+				foreach( $secondary_groups as $secondary_Group )
+				{	// Find first user group that globally allows the required permission:
+					if( $secondary_Group->check_perm( 'blogs', $group_permlevel ) )
+					{	// Secondary usergroup grants a global permission:
+						$perm = true;
+						// Stop checking other perms:
+						break 2;
+					}
+
+					if( $perm_target_ID > 0 && $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+					{	// Secondary advanced usergroup permissions on the target collection grant the requested permission:
+						$perm = true;
+						// Stop checking other perms:
+						break 2;
 					}
 				}
 
-				// Get all usergroups (primary & secondary):
-				$user_groups = $this->get_groups();
-
-				// Group may grant VIEW access, FULL access:
-				$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? $permlevel : 'editall';
-				foreach( $user_groups as $user_Group )
-				{	// Find first user group that globally allows the required permission:
-					if( $user_Group->check_perm( 'blogs', $group_permlevel ) )
-					{	// If usergroup grants a global permission:
-						$perm = true;
-						break;
-					}
-
-					if( $perm_target_ID > 0 )
-					{	// Check advanced usergroup permissions on the target collection:
-						$perm = $user_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
-					}
-
-					if( $perm )
-					{	// If we found one usergroup which grants the permission, then don't continue to check other groups:
-						break;
-					}
+				if( $perm_target_ID > 0 && $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
+				{	// Advanced user permissions on the target collection grant the requested permission:
+					$perm = true;
 				}
 
 				break;
