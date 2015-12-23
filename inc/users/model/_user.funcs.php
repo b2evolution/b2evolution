@@ -2073,7 +2073,11 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		  FROM '.$table.'
 		 WHERE '.$prefix.'_blog_ID = '.$perm_target_blog.'
 		   AND '.$perm_target_key.' = '.$perm_target_ID;
-	$row = $DB->get_row( $query, ARRAY_A );
+	$row = $DB->get_row( $query, ARRAY_A, NULL,
+			sprintf( 'Load advanced permissions for collection #%s and %s with ID = %s',
+				$perm_target_blog,
+				( $prefix == 'bloguser' ? 'User' : 'Group' ),
+				$perm_target_ID ) );
 
 	if( empty($row) )
 	{ // No rights set for this Blog - User/Group: remember this (in order not to have the same query next time)
