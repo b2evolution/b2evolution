@@ -1748,6 +1748,9 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
+		// Force status to max allowed:
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -4105,6 +4108,9 @@ function item_row_status( $Item, $index )
 	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create' ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
+
+	// Force status to max allowed:
+	$Item->status = $Blog->get_allowed_item_status( $Item->status );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )

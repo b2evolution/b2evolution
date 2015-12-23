@@ -1213,7 +1213,7 @@ function compare_visibility_status( $first_status, $second_status )
 
 
 /**
- * Get restricted visibility statuses for the current User in the given blog in back office
+ * Get restricted visibility statuses for the current User in the given blog
  *
  * @param integer blog ID
  * @param string permission prefix: 'blog_post!' or 'blog_comment!'
@@ -1226,12 +1226,24 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
 
 	$result = array();
 
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( ( $prefix == 'blog_post!' ? 'post' : 'comment' ), $blog_ID, false );
+
 	// This statuses are allowed to view/edit only for those users who may create post/comment with these statuses
-	$restricted = array( 'review', 'draft', 'deprecated', 'private' );
+	$restricted = array( 'published', 'community', 'protected', 'review', 'private', 'draft', 'deprecated' );
+	$status_is_allowed = false;
 	foreach( $restricted as $status )
 	{
-		if( !$current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
-		{ // not allowed
+		if( $status == $max_allowed_status )
+		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
+			$status_is_allowed = true;
+		}
+		if( in_array( $status, array( 'published', 'community', 'protected' ) ) )
+		{	// Keep these statuses in array only to set $status_is_allowed in order to know when we can start allow the statuses:
+			continue;
+		}
+		if( ! $status_is_allowed || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+		{	// This status is not allowed
 			$result[] = $status;
 		}
 	}
@@ -1252,10 +1264,15 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
 	if( $permlevel != 'view' )
 	{ // in case of other then 'view' action we must check the permissions
 		$restricted = array( 'published', 'community', 'protected' );
+		$status_is_allowed = false;
 		foreach( $restricted as $status )
 		{
-			if( !$current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
-			{ // not allowed
+			if( $status == $max_allowed_status )
+			{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
+				$status_is_allowed = true;
+			}
+			if( ! $status_is_allowed || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+			{	// This status is not allowed
 				$result[] = $status;
 			}
 		}

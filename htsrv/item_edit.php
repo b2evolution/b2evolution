@@ -101,7 +101,7 @@ switch( $action )
 		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status ( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave( $post_category, $post_extracats );

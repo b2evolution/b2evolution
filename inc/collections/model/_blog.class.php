@@ -1635,37 +1635,43 @@ class Blog extends DataObject
 	 */
 	function get_allowed_item_status( $status = NULL )
 	{
-		/**
-		 * @var User
-		 */
 		global $current_User;
 
-		if( empty( $status ) )
-		{
-			$status = $this->get_setting('default_post_status');
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			return NULL;
 		}
-		if( ! $current_User->check_perm( 'blog_post!'.$status, 'create', false, $this->ID ) )
-		{ // We need to find another one:
-			$status = NULL;
 
-			if( $current_User->check_perm( 'blog_post!published', 'create', false, $this->ID ) )
-				$status = 'published';
-			elseif( $current_User->check_perm( 'blog_post!community', 'create', false, $this->ID ) )
-				$status = 'community';
-			elseif( $current_User->check_perm( 'blog_post!protected', 'create', false, $this->ID ) )
-				$status = 'protected';
-			elseif( $current_User->check_perm( 'blog_post!private', 'create', false, $this->ID ) )
-				$status = 'private';
-			elseif( $current_User->check_perm( 'blog_post!review', 'create', false, $this->ID ) )
-				$status = 'review';
-			elseif( $current_User->check_perm( 'blog_post!draft', 'create', false, $this->ID ) )
-				$status = 'draft';
-			elseif( $current_User->check_perm( 'blog_post!deprecated', 'create', false, $this->ID ) )
-				$status = 'deprecated';
-			elseif( $current_User->check_perm( 'blog_post!redirected', 'create', false, $this->ID ) )
-				$status = 'redirected';
+		if( empty( $status ) )
+		{	// Get default item status:
+			$status = $this->get_setting( 'default_post_status' );
 		}
-		return $status;
+
+		// Get max allowed visibility status:
+		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false );
+
+		$visibility_statuses = get_visibility_statuses();
+		$status_is_allowed = false;
+		$max_status_is_allowed = false;
+		$allowed_status = NULL;
+		foreach( $visibility_statuses as $status_key => $status_value )
+		{
+			if( $status_key == $status || empty( $status ) )
+			{	// Start to check statuses only after the requested status:
+				$status_is_allowed = true;
+			}
+			if( $status_key == $max_allowed_status )
+			{	// All next statuses are allowed for this collection:
+				$max_status_is_allowed = true;
+			}
+			if( $status_is_allowed && $max_status_is_allowed && $current_User->check_perm( 'blog_post!'.$status_key, 'create', false, $this->ID ) )
+			{	// This status is allowed for this collection and current has a permission:
+				$allowed_status = $status_key;
+				break;
+			}
+		}
+
+		return $allowed_status;
 	}
 
 
