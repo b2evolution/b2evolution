@@ -4,17 +4,13 @@ body {
 }
 h1 {
 	font-weight: 900;
-	font-family: 'Open Sans', sans-serif;
 	color: #7c7c7c;
 	text-align: center;
 	letter-spacing: 0.8px;
 	margin-top: 30px;
 }
-h1 span {
-	color: #FAA72D
-}
 a {
-	color: #2baa78 !important;
+	color: #faa72d !important;
 }
 
 .container {
@@ -29,16 +25,16 @@ a {
 	border-right: 0;
 }
 #api_search__input:focus {
-	border: 1px solid #33B481;
+	border: 1px solid #faa72d;
 	border-right: 0;
 }
 #api_search__submit {
-	background: #2baa78;
-	border: 1px solid #33B481;
+	background: #faa72d;
+	border: 1px solid #faa72d;
 	margin-left: 0;	
 }
 #api_search__submit:hover {
-	background: #23A06E;
+	background: #f69d1b
 }
 h4.api_documentation {
 	text-align: center;
@@ -84,6 +80,14 @@ h4.api_documentation:before, h4.api_documentation:after {
 	left: 0;
 	right: 0;
 	bottom: 0;
+}
+
+.title_permalink {
+	float: right;
+	font-size: 16px;
+    top: 20px;
+    position: absolute;
+    right: 20px;
 }
 
 @-moz-keyframes dots-loader {

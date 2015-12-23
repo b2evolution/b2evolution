@@ -2084,7 +2084,8 @@ class Form extends Widget
 	 *  - "effective value": a boolean indicating whether the box should be checked or not on display
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
-	 *  - 'required': is the box required to be checked (boolean; default: false)
+	 *  - an optional class (html attribute)
+	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2111,15 +2112,24 @@ class Form extends Widget
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
+			$loop_field_name = $option[0];
+
+			if( ! empty( $option[7] ) )
+			{	// Print out this checkbox as hidden field:
+				if( $option[3] )
+				{	// Only if it is checked:
+					$this->hidden( $loop_field_name, 1 );
+				}
+				continue;
+			}
+
 			// Start of checkbox option for multi line format
 			$r .= $this->checkbox_newline_start;
 
-			$loop_field_name = $option[0];
-
-			$loop_field_note = isset($option[5]) ? $option[5] : '';
+			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( isset( $option[6] ) ? ' class="'.$option[6].'"' : '' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover

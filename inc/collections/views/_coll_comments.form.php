@@ -194,14 +194,14 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'value'   => $edited_Blog->get_setting('new_feedback_status'),
 				'options' => $status_options,
 			) );
-		$Form->info( T_('New feedback status'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+		$Form->info( T_('Status for new Anonymous comments'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
 		$Form->hidden( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status') );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
 		$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+				T_('Status for new Anonymous comments'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
 	}
 	echo '</div>';
 

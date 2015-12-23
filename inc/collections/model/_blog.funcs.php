@@ -787,24 +787,58 @@ function get_highest_publish_status( $type, $blog, $with_label = true )
 	$requested_Blog = $BlogCache->get_by_ID( $blog );
 	$default_status = ( $type == 'post' ) ? $requested_Blog->get_setting( 'default_post_status' ) : $requested_Blog->get_setting( 'new_feedback_status' );
 
+	if( $requested_Blog->get_setting( 'allow_access' ) == 'members' )
+	{	// The collection is restricted for members or only for owner:
+		if( ! $requested_Blog->get( 'advanced_perms' ) )
+		{	// If advanced permissions are NOT enabled then only owner has an access for the collection
+			// Set max allowed visibility status to "Private":
+			$max_allowed_status = 'private';
+		}
+		else
+		{	// Otherwise all members of this collection have an access for the collection
+			// Set max allowed visibility status to "Members":
+			$max_allowed_status = 'protected';
+		}
+	}
+	else
+	{	// The collection has no restriction for visibility statuses
+		// Set max allowed visibility status to "Public":
+		$max_allowed_status = 'published';
+	}
+
 	if( empty( $current_User ) || ( ( !$requested_Blog->get( 'advanced_perms' ) ) && ( !$current_User->check_perm_blog_global( $blog, 'editall' ) ) ) )
-	{ // current User is not set or collection advanced perms are not enabled and user has no global perms on the given blog, set status to the default status
-		return ( $with_label ? array( $default_status, '' ) : $default_status );
+	{	// current User is not set or collection advanced perms are not enabled and user has no global perms on the given blog, set status to the default status
+		$curr_status = $default_status;
+		if( $max_allowed_status != 'published' )
+		{	// If max allowed status is not "published" then we should check what status we can return here instead of default:
+			$statuses = get_visibility_statuses();
+			foreach( $statuses as $status_key => $status_title )
+			{
+				if( $curr_status == $status_key || $max_allowed_status == $status_key )
+				{	// Allow to use this status because only this is max allowed for the requested collection:
+					// But don't use a status more than default status:
+					$allowed_curr_status = $status_key;
+				}
+			}
+			// Force default status to max allowed:
+			$curr_status = ( empty( $allowed_curr_status ) ? '' : $allowed_curr_status );
+		}
+		return ( $with_label ? array( $curr_status, '' ) : $curr_status );
 	}
 
 	$status_order = get_visibility_statuses( 'ordered-array' );
 	$highest_index = count( $status_order ) - 1;
-	$default_status_label = '';
 	$result = false;
+	$status_is_allowed = false; // Set this flag to false in order to find first allowed status below
 	for( $index = $highest_index; $index > 0; $index-- )
 	{
 		$curr_status = $status_order[$index][0];
-		if( $curr_status == $default_status )
-		{ // Set default status label for later use
-			$default_status_label =  $status_order[$index][1];
+		if( $curr_status == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_allowed = true;
 		}
-		if( $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
-		{ // The highest available publish status has been found
+		if( $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
+		{	// The highest available publish status has been found:
 			$result = array( $curr_status, $status_order[$index][1] );
 			break;
 		}
@@ -939,11 +973,31 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 	// Get all available statuses except 'deprecated', 'trash' and 'redirected'
 	$statuses = get_visibility_statuses( '', array( 'deprecated', 'trash', 'redirected' ) );
 	$status_icons = get_visibility_statuses( 'icons', array( 'deprecated', 'trash', 'redirected' ) );
+
+	// Get current selected visibility statuses:
 	$inskin_statuses = $edited_Blog->get_setting( $type.'_inskin_statuses' );
+
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( $type, $edited_Blog->ID, false );
+
+	$status_is_hidden = true;
 	foreach( $statuses as $status => $status_text )
-	{ // Add a checklist option for each possible front office post/comment status
-		$is_checked = ( strpos( $inskin_statuses, $status ) !== false );
-		$checklist_options[] = array( $type.'_inskin_'.$status, 1, $status_icons[ $status ].' '.$status_text, $is_checked );
+	{	// Add a checklist option for each possible front office post/comment status:
+		if( $max_allowed_status == $status )
+		{	// This is max allowed status, Then display all next statuses with 
+			$status_is_hidden = false;
+		}
+
+		$checklist_options[] = array(
+				$type.'_inskin_'.$status, // Field name of checkbox
+				1, // Field value
+				$status_icons[ $status ].' '.$status_text, // Text
+				( strpos( $inskin_statuses, $status ) !== false ), // Checked?
+				'', // Disabled?
+				'', // Note
+				'', // Class
+				$status_is_hidden, // Hidden field instead of checkbox?
+			);
 	}
 
 	return $checklist_options;
@@ -1058,8 +1112,8 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'published'  => '<span class="fa fa-circle status_color_published"></span>',
 					'community'  => '<span class="fa fa-circle status_color_community"></span>',
 					'protected'  => '<span class="fa fa-circle status_color_protected"></span>',
-					'private'    => '<span class="fa fa-circle status_color_private"></span>',
 					'review'     => '<span class="fa fa-circle status_color_review"></span>',
+					'private'    => '<span class="fa fa-circle status_color_private"></span>',
 					'draft'      => '<span class="fa fa-circle status_color_draft"></span>',
 					'deprecated' => '<span class="fa fa-circle status_color_deprecated"></span>',
 					'redirected' => '<span class="fa fa-circle status_color_redirected"></span>',
@@ -1072,8 +1126,8 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'published'  => NT_('Public'),
 					'community'  => NT_('Community'),
 					'protected'  => NT_('Members'),
-					'private'    => NT_('Private'),
 					'review'     => NT_('Review'),
+					'private'    => NT_('Private'),
 					'draft'      => NT_('Draft'),
 					'deprecated' => NT_('Deprecated'),
 					'redirected' => NT_('Redirected'),
@@ -1159,7 +1213,7 @@ function compare_visibility_status( $first_status, $second_status )
 
 
 /**
- * Get restricted visibility statuses for the current User in the given blog in back office
+ * Get restricted visibility statuses for the current User in the given blog
  *
  * @param integer blog ID
  * @param string permission prefix: 'blog_post!' or 'blog_comment!'
@@ -1172,12 +1226,24 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
 
 	$result = array();
 
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( ( $prefix == 'blog_post!' ? 'post' : 'comment' ), $blog_ID, false );
+
 	// This statuses are allowed to view/edit only for those users who may create post/comment with these statuses
-	$restricted = array( 'review', 'draft', 'deprecated', 'private' );
+	$restricted = array( 'published', 'community', 'protected', 'review', 'private', 'draft', 'deprecated' );
+	$status_is_allowed = false;
 	foreach( $restricted as $status )
 	{
-		if( !$current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
-		{ // not allowed
+		if( $status == $max_allowed_status )
+		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
+			$status_is_allowed = true;
+		}
+		if( in_array( $status, array( 'published', 'community', 'protected' ) ) )
+		{	// Keep these statuses in array only to set $status_is_allowed in order to know when we can start allow the statuses:
+			continue;
+		}
+		if( ! $status_is_allowed || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+		{	// This status is not allowed
 			$result[] = $status;
 		}
 	}
@@ -1198,10 +1264,15 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view' )
 	if( $permlevel != 'view' )
 	{ // in case of other then 'view' action we must check the permissions
 		$restricted = array( 'published', 'community', 'protected' );
+		$status_is_allowed = false;
 		foreach( $restricted as $status )
 		{
-			if( !$current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
-			{ // not allowed
+			if( $status == $max_allowed_status )
+			{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
+				$status_is_allowed = true;
+			}
+			if( ! $status_is_allowed || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+			{	// This status is not allowed
 				$result[] = $status;
 			}
 		}

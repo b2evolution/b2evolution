@@ -164,13 +164,14 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
-				array( 'users', T_('Logged in users') ),
+				array( 'users', T_('Logged-in users only') ),
 				array( 'members',
-									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members').'</span>'.
+									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members only').'</span>'.
 									'<span id="allow_access_members_simple_title"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('Only the owner').'</span>',
 									'<span id="allow_access_members_advanced_note"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.sprintf( T_('(Assign membership in <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
 										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
-										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ).'</span>' ),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ).'</span>'.
+									'<span id="allow_access_members_simple_note"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('(Private collection)').'</span>' ),
 		), T_('Allow access to'), true );
 
 $Form->end_fieldset();
@@ -212,12 +213,12 @@ jQuery( 'input[name=advanced_perms]' ).click( function()
 {	// Display a proper label for "Allow access to" depending on selected "Permission management":
 	if( jQuery( this ).val() == '1' )
 	{	// If advanced permissions are selected
-		jQuery( '#allow_access_members_simple_title' ).hide();
+		jQuery( '#allow_access_members_simple_title, #allow_access_members_simple_note' ).hide();
 		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).show();
 	}
 	else
 	{	// If simple permissions are selected
-		jQuery( '#allow_access_members_simple_title' ).show();
+		jQuery( '#allow_access_members_simple_title, #allow_access_members_simple_note' ).show();
 		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).hide();
 	}
 } );
