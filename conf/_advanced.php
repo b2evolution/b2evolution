@@ -949,8 +949,10 @@ $outgoing_proxy_password = '';
 /**
  * Check for old browsers like IE and display info message.
  * Set to false if you don't want this check and never inform users if they use an old browser.
+ * Note: new default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have
+ *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
  */
-$check_browser_version = true;
+$check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
