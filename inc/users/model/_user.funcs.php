@@ -2083,7 +2083,11 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		  FROM '.$table.'
 		 WHERE '.$prefix.'_blog_ID = '.$perm_target_blog.'
 		   AND '.$perm_target_key.' IN ( '.$DB->quote( $perm_target_IDs ).' )';
-	$rows = $DB->get_results( $query, ARRAY_A );
+	$rows = $DB->get_results( $query, ARRAY_A,
+			sprintf( 'Load advanced permissions for collection #%s and %s with IDs = (%s)',
+				$perm_target_blog,
+				( $prefix == 'bloguser' ? 'Users' : 'Groups' ),
+				implode( ', ', $perm_target_IDs ) ) );
 
 	$blog_perms = array();
 	foreach( $rows as $row )
