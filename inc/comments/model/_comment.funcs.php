@@ -291,12 +291,15 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
 			// Get those statuses which are not allowed for the current User to create comments in this blog
 			if( $edited_Comment->is_meta() )
-			{ // Don't restrict statuses for meta comments
+			{	// Don't restrict statuses for meta comments:
 				$restricted_statuses = array();
 			}
 			else
-			{ // Restrict statuses for normal comments
-				$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status );
+			{	// Restrict statuses for normal comments:
+				$comment_Item = & $edited_Comment->get_Item();
+				// Comment status cannot be more than post status, restrict it:
+				$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+				$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status, $restrict_max_allowed_status );
 			}
 			$exclude_statuses = array_merge( $restricted_statuses, array( 'redirected', 'trash' ) );
 			// Get allowed visibility statuses
@@ -354,8 +357,12 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 {
 	global $Blog;
 
+	$comment_Item = & $edited_Comment->get_Item();
+	// Comment status cannot be more than post status, restrict it:
+	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status ), array( 'redirected', 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );

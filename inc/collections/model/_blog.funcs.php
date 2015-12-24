@@ -772,9 +772,10 @@ function check_allow_disp( $disp )
  * @param string 'post' or 'comment'
  * @param integer blog ID
  * @param boolean set false to get only the status without the action button label
+ * @param string Restrict max collection allowed status by this. Used for example to restrict a comment status with its post status
  * @return mixed string status if with_label is false, array( status, label ) if with_label is true
  */
-function get_highest_publish_status( $type, $blog, $with_label = true )
+function get_highest_publish_status( $type, $blog, $with_label = true, $restrict_max_allowed_status = '' )
 {
 	global $current_User;
 
@@ -814,9 +815,9 @@ function get_highest_publish_status( $type, $blog, $with_label = true )
 			$statuses = get_visibility_statuses();
 			foreach( $statuses as $status_key => $status_title )
 			{
-				if( $curr_status == $status_key || $max_allowed_status == $status_key )
+				if( $curr_status == $status_key || $max_allowed_status == $status_key || $status_key == $restrict_max_allowed_status )
 				{	// Allow to use this status because only this is max allowed for the requested collection:
-					// But don't use a status more than default status:
+					// Use min of max allowed statuses:
 					$allowed_curr_status = $status_key;
 				}
 			}
@@ -829,15 +830,22 @@ function get_highest_publish_status( $type, $blog, $with_label = true )
 	$status_order = get_visibility_statuses( 'ordered-array' );
 	$highest_index = count( $status_order ) - 1;
 	$result = false;
-	$status_is_allowed = false; // Set this flag to false in order to find first allowed status below
+	// Set this flag to know if we should not allow $max_allowed_status and find next status with lower level:
+	$restricted_status_is_allowed = empty( $restrict_max_allowed_status );
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_allowed = false;
 	for( $index = $highest_index; $index > 0; $index-- )
 	{
 		$curr_status = $status_order[$index][0];
+		if( $curr_status == $restrict_max_allowed_status )
+		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
+			$restricted_status_is_allowed = true;
+		}
 		if( $curr_status == $max_allowed_status )
 		{	// This is first allowed status, then all next statuses are also allowed:
 			$status_is_allowed = true;
 		}
-		if( $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
+		if( $restricted_status_is_allowed && $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
 		{	// The highest available publish status has been found:
 			$result = array( $curr_status, $status_order[$index][1] );
 			break;
@@ -1219,16 +1227,17 @@ function compare_visibility_status( $first_status, $second_status )
  * @param string permission prefix: 'blog_post!' or 'blog_comment!'
  * @param string permlevel: 'view'/'edit' depending on where we would like to use it
  * @param string Status; Don't restrict this status by max allowed status, for example, if it is already used for the post/comment
+ * @param string Restrict max collection allowed status by this. Used for example to restrict a comment status with its post status
  * @return array of restricted statuses
  */
-function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '' )
+function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '' )
 {
 	global $current_User;
 
 	$result = array();
 
 	// Get max allowed visibility status:
-	$max_allowed_status = get_highest_publish_status( ( $prefix == 'blog_post!' ? 'post' : 'comment' ), $blog_ID, false );
+	$max_allowed_status = get_highest_publish_status( ( $prefix == 'blog_post!' ? 'post' : 'comment' ), $blog_ID, false, $restrict_max_allowed_status );
 
 	// This statuses are allowed to view/edit only for those users who may create post/comment with these statuses
 	$restricted = array( 'published', 'community', 'protected', 'review', 'private', 'draft', 'deprecated' );
