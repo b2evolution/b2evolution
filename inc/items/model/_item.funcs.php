@@ -1744,12 +1744,9 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
-
-		// Force status to max allowed:
-		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
@@ -1834,7 +1831,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	global $next_action, $action, $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -4105,12 +4102,9 @@ function item_row_status( $Item, $index )
 	}
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create' ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
-
-	// Force status to max allowed:
-	$Item->status = $Blog->get_allowed_item_status( $Item->status );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
