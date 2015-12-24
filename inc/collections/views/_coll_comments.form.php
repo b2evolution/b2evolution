@@ -168,6 +168,9 @@ $Form->end_fieldset();
 // echo 'modules';
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
+// Get max allowed visibility status:
+$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
+
 $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moderation') );
 	$is_bootstrap_skin = ( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' );
 	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
@@ -182,6 +185,19 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 		else
 		{ // Remove published status for non-admin users
 			unset( $status_options['published'] );
+		}
+	}
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_allowed = false;
+	foreach( $status_options as $status_key => $status_option )
+	{
+		if( $status_key == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_allowed = true;
+		}
+		if( ! $status_is_allowed && $edited_Blog->get_setting( 'new_feedback_status' ) != $status_key )
+		{	// Don't allow to select this status because it is not allowed by collection restriction:
+			unset( $status_options[ $status_key ] );
 		}
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
@@ -205,17 +221,36 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	echo '</div>';
 
-	// Moderation statuses setting
-	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
-	// Get moderation statuses with status text
+	// Moderation statuses setting:
+	$all_statuses = get_visibility_statuses( 'keys', NULL );
+	$not_moderation_statuses = array_diff( $all_statuses, get_visibility_statuses( 'moderation' ) );
+	// Get moderation statuses with status text:
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
 	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'moderation_statuses' );
 	$checklist_options = array();
-	foreach( $moderation_statuses as $status => $status_text )
-	{ // Add a checklist option for each possible modeartion status
-		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_hidden = true;
+	foreach( $all_statuses as $status )
+	{	// Add a checklist option for each possible moderation status:
+		if( $status == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_hidden = false;
+		}
+		if( ! isset( $moderation_statuses[ $status ] ) )
+		{	// Don't display a checkbox for non moderation status:
+			continue;
+		}
+		$checklist_options[] = array(
+				'notif_'.$status, // Field name of checkbox
+				1, // Field value
+				$moderation_status_icons[ $status ].' '.$moderation_statuses[ $status ], // Text
+				( strpos( $blog_moderation_statuses, $status ) !== false ), // Checked?
+				'', // Disabled?
+				'', // Note
+				'', // Class
+				$status_is_hidden, // Hidden field instead of checkbox?
+			);
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
 
