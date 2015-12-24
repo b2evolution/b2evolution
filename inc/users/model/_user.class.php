@@ -6294,23 +6294,17 @@ class User extends DataObject
 		{	// Initialize the secondary groups:
 			global $DB;
 
-			// Get all secondary group IDs of this user:
+			// Initialize SQL for secondary groups of this user:
 			$secondary_groups_SQL = new SQL();
-			$secondary_groups_SQL->SELECT( 'sug_grp_ID' );
-			$secondary_groups_SQL->FROM( 'T_users__secondary_user_groups' );
+			$secondary_groups_SQL->SELECT( '*' );
+			$secondary_groups_SQL->FROM( 'T_groups' );
+			$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
 			$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
-			$secondary_group_IDs = $DB->get_col( $secondary_groups_SQL->get(), 0, 'Get all IDs of secondary groups for the user #'.$this->ID );
 
-			if( empty( $secondary_group_IDs ) )
-			{	// This user has no secondary groups, Return an empty array:
-				$this->secondary_groups = array();
-			}
-			else
-			{	// Load group objects in cache:
-				$GroupCache = & get_GroupCache();
-				$GroupCache->clear();
-				$this->secondary_groups = $GroupCache->load_list( $secondary_group_IDs );
-			}
+			// Load all secondary group objects of this user in cache:
+			$GroupCache = & get_GroupCache();
+			$GroupCache->clear();
+			$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
 		}
 
 		return $this->secondary_groups;
