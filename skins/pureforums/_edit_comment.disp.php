@@ -136,7 +136,7 @@ $Form->begin_form( 'inskin', '', $display_params );
 	}
 
 	// Get those statuses which are not allowed for the current User to create comments in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses
 	$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 	if( count( $sharing_options ) == 1 )

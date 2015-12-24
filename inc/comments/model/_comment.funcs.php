@@ -296,7 +296,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			}
 			else
 			{ // Restrict statuses for normal comments
-				$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' );
+				$restricted_statuses = get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status );
 			}
 			$exclude_statuses = array_merge( $restricted_statuses, array( 'redirected', 'trash' ) );
 			// Get allowed visibility statuses
@@ -355,7 +355,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 	global $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit' ), array( 'redirected', 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );

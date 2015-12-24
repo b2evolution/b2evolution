@@ -1221,7 +1221,7 @@ function compare_visibility_status( $first_status, $second_status )
  * @param string Status; Don't restrict this status by max allowed status, for example, if it is already used for the post/comment
  * @return array of restricted statuses
  */
-function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $current_status = '' )
+function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '' )
 {
 	global $current_User;
 
@@ -1243,7 +1243,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $curre
 		{	// Keep these statuses in array only to set $status_is_allowed in order to know when we can start allow the statuses:
 			continue;
 		}
-		if( ( $current_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+		if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
 		{	// This status is not allowed
 			$result[] = $status;
 		}
@@ -1272,7 +1272,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $curre
 			{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 				$status_is_allowed = true;
 			}
-			if( ( $current_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+			if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
 			{	// This status is not allowed
 				$result[] = $status;
 			}

@@ -240,7 +240,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{
 		// ################### VISIBILITY / SHARING ###################
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 		if( count( $sharing_options ) == 1 )
