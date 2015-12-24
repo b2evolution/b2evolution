@@ -41,7 +41,11 @@ $locale_lang = locale_lang( false );
 						<li role="presentation" class="active"><a href="index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/">
+					<img src="rsc/img/b2evolution_254x52.png" width="254" height="52" alt="b2evolution" class="b2evolution_plane_logo"
+					  srcset="rsc/img/b2evolution_508x104.png 2x,
+						 		 rsc/img/b2evolution_762x156.png 3x" /></a>
+				</h3>
 			</div>
 
 			<div class="jumbotron">
