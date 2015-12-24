@@ -7198,21 +7198,22 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 function get_status_dropdown_button( $params = array() )
 {
 	$params = array_merge( array(
-			'name'         => '',
-			'value'        => '',
-			'title_format' => '',
-			'options'      => NULL,
+			'name'             => '',
+			'value'            => '',
+			'title_format'     => '',
+			'options'          => NULL,
+			'exclude_statuses' => array( 'trash' ),
 		), $params );
 
 	if( $params['options'] === NULL )
 	{	// Get status options by title format:
-		$status_options = get_visibility_statuses( $params['title_format'] );
+		$status_options = get_visibility_statuses( $params['title_format'], $params['exclude_statuses'] );
 	}
 	else
 	{	// Use status options from params:
 		$status_options = $params['options'];
 	}
-	$status_icon_options = get_visibility_statuses( 'icons' );
+	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
 	$r = '<div class="btn-group dropdown autoselected">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'

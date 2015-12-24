@@ -1112,7 +1112,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 			break;
 
 		case 'moderation': // these statuses may need moderation
-			$r = array( 'community', 'protected', 'review', 'draft' );
+			$r = array( 'community', 'protected', 'review', 'private', 'draft' );
 			return $r;
 
 		case 'icons': // colored icons

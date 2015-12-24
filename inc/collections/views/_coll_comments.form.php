@@ -168,10 +168,11 @@ $Form->end_fieldset();
 // echo 'modules';
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
-// Get max allowed visibility status:
-$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
-
 $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moderation') );
+
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
+
 	$is_bootstrap_skin = ( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' );
 	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
 	$newstatus_warning = str_replace( '$attrs$', $newstatus_warning_attrs, $spammers_warning );
