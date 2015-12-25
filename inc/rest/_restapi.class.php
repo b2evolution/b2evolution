@@ -69,7 +69,7 @@ class RestApi
 
 		if( ! method_exists( $this, 'module_'.$this->module ) )
 		{	// Unknown module:
-			$this->halt( 'Unknown module', 'unknown_module' );
+			$this->halt( 'Unknown module "'.$this->module.'"', 'unknown_module' );
 			// Exit here.
 		}
 
@@ -182,7 +182,7 @@ class RestApi
 			$BlogCache = & get_BlogCache();
 			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 			{	// Collection is not detected in DB by requested url name:
-				$this->halt( 'No collection found in DB by requested url name', 'unknown_collection' );
+				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection' );
 				// Exit here.
 			}
 
@@ -210,7 +210,7 @@ class RestApi
 
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
 		{	// Unknown controller:
-			$this->halt( 'Unknown collection controller', 'unknown_controller' );
+			$this->halt( 'Unknown collection controller "'.$coll_controller.'"', 'unknown_controller' );
 			// Exit here.
 		}
 
@@ -344,6 +344,7 @@ class RestApi
 					'title'       => $Item->get( 'title' ),
 					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
 					'excerpt'     => $Item->get( 'excerpt' ),
+					'URL'         => $Item->get_permanent_url( '', '', '&' ),
 					'attachments' => $attachments,
 				);
 
