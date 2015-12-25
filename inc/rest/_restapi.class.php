@@ -310,14 +310,14 @@ class RestApi
 					if( ! ( $File = & $Link->get_File() ) )
 					{	// No File object
 						global $Debuglog;
-						$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+						$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
 						continue;
 					}
 
 					if( ! $File->exists() )
 					{	// File doesn't exist
 						global $Debuglog;
-						$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+						$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 						continue;
 					}
 
