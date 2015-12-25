@@ -224,9 +224,9 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_posts_list', function( data )
 	{	// Display the posts in second column on success request:
 		var r = '<ul>';
-		for( var p in data )
+		for( var p in data.items )
 		{
-			var post = data[p];
+			var post = data.items[p];
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
 		r += '</ul>';
