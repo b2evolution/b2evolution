@@ -609,6 +609,10 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 
 			case 'private': // It is allowed for users who has global 'editall' permission
 				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+				if( ! $allowed && $dbprefix == 'comment_' )
+				{	// Allow the private comments for collection owner:
+					$allowed = ( $is_logged_in && $current_User->check_perm_blogowner( $req_blog ) );
+				}
 				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
 				{ // Own private posts/comments are allowed if user can create private posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
