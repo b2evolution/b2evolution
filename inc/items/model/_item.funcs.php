@@ -607,8 +607,8 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
 				break;
 
-			case 'private': // It is allowed for users who has global 'editall' permission but only on back-office
-				$allowed = ( is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+			case 'private': // It is allowed for users who has global 'editall' permission
+				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
 				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
 				{ // Own private posts/comments are allowed if user can create private posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
