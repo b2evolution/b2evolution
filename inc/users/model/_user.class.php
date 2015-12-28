@@ -100,6 +100,14 @@ class User extends DataObject
 	var $Group;
 
 	/**
+	 * Array of the references to groups
+	 * @see User::get_secondary_groups()
+	 * @var secondary_groups
+	 * @access protected
+	 */
+	var $secondary_groups;
+
+	/**
 	 * Country lazy filled
 	 *
 	 * @var country
@@ -310,6 +318,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
 				array( 'table'=>'T_polls__answers', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
+				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 			);
 	}
 
@@ -434,13 +443,16 @@ class User extends DataObject
 				$this->set_from_Request( 'level', 'edited_user_level', true );
 
 				$edited_user_Group = $GroupCache->get_by_ID( param( 'edited_user_grp_ID', 'integer' ) );
-				if( /* User can change to any group: */
-				    $has_full_access ||
-				    /* User can change only to group with level lower than own group level: */
-				    ( $has_moderate_access && $edited_user_Group->get( 'level' ) < $current_User->get_Group()->get( 'level' ) ) )
-				{
+				if( $edited_user_Group->can_be_assigned() )
+				{	// Update group only if current user has a permission for this:
 					$this->set_Group( $edited_user_Group );
 				}
+			}
+
+			if( $is_admin_form )
+			{	// Save secondary groups for this user:
+				$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', array() );
+				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
 			}
 
 			param( 'edited_user_source', 'string', true );
@@ -2275,7 +2287,9 @@ class User extends DataObject
 
 
 	/**
-	 * Check permission for this user
+	 * Check a specific permission for this User.
+	 * This is the MAIN permission check function that you should call to check any permission.
+	 * This function will delegate to other functions when appropriate.
 	 *
 	 * @param string Permission name, can be one of:
 	 *                - 'edit_timestamp'
@@ -2389,6 +2403,8 @@ class User extends DataObject
 				}
 				break;
 
+			// Permissions on a collection:
+			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
 			case 'blog_post_statuses':
@@ -2420,30 +2436,74 @@ class User extends DataObject
 			case 'blog_item_type_restricted':
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
-				// Blog permission to edit its properties...
+				// The owner of a collection has automatic permission to so many things: 
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
 					break;
 				}
 				/* continue */
-			case 'blog_admin': // This is what the owner does not have access to!
+			case 'blog_admin': // This is what the collection owner does not have automatic access to!
 
 				// Group may grant VIEW access, FULL access:
-				$this->get_Group();
 				$group_permlevel = ( $permlevel == 'view' ||  $permlevel == 'any' ) ? $permlevel : 'editall';
-				if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
-				{ // If group grants a global permission:
+
+				$primary_Group = & $this->get_Group();
+				if( $primary_Group->check_perm( 'blogs', $group_permlevel ) )
+				{	// Primary usergroup grants a global permission:
 					$perm = true;
+					// Stop checking other perms:
 					break;
 				}
 
 				if( $perm_target_ID > 0 )
-				{ // Check user perm for this blog:
-					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
-					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
+				{	// Check the permissions below only for requested target collection:
+
+					if( $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+					{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+						$perm = true;
+						// Stop checking other perms:
+						break;
+					}
+
+					// Get secondary usergroups for this User:
+					$secondary_groups = $this->get_secondary_groups();
+
+					// Check which secondary usergroup's advanced permissions must still be loaded: (we may have some in cache already)
+					$notloaded_secondary_group_IDs = array();
+					foreach( $secondary_groups as $secondary_Group )
+					{
+						if( ! isset( $secondary_Group->blog_post_statuses[ $perm_target_ID ] ) )
+						{	// We must still load advanced permissions for this secondary usergroup:
+							$notloaded_secondary_group_IDs[] = $secondary_Group->ID;
+						}
+					}
+
+					if( count( $notloaded_secondary_group_IDs ) )
+					{	// Load advanced permissions of secondary usergroups in a single query:
+						$coll_advanced_perms = NULL;
+						load_blog_advanced_perms( $coll_advanced_perms, $perm_target_ID, $notloaded_secondary_group_IDs, 'bloggroup' );
+					}
+
+					// Find first secondary usergroup that grants the required permission:
+					foreach( $secondary_groups as $secondary_Group )
+					{
+						if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
+						{	// Set advanced usergroup permissions from array loaded above:
+							$secondary_Group->blog_post_statuses[ $perm_target_ID ] = $coll_advanced_perms[ $secondary_Group->ID ];
+						}
+						if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+						{	// Secondary usergroup grants requested permissions on the target collection:
+							$perm = true;
+							// Stop checking other groups and other perms:
+							break 2;
+						}
+					}
+
+					// Check usr specific perms:
+					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
+					{	// Advanced user permissions on the target collection grant the requested permission:
+						$perm = true;
 					}
 				}
 
@@ -6211,6 +6271,123 @@ class User extends DataObject
 				WHERE uorg_user_ID = '.$this->ID.'
 					AND uorg_org_ID IN ( '.implode( ', ', $delete_org_IDs ).' )' );
 		}
+	}
+
+
+	/**
+	 * Update user's secondary groups in DB
+	 *
+	 * @param array Secondary group IDs
+	 */
+	function update_secondary_groups( $secondary_group_IDs )
+	{
+		global $DB, $current_User;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in for this action:
+			return;
+		}
+
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
+
+		if( ! $has_full_access && ! $has_moderate_access )
+		{	// Use has no permission to edit users:
+			return;
+		}
+
+		$old_secondary_groups = $this->get_secondary_groups();
+		if( ! empty( $old_secondary_groups ) )
+		{	// Check each old secondary group if it can be deleted by current user:
+			$delete_old_secondary_groups = array();
+			foreach( $old_secondary_groups as $o => $old_secondary_Group )
+			{
+				if( $old_secondary_Group->can_be_assigned() )
+				{	// Current user can delete only this group:
+					$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
+				}
+			}
+			if( ! empty( $delete_old_secondary_group_IDs ) )
+			{	// Clear secondary groups only which can be touched by currrent user:
+				$DB->query( 'DELETE FROM T_users__secondary_user_groups
+					WHERE sug_user_ID = '.$this->ID.'
+					  AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
+			}
+		}
+
+		$GroupCache = & get_GroupCache();
+
+		if( count( $secondary_group_IDs ) )
+		{	// Update new secondary groups:
+			$new_secondary_grp_IDs = array();
+
+			foreach( $secondary_group_IDs as $secondary_group_ID )
+			{
+				if( ! empty( $secondary_group_ID ) )
+				{
+					if( $edited_user_secondary_Group = & $GroupCache->get_by_ID( $secondary_group_ID, false, false ) &&
+					    $edited_user_secondary_Group->can_be_assigned() )
+					{	// We can add this secondary group because current user has a permission:
+						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
+						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
+						{	// Add except of primary user group and the duplicates:
+							$new_secondary_grp_IDs[] = $secondary_group_ID;
+						}
+					}
+				}
+			}
+
+			if( ! empty( $new_secondary_grp_IDs ) )
+			{	// Insert new secondary groups:
+				$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID )
+					VALUES ( '.$this->ID.', '.implode( ' ), ( '.$this->ID.', ', $new_secondary_grp_IDs ).' )' );
+			}
+		}
+	}
+
+
+	/**
+	 * Get secondary groups
+	 *
+	 * @return array Secondary groups array of Group objects
+	 */
+	function get_secondary_groups()
+	{
+		if( ! is_array( $this->secondary_groups ) )
+		{	// Initialize the secondary groups:
+			global $DB;
+
+			// Initialize SQL for secondary groups of this user:
+			$secondary_groups_SQL = new SQL();
+			$secondary_groups_SQL->SELECT( '*' );
+			$secondary_groups_SQL->FROM( 'T_groups' );
+			$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
+			$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+
+			// Load all secondary group objects of this user in cache:
+			$GroupCache = & get_GroupCache();
+			$GroupCache->clear();
+			$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+		}
+
+		return $this->secondary_groups;
+	}
+
+
+	/**
+	 * Get primary & secondary user's groups
+	 *
+	 * @return array All user's groups array of Group objects
+	 */
+	function get_groups()
+	{
+		$primary_group = $this->get_Group();
+		$secondary_groups = $this->get_secondary_groups();
+
+		// Prepend primary group to secondary groups:
+		array_unshift( $secondary_groups, $primary_group );
+
+		return $secondary_groups;
 	}
 
 

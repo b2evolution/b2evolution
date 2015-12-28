@@ -33,6 +33,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups (
 			grp_ID                           int(11) NOT NULL auto_increment,
 			grp_name                         varchar(50) NOT NULL default '',
+			grp_usage                        ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary',
 			grp_level                        int unsigned DEFAULT 0 NOT NULL,
 			grp_perm_blogs                   enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
 			grp_perm_bypass_antispam         TINYINT(1) NOT NULL DEFAULT 0,
@@ -200,6 +201,14 @@ $schema_queries = array(
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__secondary_user_groups' => array(
+		'Creating table for secondary user groups',
+		"CREATE TABLE T_users__secondary_user_groups (
+			sug_user_ID INT(11) UNSIGNED NOT NULL,
+			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(

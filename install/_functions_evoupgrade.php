@@ -7160,6 +7160,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						 ( 1, 3, 3 ),
 						 ( 1, 4, 3 ),
 						 ( 1, 1, 6 )' );
+	}
+
+	if( upg_task_start( 11675, 'Creating table for secondary user groups...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'CREATE TABLE T_users__secondary_user_groups (
+				sug_user_ID INT(11) UNSIGNED NOT NULL,
+				sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY ( sug_user_ID, sug_grp_ID )
+			) ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11680, 'Upgrading groups table...' ) )
+	{	// part of 6.7.0
+		db_add_col( 'T_groups', 'grp_usage', "ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary' AFTER grp_name" );
 		upg_task_end();
 	}
 

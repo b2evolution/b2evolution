@@ -2023,11 +2023,11 @@ function load_user_read_statuses( $post_ids = NULL )
  *
  * @param array the array what should be loaded with the permission values ( it should be the User or Group blog_post_statuses array )
  * @param integer the target blog ID
- * @param integer the target User or Group ID
+ * @param integer|array the target User or Group ID OR array to load perms for several targets
  * @param string the prefix which must be bloguser or bloggroup depends from where we call this fucntion
  * @return boolean true on success, false on failure
  */
-function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_target_ID, $prefix )
+function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_target_IDs, $prefix )
 {
 	global $DB;
 
@@ -2041,7 +2041,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		return false;
 	}
 
-	if( empty( $perm_target_ID ) )
+	if( empty( $perm_target_IDs ) )
 	{ // Target object is not in DB, nothing to load!:
 		return false;
 	}
@@ -2067,63 +2067,86 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 			debug_die( 'Invalid call of load blog permission' );
 	}
 
+	if( is_array( $perm_target_IDs ) )
+	{	// This is a request to load perms to multiple targets:
+		$single_target = false;
+	}
+	else
+	{	// This is a request to load perms to single target:
+		$single_target = true;
+		$perm_target_IDs = array( $perm_target_IDs );
+	}
+
 	// Load now:
 	$query = '
 		SELECT *, '.$prefix.'_perm_poststatuses + 0 as perm_poststatuses_bin, '.$prefix.'_perm_cmtstatuses + 0 as perm_cmtstatuses_bin
 		  FROM '.$table.'
 		 WHERE '.$prefix.'_blog_ID = '.$perm_target_blog.'
-		   AND '.$perm_target_key.' = '.$perm_target_ID;
-	$row = $DB->get_row( $query, ARRAY_A, NULL,
-			sprintf( 'Load advanced permissions for collection #%s and %s with ID = %s',
+		   AND '.$perm_target_key.' IN ( '.$DB->quote( $perm_target_IDs ).' )';
+	$rows = $DB->get_results( $query, ARRAY_A,
+			sprintf( 'Load advanced permissions for collection #%s and %s with IDs = (%s)',
 				$perm_target_blog,
-				( $prefix == 'bloguser' ? 'User' : 'Group' ),
-				$perm_target_ID ) );
+				( $prefix == 'bloguser' ? 'Users' : 'Groups' ),
+				implode( ', ', $perm_target_IDs ) ) );
 
-	if( empty($row) )
-	{ // No rights set for this Blog - User/Group: remember this (in order not to have the same query next time)
-		$blog_perms = array(
-				'blog_ismember' => '0',
-				'blog_can_be_assignee' => '0',
-				'blog_post_statuses' => 0,
-				'blog_item_type' => 'standard',
-				'blog_edit' => 'no',
-				'blog_del_post' => '0',
-				'blog_edit_ts' => '0',
-				'blog_edit_cmt' => 'no',
-				'blog_del_cmts' => '0',
-				'blog_recycle_owncmts' => '0',
-				'blog_vote_spam_comments' => '0',
-				'blog_cmt_statuses' => 0,
-				'blog_cats' => '0',
-				'blog_properties' => '0',
-				'blog_admin' => '0',
-				'blog_media_upload' => '0',
-				'blog_media_browse' => '0',
-				'blog_media_change' => '0',
+	$blog_perms = array();
+	foreach( $rows as $row )
+	{	// Store all found rights in DB to the array:
+		$blog_perms[ $row[ $perm_target_key ] ] = array(
+				'blog_ismember'           => $row[$prefix.'_ismember'],
+				'blog_can_be_assignee'    => $row[$prefix.'_can_be_assignee'],
+				'blog_post_statuses'      => $row['perm_poststatuses_bin'],
+				'blog_cmt_statuses'       => $row['perm_cmtstatuses_bin'],
+				'blog_item_type'          => $row[$prefix.'_perm_item_type'],
+				'blog_edit'               => $row[$prefix.'_perm_edit'],
+				'blog_del_post'           => $row[$prefix.'_perm_delpost'],
+				'blog_edit_ts'            => $row[$prefix.'_perm_edit_ts'],
+				'blog_del_cmts'           => $row[$prefix.'_perm_delcmts'],
+				'blog_recycle_owncmts'    => $row[$prefix.'_perm_recycle_owncmts'],
+				'blog_vote_spam_comments' => $row[$prefix.'_perm_vote_spam_cmts'],
+				'blog_edit_cmt'           => $row[$prefix.'_perm_edit_cmt'],
+				'blog_cats'               => $row[$prefix.'_perm_cats'],
+				'blog_properties'         => $row[$prefix.'_perm_properties'],
+				'blog_admin'              => $row[$prefix.'_perm_admin'],
+				'blog_media_upload'       => $row[$prefix.'_perm_media_upload'],
+				'blog_media_browse'       => $row[$prefix.'_perm_media_browse'],
+				'blog_media_change'       => $row[$prefix.'_perm_media_change'],
 			);
 	}
-	else
-	{ // OK, rights found:
-		$blog_perms['blog_ismember'] = $row[$prefix.'_ismember'];
-		$blog_perms['blog_can_be_assignee'] = $row[$prefix.'_can_be_assignee'];
 
-		$blog_perms['blog_post_statuses'] = $row['perm_poststatuses_bin'];
-		$blog_perms['blog_cmt_statuses'] = $row['perm_cmtstatuses_bin'];
+	if( count( $blog_perms ) != count( $perm_target_IDs ) )
+	{	// The rights are not found for some targets Blog - User/Group
+		foreach( $perm_target_IDs as $perm_target_ID )
+		{
+			if( ! isset( $blog_perms[ $perm_target_ID ] ) )
+			{	// No rights set for this Blog - User/Group: remember this (in order not to have the same query next time)
+				$blog_perms[ $perm_target_ID ] = array(
+						'blog_ismember'           => 0,
+						'blog_can_be_assignee'    => 0,
+						'blog_post_statuses'      => 0,
+						'blog_item_type'          => 'standard',
+						'blog_edit'               => 'no',
+						'blog_del_post'           => 0,
+						'blog_edit_ts'            => 0,
+						'blog_edit_cmt'           => 'no',
+						'blog_del_cmts'           => 0,
+						'blog_recycle_owncmts'    => 0,
+						'blog_vote_spam_comments' => 0,
+						'blog_cmt_statuses'       => 0,
+						'blog_cats'               => 0,
+						'blog_properties'         => 0,
+						'blog_admin'              => 0,
+						'blog_media_upload'       => 0,
+						'blog_media_browse'       => 0,
+						'blog_media_change'       => 0,
+					);
+			}
+		}
+	}
 
-		$blog_perms['blog_item_type'] = $row[$prefix.'_perm_item_type'];
-		$blog_perms['blog_edit'] = $row[$prefix.'_perm_edit'];
-		$blog_perms['blog_del_post'] = $row[$prefix.'_perm_delpost'];
-		$blog_perms['blog_edit_ts'] = $row[$prefix.'_perm_edit_ts'];
-		$blog_perms['blog_del_cmts'] = $row[$prefix.'_perm_delcmts'];
-		$blog_perms['blog_recycle_owncmts'] = $row[$prefix.'_perm_recycle_owncmts'];
-		$blog_perms['blog_vote_spam_comments'] = $row[$prefix.'_perm_vote_spam_cmts'];
-		$blog_perms['blog_edit_cmt'] = $row[$prefix.'_perm_edit_cmt'];
-		$blog_perms['blog_cats'] = $row[$prefix.'_perm_cats'];
-		$blog_perms['blog_properties'] = $row[$prefix.'_perm_properties'];
-		$blog_perms['blog_admin'] = $row[$prefix.'_perm_admin'];
-		$blog_perms['blog_media_upload'] = $row[$prefix.'_perm_media_upload'];
-		$blog_perms['blog_media_browse'] = $row[$prefix.'_perm_media_browse'];
-		$blog_perms['blog_media_change'] = $row[$prefix.'_perm_media_change'];
+	if( $single_target )
+	{	// This was a single request:
+		$blog_perms = $blog_perms[ $perm_target_IDs[0] ];
 	}
 
 	return true;
@@ -5084,11 +5107,11 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_group'] && $UserList->filters['group'] == -1 )
 	{ // List is ungrouped, Display column with group name
 		$UserList->cols[] = array(
-				'th' => T_('Group'),
+				'th' => T_('Primary Group'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '$grp_name$ ($grp_level$)',
+				'td' => '%user_td_grp_name( #user_ID#, #grp_name#, #grp_level#, #secondary_groups_count# )%',
 			);
 	}
 
@@ -5188,6 +5211,45 @@ function user_td_grp_actions( & $row )
 	}
 	return $r;
 }
+
+
+/**
+ * Get info about group for cell of users table
+ *
+ * @param integer User ID
+ * @param string Group name
+ * @param string Group level
+ * @param integer A count of secondary groups
+ * @return string
+ */
+function user_td_grp_name( $user_ID, $group_name, $group_level, $secondary_groups_count )
+{
+	global $current_User;
+
+	// Group name:
+	$r = $group_name;
+
+	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
+	{	// Make a link to update the groups if current user can moderate this user:
+		global $admin_url;
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'">'.$r.'</a>';
+	}
+
+	// Group level:
+	$r .= ' ('.$group_level.')';
+
+	$secondary_groups_count = intval( $secondary_groups_count );
+	if( $secondary_groups_count > 0 )
+	{	// Display a count of secondary groups if at least one is assigned for user:
+		$r .= '<div class="dimmed">'
+			// TRANS: Count of secondary user groups
+			.sprintf( T_('+ %d secondary'), $secondary_groups_count )
+			.'</div>';
+	}
+
+	return $r;
+}
+
 
 function user_td_avatar( $user_ID, $thumb_size = 'crop-top-48x48' )
 {

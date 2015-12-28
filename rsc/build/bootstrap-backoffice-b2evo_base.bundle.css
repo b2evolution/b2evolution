@@ -2142,6 +2142,10 @@ div.message_toolbars {
 .edit_plugin_actions {
   padding-top: 7px;
 }
+.badge-primary {
+  background-color: #337ab7 !important;
+  color: #fff !important;
+}
 .badge-important {
   background-color: #F00 !important;
   color: #FFF !important;

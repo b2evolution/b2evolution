@@ -2545,6 +2545,7 @@ class Blog extends DataObject
 			'users'      => array( 'ID' => 4, 'name' => 'Normal Users' ),
 			'suspect'    => array( 'ID' => 5, 'name' => 'Misbehaving/Suspect Users' ),
 			'spam'       => array( 'ID' => 6, 'name' => 'Spammers/Restricted Users' ),
+			'blogb'      => array( 'ID' => 7, 'name' => 'Blog B Members' ),
 		);
 
 		// Define default group permissions for each group for any collection type:
@@ -2665,6 +2666,30 @@ class Blog extends DataObject
 				'perm_recycle_owncmts' => 0,
 				'perm_vote_spam_cmts'  => 0,
 				'perm_cmtstatuses'     => 'review,draft',
+				'perm_edit_cmt'        => 'no',
+				'perm_cats'            => 0,
+				'perm_properties'      => 0,
+				'perm_admin'           => 0,
+				'perm_media_upload'    => 0,
+				'perm_media_browse'    => 0,
+				'perm_media_change'    => 0,
+			);
+		}
+
+		if( $this->type == 'std' && $this->get( 'shortname' ) == 'Blog B' )
+		{	// Set special permission for group "Blog B Members" for collection "Blog B":
+			$group_permissions['blogb'] = array(
+				'ismember'             => 1,
+				'can_be_assignee'      => 0,
+				'perm_poststatuses'    => '',
+				'perm_item_type'       => 'standard',
+				'perm_edit'            => 'no',
+				'perm_delpost'         => 0,
+				'perm_edit_ts'         => 0,
+				'perm_delcmts'         => 0,
+				'perm_recycle_owncmts' => 0,
+				'perm_vote_spam_cmts'  => 0,
+				'perm_cmtstatuses'     => '',
 				'perm_edit_cmt'        => 'no',
 				'perm_cats'            => 0,
 				'perm_properties'      => 0,

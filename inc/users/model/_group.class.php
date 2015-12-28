@@ -36,6 +36,16 @@ class Group extends DataObject
 	var $name;
 
 	/**
+	 * Usage of group: 'primary' or 'secondary'
+	 *
+	 * Please use get/set functions to read or write this param
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	var $usage;
+
+	/**
 	 * Level of group
 	 *
 	 * Please use get/set functions to read or write this param
@@ -91,6 +101,7 @@ class Group extends DataObject
 			// echo 'Instanciating existing group';
 			$this->ID                           = $db_row->grp_ID;
 			$this->name                         = $db_row->grp_name;
+			$this->usage                        = $db_row->grp_usage;
 			$this->level                        = $db_row->grp_level;
 			$this->perm_blogs                   = $db_row->grp_perm_blogs;
 			$this->perm_bypass_antispam         = $db_row->grp_perm_bypass_antispam;
@@ -132,6 +143,30 @@ class Group extends DataObject
 		param( 'edited_grp_name', 'string' );
 		param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
 		$this->set_from_Request('name', 'edited_grp_name', true);
+
+		// Edited Group Usage:
+		$usage = param( 'edited_grp_usage', 'string' );
+		if( $this->ID > 0 && $usage != $this->get( 'usage' ) )
+		{	// Display a warning if group usage has been changed:
+			global $DB;
+			if( $usage == 'primary' )
+			{
+				$group_users_count = intval( $DB->get_var( 'SELECT COUNT( sug_grp_ID ) FROM T_users__secondary_user_groups WHERE sug_grp_ID = '.$this->ID ) );
+				if( $group_users_count > 0 )
+				{
+					$Messages->add( sprintf( T_('You made this group primary but there are %d users still using it as a secondary group.'), $group_users_count ), 'warning' );
+				}
+			}
+			else
+			{
+				$group_users_count = intval( $DB->get_var( 'SELECT COUNT( user_ID ) FROM T_users WHERE user_grp_ID = '.$this->ID ) );
+				if( $group_users_count > 0 )
+				{
+					$Messages->add( sprintf( T_('You made this group secondary but there are %d users still using it as a primary group.'), $group_users_count ), 'warning' );
+				}
+			}
+		}
+		$this->set_from_Request( 'usage', 'edited_grp_usage' );
 
 		// Edited Group Level
 		param_integer_range( 'edited_grp_level', 0, 10, T_('Group level must be between %d and %d.') );
@@ -511,6 +546,42 @@ class Group extends DataObject
 		parent::dbdelete();
 
 		$DB->commit();
+	}
+
+
+	/**
+	 * Check if this group can be assigned by current user
+	 *
+	 * @return boolean TRUE if current use can assign this group to users
+	 */
+	function can_be_assigned()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() )
+		{	// User must be assigned:
+			return false;
+		}
+
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{	// Allow to assing any group if current user has full access to edit users:
+			return true;
+		}
+
+		if( ! $current_User->check_perm( 'users', 'moderate' ) )
+		{	// User must has a permission at least to modearate the users:
+			return false;
+		}
+
+		$user_Group = & $current_User->get_Group();
+
+		if( ! $user_Group )
+		{	// User's group must be defined:
+			return false;
+		}
+
+		// Current user can assign this group if his group level is more than level of this group
+		return ( $this->get( 'level' ) < $user_Group->get( 'level' ) );
 	}
 }
 

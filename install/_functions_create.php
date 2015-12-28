@@ -41,7 +41,7 @@ function create_tables()
  */
 function create_default_data()
 {
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
 	global $test_install_all_features, $create_sample_contents;
@@ -116,6 +116,14 @@ function create_default_data()
 	$spam_Group->set( 'perm_blogs', 'user' );
 	$spam_Group->set( 'perm_stats', 'none' );
 	$spam_Group->dbinsert();
+
+	$blogb_Group = new Group(); // COPY !
+	$blogb_Group->set( 'name', 'Blog B Members' );
+	$blogb_Group->set( 'usage', 'secondary' );
+	$blogb_Group->set( 'level', 1 );
+	$blogb_Group->set( 'perm_blogs', 'user' );
+	$blogb_Group->set( 'perm_stats', 'none' );
+	$blogb_Group->dbinsert();
 	task_end();
 
 	task_begin( 'Creating groups for user field definitions... ' );
@@ -1318,6 +1326,27 @@ function assign_profile_picture( & $User, $login = NULL )
 
 
 /**
+ * Assign secondary groups to user
+ *
+ * @param integer User ID
+ * @param array IDs of groups
+ */
+function assign_secondary_groups( $user_ID, $secondary_group_IDs )
+{
+	if( empty( $secondary_group_IDs ) )
+	{	// Nothing to assign, Exit here:
+		return;
+	}
+
+	global $DB;
+
+	$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID )
+			VALUES ( '.$user_ID.', '.implode( ' ), ( '.$user_ID.', ', $secondary_group_IDs ).' )',
+		'Assign secondary groups ('.implode( ', ', $secondary_group_IDs ).') to User #'.$user_ID );
+}
+
+
+/**
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
  */
@@ -1326,7 +1355,7 @@ function create_demo_contents()
 	global $baseurl, $admin_url, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
 	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
@@ -1499,7 +1528,9 @@ function create_demo_contents()
 					'Micro bio' => 'Hi there!',
 				)
 		) );
-	assign_profile_picture( $UserCache->get_by_ID( $larry_user_ID ) );
+	$larry_User = & $UserCache->get_by_ID( $larry_user_ID );
+	assign_profile_picture( $larry_User );
+	assign_secondary_groups( $larry_User->ID, array( $blogb_Group->ID ) );
 	task_end();
 
 	task_begin('Creating demo user kate... ');
@@ -1605,10 +1636,10 @@ function create_demo_contents()
 		$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
 		$blog_stub = 'a';
 		$blog_a_ID = create_blog(
-			T_('Blog A Title'),
+			T_('Public Blog'),
 			$blog_shortname,
 			$blog_stub,
-			T_('Tagline for Blog A'),
+			T_('This blog is completely public...'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			1, // Skin ID
 			'std',
@@ -1626,10 +1657,10 @@ function create_demo_contents()
 		$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
 		$blog_stub = 'b';
 		$blog_b_ID = create_blog(
-			T_('Blog B Title'),
+			T_('Members-Only Blog'),
 			$blog_shortname,
 			$blog_stub,
-			T_('Tagline for Blog B'),
+			T_('This blog has restricted access...'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 			1, // Skin ID
 			'std',
@@ -1645,6 +1676,8 @@ function create_demo_contents()
 		{
 			$b_Blog->set_setting( 'front_disp', 'front' );
 			$b_Blog->set_setting( 'skin2_layout', 'single_column' );
+			$b_Blog->set( 'advanced_perms', '1' );
+			$b_Blog->set_setting( 'allow_access', 'members' );
 			$b_Blog->dbupdate();
 		}
 	}

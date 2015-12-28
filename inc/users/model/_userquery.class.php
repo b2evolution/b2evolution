@@ -60,8 +60,9 @@ class UserQuery extends SQL
 
 		if( $params['join_group'] )
 		{ // Join Group
-			$this->SELECT_add( ', grp_ID, grp_name, grp_level' );
-			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID ' );
+			$this->SELECT_add( ', grp_ID, grp_name, grp_level, COUNT( DISTINCT sug_grp_ID ) AS secondary_groups_count' );
+			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
+			$this->FROM_add( 'LEFT JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
 		}
 
 		if( $params['join_session'] )

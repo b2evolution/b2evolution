@@ -68,6 +68,7 @@ $db_config['aliases'] = array(
 		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
 		'T_users__organization'    => $tableprefix.'users__organization',
 		'T_users__user_org'        => $tableprefix.'users__user_org',
+		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -650,7 +651,7 @@ class _core_Module extends Module
 		{
 			$perm_admin_values = array(
 				'label' => T_( 'Access to Admin area' ),
-				'perm_block' => 'core_general',
+				'perm_block' => 'core_evobar',
 				'perm_type' => 'info',
 				'info' => T_( 'Visible link' ),
 			);
@@ -664,17 +665,17 @@ class _core_Module extends Module
 		else
 		{
 			$perm_admin_values = array(
-				'label' => T_( 'Access to Admin area' ),
+				'label' => T_( 'Evobar & Back-office' ),
 				'user_func'  => 'check_admin_user_perm',
 				'group_func' => 'check_admin_group_perm',
-				'perm_block' => 'core_general',
+				'perm_block' => 'core_evobar',
 				'options'  => array(
 					array( 'no_toolbar', T_( 'No Toolbar' ) ),
-					$none_option,
-					array( 'restricted', T_( 'Restricted' ) ),
-					array( 'normal', T_( 'Normal' ) ) ),
+					array( 'none', T_( 'No Back-office Access' ) ),
+					array( 'restricted', T_( 'Restricted Back-office Access' ) ),
+					array( 'normal', T_( 'Normal Back-office Access' ) ) ),
 				'perm_type' => 'radiobox',
-				'field_lines' => false,
+				'field_lines' => true,
 			);
 			$user_edit_option = $edit_option;
 			$user_edit_option[1] .= get_admin_badge( 'user', '#', '#', T_('Select to give User Admin permission') );
