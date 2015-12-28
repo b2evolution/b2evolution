@@ -187,16 +187,29 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	$allow_collection_redirect = false;
 	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->load_all();
+		global $basedomain;
+
 		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
-		foreach( $BlogCache->cache as $url_Blog )
-		{
-			$blog_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $url_Blog->gen_baseurl() );
-			if( $blog_domain == $redirect_to_domain )
+
+		if( preg_match( '~\.'.str_replace( '.', '\.', $basedomain ).'$~', $redirect_to_domain ) )
+		{ // Current redirect goes to subdomain, Allow this:
+			$allow_collection_redirect = true;
+		}
+		else
+		{ // Check if current redirect domain is used as absolute url at least for one collection in system:
+			global $DB;
+
+			$abs_url_coll_SQL = new SQL();
+			$abs_url_coll_SQL->SELECT( 'blog_ID' );
+			$abs_url_coll_SQL->FROM( 'T_blogs' );
+			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
+			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
+			$abs_url_coll_SQL->LIMIT( '1' );
+
+			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
+			if( ! empty( $abs_url_coll_ID ) )
 			{ // We found current redirect goes to a collection domain, so it is not external
 				$allow_collection_redirect = true;
-				break;
 			}
 		}
 	}
