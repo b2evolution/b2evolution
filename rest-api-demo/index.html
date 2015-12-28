@@ -54,9 +54,20 @@ function rest_api_request( url, obj_selector, func )
 {
 	jQuery.ajax(
 	{
+		contentType: 'application/json; charset=utf-8',
 		url: '../api/v1/' + url
 	} )
-	.then( func, function( jqXHR )
+	.then( function( data, textStatus, jqXHR )
+	{
+		if( typeof( jqXHR.responseJSON ) == 'object' )
+		{	// Call function only when we get correct JSON response:
+			eval( func )( data, textStatus, jqXHR );
+		}
+		else
+		{	// Wrong resonse format, Display error and full response text:
+			rest_api_print_message( obj_selector, '<b>Response is not JSON data:</b> ' + jQuery( '<span>' ).text( data ).html() );
+		}
+	}, function( jqXHR )
 	{	// Error request, Display the error data:
 		rest_api_print_message( obj_selector, typeof( jqXHR.responseJSON ) == 'undefined' ? jqXHR.statusText : jqXHR.responseJSON );
 	} );
