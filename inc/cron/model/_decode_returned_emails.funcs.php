@@ -51,9 +51,10 @@ function dre_msg( $message, $cron = false )
  * Connect to an IMAP or POP mail server
  *
  * @param boolean TRUE if script is executed by cron
+ * @param boolean TRUE to print out all folders of host
  * @return resource $mbox
  */
-function dre_connect( $cron = false )
+function dre_connect( $cron = false, $print_out_folders = false )
 {
 	if( ! extension_loaded( 'imap' ) )
 	{	// Exit here if imap extension is not loaded:
@@ -104,8 +105,11 @@ function dre_connect( $cron = false )
 
 	$mailserver .= '}';
 
-	// Select messages only from this IMAP folder:
-	$mailserver .= $Settings->get( 'repath_imap_folder' );
+	if( ! $print_out_folders )
+	{	// Select messages only from this IMAP folder:
+		// Don't filter by folder when we request to display all folders:
+		$mailserver .= $Settings->get( 'repath_imap_folder' );
+	}
 
 	// Connect to mail server (one retry)
 	$mbox = @imap_open( $mailserver, $Settings->get('repath_username'), $Settings->get('repath_password'), NULL, 1 );
@@ -124,6 +128,19 @@ function dre_connect( $cron = false )
 	dre_msg( '<b class="green">'.T_('Successfully connected!').'</b>', $cron );
 
 	@imap_errors();
+
+	if( $print_out_folders )
+	{	// Print out all possible folders of host:
+		$server_folders = imap_list( $mbox, $mailserver, '*' );
+		dre_msg( '<b>'.T_('Mail server has the following folders:').'</b>', $cron );
+		$folders_html = '<ol>';
+		foreach( $server_folders as $server_folder )
+		{
+			$folders_html .= '<li>'.preg_replace( '#^\{[^\}]+\}#', '', $server_folder ).'</li>';
+		}
+		$folders_html .= '</ol>';
+		dre_msg( $folders_html, $cron );
+	}
 
 	return $mbox;
 }

@@ -300,7 +300,7 @@ switch( $action )
 		switch( $action )
 		{
 			case 'test_1':
-				if( $mbox = dre_connect() )
+				if( $mbox = dre_connect( false, true ) )
 				{	// Close opened connection
 					imap_close( $mbox );
 				}

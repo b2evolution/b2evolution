@@ -32,7 +32,7 @@ $Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'return-path-c
 
 	$url = '?ctrl=email&amp;tab=return&amp;tab3=test&amp;'.url_crumb('emailsettings').'&amp;action=';
 	$Form->info_field( T_('Perform tests'),
-				'<a href="'.$url.'test_1">['.T_('server connection').']</a>&nbsp;&nbsp;'.
+				'<a href="'.$url.'test_1">['.T_('connect to server and list folders').']</a>&nbsp;&nbsp;'.
 				'<a href="'.$url.'test_2">['.T_('get one returned email').']</a>&nbsp;&nbsp;'.
 				'<a href="'.$url.'test_3">['.T_('Paste an error message/returned email').']</a>' );
 
