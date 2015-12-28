@@ -153,7 +153,11 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 
 	$Form->text_input( 'edited_grp_level', $edited_Group->get('level'), 2, T_('Group level'), '[0 - 10]', array( 'required' => true ) );
 
-	display_pluggable_permissions( $Form, 'core_general' );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group_properties_evobar') );
+
+	display_pluggable_permissions( $Form, 'core_evobar' );
 
 $Form->end_fieldset();
 
