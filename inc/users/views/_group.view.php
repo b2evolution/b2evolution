@@ -23,7 +23,7 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_level, gset_value' );
+$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_usage, grp_level, gset_value' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON gset_grp_ID = grp_ID AND gset_name = "perm_admin"' );
 
@@ -60,6 +60,14 @@ $Results->cols[] = array(
 		'td' => $has_perm_users_edit ?
 				'<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID=$grp_ID$"><b>$grp_name$</b></a>' :
 				'$grp_name$',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Usage'),
+		'order' => 'grp_usage',
+		'td' => '%get_admin_badge( "group", "", "", "", #grp_usage# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
 	);
 
 function grp_row_backoffice( $value )

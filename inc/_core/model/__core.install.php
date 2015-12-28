@@ -33,6 +33,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups (
 			grp_ID                           int(11) NOT NULL auto_increment,
 			grp_name                         varchar(50) NOT NULL default '',
+			grp_usage                        ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary',
 			grp_level                        int unsigned DEFAULT 0 NOT NULL,
 			grp_perm_blogs                   enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
 			grp_perm_bypass_antispam         TINYINT(1) NOT NULL DEFAULT 0,

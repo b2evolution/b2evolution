@@ -66,6 +66,13 @@ $edited_User->get_Group();
 $level_fieldnote = '[0 - 10]';
 $status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
 
+$GroupCache = & get_GroupCache();
+$group_where_sql = '';
+if( ! $current_User->check_perm( 'users', 'edit' ) )
+{	// Show the limited list for moderators:
+	$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
+}
+
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
@@ -74,34 +81,37 @@ if( $edited_User->ID == 1 )
 }
 else
 {	// Allow to change status and primary group for non-admin users:
-	$GroupCache = & get_GroupCache();
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
-	{	// Show the limited list for moderators:
-		$GroupCache->clear();
-		$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
-		$GroupCache->all_loaded = true;
-	}
+	$GroupCache->clear();
+	$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : ' AND ' )
+		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
+	$GroupCache->all_loaded = true;
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, T_('Primary user group') );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache,
+		// TRANS: Type: Primary user group, Secondary user group
+		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ) );
 }
 
+// Reload secondary group cache for the selects below to exclude groups that are not available for current user:
+$GroupCache->clear();
 // Secondary user groups:
 $user_secondary_groups = $edited_User->get_secondary_groups();
 if( empty( $user_secondary_groups ) )
 {	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
 	$user_secondary_groups[] = 0;
 }
-// Reload group cache for the selects below to exclude groups that are not available for current user:
-$GroupCache = & get_GroupCache();
-if( ! $current_User->check_perm( 'users', 'edit' ) )
-{	// Show the limited list for moderators:
-	$GroupCache->clear();
-	$GroupCache->load_where( 'grp_level < '.$current_User->get_Group()->get( 'level' ) );
-	$GroupCache->all_loaded = true;
-}
+$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : ' AND ' ).' grp_usage = "secondary"' );
+$GroupCache->all_loaded = true;
 foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
-	$field_title = $s ? '' : T_('Secondary user groups');
+	if( $s == 0 )
+	{	// TRANS: Type: Primary user group, Secondary user group
+		$field_title = sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
+	}
+	else
+	{
+		$field_title = '';
+	}
+
 	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
 
 	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )

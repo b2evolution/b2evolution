@@ -7137,6 +7137,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11655, 'Upgrading groups table...' ) )
+	{	// part of 6.7.0
+		db_add_col( 'T_groups', 'grp_usage', "ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary' AFTER grp_name" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
