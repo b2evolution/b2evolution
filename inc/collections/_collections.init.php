@@ -774,6 +774,9 @@ class collections_Module extends Module
 							'comments' => array(
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'userdir' => array(
+								'text' => T_('User directory'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
