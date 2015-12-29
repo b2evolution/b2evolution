@@ -1395,7 +1395,7 @@ class Plugins_admin extends Plugins
 								usort( $clean_versions, 'version_compare' );
 								$clean_oldest_enabled = array_shift($clean_versions);
 
-								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
+								if( evo_version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
 								{ // at least one instance of the installed plugins is not the current version
 									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $clean_oldest_enabled );
 								}
@@ -1427,7 +1427,7 @@ class Plugins_admin extends Plugins
 
 					case 'app_min':
 						// min b2evo version:
-						if( ! version_compare( $app_version, $type_params, '>=' ) )
+						if( ! evo_version_compare( $app_version, $type_params, '>=' ) )
 						{
 							if( $class == 'recommends' )
 							{
