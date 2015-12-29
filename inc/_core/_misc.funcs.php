@@ -7311,7 +7311,7 @@ function get_script_baseurl()
  */
 function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#', $value = NULL )
 {
-	$badge_type = 'warning';
+	$badge_class = 'badge badge-warning';
 
 	switch( $type )
 	{
@@ -7349,12 +7349,12 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 			if( $value == 'primary' )
 			{	// Use text for primary group:
 				$text = T_('Primary');
-				$badge_type = 'primary';
+				$badge_class = 'label label-primary';
 			}
 			else
-			{	// Use text for primary group:
+			{	// Use text for secondary group:
 				$text = T_('Secondary');
-				$badge_type = 'info';
+				$badge_class = 'label label-info';
 			}
 			$title = '';
 			$manual_url = '';
@@ -7373,7 +7373,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	{	// Use link:
 		$r = ' <a href="'.get_manual_url( $manual_url ).'" target="_blank"';
 	}
-	$r .= ' class="badge badge-'.$badge_type.'"';
+	$r .= ' class="'.$badge_class.'"';
 	if( ! empty( $title ) && $title != '#' )
 	{	// Use title for tooltip:
 		$r .= ' data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'"';

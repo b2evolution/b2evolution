@@ -77,7 +77,10 @@ if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
 	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info( T_('Primary user group'), $edited_User->Group->dget('name') );
+	$Form->info(
+		// TRANS: Type: Primary user group, Secondary user group
+		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) )
+		, $edited_User->Group->dget('name') );
 }
 else
 {	// Allow to change status and primary group for non-admin users:
