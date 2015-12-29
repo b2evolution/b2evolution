@@ -2999,6 +2999,7 @@ input.btn-lg {
 }
 .evo_poll__table td {
   padding: 2px 10px 2px 0;
+  vertical-align: top;
 }
 .evo_poll__table tr td:last-child {
   padding-right: 0;
@@ -3009,7 +3010,8 @@ input.btn-lg {
 }
 .evo_poll__table .evo_poll__percent_bar {
   width: 100%;
-  padding-right: 2px;
+  min-width: 40px;
+  padding-right: 6px;
 }
 .evo_poll__table .evo_poll__percent_bar > div {
   width: 100%;
@@ -3026,6 +3028,9 @@ input.btn-lg {
 }
 .evo_poll__table .evo_poll__title {
   white-space: nowrap;
+}
+.evo_container__sidebar .evo_poll__title {
+  white-space: normal;
 }
 
 /**

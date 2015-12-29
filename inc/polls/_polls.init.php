@@ -310,7 +310,7 @@ class polls_Module extends Module
 				// Vote on the poll by current User:
 				if( $PollOption->vote() )
 				{	// Successful voting:
-					$Messages->add( T_('You have voted on the poll.'), 'success' );
+					$Messages->add( T_('Your vote has been cast.'), 'success' );
 				}
 				break;
 		}

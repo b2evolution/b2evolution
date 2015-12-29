@@ -918,6 +918,7 @@ input.btn-lg {
 	width: 100%;
 	td {
 		padding: 2px 10px 2px 0;
+		vertical-align: top;
 	}
 	tr td:last-child {
 		padding-right: 0;
@@ -927,7 +928,8 @@ input.btn-lg {
 	}
 	.evo_poll__percent_bar {
 		width: 100%;
-		padding-right: 2px;
+		min-width: 40px;
+		padding-right: 6px;
 		> div {
 			width: 100%;
 			vertical-align: middle;
@@ -945,4 +947,7 @@ input.btn-lg {
 	.evo_poll__title {
 		white-space: nowrap;
 	}
+}
+.evo_container__sidebar .evo_poll__title {
+	white-space: normal;
 }
