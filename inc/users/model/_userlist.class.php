@@ -101,7 +101,8 @@ class UserList extends DataObjectList2
 				'reported'            => NULL,    // integer: 1 to show only reported users
 				'custom_sender_email' => NULL,    // integer: 1 to show only users with custom notifcation sender email address
 				'custom_sender_name'  => NULL,    // integer: 1 to show only users with custom notifaction sender name
-				'group'               => -1,      // string: User group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
+				'group'               => -1,      // integer: Primary user group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
+				'group2'              => -1,      // integer: Secondary user group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
 				'age_min'             => NULL,    // integer, Age min
 				'age_max'             => NULL,    // integer, Age max
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
@@ -203,9 +204,14 @@ class UserList extends DataObjectList2
 			memorize_param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], $this->filters['custom_sender_name'] );
 
 			/*
-			 * Restrict by user group
+			 * Restrict by primary user group:
 			 */
-			memorize_param( 'group', 'string', $this->default_filters['group'], $this->filters['group'] );
+			memorize_param( 'group', 'integer', $this->default_filters['group'], $this->filters['group'] );
+
+			/*
+			 * Restrict by secondary user group:
+			 */
+			memorize_param( 'group2', 'integer', $this->default_filters['group2'], $this->filters['group2'] );
 
 			/*
 			 * Restrict by locations
@@ -358,9 +364,14 @@ class UserList extends DataObjectList2
 		$this->filters['custom_sender_name'] = param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], true );
 
 		/*
-		 * Restrict by user group
+		 * Restrict by primary user group:
 		 */
-		$this->filters['group'] = param( 'group', 'string', $this->default_filters['group'], true );
+		$this->filters['group'] = param( 'group', 'integer', $this->default_filters['group'], true );
+
+		/*
+		 * Restrict by secondary user group:
+		 */
+		$this->filters['group2'] = param( 'group2', 'integer', $this->default_filters['group2'], true );
 
 		/*
 		 * Restrict by locations
@@ -481,6 +492,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_reported( $this->filters['reported'] );
 		$this->UserQuery->where_custom_sender( $this->filters['custom_sender_email'], $this->filters['custom_sender_name'] );
 		$this->UserQuery->where_group( $this->filters['group'] );
+		$this->UserQuery->where_secondary_group( $this->filters['group2'] );
 		$this->UserQuery->where_location( 'ctry', $ctry_filter );
 		$this->UserQuery->where_location( 'rgn', $this->filters['region'] );
 		$this->UserQuery->where_location( 'subrg', $this->filters['subregion'] );

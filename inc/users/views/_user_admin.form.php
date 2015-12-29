@@ -108,7 +108,7 @@ foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
 	if( $s == 0 )
 	{	// TRANS: Type: Primary user group, Secondary user group
-		$field_title = sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
+		$field_title = sprintf( T_('%s user groups'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
 	}
 	else
 	{

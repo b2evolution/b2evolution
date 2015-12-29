@@ -481,13 +481,24 @@ class Group extends DataObject
 
 
 	/**
-	 * Get name of the Group
+	 * Get name of the Group with level
 	 *
 	 * @return string
 	 */
 	function get_name()
 	{
 		return $this->name.' ('.$this->level.')';
+	}
+
+
+	/**
+	 * Get name of the Group without level
+	 *
+	 * @return string
+	 */
+	function get_name_without_level()
+	{
+		return $this->name;
 	}
 
 

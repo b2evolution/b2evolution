@@ -3078,12 +3078,30 @@ function callback_filter_userlist( & $Form )
 
 		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
 
+		// Primary group:
 		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
+		$GroupCache->load_where( 'grp_usage = "primary"' );
+		$GroupCache->all_loaded = true;
 		$group_options_array = array(
 				'-1' => T_('All (Ungrouped)'),
 				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array();
-		$Form->select_input_array( 'group', get_param('group'), $group_options_array, T_('User group'), '', array( 'force_keys_as_values' => true ) );
+			) + $GroupCache->get_option_array( 'get_name_without_level' );
+		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
+			// TRANS: Type: Primary Group, Secondary Group
+			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+			'', array( 'force_keys_as_values' => true ) );
+
+		// Secondary group:
+		$GroupCache->clear();
+		$GroupCache->load_where( 'grp_usage = "secondary"' );
+		$GroupCache->all_loaded = true;
+		$group_options_array = array(
+				'0'  => T_('All'),
+			) + $GroupCache->get_option_array( 'get_name_without_level' );
+		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
+			// TRANS: Type: Primary Group, Secondary Group
+			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+			'', array( 'force_keys_as_values' => true ) );
 	}
 
 	$location_filter_displayed = false;

@@ -32,6 +32,8 @@ $SQL->SELECT_add( ', CASE
 	WHEN gset_value LIKE "normal"     THEN "4_normal"
 	ELSE "5"
 END AS backoffice' );
+$SQL->SELECT_add( ', (SELECT COUNT( user_ID ) FROM T_users WHERE user_grp_ID = grp_ID ) AS primary_users_count' );
+$SQL->SELECT_add( ', (SELECT COUNT( sug_grp_ID ) FROM T_users__secondary_user_groups WHERE sug_grp_ID = grp_ID ) AS secondary_users_count' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON gset_grp_ID = grp_ID AND gset_name = "perm_admin"' );
 
@@ -78,6 +80,36 @@ $Results->cols[] = array(
 		'td_class' => 'shrinkwrap',
 	);
 
+function grp_row_users_count( $group_ID, $primary_users_count, $secondary_users_count )
+{
+	if( $primary_users_count == 0 && $secondary_users_count == 0 )
+	{	// This group is not used at all
+		return '<span class="label label-default">0</span>';
+	}
+	else
+	{
+		global $admin_url;
+		$users_url = $admin_url.'?ctrl=users&amp;filter=new&amp;';
+		$r = '';
+		if( $primary_users_count > 0 )
+		{	// This group is used as primary for several users
+			$r .= ' <a href="'.$users_url.'group='.$group_ID.'" class="label label-primary">'.$primary_users_count.'</a> ';
+		}
+		if( $secondary_users_count > 0 )
+		{	// This group is used as secondary for several users
+			$r .= ' <a href="'.$users_url.'group2='.$group_ID.'" class="label label-info">'.$secondary_users_count.'</a> ';
+		}
+		return $r;
+	}
+}
+$Results->cols[] = array(
+		'th' => T_('User count'),
+		'order' => 'primary_users_count, secondary_users_count',
+		'td' => '%grp_row_users_count( #grp_ID#, #primary_users_count#, #secondary_users_count# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+	);
+
 function grp_row_backoffice( $backoffice_access )
 {
 	switch( $backoffice_access )
@@ -105,8 +137,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Level'),
-		'th_class' => 'shrinkwrap small',
-		'td_class' => 'shrinkwrap small'.( $has_perm_users_edit ? ' group_level_edit' : '' ),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' group_level_edit' : '' ),
 		'order' => 'grp_level',
 		'default_dir' => 'D',
 		'td' => $has_perm_users_edit ?
@@ -138,7 +170,7 @@ function grp_actions( & $row )
 }
 $Results->cols[] = array(
 		'th' => T_('Actions'),
-		'th_class' => 'shrinkwrap small',
+		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => '%grp_actions( {row} )%',
 	);

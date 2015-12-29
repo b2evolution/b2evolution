@@ -62,9 +62,9 @@ class UserQuery extends SQL
 
 		if( $params['join_group'] )
 		{ // Join Group
-			$this->SELECT_add( ', grp_ID, grp_name, grp_level, COUNT( DISTINCT sug_grp_ID ) AS secondary_groups_count' );
+			$this->SELECT_add( ', grp_ID, grp_name, grp_level' );
+			$this->SELECT_add( ', ( SELECT COUNT( sug_count.sug_grp_ID ) FROM T_users__secondary_user_groups AS sug_count WHERE sug_count.sug_user_ID = user_ID ) AS secondary_groups_count' );
 			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
-			$this->FROM_add( 'LEFT JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
 		}
 
 		if( $params['join_session'] )
@@ -305,9 +305,9 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict with user group
+	 * Restrict with primary user group
 	 *
-	 * @param integer User group ID
+	 * @param integer Primary user group ID
 	 */
 	function where_group( $group_ID )
 	{
@@ -321,6 +321,27 @@ class UserQuery extends SQL
 		}
 
 		$this->WHERE_and( 'user_grp_ID = '.$DB->quote( $group_ID ) );
+	}
+
+
+	/**
+	 * Restrict with secondary user group
+	 *
+	 * @param integer Secondary user group ID
+	 */
+	function where_secondary_group( $secondary_group_ID )
+	{
+		global $DB;
+
+		$secondary_group_ID = intval( $secondary_group_ID );
+
+		if( $secondary_group_ID < 1 )
+		{	// Group ID may be '0' - to show all groups
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+		$this->WHERE_and( 'sug_grp_ID = '.$DB->quote( $secondary_group_ID ) );
 	}
 
 
