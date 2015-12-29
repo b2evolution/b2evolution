@@ -1,0 +1,31 @@
+#eu_cookie_consent {
+	background: #F2FBFF;
+	padding: 5px 20px;
+	color: #000;
+	border: 1px solid #337ab7;
+	text-align: left;
+	position: fixed;
+	bottom: 0;
+	z-index: 1000000;
+	width: 100%;
+}
+#eu_cookie_consent h3 {
+	margin: 0 0 5px 0;
+	color: #337ab7;
+}
+#eu_cookie_consent p {
+	margin: 0 0 5px 0;
+}
+
+@media (min-width: 401px) {
+	#eu_cookie_consent {
+		display: table;
+	}
+	#eu_cookie_consent > div {
+		display: table-cell;
+	}
+	.eu_cookie_consent__button {
+		vertical-align: bottom;
+		text-align: right;
+	}
+}

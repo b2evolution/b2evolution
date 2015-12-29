@@ -232,6 +232,7 @@ class Plugins_admin extends Plugins
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
+				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
