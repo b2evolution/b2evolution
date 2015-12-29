@@ -160,7 +160,7 @@ class prism_plugin extends Plugin
 
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
-		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup' ) ) )
+		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
 		{ // Use Markup for unknown language
 			$lang = '';
 		}
@@ -234,7 +234,7 @@ class prism_plugin extends Plugin
 		{	// Add lang attribute only if it is defined:
 			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
 			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
-			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup' ) ) )
+			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
 			{	// Don't allow unknown language:
 				$lang = '';
 			}
@@ -371,20 +371,22 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css|span" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript|span" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php|span" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql|span" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css|span" value="CSS" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript|span" value="JS" />';
+		echo '<input type="button" title="'.T_('Insert PHP codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php|span" value="PHP" />';
+		echo '<input type="button" title="'.T_('Insert SQL codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql|span" value="SQL" />';
+		echo '<input type="button" title="'.T_('Insert Apache codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|apacheconf|span" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		// Codeblock buttons:
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codeblock').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css" value="CSS" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript" value="JS" />';
+		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php" value="PHP" />';
+		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql" value="SQL" />';
+		echo '<input type="button" title="'.T_('Insert Apache codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|apacheconf" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
