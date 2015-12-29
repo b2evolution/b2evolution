@@ -7391,4 +7391,31 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 
 	return $r;
 }
+
+
+/**
+ * Compares two "PHP-standardized" version number strings
+ * 
+ * @param string First version number
+ * @param string Second version number
+ * @param string If the third optional operator argument is specified, test for a particular relationship.
+ *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
+ *               This parameter is case-sensitive, values should be lowercase.
+ * @return integer|boolean -1 if the first version is lower than the second, 0 if they are equal, and 1 if the second is lower.
+ *                         When using the optional operator argument, the function will return TRUE if the relationship is the one specified by the operator, FALSE otherwise.
+ */
+function evo_version_compare( $version1, $version2, $operator = NULL )
+{
+	// Remove part after "-" from versions like "6.6.6-stable":
+	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+
+	if( is_null( $operator ) )
+	{	// To return integer
+		return version_compare( $version1, $version2 );
+	}
+	else
+	{ // To return boolean
+		return version_compare( $version1, $version2, $operator );
+	}
+}
 ?>
