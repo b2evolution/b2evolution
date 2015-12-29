@@ -23,7 +23,15 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_usage, grp_level, gset_value' );
+$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_usage, grp_level' );
+$SQL->SELECT_add( ', CASE
+	WHEN grp_usage  LIKE "secondary"  THEN "5"
+	WHEN gset_value LIKE "no_toolbar" THEN "1_no_toolbar"
+	WHEN gset_value LIKE "none"       THEN "2_none"
+	WHEN gset_value LIKE "restricted" THEN "3_restricted"
+	WHEN gset_value LIKE "normal"     THEN "4_normal"
+	ELSE "5"
+END AS backoffice' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON gset_grp_ID = grp_ID AND gset_name = "perm_admin"' );
 
@@ -31,7 +39,7 @@ $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(grp_ID)' );
 $count_SQL->FROM( 'T_groups' );
 
-$Results = new Results( $SQL->get(), 'grp_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'grp_', '----D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-groups-tab' );
 
@@ -70,25 +78,27 @@ $Results->cols[] = array(
 		'td_class' => 'shrinkwrap',
 	);
 
-function grp_row_backoffice( $value )
+function grp_row_backoffice( $backoffice_access )
 {
-	switch( $value )
+	switch( $backoffice_access )
 	{
-		case 'normal':
+		case '4_normal':
 			return T_( 'Normal' );
-		case 'restricted':
+		case '3_restricted':
 			return T_( 'Restricted' );
-		case 'none':
+		case '2_none':
 			return T_( 'No Access' );
-		case 'no_toolbar':
-		default:
+		case '1_no_toolbar':
 			return T_( 'No Toolbar' );
+		default:
+			// Secondary group:
+			return '';
 	}
 }
 $Results->cols[] = array(
 		'th' => T_('Back-office access'),
-		'order' => 'gset_value',
-		'td' => '%grp_row_backoffice( #gset_value# )%',
+		'order' => 'backoffice',
+		'td' => '%grp_row_backoffice( #backoffice# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 	);
