@@ -60,7 +60,7 @@ else
 
 
 $SQL = new SQL();
-$SQL->SELECT( 'grp_ID, grp_name, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_ismember, bloggroup_can_be_assignee,'
+$SQL->SELECT( 'grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_ismember, bloggroup_can_be_assignee,'
 	. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
@@ -128,10 +128,31 @@ $Results->cols[] = array(
 						'td_class' => 'right',
 					);
 
+function grp_perm_row_name( $grp_ID, $grp_name, $grp_usage, $grp_level )
+{
+	global $admin_url;
+
+	if( $grp_usage == 'primary' )
+	{	// Primary group
+		$grp_class = 'label-primary';
+		$grp_title = T_('Primary Group');
+	}
+	else
+	{	// Secondary group
+		$grp_class = 'label-info';
+		$grp_title = T_('Secondary Group');
+	}
+
+	return '<a href="'.$admin_url.'?ctrl=users&amp;filter=new&amp;'.( $grp_usage == 'primary' ? 'group' : 'group2' ).'='.$grp_ID
+			.'" title="'.format_to_output( $grp_title, 'htmlattr' ).'" class="label '.$grp_class.'">'
+			.get_icon( 'contacts', 'imgtag', array( 'style' => 'top:1px;position:relative' ) ).' '.$grp_name
+		.'</a>'
+		.' <span class="label label-default" title="'.format_to_output( sprintf( T_('Group Level: %s'), $grp_level ), 'htmlattr' ).'">L'.$grp_level.'</span>';
+}
 $Results->cols[] = array(
 						'th' => T_('Group'),
 						'order' => 'grp_name',
-						'td' => '<a href="?ctrl=users&amp;filter=new&amp;group=$grp_ID$">$grp_name$ ($grp_level$)</a>',
+						'td' => '%grp_perm_row_name( #grp_ID#, #grp_name#, #grp_usage#, #grp_level# )%',
 					);
 
 $Results->cols[] = array(
