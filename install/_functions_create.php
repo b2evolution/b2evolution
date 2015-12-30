@@ -1341,8 +1341,8 @@ function create_demo_contents()
 		{ // Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>/media/users/admin/</code> to <code>/media/users/%s/</code>.', $User_Admin->login ).'</evo:error></span> ';
-			echo '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ';
+			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>/media/users/admin/</code> to <code>/media/users/%s/</code>.', $User_Admin->login ).'</evo:error></span> ' );
+			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
