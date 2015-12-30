@@ -89,7 +89,7 @@ function load_db_schema( $inlcude_plugins = false )
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />';
+		echo get_install_format_text( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -7417,5 +7417,78 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 	{ // To return boolean
 		return version_compare( $version1, $version2, $operator );
 	}
+}
+
+
+/**
+ * Get text for install page depending on param $display == 'cli'
+ *
+ * @param string Original text
+ * @param string Format (Used for CLI mode)
+ * @return string Prepared text
+ */
+function get_install_format_text( $text, $format = 'string' )
+{
+	global $display;
+
+	if( empty( $display ) || $display != 'cli' )
+	{	// Don't touch text for non CLI modes:
+		return $text;
+	}
+
+	// Don't remove these HTML tags on CLI mode:
+	$allowable_html_tags = '<evo:error><evo:warning><evo:success><evo:note>';
+
+	// Remove all new lines because we build them from requested format:
+	$text = str_replace( array( "\n", "\r" ), '', $text );
+
+	// Keep all URLs and display them 
+	$text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $text );
+
+	// Remove HTML tags from text:
+	$text = strip_tags( $text, $allowable_html_tags );
+
+	switch( $format )
+	{
+		case 'h2':
+			// Header 2
+			$text = "\n----- ".$text." -----\n\n";
+			break;
+
+		case 'br':
+			// Paragraph:
+			$text = $text."\n";
+			break;
+
+		case 'p':
+			// Paragraph:
+			$text = "\n".$text."\n\n";
+			break;
+
+		case 'p-start':
+			// Start paragraph:
+			$text = "\n".$text;
+			break;
+
+		case 'p-end':
+			// End paragraph:
+			$text = $text."\n\n";
+			break;
+
+		case 'li':
+			// List item:
+			$text = "\n- ".$text."\n";
+			break;
+
+		case 'code':
+			// Code:
+			$text = "\n================\n".$text."\n================\n";
+			break;
+	}
+
+	// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
+	$text = html_entity_decode( $text );
+
+	return $text;
 }
 ?>

@@ -18,6 +18,28 @@
 @ini_set( 'output_buffering', 'off' );
 
 /**
+ * @global boolean Are we running on Command Line Interface instead of a web request?
+ */
+$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
+
+if( $is_cli )
+{	// Initialize params from CLI mode request:
+	if( isset( $_SERVER['argc'], $_SERVER['argv'] ) )
+	{
+		$argc = $_SERVER['argc'];
+		$argv = $_SERVER['argv'];
+	}
+	if( isset( $argv ) )
+	{	// may not be set for CGI
+		foreach( $argv as $v => $argv_param )
+		{
+			$argv_param = explode( '=', $argv_param );
+			$_GET[ $argv_param[0] ] = isset( $argv_param[1] ) ? $argv_param[1] : NULL;
+		}
+	}
+}
+
+/**
  * include config and default functions:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
@@ -152,9 +174,13 @@ else
 }
 
 // Display mode:
-// - 'normal' - Normal mode; Used for normal installation.
+// - 'normal'  - Normal mode; Used for normal installation.
 // - 'compact' - Compact mode; Hide header, footer and progress bar; Used for automated installation.
+// - 'cli'     - CLI mode; Used for command line interface.
 param( 'display', 'string', 'normal' );
+
+// Force updating htaccess to new version:
+param( 'force_htaccess', 'integer', 1 );
 
 // check if we should try to connect to db if config is not done
 switch( $action )
@@ -335,6 +361,9 @@ $booststrap_install_form_params = array(
 
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
+
+if( $display != 'cli' )
+{	// Don't display HTML on CLI mode:
 ?>
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
@@ -374,8 +403,9 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<?php } ?>
 
 		<!-- InstanceBeginEditable name="Main" -->
-
 <?php
+} // END OF: $display != 'cli'else
+else
 
 if( ! $install_memory_limit_allow )
 { // Display error that current memory limit size is not enough for correct using:
@@ -892,7 +922,7 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
-		echo '<h2>'.T_('Installing b2evolution...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Installing b2evolution...').'</h2>', 'h2' );
 
 		// Try to display the messages here because they can be created during checking params of quick installation:
 		$Messages->display();
@@ -909,7 +939,7 @@ switch( $action )
 			{ // A quick deletion is requested before new installation
 				require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-				echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
 				evo_flush();
 
 				// Uninstall b2evolution: Delete DB & Cache files
@@ -922,11 +952,11 @@ switch( $action )
 
 		if( $old_db_version = get_db_version() )
 		{
-			echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
+			echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 			if( $old_db_version < $new_db_version )
 			{
-				echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
+				echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 			}
 
 			// Stop the animation of the progress bar
@@ -935,10 +965,10 @@ switch( $action )
 			break;
 		}
 
-		echo '<h2>'.T_('Checking files...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
 		evo_flush();
 		// Check for .htaccess:
-		if( ! install_htaccess( false ) )
+		if( ! install_htaccess( false, $force_htaccess ) )
 		{ // Exit installation here because the .htaccess file has the some errors
 			break;
 		}
@@ -1192,6 +1222,9 @@ switch( $action )
 }
 
 block_close();
+
+if( $display != 'cli' )
+{	// Don't display HTML on CLI mode:
 ?>
 
 <!-- InstanceEndEditable -->
@@ -1222,3 +1255,6 @@ block_close();
 <!-- b2evo-install-end -->
 	</body>
 </html>
+<?php
+} // END OF: $display != 'cli'
+?>

@@ -165,11 +165,11 @@ function install_newdb()
 
 	if( $old_db_version = get_db_version() )
 	{
-		echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
+		echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 		if( $old_db_version < $new_db_version )
 		{
-			echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
+			echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 		}
 
 		return;
@@ -183,14 +183,14 @@ function install_newdb()
 	 */
 	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
 
-	echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
+	echo get_install_format_text( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
 	evo_flush();
 	create_tables();
 
 	// Update the progress bar status
 	update_install_progress_bar();
 
-	echo '<h2>'.T_('Creating minimum default data...').'</h2>';
+	echo get_install_format_text( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
 	evo_flush();
 	create_default_data();
 
@@ -198,7 +198,7 @@ function install_newdb()
 	{
 		global $Settings, $test_install_all_features;
 
-		echo '<h2>'.T_('Installing sample contents...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
 		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
@@ -229,17 +229,21 @@ function install_newdb()
 	track_step( 'install-success' );
 
 	$install_result_title = T_('Installation successful!');
-	$install_result_body = '<p><strong>'
-		.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
-		.'</strong></p>'
-		.'<table>'
-			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>'
-			.'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
-		.'</table>'
-		.'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
+	$install_result_body = get_install_format_text(
+		'<p><strong>'
+			.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
+		.'</strong></p>', 'p' )
+		.get_install_format_text(
+		'<table>'
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' )
+		.get_install_format_text(
+			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
+		.'</table>', 'br' )
+		.get_install_format_text(
+		'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>', 'p' );
 
 	// Display installation data and instructions
-	echo '<h2>'.$install_result_title.'</h2>';
+	echo get_install_format_text( '<h2>'.$install_result_title.'</h2>', 'h2' );
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
@@ -253,7 +257,7 @@ function install_newdb()
  */
 function task_begin( $title )
 {
-	echo $title."\n";
+	echo get_install_format_text( $title."\n" );
 	evo_flush();
 }
 
@@ -264,7 +268,7 @@ function task_begin( $title )
  */
 function task_end( $message = 'OK.' )
 {
-	echo $message."<br />\n";
+	echo get_install_format_text( $message."<br />\n", 'br' );
 }
 
 
@@ -699,7 +703,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! is_a( $edit_Plugin, 'Plugin' ) )
 	{ // Broken plugin
-		echo '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n";
+		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;
 	}
 
@@ -720,7 +724,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return !== true )
 		{ // Warning on enable a plugin
-			echo '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n";
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n", 'br' );
 
 			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
 			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'needs_config' );
@@ -965,26 +969,28 @@ function create_relations()
 /**
  * Install htaccess: Check if it works with the webserver, then install it for real.
  *
+ * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return boolean TRUE if no errors
  */
-function install_htaccess( $upgrade = false )
+function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
-	echo '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ';
+	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ', 'p-start' );
 
 	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
 	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
 	{ // Skip installation if this is not an Apache server
-		echo '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>';
+		echo get_install_format_text( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
 		return true;
 	}
 
-	$error_message = do_install_htaccess( $upgrade );
+	$error_message = do_install_htaccess( $upgrade, $force_htaccess );
 
 	if( $error_message )
 	{
 		$htignore = param( 'htignore', 'integer', 0 );
 
-		echo '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br/><b>'.$error_message.'</b></evo:error></span>';
+		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br/><b>'.$error_message.'</b></evo:error></span>' );
 
 		if( $htignore )
 		{ // Ignore errors with .htaccess file
@@ -992,11 +998,11 @@ function install_htaccess( $upgrade = false )
 		}
 		else
 		{ // Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
-			echo '<ul class="pager"><li><a href="'.$_SERVER['REQUEST_URI'].'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>';
+			echo get_install_format_text( '<ul class="pager"><li><a href="'.( isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' ).'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>', 'li' );
 			return false;
 		}
 	}
-	echo '</p>';
+	echo get_install_format_text( '</p>', 'p-end' );
 
 	return true;
 }
@@ -1006,18 +1012,19 @@ function install_htaccess( $upgrade = false )
  * This will verify that the provided sample.htaccess does not crash apache in a test folder before installing it for real.
  *
  * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return mixed
  */
-function do_install_htaccess( $upgrade = false )
+function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 {
 	global $baseurl;
 	global $basepath;
 
-	if( @file_exists( $basepath.'.htaccess' ) )
+	if( ! $force_htaccess && @file_exists( $basepath.'.htaccess' ) )
 	{
 		if( $upgrade )
 		{
-			echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
 			return ''; // all is well :)
 		}
 
@@ -1028,14 +1035,14 @@ function do_install_htaccess( $upgrade = false )
 
 			if( $content_htaccess != $content_sample_htaccess )
 			{ // The .htaccess file has content that different from a sample file
-				echo '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>';
+				echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
 				echo T_('Here are the contents of the current .htaccess file:');
-				echo '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
-				return sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
+				echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
+				return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
 			}
 			else
 			{
-				echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
+				echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
 				return '';
 			}
 		}
@@ -1071,7 +1078,7 @@ function do_install_htaccess( $upgrade = false )
 		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo '<span class="text-success"><evo:success>'.T_('Installation successful!').'</evo:success></span>';
+	echo get_install_format_text( '<span class="text-success"><evo:success>'.T_('Installation successful!').'</evo:success></span>' );
 	return '';
 }
 
@@ -1096,6 +1103,13 @@ function get_antispam_query()
  */
 function track_step( $current_step )
 {
+	global $display;
+
+	if( ! empty( $display ) && $display == 'cli' )
+	{	// Don't display HTML on CLI mode:
+		return;
+	}
+
 	// echo 'Tracking '.$current_step;
 	echo '<div style="display:none">'
 			.'<img src="http://b2evolution.net/htsrv/track.php?key='.$current_step.'" alt="" />'
