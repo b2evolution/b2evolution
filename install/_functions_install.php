@@ -955,9 +955,11 @@ function create_relations()
 /**
  * Install htaccess: Check if it works with the webserver, then install it for real.
  *
+ * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return boolean TRUE if no errors
  */
-function install_htaccess( $upgrade = false )
+function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
 	echo '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ';
 
@@ -968,7 +970,7 @@ function install_htaccess( $upgrade = false )
 		return true;
 	}
 
-	$error_message = do_install_htaccess( $upgrade );
+	$error_message = do_install_htaccess( $upgrade, $force_htaccess );
 
 	if( $error_message )
 	{
@@ -996,14 +998,15 @@ function install_htaccess( $upgrade = false )
  * This will verify that the provided sample.htaccess does not crash apache in a test folder before installing it for real.
  *
  * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return mixed
  */
-function do_install_htaccess( $upgrade = false )
+function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 {
 	global $baseurl;
 	global $basepath;
 
-	if( @file_exists( $basepath.'.htaccess' ) )
+	if( ! $force_htaccess && @file_exists( $basepath.'.htaccess' ) )
 	{
 		if( $upgrade )
 		{

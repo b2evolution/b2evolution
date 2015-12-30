@@ -156,6 +156,9 @@ else
 // - 'compact' - Compact mode; Hide header, footer and progress bar; Used for automated installation.
 param( 'display', 'string', 'normal' );
 
+// Force updating htaccess to new version:
+param( 'force_htaccess', 'integer', 1 );
+
 // check if we should try to connect to db if config is not done
 switch( $action )
 {
@@ -938,7 +941,7 @@ switch( $action )
 		echo '<h2>'.T_('Checking files...').'</h2>';
 		evo_flush();
 		// Check for .htaccess:
-		if( ! install_htaccess( false ) )
+		if( ! install_htaccess( false, $force_htaccess ) )
 		{ // Exit installation here because the .htaccess file has the some errors
 			break;
 		}
