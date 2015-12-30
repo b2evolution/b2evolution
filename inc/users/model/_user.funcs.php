@@ -4730,6 +4730,7 @@ function users_results_block( $params = array() )
 			'display_contact'      => true,
 			'display_reported'     => true,
 			'display_group'        => true,
+			'display_sec_groups'   => false,
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_actions'      => true,
@@ -4762,6 +4763,7 @@ function users_results_block( $params = array() )
 	load_class( 'users/model/_userlist.class.php', 'UserList' );
 	$UserList = new UserList( $params['filterset_name'], $UserSettings->get('results_per_page'), $params['results_param_prefix'], array(
 			'join_group'          => $params['join_group'],
+			'join_sec_groups'     => $params['display_sec_groups'],
 			'join_city'           => $params['join_city'],
 			'join_region'         => $params['display_region'],
 			'join_subregion'      => $params['display_subregion'],
@@ -4902,6 +4904,7 @@ function users_results( & $UserList, $params = array() )
 			'display_contact'    => true,
 			'display_reported'   => true,
 			'display_group'      => true,
+			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_actions'    => true,
@@ -5222,7 +5225,18 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '%user_td_grp_name( #user_ID#, #grp_name#, #grp_level#, #secondary_groups_count# )%',
+				'td' => '%user_td_grp_name( #user_ID#, #grp_name#, #grp_level# )%',
+			);
+	}
+
+	if( $params['display_sec_groups'] )
+	{	// Display column with count of secondary groups:
+		$UserList->cols[] = array(
+				'th' => T_('Sec. Groups'),
+				'th_class' => 'shrinkwrap small',
+				'td_class' => 'shrinkwrap small',
+				'order' => 'grp_name',
+				'td' => '%conditional( #secondary_groups_count#, "<span class=\"label label-info\">#secondary_groups_count#</span>", "" )%',
 			);
 	}
 
@@ -5330,10 +5344,9 @@ function user_td_grp_actions( & $row )
  * @param integer User ID
  * @param string Group name
  * @param string Group level
- * @param integer A count of secondary groups
  * @return string
  */
-function user_td_grp_name( $user_ID, $group_name, $group_level, $secondary_groups_count )
+function user_td_grp_name( $user_ID, $group_name, $group_level )
 {
 	global $current_User;
 
@@ -5343,20 +5356,15 @@ function user_td_grp_name( $user_ID, $group_name, $group_level, $secondary_group
 	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
 	{	// Make a link to update the groups if current user can moderate this user:
 		global $admin_url;
-		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'">'.$r.'</a>';
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'" class="label label-primary">'.$r.'</a>';
+	}
+	else
+	{
+		$r = '<span class="label label-primary">'.$r.'</span>';
 	}
 
 	// Group level:
-	$r .= ' ('.$group_level.')';
-
-	$secondary_groups_count = intval( $secondary_groups_count );
-	if( $secondary_groups_count > 0 )
-	{	// Display a count of secondary groups if at least one is assigned for user:
-		$r .= '<div class="dimmed">'
-			// TRANS: Count of secondary user groups
-			.sprintf( T_('+ %d secondary'), $secondary_groups_count )
-			.'</div>';
-	}
+	$r .= '<br />'.T_('Level').': '.$group_level;
 
 	return $r;
 }

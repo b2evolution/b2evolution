@@ -48,6 +48,7 @@ class UserQuery extends SQL
 		// Params to build query
 		$params = array_merge( array(
 				'join_group'     => true,
+				'join_sec_groups'=> false,
 				'join_session'   => false,
 				'join_country'   => true,
 				'join_region'    => false,
@@ -63,8 +64,14 @@ class UserQuery extends SQL
 		if( $params['join_group'] )
 		{ // Join Group
 			$this->SELECT_add( ', grp_ID, grp_name, grp_level' );
-			$this->SELECT_add( ', ( SELECT COUNT( sug_count.sug_grp_ID ) FROM T_users__secondary_user_groups AS sug_count WHERE sug_count.sug_user_ID = user_ID ) AS secondary_groups_count' );
+			//$this->SELECT_add( ', ( SELECT COUNT( sug_count.sug_grp_ID ) FROM T_users__secondary_user_groups AS sug_count WHERE sug_count.sug_user_ID = user_ID ) AS secondary_groups_count' );
 			$this->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
+		}
+
+		if( $params['join_sec_groups'] )
+		{	// Join Secondary groups:
+			$this->SELECT_add( ', COUNT( DISTINCT sug_count.sug_grp_ID ) AS secondary_groups_count' );
+			$this->FROM_add( 'LEFT JOIN T_users__secondary_user_groups AS sug_count ON sug_count.sug_user_ID = user_ID' );
 		}
 
 		if( $params['join_session'] )
@@ -340,8 +347,8 @@ class UserQuery extends SQL
 			return;
 		}
 
-		$this->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
-		$this->WHERE_and( 'sug_grp_ID = '.$DB->quote( $secondary_group_ID ) );
+		$this->FROM_add( 'INNER JOIN T_users__secondary_user_groups sug_filter ON sug_filter.sug_user_ID = user_ID' );
+		$this->WHERE_and( 'sug_filter.sug_grp_ID = '.$DB->quote( $secondary_group_ID ) );
 	}
 
 
