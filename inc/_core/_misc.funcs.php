@@ -7596,7 +7596,7 @@ function get_install_format_text( $text, $format = 'string' )
 	}
 
 	// Don't remove these HTML tags on CLI mode:
-	$allowable_html_tags = '<evo:error><evo:warning><evo:success><evo:note>';
+	$allowable_html_tags = '<evo:error><evo:warning><evo:success><evo:note><evo:login><evo:password>';
 
 	// Remove all new lines because we build them from requested format:
 	$text = str_replace( array( "\n", "\r" ), '', $text );
