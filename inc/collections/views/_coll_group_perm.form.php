@@ -128,7 +128,7 @@ $Results->cols[] = array(
 						'td_class' => 'right',
 					);
 
-function grp_perm_row_name( $grp_ID, $grp_name, $grp_usage, $grp_level )
+function grp_perm_row_name( $grp_ID, $grp_name, $grp_usage )
 {
 	global $admin_url;
 
@@ -146,13 +146,19 @@ function grp_perm_row_name( $grp_ID, $grp_name, $grp_usage, $grp_level )
 	return '<a href="'.$admin_url.'?ctrl=users&amp;filter=new&amp;'.( $grp_usage == 'primary' ? 'group' : 'group2' ).'='.$grp_ID
 			.'" title="'.format_to_output( $grp_title, 'htmlattr' ).'" class="label '.$grp_class.'">'
 			.get_icon( 'contacts', 'imgtag', array( 'style' => 'top:1px;position:relative' ) ).' '.$grp_name
-		.'</a>'
-		.' <span class="label label-default" title="'.format_to_output( sprintf( T_('Group Level: %s'), $grp_level ), 'htmlattr' ).'">L'.$grp_level.'</span>';
+		.'</a>';
 }
 $Results->cols[] = array(
 						'th' => T_('Group'),
 						'order' => 'grp_name',
-						'td' => '%grp_perm_row_name( #grp_ID#, #grp_name#, #grp_usage#, #grp_level# )%',
+						'td' => '%grp_perm_row_name( #grp_ID#, #grp_name#, #grp_usage# )%',
+					);
+
+$Results->cols[] = array(
+						'th' => /* TRANS: Group Level */ T_('L'),
+						'order' => 'grp_level',
+						'td' => '$grp_level$',
+						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(

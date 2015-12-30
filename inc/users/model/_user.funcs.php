@@ -4939,7 +4939,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->grp_cols[] = array(
 				'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 				'td_colspan' => -1,  // nb_colds - 1
-				'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>'
+				'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$" class="label label-primary">$grp_name$</a>'
 								.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
 			);
 		$UserList->grp_cols[] = array(

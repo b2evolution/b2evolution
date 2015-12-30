@@ -981,7 +981,7 @@ table.table tbody tr.group td {
   background: #f0f0f0;
   color: #848484;
 }
-table.table tbody tr.group td a {
+table.table tbody tr.group td a:not(.label) {
   color: #337ab7;
 }
 #items_type_ajax_content {
