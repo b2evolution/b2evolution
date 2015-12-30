@@ -25,12 +25,12 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_usage, grp_level' );
 $SQL->SELECT_add( ', CASE
-	WHEN grp_usage  LIKE "secondary"  THEN "5"
+	WHEN grp_usage  LIKE "secondary"  THEN "0"
 	WHEN gset_value LIKE "no_toolbar" THEN "1_no_toolbar"
 	WHEN gset_value LIKE "none"       THEN "2_none"
 	WHEN gset_value LIKE "restricted" THEN "3_restricted"
 	WHEN gset_value LIKE "normal"     THEN "4_normal"
-	ELSE "5"
+	ELSE "0"
 END AS backoffice' );
 $SQL->SELECT_add( ', (SELECT COUNT( user_ID ) FROM T_users WHERE user_grp_ID = grp_ID ) AS primary_users_count' );
 $SQL->SELECT_add( ', (SELECT COUNT( sug_grp_ID ) FROM T_users__secondary_user_groups WHERE sug_grp_ID = grp_ID ) AS secondary_users_count' );
@@ -41,7 +41,7 @@ $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(grp_ID)' );
 $count_SQL->FROM( 'T_groups' );
 
-$Results = new Results( $SQL->get(), 'grp_', '----D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'grp_', '--D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-groups-tab' );
 
@@ -70,6 +70,17 @@ $Results->cols[] = array(
 		'td' => $has_perm_users_edit ?
 				'<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID=$grp_ID$"><b>$grp_name$</b></a>' :
 				'$grp_name$',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Level'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' group_level_edit' : '' ),
+		'order' => 'grp_level',
+		'default_dir' => 'D',
+		'td' => $has_perm_users_edit ?
+				'<a href="#" rel="$grp_level$">$grp_level$</a>' :
+				'$grp_level$',
 	);
 
 $Results->cols[] = array(
@@ -129,21 +140,10 @@ function grp_row_backoffice( $backoffice_access )
 }
 $Results->cols[] = array(
 		'th' => T_('Back-office access'),
-		'order' => 'backoffice',
+		'order' => 'backoffice, grp_ID',
 		'td' => '%grp_row_backoffice( #backoffice# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Level'),
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' group_level_edit' : '' ),
-		'order' => 'grp_level',
-		'default_dir' => 'D',
-		'td' => $has_perm_users_edit ?
-				'<a href="#" rel="$grp_level$">$grp_level$</a>' :
-				'$grp_level$',
 	);
 
 function grp_actions( & $row )
