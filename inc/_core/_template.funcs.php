@@ -178,14 +178,15 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_to );
 
 	if( $external_redirect == false )
-	{ // blueyed> Removed "confirm(ed)?" so it doesn't do the same thing twice
+	{	// (blueyed>) Remove "confirm(ed)?" from redirect_to so it doesn't do the same thing twice
 		// TODO: fp> confirm should be normalized to confirmed
 		$redirect_to = preg_replace( '~(?<=\?|&) (confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
+
 	$allow_collection_redirect = false;
 	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
-	{ // If a redirect is external and we allow to redirect to all collection domains then check this:
+	{ // If a redirect is external and we allow to redirect to all collection domains:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->load_all();
 		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
@@ -193,7 +194,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		{
 			$blog_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $url_Blog->gen_baseurl() );
 			if( $blog_domain == $redirect_to_domain )
-			{ // We found current redirect goes really to collection domain, so it is not external
+			{ // We found current redirect goes to a collection domain, so it is not external
 				$allow_collection_redirect = true;
 				break;
 			}
