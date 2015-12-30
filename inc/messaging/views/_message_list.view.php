@@ -290,7 +290,7 @@ if( $is_recipient )
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
 		if( ! is_admin_page() )
-		{ // Add hidden blog to correct redirect after message posting:
+		{ // Add hidden blog ID to correctly redirect after message posting:
 			$Form->hidden( 'blog', $Blog->ID );
 		}
 
