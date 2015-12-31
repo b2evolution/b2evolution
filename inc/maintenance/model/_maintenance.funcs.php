@@ -57,7 +57,7 @@ function check_version( $new_version_dir )
 
 	require( $new_version_file );
 
-	$vc = version_compare( $app_version, $GLOBALS['app_version'] );
+	$vc = evo_version_compare( $app_version, $GLOBALS['app_version'] );
 
 	if( $vc < 0 )
 	{

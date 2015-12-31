@@ -89,7 +89,7 @@ function load_db_schema( $inlcude_plugins = false )
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />';
+		echo get_install_format_text( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -329,8 +329,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// use as a form value: escapes &, quotes and < > but leaves code alone
-			$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
 			break;
 
 		case 'xml':
@@ -5000,7 +5000,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 		if( $format_to_output )
 		{
-			$r .= ' '.$l_attr.'="'.htmlspecialchars($l_value).'"';
+			$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
 		}
 		else
 		{
@@ -7549,5 +7549,110 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	}
 
 	return $r;
+}
+
+
+/**
+ * Compares two "PHP-standardized" version number strings
+ * 
+ * @param string First version number
+ * @param string Second version number
+ * @param string If the third optional operator argument is specified, test for a particular relationship.
+ *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
+ *               This parameter is case-sensitive, values should be lowercase.
+ * @return integer|boolean -1 if the first version is lower than the second, 0 if they are equal, and 1 if the second is lower.
+ *                         When using the optional operator argument, the function will return TRUE if the relationship is the one specified by the operator, FALSE otherwise.
+ */
+function evo_version_compare( $version1, $version2, $operator = NULL )
+{
+	// Remove part after "-" from versions like "6.6.6-stable":
+	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+
+	if( is_null( $operator ) )
+	{	// To return integer
+		return version_compare( $version1, $version2 );
+	}
+	else
+	{ // To return boolean
+		return version_compare( $version1, $version2, $operator );
+	}
+}
+
+
+/**
+ * Get text for install page depending on param $display == 'cli'
+ *
+ * @param string Original text
+ * @param string Format (Used for CLI mode)
+ * @return string Prepared text
+ */
+function get_install_format_text( $text, $format = 'string' )
+{
+	global $display;
+
+	if( empty( $display ) || $display != 'cli' )
+	{	// Don't touch text for non CLI modes:
+		return $text;
+	}
+
+	// Don't remove these HTML tags on CLI mode:
+	$allowable_html_tags = '<evo:error><evo:warning><evo:success><evo:note><evo:login><evo:password>';
+
+	// Remove all new lines because we build them from requested format:
+	$text = str_replace( array( "\n", "\r" ), '', $text );
+
+	// Keep all URLs and display them 
+	$text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $text );
+
+	// Remove HTML tags from text:
+	$text = strip_tags( $text, $allowable_html_tags );
+
+	switch( $format )
+	{
+		case 'h2':
+			// Header 2
+			$text = "\n\n----- ".$text." -----\n\n";
+			break;
+
+		case 'br':
+			// Paragraph:
+			$text = $text."\n";
+			break;
+
+		case 'p':
+			// Paragraph:
+			$text = "\n".$text."\n\n";
+			break;
+
+		case 'p-start':
+			// Start paragraph:
+			$text = "\n".$text;
+			break;
+
+		case 'p-start-br':
+			// Start paragraph:
+			$text = "\n".$text."\n";
+			break;
+
+		case 'p-end':
+			// End paragraph:
+			$text = $text."\n\n";
+			break;
+
+		case 'li':
+			// List item:
+			$text = "\n- ".$text."\n";
+			break;
+
+		case 'code':
+			// Code:
+			$text = "\n================\n".$text."\n================\n";
+			break;
+	}
+
+	// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
+	$text = html_entity_decode( $text );
+
+	return $text;
 }
 ?>

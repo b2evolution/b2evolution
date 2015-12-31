@@ -28,6 +28,7 @@ Modifications by yura:
 	    - ####header {#header-id-value.header-class-value} => <h4 class="header-class-value" id="header-id-value">header</h4>
 	9. Don't apply <p> around list and already existing paragraph tags
 	10. Don't convert HTML entities inside <code> html tags because the "Escape code" plugin does this
+	11. Fix the missed empty lines in code blocks which are started and ended with ```
 */
 
 class Parsedown
@@ -149,9 +150,17 @@ class Parsedown
 			if( $line === '' )
 			{
 				$element['interrupted'] = true;
-				
-				$element['type'] === 'code' and $element['text'] .= "\n";
-				
+
+				if( $element['type'] === 'code' )
+				{	// Don't miss empty lines in code blocks where each line is started with 4 spaces:
+					$element['text'] .= "\n";
+				}
+
+				if( $element['type'] === 'codeblock' )
+				{	// Don't miss empty lines in code blocks which are started and ended with ```:
+					$element['lines'][] = $line;
+				}
+
 				continue;
 			}
 

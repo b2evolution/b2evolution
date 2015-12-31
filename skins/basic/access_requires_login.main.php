@@ -13,7 +13,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $app_version, $disp, $Blog, $Plugins, $Hit;
 
-if( version_compare( $app_version, '2.4.1' ) < 0 )
+if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
 	die( 'This skin is designed for b2evolution 2.4.1 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }

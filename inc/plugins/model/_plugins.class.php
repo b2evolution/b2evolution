@@ -740,7 +740,7 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = $l_meta['defaultvalue'];
 			}
-			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
+			elseif( isset( $l_meta['type'] ) && strpos( $l_meta['type'], 'array' ) === 0 )
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}

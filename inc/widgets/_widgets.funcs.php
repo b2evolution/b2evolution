@@ -154,6 +154,13 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 
 
+	/* Sidebar Single */
+	if( $kind == 'forum' )
+	{
+		add_basic_widget( $blog_id, 'Sidebar Single', 'coll_related_post_list', 'core', 1 );
+	}
+
+
 	/* Page Top */
 	add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
 
@@ -249,7 +256,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array(
 				'blog_ID'          => '',
-				'limit'            => 50,
+				'limit'            => 5,
 				'attached_pics'    => 'first',
 				'disp_first_image' => 'special',
 			);

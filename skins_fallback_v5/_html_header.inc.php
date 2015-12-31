@@ -104,6 +104,9 @@ echo $params['html_tag'];
 require skin_fallback_path( '_toolbar.inc.php' );
 // ------------------------------- END OF TOOLBAR --------------------------------
 
+// Call BeforeSkinWrapper to display additional info:
+$Plugins->trigger_event( 'BeforeSkinWrapper' );
+
 echo "\n";
 if( show_toolbar() )
 {

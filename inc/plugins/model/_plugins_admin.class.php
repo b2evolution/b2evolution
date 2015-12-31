@@ -89,7 +89,7 @@ class Plugins_admin extends Plugins
 				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
 				'AdminDisplayEditorButton' => 'Display action buttons on the edit screens in the back-office',
 				'DisplayEditorButton' => 'Display action buttons on the edit screen in the front-office',
-				'AdminDisplayToolbar' => 'Display a toolbar on the edit screens',
+				'AdminDisplayToolbar' => 'Display a toolbar on the post/item form',
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
 				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
@@ -177,7 +177,7 @@ class Plugins_admin extends Plugins
 				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
 				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
-				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
+				'DisplayCommentToolbar' => 'Display a toolbar on the feedback/comment form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
 				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',
@@ -232,6 +232,7 @@ class Plugins_admin extends Plugins
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
+				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
@@ -1394,7 +1395,7 @@ class Plugins_admin extends Plugins
 								usort( $clean_versions, 'version_compare' );
 								$clean_oldest_enabled = array_shift($clean_versions);
 
-								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
+								if( evo_version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
 								{ // at least one instance of the installed plugins is not the current version
 									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $clean_oldest_enabled );
 								}
@@ -1426,7 +1427,7 @@ class Plugins_admin extends Plugins
 
 					case 'app_min':
 						// min b2evo version:
-						if( ! version_compare( $app_version, $type_params, '>=' ) )
+						if( ! evo_version_compare( $app_version, $type_params, '>=' ) )
 						{
 							if( $class == 'recommends' )
 							{

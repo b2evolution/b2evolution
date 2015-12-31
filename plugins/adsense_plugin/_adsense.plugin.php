@@ -220,12 +220,82 @@ class adsense_plugin extends Plugin
 	}
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
+	{
+		if( !empty( $params['Item'] ) )
+		{	// Item is set, get Blog from post:
+			$edited_Item = & $params['Item'];
+			$Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			if( $comment_Item = & $Comment->get_Item() )
+			{
+				$Blog = & $comment_Item->get_Blog();
+			}
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar()
 	{
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );

@@ -811,7 +811,7 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains or redirect of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
  *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
@@ -874,8 +874,8 @@ $library_cdn_urls = array(
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
-		//'#videojs#' => array( 'http://vjs.zencdn.net/c/video.js' ),
-		//'#videojs_css#' => array( 'http://vjs.zencdn.net/c/video-js.css' ),
+		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
+		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
 	);
 
 /**

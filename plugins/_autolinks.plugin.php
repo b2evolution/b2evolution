@@ -27,7 +27,7 @@ class autolinks_plugin extends Plugin
 {
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
-	var $priority = 60;
+	var $priority = 63;
 	var $version = '5.0.0';
 	var $group = 'rendering';
 	var $short_desc;
@@ -321,13 +321,17 @@ class autolinks_plugin extends Plugin
 		$word = $data[0];
 		$url = isset( $data[3] ) ? $data[3] : NULL;
 		if( $url == '-' || empty( $url ) )
-		{	// Remove URL (useful to remove some defs on a specific site):
+		{ // Remove URL (useful to remove some defs on a specific site):
 			unset( $this->link_array[0][$word] );
 			unset( $this->link_array[$coll_ID][$word] );
 		}
 		else
 		{
-			$this->link_array[$coll_ID][$word] = array( $data[1], $url );
+			if( ! isset( $this->link_array[ $coll_ID ][ $word ] ) )
+			{ // Initialize array only first time to store several previous words for each word:
+				$this->link_array[ $coll_ID ][ $word ] = array();
+			}
+			$this->link_array[ $coll_ID ][ $word ][ $data[1] ] = $url;
 		}
 	}
 
@@ -473,10 +477,10 @@ class autolinks_plugin extends Plugin
 		$this->previous_used = false;
 
 		// Optimization: Check if the text contains words from the replacement links strings, and call replace callback only if there is at least one word which needs to be replaced.
-		$text_words = explode( ' ', utf8_strtolower( $text ) );
+		$text_words = preg_split( '/\s/', utf8_strtolower( $text ) );
 		foreach( $text_words as $text_word )
 		{ // Trim the signs [({/ from start and the signs ])}/.,:;!? from end of each word
-			$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-\.]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
+			$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
 			if( $clear_word != $text_word )
 			{ // Append a clear word to array if word has the punctuation signs
 				$text_words[] = $clear_word;
@@ -486,7 +490,7 @@ class autolinks_plugin extends Plugin
 		$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
 		if( $text_contains_replacement )
 		{ // Find word with 3 characters at least:
-			$text = preg_replace_callback( '#(^|\s|[(),;\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
+			$text = preg_replace_callback( '#(^|\s|[(),;\[{/])([@\p{L}0-9_\-]{3,})([\.,:;!\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
 		}
 
 		// Cleanup words to be deleted:
@@ -527,10 +531,20 @@ class autolinks_plugin extends Plugin
 
 		if( isset( $this->replacement_link_array[ $lword ] ) )
 		{ // There is an autolink definition with the current word
-			// An optional previous required word (allows to create groups of 2 words)
-			$previous = $this->replacement_link_array[ $lword ][0];
-			// Url for current word
-			$url = 'http://'.$this->replacement_link_array[ $lword ][1];
+			if( ! empty( $this->previous_lword ) && isset( $this->replacement_link_array[ $lword ][ $this->previous_lword ] ) )
+			{ // Set an previous word and url from config array:
+				// An optional previous required word (allows to create groups of 2 words)
+				$previous = $this->previous_lword;
+				// Url for current word
+				$url = 'http://'.$this->replacement_link_array[ $lword ][ $this->previous_lword ];
+			}
+			else
+			{ // No previous word, it is a single word
+				foreach( $this->replacement_link_array[ $lword ] as $previous => $url )
+				{ // Initialize an optional previous required word and url as first of the current word
+					break;
+				}
+			}
 
 			if( in_array( $url, $this->already_linked_array ) || in_array( $lword, $this->already_linked_usernames ) )
 			{ // Do not repeat link to same destination:
