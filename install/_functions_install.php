@@ -965,7 +965,7 @@ function create_relations()
  */
 function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
-	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ', 'p-start' );
+	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').'<br />', 'p-start-br' );
 
 	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
 	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
@@ -980,7 +980,7 @@ function install_htaccess( $upgrade = false, $force_htaccess = false )
 	{
 		$htignore = param( 'htignore', 'integer', 0 );
 
-		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br/><b>'.$error_message.'</b></evo:error></span>' );
+		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br /><b>'.$error_message.'</b></evo:error></span>' );
 
 		if( $htignore )
 		{ // Ignore errors with .htaccess file
@@ -1052,8 +1052,10 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 
 	// Make sure .htaccess does not crash in the test folder:
 	load_funcs('_core/_url.funcs.php');
+	$fetch_test_url = $baseurl.'install/test/';
 	$info = array();
-	if( ! $remote_page = fetch_remote_page( $baseurl.'install/test/', $info ) )
+	echo get_install_format_text( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
+	if( ! $remote_page = fetch_remote_page( $fetch_test_url, $info ) )
 	{
 		return $info['error'];
 	}
@@ -1068,7 +1070,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo get_install_format_text( '<span class="text-success"><evo:success>'.T_('Installation successful!').'</evo:success></span>' );
+	echo get_install_format_text( '<span class="text-success"><evo:success>'.T_('.htaccess installation successful!').'</evo:success></span>' );
 	return '';
 }
 
@@ -1415,7 +1417,7 @@ function display_install_messages( $messages, $type = 'error' )
 		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$before_message.$message.$after_message.'</div>'."\n";
 	}
 
-	echo $r;
+	echo get_install_format_text($r);
 }
 
 
