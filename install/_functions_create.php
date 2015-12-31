@@ -1384,15 +1384,17 @@ function create_demo_contents()
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 
 	global $media_path;
+	$src_admin_dir = $media_path.'users/admin';
+	$dest_admin_dir = $media_path.'users/'.$User_Admin->login;
 	if( $User_Admin->login != 'admin' )
 	{ // If admin login is not "admin" we should try to rename folder of the admin avatars
-		if( ! file_exists( $media_path.'users/admin' ) ||
-		    ! is_dir( $media_path.'users/admin' ) ||
-		    ! @rename( $media_path.'users/admin', $media_path.'users/'.$User_Admin->login ) )
+		if( ! file_exists( $src_admin_dir ) ||
+		    ! is_dir( $src_admin_dir ) ||
+		    ! @rename( $src_admin_dir, $dest_admin_dir ) )
 		{ // Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>/media/users/admin/</code> to <code>/media/users/%s/</code>.', $User_Admin->login ).'</evo:error></span> ' );
+			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
 			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":

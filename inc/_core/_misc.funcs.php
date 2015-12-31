@@ -7452,7 +7452,7 @@ function get_install_format_text( $text, $format = 'string' )
 	{
 		case 'h2':
 			// Header 2
-			$text = "\n----- ".$text." -----\n\n";
+			$text = "\n\n----- ".$text." -----\n\n";
 			break;
 
 		case 'br':
@@ -7468,6 +7468,11 @@ function get_install_format_text( $text, $format = 'string' )
 		case 'p-start':
 			// Start paragraph:
 			$text = "\n".$text;
+			break;
+
+		case 'p-start-br':
+			// Start paragraph:
+			$text = "\n".$text."\n";
 			break;
 
 		case 'p-end':

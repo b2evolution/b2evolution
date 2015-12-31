@@ -583,9 +583,8 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( param( 'blog_tagline', 'html', NULL ) !== NULL )
-		{	// HTML tagline:
-			param_check_html( 'blog_tagline', T_('Invalid tagline') );
+		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
+		{	// tagline:
 			$this->set( 'tagline', get_param( 'blog_tagline' ) );
 		}
 		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
