@@ -1035,12 +1035,6 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 
 		if( @file_exists( $basepath.'.htaccess' ) )
 		{
-			if( $upgrade )
-			{
-				echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
-				return ''; // all is well :)
-			}
-
 			if( @file_exists( $basepath.'sample.htaccess' ) )
 			{
 				$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
@@ -1048,14 +1042,22 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 
 				if( $content_htaccess != $content_sample_htaccess )
 				{ // The .htaccess file has content that different from a sample file
-					echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
-					echo T_('Here are the contents of the current .htaccess file:');
-					echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
-					return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
+					if( $upgrade )
+					{
+						echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check teh differences manually.').'</evo:warning></span>' );
+						return '';
+					}
+					else
+					{
+						echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
+						echo T_('Here are the contents of the current .htaccess file:');
+						echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
+						return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
+					}
 				}
 				else
-				{
-					echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
+				{	// Installed file is the same as recommended:
+					echo get_install_format_text( '<span class="text-info">'.T_('<code>.htaccess</code> is already installed and matches <code>sample.htaccess</code>.').'</span>' );
 					return '';
 				}
 			}
