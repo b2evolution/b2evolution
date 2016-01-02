@@ -79,7 +79,7 @@ class Messages
 	 *
 	 * @param array Params
 	 */
-	function Messages( $params = array() )
+	function __construct( $params = array() )
 	{
 		// Default params of messages
 		$this->params = array_merge( array(

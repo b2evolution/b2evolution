@@ -46,7 +46,7 @@ class Timer
 	 *
 	 * @param string|NULL If a category is given the timer starts right away.
 	 */
-	function Timer( $category = NULL )
+	function __construct( $category = NULL )
 	{
 		if( is_string($category) )
 		{

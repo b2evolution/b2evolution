@@ -57,7 +57,7 @@ class PluginUserSettings extends AbstractSettings
 			}
 			$user_ID = $current_User->ID;
 		}
-		return parent::get( $this->plugin_ID, $user_ID, $setting );
+		return parent::getx( $this->plugin_ID, $user_ID, $setting );
 	}
 
 
@@ -82,7 +82,7 @@ class PluginUserSettings extends AbstractSettings
 			}
 			$user_ID = $current_User->ID;
 		}
-		return parent::set( $this->plugin_ID, $user_ID, $setting, $value );
+		return parent::setx( $this->plugin_ID, $user_ID, $setting, $value );
 	}
 
 

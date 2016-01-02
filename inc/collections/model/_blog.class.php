@@ -132,7 +132,7 @@ class Blog extends DataObject
 	 *
 	 * @param object DB row
 	 */
-	function Blog( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		global $Timer;
 

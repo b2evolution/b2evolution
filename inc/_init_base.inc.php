@@ -92,7 +92,7 @@ if( isset( $error_message ) )
 /**
  * Class loader.
  */
-require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_class5.funcs.php';
 
 
 /**

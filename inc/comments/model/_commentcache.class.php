@@ -36,7 +36,7 @@ class CommentCache extends DataObjectCache
 	 */
 	function CommentCache( $objType = 'Comment', $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
 	{
-		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
+		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
 
 

@@ -131,7 +131,7 @@ class GroupSettings extends AbstractSettings
 	{
 		if( $grp_ID != 0 )
 		{	// We can get permission from database, because the current group setting are available in database
-			$this->permission_values[$permission] = parent::get( $grp_ID, $permission );
+			$this->permission_values[$permission] = parent::getx( $grp_ID, $permission );
 		}
 		return $this->permission_values[$permission];
 	}
@@ -149,7 +149,7 @@ class GroupSettings extends AbstractSettings
 		if( $grp_ID != 0 )
 		{	// We can set permission, because the current group is already in database
 			$this->permission_values[$permission] = $value;
-			return parent::set( $grp_ID, $permission, $value );
+			return parent::setx( $grp_ID, $permission, $value );
 		}
 
 		$this->_permissions[$permission] = $value;

@@ -31,7 +31,7 @@ class FiletypeCache extends DataObjectCache
 	function FiletypeCache()
 	{
 		// Call parent constructor:
-		parent::DataObjectCache( 'Filetype', true, 'T_filetypes', 'ftyp_', 'ftyp_ID', 'ftyp_extensions' );
+		parent::__construct( 'Filetype', true, 'T_filetypes', 'ftyp_', 'ftyp_ID', 'ftyp_extensions' );
 	}
 
 

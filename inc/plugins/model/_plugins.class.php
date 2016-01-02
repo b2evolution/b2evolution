@@ -145,7 +145,7 @@ class Plugins
 	/**
 	 * Constructor. Sets {@link $plugins_path} and load events.
 	 */
-	function Plugins()
+	function __construct()
 	{
 		global $basepath, $plugins_subdir, $Timer;
 

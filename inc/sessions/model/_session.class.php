@@ -95,7 +95,7 @@ class Session
 	 * If valid session cookie received: pull session from DB
 	 * Otherwise, INSERT a session into DB
 	 */
-	function Session()
+	function __construct()
 	{
 		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
