@@ -40,7 +40,7 @@ class SQL
 	/**
 	 * Constructor.
 	 */
-	function SQL($title = NULL)
+	function __construct($title = NULL)
 	{
 		if( $title )
 			$this->title = $title;

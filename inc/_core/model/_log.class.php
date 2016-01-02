@@ -72,7 +72,7 @@ class Log
 	 *
 	 * @param string sets default category
 	 */
-	function Log( $category = 'note' )
+	function __construct( $category = 'note' )
 	{
 		$this->defaultcategory = $category;
 
@@ -572,7 +572,7 @@ class Log_noop {
 	/**
 	 * This is a no-operation method.
 	 */
-	function Log_noop() {}
+	function __construct() {}
 
 	/**
 	 * This is a no-operation method.

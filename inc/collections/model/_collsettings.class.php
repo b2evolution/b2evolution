@@ -226,6 +226,7 @@ class CollectionSettings extends AbstractSettings
 		parent::AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
 	}
 
+
 	/**
 	 * Loads the settings. Not meant to be called directly, but gets called
 	 * when needed.
@@ -243,6 +244,34 @@ class CollectionSettings extends AbstractSettings
 		}
 
 		return parent::_load( $coll_ID, $arg );
+	}
+
+
+	/**
+	 * Get a setting from the DB settings table.
+	 *
+	 * @uses get_default()
+	 * @param string First column key
+	 * @param string Second column key
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get( $col_key1, $col_key2 )
+	{
+		return parent::getx( $col_key1, $col_key2 );
+	}
+
+
+	/**
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
+	 *
+	 * @param string First column key
+	 * @param string Second column key
+	 * @param mixed Value
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set( $col_key1, $col_key2, $value )
+	{
+		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }
 

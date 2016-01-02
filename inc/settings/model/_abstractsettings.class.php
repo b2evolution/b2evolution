@@ -106,7 +106,7 @@ class AbstractSettings
 	 * @param string The name of the DB column that holds the value.
 	 * @param integer The number of column keys to cache by. This are the first x keys of {@link $col_key_names}. 0 means 'load all'.
 	 */
-	function AbstractSettings( $db_table_name, $col_key_names, $col_value_name, $cache_by_col_keys = 0 )
+	function __construct( $db_table_name, $col_key_names, $col_value_name, $cache_by_col_keys = 0 )
 	{
 		$this->db_table_name = $db_table_name;
 		$this->col_key_names = $col_key_names;
@@ -258,7 +258,7 @@ class AbstractSettings
 	 * @param string Third column key
 	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
-	function get( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
+	function getx( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
 	{
 		global $debug;
 
@@ -431,7 +431,7 @@ class AbstractSettings
 	 *                         and {@link $col_value_name column value}. Must match order and count!
 	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
-	function set()
+	function setx()
 	{
 		global $Debuglog;
 

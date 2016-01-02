@@ -45,7 +45,7 @@ class PluginSettings extends AbstractSettings
 	 */
 	function get( $setting )
 	{
-		return parent::get( $this->plugin_ID, $setting );
+		return parent::getx( $this->plugin_ID, $setting );
 	}
 
 
@@ -58,7 +58,7 @@ class PluginSettings extends AbstractSettings
 	 */
 	function set( $setting, $value )
 	{
-		return parent::set( $this->plugin_ID, $setting, $value );
+		return parent::setx( $this->plugin_ID, $setting, $value );
 	}
 
 

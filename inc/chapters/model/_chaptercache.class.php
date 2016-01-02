@@ -71,7 +71,7 @@ class ChapterCache extends DataObjectCache
 	 */
 	function ChapterCache()
 	{
-		parent::DataObjectCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
+		parent::__construct( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
 
 		// This is the property by which we will filter out subsets, for exampel 'blog_ID' if we want to only load a specific collection:
 		$this->subset_property = 'blog_ID';

@@ -40,7 +40,7 @@ class IPRangeCache extends DataObjectCache
 	 */
 	function IPRangeCache( $objType = 'IPRange', $dbtablename = 'T_antispam__iprange', $dbprefix = 'aipr_', $dbIDname = 'aipr_ID' )
 	{
-		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
+		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
 
 

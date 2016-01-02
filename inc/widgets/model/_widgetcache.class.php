@@ -45,7 +45,7 @@ class WidgetCache extends DataObjectCache
 	 */
 	function WidgetCache( $enabled_only = false )
 	{
-		parent::DataObjectCache( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
+		parent::__construct( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
 		$this->load_enabled_only = $enabled_only;
 	}
 
