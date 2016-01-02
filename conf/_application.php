@@ -57,7 +57,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2015 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
+$copyright_text = '<span class="nobr">&copy;2003-2016 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
  * Do you want to display the help links to online documentaion?
