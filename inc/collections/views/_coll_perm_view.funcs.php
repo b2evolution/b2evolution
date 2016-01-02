@@ -4,11 +4,9 @@
  * 
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * 
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package evocore
- * 
- * @version $Id: _coll_perm_view.funcs.php 9699 2015-07-01 11:44:57Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
