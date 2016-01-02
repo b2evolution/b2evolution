@@ -252,6 +252,8 @@ skin_widget( array(
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
 			'disp_section_title'    => false,
+			'disp_meta_comment_info' => false,
+
 			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
