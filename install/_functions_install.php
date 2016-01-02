@@ -977,11 +977,14 @@ function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
 	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').'<br />', 'p-start-br' );
 
-	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
-	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
-	{ // Skip installation if this is not an Apache server
-		echo get_install_format_text( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
-		return true;
+	if( ! $force_htaccess )
+	{	// Check if we run apache...
+		$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+		if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
+		{ // Skip installation if this is not an Apache server
+			echo get_install_format_text( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
+			return true;
+		}
 	}
 
 	$error_message = do_install_htaccess( $upgrade, $force_htaccess );
@@ -1021,58 +1024,62 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 	global $baseurl;
 	global $basepath;
 
-	if( ! $force_htaccess && @file_exists( $basepath.'.htaccess' ) )
-	{
-		if( $upgrade )
-		{
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
-			return ''; // all is well :)
-		}
-
-		if( @file_exists( $basepath.'sample.htaccess' ) )
-		{
-			$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
-			$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
-
-			if( $content_htaccess != $content_sample_htaccess )
-			{ // The .htaccess file has content that different from a sample file
-				echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
-				echo T_('Here are the contents of the current .htaccess file:');
-				echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
-				return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
-			}
-			else
-			{
-				echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
-				return '';
-			}
-		}
-	}
-
 	// Make sure we have a sample file to start with:
 	if( ! @file_exists( $basepath.'sample.htaccess' ) )
 	{
 		return T_('Cannot find file [ sample.htaccess ] in your base url folder.');
 	}
 
-	// Try to copy that file to the test folder:
-	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
-	{
-		return T_('Failed to copy files!');
-	}
+	if( !$force_htaccess )
+	{ // We're not forcing install, we want to check if it's supported:
 
-	// Make sure .htaccess does not crash in the test folder:
-	load_funcs('_core/_url.funcs.php');
-	$fetch_test_url = $baseurl.'install/test/';
-	$info = array();
-	echo get_install_format_text( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
-	if( ! $remote_page = fetch_remote_page( $fetch_test_url, $info ) )
-	{
-		return $info['error'];
-	}
-	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
-	{
-		return sprintf( T_('%s was not found as expected.'), $baseurl.'install/test/index.html' );
+		if( @file_exists( $basepath.'.htaccess' ) )
+		{
+			if( $upgrade )
+			{
+				echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
+				return ''; // all is well :)
+			}
+
+			if( @file_exists( $basepath.'sample.htaccess' ) )
+			{
+				$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
+				$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
+
+				if( $content_htaccess != $content_sample_htaccess )
+				{ // The .htaccess file has content that different from a sample file
+					echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
+					echo T_('Here are the contents of the current .htaccess file:');
+					echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
+					return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
+				}
+				else
+				{
+					echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>' );
+					return '';
+				}
+			}
+		}
+
+		// Try to copy that file to the test folder:
+		if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
+		{
+			return T_('Failed to copy sample.htaccess to test folder!');
+		}
+
+		// Make sure .htaccess does not crash in the test folder:
+		load_funcs('_core/_url.funcs.php');
+		$fetch_test_url = $baseurl.'install/test/';
+		$info = array();
+		echo get_install_format_text( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
+		if( ! $remote_page = fetch_remote_page( $fetch_test_url, $info ) )
+		{
+			return $info['error'];
+		}
+		if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
+		{
+			return sprintf( T_('%s was not found as expected.'), $baseurl.'install/test/index.html' );
+		}
 	}
 
 	// Now we consider it's safe, copy .htaccess to its real location:
