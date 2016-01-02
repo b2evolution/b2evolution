@@ -9,7 +9,8 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2012-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2012-2016 by Francois Planque - {@link http://fplanque.com/}.
+ *
  * {@internal
  * b2evolution is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +24,6 @@
  * }}
  *
  * @package plugins
- *
- * @author fplanque: Francois PLANQUE
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
