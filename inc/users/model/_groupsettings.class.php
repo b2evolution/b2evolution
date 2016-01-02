@@ -38,7 +38,7 @@ class GroupSettings extends AbstractSettings
 	 */
 	function GroupSettings()
 	{ 	// call parent constructor
-		parent::AbstractSettings( 'T_groups__groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
+		parent::__construct( 'T_groups__groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
 	}
 
 

@@ -1949,7 +1949,7 @@ function credits( $params = array() )
 		), $params );
 
 
-	$cred_links = $global_Cache->get( 'creds' );
+	$cred_links = $global_Cache->getx( 'creds' );
 	if( empty( $cred_links ) )
 	{	// Use basic default:
 		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:3:"CMS";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
@@ -2020,7 +2020,7 @@ function powered_by( $params = array() )
 
 	$img_url = str_replace( '$rsc$', $rsc_uri, $params['img_url'] );
 
-	$evo_links = $global_Cache->get( 'evo_links' );
+	$evo_links = $global_Cache->getx( 'evo_links' );
 	if( empty( $evo_links ) )
 	{	// Use basic default:
 		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:26:"powered by b2evolution CMS";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by an open-source CMS";}}}}}');

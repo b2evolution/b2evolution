@@ -223,7 +223,7 @@ class CollectionSettings extends AbstractSettings
 	 */
 	function CollectionSettings()
 	{
-		parent::AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
+		parent::__construct( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
 	}
 
 

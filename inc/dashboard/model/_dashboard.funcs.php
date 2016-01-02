@@ -170,7 +170,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 			foreach( $response as $key=>$data )
 			{
-				$global_Cache->set( $key, serialize($data) );
+				$global_Cache->setx( $key, serialize($data) );
 			}
 
 			$global_Cache->delete( 'evonet_updates' );	// Cleanup
