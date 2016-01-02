@@ -988,12 +988,13 @@ function install_htaccess( $upgrade = false, $force_htaccess = false )
 
 	if( $error_message )
 	{
-		$htignore = param( 'htignore', 'integer', 0 );
 
 		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br /><b>'.$error_message.'</b></evo:error></span>' );
 
+		// Do we want to ignore the error?
+		$htignore = param( 'htignore', 'integer', 0 );
 		if( $htignore )
-		{ // Ignore errors with .htaccess file
+		{ // Ignore error with .htaccess file and continue install...
 			return true;
 		}
 		else

@@ -179,8 +179,11 @@ else
 // - 'cli'     - CLI mode; Used for command line interface.
 param( 'display', 'string', 'normal' );
 
-// Force updating htaccess to new version:
-param( 'force_htaccess', 'integer', 1 );
+// How to handle htaccess:
+// - 'test'  - Default: test if htacess is supported, and try to install the file if it doesn't exist
+// - 'force' - Force updating htaccess to latest version
+// - 'skip'  - Skip this process entirely
+param( 'htaccess', 'string', 'test' );
 
 // check if we should try to connect to db if config is not done
 switch( $action )
@@ -965,12 +968,15 @@ switch( $action )
 			break;
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( false, $force_htaccess ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( false, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status
