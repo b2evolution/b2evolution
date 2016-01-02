@@ -61,6 +61,7 @@ $localtimenow = $servertimenow + $time_difference;
 
 
 /**
+ * @todo TODO: make a class GlobalSettings
  * @global AbstractSettings
  */
 $global_Cache = new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 0 /* load all */ );

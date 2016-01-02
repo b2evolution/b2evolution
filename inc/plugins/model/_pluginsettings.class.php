@@ -31,7 +31,7 @@ class PluginSettings extends AbstractSettings
 	 */
 	function PluginSettings( $plugin_ID )
 	{ // constructor
-		parent::AbstractSettings( 'T_pluginsettings', array( 'pset_plug_ID', 'pset_name' ), 'pset_value', 1 );
+		parent::__construct( 'T_pluginsettings', array( 'pset_plug_ID', 'pset_name' ), 'pset_value', 1 );
 
 		$this->plugin_ID = $plugin_ID;
 	}

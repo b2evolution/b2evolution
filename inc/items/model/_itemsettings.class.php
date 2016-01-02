@@ -51,7 +51,7 @@ class ItemSettings extends AbstractSettings
 	 */
 	function ItemSettings()
 	{
-		parent::AbstractSettings( 'T_items__item_settings', array( 'iset_item_ID', 'iset_name' ), 'iset_value', 1 );
+		parent::__construct( 'T_items__item_settings', array( 'iset_item_ID', 'iset_name' ), 'iset_value', 1 );
 	}
 
 

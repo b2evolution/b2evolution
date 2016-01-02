@@ -170,7 +170,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			 */
 			global $global_Cache;
 
-			$feedhlp = $global_Cache->get( 'feedhlp' );
+			$feedhlp = $global_Cache->getx( 'feedhlp' );
 			if( empty( $feedhlp ) )
 			{	// Use basic default: (fp> needs serious update) -- Note: no localization because destination is in English anyway.
 				$feedhlp = array( array( 'http://www.webreference.fr/defintions/rss-atom-xml', 'What is RSS?' ) );

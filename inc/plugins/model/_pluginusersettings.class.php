@@ -31,7 +31,7 @@ class PluginUserSettings extends AbstractSettings
 	 */
 	function PluginUserSettings( $plugin_ID )
 	{ // constructor
-		parent::AbstractSettings( 'T_pluginusersettings', array( 'puset_plug_ID', 'puset_user_ID', 'puset_name' ), 'puset_value', 1 );
+		parent::__construct( 'T_pluginusersettings', array( 'puset_plug_ID', 'puset_user_ID', 'puset_name' ), 'puset_value', 1 );
 
 		$this->plugin_ID = $plugin_ID;
 	}

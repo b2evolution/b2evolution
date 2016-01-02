@@ -1603,7 +1603,7 @@ var downloadInterval = setInterval( function()
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
 	global $global_Cache, $credit_links;
-	$credit_links = $global_Cache->get( 'creds' );
+	$credit_links = $global_Cache->getx( 'creds' );
 
 	$Timer->pause( 'skin_init' );
 
