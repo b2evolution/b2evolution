@@ -1044,7 +1044,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 				{ // The .htaccess file has content that different from a sample file
 					if( $upgrade )
 					{
-						echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check teh differences manually.').'</evo:warning></span>' );
+						echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check the differences manually.').'</evo:warning></span>' );
 						return '';
 					}
 					else
