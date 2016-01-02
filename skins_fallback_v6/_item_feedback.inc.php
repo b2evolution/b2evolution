@@ -32,6 +32,7 @@ $params = array_merge( array(
 		'disp_trackback_url'    => true,
 		'disp_pingbacks'        => true,
 		'disp_section_title'    => true,
+		'disp_meta_comment_info' => true,
 		'disp_rating_summary'   => true,
 		'before_section_title'  => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 		'after_section_title'   => '</h3>',
@@ -212,8 +213,11 @@ if( $Item->can_see_comments( true ) )
 			echo $params['after_section_title'];
 		}
 
-		if( is_logged_in() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
-		{	// Display the meta comments info if current user can edit this post:
+		// // Display the meta comments info ?
+		if( $params['disp_meta_comment_info'] 	// If we want it
+			&& is_logged_in() 						// If we're lgged in
+			&& $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) // If we have permission to edit this post
+		{	// Display the meta comments info:
 			global $admin_url;
 			echo '<div class="evo_comment__meta_info">';
 			$meta_comments_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
