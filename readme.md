@@ -1,6 +1,6 @@
 # b2evolution CCMS
 
-This is WORK IN PROGRESS on version **6.7.0-stable**.
+This is WORK IN PROGRESS on version **6.7.0-alpha**.
 
 ## A complete engine for your website !
 
