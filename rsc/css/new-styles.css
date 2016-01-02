@@ -1,0 +1,18 @@
+.some-new-class-for-preview {
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    opacity: 0.5;
+    -webkit-transform: translateX(0px);
+    -ms-transform: translateX(0px);
+    transform: translateX(0px);
+}
+.some-new-class-for-preview:hover {
+    opacity: 1;
+    -webkit-transform: translateX(220px);
+    -ms-transform: translateX(220px);
+    transform: translateX(220px);
+}
+.preview-class-github{
+	width: calc(100vh - 200px);
+	height: 100vh;
+}
