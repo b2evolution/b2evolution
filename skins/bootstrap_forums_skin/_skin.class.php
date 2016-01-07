@@ -315,6 +315,35 @@ class bootstrap_forums_Skin extends Skin
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
 		}
+		
+		// Add custom CSS:
+		$custom_css = '';
+		
+		
+		// If sidebar == true + col-lg
+		if( $layout = $this->get_setting( 'layout' ) != 'no_sidebar' )
+		{
+			$custom_css = "@media screen and (min-width: 1200px) {
+				.forums_list .ft_date { 
+					white-space: normal;
+					margin-top: 11px;
+				}
+				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
+					padding-left: 15px;
+				}
+				\n
+			}";
+		}
+		
+		if( ! empty( $custom_css ) )
+		{ // Function for custom_css:
+		$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+		add_headline( $custom_css );
+		}			
 	}
 
 
