@@ -253,7 +253,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				$status_is_hidden, // Hidden field instead of checkbox?
 			);
 	}
-	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
+	$Form->checklist( $checklist_options, 'moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Comments with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
 	$Form->radio( 'comment_quick_moderation', $edited_Blog->get_setting( 'comment_quick_moderation' ),
 					array(  array( 'never', T_('Never') ),

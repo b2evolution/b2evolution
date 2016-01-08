@@ -444,7 +444,6 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	switch( $status )
 	{
 		case 'draft':
-			// erhsatingin> not sure where to get the param_prefix, hardcoding it temporarily
 			$param_prefix = 'items_type_';
 			$block_title = T_('Recent drafts').
 				' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]=draft&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.

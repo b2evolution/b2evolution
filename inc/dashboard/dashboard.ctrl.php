@@ -251,15 +251,16 @@ if( $blog )
 	}
 
 	/*
-	 * RECENT POSTS awaiting moderation
+	 * POSTS awaiting moderation : 1 panel per status
 	 */
 	$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
 	ob_start();
 	foreach( $post_moderation_statuses as $status )
 	{ // go through all statuses
 	
-		// cloning $block_item_Widget as we don't want to add a 'Write New Post' widget to all
+		// erwin> cloning $block_item_Widget as we don't want to add a 'Write New Post' widget to all
 		// the blocks except when status is 'draft'
+		// fp>erwin: it's ok to have the 'new post' button in every panel
 		if ( $status == 'draft' )
 		{
 			$status_block_item_Widget = duplicate( $block_item_Widget );

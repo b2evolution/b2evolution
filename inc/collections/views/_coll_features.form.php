@@ -167,7 +167,7 @@ $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation'
 				$status_is_hidden, // Hidden field instead of checkbox?
 			);
 	}
-	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('Post moderation reminder statuses'), false, false, array( 'note' => 'Posts with the selected statuses will be notified on the "Send reminders about posts awaiting moderation" scheduled job.' ) );
+	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
 $Form->end_fieldset();
 
