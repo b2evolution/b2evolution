@@ -170,7 +170,7 @@ if( $blog )
 		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
 			' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;'.$show_statuses_param.'" style="text-decoration:none">'.
 			'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>'.
-			get_manual_link( 'collection-dashboard' );
+			get_manual_link( 'dashboard-comments-awaiting-moderation' );
 
 		echo '<div class="evo_content_block">';
 		echo '<div id="comments_block" class="dashboard_comments_block">';
@@ -257,8 +257,21 @@ if( $blog )
 	ob_start();
 	foreach( $post_moderation_statuses as $status )
 	{ // go through all statuses
-		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
-		{ // a block was dispalyed for this status
+	
+		// cloning $block_item_Widget as we don't want to add a 'Write New Post' widget to all
+		// the blocks except when status is 'draft'
+		if ( $status == 'draft' )
+		{
+			$status_block_item_Widget = duplicate( $block_item_Widget );
+			$status_block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		}
+		else
+		{
+			$status_block_item_Widget = $block_item_Widget;
+		}
+		
+		if( display_posts_awaiting_moderation( $status, $status_block_item_Widget ) )
+		{ // a block was displayed for this status
 			$nb_blocks_displayed++;
 		}
 	}
@@ -300,7 +313,7 @@ if( $blog )
 
 		echo '<div class="items_container evo_content_block">';
 
-		$block_item_Widget->title = T_('Recently edited');
+		$block_item_Widget->title = T_('Recently edited').get_manual_link( 'dashboard-recently-edited-posts' );
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		while( $Item = & $ItemList->get_item() )

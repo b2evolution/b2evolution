@@ -420,7 +420,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
  */
 function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 {
-	global $Blog, $current_User;
+	global $Blog, $current_User, $admin_url;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -444,7 +444,12 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	switch( $status )
 	{
 		case 'draft':
-			$block_title = T_('Recent drafts');
+			// erhsatingin> not sure where to get the param_prefix, hardcoding it temporarily
+			$param_prefix = 'items_type_';
+			$block_title = T_('Recent drafts').
+				' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]=draft&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
+				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.
+				get_manual_link( 'dashboard-recent-draft-posts' );
 			break;
 
 		case 'review':
