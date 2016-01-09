@@ -43,7 +43,9 @@ class AdminUI extends AdminUI_general
 		global $Messages, $debug, $Hit, $check_browser_version;
 
 		// This is included before controller specifc require_css() calls:
-		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
+// fp>yura : do we need results.css in this backoffice skin???
+// I am disabling it temporarily to see what happens
+//		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
