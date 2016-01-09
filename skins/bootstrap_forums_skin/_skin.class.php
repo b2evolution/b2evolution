@@ -321,7 +321,7 @@ class bootstrap_forums_Skin extends Skin
 		
 		
 		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout' ) != 'no_sidebar' )
+		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
 		{
 			$custom_css = "@media screen and (min-width: 1200px) {
 				.forums_list .ft_date { 
