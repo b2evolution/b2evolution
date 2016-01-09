@@ -126,6 +126,7 @@ ol.breadcrumb {
   font-size: 90%;
   color: #8b96a1;
   display: inline-block;
+  white-space: normal !important;
 }
 .forums_list .posts_panel .ft_author_info.shrinked {
   display: none;
