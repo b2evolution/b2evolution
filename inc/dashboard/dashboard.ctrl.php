@@ -256,22 +256,8 @@ if( $blog )
 	$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
 	ob_start();
 	foreach( $post_moderation_statuses as $status )
-	{ // go through all statuses
-	
-		// erwin> cloning $block_item_Widget as we don't want to add a 'Write New Post' widget to all
-		// the blocks except when status is 'draft'
-		// fp>erwin: it's ok to have the 'new post' button in every panel
-		if ( $status == 'draft' )
-		{
-			$status_block_item_Widget = duplicate( $block_item_Widget );
-			$status_block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
-		}
-		else
-		{
-			$status_block_item_Widget = $block_item_Widget;
-		}
-		
-		if( display_posts_awaiting_moderation( $status, $status_block_item_Widget ) )
+	{ // go through all statuses		
+		if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
 		{ // a block was displayed for this status
 			$nb_blocks_displayed++;
 		}

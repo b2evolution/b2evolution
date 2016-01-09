@@ -444,11 +444,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 	switch( $status )
 	{
 		case 'draft':
-			$param_prefix = 'items_type_';
-			$block_title = T_('Recent drafts').
-				' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]=draft&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
-				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.
-				get_manual_link( 'dashboard-recent-draft-posts' );
+			$block_title = T_('Recent drafts');
 			break;
 
 		case 'review':
@@ -467,6 +463,10 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 			$block_title = T_('Recent posts awaiting moderation');
 			break;
 	}
+	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above 
+	$param_prefix = 'items_type_';
+	$block_title = $block_title.' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]='.$status.'&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
+				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.get_manual_link( 'dashboard-posts-awaiting-moderation' );
 	$block_item_Widget->title = $block_title;
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
