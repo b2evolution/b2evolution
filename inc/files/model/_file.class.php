@@ -337,7 +337,10 @@ class File extends DataObject
 				{
 					$this->can_be_main_profile = $row->file_can_be_main_profile;
 				}
-				$this->download_count = $row->file_download_count;
+				if( isset( $row->file_download_count ) )
+				{
+					$this->download_count = $row->file_download_count;
+				}
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();
