@@ -81,6 +81,12 @@ class File extends DataObject
 	var $can_be_main_profile;
 
 	/**
+	 * Meta data: Number of times the file was downloaded
+	 * @var integer
+	 */
+	 var $download_count;
+
+	/**
 	 * FileRoot of this file
 	 * @var Fileroot
 	 * @access protected
@@ -331,6 +337,7 @@ class File extends DataObject
 				{
 					$this->can_be_main_profile = $row->file_can_be_main_profile;
 				}
+				$this->download_count = $row->file_download_count;
 
 				// Store this in the FileCache:
 				$FileCache = & get_FileCache();
@@ -3018,6 +3025,31 @@ class File extends DataObject
 		}
 
 		return sprintf( $params['message'], $count, implode( ', ', $users ) );
+	}
+	
+	/**
+	 * Increments the number of times the file was downloaded
+	 *
+	 * @param integer Amount to increment the download count
+	 * @return integer Latest number download count
+	 */
+	function increment_download_count( $count = 1 )
+	{
+		$download_count = $this->download_count + $count;
+		$this->set( 'download_count', $download_count );
+ 		$this->dbupdate();
+
+		return $download_count;
+	}
+	
+	/**
+	 * Get total number of times the file was downloaded
+	 *
+	 * @return integer Download count
+	 */
+	function get_download_count()
+	{
+		return $this->download_count;
 	}
 }
 

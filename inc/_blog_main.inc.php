@@ -528,6 +528,17 @@ elseif( $disp == '-' && !empty($Item) )
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
+		
+		// erhsatingin> Is this the right place to increment the download count?
+		$link_ID = param( 'download', 'integer', false);
+		$LinkCache = & get_LinkCache();
+		if( ( $download_Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && // Link exists in DB
+				( $download_File = & $download_Link->get_File() ) && // Link has a correct File object
+				( $download_File->exists() ) // File exists on the disk
+			)
+		{
+			$download_File->increment_download_count();
+		}
 	}
 	elseif( $Item->ityp_ID == 1000 )
 	{
