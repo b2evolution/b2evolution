@@ -430,63 +430,7 @@ if( $blog )
 		$right_block_col_size = '12';
 	}
 
-	echo '<div class="row dashboard_sidebar_panels"><div class="col-lg-12 col-sm-'.$right_block_col_size.' col-xs-12">';
-
-	$side_item_Widget->title = T_('Manage this collection');
-	$side_item_Widget->disp_template_replaced( 'block_start' );
-
-	echo '<div class="dashboard_sidebar">';
-	echo '<ul>';
-		if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">'.T_('Write a new post').' &raquo;</a></li>';
-		}
-
- 		echo '<li>'.T_('Browse').':<ul>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=type&tab_type=posts&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
-		if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
-		}
-		echo '</ul></li>';
-
-		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
-		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=chapters&blog='.$Blog->ID.'">'.T_('Edit categories').' &raquo;</a></li>';
-		}
-
-		echo '<li><a href="'.$Blog->get('url').'">'.T_('View this collection').'</a></li>';
-	echo '</ul>';
-	echo '</div>';
-
-	$side_item_Widget->disp_template_raw( 'block_end' );
-
-	echo '</div>';
-
-	if( $perm_blog_properties )
-	{
-		echo '<div class="col-lg-12 col-sm-'.$right_block_col_size.' col-xs-12">';
-
-		$side_item_Widget->title = T_('Customize this collection');
-		$side_item_Widget->disp_template_replaced( 'block_start' );
-
-		echo '<div class="dashboard_sidebar">';
-		echo '<ul>';
-
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID.'">'.T_('Blog properties').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'">'.T_('Blog features').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=widgets&amp;blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$Blog->ID.'">'.T_('Blog URLs').' &raquo;</a></li>';
-
-		echo '</ul>';
-		echo '</div>';
-
-		$side_item_Widget->disp_template_raw( 'block_end' );
-
-		echo '</div>';
-	}
+	echo '<div class="row dashboard_sidebar_panels">';
 
 	if( $perm_options_edit )
 	{ // We have some serious admin privilege:
@@ -564,7 +508,7 @@ else
  * Administrative tasks
  */
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( $current_User->check_perm( 'options', 'edit' ) && empty( $blog ) )
 { // We have some serious admin privilege:
 	/**
 	 * @var AbstractSettings
@@ -576,77 +520,77 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	echo '<div class="row browse"><div class="col-lg-12">';
 
-	if( empty( $blog ) )
-	{ // -- System stats -- //
+	// -- System stats -- //
 
-		$chart_data = array();
-		// Users
-		$chart_data[] = array(
-				'title' => T_('Users'),
-				'value' => get_table_count( 'T_users' ),
-				'type'  => 'number',
-			);
-		// Blogs
-		$chart_data[] = array(
-				'title' => T_('Blogs'),
-				'value' => get_table_count( 'T_blogs' ),
-				'type'  => 'number',
-			);
-		$post_all_counter = get_table_count( 'T_items__item' );
-		if( empty( $blog ) )
-		{
-			// Posts
-			$chart_data[] = array(
-					'title' => T_('Posts'),
-					'value' => $post_all_counter,
-					'type'  => 'number',
-				);
-		}
-		if( empty( $blog ) )
-		{
-			// Slugs
-			$chart_data[] = array(
-					'title' => T_('Slugs'),
-					'value' => get_table_count( 'T_slug' ),
-					'type'  => 'number',
-				);
-			// Comments
-			$chart_data[] = array(
-					'title' => T_('Comments'),
-					'value' => get_table_count( 'T_comments' ),
-					'type'  => 'number',
-				);
-		}
-		// Files
-		$chart_data[] = array(
-				'title' => T_('Files'),
-				'value' => get_table_count( 'T_files' ),
-				'type'  => 'number',
-			);
-		// Conversations
-		$chart_data[] = array(
-				'title' => T_('Conversations'),
-				'value' => get_table_count( 'T_messaging__thread' ),
-				'type'  => 'number',
-			);
-		// Messages
-		$chart_data[] = array(
-				'title' => T_('Messages'),
-				'value' => get_table_count( 'T_messaging__message' ),
-				'type'  => 'number',
-			);
+	$chart_data = array();
+	// Users
+	$chart_data[] = array(
+			'title' => T_('Users'),
+			'value' => get_table_count( 'T_users' ),
+			'type'  => 'number',
+		);
 
-		$stat_item_Widget = new Widget( 'block_item' );
+	// Blogs
+	$chart_data[] = array(
+			'title' => T_('Blogs'),
+			'value' => get_table_count( 'T_blogs' ),
+			'type'  => 'number',
+		);
+	$post_all_counter = get_table_count( 'T_items__item' );
+	
+	// Posts
+	$chart_data[] = array(
+			'title' => T_('Posts'),
+			'value' => $post_all_counter,
+			'type'  => 'number',
+		);
+	
+	// Slugs
+	$chart_data[] = array(
+			'title' => T_('Slugs'),
+			'value' => get_table_count( 'T_slug' ),
+			'type'  => 'number',
+		);
+	// Comments
+	$chart_data[] = array(
+			'title' => T_('Comments'),
+			'value' => get_table_count( 'T_comments' ),
+			'type'  => 'number',
+		);
 
-		$stat_item_Widget->title = T_('System metrics');
-		$stat_item_Widget->disp_template_replaced( 'block_start' );
+	// Files
+	$chart_data[] = array(
+			'title' => T_('Files'),
+			'value' => get_table_count( 'T_files' ),
+			'type'  => 'number',
+		);
 
-		display_charts( $chart_data );
+	// Conversations
+	$chart_data[] = array(
+			'title' => T_('Conversations'),
+			'value' => get_table_count( 'T_messaging__thread' ),
+			'type'  => 'number',
+		);
 
-		$stat_item_Widget->disp_template_raw( 'block_end' );
+	// Messages
+	$chart_data[] = array(
+			'title' => T_('Messages'),
+			'value' => get_table_count( 'T_messaging__message' ),
+			'type'  => 'number',
+		);
 
-	} //---- END OF - System stats ----//
+	$stat_item_Widget = new Widget( 'block_item' );
 
+	$stat_item_Widget->title = T_('System metrics');
+	$stat_item_Widget->disp_template_replaced( 'block_start' );
+
+	display_charts( $chart_data );
+
+	$stat_item_Widget->disp_template_raw( 'block_end' );
+
+	//---- END OF - System stats ----//
+
+	 
 	$block_item_Widget = new Widget( 'block_item' );
 
 	$block_item_Widget->title = T_('Updates from b2evolution.net');
@@ -679,8 +623,8 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		$block_item_Widget->disp_template_replaced( 'block_end' );
 
 		/*
-		 * DashboardAdminMain to be added here (anyone?)
-		 */
+		* DashboardAdminMain to be added here (anyone?)
+		*/
 	}
 	else
 	{
