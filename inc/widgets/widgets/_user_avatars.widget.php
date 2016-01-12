@@ -92,6 +92,7 @@ class user_avatars_Widget extends ComponentWidget
 						'random'  => T_('Random users'),
 						'regdate' => T_('Most recent registrations'),
 						'moddate' => T_('Most recent profile updates'),
+						'numposts' => T_('Number of posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -195,6 +196,9 @@ class user_avatars_Widget extends ComponentWidget
 			case 'moddate':
 				$sql_order = 'user_profileupdate_date DESC';
 				break;
+			case 'numposts':
+				$sql_order = 'user_numposts DESC';
+				break;
 			case 'random':
 			default:
 				$sql_order = 'RAND()';
@@ -205,6 +209,16 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL = new SQL();
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_users' );
+		if( $this->disp_params[ 'order_by' ] == 'numposts' )
+		{ // Highest number of posts
+			$SQL->FROM_add( 'LEFT JOIN
+							( SELECT items_item.post_creator_user_ID, count(*) as user_numposts
+								FROM T_items__item as items_item
+    							GROUP BY items_item.post_creator_user_ID
+    						) user_posts
+    						ON user_posts.post_creator_user_ID = user_ID ' );
+		}
+
 		$SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
 		$SQL->WHERE_and( 'user_status <> "closed"' );
 		if( is_logged_in() )

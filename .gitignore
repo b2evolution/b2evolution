@@ -9,3 +9,7 @@ _transifex/files.txt
 _transifex/messages.pot.bak
 _transifex/translations
 rsc/build/testless.css
+
+# IDE Files
+/nbproject/
+.idea/*
