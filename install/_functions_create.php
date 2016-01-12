@@ -2997,16 +2997,19 @@ function create_default_posts_location()
  */
 function create_default_email_campaigns()
 {
-	global $DB;
+	global $DB, $create_sample_contents;
 
 	task_begin( 'Creating default email campaigns... ' );
+
 	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
-	$EmailCampaign = new EmailCampaign();
-	$EmailCampaign->set( 'name', T_('Markdown Example') );
-	$EmailCampaign->set( 'email_title', T_('Markdown Example') );
-	$EmailCampaign->set( 'email_text', T_('Heading
+	if( $create_sample_contents )
+	{
+		$EmailCampaign = new EmailCampaign();
+		$EmailCampaign->set( 'name', T_('Markdown Example') );
+		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
+		$EmailCampaign->set( 'email_text', T_('Heading
 =======
 
 Sub-heading
@@ -3043,12 +3046,13 @@ Shopping list:
 
 The rain---not the reign---in Spain.') );
 
-	if( $EmailCampaign->dbinsert() )
-	{	// Add recipients after successfull email campaign creating:
-		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-		if( ! empty( $user_IDs ) )
-		{	// Only if we have found the users in DB
-			$EmailCampaign->add_users( $user_IDs );
+		if( $EmailCampaign->dbinsert() )
+		{	// Add recipients after successfull email campaign creating:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			if( ! empty( $user_IDs ) )
+			{	// Only if we have found the users in DB
+				$EmailCampaign->add_users( $user_IDs );
+			}
 		}
 	}
 

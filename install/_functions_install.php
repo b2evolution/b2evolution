@@ -220,8 +220,8 @@ function install_newdb()
 		create_demo_contents();
 	}
 
-	evo_flush();
 	create_default_email_campaigns();
+	evo_flush();
 
 	// Update the progress bar status
 	update_install_progress_bar();
