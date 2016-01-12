@@ -187,16 +187,16 @@ function create_default_data()
 	// Create organization
 	global $user_org_IDs;
 	$user_org_IDs = NULL;
-	if( $create_sample_contents )
-	{ // Only when demo content is installing
-		$Organization = new Organization();
-		$Organization->set( 'owner_user_ID', '1' );
-		$Organization->set( 'name', 'Company XYZ' );
-		$Organization->set( 'url', 'http://b2evolution.net/' );
-		if( $Organization->dbinsert() )
-		{ // Use this organization for new created users
-			$user_org_IDs = array( $Organization->ID );
-		}
+	
+	// A default organization will be created so that there will be something to
+	// display in the homepage's organization members widget
+	$Organization = new Organization();
+	$Organization->set( 'owner_user_ID', '1' );
+	$Organization->set( 'name', 'Company XYZ' );
+	$Organization->set( 'url', 'http://b2evolution.net/' );
+	if( $Organization->dbinsert() )
+	{ // Use this organization for new created users
+		$user_org_IDs = array( $Organization->ID );
 	}
 
 	// Set default country from locale code
