@@ -1249,7 +1249,7 @@ function get_install_steps_count()
 	$steps = 0;
 
 	// After Deleting b2evolution tables:
-	if( $config_test_install_all_features && $allow_evodb_reset )
+	if( $allow_evodb_reset >= 2 || ($config_test_install_all_features && $allow_evodb_reset >= 1) )
 	{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 		$delete_contents = param( 'delete_contents', 'integer', 0 );
 
