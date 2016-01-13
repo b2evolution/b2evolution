@@ -548,9 +548,9 @@ class menu_link_Widget extends ComponentWidget
 		}
 
 		// Override default link text?
-		if( ! empty( $this->param_array['link_text'] ) )
+		if( ! empty( $this->disp_params['link_text'] ) )
 		{ // We have a custom link text:
-			$text = $this->param_array['link_text'];
+			$text = $this->disp_params['link_text'];
 		}
 
 		echo $this->disp_params['block_start'];
