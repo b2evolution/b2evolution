@@ -813,16 +813,17 @@ switch( $action )
 				</div>
 			</div>
 			<?php
-				if( $test_install_all_features )
-				{ // Checkbox to install all features
+			if( $test_install_all_features )
+			{ // Checkbox to install all features
 			?>
-			<div class="checkbox" style="margin-top:15px">
-				<label>
-					<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-					<?php echo T_('Also install all test features.')?>
-				</label>
-			</div>
+				<div class="checkbox" style="margin-top:15px">
+					<label>
+						<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+						<?php echo T_('Also install all test features.')?>
+					</label>
+				</div>
 			<?php } ?>
+	
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
@@ -831,19 +832,25 @@ switch( $action )
 			</div>
 
 			<p class="evo_form__install_buttons">
-			<?php
-			if( $test_install_all_features && $allow_evodb_reset && $old_db_version = get_db_version() )
-			{ // We can allow to delete DB before installation
-			?>
-				<input type="hidden" name="delete_contents" value="1" />
-				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
-			}
-			else
-			{ // Allow only install new DB without deleting previous DB
-			?>
-			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
-			}
-			?><a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+			
+				<?php
+				if( ( ($allow_evodb_reset >= 2) 
+					 	|| ($test_install_all_features && $allow_evodb_reset >= 1) ) 
+					&& $old_db_version = get_db_version() )
+				{ // We can allow to delete DB before installation
+				?>
+					<input type="hidden" name="delete_contents" value="1" />
+					<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
+				}
+				else
+				{ // Allow only install new DB without deleting previous DB
+				?>
+					<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
+				}
+				?>
+
+				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+	
 			</p>
 		</form>
 
