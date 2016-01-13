@@ -10,3 +10,7 @@ _transifex/messages.pot.bak
 _transifex/translations
 rsc/build/testless.css
 npm-debug.log
+
+# IDE Files
+/nbproject/
+.idea/*
