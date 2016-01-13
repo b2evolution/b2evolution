@@ -1688,7 +1688,7 @@ function blog_row_name( $coll_name, $coll_ID )
 	global $current_User, $ctrl, $admin_url;
 	if( $ctrl == 'dashboard' )
 	{ // Dashboard
-		$edit_url = $admin_url.'?ctrl=dashboard&amp;blog='.$coll_ID;
+		$edit_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$coll_ID;
 		$r = '<a href="'.$edit_url.'">';
 		$r .= $coll_name;
 		$r .= '</a>';

@@ -30,7 +30,7 @@ echo "\n\n";
 foreach( $params['blogs'] as $blog_ID )
 {
 	$moderation_Blog = $BlogCache->get_by_ID( $blog_ID );
-	echo "\t - ".$moderation_Blog->get( 'shortname' ).' ('.sprintf( T_( '%s posts waiting' ), $params['posts'][$blog_ID] ).') - '.$admin_url.'?ctrl=dashboard&blog='.$blog_ID."\n";
+	echo "\t - ".$moderation_Blog->get( 'shortname' ).' ('.sprintf( T_( '%s posts waiting' ), $params['posts'][$blog_ID] ).') - '.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&blog='.$blog_ID."\n";
 }
 
 // Footer vars:

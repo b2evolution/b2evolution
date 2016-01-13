@@ -346,7 +346,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		if( ! $script )
 		{ // Set page, where to redirect, because the function is called from async.php (regenerate_url gives => async.php)
 			global $admin_url;
-			$redirect_to = $admin_url.'?ctrl=dashboard&blog='.$blog_ID;
+			$redirect_to = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&blog='.$blog_ID;
 		}
 
 		echo '<div class="floatleft">';
