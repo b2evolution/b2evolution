@@ -333,6 +333,12 @@ class shortlinks_plugin extends Plugin
 				// Parse wiki word to find additional param for atrr "id"
 				$url_params = '';
 				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
+				if( empty($WikiWord_match) )
+				{
+					preg_match( '/#(?<=#).*/', $WikiWord, $WikiWord_match );
+					$WikiWord_match[1] = isset( $WikiWord_match[0] ) ? $WikiWord_match[0] : null;
+				}
+				//pre_dump( $WikiWord_match, 'pm');
 				if( isset( $WikiWord_match[3] ) )
 				{ // wiki word has attr "id"
 					$url_params .= '#'.$WikiWord_match[3];
@@ -384,6 +390,11 @@ class shortlinks_plugin extends Plugin
 					$existing_link_text = $Chapter->get( 'name' );
 				}
 				elseif( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
+				{ // Item is found
+					$permalink = $Item->get_permanent_url();
+					$existing_link_text = $Item->get( 'title' );
+				}
+				elseif( is_number( $wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $wiki_word, false )) !== false )
 				{ // Item is found
 					$permalink = $Item->get_permanent_url();
 					$existing_link_text = $Item->get( 'title' );
