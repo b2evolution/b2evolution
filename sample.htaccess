@@ -1,6 +1,6 @@
 # Apache configuration for b2evolution's base folder
 # Lines starting with # are comments.
-# Updated 2013-07-16
+# Updated 2016-01-01
 
 # PHP / SECURITY:
 <IfModule mod_php5.c>
