@@ -330,6 +330,12 @@ div#evo_toolbar {
 		float: right;
 	}
 }
+// Hide "Dev" button when <480px width
+@media (max-width: 479px) {
+	div#evo_toolbar .actions_right .debug_dev_button {
+		display: none;
+	}
+}
 .evobar-menu, .evobar-menu * {
 	margin: 0;
 	padding: 0;
