@@ -489,7 +489,7 @@ if( $action == 'dashboard' )
 		
 		// Block Group 1
 		echo '<!-- Start of Block Group 1 -->';
-		echo '<div class="col-xs-12 col-sm-12 col-md-2 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '2' ).' col-lg-push-0 floatright">';
+		echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 		
 		$side_item_Widget = new Widget( 'side_item' );
 
@@ -541,7 +541,7 @@ if( $action == 'dashboard' )
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
 			echo '<!-- Start of Block Group 2 -->';
-			echo '<div class="col-xs-12 col-sm-12 col-md-10 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
+			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
 			
 			// Comments Awaiting Moderation Block
 			if( $have_comments_to_moderate )
@@ -590,11 +590,11 @@ if( $action == 'dashboard' )
 		echo '<!-- Start of Block Group 3 -->';
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
-			echo '<div class="col-xs-12 col-sm-12 col-md-10 col-md-pull-0 col-lg-6 col-lg-pull-0 coll-dashboard-block-3">';
+			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 coll-dashboard-block-3">';
 		}
 		else
 		{
-			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '10' ).' col-lg-pull-0 coll-dashboard-block-3">';
+			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
 		}
 		
 		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )

@@ -541,7 +541,7 @@ function display_charts( $chart_data )
 		return;
 	}
 
-	echo '<div class="charts">';
+	echo '<div class="charts row">';
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
@@ -561,10 +561,10 @@ function display_charts( $chart_data )
 			$chart_percent = 0.01;
 		}
 		// Display chart
-		echo '<div class="chart">
+		echo '<div class="center col-xs-4 col-sm-4 col-md-12 col-lg-4"><div class="chart">
 				<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
 				<div class="label">'.$chart_item['title'].'</div>
-			</div>';
+				</div></div>';
 	}
 	echo '</div>';
 
