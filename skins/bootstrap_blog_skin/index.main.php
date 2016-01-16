@@ -208,7 +208,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
-					// disp=single:
+					// Item content:
 					'url_link_position'     => 'top',
 					'parent_link_position'  => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
