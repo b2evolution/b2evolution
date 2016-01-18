@@ -100,6 +100,8 @@ echo $params['html_tag'];
 <body<?php skin_body_attrs( array( 'class' => $params['body_class'] ) ); ?>>
 
 <?php
+$Blog->disp_setting( 'body_includes', 'raw');
+
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require skin_fallback_path( '_toolbar.inc.php' );
 // ------------------------------- END OF TOOLBAR --------------------------------

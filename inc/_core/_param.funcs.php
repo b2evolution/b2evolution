@@ -2283,13 +2283,26 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			break;
 
 		case 'head_extension':
-			$xhtmlvalidation  = true;
-			// We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
-			$allow_css_tweaks = false;
-			$allow_javascript = false;
-			$allow_iframes    = false;
-			$allow_objects    = false;
-			$bypass_antispam  = false;
+		case 'body_extension':
+		case 'footer_extension':
+			$Group = $User->get_Group();
+			$xhtmlvalidation = $Group->perm_xhtmlvalidation == 'always';
+			if( $xhtmlvalidation )
+			{ // We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
+				$allow_css_tweaks = false;
+				$allow_javascript = false;
+				$allow_iframes    = false;
+				$allow_objects    = false;
+				$bypass_antispam  = false;
+			}
+			else
+			{ // Use basic checking
+				$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
+				$allow_javascript = $Group->perm_xhtml_javascript;
+				$allow_iframes    = $Group->perm_xhtml_iframes;
+				$allow_objects    = $Group->perm_xhtml_objects;
+				$bypass_antispam  = $Group->perm_bypass_antispam;	
+			}
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
