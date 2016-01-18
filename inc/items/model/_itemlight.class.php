@@ -427,9 +427,8 @@ class ItemLight extends DataObject
 				return $this->get_chapter_url( $blogurl, $glue );
 
 			case 'none':
-				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
-				// Link to blog home:
-				return $this->Blog->gen_blogurl();
+				// This happens when we try to permalink to an Item that cannot be addressed directly:
+				return NULL;
 
 			case 'cat':
 				// Link to permanent url of main chapter:
