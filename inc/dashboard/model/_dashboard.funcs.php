@@ -346,7 +346,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		if( ! $script )
 		{ // Set page, where to redirect, because the function is called from async.php (regenerate_url gives => async.php)
 			global $admin_url;
-			$redirect_to = $admin_url.'?ctrl=dashboard&blog='.$blog_ID;
+			$redirect_to = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&blog='.$blog_ID;
 		}
 
 		echo '<div class="floatleft">';
@@ -536,12 +536,16 @@ function log10_percent( $value )
  */
 function display_charts( $chart_data )
 {
+	// We'll need to know where the chart will be displayed
+	global $ctrl;
+    
 	if( empty( $chart_data ) )
 	{ // No data
 		return;
 	}
 
-	echo '<div class="charts">';
+	echo '<div class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
@@ -560,11 +564,22 @@ function display_charts( $chart_data )
 		{ // Display a little chart for not null values
 			$chart_percent = 0.01;
 		}
+        
 		// Display chart
-		echo '<div class="chart">
-				<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
-				<div class="label">'.$chart_item['title'].'</div>
-			</div>';
+		if( $ctrl == 'coll_settings' )
+		{ // in collection dashboard
+			echo '<div class="center col-xs-4 col-sm-4 col-md-12 col-lg-4"><div class="chart">
+					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
+					<div class="label">'.$chart_item['title'].'</div>
+					</div></div>';
+		}
+		else
+		{ // in everything else
+			echo '<div class="chart">
+					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
+					<div class="label">'.$chart_item['title'].'</div>
+					</div>';
+		}
 	}
 	echo '</div>';
 

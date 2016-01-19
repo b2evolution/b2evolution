@@ -2307,3 +2307,18 @@ div.message_toolbars {
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
 }
+@media (min-width: 768px) {
+  div.coll-dashboard-block-3 {
+    float: left;
+  }
+}
+@media (min-width: 992px) {
+  div.coll-dashboard-block-3 {
+    float: left;
+  }
+}
+@media (min-width: 1200px) {
+  div.coll-dashboard-block-3 {
+    float: right;
+  }
+}

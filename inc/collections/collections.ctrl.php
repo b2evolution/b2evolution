@@ -119,7 +119,7 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $admin_url.'?ctrl=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -362,7 +362,7 @@ switch( $tab )
 
 		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
-		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 		$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog=$blog$' );
 
@@ -380,7 +380,7 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 		$AdminUI->breadcrumbpath_add( T_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
 
 		// Set an url for manual page:
@@ -403,7 +403,7 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;

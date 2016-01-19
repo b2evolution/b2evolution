@@ -673,7 +673,7 @@ class collections_Module extends Module
 					'site' => $site_menu,
 					'collections' => array(
 						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=dashboard&blog='.$working_blog
+						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
 					)
 				)
 			);
@@ -716,7 +716,7 @@ class collections_Module extends Module
 		$collection_menu_entries = array(
 				'dashboard' => array(
 					'text' => T_('Collection Dashboard'),
-					'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
+					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$blog,
 					'order' => 'group_last' ),
 			);
 

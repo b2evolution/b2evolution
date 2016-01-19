@@ -1020,7 +1020,7 @@ class _core_Module extends Module
 			}
 			else
 			{ // Dashboard of the working blog
-				$collection_url = $admin_url.'?ctrl=dashboard&amp;blog='.$working_blog;
+				$collection_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$working_blog;
 			}
 		}
 		if( $perm_admin_normal || $perm_admin_restricted )
@@ -1116,7 +1116,7 @@ class _core_Module extends Module
 					// Collection dashboard
 					$entries['blog']['entries']['coll_dashboard'] = array(
 							'text' => T_('Collection Dashboard').'&hellip;',
-							'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$Blog->ID
+							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID
 						);
 
 					$entries['blog']['entries'][] = array( 'separator' => true );

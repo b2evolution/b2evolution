@@ -68,6 +68,10 @@ div.front_main_area div.widget_core_coll_post_list.evo_1pic__special ul li .item
   width: 80px;
   background: #f5f5f5;
   margin-right: 6px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
   border-radius: 3px;
 }
 div.front_main_area div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder:before,

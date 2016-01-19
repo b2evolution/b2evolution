@@ -206,7 +206,7 @@ class AdminUI_general extends Menu
 
 		if( $add_blog && isset( $Blog ) )
 		{ // Add path to Blog
-			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' );
 		}
 
 		// Initialize the default manual link, this is always visible when explicit manual link is not set for a page
