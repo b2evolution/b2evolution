@@ -43,6 +43,7 @@ $Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager
 		$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), '', T_('Check to display file permissions like "rwxr-xr-x" rather than short form') );
 		$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('File Owner'), T_('Unix file owner') );
 		$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('File Group'), T_('Unix file group') );
+		$Form->checkbox( 'option_showdownload', $UserSettings->get('fm_showdownload'), T_('Download Count'), T_('Number of times the file has been downloaded through disp=download') );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Options') );
@@ -71,6 +72,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	}
 }
 
-$Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Save Changes!'), 'ActionButton') ) );
+$Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Save Changes!'), 'SaveButton') ) );
 
 ?>

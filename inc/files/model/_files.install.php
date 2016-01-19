@@ -36,6 +36,7 @@ $schema_queries['T_files'] = array(
 			file_hash                binary(16) default NULL,
 			file_path_hash           binary(16) default NULL,
 			file_can_be_main_profile TINYINT(1) NOT NULL DEFAULT 1,
+			file_download_count      INT(10) unsigned NOT NULL DEFAULT 0,
 			primary key (file_ID),
 			unique file_path (file_path_hash)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );

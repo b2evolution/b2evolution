@@ -7177,6 +7177,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_groups', 'grp_usage', "ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary' AFTER grp_name" );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 11685, 'Upgrading files table...' ) )
+	{
+		db_add_col( 'T_files', 'file_download_count', 'INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER file_can_be_main_profile' );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

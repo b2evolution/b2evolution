@@ -112,6 +112,11 @@ $Form->begin_form();
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 		}
 
+		if( $UserSettings->get('fm_showdownload') )
+		{  // Show download count column
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'download_count', /* TRANS: download count */ T_('Downloads') ).'</th>';
+		}
+
 		echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'size', /* TRANS: file size */ T_('Size') ).'</th>';
 
 		if( $UserSettings->get('fm_showdate') != 'no' )
@@ -353,6 +358,14 @@ $Form->begin_form();
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
+		}
+
+		/****************  Download Count  ****************/
+		
+		if( $UserSettings->get('fm_showdownload') )
+		{ // Show download count
+			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead 
+			echo '<td class="center">'.$lFile->get_download_count().'</td>';
 		}
 
 		/*******************  File size  ******************/

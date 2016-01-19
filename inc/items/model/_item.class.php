@@ -3019,7 +3019,7 @@ class Item extends ItemLight
 
 			// A link with icon to download
 			$icon_link = ( $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
-					action_icon( $params['download_link_title'], $params['download_link_icon'], $File->get_url(), '', 5 ) : '';
+					action_icon( $params['download_link_title'], $params['download_link_icon'], $Link->get_download_url(), '', 5 ) : '';
 
 			// File size info
 			$file_size = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
