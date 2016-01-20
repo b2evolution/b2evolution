@@ -89,6 +89,8 @@ class org_members_Widget extends ComponentWidget
 		{
 			$user_fields[ $UserField->get( 'code' ) ] = $UserField->get_name();
 		}
+		
+		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -103,6 +105,14 @@ class org_members_Widget extends ComponentWidget
 					'type' => 'integer',
 					'size' => 3,
 					'defaultvalue' => 1,
+				),
+				// TODO: erhsatingin
+				'thumb_size' => array(
+					'label' => T_('Image size'),
+					'note' => T_('Cropping and sizing of thumbnails'),
+					'type' => 'select',
+					'options' => get_available_thumb_sizes(),
+					'defaultvalue' => 'fit-320x320',
 				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
@@ -208,7 +218,7 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					// Profile picture
-					echo $org_User->get_avatar_imgtag( 'crop-top-320x320', 'img-circle img-responsive img-center' );
+					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center' );
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
