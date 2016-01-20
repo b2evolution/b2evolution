@@ -720,7 +720,7 @@ switch( $action )
 			<h2><?php echo T_('b2evolution is already installed') ?></h2>
 
 		<?php
-		if( $allow_evodb_reset >= 2 || ($test_install_all_features && $allow_evodb_reset >= 1) )
+		if( $allow_evodb_reset >= 2 || ($test_install_all_features && $allow_evodb_reset >= 1) )
 		{ // We can allow to continue installation with deleting DB
 		?>
 			<input type="hidden" name="action" value="menu-options" />
