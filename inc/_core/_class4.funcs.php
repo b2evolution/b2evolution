@@ -38,4 +38,15 @@ function duplicate( $Obj )
 	return $Copy;
 }
 
+/**
+ * Replacement for the basename function which alters strings that start with
+ * utf-8 characters for PHP version 5.5 and earlier. This was taken from
+ * http://www.abeautifulsite.net/stop-basename-from-changing-russian-and-other-non-latin-strings/
+ */
+function get_basename( $path, $suffix = NULL)
+{
+	$split = preg_split('/\//', rtrim($path, '/ '));
+  return substr(basename('X' . $split[count($split) - 1], $suffix), 1);
+}
+
 ?>

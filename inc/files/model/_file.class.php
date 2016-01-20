@@ -238,7 +238,8 @@ class File extends DataObject
 		{
 			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
-			$this->_name = basename( $this->_adfp_full_path );
+			// erhsatingin> using get_basename() instead of standard basename function to display UTF-8 characters properly 
+			$this->_name = get_basename( $this->_adfp_full_path );
 			$this->_dir = dirname( $this->_adfp_full_path ).'/';
 			$this->_md5ID = md5( $this->_adfp_full_path );
 

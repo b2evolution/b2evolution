@@ -127,8 +127,8 @@ class GeneralSettings extends AbstractSettings
 		'reportpm_title'   => 'The user account $reportedlogin$ that you have reported has just been deleted.',
 		'reportpm_message' => "You have reported the user account \$reportedlogin\$.\n\nThis is to inform you that we have just deleted this account.\n\nThank you for your help in keeping this site a friendly place!",
 
-		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
-		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
+		'regexp_filename' => '^[a-zA-Z0-9~!@#\$%\^&\(\)\-_=\+\[\]\{\}\p{L},\. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
+		'regexp_dirname' => '^[a-zA-Z0-9~!@#\$%\^&\(\)\-_=\+\[\]\{\}\p{L}, ]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
