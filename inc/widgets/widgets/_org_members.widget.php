@@ -106,13 +106,12 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
-				// TODO: erhsatingin
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
 					'type' => 'select',
 					'options' => get_available_thumb_sizes(),
-					'defaultvalue' => 'fit-320x320',
+					'defaultvalue' => 'crop-top-200x200',
 				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
