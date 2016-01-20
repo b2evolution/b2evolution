@@ -814,7 +814,7 @@ $failed_logins_lockout = 600; // 10 minutes
  *  - 'always' : Always allow redirects to a different domain
  *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
- *  - 'never' : Force redirects to the current domain in all case, and never allow redirects to a different domain
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
