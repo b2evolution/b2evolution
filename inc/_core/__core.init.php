@@ -1551,6 +1551,7 @@ class _core_Module extends Module
 					'href'    => $admin_url.'#',
 					'text'    => '<span class="fa fa-wrench"></span> Dev',
 					'entries' => $dev_entries,
+					'class'   => 'debug_dev_button',
 				);
 		}
 

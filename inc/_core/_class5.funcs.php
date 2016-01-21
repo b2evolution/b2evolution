@@ -86,4 +86,28 @@ function duplicate( $Obj )
 	return $Copy;
 }
 
+/**
+ * Rebuilds a url using provided components
+ */
+function rebuild_url( $url, $comp = array() )
+{
+	$u = '';
+	$url = parse_url( $url );
+	
+	foreach( $comp as $c => $val )
+	{
+		$url[$c] = $val;
+	}
+
+	$u = ( ( isset( $url['scheme'] ) ) ? $url['scheme'] . '://' : 'http://')
+			.( ( isset( $url['user'] ) ) ? $url['user'] . ( ( isset( $url['pass'] ) ) ? ':' . $url['pass'] : '' ) .'@' : '' )
+			.( ( isset( $url['host'] ) ) ? $url['host'] : '' )
+			.( ( isset( $url['port'] ) ) ? ':' . $url['port'] : '' )
+			.( ( isset( $url['path'] ) ) ? $url['path'] : '' )
+			.( ( isset( $url['query'] ) ) ? '?' . $url['query'] : '' )
+			.( ( isset( $url['fragment'] ) ) ? '#' . $url['fragment'] : '' );
+	
+	return $u;	
+}
+
 ?>

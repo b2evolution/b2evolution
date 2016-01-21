@@ -122,6 +122,7 @@ $thumbnail_sizes = array(
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
 			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
 			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
@@ -818,7 +819,7 @@ $failed_logins_lockout = 600; // 10 minutes
  *  - 'always' : Always allow redirects to a different domain
  *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
- *  - 'never' : Force redirects to the current domain in all case, and never allow redirects to a different domain
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 

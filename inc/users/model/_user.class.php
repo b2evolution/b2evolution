@@ -1491,6 +1491,7 @@ class User extends DataObject
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
 				'login_mask'     => '', // example: 'text $login$ text'
+				'login_class'    => 'identity_link_username',  // No used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -1553,9 +1554,13 @@ class User extends DataObject
 			}
 			// Add class "login" to detect logins by js plugins
 			$class .= ( $link_login == $this->login ? ' login' : '' );
-			if( $params['login_mask'] != '' )
+			if( !empty($params['login_mask']) )
 			{ // Apply login mask
 				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+			}
+			elseif( !empty($params['login_class']) )
+			{
+				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</a>';
 			}
 		}
 

@@ -242,7 +242,7 @@ if( $Item->can_see_comments( true ) )
 		// // Display the meta comments info ?
 		if( $params['disp_meta_comment_info'] 	// If we want it
 			&& ! $params['disp_meta_comments'] 	// If we're not displaying the full list of meta comments anyways
-			&& is_logged_in() 						// If we're lgged in
+			&& is_logged_in() 						// If we're logged in
 			&& $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) // If we have permission to edit this post
 		{	// Display the meta comments info:
 			global $admin_url;
