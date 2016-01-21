@@ -1065,7 +1065,10 @@ class Skin extends DataObject
 					// Specific features for disp=edit:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					init_tokeninput_js( 'blog' );
 
@@ -1089,7 +1092,10 @@ class Skin extends DataObject
 					// Specific features for disp=edit_comment:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
@@ -1110,7 +1116,10 @@ class Skin extends DataObject
 					// Specific features for disp=usercomments:
 
 					// Require results.css to display item/comment query results in a table
-					require_css( 'results.css' ); // Results/tables styles
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Require functions.js to show/hide a panel with filters
 					require_js( 'functions.js', 'blog' );
