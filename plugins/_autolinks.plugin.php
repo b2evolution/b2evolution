@@ -542,6 +542,9 @@ class autolinks_plugin extends Plugin
 			{ // No previous word, it is a single word
 				foreach( $this->replacement_link_array[ $lword ] as $previous => $url )
 				{ // Initialize an optional previous required word and url as first of the current word
+				
+					// Make sure URL is well formed
+					$url = rebuild_url( $url );
 					break;
 				}
 			}
