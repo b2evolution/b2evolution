@@ -182,8 +182,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function render_content( & $content )
 	{
-
-		global $ItemCache, $admin_url, $blog, $evo_charset, $post_ID;
+		global $ItemCache, $admin_url, $blog, $evo_charset;
 
 		$regexp_modifier = '';
 		if( $evo_charset == 'utf-8' )
@@ -334,13 +333,6 @@ class shortlinks_plugin extends Plugin
 				// Parse wiki word to find additional param for atrr "id"
 				$url_params = '';
 				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
-				if( empty( $WikiWord_match ) )
-				{
-					preg_match( '/#(?<=#).*/', $WikiWord, $WikiWord_match );
-					$WikiWord_match[1] = isset( $WikiWord_match[0] ) ? $WikiWord_match[0] : null;
-					$anchor = $WikiWord_match[1];
-				}
-
 				if( isset( $WikiWord_match[3] ) )
 				{ // wiki word has attr "id"
 					$url_params .= '#'.$WikiWord_match[3];
@@ -386,12 +378,7 @@ class shortlinks_plugin extends Plugin
 				$permalink = '';
 				$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
 				$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
-				if( is_numeric( $wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $wiki_word, false )) !== false )
-				{ // Item is found
-					$permalink = $Item->get_permanent_url();
-					$existing_link_text = $Item->get( 'title' );
-				}
-				elseif( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
+				if( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
 				{ // Chapter is found
 					$permalink = $Chapter->get_permanent_url();
 					$existing_link_text = $Chapter->get( 'name' );
@@ -399,12 +386,6 @@ class shortlinks_plugin extends Plugin
 				elseif( ($Item = & $ItemCache->get_by_urltitle( $wiki_word, false )) !== false )
 				{ // Item is found
 					$permalink = $Item->get_permanent_url();
-					$existing_link_text = $Item->get( 'title' );
-				}
-				elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false )) !== false )
-				{ // Item is found
-					$permalink = $Item->get_permanent_url();
-					$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
 					$existing_link_text = $Item->get( 'title' );
 				}
 
