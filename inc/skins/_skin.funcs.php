@@ -564,7 +564,7 @@ var downloadInterval = setInterval( function()
 					$disp = 'login';
 					param( 'action', 'string', 'req_login' );
 					// override redirect to param
-					param( 'redirect_to', 'url', regenerate_url(), true, true );
+					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 					{ // Redirect to special blog for messaging actions if it is defined in general settings
 						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
