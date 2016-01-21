@@ -59,14 +59,14 @@ $Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {	// TODO: better perm check
-	echo '<p class="note">'.T_('See also:').' ';
-
   /**
 	 * @var FileRoot
 	 */
 	global $fm_FileRoot;
+
 	if( $fm_FileRoot->type == 'collection' )
 	{
+		echo '<p class="note">'.T_('See also:').' ';
 		echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; <a href="?ctrl=coll_settings&tab=advanced&blog='.$fm_FileRoot->in_type_ID.'">'
 					.T_('Media directory location').'</a>';
 	}
