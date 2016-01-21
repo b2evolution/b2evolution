@@ -101,8 +101,9 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => '',
 				'type' => 'select',
 				'options' => array(
-						'simple' => T_('Pictures only'),
-						'badges' => T_('User badges'),
+						'username' => T_('User Names'),
+						'simple' => T_('Profile Pictures only'),
+						'badges' => T_('Both (username,  pics)'),
 					),
 				'defaultvalue' => 'simple',
 			),
@@ -153,7 +154,7 @@ class user_avatars_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Users pictures');
+		return T_('User list');
 	}
 
 
@@ -219,8 +220,10 @@ class user_avatars_Widget extends ComponentWidget
     						) user_posts
     						ON user_posts.post_creator_user_ID = user_ID ' );
 		}
-
-		$SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
+		if( $this->disp_params[ 'style' ] == 'simple' )
+		{ //Display users with pictures
+			$SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
+		}
 		$SQL->WHERE_and( 'user_status <> "closed"' );
 		if( is_logged_in() )
 		{ // Add filters
@@ -359,10 +362,18 @@ class user_avatars_Widget extends ComponentWidget
 			if( ! empty( $identity_url ) )
 			{
 				$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
-				$r .= $avatar_tag;
+				if( $this->disp_params[ 'style' ] != 'username' )
+				{ // Display only username
+					$r .= $avatar_tag;
+				}
+
 				if( $this->disp_params[ 'style' ] == 'badges' )
 				{ // Add user login after picture
 					$r .= '<br >'.$User->get_colored_login();
+				}
+				elseif( $this->disp_params[ 'style' ] == 'username' )
+				{ // username without <br>
+					$r .= $User->get_colored_login();
 				}
 				$r .= '</a>';
 			}
