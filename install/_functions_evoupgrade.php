@@ -6972,14 +6972,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				ELSE "post"
 			END' );
 		db_drop_col( 'T_items__type', 'ityp_backoffice_tab' );
-		// Extend setting "Use URL" to use "Required & treat as Podcast media" specially for "Podcast" item type:
-		$DB->query( "ALTER TABLE T_items__type
-			MODIFY ityp_use_url ENUM( 'required', 'required_podcast', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional'" );
+		// Add setting "Treat as Podcast Media" to use it specially for "Podcast" item type:
+		db_add_col( 'T_items__type', 'ityp_podcast', 'TINYINT(1) DEFAULT 0 AFTER ityp_use_url' );
 		$DB->query( 'UPDATE T_items__type
 			  SET ityp_name = "Podcast Episode"
 			WHERE ityp_name = "Podcast"' );
 		$DB->query( 'UPDATE T_items__type
-			  SET ityp_use_url = "required_podcast"
+			  SET ityp_podcast = "1"
 			WHERE ityp_ID = "2000"' );
 		// Delete the reserved item type:
 		$DB->query( 'DELETE FROM T_items__type

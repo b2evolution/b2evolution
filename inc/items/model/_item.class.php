@@ -604,8 +604,7 @@ class Item extends ItemLight
 			param_check_url( 'post_url', 'posting', '' );
 			$this->set_from_Request( 'url' );
 		}
-		if( empty( $post_url ) &&
-		    ( $this->get_type_setting( 'use_url' ) == 'required' || $this->get_type_setting( 'use_url' ) == 'required_podcast' ) )
+		if( empty( $post_url ) && $this->get_type_setting( 'use_url' ) == 'required' )
 		{ // URL must be entered
 			param_check_not_empty( 'post_url', T_('Please provide a "Link To" URL.'), '' );
 		}
@@ -4767,8 +4766,8 @@ class Item extends ItemLight
 			), $params );
 
 		if( $params['podcast'] == '#' )
-		{	// Check if this post is a podcast
-			$params['podcast'] = ( $this->get_type_setting( 'use_url' ) == 'required_podcast' );
+		{	// Check if this post is a podcast:
+			$params['podcast'] = $this->get_type_setting( 'podcast' );
 		}
 
 		if( $params['podcast'] && $params['format'] == 'htmlbody' )

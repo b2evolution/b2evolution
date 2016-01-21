@@ -244,23 +244,23 @@ function create_default_data()
 	task_begin( 'Creating default Post Types... ' );
 	$DB->query( "
 		INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html,
-					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url )
-		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
-					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'required_podcast' ),
-					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
-					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional' ),
-					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional' ),
-					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional' ),
-					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional' ),
-					 ( 'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional' ),
-					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional' ),
-					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional' )" );
+					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url, ityp_podcast )
+		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
+					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 1 ),
+					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
+					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional', 0 ),
+					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
+					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
+					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
+					 ( 'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 ),
+					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 )" );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
