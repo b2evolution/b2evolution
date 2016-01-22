@@ -406,6 +406,7 @@ class shortlinks_plugin extends Plugin
 					$permalink = $Item->get_permanent_url();
 					$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
 					$existing_link_text = $Item->get( 'title' );
+					unset($anchor);
 				}
 
 				if( !empty( $permalink ) )
@@ -424,7 +425,7 @@ class shortlinks_plugin extends Plugin
 				}
 				else
 				{ // Chapter and Item are not found
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+					$create_link = isset( $blog ) && !is_numeric( $wiki_word ) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 					// [[WikiWord text]]
 					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
