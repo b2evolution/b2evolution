@@ -996,4 +996,33 @@ function url_check_same_domain( $main_url, $check_url )
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
 }
+
+
+/**
+ * Rebuilds a url using provided components
+ *
+ * @param string main url to rebuild
+ * @param array string list of url components to be used in rebuilding main url
+ * @return string rebuilt url
+ */
+function rebuild_url( $url, $comp = array() )
+{
+	$u = '';
+	$url = parse_url( $url );
+	
+	foreach( $comp as $c => $val )
+	{
+		$url[$c] = $val;
+	}
+
+	$u = ( ( isset( $url['scheme'] ) ) ? $url['scheme'] . '://' : 'http://')
+			.( ( isset( $url['user'] ) ) ? $url['user'] . ( ( isset( $url['pass'] ) ) ? ':' . $url['pass'] : '' ) .'@' : '' )
+			.( ( isset( $url['host'] ) ) ? $url['host'] : '' )
+			.( ( isset( $url['port'] ) ) ? ':' . $url['port'] : '' )
+			.( ( isset( $url['path'] ) ) ? $url['path'] : '' )
+			.( ( isset( $url['query'] ) ) ? '?' . $url['query'] : '' )
+			.( ( isset( $url['fragment'] ) ) ? '#' . $url['fragment'] : '' );
+	
+	return $u;	
+}
 ?>

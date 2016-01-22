@@ -2260,6 +2260,8 @@ class File extends DataObject
 	 */
 	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL )
 	{
+		global $thumbnail_sizes;
+
 		$img_attribs = array(
 				'title' => isset($title) ? $title : $this->get('title'),
 				'alt'   => isset($alt) ? $alt : $this->get('alt'),
@@ -2292,10 +2294,15 @@ class File extends DataObject
 			{	// Add attributes "width" & "height" only when they are not disabled:
 				$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
 				if( $tag_size !== NULL )
-				{	// Change size values
+				{ // Change size values
 					$tag_size = explode( 'x', $tag_size );
 					$img_attribs['width'] = $tag_size[0];
 					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( isset( $thumbnail_sizes[$size_name] ) )
+				{	// Get tag_size based from size_name
+					$img_attribs['width'] = $thumbnail_sizes[$size_name][1];
+					$img_attribs['height'] = $thumbnail_sizes[$size_name][2];
 				}
 				elseif( substr( $thumb_path, 0, 1 ) != '!'
 					&& ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )

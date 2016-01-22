@@ -205,6 +205,8 @@ class org_members_Widget extends ComponentWidget
 
 			if( count( $users ) )
 			{
+				echo '<div class="row">';
+				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
 					echo '<div class="col-lg-4 col-sm-6 text-center">';
@@ -217,7 +219,7 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					// Profile picture
-					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center' );
+					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center');
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
@@ -227,7 +229,7 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					// Full name
-					echo '<h3>'.$org_User->get( 'fullname' ).'</h3>';
+					echo '<h3 class="member-name">'.$org_User->get( 'fullname' ).'</h3>';
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
@@ -237,17 +239,18 @@ class org_members_Widget extends ComponentWidget
 					if( $this->disp_params['display_icons'] )
 					{ // Display user links as icons
 						$url_fields = $org_User->userfields_by_type( 'url' );
+						echo '<div class="ufld_icon_links">';
 						if( count( $url_fields ) )
 						{
-							echo '<div class="ufld_icon_links">';
+							
 							foreach( $url_fields as $field )
 							{
 								echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
 										.'<span class="'.$field->ufdf_icon_name.'"></span>'
 									.'</a>';
 							}
-							echo '</div>';
 						}
+						echo '</div>';
 					}
 
 					// Info
@@ -271,9 +274,22 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					echo '</div>';
+					
+					$member_counter++;
+					switch( $member_counter )
+					{
+						case 3:
+							echo '<div class="clearfix visible-lg-block"></div>';
+							break;
+						case 2:
+							echo '<div class="clearfix visible-sm-block"></div>';
+							break;
+						default:
+							// do nothing
+					}
 				}
-
 				echo '<div class="clear"></div>';
+				echo '</div>';
 			}
 		}
 

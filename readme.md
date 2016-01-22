@@ -1,4 +1,6 @@
-# b2evolution CCMS
+![b2evolution CMS](media/shared/global/logos/b2evolution_1016x208_wbg.png)
+
+# b2evolution CMS
 
 This is WORK IN PROGRESS on version **6.7.0-alpha**.
 
