@@ -33,10 +33,10 @@ class Country extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Country( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__country', 'ctry_', 'ctry_ID' );
+		parent::__construct( 'T_regional__country', 'ctry_', 'ctry_ID' );
 
 		if( $db_row )
 		{

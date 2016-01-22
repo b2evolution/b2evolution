@@ -61,7 +61,7 @@ class UserList extends DataObjectList2
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization
 	 */
-	function UserList(
+	function __construct(
 		$filterset_name = '', // Name to be used when saving the filterset (leave empty to use default)
 		$limit = 20, // Page size
 		$param_prefix = 'users_',
@@ -69,7 +69,7 @@ class UserList extends DataObjectList2
 		)
 	{
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache( 'UserCache' ), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache( 'UserCache' ), $limit, $param_prefix, NULL );
 
 		// Init query params, @see $this->query_init()
 		$this->query_params = $query_params;

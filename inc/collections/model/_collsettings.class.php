@@ -221,7 +221,7 @@ class CollectionSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function CollectionSettings()
+	function __construct()
 	{
 		parent::__construct( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
 	}

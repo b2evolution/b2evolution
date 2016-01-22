@@ -38,10 +38,10 @@ class Goal extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Goal( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
+		parent::__construct( 'T_track__goal', 'goal_', 'goal_ID' );
 
 		if( $db_row )
 		{

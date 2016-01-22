@@ -39,10 +39,10 @@ class coll_item_tags_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_item_tags_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_item_tags' );
+		parent::__construct( $db_row, 'core', 'coll_item_tags' );
 	}
 
 

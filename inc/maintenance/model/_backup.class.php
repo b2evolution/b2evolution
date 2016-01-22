@@ -132,7 +132,7 @@ class Backup
 	/**
 	 * Constructor
 	 */
-	function Backup()
+	function __construct()
 	{
 		global $backup_paths, $backup_tables;
 

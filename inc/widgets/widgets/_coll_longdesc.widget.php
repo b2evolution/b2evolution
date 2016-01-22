@@ -27,10 +27,10 @@ class coll_longdesc_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_longdesc_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_longdesc' );
+		parent::__construct( $db_row, 'core', 'coll_longdesc' );
 	}
 
 

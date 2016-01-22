@@ -54,7 +54,7 @@ class ItemList2 extends ItemListLight
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
-	function ItemList2(
+	function __construct(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
@@ -67,7 +67,7 @@ class ItemList2 extends ItemListLight
 		global $Settings;
 
 		// Call parent constructor:
-		parent::ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name );
+		parent::__construct( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name );
 	}
 
 

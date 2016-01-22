@@ -28,10 +28,10 @@ class LinkItem extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function LinkItem( $Item )
+	function __construct( $Item )
 	{
 		// call parent contsructor
-		parent::LinkOwner( $Item, 'item' );
+		parent::__construct( $Item, 'item' );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(

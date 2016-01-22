@@ -77,7 +77,7 @@ class LinkCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function LinkCache()
+	function __construct()
 	{
 		parent::__construct( 'Link', false, 'T_links', 'link_', 'link_ID' );
 	}

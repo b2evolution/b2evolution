@@ -30,10 +30,10 @@ class Currency extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Currency( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__currency', 'curr_', 'curr_ID' );
+		parent::__construct( 'T_regional__currency', 'curr_', 'curr_ID' );
 
 		if( $db_row )
 		{

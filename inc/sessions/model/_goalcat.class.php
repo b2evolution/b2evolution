@@ -26,10 +26,10 @@ class GoalCategory extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function GoalCategory( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_track__goalcat', 'gcat_', 'gcat_ID' );
+		parent::__construct( 'T_track__goalcat', 'gcat_', 'gcat_ID' );
 
 		if( $db_row )
 		{

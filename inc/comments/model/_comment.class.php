@@ -191,10 +191,10 @@ class Comment extends DataObject
 	/**
 	 * Constructor
 	 */
-	function Comment( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_comments', 'comment_', 'comment_ID' );
+		parent::__construct( 'T_comments', 'comment_', 'comment_ID' );
 
 		if( $db_row == NULL )
 		{

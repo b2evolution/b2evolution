@@ -45,7 +45,7 @@ class BlockCache
 	/**
 	 * Constructor
 	 */
-	function BlockCache( $type, $keys )
+	function __construct( $type, $keys )
 	{
 		global $instance_name;
 

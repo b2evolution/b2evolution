@@ -275,14 +275,14 @@ class Item extends ItemLight
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function Item( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
+	function __construct( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'Item',
 	               $datecreated_field = 'datecreated', $datemodified_field = 'datemodified',
 	               $creator_field = 'creator_user_ID', $lasteditor_field = 'lastedit_user_ID' )
 	{
 		global $localtimenow, $default_locale, $current_User;
 
 		// Call parent constructor:
-		parent::ItemLight( $db_row, $dbtable, $dbprefix, $dbIDname, $objtype,
+		parent::__construct( $db_row, $dbtable, $dbprefix, $dbIDname, $objtype,
 	               $datecreated_field, $datemodified_field,
 	               $creator_field, $lasteditor_field );
 

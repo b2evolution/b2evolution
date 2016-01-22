@@ -84,7 +84,7 @@ class ItemListLight extends DataObjectList2
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
-	function ItemListLight(
+	function __construct(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
@@ -97,7 +97,7 @@ class ItemListLight extends DataObjectList2
 		global $Settings, $posttypes_specialtypes;
 
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// asimo> The ItemQuery init was moved into the query_init() method
 		// The SQL Query object:

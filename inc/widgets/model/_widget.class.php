@@ -82,10 +82,10 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param object data row from db
 	 */
-	function ComponentWidget( $db_row = NULL, $type = 'core', $code = NULL )
+	function __construct( $db_row = NULL, $type = 'core', $code = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_widget', 'wi_', 'wi_ID' );
+		parent::__construct( 'T_widget', 'wi_', 'wi_ID' );
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:

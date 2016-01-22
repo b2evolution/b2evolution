@@ -41,10 +41,10 @@ class Link extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Link( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_links', 'link_', 'link_ID',
+		parent::__construct( 'T_links', 'link_', 'link_ID',
 													'datecreated', 'datemodified', 'creator_user_ID', 'lastedit_user_ID' );
 
 		if( $db_row != NULL )

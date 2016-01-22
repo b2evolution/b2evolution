@@ -44,7 +44,7 @@ class am_css_highlighter
 	 * @param object $parent
 	 * @return object am_css_highlighter
 	 */
-	function am_css_highlighter( & $parent )
+	function __construct( & $parent )
 	{
 		$this->parent = & $parent;
 		return $this;

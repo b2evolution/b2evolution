@@ -51,7 +51,7 @@ class CommentQuery extends SQL
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function CommentQuery( $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
+	function __construct( $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
 	{
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;

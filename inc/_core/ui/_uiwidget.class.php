@@ -56,7 +56,7 @@ class Widget
 	 *
 	 * @param string template name to get from $AdminUI
 	 */
-	function Widget( $ui_template = NULL )
+	function __construct( $ui_template = NULL )
 	{
 		global $AdminUI;
 
@@ -347,9 +347,9 @@ class Table extends Widget
 	 * @param string template name to get from $AdminUI
 	 * @param string prefix to differentiate page/order/filter params
 	 */
-	function Table( $ui_template = NULL, $param_prefix = '' )
+	function __construct( $ui_template = NULL, $param_prefix = '' )
 	{
-		parent::Widget( $ui_template );
+		parent::__construct( $ui_template );
 
 		$this->param_prefix = $param_prefix;
 

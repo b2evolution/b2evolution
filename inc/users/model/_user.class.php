@@ -155,12 +155,12 @@ class User extends DataObject
 	 *
 	 * @param object DB row
 	 */
-	function User( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		global $default_locale, $Settings, $localtimenow;
 
 		// Call parent constructor:
-		parent::DataObject( 'T_users', 'user_', 'user_ID' );
+		parent::__construct( 'T_users', 'user_', 'user_ID' );
 
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
