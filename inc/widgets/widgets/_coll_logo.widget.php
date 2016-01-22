@@ -27,10 +27,10 @@ class coll_logo_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_logo_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_logo' );
+		parent::__construct( $db_row, 'core', 'coll_logo' );
 	}
 
 

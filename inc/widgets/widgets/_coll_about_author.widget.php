@@ -39,10 +39,10 @@ class coll_about_author_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_about_author_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_about_author' );
+		parent::__construct( $db_row, 'core', 'coll_about_author' );
 	}
 
 

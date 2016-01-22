@@ -37,10 +37,10 @@ class coll_seen_by_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_seen_by_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_seen_by' );
+		parent::__construct( $db_row, 'core', 'coll_seen_by' );
 	}
 
 

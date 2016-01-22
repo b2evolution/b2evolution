@@ -55,10 +55,10 @@ class Skin extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Skin( $db_row = NULL, $skin_folder = NULL )
+	function __construct( $db_row = NULL, $skin_folder = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
+		parent::__construct( 'T_skins__skin', 'skin_', 'skin_ID' );
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:

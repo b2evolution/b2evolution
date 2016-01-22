@@ -27,10 +27,10 @@ class linkblog_Widget extends coll_item_list_Widget
 	/**
 	 * Constructor
 	 */
-	function linkblog_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'linkblog' );
+		ComponentWidget::__construct( $db_row, 'core', 'linkblog' );
 	}
 
 

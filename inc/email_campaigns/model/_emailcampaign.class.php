@@ -59,10 +59,10 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function EmailCampaign( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_email__campaign', 'ecmp_', 'ecmp_ID', 'date_ts' );
+		parent::__construct( 'T_email__campaign', 'ecmp_', 'ecmp_ID', 'date_ts' );
 
 		if( $db_row == NULL )
 		{

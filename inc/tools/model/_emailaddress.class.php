@@ -51,10 +51,10 @@ class EmailAddress extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function EmailAddress( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_email__address', 'emadr_', 'emadr_ID' );
+		parent::__construct( 'T_email__address', 'emadr_', 'emadr_ID' );
 
 		if( $db_row != NULL )
 		{

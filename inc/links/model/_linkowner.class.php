@@ -80,7 +80,7 @@ class LinkOwner
 	 * @param object the link owner object
 	 * @param string the link type ( item, comment, ... )
 	 */
-	function LinkOwner( $link_Object, $type )
+	function __construct( $link_Object, $type )
 	{
 		$this->link_Object = $link_Object;
 		$this->type = $type;

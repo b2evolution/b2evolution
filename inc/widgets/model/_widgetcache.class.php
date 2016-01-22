@@ -43,7 +43,7 @@ class WidgetCache extends DataObjectCache
 	 *
 	 * @param boolean Load enabled widgets only?
 	 */
-	function WidgetCache( $enabled_only = false )
+	function __construct( $enabled_only = false )
 	{
 		parent::__construct( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
 		$this->load_enabled_only = $enabled_only;

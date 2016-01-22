@@ -65,7 +65,7 @@ class am_shell_highlighter
 	 * @param object $parent
 	 * @return object am_shell_highlighter
 	 */
-	function am_shell_highlighter( & $parent )
+	function __construct( & $parent )
 	{
 		$this->parent = & $parent;
 		return $this;

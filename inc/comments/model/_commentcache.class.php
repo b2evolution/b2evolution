@@ -34,7 +34,7 @@ class CommentCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function CommentCache( $objType = 'Comment', $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
+	function __construct( $objType = 'Comment', $dbtablename = 'T_comments', $dbprefix = 'comment_', $dbIDname = 'comment_ID' )
 	{
 		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}

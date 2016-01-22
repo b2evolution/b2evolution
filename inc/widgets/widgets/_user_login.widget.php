@@ -28,10 +28,10 @@ class user_login_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_login_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_login' );
+		parent::__construct( $db_row, 'core', 'user_login' );
 	}
 
 

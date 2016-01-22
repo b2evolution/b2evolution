@@ -38,10 +38,10 @@ class Poll extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function Poll( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_polls__question', 'pqst_', 'pqst_ID' );
+		parent::__construct( 'T_polls__question', 'pqst_', 'pqst_ID' );
 
 		if( $db_row != NULL )
 		{	// Get poll data from DB:

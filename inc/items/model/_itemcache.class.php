@@ -43,7 +43,7 @@ class ItemCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemCache( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
+	function __construct( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 	{
 		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}

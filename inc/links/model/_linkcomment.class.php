@@ -28,9 +28,9 @@ class LinkComment extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function LinkComment( $edited_Comment )
+	function __construct( $edited_Comment )
 	{
-		parent::LinkOwner( $edited_Comment, 'comment' );
+		parent::__construct( $edited_Comment, 'comment' );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(

@@ -27,10 +27,10 @@ class coll_post_list_Widget extends coll_item_list_Widget
 	/**
 	 * Constructor
 	 */
-	function coll_post_list_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_post_list' );
+		ComponentWidget::__construct( $db_row, 'core', 'coll_post_list' );
 	}
 
 

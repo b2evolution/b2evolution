@@ -63,7 +63,7 @@ class XHTML_Validator
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 * @param string Message type for errors
 	 */
-	function XHTML_Validator( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
+	function __construct( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
 	{
 		global $inc_path;
 

@@ -27,10 +27,10 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_tag_cloud_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_tag_cloud' );
+		parent::__construct( $db_row, 'core', 'coll_tag_cloud' );
 	}
 
 

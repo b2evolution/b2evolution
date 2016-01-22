@@ -91,10 +91,10 @@ class Chapter extends DataObject
 	 * @param table Database row
  	 * @param integer|NULL subset to use for new object
 	 */
-	function Chapter( $db_row = NULL, $subset_ID = NULL )
+	function __construct( $db_row = NULL, $subset_ID = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_categories', 'cat_', 'cat_ID' );
+		parent::__construct( 'T_categories', 'cat_', 'cat_ID' );
 
 		if( is_null( $db_row ) )
 		{	// We are creating an object here:

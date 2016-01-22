@@ -74,7 +74,7 @@ class DataObject
 	 * @param string User ID field name
 	 * @param string datetime field name
 	 */
-	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
+	function __construct( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
 	{
 		$this->dbtablename        = $tablename;
 		$this->dbprefix           = $prefix;

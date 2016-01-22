@@ -27,10 +27,10 @@ class coll_featured_intro_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_featured_intro_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_featured_intro' );
+		parent::__construct( $db_row, 'core', 'coll_featured_intro' );
 	}
 
 

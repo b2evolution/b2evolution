@@ -264,9 +264,9 @@ class Results extends Table
 	 * @param boolean TRUE to initialize page params
 	 * @param integer|NULL Total rows count that allows to use an order of any column, NULL - don't restrict
 	 */
-	function Results( $sql, $param_prefix = '', $default_order = '', $default_limit = NULL, $count_sql = NULL, $init_page = true, $force_order_by_count = NULL )
+	function __construct( $sql, $param_prefix = '', $default_order = '', $default_limit = NULL, $count_sql = NULL, $init_page = true, $force_order_by_count = NULL )
 	{
-		parent::Table( NULL, $param_prefix );
+		parent::__construct( NULL, $param_prefix );
 
 		$this->sql = $sql;
 		$this->count_sql = $count_sql;

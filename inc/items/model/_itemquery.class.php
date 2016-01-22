@@ -53,7 +53,7 @@ class ItemQuery extends SQL
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemQuery( $dbtablename, $dbprefix = '', $dbIDname )
+	function __construct( $dbtablename, $dbprefix = '', $dbIDname )
 	{
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;
