@@ -870,21 +870,23 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 			}
 
+			$includes_error_msg = 'You can loosen this restriction in the <a href="admin.php?ctrl=groups&action=edit&grp_ID='.
+					$current_User->grp_ID.'">group settings</a>.';
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
 			{	// HTML header includes:
-				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.'), '#', 'head_extension' );
+				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section. '.$includes_error_msg), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )
-			{
-				param_check_html( 'blog_body_includes', T_('Invalid Custom javascript section'), "#", 'body_extension' );
+			{ // HTML body includes:
+				param_check_html( 'blog_body_includes', T_('Invalid Custom javascript section. '.$includes_error_msg), "#", 'body_extension' );
 				$this->set_setting( 'body_includes', get_param( 'blog_body_includes' ) );
 			}
 
 			if( param( 'blog_footer_includes', 'html', NULL ) !== NULL )
-			{	// HTML header includes:
-				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section'), "#", 'footer_extension' );
+			{	// HTML footer includes:
+				param_check_html( 'blog_footer_includes', T_('Invalid Custom javascript section. '.$includes_error_msg), "#", 'footer_extension' );
 				$this->set_setting( 'footer_includes', get_param( 'blog_footer_includes' ) );
 			}
 
