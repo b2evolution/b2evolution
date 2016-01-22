@@ -277,7 +277,7 @@ class Plugin
 	 * You should not use a constructor with your plugin, but the
 	 * {@link Plugin::PluginInit()} method instead!
 	 */
-	function Plugin()
+	function __construct()
 	{
 	}
 

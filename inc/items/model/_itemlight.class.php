@@ -123,14 +123,14 @@ class ItemLight extends DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function ItemLight( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
+	function __construct( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
 		global $localtimenow, $default_locale, $current_User;
 
 		// Call parent constructor:
-		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
+		parent::__construct( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
 												$creator_field, $lasteditor_field );
 
 		$this->objtype = $objtype;

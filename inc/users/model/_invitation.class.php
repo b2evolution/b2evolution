@@ -44,10 +44,10 @@ class Invitation extends DataObject
 	 *
 	 * @param object DB row
 	 */
-	function Invitation( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__invitation_code', 'ivc_', 'ivc_ID' );
+		parent::__construct( 'T_users__invitation_code', 'ivc_', 'ivc_ID' );
 
 		if( $db_row != NULL )
 		{ // Loading an object from DB:

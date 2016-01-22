@@ -31,10 +31,10 @@ class UserfieldGroup extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function UserfieldGroup( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
+		parent::__construct( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
 
 		if( $db_row != NULL )
 		{

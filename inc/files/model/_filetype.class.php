@@ -35,10 +35,10 @@ class Filetype extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Filetype( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_filetypes', 'ftyp_', 'ftyp_ID' );
+		parent::__construct( 'T_filetypes', 'ftyp_', 'ftyp_ID' );
 
 		if( $db_row != NULL )
 		{

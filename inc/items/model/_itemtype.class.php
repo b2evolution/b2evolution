@@ -76,10 +76,10 @@ class ItemType extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function ItemType( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__type', 'ityp_', 'ityp_ID' );
+		parent::__construct( 'T_items__type', 'ityp_', 'ityp_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;

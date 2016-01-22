@@ -69,7 +69,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function ChapterCache()
+	function __construct()
 	{
 		parent::__construct( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
 

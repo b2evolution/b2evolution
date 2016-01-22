@@ -39,10 +39,10 @@ class coll_small_print_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_small_print_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_small_print' );
+		parent::__construct( $db_row, 'core', 'coll_small_print' );
 	}
 
 

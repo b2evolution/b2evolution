@@ -39,7 +39,7 @@ class ItemTypeCache extends DataObjectCache
 	 *
 	 * @param table Database row
 	 */
-	function ItemTypeCache()
+	function __construct()
 	{
 		// Call parent constructor:
 		parent::__construct( 'ItemType', true, 'T_items__type', 'ityp_', 'ityp_ID', 'ityp_name', 'ityp_ID' );

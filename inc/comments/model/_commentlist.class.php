@@ -53,7 +53,7 @@ class CommentList2 extends DataObjectList2
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 */
-	function CommentList2(
+	function __construct(
 		$Blog,
 		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
@@ -64,7 +64,7 @@ class CommentList2 extends DataObjectList2
 		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// Set Blog. Note: It can be NULL on ?disp=usercomments
 		$this->Blog = $Blog;

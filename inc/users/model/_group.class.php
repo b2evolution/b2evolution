@@ -84,10 +84,10 @@ class Group extends DataObject
 	 *
 	 * @param object DB row
 	 */
-	function Group( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_groups', 'grp_', 'grp_ID' );
+		parent::__construct( 'T_groups', 'grp_', 'grp_ID' );
 
 		if( $db_row == NULL )
 		{

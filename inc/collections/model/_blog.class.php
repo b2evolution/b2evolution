@@ -139,7 +139,7 @@ class Blog extends DataObject
 		$Timer->start( 'Blog constructor' );
 
 		// Call parent constructor:
-		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
+		parent::__construct( 'T_blogs', 'blog_', 'blog_ID' );
 
 		if( $db_row == NULL )
 		{

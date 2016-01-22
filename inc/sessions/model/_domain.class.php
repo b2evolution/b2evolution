@@ -36,10 +36,10 @@ class Domain extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function Domain( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_basedomains', 'dom_', 'dom_ID' );
+		parent::__construct( 'T_basedomains', 'dom_', 'dom_ID' );
 
 		if( $db_row != NULL )
 		{

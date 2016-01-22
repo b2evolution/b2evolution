@@ -220,14 +220,14 @@ class File extends DataObject
 	 * @param boolean check for meta data?
 	 * @return mixed false on failure, File object on success
 	 */
-	function File( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
+	function __construct( $root_type, $root_ID, $rdfp_rel_path, $load_meta = false )
 	{
 		global $Debuglog;
 
 		$Debuglog->add( "new File( $root_type, $root_ID, $rdfp_rel_path, load_meta=$load_meta)", 'files' );
 
 		// Call parent constructor
-		parent::DataObject( 'T_files', 'file_', 'file_ID', '', '', '', '' );
+		parent::__construct( 'T_files', 'file_', 'file_ID', '', '', '', '' );
 
 		// Memorize filepath:
 		$FileRootCache = & get_FileRootCache();

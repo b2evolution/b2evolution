@@ -27,10 +27,10 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function mobile_skin_switcher_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'mobile_skin_switcher' );
+		parent::__construct( $db_row, 'core', 'mobile_skin_switcher' );
 	}
 
 

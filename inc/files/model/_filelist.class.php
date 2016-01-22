@@ -254,7 +254,7 @@ class Filelist
 	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list; NULL for the Fileroot's ads_path.
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $FileRoot, $path = NULL )
+	function __construct( $FileRoot, $path = NULL )
 	{
 		global $AdminUI;
 

@@ -40,10 +40,10 @@ class IPRange extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function IPRange( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_antispam__iprange', 'aipr_', 'aipr_ID' );
+		parent::__construct( 'T_antispam__iprange', 'aipr_', 'aipr_ID' );
 
 		if( $db_row != NULL )
 		{

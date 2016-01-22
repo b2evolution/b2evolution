@@ -63,10 +63,10 @@ class Message extends DataObject
 	 *
 	 * @param db_row database row
 	 */
-	function Message( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_messaging__message', 'msg_', 'msg_ID', 'datetime', '', 'author_user_ID' );
+		parent::__construct( 'T_messaging__message', 'msg_', 'msg_ID', 'datetime', '', 'author_user_ID' );
 
 		if( $db_row == NULL )
 		{

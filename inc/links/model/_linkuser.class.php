@@ -28,10 +28,10 @@ class LinkUser extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function LinkUser( $User )
+	function __construct( $User )
 	{
 		// call parent contsructor
-		parent::LinkOwner( $User, 'user' );
+		parent::__construct( $User, 'user' );
 		$this->User = & $this->link_Object;
 
 		$this->_trans = array(

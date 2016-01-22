@@ -66,7 +66,7 @@ class PageCache
 	 *
 	 * @param Blog to use, can be NULL
 	 */
-	function PageCache( $Blog = NULL )
+	function __construct( $Blog = NULL )
 	{
 		global $Debuglog;
 		global $Settings;

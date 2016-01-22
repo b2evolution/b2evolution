@@ -32,10 +32,10 @@ class Subregion extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Subregion( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
+		parent::__construct( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
 
 		if( $db_row )
 		{

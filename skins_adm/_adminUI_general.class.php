@@ -139,7 +139,7 @@ class AdminUI_general extends Menu
 	/**
 	 * Constructor.
 	 */
-	function AdminUI_general()
+	function __construct()
 	{
 		global $mode; // TODO: make it a real property
 		global $htsrv_url, $baseurl;

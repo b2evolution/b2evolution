@@ -49,10 +49,10 @@ class Organization extends DataObject
 	 *
 	 * @param object DB row
 	 */
-	function Organization( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__organization', 'org_', 'org_ID' );
+		parent::__construct( 'T_users__organization', 'org_', 'org_ID' );
 
 		if( $db_row != NULL )
 		{ // Loading an object from DB:

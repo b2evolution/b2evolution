@@ -37,7 +37,7 @@ class UserQuery extends SQL
 	 * @param string Name of the ID field (including prefix)
 	 * @param array Query params
 	 */
-	function UserQuery( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
+	function __construct( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
 	{
 		global $collections_Module;
 

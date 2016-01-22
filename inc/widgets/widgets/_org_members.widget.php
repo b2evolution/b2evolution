@@ -27,10 +27,10 @@ class org_members_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function org_members_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'org_members' );
+		parent::__construct( $db_row, 'core', 'org_members' );
 	}
 
 
