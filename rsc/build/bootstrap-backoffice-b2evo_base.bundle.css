@@ -1282,7 +1282,7 @@ div.debug td.odd {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-.disp_messages .table_scroll table.table tr td {
+.evo_private_messages_list .table_scroll table.table tr td {
   vertical-align: top;
 }
 a.jslog_switcher {
