@@ -2405,7 +2405,7 @@ class Blog extends DataObject
 
 		if( $set_default_blog_ID )
 		{	// No default blog yet, Use for first base url as "Default collection in index.php"
-			// We need index.php so that permalinks to info pages can work even when .htaccess is not properly configured.
+			// We need an URL scheme that uses "index.php" so that permalinks to info pages can work even when .htaccess is not properly configured.
 			$this->set( 'access_type', 'default' );
 		}
 		else
