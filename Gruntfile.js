@@ -1,22 +1,6 @@
-// In order to use Grunt:
-// - first install NodeJS on your system (http://nodejs.org), which includes the npm tool.
-// - then install the Grunt CLI on your system: (sudo) npm install -g grunt-cli
-// - then switch to the b2evolution folder (where this file resides) and install (locally in this dir) 
-//   everything that is needed: just type "npm install" - this will use the package.json file to know what to install.
-//   each of the required packages with "npm install xxx" for each of the Dependencies listed in package.json
-// - then, in order to be able to invoke 'grunt' on your system, type "sudo npm install -g grunt-cli". This will make
-//   grunt available from the Command Line Interface.
-// - ONCE IN A WHILE: run "npm update" to update all youe packages
-// In order to use Sass:
-// - Make sur Ruby is installed on your system (should be preinstalled on MacOSX. On windows: http://rubyinstaller.org)
-// - Type: "sudo gem install sass"
-// Once this is done, you can:
-// - type 'grunt' (in this dir) and run the default tasks
-// - type 'grunt xxx' where xxx is a specific task name
-// - type 'grunt watch' and grunt will start listening for file edits and run automatically 
-// Note for devs: when adding new plugins, use for example "npm install grunt-contrib-less --save-dev" 
-// to update the package.json file with the new plugin reference.
-
+// ---------------------------------------------------------------
+// To get started with Grunt: see http://b2evolution.net/man/grunt
+// ---------------------------------------------------------------
 module.exports = function(grunt) {
 
 	// Project configuration:

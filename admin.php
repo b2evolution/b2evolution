@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main dispatcher for the admin interface.
+ * This is the main dispatcher for the admin interface, a.k.a. The Back-Office.
  *
  * ---------------------------------------------------------------------------------------------------------------
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
