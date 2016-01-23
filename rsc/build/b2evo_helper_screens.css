@@ -41,6 +41,10 @@ nav ul {
   margin-bottom: 0;
   line-height: 40px;
 }
+.container p img {
+  width: 100%;
+  height: auto;
+}
 @media (min-width: 768px) {
   .container {
     max-width: 730px;
