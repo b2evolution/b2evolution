@@ -11,8 +11,11 @@
 	img {
 		display: inline-block;
 	}
-	h2.page-header {
-		margin-top: 0;
+	a.user_link {
+		color: @widget_core_org_members-user-link-color;
+		&:hover {
+			color: @widget_core_org_members-user-link-hover-color;
+		}
 	}
 	h3.member-name {
 		margin-top: 10px;
@@ -32,14 +35,6 @@
 		-webkit-line-clamp: 2;
 		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
 	}
-}
-body.pictured .secondary_area .widget_core_org_members {
-		a.user_link {
-			color: @widget_core_org_members-user-link-color;
-			&:hover {
-				color: @widget_core_org_members-user-link-hover-color;
-			}
-		}
 }
 
 // Responsive layout
