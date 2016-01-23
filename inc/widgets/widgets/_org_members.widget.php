@@ -113,6 +113,20 @@ class org_members_Widget extends ComponentWidget
 					'options' => get_available_thumb_sizes(),
 					'defaultvalue' => 'crop-top-200x200',
 				),
+				'order_by' => array(
+					'label' => T_('Order by'),
+					'note' => T_('Field used to sort the order in which the members are displayed'),
+					'type' => 'select',
+					'options' => array(
+							'user_id' => 'User ID', 
+							'user_level' => 'User Level',
+							'org_role' => 'Role in Organization',
+							'username' => 'Username',
+							'lastname' => 'Last Name, First Name',
+							'firstname' => 'First Name, Last Name'
+					),
+					'defaultvalue' => 'user_id'
+				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
 					'note' => T_('Check this to link each user to his profile.'),
@@ -186,7 +200,8 @@ class org_members_Widget extends ComponentWidget
 		else
 		{
 			// Get all users of the selected organization
-			$users = $Organization->get_users();
+			$order_by = $this->disp_params['order_by'];
+			$users = $Organization->get_users( $order_by );
 
 			if( $this->disp_params['display_icons'] )
 			{ // Initialise css classes for icons depending on widget setting and only when they are displayed
