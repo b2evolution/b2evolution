@@ -2300,7 +2300,7 @@ class File extends DataObject
 					$img_attribs += $size_arr;
 				}
 				elseif( $thumb_sizes = $this->get_thumb_size( $size_name ) )
-				{	// Get sizes that are used for thumbnail really
+				{	// Get sizes of the generated thumbnail:
 					$img_attribs['width'] = $thumb_sizes[0];
 					$img_attribs['height'] = $thumb_sizes[1];
 				}
