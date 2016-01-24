@@ -138,7 +138,13 @@ function switch_maintenance_mode( $enable, $mode = 'all', $msg = '', $silent = f
 <hr />
 <p>Site administrators: please view the source of this page for details.</p>
 <!--
-If you need to manually put b2evolution out of maintenance mode, delete or rename the file /conf/maintenance.html
+If you need to manually put b2evolution OUT of maintenance mode, delete or rename the file
+/conf/maintenance.html or /conf/imaintenance.html or /conf/umaintenance.html .
+The presence of any of these files will make b2evolution show it is in maintenance mode.
+
+WARNING: If you just had an upgrade fail in the middle of it, it is a very bad idea to just
+get out of maintenance mode without immdiately restoring a DB backup first. Continuing without
+a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 -->
 </body>
 </html>';
