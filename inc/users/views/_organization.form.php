@@ -67,6 +67,7 @@ if( $edited_Organization->ID > 0 )
 			'results_order'        => '/uorg_accepted/D',
 			'page_url'             => get_dispctrl_url( 'organizations', 'action=edit&amp;org_ID='.$edited_Organization->ID ),
 			'display_orgstatus'    => true,
+			'display_role'         => true,
 			'display_ID'           => false,
 			'display_btn_adduser'  => false,
 			'display_btn_addgroup' => false,

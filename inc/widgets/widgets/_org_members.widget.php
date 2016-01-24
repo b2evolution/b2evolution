@@ -125,11 +125,17 @@ class org_members_Widget extends ComponentWidget
 							'lastname' => 'Last Name, First Name',
 							'firstname' => 'First Name, Last Name'
 					),
-					'defaultvalue' => 'user_id'
+					'defaultvalue' => 'user_id',
 				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
 					'note' => T_('Check this to link each user to his profile.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+				'display_role' => array(
+					'label' => T_('Role in organization'),
+					'note' => T_('Check this to display the role of the members in the organization'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
@@ -244,11 +250,17 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					// Full name
-					echo '<h3 class="member-name">'.$org_User->get( 'fullname' ).'</h3>';
+					echo '<h3 class="evo_user_name">'.$org_User->get( 'fullname' ).'</h3>';
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
 						echo '</a>';
+					}
+					
+					// Organizational role
+					if( $this->disp_params['display_role'] == 1 )
+					{
+						echo '<h2 class="evo_org_role text-muted">'.$org_User->get_organizations_data()[$org_ID]['role'].'</h2>';
 					}
 
 					if( $this->disp_params['display_icons'] )
