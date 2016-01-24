@@ -207,7 +207,7 @@ class org_members_Widget extends ComponentWidget
 		{
 			// Get all users of the selected organization
 			$order_by = $this->disp_params['order_by'];
-			$users = $Organization->get_users( $order_by );
+			$users = $Organization->get_users( $order_by, true );
 
 			if( $this->disp_params['display_icons'] )
 			{ // Initialise css classes for icons depending on widget setting and only when they are displayed
