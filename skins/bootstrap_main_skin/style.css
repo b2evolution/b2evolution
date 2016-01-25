@@ -2,6 +2,10 @@
   margin: 5em 0 30px;
   color: #333333;
 }
+.widget_core_org_members div.evo_org_member {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
 .widget_core_org_members img {
   display: inline-block;
 }
@@ -10,8 +14,9 @@
   margin-bottom: 0;
 }
 .widget_core_org_members div.evo_org_role {
-  margin-top: 3px;
+  margin-top: 10px;
   margin-bottom: 0;
+  min-height: 25px;
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
@@ -25,7 +30,7 @@
   min-height: 44px;
 }
 .widget_core_org_members p.user_field {
-  margin-bottom: 40px;
+  margin-top: 10px;
   line-height: 1.5;
   text-overflow: ellipsis;
   display: -webkit-box;

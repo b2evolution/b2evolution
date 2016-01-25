@@ -230,7 +230,7 @@ class org_members_Widget extends ComponentWidget
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="col-lg-4 col-sm-6 text-center">';
+					echo '<div class="evo_org_member col-lg-4 col-md-6 col-sm-6 text-center">';
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
@@ -313,7 +313,7 @@ class org_members_Widget extends ComponentWidget
 							echo '<div class="clearfix visible-lg-block"></div>';
 							break;
 						case 2:
-							echo '<div class="clearfix visible-sm-block"></div>';
+							echo '<div class="clearfix visible-sm-block visible-md-block"></div>';
 							break;
 						default:
 							// do nothing
