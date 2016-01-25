@@ -5758,7 +5758,7 @@ function get_active_opcode_cache()
 	{
 		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
 		$apc_info = apc_cache_info( '', true );
-		if( isset( $apc_info['num_entries'] ) && ( $apc_info['num_entries'] ) )
+		if( isset( $apc_info['num_slots'] ) && ( $apc_info['num_slots'] ) )
 		{
 			return 'APC';
 		}
