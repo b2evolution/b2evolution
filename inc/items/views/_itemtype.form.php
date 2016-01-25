@@ -42,7 +42,7 @@ $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-type-form') : T_('Post type').get_manual_link('item-type-form') );
+$Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
 	$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 
