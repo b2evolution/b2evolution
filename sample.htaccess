@@ -17,17 +17,20 @@
 	php_flag register_globals Off
 	php_flag allow_url_include Off
 	php_flag magic_quotes_gpc Off
+
+	# For uploading
 	php_value upload_max_filesize 32M
 	php_value post_max_size 40M
-	php_value max_execution_time 600
+
+	# You may increase the following if PHP is not able to increase it by itself when needed
+	# Otherwiwse it's better to keep the number low enough for general use
+	php_value max_execution_time 30
 	
 	# You may want to turn the following to Off on production servers
 	# Please do this only if you know what you're doing and will be able to retrieve potential errors from your error log
 	php_flag display_errors On
 	# The following is the same as 'E_ALL & ~ E_STRICT' (except those constants may not be available here)
 	php_value error_reporting 30719
-
-
 </IfModule>
 
 # DISABLE LISTING FILES ON SERVER:
