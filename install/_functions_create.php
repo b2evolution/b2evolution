@@ -1844,7 +1844,7 @@ function create_demo_contents()
 <p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
 <p>If needed, skins can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
-			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 		$edit_File = new File( 'shared', 1, 'logos/b2evolution_272x64.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
@@ -1895,7 +1895,7 @@ function create_demo_contents()
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( $jay_moderator_ID, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
-			array(), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2030,7 +2030,7 @@ function create_demo_contents()
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( $paul_blogger_ID, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
-			array(), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
@@ -2145,7 +2145,7 @@ function create_demo_contents()
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('About Photos'), sprintf( $info_page, T_('Photos') ), $now, $cat_photo_album,
-			array(), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post into photoblog:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2249,7 +2249,7 @@ The rain---not the reign---in Spain.');
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_("About Forums"), sprintf( $info_page, T_('Forums') ), $now, $cat_forums_ann,
-			array(), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
@@ -2389,7 +2389,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 		$now = date('Y-m-d H:i:s',$timestamp++);
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_("About this manual"), sprintf( $info_page, T_('Manual') ), $now, $cat_manual_intro,
-			array(), 'published', '#', '', '', 'open', array('default'), 'Page' );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
 		$now = date('Y-m-d H:i:s',$timestamp++);
