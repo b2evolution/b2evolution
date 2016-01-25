@@ -155,7 +155,7 @@ class Organization extends DataObject
 	 *
 	 * return array User objects
 	 */
-	function get_users( $order_by = 'user_id' )
+	function get_users( $order_by = 'user_id', $accepted_only = false )
 	{
 		global $DB;
 
@@ -171,6 +171,10 @@ class Organization extends DataObject
 		$users_SQL->FROM( 'T_users__user_org' );
 		$users_SQL->FROM_add( 'INNER JOIN T_users ON uorg_user_ID = user_ID' );
 		$users_SQL->WHERE( 'uorg_org_ID = '.$DB->quote( $this->ID ) );
+		if( $accepted_only )
+		{
+			$users_SQL->WHERE( 'uorg_accepted = 1' );
+		}
 		
 		switch( $order_by )
 		{

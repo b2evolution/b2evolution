@@ -4713,6 +4713,7 @@ function users_results_block( $params = array() )
 			'display_lastname'     => false,
 			'display_nickname'     => true,
 			'display_name'         => true,
+			'display_role'         => false,
 			'display_gender'       => true,
 			'display_country'      => true,
 			'display_region'       => false,
@@ -4887,6 +4888,7 @@ function users_results( & $UserList, $params = array() )
 			'display_nickname'   => true,
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
+			'display_role'       => false,
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_country_type' => 'both', // 'both', 'flag', 'name'
@@ -5041,6 +5043,17 @@ function users_results( & $UserList, $params = array() )
 			$col['order'] = $params['order_name'];
 		}
 		$UserList->cols[] = $col;
+	}
+	
+	if( $params['display_role'] )
+	{ // Display organizational role
+		$UserList->cols[] = array(
+			'th' => T_('Role'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'order' => 'uorg_role',
+			'td' => '$uorg_role$',
+		);
 	}
 
 	if( $params['display_gender'] )
