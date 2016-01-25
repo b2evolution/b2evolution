@@ -516,54 +516,6 @@ class ItemType extends DataObject
 
 
 	/**
-	 *  Returns array, which determinate the lower and upper limit of protected ID's
-	 *
-	 * @deprecated
-	 *
-	 *  @return array
-	 */
-	function get_special_range()
-	{
-		return array( 1000, 5000 );
-	}
-
-
-	/**
-	 * Check if this post type is special( reserved in system )
-	 *
-	 * @deprecated
-	 *
-	 * @param integer Use this param ID of post type when object is not created
-	 * @return boolean
-	 */
-	function is_special( $ID = NULL )
-	{
-		$special_range = ItemType::get_special_range();
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return $ID >= $special_range[0] && $ID <= $special_range[1];
-	}
-
-
-	/**
-	 * Check if this post type is reserved
-	 *
-	 * @deprecated
-	 *
-	 * @param integer Use this param ID of post type when object is not created
-	 * @return boolean
-	 */
-	static function is_reserved( $ID = NULL )
-	{
-		return false;
-	}
-
-
-	/**
 	 * Check if this post type is used for intro posts
 	 *
 	 * @return boolean

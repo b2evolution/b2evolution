@@ -2105,11 +2105,6 @@ function check_perm_posttype( $item_typ_ID, $post_extracats )
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
 
-	if( ItemType::is_reserved( $ItemType->ID ) )
-	{ // Don't allow to use a reserved post type:
-		debug_die( 'This post type is reserved and cannot be used. Please choose another one.' );
-	}
-
 	if( ! $Blog->is_item_type_enabled( $ItemType->ID ) )
 	{ // Don't allow to use a not enabled post type:
 		debug_die( 'This post type is not enabled. Please choose another one.' );

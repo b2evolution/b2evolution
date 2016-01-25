@@ -41,12 +41,10 @@ function get_actions_for_itemtype( $id )
 	$action = action_icon( T_('Duplicate this Post Type...'), 'copy',
 										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
 
-	if( ! ItemType::is_reserved( $id ) )
-	{ // Edit all post types except of not reserved post type
-		$action = action_icon( T_('Edit this Post Type...'), 'edit',
-										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
-							.$action;
-	}
+	// Edit all post types except of not reserved post type
+	$action = action_icon( T_('Edit this Post Type...'), 'edit',
+									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
+						.$action;
 
 	if( ! in_array( $id, $default_ids ) )
 	{	// Delete only the not default post types:
@@ -64,7 +62,7 @@ function get_name_for_itemtype( $id, $name )
 {
 	global $current_User;
 
-	if( ! ItemType::is_reserved( $id ) && $current_User->check_perm( 'options', 'edit' ) )
+	if( $current_User->check_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'action,ID', 'ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}
@@ -87,11 +85,6 @@ $Results->cols[] = array(
 
 function ityp_row_enabled( $enabled, $item_type_ID )
 {
-	if( ItemType::is_reserved( $item_type_ID ) )
-	{ // It is reserved item type, Don't allow to enable this
-		return '';
-	}
-
 	global $current_User, $admin_url, $Blog;
 
 	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
@@ -132,11 +125,6 @@ $Results->cols[] = array(
 
 function ityp_row_default( $item_type_ID )
 {
-	if( ItemType::is_reserved( $item_type_ID ) )
-	{ // It is reserved item type, Don't allow to enable this
-		return '';
-	}
-
 	global $current_User, $admin_url, $Blog;
 
 	if( $Blog->get_setting( 'default_post_type' ) == $item_type_ID )
@@ -216,11 +204,6 @@ $Results->cols[] = array(
 
 function ityp_row_perm_level( $level, $id )
 {
-	if( ItemType::is_reserved( $id ) )
-	{ // It is reserved item type, Don't display perm level
-		return '';
-	}
-
 	$perm_levels = array(
 			'standard'   => T_('Standard'),
 			'restricted' => T_('Restricted'),

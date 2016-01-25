@@ -247,7 +247,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		if( $edited_Itemtype && ! ItemType::is_reserved( $edited_Itemtype->ID ) )
+		if( $edited_Itemtype )
 		{ // Do only when item type exists in DB
 			if( $action == 'enable' )
 			{ // Enable item type for the collection
@@ -279,7 +279,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		if( $edited_Itemtype && ! ItemType::is_reserved( $edited_Itemtype->ID ) )
+		if( $edited_Itemtype )
 		{	// Do only when item type exists in DB:
 
 			// Update default item type to new selected:
