@@ -313,8 +313,9 @@ class AdminUI extends AdminUI_general
 					);
 
 			case 'Results':
+			case 'compact_results':
 				// Results list:
-				return array(
+				$results_template = array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
@@ -408,6 +409,14 @@ class AdminUI extends AdminUI_general
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
+				if( $name == 'compact_results' )
+				{	// Use a little different template for compact results table:
+					$results_template = array_merge( $results_template, array(
+							'before' => '<div class="results evo_results__compact">',
+							'head_title' => '',
+						) );
+				}
+				return $results_template;
 
 			case 'blockspan_form':
 				// Form settings for filter area:
