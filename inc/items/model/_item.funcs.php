@@ -1552,10 +1552,10 @@ function get_tab_by_item_type_usage( $type_usage )
 	switch( $type_usage )
 	{
 		case 'post':
-			$type_tab = array( 'post', NT_('Post') );
+			$type_tab = array( 'post', NT_('Posts') );
 			break;
 		case 'page':
-			$type_tab = array( 'page', NT_('Page') );
+			$type_tab = array( 'page', NT_('Pages') );
 			break;
 		case 'special':
 			$type_tab = array( 'special', NT_('Special') );

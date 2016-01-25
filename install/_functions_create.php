@@ -252,7 +252,7 @@ function create_default_data()
 					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
 					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
 					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Page',                    'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
+					 ( 'Standalone Page',         'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
 					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
 					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
 					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),

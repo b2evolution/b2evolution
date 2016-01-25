@@ -6983,6 +6983,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Delete the reserved item type:
 		$DB->query( 'DELETE FROM T_items__type
 			WHERE ityp_ID = "5000"' );
+		// Update name of page item type:
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_name = "Standalone Page"
+			WHERE ityp_usage = "page"
+			  AND ityp_name = "Page"' );
 		task_end();
 
 		// set_upgrade_checkpoint( '11520' );
