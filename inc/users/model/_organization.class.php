@@ -119,7 +119,7 @@ class Organization extends DataObject
 		$users_SQL->WHERE( 'uorg_org_ID = '.$DB->quote( $this->ID ) );
 		if( $accepted_only )
 		{
-			$users_SQL->WHERE( 'uorg_accepted = 1' );
+			$users_SQL->WHERE_and( 'uorg_accepted = 1' );
 		}
 		
 		switch( $order_by )
