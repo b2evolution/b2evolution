@@ -631,17 +631,19 @@ class autolinks_plugin extends Plugin
 				// An optional previous required word (allows to create groups of 2 words)
 				$previous = $this->previous_lword;
 				// Url for current word
-				$url = 'http://'.$this->replacement_link_array[ $lword ][ $this->previous_lword ];
+				$url = $this->replacement_link_array[ $lword ][ $this->previous_lword ];
 			}
 			else
 			{ // No previous word, it is a single word
 				foreach( $this->replacement_link_array[ $lword ] as $previous => $url )
 				{ // Initialize an optional previous required word and url as first of the current word
-				
-					// Make sure URL is well formed
-					$url = rebuild_url( $url );
 					break;
 				}
+			}
+
+			if( ! preg_match( '#(^|[a-z]+:)//#', $url ) )
+			{	// Use default URL scheme if it is not defined by config:
+				$url = 'http://'.$url;
 			}
 
 			if( in_array( $url, $this->already_linked_array ) || in_array( $lword, $this->already_linked_usernames ) )

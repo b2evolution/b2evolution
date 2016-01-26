@@ -3478,7 +3478,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$NL = "\r\n";
 
 	if( $demo_mode )
-	{ // Debug mode restriction: Sending email in debug mode is not allowed
+	{ // Debug mode restriction: Sending email in demo mode is not allowed
 		return false;
 	}
 

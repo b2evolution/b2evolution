@@ -180,7 +180,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog;
+		global $DB, $Item, $Blog, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
@@ -230,7 +230,7 @@ class org_members_Widget extends ComponentWidget
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="col-lg-4 col-sm-6 text-center">';
+					echo '<div class="evo_org_member col-lg-4 col-md-6 col-sm-6 text-center">';
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
@@ -239,8 +239,12 @@ class org_members_Widget extends ComponentWidget
 						echo '<a href="'.$user_url.'" class="user_link">';
 					}
 
+					// Get image tag size based on thumb size param
+					$tag_size = $thumbnail_sizes[ $this->disp_params['thumb_size'] ];
+					$tag_size = $tag_size[1].'x'.$tag_size[2];
+
 					// Profile picture
-					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center');
+					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center', '', false, '', '', $tag_size );
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
@@ -309,7 +313,7 @@ class org_members_Widget extends ComponentWidget
 							echo '<div class="clearfix visible-lg-block"></div>';
 							break;
 						case 2:
-							echo '<div class="clearfix visible-sm-block"></div>';
+							echo '<div class="clearfix visible-sm-block visible-md-block"></div>';
 							break;
 						default:
 							// do nothing
