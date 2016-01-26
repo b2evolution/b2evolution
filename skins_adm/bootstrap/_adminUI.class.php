@@ -412,8 +412,12 @@ class AdminUI extends AdminUI_general
 				if( $name == 'compact_results' )
 				{	// Use a little different template for compact results table:
 					$results_template = array_merge( $results_template, array(
-							'before' => '<div class="results evo_results__compact">',
+							'before' => '<div class="results">',
 							'head_title' => '',
+							'no_results_start' => '<div class="table_scroll">'."\n"
+																		.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+							'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																		.'</tbody></table></div>'."\n\n",
 						) );
 				}
 				return $results_template;
