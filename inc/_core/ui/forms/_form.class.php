@@ -2545,8 +2545,8 @@ class Form extends Widget
 		{
 			if( is_array( $l_option ) )
 			{	// If option is array then it is a group of the options:
-				$r .= Form::get_select_group_options_string( $field_options, $field_value, $force_keys_as_values, $color_array );
-				break;
+				$r .= Form::get_select_group_options_string( array( $l_key => $l_option ), $field_value, $force_keys_as_values, $color_array );
+				continue;
 			}
 
 			// Get the value attribute from key if is_string():

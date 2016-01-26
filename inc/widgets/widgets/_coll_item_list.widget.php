@@ -48,11 +48,17 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemTypeCache
 		 */
 		$ItemTypeCache = & get_ItemTypeCache();
+
 		$item_type_options =
 			array(
 				'#' => T_('Default'),
 				''  => T_('All'),
-			) + $ItemTypeCache->get_option_array() ;
+			) + $ItemTypeCache->get_option_array();
+
+		$item_type_usage_options =
+			array(
+				'' => T_('All'),
+			) + $ItemTypeCache->get_usage_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -83,6 +89,13 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $item_type_options,
 					'defaultvalue' => '#',
+				),
+				'item_type_usage' => array(
+					'label' => T_('Post type usage'),
+					'note' => T_('What kind of items usage do you want to list?'),
+					'type' => 'select',
+					'options' => $item_type_usage_options,
+					'defaultvalue' => '',
 				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),

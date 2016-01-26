@@ -908,9 +908,27 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					$check_options = array($check_options);
 				}
 
-				foreach($check_options as $v)
+				// Get all possible values for the select element:
+				$meta_options = array();
+				foreach( $meta['options'] as $meta_option_key => $meta_option_value )
 				{
-					if( ! in_array( $v, array_keys($meta['options']) ) )
+					if( is_array( $meta_option_value ) )
+					{	// It is a grouped options:
+						foreach( $meta_option_value as $meta_group_option_key => $meta_group_option_value )
+						{
+							$meta_options[] = $meta_group_option_key;
+						}
+					}
+					else
+					{	// Single option:
+						$meta_options[] = $meta_option_key;
+					}
+				}
+
+				// Check if the selected values can be used for the select element:
+				foreach( $check_options as $v )
+				{
+					if( ! in_array( $v, $meta_options ) )
 					{
 						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
 						return false;

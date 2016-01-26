@@ -46,23 +46,8 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
 	$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 
-	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, array(
-			T_('In content flow') => array(
-					'post' => T_('Post')
-				),
-			T_('Out of content flow') => array(
-					'page'    => T_('Page'),
-					'special' => T_('Special'),
-				),
-			T_('Intros') => array(
-					'intro-front' => T_('Intro-Front'),
-					'intro-main'  => T_('Intro-Main'),
-					'intro-cat'   => T_('Intro-Cat'),
-					'intro-tag'   => T_('Intro-Tag'),
-					'intro-sub'   => T_('Intro-Sub'),
-					'intro-all'   => T_('Intro-All'),
-				),
-		), T_('Usage'), '', array( 'required' => true ) );
+	$ItemTypeCache = & get_ItemTypeCache();
+	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, $ItemTypeCache->get_usage_option_array(), T_('Usage'), '', array( 'required' => true ) );
 
 	// Display a field to edit a name:
 	$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
