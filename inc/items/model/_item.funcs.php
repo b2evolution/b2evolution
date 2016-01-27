@@ -52,7 +52,7 @@ function init_MainList( $items_nb_limit )
 			// $MainList->dump_active_filters();
 
 			// Run the query:
-			$MainList->query();
+			$MainList->query_ItemList2();
 
 			// Old style globals for category.funcs:
 			$postIDlist = $MainList->get_page_ID_list();
@@ -273,7 +273,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
-		$FeaturedList->query();
+		$FeaturedList->query_ItemList2();
 
 
 		// SECOND: If no Intro, try to find an Featured post:
@@ -290,7 +290,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 				), false /* Do NOT memorize!! */ );
 
 			// Run the query:
-			$FeaturedList->query();
+			$FeaturedList->query_ItemList2();
 		}
 	}
 

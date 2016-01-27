@@ -1521,7 +1521,7 @@ var downloadInterval = setInterval( function()
 				$user_ItemList->set_filters( array(
 						'authors' => $user_ID,
 					), true, true );
-				$user_ItemList->query();
+				$user_ItemList->query_ItemList2();
 			}
 			else // $disp == 'usercomments'
 			{ // Init comments list

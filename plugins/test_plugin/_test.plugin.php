@@ -982,7 +982,7 @@ class test_plugin extends Plugin
 			}
 
 			// Run the query:
-			$params['MainList']->query();
+			$params['MainList']->query_ItemList2();
 
 			// Restore aggregate setting to its original value
 			$Blog->set_setting( 'aggregate_coll_IDs', $saved_aggregate_state );
