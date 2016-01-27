@@ -1816,7 +1816,7 @@ function xmlrpc_get_items( $params, & $Blog )
 	$ItemList->set_filters( $filters, false );
 
 	// Run the query:
-	$ItemList->query_ItemList2();
+	$ItemList->query();
 
 	logIO( 'Items found: '.$ItemList->result_num_rows );
 

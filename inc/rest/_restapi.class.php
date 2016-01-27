@@ -287,7 +287,7 @@ class RestApi
 		}
 
 		// Run the items list query:
-		$ItemList2->query_ItemList2();
+		$ItemList2->query();
 
 		if( ! $post_ID )
 		{	// Add data of posts list to response:

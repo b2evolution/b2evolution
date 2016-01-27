@@ -429,7 +429,7 @@ function blogger_getrecentposts( $m )
 		) );
 
 	// Run the query:
-	$MainList->query_ItemList2();
+	$MainList->query();
 
 
 	logIO( 'Items:'.$MainList->result_num_rows );

@@ -93,7 +93,7 @@ if( ! empty( $chapters ) )
 				'cat_modifier' => NULL,
 				'unit'         => 'all', // Display all items of this category, Don't limit by page
 			) );
-		$ItemList->query_ItemList2();
+		$ItemList->query();
 		if( $ItemList->result_num_rows > 0 )
 		{
 			$no_content_to_display = false;

@@ -37,7 +37,7 @@ if( $cat > 0 )
 			'cat_modifier' => NULL,
 			'page' => $page
 		) );
-	$MainList->query_ItemList2();
+	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
 
 	// Load read statuses if required

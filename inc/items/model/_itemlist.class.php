@@ -249,7 +249,7 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
 	 */
-	function query_ItemList2()
+	function query()
 	{
 		global $DB;
 
