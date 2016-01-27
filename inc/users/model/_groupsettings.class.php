@@ -161,7 +161,7 @@ class GroupSettings extends AbstractSettings
 	 *
 	 * @param integer Group ID
 	 */
-	function dbupdate( $grp_ID )
+	function dbupdate_GroupSettings( $grp_ID )
 	{
 		if( ! empty( $this->_permissions ) )
 		{	// Set temporary permissions. It is only for the new creating group
