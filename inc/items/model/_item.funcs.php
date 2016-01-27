@@ -156,6 +156,9 @@ function init_inskin_editing()
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 
+	// Restrict item status to max allowed by item collection:
+	$edited_Item->restrict_status_by_collection();
+
 	// Used in the edit form:
 
 	// We never allow HTML in titles, so we always encode and decode special chars.

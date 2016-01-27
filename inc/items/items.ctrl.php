@@ -691,6 +691,9 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection();
+
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
 
@@ -745,6 +748,9 @@ switch( $action )
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection( true );
 
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit' || $action == 'create_link'), /* creating? */ true );
@@ -930,6 +936,9 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
+
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection( true );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesful

@@ -7737,5 +7737,49 @@ class Item extends ItemLight
 
 		return $other_tags;
 	}
+
+
+	/**
+	 * Restrict item status by item collection
+	 *
+	 * @param boolean TRUE to update status
+	 */
+	function restrict_status_by_collection( $update_status = false )
+	{
+		$item_Blog = & $this->get_Blog();
+
+		// Store current status to display a warning:
+		$current_status = $this->get( 'status' );
+
+		// Restrict status to max allowed for item collection:
+		$restricted_status = $item_Blog->get_allowed_item_status( $current_status );
+
+		if( $update_status )
+		{	// Update status to new restricted value:
+			$this->set( 'status', $restricted_status );
+		}
+		else
+		{	// Only change status to update it on the edit forms:
+			$this->status = $restricted_status;
+		}
+
+		if( $current_status != $this->get( 'status' ) )
+		{	// If current item status cannot be used for item collection
+			global $Messages;
+
+			if( $item_Blog->get_setting( 'allow_access' ) == 'members' )
+			{	// The collection is restricted for members or only for owner
+				$visibility_statuses = get_visibility_statuses();
+				if( ! $item_Blog->get( 'advanced_perms' ) )
+				{	// If advanced permissions are NOT enabled then only owner has an access for the collection
+					$Messages->add( sprintf( T_('Since this collection is "Private", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
+				}
+				else
+				{	// Otherwise all members of this collection have an access for the collection
+					$Messages->add( sprintf( T_('Since this collection is "Members only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
+				}
+			}
+		}
+	}
 }
 ?>
