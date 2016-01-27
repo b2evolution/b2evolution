@@ -67,7 +67,9 @@ See manual for more.');
 			$default_params['default_post_rendering'] = 'opt-out';
 		}
 
-		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
+		$merge_result = array_merge( $params, $default_params );
+
+		return parent::get_coll_setting_definitions( $merge_result );
 	}
 
 
