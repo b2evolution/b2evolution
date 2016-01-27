@@ -125,6 +125,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_cmtstatuses += param( 'blog_perm_deprecated_cmt_'.$loop_ID, 'integer', 0 ) ? get_status_permvalue( 'deprecated' ) : 0;
 		$perm_edit_cmt = param( 'blog_perm_edit_cmt_'.$loop_ID, 'string', 'no' );
 
+		$perm_meta_comments = param( 'blog_perm_meta_comment_'.$loop_ID, 'integer', 0 );
 		$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 		$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
@@ -144,7 +145,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		// Update those permissions in DB:
 
 		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
-			$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
+			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
@@ -153,7 +154,7 @@ function blog_update_perms( $blog, $context = 'user' )
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
-																$perm_cats, $perm_properties, $perm_admin, $perm_media_upload,
+																$perm_meta_comments, $perm_cats, $perm_properties, $perm_admin, $perm_media_upload,
 																$perm_media_browse, $perm_media_change )";
 		}
 	}
@@ -164,7 +165,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
-											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
+											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change )
 									VALUES ".implode( ',', $inserted_values ) );
 	}

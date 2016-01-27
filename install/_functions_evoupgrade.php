@@ -7183,6 +7183,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_files', 'file_download_count', 'INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER file_can_be_main_profile' );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 11690, 'Updating collection user/group permissions...' ) )
+	{
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_meta_comment', 'tinyint NOT NULL default 0 AFTER bloguser_perm_edit_cmt' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_meta_comment', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_edit_cmt' );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

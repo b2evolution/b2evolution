@@ -2886,11 +2886,11 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	// Admin for blog A:
 	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_cats, bloguser_perm_properties,
+							bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties,
 							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 						VALUES
 							( $blog_a_ID, ".$User_Demo->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 )";
+							'published,deprecated,protected,private,draft', 1, 1, 1, 0, 0, 1, 1, 1 )";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	*/

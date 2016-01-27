@@ -2105,6 +2105,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_recycle_owncmts'    => $row[$prefix.'_perm_recycle_owncmts'],
 				'blog_vote_spam_comments' => $row[$prefix.'_perm_vote_spam_cmts'],
 				'blog_edit_cmt'           => $row[$prefix.'_perm_edit_cmt'],
+				'blog_meta_comment'       => $row[$prefix.'_perm_meta_comment'],
 				'blog_cats'               => $row[$prefix.'_perm_cats'],
 				'blog_properties'         => $row[$prefix.'_perm_properties'],
 				'blog_admin'              => $row[$prefix.'_perm_admin'],
@@ -2133,6 +2134,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_recycle_owncmts'    => 0,
 						'blog_vote_spam_comments' => 0,
 						'blog_cmt_statuses'       => 0,
+						'blog_meta_comment'       => 0,
 						'blog_cats'               => 0,
 						'blog_properties'         => 0,
 						'blog_admin'              => 0,
@@ -2237,6 +2239,10 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 			}
 
 			$perm = $perm_statuses_value & get_status_permvalue( $status );
+			break;
+
+		case 'meta_comment':
+			return $blog_perms['blog_meta_comment'];
 			break;
 
 		case 'files':

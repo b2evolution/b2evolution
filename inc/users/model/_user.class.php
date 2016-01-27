@@ -2622,10 +2622,15 @@ class User extends DataObject
 					case 'view':
 					case 'add':
 						// Check perms to View/Add meta comments:
+						$blog_ID = $Item->get_blog_ID();
 						$perm = // If User can edit or delete this Item
 								$this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 								// OR If User can delete any Item of the Blog
-								|| $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() );
+								|| $this->check_perm( 'blog_del_post', '', false, $blog_ID )
+								// OR If User is explicitly allowed in the user permissions
+								|| $this->check_perm_blogusers( 'meta_comment', '', $blog_ID )
+								// OR If User belongs to a group explicitly allowed in the group permissions
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $blog_ID, $Item, $this );
 						break;
 
 					case 'edit':
@@ -2651,6 +2656,15 @@ class User extends DataObject
 						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 						    $Comment->author_user_ID == $this->ID )
 						{ // If it is own meta comment of the User
+							$perm = true;
+							break;
+						}
+						
+						// Check perms to Delete meta based on user/group settings
+						if( $Comment->author_user_ID == $this->ID &&
+								( $this->check_perm_blogusers( 'meta_comment', 'any', $Item->get_blog_ID() )
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $Item->get_blog_ID(), $Item, $this) ) )
+						{
 							$perm = true;
 							break;
 						}
