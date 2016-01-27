@@ -690,7 +690,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_statuses( $this->filters['statuses'] );
 		// types param is kept only for the case when some custom types should be displayed
 		$next_Query->where_types( !empty( $types ) ? $types : $this->filters['types'] );
-		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
+		$next_Query->where_keywords_ItemQuery( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		// $next_Query->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$next_Query->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],

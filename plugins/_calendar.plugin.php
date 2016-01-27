@@ -321,7 +321,7 @@ class calendar_plugin extends Plugin
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', $dstart, '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
 
 			// Keyword search stuff:
-			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
+			$Calendar->ItemQuery->where_keywords_ItemQuery( $s, $sentence, $exact );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -1014,7 +1014,7 @@ class Calendar
 			// if a month is specified in the querystring, load that month:
 			$nav_ItemQuery->where_datestart( /* NO m */'', /* NO w */'', /* NO dstart */'', '', $this->ItemQuery->timestamp_min, $this->ItemQuery->timestamp_max );
 			// Keyword search stuff:
-			$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
+			$nav_ItemQuery->where_keywords_ItemQuery( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
 			// Exclude pages and intros:
 			$nav_ItemQuery->where_types( $this->ItemQuery->types );
 		}

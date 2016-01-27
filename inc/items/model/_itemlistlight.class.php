@@ -583,7 +583,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 		$this->ItemQuery->where_types( $this->filters['types'] );
-		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
+		$this->ItemQuery->where_keywords_ItemQuery( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$this->ItemQuery->where_ID_list( $this->filters['post_ID_list'] );
 		$this->ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
@@ -814,7 +814,7 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
-		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
+		$lastpost_ItemQuery->where_keywords_ItemQuery( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
 		                                   $this->filters['ymdhms_min'], $this->filters['ymdhms_max'],

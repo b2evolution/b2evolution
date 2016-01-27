@@ -794,7 +794,7 @@ class ItemQuery extends SQL
 	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
 	 * @param string Scope of keyword search string: 'title', 'content'
 	 */
-	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
+	function where_keywords_ItemQuery( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
 		global $DB;
 

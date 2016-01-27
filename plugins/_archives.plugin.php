@@ -426,7 +426,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Keyword search stuff:
-			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
+			$this->ItemQuery->where_keywords_ItemQuery( $s, $sentence, $exact );
 
 			$this->ItemQuery->where_types( $types );
 		}
