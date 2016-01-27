@@ -3373,7 +3373,7 @@ class User extends DataObject
 	 *
 	 * Triggers the plugin event AfterUserUpdate.
 	 */
-	function dbupdate()
+	function dbupdate_User()
 	{
 		global $DB, $Plugins, $current_User, $localtimenow;
 
@@ -3502,7 +3502,7 @@ class User extends DataObject
 	 *
 	 * @param Log Log object where output gets added (by reference).
 	 */
-	function dbdelete( & $Log )
+	function dbdelete_User( & $Log )
 	{
 		global $DB, $Plugins;
 

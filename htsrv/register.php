@@ -336,7 +336,7 @@ switch( $action )
 			$DB->rollback();
 
 			// Delete, in case there's no transaction support:
-			$new_User->dbdelete( $Debuglog );
+			$new_User->dbdelete_User( $Debuglog );
 
 			$Messages->add( T_('No user account has been created!'), 'error' );
 			break; // break out to _reg_form.php

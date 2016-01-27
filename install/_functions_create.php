@@ -1317,7 +1317,7 @@ function assign_profile_picture( & $User, $login = NULL )
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$File->load_meta( true );
 	$User->set( 'avatar_file_ID', $File->ID );
-	$User->dbupdate();
+	$User->dbupdate_User();
 
 	// Set link between user and avatar file
 	$LinkOwner = new LinkUser( $User );
