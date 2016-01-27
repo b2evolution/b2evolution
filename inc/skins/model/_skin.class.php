@@ -418,7 +418,7 @@ class Skin extends DataObject
 	 *
 	 * @return boolean true
 	 */
-	function dbupdate()
+	function dbupdate_Skin()
 	{
 		global $DB;
 
