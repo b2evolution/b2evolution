@@ -2765,7 +2765,7 @@ class Blog extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 */
-	function dbupdate()
+	function dbupdate_Blog()
 	{
 		global $DB, $Plugins, $servertimenow;
 

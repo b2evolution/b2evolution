@@ -1205,7 +1205,7 @@ function create_blog(
 
 	$Blog->set( 'order', $Blog->ID );
 
-	$Blog->dbupdate();
+	$Blog->dbupdate_Blog();
 
 	// Insert default group permissions:
 	$Blog->insert_default_group_permissions();
