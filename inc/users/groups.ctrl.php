@@ -150,7 +150,7 @@ switch ( $action )
 		}
 		else
 		{ // Commit update to the DB:
-			$edited_Group->dbupdate();
+			$edited_Group->dbupdate_Group();
 			$Messages->add( T_('Group updated.'), 'success' );
 		}
 
