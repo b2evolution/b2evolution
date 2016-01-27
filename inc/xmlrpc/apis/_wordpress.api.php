@@ -224,7 +224,7 @@ function wp_getpagelist( $m )
 		) );
 
 	// Run the query:
-	$MainList->query();
+	$MainList->query_ItemListLight();
 
 	logIO( 'Items:'.$MainList->result_num_rows );
 
