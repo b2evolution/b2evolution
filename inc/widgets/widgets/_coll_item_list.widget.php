@@ -51,7 +51,6 @@ class coll_item_list_Widget extends ComponentWidget
 
 		$item_type_options =
 			array(
-				'#' => T_('Default'),
 				''  => T_('All'),
 			) + $ItemTypeCache->get_option_array();
 
@@ -88,7 +87,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_('What kind of items do you want to list?'),
 					'type' => 'select',
 					'options' => $item_type_options,
-					'defaultvalue' => '#',
+					'defaultvalue' => '',
 				),
 				'item_type_usage' => array(
 					'label' => T_('Post type usage'),
@@ -365,7 +364,8 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['page'] = $this->disp_params['page'];
 		}
 
-		if( $this->disp_params['item_type'] != '#' )
+		if( $this->disp_params['item_type'] != '' &&
+		    $this->disp_params['item_type'] != '#' /* deprecated value, it was used as default value of ItemList filter */ )
 		{	// Not "default", restrict to a specific type (or '' for all)
 			$filters['types'] = $this->disp_params['item_type'];
 		}
