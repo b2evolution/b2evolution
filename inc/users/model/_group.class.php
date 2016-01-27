@@ -543,7 +543,7 @@ class Group extends DataObject
 	/**
 	 * Delete object from DB.
 	 */
-	function dbdelete()
+	function dbdelete_Group()
 	{
 		global $DB;
 
