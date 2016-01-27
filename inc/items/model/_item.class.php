@@ -578,7 +578,7 @@ class Item extends ItemLight
 	function load_from_Request( $editing = false, $creating = false )
 	{
 		global $default_locale, $current_User, $localtimenow;
-		global $posttypes_reserved_IDs, $item_typ_ID;
+		global $item_typ_ID;
 
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
@@ -904,13 +904,10 @@ class Item extends ItemLight
 
 		// LOCATION (COUNTRY -> CITY):
 		load_funcs( 'regional/model/_regional.funcs.php' );
-		// Check if this item has a special post type. Location is not required for special posts.
-		$not_special_post = ! $this->is_special();
 		if( $this->country_visible() )
 		{ // Save country
 			$country_ID = param( 'item_ctry_ID', 'integer', 0 );
 			$country_is_required = $this->get_type_setting( 'use_country' ) == 'required'
-					&& $not_special_post
 					&& countries_exist();
 			param_check_number( 'item_ctry_ID', T_('Please select a country'), $country_is_required );
 			$this->set_from_Request( 'ctry_ID', 'item_ctry_ID', true );
@@ -920,7 +917,6 @@ class Item extends ItemLight
 		{ // Save region
 			$region_ID = param( 'item_rgn_ID', 'integer', 0 );
 			$region_is_required = $this->get_type_setting( 'use_region' ) == 'required'
-					&& $not_special_post
 					&& regions_exist( $country_ID );
 			param_check_number( 'item_rgn_ID', T_('Please select a region'), $region_is_required );
 			$this->set_from_Request( 'rgn_ID', 'item_rgn_ID', true );
@@ -930,7 +926,6 @@ class Item extends ItemLight
 		{ // Save subregion
 			$subregion_ID = param( 'item_subrg_ID', 'integer', 0 );
 			$subregion_is_required = $this->get_type_setting( 'use_sub_region' ) == 'required'
-					&& $not_special_post
 					&& subregions_exist( $region_ID );
 			param_check_number( 'item_subrg_ID', T_('Please select a sub-region'), $subregion_is_required );
 			$this->set_from_Request( 'subrg_ID', 'item_subrg_ID', true );
@@ -940,7 +935,6 @@ class Item extends ItemLight
 		{ // Save city
 			param( 'item_city_ID', 'integer', 0 );
 			$city_is_required = $this->get_type_setting( 'use_city' ) == 'required'
-					&& $not_special_post
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
@@ -4772,8 +4766,8 @@ class Item extends ItemLight
 			), $params );
 
 		if( $params['podcast'] == '#' )
-		{	// Check if this post is a podcast
-			$params['podcast'] = ( $this->ityp_ID == 2000 );
+		{	// Check if this post is a podcast:
+			$params['podcast'] = $this->get_type_setting( 'podcast' );
 		}
 
 		if( $params['podcast'] && $params['format'] == 'htmlbody' )
@@ -5052,21 +5046,34 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_typ_ID = 1,
+		$item_type_name = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type
 		$item_st_ID = NULL,
 		$post_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_typ_ID == 1 )
-		{ // Try to set default post type ID from blog setting
+		if( $item_type_name == '#' )
+		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
 			    $Blog = & $Chapter->get_Blog() )
-			{ // Use default post type what used for the blog
+			{	// Use default post type what used for the blog:
 				$item_typ_ID = $Blog->get_setting( 'default_post_type' );
 			}
+		}
+		else
+		{	// Try to get item type by requested name:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name, false, false ) )
+			{	// Item type exists in DB by requested name, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+		}
+
+		if( empty( $item_typ_ID ) )
+		{	// Use first item type by default for wrong request:
+			$item_typ_ID = 1;
 		}
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -5782,7 +5789,7 @@ class Item extends ItemLight
 	 */
 	function handle_post_processing( $just_created, $verbose = true )
 	{
-		global $Settings, $Messages, $localtimenow, $posttypes_nopermanentURL;
+		global $Settings, $Messages, $localtimenow;
 
 		if( $just_created )
 		{ // we must try to send moderation notifications for the newly created posts
@@ -5830,7 +5837,16 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
+		if( $ItemType = & $this->get_ItemType() )
+		{	// Get type usage of this item:
+			$item_type_usage = $ItemType->get( 'usage' );
+		}
+		else
+		{	// Use default item type usage:
+			$item_type_usage = 'post';
+		}
+
+		if( in_array( $item_type_usage, array( 'intro-front', 'intro-main', 'special' ) ) )
 		{
 			// TODO: discard any notification that may be pending!
 			if( $verbose )
@@ -7520,40 +7536,6 @@ class Item extends ItemLight
 				return empty( $attr_href ) ? '' : $attr_href;
 				break;
 		}
-	}
-
-
-	/**
-	 * Get the ItemType object for the Item.
-	 *
-	 * @return object ItemType
-	 */
-	function & get_ItemType()
-	{
-		if( empty( $this->ItemType ) )
-		{
-			$ItemTypeCache = & get_ItemTypeCache();
-			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
-		}
-
-		return $this->ItemType;
-	}
-
-
-	/**
-	 * Get setting of the post type
-	 *
-	 * @param string Setting name
-	 * @return string Setting value
-	 */
-	function get_type_setting( $setting_name )
-	{
-		if( ! $this->get_ItemType() )
-		{ // Unknown post type
-			return false;
-		}
-
-		return $this->ItemType->get( $setting_name );
 	}
 
 

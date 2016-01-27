@@ -261,11 +261,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  */
 function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog, $posttypes_perms;
-
-	// Exclude from search: 'sidebar' type posts and from reserved type with ID 5000
-	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
-	$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );
+	global $DB, $Blog;
 
 	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
@@ -273,7 +269,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			'keywords'      => $search_term,
 			'keyword_scope' => 'title,content,tags', // TODO: add more fields
 			'phrase'        => 'OR',
-			'types'         => '-'.implode( ',', $filter_post_types ),
+			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
 			'order'         => 'DESC',
 			'posts'         => 1000
@@ -531,7 +527,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 		return array();
 	}
 
-	global $Blog, $DB, $posttypes_perms, $debug;
+	global $Blog, $DB, $debug;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
 	// Get quoted parts parts of the search query

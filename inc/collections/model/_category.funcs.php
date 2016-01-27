@@ -150,15 +150,14 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 
 	if( !isset( $number_of_posts_in_cat[ (string) $blog_ID ] ) )
 	{
-		global $posttypes_specialtypes;
-
 		$SQL = new SQL( 'Get # of posts for each category in a blog' );
 		$SQL->SELECT( 'cat_ID, count( postcat_post_ID ) c' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON postcat_post_ID = post_id' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
+		$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
 		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
@@ -186,23 +185,20 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 
 	if( !isset( $number_of_comments_in_cat[(string) $blog_ID] ) )
 	{
-		global $posttypes_specialtypes;
-
 		$SQL = new SQL();
 		$SQL->SELECT( 'cat_ID, COUNT( comment_ID ) c' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->FROM_add( 'LEFT JOIN T_postcats ON comment_item_ID = postcat_post_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON postcat_cat_ID = cat_id' );
 		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_id' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
 		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
-		if( ! empty( $posttypes_specialtypes ) )
-		{ // Get content post types, Exclide pages, intros, sidebar links and ads
-			$SQL->WHERE_and( 'post_ityp_ID NOT IN( '.$DB->quote( $posttypes_specialtypes ).' )' );
-		}
+		// Get content post types, Exclide pages, intros, sidebar links and ads
+		$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 		$SQL->GROUP_BY( 'cat_ID' );
 
 		$number_of_comments_in_cat[(string) $blog_ID] = $DB->get_assoc( $SQL->get() );

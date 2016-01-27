@@ -5965,7 +5965,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb' );
 
-		global $posttypes_perms;
 		// Create post types for each blog that has at aleast one custom field
 		$SQL = new SQL();
 		$SQL->SELECT( '*' );
@@ -6048,55 +6047,53 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							WHERE post_ityp_ID = 1
 							  AND post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
 
-						if( ! empty( $posttypes_perms['page'] ) )
-						{ // Find the Pages that have at least one defined custom field:
-							$pages_SQL = new SQL();
-							$pages_SQL->SELECT( 'post_ID' );
-							$pages_SQL->FROM( 'T_items__item' );
-							$pages_SQL->FROM_add( 'INNER JOIN T_items__item_settings ON post_ID = iset_item_ID' );
-							$pages_SQL->WHERE( 'post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
-							$pages_SQL->WHERE_and( 'post_ityp_ID IN ( '.implode( ', ', $posttypes_perms['page'] ).' )' );
-							$pages_SQL->WHERE_and( 'iset_name LIKE '.$DB->quote( 'custom_double_%' )
-							                  .' OR iset_name LIKE '.$DB->quote( 'custom_varchar_%' ) );
-							$pages_SQL->WHERE_and( 'iset_value != ""' );
-							$pages_SQL->GROUP_BY( 'post_ID' );
-							$pages_IDs = $DB->get_col( $pages_SQL->get() );
-							$page_type_max_ID = 0;
-							if( count( $pages_IDs ) > 0 )
-							{ // We have the Pages that have the defined custom fields
-								// Increase post type ID for new special post type for pages
-								$page_type_max_ID = $item_type_max_ID + 1;
-								$itypes_insert_data[] = '( '.$page_type_max_ID.', '
-									.$DB->quote( 'page_'.$cf_Blog->get( 'shortname' ) ).', '
-									.'"Pages", '
-									.'"page", '
-									.$DB->quote( $cf_Blog->get_setting( 'require_title' ) == 'none' ? 'never' : $cf_Blog->get_setting( 'require_title' ) ).', '
-									.$DB->quote( intval( $cf_Blog->get_setting( 'allow_html_post' ) ) ).', '
-									.$DB->quote( $cf_Blog->get_setting( 'location_country' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_country' ) ).', '
-									.$DB->quote( $cf_Blog->get_setting( 'location_region' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_region' ) ).', '
-									.$DB->quote( $cf_Blog->get_setting( 'location_subregion' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_subregion' ) ).', '
-									.$DB->quote( $cf_Blog->get_setting( 'location_city' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_city' ) ).', '
-									.$DB->quote( $cf_Blog->get_setting( 'show_location_coordinates' ) ? 'optional' : 'never' ).', '
-									.$DB->quote( intval( $cf_Blog->get_setting( 'disable_comments_bypost' ) ) ).' )';
-								foreach( $c_fields as $c_field )
-								{
-									// Insert custom field to get new ID
-									$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-										VALUES ( '.$page_type_max_ID.', '
-										.$DB->quote( $c_field['label'] ).', '
-										.$DB->quote( $c_field['name'] ).', '
-										.$DB->quote( $c_field['type'] ).' )' );
-									$itcf_ID = $DB->insert_id;
-									// Change the UID of the item settings to the new inserted itcf_ID (ID of the custom field)
-									$DB->query( 'UPDATE T_items__item_settings
-											SET iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$itcf_ID ).'
-										WHERE iset_item_ID IN ( '.implode( ', ', $pages_IDs ).' )
-											AND iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
-								}
-								// Set new post type for each page
-								$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$page_type_max_ID.'
-									WHERE post_ID IN ( '.implode( ', ', $pages_IDs ).' )' );
+						// Find the Pages that have at least one defined custom field:
+						$pages_SQL = new SQL();
+						$pages_SQL->SELECT( 'post_ID' );
+						$pages_SQL->FROM( 'T_items__item' );
+						$pages_SQL->FROM_add( 'INNER JOIN T_items__item_settings ON post_ID = iset_item_ID' );
+						$pages_SQL->WHERE( 'post_main_cat_ID IN ( '.implode( ', ', $blog_categories ).' )' );
+						$pages_SQL->WHERE_and( 'post_ityp_ID = 1000' );
+						$pages_SQL->WHERE_and( 'iset_name LIKE '.$DB->quote( 'custom_double_%' )
+															.' OR iset_name LIKE '.$DB->quote( 'custom_varchar_%' ) );
+						$pages_SQL->WHERE_and( 'iset_value != ""' );
+						$pages_SQL->GROUP_BY( 'post_ID' );
+						$pages_IDs = $DB->get_col( $pages_SQL->get() );
+						$page_type_max_ID = 0;
+						if( count( $pages_IDs ) > 0 )
+						{ // We have the Pages that have the defined custom fields
+							// Increase post type ID for new special post type for pages
+							$page_type_max_ID = $item_type_max_ID + 1;
+							$itypes_insert_data[] = '( '.$page_type_max_ID.', '
+								.$DB->quote( 'page_'.$cf_Blog->get( 'shortname' ) ).', '
+								.'"Pages", '
+								.'"page", '
+								.$DB->quote( $cf_Blog->get_setting( 'require_title' ) == 'none' ? 'never' : $cf_Blog->get_setting( 'require_title' ) ).', '
+								.$DB->quote( intval( $cf_Blog->get_setting( 'allow_html_post' ) ) ).', '
+								.$DB->quote( $cf_Blog->get_setting( 'location_country' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_country' ) ).', '
+								.$DB->quote( $cf_Blog->get_setting( 'location_region' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_region' ) ).', '
+								.$DB->quote( $cf_Blog->get_setting( 'location_subregion' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_subregion' ) ).', '
+								.$DB->quote( $cf_Blog->get_setting( 'location_city' ) == 'hidden' ? 'never' : $cf_Blog->get_setting( 'location_city' ) ).', '
+								.$DB->quote( $cf_Blog->get_setting( 'show_location_coordinates' ) ? 'optional' : 'never' ).', '
+								.$DB->quote( intval( $cf_Blog->get_setting( 'disable_comments_bypost' ) ) ).' )';
+							foreach( $c_fields as $c_field )
+							{
+								// Insert custom field to get new ID
+								$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
+									VALUES ( '.$page_type_max_ID.', '
+									.$DB->quote( $c_field['label'] ).', '
+									.$DB->quote( $c_field['name'] ).', '
+									.$DB->quote( $c_field['type'] ).' )' );
+								$itcf_ID = $DB->insert_id;
+								// Change the UID of the item settings to the new inserted itcf_ID (ID of the custom field)
+								$DB->query( 'UPDATE T_items__item_settings
+										SET iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$itcf_ID ).'
+									WHERE iset_item_ID IN ( '.implode( ', ', $pages_IDs ).' )
+										AND iset_name = '.$DB->quote( 'custom_'.$c_field['type'].'_'.$c_field['key'] ) );
 							}
+							// Set new post type for each page
+							$DB->query( 'UPDATE T_items__item SET post_ityp_ID = '.$page_type_max_ID.'
+								WHERE post_ID IN ( '.implode( ', ', $pages_IDs ).' )' );
 						}
 					}
 					// Insert custom fields for standard posts (not pages)
@@ -6140,18 +6137,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{ // Set it from first non reserved post type
 				if( ! isset( $first_item_type ) )
 				{
-					$reserved_types = array();
-					foreach( $posttypes_perms as $r_types )
-					{
-						$reserved_types = array_merge( $reserved_types, $r_types );
-					}
 					$SQL = new SQL();
 					$SQL->SELECT( 'ityp_ID' );
 					$SQL->FROM( 'T_items__type' );
-					if( ! empty( $reserved_types ) )
-					{
-						$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $reserved_types ).' )' );
-					}
+					$SQL->WHERE( 'ityp_ID NOT IN (1000,1400,1500,1520,1530,1570,1600,2000,3000,4000,5000)' );
 					$SQL->ORDER_BY( 'ityp_ID' );
 					$SQL->LIMIT( '1' );
 					$first_item_type = $DB->get_var( $SQL->get() );;
@@ -7160,6 +7149,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						 ( 1, 3, 3 ),
 						 ( 1, 4, 3 ),
 						 ( 1, 1, 6 )' );
+		upg_task_end();
 	}
 
 	if( upg_task_start( 11675, 'Creating table for secondary user groups...' ) )
@@ -7177,17 +7167,62 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_groups', 'grp_usage', "ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary' AFTER grp_name" );
 		upg_task_end();
 	}
-	
+
 	if( upg_task_start( 11685, 'Upgrading files table...' ) )
-	{
+	{	// part of 6.7.0
 		db_add_col( 'T_files', 'file_download_count', 'INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER file_can_be_main_profile' );
 		upg_task_end();
 	}
-	
+
 	if( upg_task_start( 11690, 'Updating collection user/group permissions...' ) )
-	{
+	{	// part of 6.7.0
 		db_add_col( 'T_coll_user_perms', 'bloguser_perm_meta_comment', 'tinyint NOT NULL default 0 AFTER bloguser_perm_edit_cmt' );
 		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_meta_comment', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_edit_cmt' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11695, 'Upgrade table item types...' ) )
+	{	// part of 6.7.0
+		// Add item type usage field and new setting "Treat as Podcast Media" to use it specially for "Podcast" item type:
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD COLUMN ityp_usage   VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT "post" AFTER ityp_backoffice_tab,
+			ADD COLUMN ityp_podcast TINYINT(1) DEFAULT 0 AFTER ityp_use_url' );
+		// Replace old field "ityp_backoffice_tab" with new "ityp_usage":
+		$DB->query( 'UPDATE T_items__type SET
+			ityp_usage = CASE
+				WHEN ( ityp_backoffice_tab = "Pages" OR ityp_name = "Page" ) THEN "page"
+				WHEN ityp_name = "Intro-Front"   THEN "intro-front"
+				WHEN ityp_name = "Intro-Main"    THEN "intro-main"
+				WHEN ityp_name = "Intro-Cat"     THEN "intro-cat"
+				WHEN ityp_name = "Intro-Tag"     THEN "intro-tag"
+				WHEN ityp_name = "Intro-Sub"     THEN "intro-sub"
+				WHEN ityp_name = "Intro-All"     THEN "intro-all"
+				WHEN ityp_name = "Sidebar link"  THEN "special"
+				WHEN ityp_name = "Advertisement" THEN "special"
+				ELSE "post"
+			END' );
+		db_drop_col( 'T_items__type', 'ityp_backoffice_tab' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11700, 'Update item types for new created fields...' ) )
+	{	// part of 6.7.0
+		// Update name of podcast item type:
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_name = "Podcast Episode"
+			WHERE ityp_name = "Podcast"' );
+		// Enable new podcast setting for item type "Podcast"
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_podcast = "1"
+			WHERE ityp_ID = "2000"' );
+		// Delete the reserved item type:
+		$DB->query( 'DELETE FROM T_items__type
+			WHERE ityp_ID = "5000"' );
+		// Update name of page item type:
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_name = "Standalone Page"
+			WHERE ityp_usage = "page"
+			  AND ityp_name = "Page"' );
 		upg_task_end();
 	}
 

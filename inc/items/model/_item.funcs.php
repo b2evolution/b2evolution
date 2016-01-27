@@ -39,7 +39,7 @@ function init_MainList( $items_nb_limit )
 			if( $disp == 'page' || $disp == 'terms' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
-						'types' => '1000',		// pages
+						'itemtype_usage' => 'page' // pages
 					) );
 			}
 
@@ -233,13 +233,13 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 			if( $restrict_disp == 'front' )
 			{	// Special Front page:
 				// Use Intro-Front posts
-				$restrict_to_types = '1400';
+				$restrict_to_types_usage = 'intro-front';
 			}
 			else
 			{	// Default front page displaying posts:
 				// The competing intro-* types are: 'main' and 'all':
 				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-				$restrict_to_types = '1500,1600';
+				$restrict_to_types_usage = 'intro-main,intro-all';
 			}
 		}
 		else
@@ -251,25 +251,25 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 				case 'posts-subcat':
 					// The competing intro-* types are: 'cat' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1520,1600';
+					$restrict_to_types_usage = 'intro-cat,intro-all';
 					break;
 
 				case 'posts-tag':
 					// The competing intro-* types are: 'tag' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1530,1600';
+					$restrict_to_types_usage = 'intro-tag,intro-all';
 					break;
 
 				default:
 					// The competing intro-* types are: 'sub' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types = '1570,1600';
+					$restrict_to_types_usage = 'intro-sub,intro-all';
 			}
 		}
 
 		$FeaturedList->set_filters( array(
 				'coll_IDs' => $coll_IDs,
-				'types' => $restrict_to_types,
+				'itemtype_usage' => $restrict_to_types_usage,
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
@@ -1451,11 +1451,11 @@ function attach_browse_tabs( $display_tabs3 = true )
 	}
 
 	$type_tabs = get_item_type_tabs();
-	foreach( $type_tabs as $type_tab )
+	foreach( $type_tabs as $type_tab => $type_tab_name )
 	{
 		$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
 		$menu_entries[ $type_tab_key ] = array(
-			'text' => T_( $type_tab ),
+			'text' => T_( $type_tab_name ),
 			'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
 		);
 	}
@@ -1526,36 +1526,86 @@ function get_item_type_tabs()
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'DISTINCT( ityp_backoffice_tab )' );
+	$SQL->SELECT( 'DISTINCT( ityp_usage )' );
 	$SQL->FROM( 'T_items__type' );
 	$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
-	$SQL->WHERE( 'ityp_backoffice_tab IS NOT NULL' );
 	$SQL->ORDER_BY( 'ityp_ID' );
 
-	return $DB->get_col( $SQL->get() );
+	$type_usages = $DB->get_col( $SQL->get() );
+
+	$type_tabs = array();
+	foreach( $type_usages as $type_usage )
+	{
+		if( $type_tab = get_tab_by_item_type_usage( $type_usage ) )
+		{	// Only if tab exists for current item type usage:
+			$type_tabs[ $type_tab[0] ] = $type_tab[1];
+		}
+	}
+
+	return $type_tabs;
 }
 
 
 /**
- * Get post type IDs by tab name
+ * Get tab name by item type usage value
  *
- * @return string Item IDs separated by comma
+ * @return array|boolean 
  */
-function get_item_types_by_tab( $tab_name )
+function get_tab_by_item_type_usage( $type_usage )
 {
-	global $DB;
-
-	if( empty( $tab_name ) )
+	switch( $type_usage )
 	{
-		return '';
+		case 'post':
+			$type_tab = array( 'post', NT_('Posts') );
+			break;
+		case 'page':
+			$type_tab = array( 'page', NT_('Pages') );
+			break;
+		case 'special':
+			$type_tab = array( 'special', NT_('Special') );
+			break;
+		case 'intro-front':
+		case 'intro-main':
+		case 'intro-cat':
+		case 'intro-tag':
+		case 'intro-sub':
+		case 'intro-all':
+			$type_tab = array( 'intro', NT_('Intros') );
+			break;
+
+		default:
+			// Unknown item type usage:
+			return false;
 	}
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'ityp_ID' );
-	$SQL->FROM( 'T_items__type' );
-	$SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_name ) );
+	return $type_tab;
+}
 
-	return implode( ',', $DB->get_col( $SQL->get() ) );
+
+/**
+ * Get item type usage values by tab name
+ *
+ * @return array
+ */
+function get_item_type_usage_by_tab( $tab_name )
+{
+	switch( $tab_name )
+	{
+		case 'post':
+			$type_usages = array( 'post' );
+			break;
+		case 'page':
+			$type_usages = array( 'page' );
+			break;
+		case 'special':
+			$type_usages = array( 'special' );
+			break;
+		case 'intro':
+			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+	}
+
+	return $type_usages;
 }
 
 
@@ -2059,11 +2109,6 @@ function check_perm_posttype( $item_typ_ID, $post_extracats )
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
 
-	if( ItemType::is_reserved( $ItemType->ID ) )
-	{ // Don't allow to use a reserved post type:
-		debug_die( 'This post type is reserved and cannot be used. Please choose another one.' );
-	}
-
 	if( ! $Blog->is_item_type_enabled( $ItemType->ID ) )
 	{ // Don't allow to use a not enabled post type:
 		debug_die( 'This post type is not enabled. Please choose another one.' );
@@ -2432,33 +2477,6 @@ function echo_show_comments_changed( $comment_type )
 				item_id = -1;
 			}
 			refresh_item_comments( item_id, 1, '<?php echo $comment_type; ?>' );
-		} );
-	</script>
-<?php
-}
-
-
-/**
- * Make location fields are not required for special posts
- */
-function echo_onchange_item_type_js()
-{
-	global $posttypes_specialtypes;
-
-?>
-	<script type="text/javascript">
-		var item_special_types = [<?php echo implode( ',', $posttypes_specialtypes ) ?>];
-		jQuery( '#item_typ_ID' ).change( function()
-		{
-			for( var i in item_special_types )
-			{
-				if( item_special_types[i] == jQuery( this ).val() )
-				{
-					jQuery( '#item_locations' ).addClass( 'not_required' );
-					return true;
-				}
-			}
-			jQuery( '#item_locations' ).removeClass( 'not_required' );
 		} );
 	</script>
 <?php
@@ -3926,7 +3944,7 @@ function item_type_global_icons( $object_Widget )
 		$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 		if( ! empty( $tab_type ) )
 		{ // Get item types only by selected back-office tab
-			$item_types_SQL->WHERE( 'ityp_backoffice_tab = '.$DB->quote( $tab_type ) );
+			$item_types_SQL->WHERE( 'ityp_usage IN ( '.$DB->quote( get_item_type_usage_by_tab( $tab_type ) ).' )' );
 		}
 		$item_types_SQL->ORDER_BY( 'fix_order, ityp_ID' );
 		$item_types = $DB->get_results( $item_types_SQL->get() );

@@ -94,7 +94,7 @@ class ItemCache extends DataObjectCache
 	 */
 	function load_by_categories( $cat_array, $coll_ID )
 	{
-		global $DB, $posttypes_specialtypes;
+		global $DB;
 
 		if( empty( $cat_array ) && empty( $coll_ID ) )
 		{ // Nothing to load
@@ -151,7 +151,7 @@ class ItemCache extends DataObjectCache
 		$ItemQuery->where_chapter2( $Blog, $not_loaded_cat_ids, "" );
 		$ItemQuery->where_visibility( $visibility_statuses );
 		$ItemQuery->where_datestart( NULL, NULL, NULL, NULL, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
-		$ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
+		$ItemQuery->where_itemtype_usage( 'post' );
 
 		// Clear previous items from the cache and load by the defined SQL
 		$this->clear( true );

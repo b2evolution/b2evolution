@@ -48,11 +48,16 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemTypeCache
 		 */
 		$ItemTypeCache = & get_ItemTypeCache();
+
 		$item_type_options =
 			array(
-				'#' => T_('Default'),
 				''  => T_('All'),
-			) + $ItemTypeCache->get_option_array() ;
+			) + $ItemTypeCache->get_option_array();
+
+		$item_type_usage_options =
+			array(
+				'' => T_('All'),
+			) + $ItemTypeCache->get_usage_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -82,7 +87,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_('What kind of items do you want to list?'),
 					'type' => 'select',
 					'options' => $item_type_options,
-					'defaultvalue' => '#',
+					'defaultvalue' => '',
+				),
+				'item_type_usage' => array(
+					'label' => T_('Post type usage'),
+					'note' => T_('What kind of items usage do you want to list?'),
+					'type' => 'select',
+					'options' => $item_type_usage_options,
+					'defaultvalue' => '',
 				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
@@ -352,9 +364,15 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['page'] = $this->disp_params['page'];
 		}
 
-		if( $this->disp_params['item_type'] != '#' )
+		if( $this->disp_params['item_type'] != '' &&
+		    $this->disp_params['item_type'] != '#' /* deprecated value, it was used as default value of ItemList filter */ )
 		{	// Not "default", restrict to a specific type (or '' for all)
 			$filters['types'] = $this->disp_params['item_type'];
+		}
+
+		if( isset( $this->disp_params['item_type_usage'] ) )
+		{	// Not "default", restrict to a specific type usage (or '' for all):
+			$filters['itemtype_usage'] = $this->disp_params['item_type_usage'];
 		}
 
 		if( $this->disp_params['follow_mainlist'] == 'tags' )

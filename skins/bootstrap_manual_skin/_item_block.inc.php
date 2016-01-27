@@ -69,7 +69,7 @@ $params = array_merge( array(
 			'text'   => '#icon#',
 			'class'  => button_class(),
 		) );
-	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
+	if( $Item->is_intro() )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )

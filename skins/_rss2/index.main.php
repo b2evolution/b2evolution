@@ -111,7 +111,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<guid isPermaLink="false"><?php $Item->ID() ?>@<?php echo $baseurl ?></guid>
 			<?php
 				// PODCAST ------------------------------------------------------------------------
-				if( $Item->ityp_ID == 2000 )
+				if( $Item->get_type_setting( 'podcast' ) )
 				{	// This is a podcast Item !
 					echo '<enclosure url="'.$Item->url.'" />';
 					// TODO: add length="12216320" type="audio/mpeg"

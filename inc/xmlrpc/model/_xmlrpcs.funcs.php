@@ -1777,6 +1777,7 @@ function xmlrpc_get_items( $params, & $Blog )
 			'limit' => 0,
 			'item_ID' => 0,
 			'types' => '', // all post types
+			'itemtype_usage' => '', // all post types
 		), $params);
 
 	// Protected and private get checked by statuses_where_clause().
@@ -1792,9 +1793,10 @@ function xmlrpc_get_items( $params, & $Blog )
 		logIO('Getting item #'.$params['item_ID']);
 
 		$filters = array(
-				'visibility_array'	=> $statuses,
-				'types'				=> NULL,
-				'post_ID'			=> $params['item_ID'],
+				'visibility_array' => $statuses,
+				'types'            => NULL,
+				'itemtype_usage'   => NULL,
+				'post_ID'          => $params['item_ID'],
 			);
 	}
 	else
@@ -1802,10 +1804,11 @@ function xmlrpc_get_items( $params, & $Blog )
 		logIO( sprintf('Trying to get latest items (%s)', ($params['limit'] ? $params['limit'] : 'all')) );
 
 		$filters = array(
-				'visibility_array'	=> $statuses,
-				'types'				=> $params['types'],
-				'order'				=> 'DESC',
-				'unit'				=> 'posts',
+				'visibility_array' => $statuses,
+				'types'            => $params['types'],
+				'itemtype_usage'   => $params['itemtype_usage'],
+				'order'            => 'DESC',
+				'unit'             => 'posts',
 			);
 	}
 

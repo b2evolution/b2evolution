@@ -821,8 +821,6 @@ else
 echo_onchange_newcat();
 // Location
 echo_regional_js( 'item', $edited_Item->region_visible() );
-// Post type
-echo_onchange_item_type_js();
 // Goal
 echo_onchange_goal_cat();
 // Fieldset folding

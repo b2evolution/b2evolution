@@ -447,8 +447,6 @@ class ItemList2 extends ItemListLight
 	 */
 	function prevnext_item_links( $params )
 	{
-		global $posttypes_specialtypes;
-
 		$params = array_merge( array(
 									'template' => '$prev$$separator$$next$',
 									'prev_start' => '',
@@ -464,7 +462,7 @@ class ItemList2 extends ItemListLight
 									'next_class' => '',
 									'target_blog' => '',
 									'post_navigation' => $this->Blog->get_setting( 'post_navigation' ),
-									'types' => '-'.implode(',',$posttypes_specialtypes), // Exclude pages, intros & sidebar stuff
+									'itemtype_usage' => 'post', // Include only post with type usage "post"
 									'featured' => NULL,
 								), $params );
 
@@ -511,8 +509,8 @@ class ItemList2 extends ItemListLight
 			}
 		}
 
-		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false, $params[ 'target_blog'], $params['prev_class'], $params['types'], $params['featured'], $params['post_navigation'] );
-		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false, $params[ 'target_blog'], $params['next_class'], $params['types'], $params['featured'], $params['post_navigation'] );
+		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false, $params[ 'target_blog'], $params['prev_class'], $params['itemtype_usage'], $params['featured'], $params['post_navigation'] );
+		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false, $params[ 'target_blog'], $params['next_class'], $params['itemtype_usage'], $params['featured'], $params['post_navigation'] );
 
 		if( empty( $prev ) || empty( $next ) )
 		{	// Use separator text only when prev & next are not empty
@@ -535,12 +533,12 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to previous
 	 */
-	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true, $target_blog = '', $class = '', $types = '', $featured = NULL, $post_navigation = NULL )
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true, $target_blog = '', $class = '', $itemtype_usage = '', $featured = NULL, $post_navigation = NULL )
 	{
 		/**
 		 * @var Item
 		 */
-		$prev_Item = & $this->get_prevnext_Item( 'prev', $types, $featured, $post_navigation );
+		$prev_Item = & $this->get_prevnext_Item( 'prev', $itemtype_usage, $featured, $post_navigation );
 
 		if( !is_null($prev_Item) )
 		{
@@ -560,12 +558,12 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to next
 	 */
-	function next_item_link( $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true, $target_blog = '', $class = '', $types = '', $featured = true, $post_navigation = NULL )
+	function next_item_link( $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true, $target_blog = '', $class = '', $itemtype_usage = '', $featured = true, $post_navigation = NULL )
 	{
 		/**
 		 * @var Item
 		 */
-		$next_Item = & $this->get_prevnext_Item( 'next', $types, $featured, $post_navigation );
+		$next_Item = & $this->get_prevnext_Item( 'next', $itemtype_usage, $featured, $post_navigation );
 
 		if( !is_null($next_Item) )
 		{
@@ -641,9 +639,9 @@ class ItemList2 extends ItemListLight
 	 *
 	 * @param string prev | next  (relative to the current sort order)
 	 */
-	function & get_prevnext_Item( $direction = 'next', $types = '', $featured = NULL, $post_navigation = 'same_blog' )
+	function & get_prevnext_Item( $direction = 'next', $itemtype_usage = '', $featured = NULL, $post_navigation = 'same_blog' )
 	{
-		global $DB, $ItemCache, $posttypes_specialtypes;
+		global $DB, $ItemCache;
 
 		if( ! $this->single_post )
 		{	// We are not on a single post:
@@ -662,7 +660,7 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		if( in_array( $current_Item->ityp_ID, $posttypes_specialtypes ) ) // page, intros, ads
+		if( $current_Item->get_type_setting( 'usage' ) != 'post' )
 		{	// We are not on a REGULAR post -- we cannot navigate:
 			$r = NULL;
 			return $r;
@@ -689,8 +687,8 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
-		// types param is kept only for the case when some custom types should be displayed
-		$next_Query->where_types( !empty( $types ) ? $types : $this->filters['types'] );
+		// itemtype_usage param is kept only for the case when some custom types should be displayed
+		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		// $next_Query->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$next_Query->where_datestart( $this->filters['ymdhms'], $this->filters['week'],

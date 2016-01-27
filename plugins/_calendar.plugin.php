@@ -63,22 +63,17 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		global $posttypes_specialtypes;
-
 		// Initialize an array for the field "Post type":
 		$ItemTypeCache = & get_ItemTypeCache();
-		$item_types = $ItemTypeCache->get_option_array();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "post"' );
 		$item_type_options = array(
 				'#' => T_('Default'),
 				''  => T_('All'),
 			);
-		foreach( $item_types as $item_type_ID => $item_type_name )
+		foreach( $ItemTypeCache->cache as $ItemType )
 		{
-			if( in_array( $item_type_ID, $posttypes_specialtypes ) )
-			{	// Exclude special item types:
-				continue;
-			}
-			$item_type_options[ $item_type_ID ] = $item_type_name;
+			$item_type_options[ $ItemType->ID ] = $ItemType->get_name();
 		}
 
 		$r = array(
@@ -212,7 +207,6 @@ class calendar_plugin extends Plugin
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
 		global $s, $sentence, $exact;
-		global $posttypes_specialtypes;
 
 		/**
 		 * Default params:
@@ -348,15 +342,21 @@ class calendar_plugin extends Plugin
 		{
 			if( $params['item_type'] == '#' )
 			{	// Exclude pages and intros and sidebar stuff by default:
-				$item_types = '-'.implode( ',', $posttypes_specialtypes );
+				$item_types_usage = 'post';
 			}
 			elseif( $params['item_type'] != 'all' )
 			{	// Filter by one selected item type:
 				$item_types = $params['item_type'];
 			}
 		}
-		// Filter by item types:
-		$Calendar->ItemQuery->where_types( $item_types );
+		if( isset( $item_types_usage ) )
+		{	// Filter by item types usage:
+			$Calendar->ItemQuery->where_itemtype_usage( $item_types_usage );
+		}
+		else
+		{	// Filter by item types:
+			$Calendar->ItemQuery->where_types( $item_types );
+		}
 
 		// DISPLAY:
 		$Calendar->display( );
@@ -641,6 +641,7 @@ class Calendar
 													EXTRACT(DAY FROM '.$this->dbprefix.'datestart) AS myday
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+										LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID
 									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\'
 										AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) = \''.$this->month.'\'
 										'.$this->ItemQuery->get_where( ' AND ' ).'
@@ -693,6 +694,7 @@ class Calendar
 				SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
 				  FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 				 INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+				 LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID
 				 WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
 				       .$this->ItemQuery->get_where( ' AND ' ).'
 				 GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );

@@ -2550,6 +2550,12 @@ class Form extends Widget
 
 		foreach( $field_options as $l_key => $l_option )
 		{
+			if( is_array( $l_option ) )
+			{	// If option is array then it is a group of the options:
+				$r .= Form::get_select_group_options_string( array( $l_key => $l_option ), $field_value, $force_keys_as_values, $color_array );
+				continue;
+			}
+
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
@@ -2571,6 +2577,30 @@ class Form extends Widget
 
 			$r .= '>'.format_to_output($l_option).'</option>';
 		}
+		return $r;
+	}
+
+
+	/**
+	 * Get the grouped OPTION list as string for use in a SELECT.
+	 *
+	 * @param array Groups ( title => array( Options (key => value) )
+	 * @param string Selected value (if any)
+	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
+	 *                which are strings will be used).
+	 * @return string
+	 */
+	static function get_select_group_options_string( $group_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false )
+	{
+		$r = '';
+
+		foreach( $group_options as $group_title => $group_options )
+		{
+			$r .= '<optgroup label="'.format_to_output( $group_title, 'htmlattr' ).'">';
+			$r .= Form::get_select_options_string( $group_options, $field_value, $force_keys_as_values, $color_array );
+			$r .= '</optgroup>';
+		}
+
 		return $r;
 	}
 

@@ -42,11 +42,21 @@ class linkblog_Widget extends coll_item_list_Widget
 	 */
 	function get_param_definitions( $params )
 	{
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "special"' ); // Load only special item types
+		$ItemTypeCache->all_loaded = true; // Set TRUE to don't load all item types in get_option_array() below
+		$special_item_type_options =
+			array(
+				''  => T_('All'),
+			) + $ItemTypeCache->get_option_array();
+
 		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
 		$r = parent::get_param_definitions( $params );
 		// We only change the defaults and hide some params.
 		$r['title']['defaultvalue'] = T_('Linkblog');
 		$r['title_link']['no_edit'] = true;
+		$r['item_type_usage']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_group_by']['defaultvalue'] = 'chapter';
@@ -57,6 +67,15 @@ class linkblog_Widget extends coll_item_list_Widget
 		$r['disp_teaser_maxwords']['no_edit'] = true;
 		$r['widget_css_class']['no_edit'] = true;
 		$r['widget_ID']['no_edit'] = true;
+
+		// Allow to select what special item type to display:
+		$r['item_type'] = array(
+				'label' => T_('Post type'),
+				'note' => T_('What kind of items do you want to list?'),
+				'type' => 'select',
+				'options' => $special_item_type_options,
+				'defaultvalue' => '',
+			);
 
 		return $r;
 	}
@@ -121,6 +140,9 @@ class linkblog_Widget extends coll_item_list_Widget
 				$params['blog_ID'] = $Blog->get('links_blog_ID');
 			}
 		}
+
+		// Force some params (because this is a simplified widget):
+		$params['item_type_usage'] = 'special';	// Use post types usage "special" only
 
 		parent::init_display( $params );
 	}

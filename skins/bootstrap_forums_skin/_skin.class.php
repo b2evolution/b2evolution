@@ -913,6 +913,7 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL->FROM( 'T_items__item' );
 			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
 			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			// In theory, it would be more safe to use this comparison:

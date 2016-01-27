@@ -35,6 +35,7 @@ class ItemQuery extends SQL
 	var $assignees_login;
 	var $statuses;
 	var $types;
+	var $itemtype_usage;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
@@ -595,6 +596,43 @@ class ItemQuery extends SQL
 		else
 		{
 			$this->WHERE_and( $this->dbprefix.'ityp_ID IN ('.$types.')' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific post types usage
+	 *
+	 * @param string List of types usage to restrict to (must have been previously validated):
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 */
+	function where_itemtype_usage( $itemtype_usage )
+	{
+		global $DB;
+
+		$this->itemtype_usage = $itemtype_usage;
+
+		if( empty( $itemtype_usage ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
+
+		if( $itemtype_usage == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+		}
+		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
+			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
+			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+		}
+		else
+		{
+			$itemtype_usage = explode( ',', $itemtype_usage );
+			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
 		}
 	}
 
