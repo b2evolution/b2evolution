@@ -156,7 +156,7 @@ class OnlineSessions
 	 *
 	 * @param integer Online session timeout in seconds.
 	 */
-	function OnlineSessions( $timeout_online_user = 300 )
+	function __construct( $timeout_online_user = 300 )
 	{
 		$this->_timeout_online_user = $timeout_online_user;
 	}
