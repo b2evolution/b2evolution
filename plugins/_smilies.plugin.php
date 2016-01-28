@@ -181,6 +181,8 @@ XX(      graydead.gif
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		global $Blog;
+		
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
