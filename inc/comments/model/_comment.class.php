@@ -4181,6 +4181,108 @@ class Comment extends DataObject
 
 		return $comment_IDs;
 	}
+
+
+	/*
+	 * Get max allowed comment status depending on parent item status
+	 *
+	 * @return string Status key
+	 */
+	function get_allowed_status()
+	{
+		$comment_Item = & $this->get_Item();
+		$item_Blog = & $comment_Item->get_Blog();
+
+		// Current comment status:
+		$current_status = $this->get( 'status' );
+
+		// Restrict status to max allowed for item collection:
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+
+		// Comment status cannot be more than post status, restrict it:
+		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
+		// Get all visibility statuses:
+		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );
+
+		// Find what max comment status we can use depending on parent item:
+		$status_order = 0;
+		$comment_status_order = NULL;
+		$item_status_order = NULL;
+		$max_allowed_comment_status = '';
+		foreach( $visibility_statuses as $visibility_status => $visibility_status_title )
+		{
+			if( $status_order == 0 )
+			{	// Set max allowed comment status:
+				$max_allowed_comment_status = $visibility_status;
+			}
+			if( $visibility_status == $current_status )
+			{	// Set an order for current status of this comment:
+				$comment_status_order = $status_order;
+			}
+			if( $visibility_status == $item_restricted_status )
+			{	// Set an order for max allowed status of the comment's item:
+				$item_status_order = $status_order;
+			}
+			$status_order++;
+		}
+
+		if( $comment_status_order === NULL )
+		{	// Current comment status is higher than max allowed by parent item,
+			// So restrict it by max allowed for comments:
+			$comment_restricted_status = $max_allowed_comment_status;
+		}
+		elseif( $comment_status_order < $item_restricted_status )
+		{	// Restrict comment status to max allowed by parent item:
+			$comment_restricted_status = $item_restricted_status;
+		}
+		else
+		{	// Don't restrict because current comment status is allowed:
+			$comment_restricted_status = $current_status;
+		}
+
+		return $comment_restricted_status;
+	}
+
+
+	/**
+	 * Restrict comment status by parent item
+	 *
+	 * @param boolean TRUE to update status
+	 */
+	function restrict_status_by_item( $update_status = false )
+	{
+		// Store current status to display a warning:
+		$current_status = $this->get( 'status' );
+
+		// Restrict status to max allowed by parent item:
+		$comment_allowed_status = $this->get_allowed_status();
+
+		if( $update_status )
+		{	// Update status to new restricted value:
+			$this->set( 'status', $comment_allowed_status );
+		}
+		else
+		{	// Only change status to update it on the edit forms and Display a warning:
+			$this->status = $comment_allowed_status;
+
+			if( $current_status != $this->get( 'status' ) )
+			{	// If current comment status cannot be used because it is restricted by parent item:
+				global $Messages;
+
+				// Get max allowed for item collection:
+				$comment_Item = & $this->get_Item();
+				$item_Blog = & $comment_Item->get_Blog();
+				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+
+				// Get all visibility status titles:
+				$visibility_statuses = get_visibility_statuses();
+
+				// Display a warning:
+				$Messages->add( sprintf( T_('Since the parent post of this comment have its visibility set to "%s", the visibility of this comment will be restricted to "%s".'),
+						$visibility_statuses[ $item_restricted_status ], $visibility_statuses[ $this->status ] ), 'warning' );
+			}
+		}
+	}
 }
 
 ?>

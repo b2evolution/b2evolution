@@ -79,6 +79,10 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
+		// Restrict comment status by parent item:
+		$update_restricted_status = ( $action != 'edit' && $action != 'switch_view' );
+		$edited_Comment->restrict_status_by_item( $update_restricted_status );
+
 		$comment_title = '';
 		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
 
@@ -396,6 +400,10 @@ switch( $action )
 			$old_comment_status = $edited_Comment->get( 'status' );
 			$edited_Comment->set( 'status', $comment_status );
 		}
+
+		// Restrict comment status by parent item:
+		$edited_Comment->restrict_status_by_item( true );
+		$comment_status = $edited_Comment->get( 'status' );
 
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
