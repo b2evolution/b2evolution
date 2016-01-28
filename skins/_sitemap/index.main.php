@@ -33,7 +33,7 @@ $MainList->set_filters( array(
 // pre_dump( $cat_focus, $MainList->filters );
 
 // Run the query:
-$MainList->query_ItemListLight();
+$MainList->query();
 
 // Old style globals for category.funcs:
 // TODO: dh> check if still required.

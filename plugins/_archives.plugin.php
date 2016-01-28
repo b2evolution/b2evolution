@@ -501,7 +501,7 @@ class ArchiveList extends Results
 					'order' => 'ASC') );
 				}
 
-				$archives_list->query_ItemListLight();
+				$archives_list->query();
 				$this->rows = array();
 				while ($Item = $archives_list->get_item())
 				{
