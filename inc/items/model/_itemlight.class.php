@@ -1199,7 +1199,8 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->$params['title_field'], $params['format'] );
+		$params_title_field = $params['title_field'];
+		$title = format_to_output( $this->$params_title_field, $params['format'] );
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
