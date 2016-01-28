@@ -25,7 +25,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
  * @param string link type ( item, comment, ... )
  * @param integer the corresponding object ID
  */
-function get_link_owner( $link_type, $object_ID )
+function & get_link_owner( $link_type, $object_ID )
 {
 	switch( $link_type )
 	{
