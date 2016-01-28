@@ -100,8 +100,8 @@ class calendar_plugin extends Plugin
 				'defaultvalue' => 'all',
 			),
 			'item_type' => array(
-				'label' => T_('Post type'),
-				'note' => T_('What kind of items do you want to list?'),
+				'label' => T_('Exact post type'),
+				'note' => T_('What type of items do you want to list?'),
 				'type' => 'select',
 				'options' => $item_type_options,
 				'defaultvalue' => '#',

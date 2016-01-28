@@ -72,8 +72,8 @@ class coll_link_list_Widget extends coll_item_list_Widget
 
 		// Allow to select what special item type to display:
 		$r['item_type'] = array(
-				'label' => T_('Post type'),
-				'note' => T_('What kind of items do you want to list?'),
+				'label' => T_('Exact post type'),
+				'note' => T_('What type of items do you want to list?'),
 				'type' => 'select',
 				'options' => $special_item_type_options,
 				'defaultvalue' => '',

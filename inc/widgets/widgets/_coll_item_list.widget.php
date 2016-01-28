@@ -82,18 +82,18 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'all', T_('show all posts the current user is allowed to see') ) ),
 					'defaultvalue' => 'all',
 				),
-				'item_type' => array(
-					'label' => T_('Post type'),
-					'note' => T_('What kind of items do you want to list?'),
-					'type' => 'select',
-					'options' => $item_type_options,
-					'defaultvalue' => '',
-				),
 				'item_type_usage' => array(
 					'label' => T_('Post type usage'),
-					'note' => T_('What kind of items usage do you want to list?'),
+					'note' => T_('Restrict to a specific item type usage?'),
 					'type' => 'select',
 					'options' => $item_type_usage_options,
+					'defaultvalue' => '',
+				),
+				'item_type' => array(
+					'label' => T_('Exact post type'),
+					'note' => T_('What type of items do you want to list?'),
+					'type' => 'select',
+					'options' => $item_type_options,
 					'defaultvalue' => '',
 				),
 				'follow_mainlist' => array(
