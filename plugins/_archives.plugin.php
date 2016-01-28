@@ -363,7 +363,7 @@ class ArchiveList extends Results
 	 * @param integer
 	 * @param boolean
 	 */
-	function ArchiveList(
+	function __construct(
 		$archive_mode = 'monthly',
 		$limit = 100,
 		$sort_order = 'date',
@@ -525,7 +525,7 @@ class ArchiveList extends Results
 			}
 		}
 
-		parent::Results( $sql, 'archivelist_', '', $limit );
+		parent::__construct( $sql, 'archivelist_', '', $limit );
 
 		$this->restart();
 	}
