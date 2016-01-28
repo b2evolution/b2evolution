@@ -2800,7 +2800,8 @@ function debug_info( $force = false, $force_clean = false )
 		if( stripos($header, 'content-type:') !== false )
 		{ // content type sent
 			# "Content-Type:text/html;charset=utf-8" => "text/html"
-			$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+			$explod_result = explode(';', array_pop(explode(':', $header, 2)));
+			$content_type = trim(array_shift( $explod_result ));
 			break;
 		}
 	}
