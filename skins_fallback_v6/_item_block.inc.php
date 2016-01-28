@@ -182,14 +182,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<footer>
 
 		<?php
-			if( ! $Item->is_intro() )
+			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
 				$Item->tags( array(
 						'before'    => '<nav class="small post_tags">',
 						'after'     => '</nav>',
 						'separator' => ' ',
 					) );
-			}
 		?>
 
 		<nav class="post_comments_link">
@@ -219,6 +218,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
+		<?php } ?>
 	</footer>
 
 	<?php
