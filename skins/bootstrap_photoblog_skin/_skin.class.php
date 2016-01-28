@@ -404,7 +404,7 @@ class bootstrap_photoblog_Skin extends Skin
 		if( $post_border_col = $this->get_setting( 'post_border_col' ) )
 		{ // Post border color:
 			$custom_css .= '.evo_post div.evo_post_details, .panel, .evo_featured_post div.evo_post_details, .featurepost div.evo_post_details { border: 1px solid '.$post_border_col." }\n";
-			$custom_css .= 'div.evo_intro_post { border: 3px solid '.$post_border_col." }\n";
+			$custom_css .= 'article.evo_intro_post .evo_post_details { border: 3px solid '.$post_border_col." }\n";
 			$custom_css .= '.main_content_container .panel-heading, .evo_comment__meta_info a, .evo_post_comment_notification a, .evo_comment__meta_info a:hover, .evo_post_comment_notification a:hover { background-color: '.$post_border_col." !important }\n";
 		}
 		

@@ -38,11 +38,11 @@ $params = array_merge( array(
 	<?php
 		// Display images that are linked to this post:
 		$Item->images( array(
-				'before' =>              '<div class="bImages">',
-				'before_image' =>        '<div class="image_block center">',
-				'before_image_legend' => '<div class="image_legend">',
-				'after_image_legend' =>  '</div>',
-				'after_image' =>         '</div>',
+				'before' =>              '<div class="evo_post_images">',
+				'before_image' =>        '<figure class="evo_image_block center">',
+				'before_image_legend' => '<figcaption class="evo_image_legend">',
+				'after_image_legend' =>  '</figcaption>',
+				'after_image' =>         '</figure>',
 				'after' =>               '</div>',
 				'image_size' =>          'fit-720x500',
 				/* Comment the above line to use the default image size
@@ -56,6 +56,18 @@ $params = array_merge( array(
 				 */
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+				'before_gallery'           => '<div class="evo_post_gallery">',
+				'after_gallery'            => '</div>',
+				'gallery_table_start'      => '',
+				'gallery_table_end'        => '',
+				'gallery_row_start'        => '',
+				'gallery_row_end'          => '',
+				'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+				'gallery_cell_end'         => '</div>',
+				'gallery_image_size'       => 'crop-80x80',
+				'gallery_image_limit'      => 1000,
+				'gallery_colls'            => 5,
+				'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 			) );
 	?>
 

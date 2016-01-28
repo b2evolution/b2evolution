@@ -186,7 +186,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 				'template' => '$next$$prev$',
-				'block_start' => '<div class="nav_right">',
+				'block_start' => '<div class="page_navigation center">',
 				'next_start'  => '<div class="next_nav_section">',
 				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
 				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
