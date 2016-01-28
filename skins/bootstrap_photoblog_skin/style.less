@@ -325,7 +325,7 @@ nav.sitewide_header {
 	}
 	.evo_post_details {
 		margin: 13px 0 60px; // 13 top margin because of the 7px bottom margin from img
-		.evo_post_header
+		.evo_post_details_header
 		{ // Post title section
 			margin: 0;
 			padding-bottom: 12px;
@@ -365,7 +365,7 @@ nav.sitewide_header {
 .evo_intro_post, .evo_featured_post, .featurepost {
 	margin-bottom: 60px;
 	.evo_post_details {
-		.evo_post_header
+		.evo_post_details_header
 		{ // Post title section
 			margin: 0;
 			padding-bottom: 12px;
@@ -441,14 +441,11 @@ textarea.bComment
 }
 
 // This skin needs this for disp=posts to separate from lower pagination
-div.pageFooter {
+footer.pageFooter {
 	margin-top: 20px;
 	padding: 0 0 1ex 0;
 	p.baseline {
-		text-align: center;
-		font-size: 84%;
-		padding: 6ex 0 4ex 0;
-		margin: 0;
+		margin-bottom: 30px;
 	}
 }
 
@@ -491,11 +488,6 @@ select.bComment {
 }
 .image_index div:hover {
 	background: #777;
-}
-
-#pageFooter a
-{
-	color: #aaa;
 }
 
 table.grouped, #edit_group_contacts {
@@ -612,9 +604,6 @@ span.loader_img.loader_ajax_form {
 		float: right;
 	}
 }
-
-
-
 
 // ------------------------------ ?disp=profile ------------------------------
 

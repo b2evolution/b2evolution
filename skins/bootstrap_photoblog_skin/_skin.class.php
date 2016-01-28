@@ -421,7 +421,7 @@ class bootstrap_photoblog_Skin extends Skin
 
 		if( $panel_titles = $this->get_setting( 'panel_titles' ) )
 		{ // Panel titles color:
-			$custom_css .= '.main_content_container .panel-heading h4, .main_content_container .panel-heading h3, .main_content_container .panel-heading a { color: '.$panel_titles." }\n";
+			$custom_css .= '.main_content_container .panel-heading h4, .main_content_container .panel-heading h3, .main_content_container .panel-heading a, legend.panel-heading { color: '.$panel_titles." }\n";
 		}
 		
 		if( $prev_bgd = $this->get_setting( 'prev_bgd' ) )

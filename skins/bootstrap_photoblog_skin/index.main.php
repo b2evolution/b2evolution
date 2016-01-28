@@ -181,8 +181,6 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		
 		<?php
-		if( $disp == 'single' )
-		{
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 				'template' => '$next$$prev$',
@@ -198,7 +196,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_end'   => '</div><div class="clear"></div>',
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
-		}
 		?>
 
 		<?php
@@ -213,18 +210,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'item_selected_start' => '<li class="active">',
 						'item_selected_end'   => '</li>',
 						'block_end'           => '</ul></nav>',
-					),
-					// Pagination
-					'pagination' => array(
-						'block_start'           => '<div class="center"><ul class="pagination">',
-						'block_end'             => '</ul></div>',
-						'page_current_template' => '<span>$page_num$</span>',
-						'page_item_before'      => '<li>',
-						'page_item_after'       => '</li>',
-						'page_item_current_before' => '<li class="active">',
-						'page_item_current_after'  => '</li>',
-						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
 					'url_link_position'     => 'top',
@@ -367,10 +352,8 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </div><!-- .row -->
 
-<footer class="row">
-
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 pageFooter">
+	<footer class="col-md-12 pageFooter">
 
 		<div class="evo_container evo_container__footer">
 		<?php
@@ -384,7 +367,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p class="baseline">
+		<p class="baseline small center">
 			<?php
 				// Display a link to contact the owner of this blog (if owner accepts messages):
 				$Blog->contact_link( array(
@@ -421,7 +404,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</p>
 
 
-		<p class="baseline">
+		<p class="baseline small center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -445,10 +428,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					) );
 			?>
 		</p>
-	</div><!-- .col -->
-	
-</footer><!-- .row -->
-
+	</footer><!-- .footer -->
 
 </div><!-- .container -->
 
