@@ -279,7 +279,7 @@ class bootstrap_main_Skin extends Skin
 	 *
 	 * This may register some CSS or JS...
 	 */
-	function display_init( $php7_compatibility = array() )
+	function display_init()
 	{
 		global $Messages, $disp, $debug;
 
