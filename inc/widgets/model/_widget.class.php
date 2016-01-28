@@ -861,7 +861,7 @@ class ComponentWidget extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 */
-	function dbupdate( $php7_compatibility = '' )
+	function dbupdate()
 	{
 		global $DB;
 
