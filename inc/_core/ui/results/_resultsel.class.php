@@ -59,7 +59,7 @@ class ResultSel extends Results
 		global $current_User;
 
 		// Call parent:
-		parent::Results( $sql, $param_prefix, $default_order, $limit, $count_sql );
+		parent::__construct( $sql, $param_prefix, $default_order, $limit, $count_sql );
 
 		if( ! $current_User->check_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections

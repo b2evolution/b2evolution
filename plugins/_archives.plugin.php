@@ -524,7 +524,7 @@ class ArchiveList extends Results
 			}
 		}
 
-		parent::Results( $sql, 'archivelist_', '', $limit );
+		parent::__construct( $sql, 'archivelist_', '', $limit );
 
 		$this->restart();
 	}
