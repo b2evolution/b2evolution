@@ -37,7 +37,7 @@ class Text_Diff {
      *                           Normally an array of two arrays, each
      *                           containing the lines from a file.
      */
-    function Text_Diff($engine, $params)
+    function __construct($engine, $params)
     {
         // Backward compatibility workaround.
         if (!is_string($engine)) {
@@ -313,7 +313,7 @@ class Text_MappedDiff extends Text_Diff {
         assert(count($from_lines) == count($mapped_from_lines));
         assert(count($to_lines) == count($mapped_to_lines));
 
-        parent::Text_Diff($mapped_from_lines, $mapped_to_lines);
+        parent::__construct($mapped_from_lines, $mapped_to_lines);
 
         $xi = $yi = 0;
         for ($i = 0; $i < count($this->_edits); $i++) {
