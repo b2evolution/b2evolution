@@ -337,29 +337,29 @@ textarea,
 .evo_post .evo_post_details {
   margin: 13px 0 60px;
 }
-.evo_post .evo_post_details .evo_post_header {
+.evo_post .evo_post_details .evo_post_details_header {
   margin: 0;
   padding-bottom: 12px;
 }
-.evo_post .evo_post_details .evo_post_header h3.evo_post_title,
-.evo_post .evo_post_details .evo_post_header h3.evo_post_title.linked a {
+.evo_post .evo_post_details .evo_post_details_header h3.evo_post_title,
+.evo_post .evo_post_details .evo_post_details_header h3.evo_post_title.linked a {
   font-size: 16px;
   display: inline;
   letter-spacing: 2px;
 }
-.evo_post .evo_post_details .evo_post_header .timestamp {
+.evo_post .evo_post_details .evo_post_details_header .timestamp {
   margin: 0 0 0 1em;
   font-size: 84%;
 }
-.evo_post .evo_post_details .evo_post_header .action_right {
+.evo_post .evo_post_details .evo_post_details_header .action_right {
   font-size: 84%;
   float: right;
   margin: 0 0 0 1em;
 }
-.evo_post .evo_post_details .evo_post_header .action_right i {
+.evo_post .evo_post_details .evo_post_details_header .action_right i {
   font-size: 14px;
 }
-.evo_post .evo_post_details .evo_post_header .action_right a {
+.evo_post .evo_post_details .evo_post_details_header .action_right a {
   margin-left: 15px;
 }
 .evo_post .evo_post_details .evo_post__full_text .image_block {
@@ -373,42 +373,42 @@ textarea,
 .featurepost {
   margin-bottom: 60px;
 }
-.evo_intro_post .evo_post_details .evo_post_header,
-.evo_featured_post .evo_post_details .evo_post_header,
-.featurepost .evo_post_details .evo_post_header {
+.evo_intro_post .evo_post_details .evo_post_details_header,
+.evo_featured_post .evo_post_details .evo_post_details_header,
+.featurepost .evo_post_details .evo_post_details_header {
   margin: 0;
   padding-bottom: 12px;
 }
-.evo_intro_post .evo_post_details .evo_post_header h3.evo_post_title,
-.evo_featured_post .evo_post_details .evo_post_header h3.evo_post_title,
-.featurepost .evo_post_details .evo_post_header h3.evo_post_title,
-.evo_intro_post .evo_post_details .evo_post_header h3.evo_post_title.linked a,
-.evo_featured_post .evo_post_details .evo_post_header h3.evo_post_title.linked a,
-.featurepost .evo_post_details .evo_post_header h3.evo_post_title.linked a {
+.evo_intro_post .evo_post_details .evo_post_details_header h3.evo_post_title,
+.evo_featured_post .evo_post_details .evo_post_details_header h3.evo_post_title,
+.featurepost .evo_post_details .evo_post_details_header h3.evo_post_title,
+.evo_intro_post .evo_post_details .evo_post_details_header h3.evo_post_title.linked a,
+.evo_featured_post .evo_post_details .evo_post_details_header h3.evo_post_title.linked a,
+.featurepost .evo_post_details .evo_post_details_header h3.evo_post_title.linked a {
   display: inline;
   letter-spacing: 2px;
 }
-.evo_intro_post .evo_post_details .evo_post_header .timestamp,
-.evo_featured_post .evo_post_details .evo_post_header .timestamp,
-.featurepost .evo_post_details .evo_post_header .timestamp {
+.evo_intro_post .evo_post_details .evo_post_details_header .timestamp,
+.evo_featured_post .evo_post_details .evo_post_details_header .timestamp,
+.featurepost .evo_post_details .evo_post_details_header .timestamp {
   margin: 0 0 0 1em;
   font-size: 84%;
 }
-.evo_intro_post .evo_post_details .evo_post_header .action_right,
-.evo_featured_post .evo_post_details .evo_post_header .action_right,
-.featurepost .evo_post_details .evo_post_header .action_right {
+.evo_intro_post .evo_post_details .evo_post_details_header .action_right,
+.evo_featured_post .evo_post_details .evo_post_details_header .action_right,
+.featurepost .evo_post_details .evo_post_details_header .action_right {
   font-size: 84%;
   float: right;
   margin: 0 0 0 1em;
 }
-.evo_intro_post .evo_post_details .evo_post_header .action_right i,
-.evo_featured_post .evo_post_details .evo_post_header .action_right i,
-.featurepost .evo_post_details .evo_post_header .action_right i {
+.evo_intro_post .evo_post_details .evo_post_details_header .action_right i,
+.evo_featured_post .evo_post_details .evo_post_details_header .action_right i,
+.featurepost .evo_post_details .evo_post_details_header .action_right i {
   font-size: 14px;
 }
-.evo_intro_post .evo_post_details .evo_post_header .action_right a,
-.evo_featured_post .evo_post_details .evo_post_header .action_right a,
-.featurepost .evo_post_details .evo_post_header .action_right a {
+.evo_intro_post .evo_post_details .evo_post_details_header .action_right a,
+.evo_featured_post .evo_post_details .evo_post_details_header .action_right a,
+.featurepost .evo_post_details .evo_post_details_header .action_right a {
   margin-left: 15px;
 }
 .evo_intro_post .evo_post_details .evo_post_footer,
@@ -452,15 +452,12 @@ textarea.bComment {
   padding: 2px;
   margin: 0ex;
 }
-div.pageFooter {
+footer.pageFooter {
   margin-top: 20px;
   padding: 0 0 1ex 0;
 }
-div.pageFooter p.baseline {
-  text-align: center;
-  font-size: 84%;
-  padding: 6ex 0 4ex 0;
-  margin: 0;
+footer.pageFooter p.baseline {
+  margin-bottom: 30px;
 }
 div.image_block img {
   background-color: #fff;
@@ -495,9 +492,6 @@ select.bComment {
 }
 .image_index div:hover {
   background: #777;
-}
-#pageFooter a {
-  color: #aaa;
 }
 table.grouped,
 #edit_group_contacts {

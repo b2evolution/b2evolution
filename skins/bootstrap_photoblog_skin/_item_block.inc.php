@@ -74,7 +74,7 @@ $params = array_merge( array(
 
 	<div class="evo_post_details panel-body">
 
-		<div class="evo_post_header">
+		<div class="evo_post_details_header">
 
 			<?php
 				if( $Item->status != 'published' )
@@ -206,6 +206,21 @@ $params = array_merge( array(
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	?>
+
+	<?php
+		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
+		skin_include( '_item_workflow.inc.php' );
+		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	?>
+
+	<?php
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+			) );
+		// ---------------------- END OF META COMMENTS ---------------------
 	?>
 
 	<?php

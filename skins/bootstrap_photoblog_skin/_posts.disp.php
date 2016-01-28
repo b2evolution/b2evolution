@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 mainlist_page_links( array(
 				'page_current_template' => ' ',
-				'block_start' => '<div class="page_navigation">',
+				'block_start' => '<div class="page_navigation center">',
 				'next_start'  => '<div class="next_nav_section">',
 				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
 				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
@@ -49,7 +49,7 @@ while( mainlist_get_item() )
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 mainlist_page_links( array(
 				'page_current_template' => ' ',
-				'block_start' => '<div class="page_navigation">',
+				'block_start' => '<div class="page_navigation center">',
 				'next_start'  => '<div class="next_nav_section">',
 				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
 				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
