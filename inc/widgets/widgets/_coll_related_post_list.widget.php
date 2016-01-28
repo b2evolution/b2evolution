@@ -45,11 +45,14 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemTypeCache->clear();
 		$ItemTypeCache->load_where( 'ityp_usage = "post"' ); // Load only post item types
-		$ItemTypeCache->all_loaded = true; // Set TRUE to don't load all item types in get_option_array() below
+		$item_type_cache_load_all = $ItemTypeCache->load_all; // Save original value
+		$ItemTypeCache->load_all = false; // Force to don't load all item types in get_option_array() below
 		$post_item_type_options =
 			array(
 				''  => T_('All'),
 			) + $ItemTypeCache->get_option_array();
+		// Revert back to original value:
+		$ItemTypeCache->load_all = $item_type_cache_load_all;
 
 		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
 		$r = parent::get_param_definitions( $params );
