@@ -181,6 +181,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		
 		<?php
+			if ( $disp == 'single' ) {
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 				'template' => '$next$$prev$',
@@ -196,6 +197,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_end'   => '</div><div class="clear"></div>',
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
+			}
 		?>
 
 		<?php
