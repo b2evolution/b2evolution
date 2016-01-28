@@ -477,7 +477,7 @@ class Calendar
 	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
 	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 */
-	function Calendar( $m = '', $params = array() )
+	function __construct( $m = '', $params = array() )
 	{
 		global $localtimenow;
 
