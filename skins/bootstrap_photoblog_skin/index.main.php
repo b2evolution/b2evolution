@@ -213,6 +213,20 @@ siteskin_include( '_site_body_header.inc.php' );
 						'item_selected_end'   => '</li>',
 						'block_end'           => '</ul></nav>',
 					),
+      				// Pagination
+      				'pagination' => array(
+						'template' => '$next$$prev$',
+						'block_start' => '<div class="page_navigation center">',
+						'next_start'  => '<div class="next_nav_section">',
+						'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
+						'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
+						'next_end'    => '</div>',
+						'prev_start'  => '<div class="prev_nav_section">',
+						'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
+						'prev_no_item' => '',
+						'prev_end'    => '</div>',
+						'block_end'   => '</div><div class="clear"></div>',
+      				),
 					// Item content:
 					'url_link_position'     => 'top',
 					'parent_link_position'  => 'top',
