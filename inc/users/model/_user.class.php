@@ -1685,7 +1685,7 @@ class User extends DataObject
 	{
 		if( empty( $this->city_ID ) )
 		{
-			return;
+			return '';
 		}
 
 		load_class( 'regional/model/_city.class.php', 'City' );

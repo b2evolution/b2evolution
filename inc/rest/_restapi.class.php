@@ -157,6 +157,9 @@ class RestApi
 	}
 
 
+	/**** MODULE COLLECTIONS ---- START ****/
+
+
 	/**
 	 * Call module to prepare request for collections
 	 */
@@ -595,4 +598,134 @@ class RestApi
 			$this->add_response( 'results', $result_data, 'array' );
 		}
 	}
+
+
+	/**** MODULE COLLECTIONS ---- END ****/
+
+
+	/**** MODULE USERS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for users
+	 */
+	private function module_users()
+	{
+		// User controller ('list' by default):
+		$user_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
+
+		if( intval( $user_controller ) > 0 )
+		{	// This is a request to view a details of single user:
+			$user_controller = 'view';
+		}
+
+		if( ! method_exists( $this, 'controller_user_'.$user_controller ) )
+		{	// Unknown controller:
+			$this->halt( 'Unknown user controller "'.$user_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		// Call collection controller to prepare current request:
+		$this->{'controller_user_'.$user_controller}();
+	}
+
+
+	/**
+	 * Call user controller to list the users
+	 */
+	private function controller_user_list()
+	{
+		global $Settings;
+
+		// Get param to limit number users per page:
+		$api_per_page = param( 'per_page', 'integer', 10 );
+
+		// Create result set:
+		load_class( 'users/model/_userlist.class.php', 'UserList' );
+		$UserList = new UserList( 'api_', $api_per_page, '' );
+
+		$UserList->load_from_Request();
+
+		// Execute query:
+		$UserList->query();
+
+		// Add data of users list to response:
+		$this->add_response( 'found', $UserList->total_rows, 'integer' );
+		$this->add_response( 'page', $UserList->page, 'integer' );
+		$this->add_response( 'page_size', $UserList->limit, 'integer' );
+		$this->add_response( 'pages_total', $UserList->total_pages, 'integer' );
+
+		// Add each user row in the response array:
+		while( $User = & $UserList->get_next() )
+		{
+			// ID:
+			$user_data = array( 'id' => intval( $User->ID ) );
+			// Picture:
+			if( $Settings->get( 'allow_avatars' ) )
+			{	// Only if it is allowed by general settings:
+				$user_picture = $User->get_avatar_imgtag( 'crop-top-48x48' );
+				if( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) )
+				{
+					$user_data['picture'] = $user_picture[1];
+				}
+			}
+			// Login:
+			$user_data['login'] = $User->get( 'login' );
+			// Full name:
+			$user_data['fullname'] = $User->get( 'fullname' );
+			// City:
+			$user_data['city'] = $User->get_city_name();
+
+			// Add each user row in the response array:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+
+		if( empty( $this->response ) )
+		{	// No posts found:
+			$this->halt( 'No users found', 'no_users', 200 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call user controller to view a user
+	 */
+	private function controller_user_view()
+	{
+		// Get an user ID for request "<baseurl>/api/v1/users/<id>":
+		$user_ID = empty( $this->args[1] ) ? 0 : $this->args[1];
+
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+
+		if( ! $User )
+		{	// Wrong user request:
+			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			// Exit here.
+		}
+
+		// ID:
+		$user_data = array( 'id' => intval( $User->ID ) );
+		// Picture:
+		$user_picture = $User->get_avatar_imgtag( is_logged_in() ? 'crop-top-320x320' : 'crop-top-320x320-blur-8' );
+		if( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) )
+		{
+			$user_data['picture'] = $user_picture[1];
+		}
+		// Login:
+		$user_data['login'] = $User->get( 'login' );
+		// Full name:
+		$user_data['fullname'] = $User->get( 'fullname' );
+		// City:
+		$user_data['city'] = $User->get_city_name();
+		// Gender:
+		$user_data['gender'] = $User->get( 'gender' );
+
+		// Add user data in the response:
+		$this->response = $user_data;
+	}
+
+
+	/**** MODULE USERS ---- END ****/
 }
