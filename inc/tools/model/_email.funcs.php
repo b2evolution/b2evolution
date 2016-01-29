@@ -822,18 +822,18 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 					// HTML:
 				case 'text/plain':
 					// TEXT:
-					$Swift_Message->setBody( $message, $content_type, $charset );
+					$Swift_Message->setBody( $message['full'], $content_type, $charset );
 					break;
 
 				default:
 					// Unknown content type
-					$Swift_Message->setBody( $message, null, $charset );
+					$Swift_Message->setBody( $message['full'], null, $charset );
 					break;
 			}
 		}
 		else
 		{ // Unknown content type
-			$Swift_Message->setBody( $message, null, $charset );
+			$Swift_Message->setBody( $message['full'], null, $charset );
 		}
 		// From:
 		if( ! empty( $message['from_email'] ) )
