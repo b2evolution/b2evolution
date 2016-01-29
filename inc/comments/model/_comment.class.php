@@ -4201,6 +4201,13 @@ class Comment extends DataObject
 
 		// Comment status cannot be more than post status, restrict it:
 		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
+
+		// Add 'redirected' status to the list of restricted statuses since it does not exists for comments
+		if( ! in_array( 'redirected', $restricted_statuses ) )
+		{
+			$restricted_statuses[] = 'redirected';
+		}
+		
 		// Get all visibility statuses:
 		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );
 
@@ -4251,11 +4258,21 @@ class Comment extends DataObject
 	 */
 	function restrict_status_by_item( $update_status = false )
 	{
+		global $current_User;
+		
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
-
-		// Restrict status to max allowed by parent item:
-		$comment_allowed_status = $this->get_allowed_status();
+		
+		// Do not restrict if meta comment and user or user's group is explicitly allowed
+		if( $this->is_meta() && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item) )
+		{
+			$comment_allowed_status = $current_status;
+		}
+		else
+		{
+			// Restrict status to max allowed by parent item:
+			$comment_allowed_status = $this->get_allowed_status();
+		}
 
 		if( $update_status )
 		{	// Update status to new restricted value:
