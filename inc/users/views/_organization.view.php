@@ -17,7 +17,7 @@ global $blog, $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept, user_login, COUNT( uorg_user_ID ) AS members_count' );
+$SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept, org_perm_role, user_login, COUNT( uorg_user_ID ) AS members_count' );
 $SQL->FROM( 'T_users__organization' );
 $SQL->FROM_add( 'INNER JOIN T_users ON org_owner_user_ID = user_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_org_ID = org_ID' );

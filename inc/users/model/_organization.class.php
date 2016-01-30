@@ -45,6 +45,12 @@ class Organization extends DataObject
 	var $accept = 'owner';
 
 	/**
+	 * Edit Role
+	 * @var string: 'owner and member', 'owner'
+	 */
+	var $perm_role = 'owner and member';
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -61,6 +67,7 @@ class Organization extends DataObject
 			$this->name          = $db_row->org_name;
 			$this->url           = $db_row->org_url;
 			$this->accept        = $db_row->org_accept;
+			$this->perm_role     = $db_row->org_perm_role;
 		}
 		else
 		{	// Set default organization data for new object:
@@ -134,6 +141,10 @@ class Organization extends DataObject
 		// Accept level:
 		param( 'org_accept', 'string' );
 		$this->set_from_Request( 'accept' );
+		
+		// Edit Role Permission:
+		param( 'org_perm_role', 'string' );
+		$this->set_from_Request( 'perm_role' );
 
 		return ! param_errors_detected();
 	}

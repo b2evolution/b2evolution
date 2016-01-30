@@ -7225,6 +7225,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  AND ityp_name = "Page"' );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 11705, 'Upgrading users organization table...' ) )
+	{
+		db_add_col( 'T_users__organization', 'org_perm_role', "ENUM('owner and member', 'owner') COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member' AFTER org_accept" );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

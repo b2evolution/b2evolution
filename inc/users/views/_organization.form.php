@@ -60,6 +60,12 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 						array( 'owner', T_('Yes, owner must accept them') ),
 						array( 'no', T_('No') ),
 				), T_('Let members join'), true );
+	
+	$Form->radio( 'org_perm_role', $edited_Organization->get( 'perm_role' ),
+			array(
+				array( 'owner and member', T_('can be edited by user and organization owner') ),
+				array( 'owner', T_('can be edited by organization owner only') )
+			), T_('Role in organization'), true );
 
 
 $buttons = array();

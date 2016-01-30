@@ -408,10 +408,22 @@ if( $action != 'view' )
 					) );
 			}
 			else
-			{ // Allow to update the oraganization fields
+			{ // Allow to update the organization fields
+				$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID )
+						|| ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+				
+
 				$Form->output = false;
 				$Form->switch_layout( 'none' );
-				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				if( $perm_edit_org_role )
+				{
+					$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.
+							$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
 
