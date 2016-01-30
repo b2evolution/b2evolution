@@ -1188,7 +1188,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	{
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
 		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
-		{ // Use blog url when user has no access to backoffice 
+		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
 				$BlogCache = & get_BlogCache();
@@ -1206,7 +1206,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 			}
 
 			if( ! empty( $current_Blog ) )
-			{ // We should use blog url when at least one blog exist 
+			{ // We should use blog url when at least one blog exist
 				if( $is_admin_tab )
 				{ // Deny all admin tabs for such users
 					$user_tab = 'user';
@@ -4432,6 +4432,33 @@ function echo_user_add_organization_js( $edited_Organization )
 	</script>';
 }
 
+/**
+ * Initialize JavaScript for AJAX loading of popup window to edit user in organization
+ *
+ * @param object Organization
+ */
+function echo_user_edit_membership_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to edit user in organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
+		var evo_js_lang_edit = \''.TS_('Edit').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
 
 /**
  * Check invitation code and display error on incorrect code
@@ -4741,6 +4768,7 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_actions'      => true,
+			'display_org_actions'  => false,
 			'display_newsletter'   => true,
 			'force_check_user'     => false,
 		), $params );
@@ -4916,6 +4944,7 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_actions'    => true,
+			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
@@ -5050,7 +5079,7 @@ function users_results( & $UserList, $params = array() )
 		}
 		$UserList->cols[] = $col;
 	}
-	
+
 	if( $params['display_role'] )
 	{ // Display organizational role
 		$UserList->cols[] = array(
@@ -5058,7 +5087,7 @@ function users_results( & $UserList, $params = array() )
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'uorg_role',
-			'td' => '$uorg_role$',
+			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$uorg_role$</a>',
 		);
 	}
 
@@ -5318,6 +5347,16 @@ function users_results( & $UserList, $params = array() )
 					'td' => '%user_td_actions( #user_ID# )%'
 				);
 		}
+
+		if( $params['display_org_actions'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
+				);
+		}
 	}
 }
 
@@ -5573,6 +5612,34 @@ function user_td_actions( $user_ID )
 			$r .= get_icon( 'delete', 'noimg' );
 		}
 	}
+
+	return $r;
+}
+
+/**
+ * Get user level as link to edit ot as simple text to view
+ *
+ * @param integer User_ID
+ * @param integer User Level
+ * @return string
+ */
+function user_td_org_actions( $org_ID, $user_ID )
+{
+	global $current_User;
+
+	$r = '';
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{ // Current user can moderate this user
+		$link_params = array(
+				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
+			);
+		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
+
 
 	return $r;
 }

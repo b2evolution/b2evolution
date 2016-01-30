@@ -409,9 +409,11 @@ if( $action != 'view' )
 			}
 			else
 			{ // Allow to update the organization fields
-				$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID )
-						|| ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
-				
+				$perm_edit_org_role = false;
+				if( ! empty( $org_ID ) )
+				{
+					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+				}
 
 				$Form->output = false;
 				$Form->switch_layout( 'none' );

@@ -60,7 +60,7 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 						array( 'owner', T_('Yes, owner must accept them') ),
 						array( 'no', T_('No') ),
 				), T_('Let members join'), true );
-	
+
 	$Form->radio( 'org_perm_role', $edited_Organization->get( 'perm_role' ),
 			array(
 				array( 'owner and member', T_('can be edited by user and organization owner') ),
@@ -111,6 +111,7 @@ if( $edited_Organization->ID > 0 )
 			'display_level'        => false,
 			'display_status'       => false,
 			'display_actions'      => false,
+			'display_org_actions'  => true,
 			'display_newsletter'   => false,
 		) );
 }
