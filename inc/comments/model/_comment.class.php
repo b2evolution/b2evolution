@@ -3230,7 +3230,7 @@ class Comment extends DataObject
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables: 
+	 * There are 2 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
 	 *
@@ -3263,7 +3263,7 @@ class Comment extends DataObject
 		$r = str_replace( array( '$status$', '$status_title$' ),
 			array( $params['status'], $params['status_title'] ),
 			$params['template'] );
-	
+
 		echo format_to_output( $r, $params['format'] );
 	}
 
@@ -4202,12 +4202,6 @@ class Comment extends DataObject
 		// Comment status cannot be more than post status, restrict it:
 		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
 
-		// Add 'redirected' status to the list of restricted statuses since it does not exists for comments
-		if( ! in_array( 'redirected', $restricted_statuses ) )
-		{
-			$restricted_statuses[] = 'redirected';
-		}
-		
 		// Get all visibility statuses:
 		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );
 
@@ -4259,14 +4253,14 @@ class Comment extends DataObject
 	function restrict_status_by_item( $update_status = false )
 	{
 		global $current_User;
-		
+
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
-		
-		// Do not restrict if meta comment and user or user's group is explicitly allowed
+
+		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
 		if( $this->is_meta() && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item) )
 		{
-			$comment_allowed_status = $current_status;
+			$comment_allowed_status = 'protected';
 		}
 		else
 		{
