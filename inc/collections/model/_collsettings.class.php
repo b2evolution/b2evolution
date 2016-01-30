@@ -164,6 +164,7 @@ class CollectionSettings extends AbstractSettings
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
+			'blog_body_includes' => '',
 			'blog_footer_includes' => '',
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.

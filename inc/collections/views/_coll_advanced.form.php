@@ -199,6 +199,8 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
 		$Form->textarea( 'blog_head_includes', $edited_Blog->get_setting( 'head_includes' ), 5, T_('Custom meta tag/css section (before &lt;/head&gt;)'),
 			T_('Add custom meta tags and/or css styles to the &lt;head&gt; section. Example use: website verification, Google+, favicon image...'), 50 );
+		$Form->textarea( 'blog_body_includes', $edited_Blog->get_setting( 'body_includes' ), 5, T_('Custom javascript section (after &lt;body&gt;)'),
+			T_('Add custom javascript after the opening &lt;body&gt; tag.<br />Example use: tracking scripts, javascript libraries...'), 50 );
 		$Form->textarea( 'blog_footer_includes', $edited_Blog->get_setting( 'footer_includes' ), 5, T_('Custom javascript section (before &lt;/body&gt;)'),
 			T_('Add custom javascript before the closing &lt;/body&gt; tag in order to avoid any issues with page loading delays for visitors with slow connection speeds.<br />Example use: tracking scripts, javascript libraries...'), 50 );
 	$Form->end_fieldset();

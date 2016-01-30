@@ -73,6 +73,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 
 <body<?php skin_body_attrs( array( 'class' => 'low-contrast-linen-wptouch-bg' ) ); ?>>
 <?php
+$Blog->disp_setting( 'body_includes', 'raw');
 
 // Call BeforeSkinWrapper to display additional info:
 $Plugins->trigger_event( 'BeforeSkinWrapper' );
