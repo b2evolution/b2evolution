@@ -878,8 +878,6 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 			}
 
-			$includes_error_msg = 'You can loosen this restriction in the <a href="admin.php?ctrl=groups&action=edit&grp_ID='.
-					$current_User->grp_ID.'">group settings</a>.';
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
 			{	// HTML header includes:
 				param_check_html( 'blog_head_includes', sprintf( T_('Invalid Custom meta tag/css section. You can loosen this restriction in the <a %s>group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
@@ -3822,7 +3820,7 @@ class Blog extends DataObject
 		$enable_post_types = array();
 		foreach( $cache_all_item_type_data as $item_type )
 		{
-			if( $item_type->ityp_usage == 'post' && 
+			if( $item_type->ityp_usage == 'post' &&
 			    in_array( $item_type->ityp_name, $default_post_types ) )
 			{	// This "post" item type can be enabled:
 				$enable_post_types[] = $item_type->ityp_ID;
