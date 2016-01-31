@@ -4468,7 +4468,7 @@ class Item extends ItemLight
 				// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="evo_status__banner evo_status__$status$">$status_title$</div>' ) );
 				$r .= get_styled_status( $this->status, $this->get('t_status'), $params['class'] );
 				break;
-				
+
 			default: // other formats
 				$r .= format_to_output( $this->get('t_status'), $params['format'] );
 				break;
@@ -4509,7 +4509,7 @@ class Item extends ItemLight
 	/**
 	 * Get status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables: 
+	 * There are 2 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
 	 *
@@ -4525,7 +4525,7 @@ class Item extends ItemLight
 
 		$r = str_replace( '$status$', $this->status, $params['template'] );
 		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
-	
+
 		return format_to_output( $r, $params['format'] );
 	}
 
@@ -4533,7 +4533,7 @@ class Item extends ItemLight
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables: 
+	 * There are 2 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
 	 *
