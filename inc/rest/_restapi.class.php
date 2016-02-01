@@ -622,7 +622,7 @@ class RestApi
 		{
 			case 'POST':
 				// Set controller to update the requested user OR create one new:
-				$user_controller = ( $user_ID > 0 ) ? 'update' : 'create';
+				$user_controller = 'save';
 				break;
 
 			case 'DELETE':
@@ -827,20 +827,61 @@ class RestApi
 
 
 	/**
-	 * Call user controller to create new user
+	 * Call user controller to update the requested user OR create new one
 	 */
-	private function controller_user_create()
+	private function controller_user_save()
 	{
-		
-	}
+		global $current_User;
 
+		if( ! is_logged_in() )
+		{	// Must be logged in
+			$this->halt( T_( 'You are not logged in.' ), 'no_access', 500 );
+			// Exit here.
+		}
 
-	/**
-	 * Call user controller to update the requested user
-	 */
-	private function controller_user_update()
-	{
-		
+		// Get an user ID for request "POST <baseurl>/api/v1/users/<id>":
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		if( $user_ID > 0 )
+		{	// Initialize User object to update it:
+			$UserCache = & get_UserCache();
+			$edited_User = & $UserCache->get_by_ID( $user_ID, false, false );
+
+			if( ! $edited_User )
+			{	// Wrong user request:
+				$this->halt( 'Invalid user ID', 'user_invalid_id' );
+				// Exit here.
+			}
+
+			if( ! $current_User->can_moderate_user( $edited_User->ID )
+			    && $edited_User->ID != $current_User->ID )
+			{	// Current user has no permission to delate the requested user:
+				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 500 );
+				// Exit here.
+			}
+		}
+		else
+		{ // Initialize User object to create new one:
+			$edited_User = new User();
+		}
+
+		// Clear all messages in order to keep only from function User->update_from_request() below:
+		global $Messages;
+		$Messages->clear();
+
+		// Create new user or Update the requested user:
+		$is_new_user = ( $edited_User->ID == 0 ? true : false );
+		$result = $edited_User->update_from_request( $is_new_user );
+		if( $result !== true )
+		{	// There are errors on update the requested user:
+			$this->halt( $Messages->messages_text[0], 'update_failed', 500 );
+			// Exit here.
+		}
+		else
+		{	// The requested user has been updated successfully
+			$this->halt( $Messages->messages_text[0], 'update_success', 200 );
+			// Exit here.
+		}
 	}
 
 
@@ -880,8 +921,10 @@ class RestApi
 			// Exit here.
 		}
 
+		// Clear all messages in order to keep only from function User->check_delete() below:
 		global $Messages;
 		$Messages->clear();
+
 		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
 		{	// There are restrictions on delete the requested user:
 			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 500 );
