@@ -700,6 +700,8 @@ class RestApi
 	 */
 	private function controller_user_view()
 	{
+		global $current_User;
+
 		// Get an user ID for request "<baseurl>/api/v1/users/<id>":
 		$user_ID = intval( empty( $this->args[1] ) ? 0 : $this->args[1] );
 
@@ -721,20 +723,77 @@ class RestApi
 
 		// ID:
 		$user_data = array( 'id' => intval( $User->ID ) );
-		// Picture:
+		// Pictures:
+		// Main Picture:
 		$user_picture = $User->get_avatar_imgtag( is_logged_in() ? 'crop-top-320x320' : 'crop-top-320x320-blur-8' );
-		if( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) )
-		{
-			$user_data['picture'] = $user_picture[1];
+		$user_picture = ( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) ) ? $user_picture[1] : '';
+		$user_data['picture'] = $user_picture;
+		// Other pictures:
+		$user_data['pictures'] = array();
+		if( is_logged_in() && $current_User->check_status( 'can_view_user', $user_ID ) )
+		{ // Display other pictures, but only for logged in and activated users:
+			$user_pic_links = $User->get_avatar_Links();
+			foreach( $user_pic_links as $user_pic_Link )
+			{
+				$user_pic_url = $user_pic_Link->get_tag( array(
+						'before_image'        => '',
+						'before_image_legend' => NULL,
+						'after_image_legend'  => NULL,
+						'after_image'         => '',
+						'image_size'          => 'crop-top-80x80',
+					) );
+				if( ( preg_match( '#src="([^"]+)"#', $user_pic_url, $user_pic_url ) ) )
+				{	// Extract image url:
+					$user_data['pictures'][] = $user_pic_url[1];
+				}
+			}
 		}
+
 		// Login:
 		$user_data['login'] = $User->get( 'login' );
-		// Full name:
-		$user_data['fullname'] = $User->get( 'fullname' );
-		// City:
-		$user_data['city'] = $User->get_city_name();
+		// First name:
+		$user_data['firstname'] = $User->get( 'firstname' );
+		// Last name:
+		$user_data['lastname'] = $User->get( 'lastname' );
 		// Gender:
 		$user_data['gender'] = $User->get( 'gender' );
+
+		// Location:
+		$user_data['location'] = array(
+				'country'   => empty( $User->ctry_ID )  ? NULL : array( 'ID' => intval( $User->ctry_ID ),  'name' => $User->get_country_name() ),
+				'region'    => empty( $User->rgn_ID )   ? NULL : array( 'ID' => intval( $User->rgn_ID ),   'name' => $User->get_region_name() ),
+				'subregion' => empty( $User->subrg_ID ) ? NULL : array( 'ID' => intval( $User->subrg_ID ), 'name' => $User->get_subregion_name() ),
+				'city'      => empty( $User->city_ID )  ? NULL : array( 'ID' => intval( $User->city_ID ),  'name' => $User->get_city_name() )
+			);
+
+		// Organizations:
+		$user_data['organizations'] = array();
+		$user_organizations = $User->get_organizations();
+		foreach( $user_organizations as $org )
+		{
+			$user_data['organizations'][] = array(
+					'name' => $org->name,
+					'url'  => $org->url,
+				);
+		}
+
+		// User fields:
+		$user_data['userfields'] = array();
+		// Load the user fields:
+		$User->userfields_load();
+		foreach( $User->userfields as $userfield )
+		{
+			if( ! isset( $user_data['userfields'][ $userfield->ufgp_name ] ) )
+			{	// Initalize an array for each group of the user fields:
+				$user_data['userfields'][ $userfield->ufgp_name ] = array();
+			}
+
+			$user_data['userfields'][ $userfield->ufgp_name ][] = array(
+					'code'  => $userfield->ufdf_code,
+					'name'  => $userfield->ufdf_name,
+					'value' => $userfield->uf_varchar
+				);
+		}
 
 		// Add user data in the response:
 		$this->response = $user_data;
