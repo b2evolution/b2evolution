@@ -637,6 +637,13 @@ class RestApi
 	{
 		global $Settings;
 
+		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
+		{	// Current user has no access to public list of the users,
+			// Display error message:
+			$this->halt( $access_error_message, 'no_access', 200 );
+			// Exit here.
+		}
+
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
@@ -694,7 +701,14 @@ class RestApi
 	private function controller_user_view()
 	{
 		// Get an user ID for request "<baseurl>/api/v1/users/<id>":
-		$user_ID = empty( $this->args[1] ) ? 0 : $this->args[1];
+		$user_ID = intval( empty( $this->args[1] ) ? 0 : $this->args[1] );
+
+		if( ( $access_error_message = check_access_user_profile( $user_ID, 'api' ) ) !== true )
+		{	// Current user has no access to public list of the users,
+			// Display error message:
+			$this->halt( $access_error_message, 'no_access', 200 );
+			// Exit here.
+		}
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
