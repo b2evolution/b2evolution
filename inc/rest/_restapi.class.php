@@ -611,12 +611,38 @@ class RestApi
 	 */
 	private function module_users()
 	{
-		// User controller ('list' by default):
-		$user_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
+		// Set user controller 'list' by default:
+		$user_controller = 'list';
 
-		if( intval( $user_controller ) > 0 )
-		{	// This is a request to view a details of single user:
-			$user_controller = 'view';
+		// Get user ID:
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		switch( $request_method )
+		{
+			case 'POST':
+				// Set controller to update the requested user OR create one new:
+				$user_controller = ( $user_ID > 0 ) ? 'update' : 'create';
+				break;
+
+			case 'DELETE':
+				// Set controller to delete the requested user:
+				if( $user_ID > 0 )
+				{	// Only if user ID is defined:
+					$user_controller = 'delete';
+				}
+				else
+				{	// Wrong user request:
+					$this->halt( 'Invalid user ID', 'user_invalid_id' );
+					// Exit here.
+				}
+				break;
+
+			case 'GET':
+			default:
+				// Set controller to view the requested user profile or ALL users:
+				$user_controller = ( $user_ID > 0 ) ? 'view' : 'list';
+				break;
 		}
 
 		if( ! method_exists( $this, 'controller_user_'.$user_controller ) )
@@ -640,7 +666,7 @@ class RestApi
 		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
 		{	// Current user has no access to public list of the users,
 			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 200 );
+			$this->halt( $access_error_message, 'no_access', 500 );
 			// Exit here.
 		}
 
@@ -696,19 +722,19 @@ class RestApi
 
 
 	/**
-	 * Call user controller to view a user
+	 * Call user controller to view a profile of the requested user
 	 */
 	private function controller_user_view()
 	{
 		global $current_User;
 
-		// Get an user ID for request "<baseurl>/api/v1/users/<id>":
+		// Get an user ID for request "GET <baseurl>/api/v1/users/<id>":
 		$user_ID = intval( empty( $this->args[1] ) ? 0 : $this->args[1] );
 
 		if( ( $access_error_message = check_access_user_profile( $user_ID, 'api' ) ) !== true )
 		{	// Current user has no access to public list of the users,
 			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 200 );
+			$this->halt( $access_error_message, 'no_access', 500 );
 			// Exit here.
 		}
 
@@ -797,6 +823,81 @@ class RestApi
 
 		// Add user data in the response:
 		$this->response = $user_data;
+	}
+
+
+	/**
+	 * Call user controller to create new user
+	 */
+	private function controller_user_create()
+	{
+		
+	}
+
+
+	/**
+	 * Call user controller to update the requested user
+	 */
+	private function controller_user_update()
+	{
+		
+	}
+
+
+	/**
+	 * Call user controller to delete the requested user
+	 */
+	private function controller_user_delete()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
+		{	// Current user has no permission to delate the requested user:
+			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 500 );
+			// Exit here.
+		}
+
+		// Get an user ID for request "DELETE <baseurl>/api/v1/users/<id>":
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+
+		if( ! $User )
+		{	// Wrong user request:
+			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			// Exit here.
+		}
+
+		if( $User->ID == $current_User->ID )
+		{
+			$this->halt( T_('You can\'t delete yourself!'), 'no_access', 500 );
+			// Exit here.
+		}
+		if( $User->ID == 1 )
+		{
+			$this->halt( T_('You can\'t delete User #1!'), 'no_access', 500 );
+			// Exit here.
+		}
+
+		global $Messages;
+		$Messages->clear();
+		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
+		{	// There are restrictions on delete the requested user:
+			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 500 );
+			// Exit here.
+		}
+
+		if( $User->dbdelete( $Messages ) !== false )
+		{	// The requested user has been deleted successfully
+			$this->halt( sprintf( T_('User &laquo;%s&raquo; deleted.'), $User->get( 'login' ) ), 'delete_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// Cannot delete the requested user
+			$this->halt( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ), 'delete_failed', 500 );
+			// Exit here.
+		}
 	}
 
 
