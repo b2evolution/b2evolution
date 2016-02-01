@@ -184,14 +184,7 @@ function create_default_data()
 
 	// A default organization will be created so that there will be something to
 	// display in the homepage's organization members widget
-	$Organization = new Organization();
-	$Organization->set( 'owner_user_ID', '1' );
-	$Organization->set( 'name', 'Company XYZ' );
-	$Organization->set( 'url', 'http://b2evolution.net/' );
-	if( $Organization->dbinsert() )
-	{ // Use this organization for new created users
-		$user_org_IDs = array( $Organization->ID );
-	}
+	$user_org_IDs = array( create_demo_organization( 1 ) );
 
 	// Set default country from locale code
 	$country_code = explode( '-', $default_locale );
@@ -1260,7 +1253,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		task_begin( 'Creating Home collection...' );
-		create_main_demo_content( $jay_moderator_ID, $timeshift );
+		create_demo_collection( 'main', $jay_moderator_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1269,7 +1262,7 @@ function create_demo_contents()
 	{ // Install Blog A
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
-		create_blog_a_demo_content( $jay_moderator_ID, $timeshift );
+		create_demo_collection( 'blog_a', $jay_moderator_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1278,7 +1271,7 @@ function create_demo_contents()
 	{ // Install Blog B
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
-		create_blog_b_demo_content( $paul_blogger_ID );
+		create_demo_collection( 'blog_b', $paul_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1287,7 +1280,7 @@ function create_demo_contents()
 	{ // Install Photos blog
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
-		create_photos_demo_content( $dave_blogger_ID );
+		create_demo_collection( 'photos', $dave_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1296,7 +1289,7 @@ function create_demo_contents()
 	{ // Install Forums blog
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
-		create_forums_demo_content( $paul_blogger_ID );
+		create_demo_collection( 'forums', $paul_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1305,12 +1298,12 @@ function create_demo_contents()
 	{ // Install Manual blog
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
-		create_manual_demo_content( $dave_blogger_ID );
+		create_demo_collection( 'manual', $dave_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
 
-	task_begin( 'Setting first blog as default login and default messaging collection...' );
+	task_begin( 'Setting default login and default messaging collection...' );
 	$BlogCache = & get_BlogCache();
 	if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
 	{ // Set first blog as default login and default messaging collection
@@ -1324,6 +1317,7 @@ function create_demo_contents()
 
 	task_begin( 'Creating sample comments... ' );
 
+	/*
 	// Create two demo comments for each new created item
 	$new_created_item_IDs = $DB->get_col( 'SELECT post_ID FROM T_items__item ORDER BY post_ID' );
 	foreach( $new_created_item_IDs as $new_created_item_ID )
@@ -1349,7 +1343,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 			}
 		}
 	}
-
+	*/
 	task_end();
 
 
@@ -1397,6 +1391,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Item ID
  * @param string Comment status
  */
+ /*
 function create_demo_comment( $item_ID, $status )
 {
 	global $DB, $b2evo_demo_comment_users, $b2evo_demo_comment_user_num;
@@ -1454,6 +1449,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
 			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
 }
+*/
 
 
 /**
