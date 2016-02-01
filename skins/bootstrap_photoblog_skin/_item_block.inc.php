@@ -17,45 +17,48 @@ global $Item, $Skin;
 
 // Default params:
 $params = array_merge( array(
-		'feature_block'          	 => false,
+		'feature_block'              => false,			// fp>yura: what is this for??
+		// Classes for the <article> tag:
 		'item_class'                 => 'evo_post evo_content_block',
 		'item_type_class'            => 'evo_post__ptyp_',
 		'item_status_class'          => 'evo_post__',
-		'content_mode'          	 => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-		'image_size'            	 => '', // Do not display images in content block - Image is handled separately
-		'url_link_text_template'	 => '', // link will be displayed (except player if podcast)
-		'image_class'                => '',
+		// Controlling the title:
+		'disp_title'                 => true,
+		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+			'item_title_before'          => '<h2>',	
+			'item_title_after'           => '</h2>',
+			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+			'item_title_single_after'    => '</h1>',
+		'item_title_line_after'      => '</div>',
+		// Controlling the content:
+		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
+		'image_class'                => 'img-responsive',
+		'image_size'                 => 'fit-1280x720',
+		'author_link_text'           => 'preferredname',
 	), $params );
 
+
+echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
 
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-	?>
 
-	<?php
 		// Display images that are linked to this post:
-		$Item->images( array(
-				'before' =>              '<div class="evo_post_images">',
-				'before_image' =>        '<figure class="evo_image_block center">',
-				'before_image_legend' => '<figcaption class="evo_image_legend">',
-				'after_image_legend' =>  '</figcaption>',
-				'after_image' =>         '</figure>',
-				'after' =>               '</div>',
-				'image_size' =>          'fit-720x500',
-				/* Comment the above line to use the default image size
-				 * (fit-720x500). Possible values for the image_size
-				 * parameter are:
-				 * fit-720x500, fit-640x480, fit-520x390, fit-400x320,
-				 * fit-320x320, fit-160x160, fit-160x120, fit-80x80,
-				 * crop-80x80, crop-64x64, crop-48x48, crop-32x32,
-				 * crop-15x15
-				 * See also the $thumbnail_sizes array in conf/_advanced.php.
-				 */
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+			$Item->images( array(
+				'before_images'            => '<div class="evo_post_images">',
+				'before_image'             => '<figure class="evo_image_block">',
+				'before_image_legend'      => '<figcaption class="evo_image_legend">',
+				'after_image_legend'       => '</figcaption>',
+				'after_image'              => '</figure>',
+				'after_images'             => '</div>',
+				'image_class'              => 'img-responsive',
+				'image_size'               => 'fit-1280x720',
+				'image_limit'              =>  1000,
+				'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+
 				'before_gallery'           => '<div class="evo_post_gallery">',
 				'after_gallery'            => '</div>',
 				'gallery_table_start'      => '',
@@ -68,141 +71,202 @@ $params = array_merge( array(
 				'gallery_image_limit'      => 1000,
 				'gallery_colls'            => 5,
 				'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
+
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'teaser',
 			) );
 	?>
+	
+	<?php 
+		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
+			echo '<section class="evo_post__full panel panel-default">';
+			echo '<div class="evo_post__full_text panel-body">';
+		} else {
+			echo '<section class="evo_post__full">';
+			echo '<div class="evo_post__full_text">';
+		}
+	?>
+	<header>
+	<?php
+		// ------- Title -------
+		if( $params['disp_title'] )
+		{
+			echo $params['item_title_line_before'];
 
-
-	<div class="evo_post_details panel-body">
-
-		<div class="evo_post_details_header">
-
-			<?php
-				if( $Item->status != 'published' )
-				{
-					$Item->format_status( array(
-							'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-						) );
-				}
-				
-				echo '<div class="action_right">';
-					
-				// Link for editing
-				$Item->edit_link( array(
-					'before'    => '',
-					'after'     => '',
-					'title'     => T_('Edit title/description...'),
-				) );
-				
-				// Permalink:
-				$Item->permanent_link( array(
-						'before'    => '',
-						'after'     => '',
-						'text' => '<i class="fa fa-external-link"></i> '.T_('Permalink'),
-					) );
-					
-				// Link to comments, trackbacks, etc.:
-				$Item->feedback_link( array(
-								'type' => 'feedbacks',
-								'link_before' => '',
-								'link_after' => '',
-								'link_text_zero' => get_icon( 'nocomment' ),
-								'link_text_one' => '1 '.get_icon( 'comments' ),
-								'link_text_more' => T_('%d ').get_icon( 'comments' ),
-								'link_title' => '#',
-							) );
-
-				
-				echo '</div>';
-				
-			?>
-
-			<h3 class="evo_post_title linked"><?php
-			
-			if( ! $Item->is_intro() )
+			if( $disp == 'single' || $disp == 'page' )
 			{
-				$permalink_title = 'permalink';
+				$title_before = $params['item_title_single_before'];
+				$title_after = $params['item_title_single_after'];
 			}
 			else
 			{
-				$permalink_title = '';
+				$title_before = $params['item_title_before'];
+				$title_after = $params['item_title_after'];
 			}
-				$Item->title( array(
-					'link_type' => $permalink_title,
+
+			// POST TITLE:
+			$Item->title( array(
+				'before'    => $title_before,
+				'after'     => $title_after,
+				'link_type' => '#'
+			) );
+
+				// EDIT LINK:
+				if( $Item->is_intro() )
+				{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
+					$Item->edit_link( array(
+								'before' => '<div class="'.button_class( 'group' ).'">',
+								'after'  => '</div>',
+								'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+								'class'  => button_class( 'text' ),
+							) );
+				}
+
+			echo $params['item_title_line_after'];
+		}
+		
+		if( ! $Item->is_intro() )
+		{ // Don't display the following for intro posts
+
+			echo '<div class="small text-muted">';
+		
+			if( $Item->status != 'published' )
+			{
+				$Item->format_status( array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 					) );
-			?></h3>
-
-			<?php
-				$Item->issue_date( array(
-						'before'      => '<span class="timestamp">',
-						'after'       => '</span>',
-						'date_format' => locale_datefmt().' H:i',
-					) );
-			?>
-
-		</div>
-
-		<?php
-			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-			// Note: at the top of this file, we set: 'image_size' =>	'', // Do not display images in content block - Image is handled separately
-			skin_include( '_item_content.inc.php', $params );
-			// Note: You can customize the default item content by copying the generic
-			// /skins/_item_content.inc.php file into the current skin folder.
-			// -------------------------- END OF POST CONTENT -------------------------
-		?>
-
-		<div class="evo_post_footer">
-		<?php
-			$Item->author( array(
-					'before'    => T_('By').' ',
-					'after'     => ' &bull; ',
-					'link_text' => 'preferredname',
+			}
+			// Permalink:
+			$Item->permanent_link( array(
+					'text' => '#icon#',
 				) );
-		?>
 
-		<?php
+			// We want to display the post time:
+			$Item->issue_time( array(
+					'before'      => ' '.T_('posted on '),
+					'after'       => ' ',
+					'time_format' => 'M j, Y',
+				) );
+
+			// Author
+			$Item->author( array(
+				'before'    => ' '.T_('by').' ',
+				'after'     => ' ',
+				'link_text' => $params['author_link_text'],
+			) );
+
+			// Categories
 			$Item->categories( array(
-				'before'          => T_('Galleries').': ',
+				'before'          => T_('in').' ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
 				'include_external'=> true,
 				'link_categories' => true,
 			) );
-		?>
 
+			// Link for editing
+			$Item->edit_link( array(
+				'before'    => ' &bull; ',
+				'after'     => '',
+			) );
+			
+			echo '</div>';
+		}
+	?>
+	
+	</header>
+	<?php
+	if( $disp == 'single' )
+	{
+		?>
+		<div class="evo_container evo_container__item_single">
 		<?php
-			// List all tags attached to this post:
-			if( ! $Item->is_intro() ) {
-				$Item->tags( array(
-						'before' =>         ' &bull; '.T_('Tags').': ',
-						'after' =>          ' ',
-						'separator' =>      ', ',
-					) );
-			}
+		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+			// Template params for "Item Tags" widget
+			'widget_coll_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
+			'widget_coll_item_tags_after'     => '</div>',
+			// Params for skin file "_item_content.inc.php"
+			'widget_coll_item_content_params' => $params,
+		) );
+		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
-
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => ' &bull; '.T_('Link').': ',
-					'after'         => ' ',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
-		?>
-
 		</div>
-	</div>
+		<?php
+	}
+	else
+	{
+	// this will create a <section>
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+		skin_include( '_item_content.inc.php', $params );
+		// Note: You can customize the default item content by copying the generic
+		// /skins/_item_content.inc.php file into the current skin folder.
+		// -------------------------- END OF POST CONTENT -------------------------
+	// this will end a </section>
+	}
+	?>
+
+	<footer>
+		<?php
+			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
+			{ // List all tags attached to this post:
+				$Item->tags( array(
+						'before'    => '<nav class="small post_tags">',
+						'after'     => '</nav>',
+						'separator' => ' ',
+					) );
+		?>
+
+		<nav>
+		<?php
+			// Link to comments, trackbacks, etc.:
+			$Item->feedback_link( array(
+							'type' => 'comments',
+							'link_before' => '',
+							'link_after' => '',
+							'link_text_zero' => '#',
+							'link_text_one' => '#',
+							'link_text_more' => '#',
+							'link_title' => '#',
+							// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
+							// But why do we even have a comment link on the home page ? (only when logged in)
+						) );
+
+			// Link to comments, trackbacks, etc.:
+			$Item->feedback_link( array(
+							'type' => 'trackbacks',
+							'link_before' => ' &bull; ',
+							'link_after' => '',
+							'link_text_zero' => '#',
+							'link_text_one' => '#',
+							'link_text_more' => '#',
+							'link_title' => '#',
+						) );
+		?>
+		</nav>
+		<?php } ?>
+	</footer>
+	
+	</div> <!-- ../content_end_full_text -->
+	</section>  <!-- ../content_end_full -->
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array(
-				'before_section_title' => '<h4>',
-				'after_section_title'  => '</h4>',
-				'author_link_text' => 'preferredname',
-			) );
+		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
+				'after_section_title'  => '</h3>',
+			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
@@ -226,5 +290,6 @@ $params = array_merge( array(
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
-
 </article>
+
+<?php echo '</div>'; // End of post display ?>

@@ -25,15 +25,6 @@ if( evo_version_compare( $app_version, '6.4' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-// -------------------------- HTML HEADER INCLUDED HERE --------------------------
-skin_include( '_html_header.inc.php', array(
-		'arcdir_text'     => T_('Index'),
-		'catdir_text'     => T_('Galleries'),
-		'category_text'   => T_('Gallery').': ',
-		'categories_text' => T_('Galleries').': ',
-	) );
-// -------------------------------- END OF HEADER --------------------------------
-
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array() );
@@ -47,7 +38,8 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 
-<div class="container-fluid pageHeader">
+<div class="container">
+
 
 <header class="row">
 
@@ -90,6 +82,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </header><!-- .row -->
 
+
 <nav class="row">
 
 	<div class="col-md-12">
@@ -119,9 +112,6 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </nav><!-- .row -->
 
-</div><!-- .pageHeader -->
-
-<div class="container main_content_container">
 
 <div class="row">
 
@@ -141,6 +131,19 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
+		?>
+
+		<?php
+			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+			item_prevnext_links( array(
+					'block_start' => '<nav><ul class="pager">',
+						'prev_start'  => '<li class="previous">',
+						'prev_end'    => '</li>',
+						'next_start'  => '<li class="next">',
+						'next_end'    => '</li>',
+					'block_end'   => '</ul></nav>',
+				) );
+			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 		?>
 
 		<?php
@@ -174,30 +177,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					'feature_block' => true,
 					'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-					'item_class'   => ($Item->is_intro() ? 'evo_intro_post' : 'evo_featured_post'),
+					'item_class'   => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post'),
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
-		?>
-		
-		<?php
-			if ( $disp == 'single' ) {
-			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-			item_prevnext_links( array(
-				'template' => '$next$$prev$',
-				'block_start' => '<div class="page_navigation center">',
-				'next_start'  => '<div class="next_nav_section">',
-				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
-				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
-				'next_end'    => '</div>',
-				'prev_start'  => '<div class="prev_nav_section">',
-				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
-				'prev_no_item' => '',
-				'prev_end'    => '</div>',
-				'block_end'   => '</div><div class="clear"></div>',
-				) );
-			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
-			}
 		?>
 
 		<?php
@@ -213,20 +196,18 @@ siteskin_include( '_site_body_header.inc.php' );
 						'item_selected_end'   => '</li>',
 						'block_end'           => '</ul></nav>',
 					),
-      				// Pagination
-      				'pagination' => array(
-						'template' => '$next$$prev$',
-						'block_start' => '<div class="page_navigation center">',
-						'next_start'  => '<div class="next_nav_section">',
-						'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
-						'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
-						'next_end'    => '</div>',
-						'prev_start'  => '<div class="prev_nav_section">',
-						'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
-						'prev_no_item' => '',
-						'prev_end'    => '</div>',
-						'block_end'   => '</div><div class="clear"></div>',
-      				),
+					// Pagination
+					'pagination' => array(
+						'block_start'           => '<div class="center"><ul class="pagination">',
+						'block_end'             => '</ul></div>',
+						'page_current_template' => '<span>$page_num$</span>',
+						'page_item_before'      => '<li>',
+						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
+						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+					),
 					// Item content:
 					'url_link_position'     => 'top',
 					'parent_link_position'  => 'top',
@@ -268,8 +249,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
 					// Front page
-					'featured_intro_before' => '',
-					'featured_intro_after'  => '',
+					'featured_intro_before' => '<div class="jumbotron"><div class="intro_background_image"></div>',
+					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Sending a message'),
 				) );
@@ -368,8 +349,11 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </div><!-- .row -->
 
+
+<footer class="row">
+
 	<!-- =================================== START OF FOOTER =================================== -->
-	<footer class="col-md-12 pageFooter">
+	<div class="col-md-12 center">
 
 		<div class="evo_container evo_container__footer">
 		<?php
@@ -383,68 +367,60 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p class="baseline small center">
+		<p>
+			<?php
+				// Display footer text (text can be edited in Blog Settings):
+				$Blog->footer_text( array(
+						'before' => '',
+						'after'  => ' &bull; ',
+					) );
+			?>
+
 			<?php
 				// Display a link to contact the owner of this blog (if owner accepts messages):
 				$Blog->contact_link( array(
-						'before'      => '',
-						'after'       => ' | ',
+						'before' => '',
+						'after'  => ' &bull; ',
 						'text'   => T_('Contact'),
 						'title'  => T_('Send a message to the owner of this blog...'),
 					) );
 				// Display a link to help page:
 				$Blog->help_link( array(
 						'before'      => ' ',
-						'after'       => ' | ',
+						'after'       => ' ',
 						'text'        => T_('Help'),
 					) );
 			?>
-
-			<?php
-			if( $Blog->get_setting( 'comments_latest' ) )
-			{
-			?>
-			<a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><?php echo T_('Latest comments') ?></a> |
-			<?php
-			}
-			if( $Blog->get_setting( 'feed_content' ) != 'none' )
-			{
-			?>
-				<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>">RSS 2.0</a> /
-				<a href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>"><?php echo T_('Atom Feed') ?></a> /
-				<a href="http://webreference.fr/2006/08/30/rss_atom_xml" title="External - English"><?php echo T_('What is RSS?') ?></a>
-				| <a href="http://b2evolution.net/" title="b2evolution CMS" target="_blank">Powered by b2evolution</a>
-			<?php
-			}
-			?>
-		</p>
-
-
-		<p class="baseline small center">
-			<?php
-				// Display footer text (text can be edited in Blog Settings):
-				$Blog->footer_text( array(
-						'before'      => '',
-						'after'       => ' | ',
-					) );
-			?>
-
-			<?php display_param_link( $skin_links ) ?>
 
 			<?php
 				// Display additional credits:
 				// If you can add your own credits without removing the defaults, you'll be very cool :))
 				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 				credits( array(
-						'list_start'  => ' | ',
-						'list_end'    => '',
-						'separator'   => ' | ',
+						'list_start'  => '&bull;',
+						'list_end'    => ' ',
+						'separator'   => '&bull;',
 						'item_start'  => ' ',
 						'item_end'    => ' ',
 					) );
 			?>
 		</p>
-	</footer><!-- .footer -->
+
+		<?php
+			// Please help us promote b2evolution and leave this logo on your blog:
+			powered_by( array(
+					'block_start' => '<div class="powered_by">',
+					'block_end'   => '</div>',
+					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+					'img_width'   => 120,
+					'img_height'  => 32,
+				) );
+		?>
+	</div><!-- .col -->
+	
+</footer><!-- .row -->
+
 
 </div><!-- .container -->
 

@@ -63,11 +63,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		// Load to use function get_available_thumb_sizes()
-		load_funcs( 'files/model/_image.funcs.php' );
-		
 		$r = array_merge( array(
-				// Layout settings
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
@@ -86,16 +82,6 @@ class bootstrap_photoblog_Skin extends Skin
 							),
 						'type' => 'select',
 					),
-				'section_layout_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Images layout
-				'section_image_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Images Layout')
-				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'note' => 'px',
@@ -103,134 +89,23 @@ class bootstrap_photoblog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size for media index'),
+					'font_size' => array(
+						'label' => T_('Font size'),
 						'note' => '',
-						'defaultvalue' => 'fit-80x80',
-						'options' => get_available_thumb_sizes(),
+						'defaultvalue' => 'default',
+						'options' => array(
+								'default'        => T_('Default (14px)'),
+								'standard'       => T_('Standard (16px)'),
+								'medium'      	 => T_('Medium (18px)'),
+								'large' 		 => T_('Large (20px)'),
+								'very_large'     => T_('Very large (22px)'),
+							),
 						'type' => 'select',
 					),
-				'section_image_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Custom page styles
-				'section_page_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Custom Page Styles')
-				),
-					'page_bg_color' => array(
-						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#666666',
-						'type' => 'color',
-					),
-					'page_text_color' => array(
-						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'menu_bg_color' => array(
-						'label' => T_('Menu background color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#333333',
-						'type' => 'color',
-					),
-					'menu_text_color' => array(
-						'label' => T_('Menu elements color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'menu_links_hover' => array(
-						'label' => T_('Menu links hover color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'post_bg_color' => array(
-						'label' => T_('Post info background color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#555555',
-						'type' => 'color',
-					),
-					'post_border_col' => array(
-						'label' => T_('Post border color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'post_text_color' => array(
-						'label' => T_('Post info text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'main_link_color' => array(
-						'label' => T_('Main content links color'),
-						'note' => T_('E-g: #fff for white'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-					'panel_titles' => array(
-						'label' => T_('Panel titles color'),
-						'note' => T_('E-g: #fff for white'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-				'section_page_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Submit & preview styles
-				'subm_prev_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Submit and Preview buttons styles')
-				),
-					'prev_bgd' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'subm_bgd' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#333',
-						'type' => 'color',
-					),
-				'subm_prev_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Footer styles
-				'footer_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Submit and Preview buttons styles')
-				),
-					'footer_bgd' => array(
-						'label' => T_('Footer background color'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'footer_text' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'footer_links' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-				'footer_end' => array(
+				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
-				
-				// Colorbox image zoom
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
@@ -282,7 +157,6 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 
 
-				// Username options
 				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
@@ -310,7 +184,6 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 
 
-				// Access layout
 				'section_access_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('When access is denied or requires login...')
@@ -366,83 +239,80 @@ class bootstrap_photoblog_Skin extends Skin
 		if( $max_image_height > 0 )
 		{
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		}	
 		
 		// Add custom CSS:
 		$custom_css = '';
 		
-		if( $page_bg_color = $this->get_setting( 'page_bg_color' ) )
-		{ // Background color:
-			$custom_css .= 'body { background-color: '.$page_bg_color." }\n";
-		}
 		
-		if( $text_color = $this->get_setting( 'page_text_color' ) )
-		{ // Text color:
-			$custom_css .= 'body { color: '.$text_color." }\n";
-		}
-		
-		if( $menu_bg_color = $this->get_setting( 'menu_bg_color' ) )
-		{ // Menu background color:
-			$custom_css .= 'div.pageHeader { background-color: '.$menu_bg_color." }\n";
-		}
-		
-		if( $menu_t_color = $this->get_setting( 'menu_text_color' ) )
-		{ // Menu elements color:
-			$custom_css .= 'div.pageHeader, div.pageHeader a, div.pageHeader span { color: '.$menu_t_color." }\n";
-		}
-		
-		if( $menu_a_hover = $this->get_setting( 'menu_links_hover' ) )
-		{ // Menu links hover color:
-			$custom_css .= 'div.pageHeader a:hover { color: '.$menu_a_hover." }\n";
-		}
-		
-		if( $post_bg_color = $this->get_setting( 'post_bg_color' ) )
-		{ // Post background color:
-			$custom_css .= 'div.evo_post_details, .panel, #comment_preview { background-color: '.$post_bg_color." }\n";
-		}
-
-		if( $post_border_col = $this->get_setting( 'post_border_col' ) )
-		{ // Post border color:
-			$custom_css .= '.evo_post div.evo_post_details, .panel, .evo_featured_post div.evo_post_details, .featurepost div.evo_post_details { border: 1px solid '.$post_border_col." }\n";
-			$custom_css .= 'article.evo_intro_post .evo_post_details { border: 3px solid '.$post_border_col." }\n";
-			$custom_css .= '.main_content_container .panel-heading, .evo_comment__meta_info a, .evo_post_comment_notification a, .evo_comment__meta_info a:hover, .evo_post_comment_notification a:hover { background-color: '.$post_border_col." !important }\n";
-		}
-		
-		if( $post_text_color = $this->get_setting( 'post_text_color' ) )
-		{ // Post text color:
-			$custom_css .= 'div.evo_post_details { color: '.$post_text_color." }\n";
-		}
-
-		if( $main_link_color = $this->get_setting( 'main_link_color' ) )
-		{ // Links color (main section):
-			$custom_css .= 'div.main_content_container a { color: '.$main_link_color." }\n";
-			$custom_css .= '#bCalendarToday { background-color: '.$main_link_color." }\n";
-		}
-
-		if( $panel_titles = $this->get_setting( 'panel_titles' ) )
-		{ // Panel titles color:
-			$custom_css .= '.main_content_container .panel-heading h4, .main_content_container .panel-heading h3, .main_content_container .panel-heading a, legend.panel-heading { color: '.$panel_titles." }\n";
-		}
-		
-		if( $prev_bgd = $this->get_setting( 'prev_bgd' ) )
-		{ // Preview button background color:
-			$custom_css .= '.main_content_container .preview { background-color: '.$prev_bgd." }\n";
-		}
-
-		if( $subm_bgd = $this->get_setting( 'subm_bgd' ) )
-		{ // Submit button background color:
-			$custom_css .= '.main_content_container .submit { background-color: '.$subm_bgd." }\n";
-			$custom_css .= '.main_content_container .search_submit { border-color: '.$subm_bgd." }\n";
-		}
-		
-		if( !empty( $custom_css ) )
+		// Font size customization
+		if( $font_size = $this->get_setting( 'font_size' ) )
 		{
-			$custom_css = '<style type="text/css">
-	<!--
-'.$custom_css.'	-->
-	</style>';
-			add_headline( $custom_css );
+			switch( $font_size )
+			{
+				case 'default': // When default font size, no CSS entry
+				$custom_css = '';
+				break;
+				
+				case 'standard':// When standard layout
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 38px'." }\n";
+				$custom_css .= '.container h2 { font-size: 32px'." }\n";
+				$custom_css .= '.container h3 { font-size: 26px'." }\n";
+				$custom_css .= '.container h4 { font-size: 18px'." }\n";
+				$custom_css .= '.container h5 { font-size: 16px'." }\n";
+				$custom_css .= '.container h6 { font-size: 14px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+
+				case 'medium': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 40px'." }\n";
+				$custom_css .= '.container h2 { font-size: 34px'." }\n";
+				$custom_css .= '.container h3 { font-size: 28px'." }\n";
+				$custom_css .= '.container h4 { font-size: 20px'." }\n";
+				$custom_css .= '.container h5 { font-size: 18px'." }\n";
+				$custom_css .= '.container h6 { font-size: 16px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 42px'." }\n";
+				$custom_css .= '.container h2 { font-size: 36px'." }\n";
+				$custom_css .= '.container h3 { font-size: 30px'." }\n";
+				$custom_css .= '.container h4 { font-size: 22px'." }\n";
+				$custom_css .= '.container h5 { font-size: 20px'." }\n";
+				$custom_css .= '.container h6 { font-size: 18px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'very_large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 44px'." }\n";
+				$custom_css .= '.container h2 { font-size: 38px'." }\n";
+				$custom_css .= '.container h3 { font-size: 32px'." }\n";
+				$custom_css .= '.container h4 { font-size: 24px'." }\n";
+				$custom_css .= '.container h5 { font-size: 22px'." }\n";
+				$custom_css .= '.container h6 { font-size: 20px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+			}
 		}
+		
+		if( ! empty( $custom_css ) )
+		{ // Function for custom_css:
+		$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+		add_headline( $custom_css );
+		}			
 	}
 
 
