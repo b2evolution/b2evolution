@@ -50,7 +50,7 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Block title'),
 				'note' => T_( 'Title to display in your skin.' ),
 				'size' => 40,
-				'defaultvalue' => T_('Random Users'),
+				'defaultvalue' => T_('Users'),
 			),
 			'thumb_size' => array(
 				'label' => T_('Thumbnail size'),
@@ -103,7 +103,7 @@ class user_avatars_Widget extends ComponentWidget
 				'options' => array(
 						'username' => T_('User Names'),
 						'simple' => T_('Profile Pictures only'),
-						'badges' => T_('Both (username,  pics)'),
+						'badges' => T_('Both'),
 					),
 				'defaultvalue' => 'simple',
 			),
