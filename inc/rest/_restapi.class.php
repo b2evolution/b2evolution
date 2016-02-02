@@ -786,10 +786,10 @@ class RestApi
 
 		// Location:
 		$user_data['location'] = array(
-				'country'   => empty( $User->ctry_ID )  ? NULL : array( 'ID' => intval( $User->ctry_ID ),  'name' => $User->get_country_name() ),
-				'region'    => empty( $User->rgn_ID )   ? NULL : array( 'ID' => intval( $User->rgn_ID ),   'name' => $User->get_region_name() ),
-				'subregion' => empty( $User->subrg_ID ) ? NULL : array( 'ID' => intval( $User->subrg_ID ), 'name' => $User->get_subregion_name() ),
-				'city'      => empty( $User->city_ID )  ? NULL : array( 'ID' => intval( $User->city_ID ),  'name' => $User->get_city_name() )
+				'country'   => empty( $User->ctry_ID )  ? NULL : array( 'id' => intval( $User->ctry_ID ),  'name' => $User->get_country_name() ),
+				'region'    => empty( $User->rgn_ID )   ? NULL : array( 'id' => intval( $User->rgn_ID ),   'name' => $User->get_region_name() ),
+				'subregion' => empty( $User->subrg_ID ) ? NULL : array( 'id' => intval( $User->subrg_ID ), 'name' => $User->get_subregion_name() ),
+				'city'      => empty( $User->city_ID )  ? NULL : array( 'id' => intval( $User->city_ID ),  'name' => $User->get_city_name() )
 			);
 
 		// Organizations:
