@@ -63,7 +63,11 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ), 'flow' => T_( 'Flowing Blocks' ) ),
+				'options' => array( 
+						'flow' => T_( 'Flowing Blocks' ),
+						'list' => T_( 'List' ), 
+						'grid' => T_( 'Grid' ),
+					 ),
 				'defaultvalue' => 'flow',
 			),
 			'grid_nb_cols' => array(
@@ -102,8 +106,8 @@ class user_avatars_Widget extends ComponentWidget
 				'type' => 'select',
 				'options' => array(
 						'username' => T_('User Names'),
+						'badges' => T_('Profile Badges'),
 						'simple' => T_('Profile Pictures only'),
-						'badges' => T_('Both'),
 					),
 				'defaultvalue' => 'simple',
 			),
