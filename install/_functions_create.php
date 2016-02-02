@@ -1280,7 +1280,7 @@ function create_demo_contents()
 	{ // Install Photos blog
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
-		create_demo_collection( 'photos', $dave_blogger_ID, true, $timeshift );
+		create_demo_collection( 'photo', $dave_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1289,7 +1289,7 @@ function create_demo_contents()
 	{ // Install Forums blog
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
-		create_demo_collection( 'forums', $paul_blogger_ID, true, $timeshift );
+		create_demo_collection( 'forum', $paul_blogger_ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}

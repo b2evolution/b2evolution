@@ -69,6 +69,24 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 	}
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_( 'Demo contents' ).get_manual_link( 'collection-demo-content' ) );
+	$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', 1 ),
+				array(
+					array( 1, T_('Initialize this collection with some demo contents') ),
+					array( 0, T_('Create an empty collection') ),
+				), T_('New contents'), true );
+	if( $current_User->check_perm( 'orgs', 'create', false ) )
+	{ // Permission to create organizations
+		$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
+				T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
+	}
+
+	if( $current_User->check_perm( 'users', 'edit', false ) )
+	{ // Permission to edit users
+		$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
+				T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
+	}
+$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
@@ -209,6 +227,17 @@ $Form->end_form();
 
 ?>
 <script type="text/javascript">
+jQuery( 'input[name=create_demo_contents]' ).click( function()
+{ // Enable/disable demo organization/users checkbox
+	if( jQuery( this ).val() == '1' )
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).attr( 'disabled', true );
+	}
+} );
 jQuery( 'input[name=advanced_perms]' ).click( function()
 {	// Display a proper label for "Allow access to" depending on selected "Permission management":
 	if( jQuery( this ).val() == '1' )

@@ -116,6 +116,31 @@ switch( $action )
 			// create the new blog
 			$edited_Blog->create( $kind );
 
+			// create demo contents for the new blog
+			param( 'create_demo_contents', 'boolean' );
+			param( 'blog_locale', 'string' );
+			if( $create_demo_contents )
+			{
+				load_funcs( 'collections/_demo_content.funcs.php' );
+				param( 'create_demo_org', 'boolean', false );
+				param( 'create_demo_users', 'boolean', false );
+				$demo_org_ID = NULL;
+
+				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
+				{ // Create the demo organization
+					$demo_org_ID = create_demo_organization( $edited_Blog->owner_user_ID );
+				}
+				if( $create_demo_users )
+				{ // Create demo 'Normal' users
+					create_demo_users( NULL, array( $demo_org_ID ) );
+				}
+
+				// Switch locale to translate content
+				locale_temp_switch( $blog_locale );
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
+				locale_restore_previous();
+			}
+
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 

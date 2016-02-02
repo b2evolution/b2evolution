@@ -24,6 +24,7 @@ global $Plugins;
 global $test_install_all_features;
 global $user_org_IDs;
 
+load_class( 'items/model/_item.class.php', 'Item' );
 load_class( 'files/model/_file.class.php', 'File' );
 load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'users/model/_group.class.php', 'Group' );
@@ -37,7 +38,7 @@ load_class( 'users/model/_organization.class.php', 'Organization' );
  * @param string Type of filler text
  * @return string Filler text
  */
-function get_filler_text( $type )
+function get_filler_text( $type = NULL )
 {
 	$filler_text = '';
 
@@ -338,7 +339,7 @@ function assign_secondary_groups( $user_ID, $secondary_group_IDs )
  */
 function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $add_current_user = true )
 {
-	global $DB, $current_User;
+	global $DB, $Messages, $current_User;
 
 	// Check if our demo organization already exists
 	$demo_org_ID = NULL;
@@ -346,19 +347,21 @@ function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $a
 	$SQL = $OrganizationCache->get_SQL_object();
 	$SQL->WHERE_and( 'org_name = '.$DB->quote( $demo_org_name ) );
 
-	if( $db_row = $DB->get_row( $SQL->get() ) )
+	$db_row = $DB->get_row( $SQL->get() );
+	if( $db_row )
 	{
-		$demo_org_ID = $db_row->ID;
+		$demo_org_ID = $db_row->org_ID;
 	}
 	else
 	{
 		$Organization = new Organization();
 		$Organization->set( 'owner_user_ID', $owner_ID );
-		$Organization->set( 'name', 'Company XYZ' );
+		$Organization->set( 'name', $demo_org_name );
 		$Organization->set( 'url', 'http://b2evolution.net/' );
 		if( $Organization->dbinsert() )
 		{ // Use this organization for new created users
 			$demo_org_ID = $Organization->ID;
+			$Messages->add( sprintf( T_('The demo organization %s has been created.'), $demo_org_name ), 'success' );
 		}
 	}
 
@@ -372,6 +375,20 @@ function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $a
 }
 
 
+function create_demo_users( $group = NULL, $user_org_IDs = NULL )
+{
+	global $Messages;
+
+	$demo_users = array( 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
+	foreach( $demo_users as $demo_user )
+	{
+		create_demo_user( $demo_user, $group, $user_org_IDs );
+	}
+
+	$Messages->add( T_('Demo users has been created.'), 'success' );
+}
+
+
 /**
  * Create a demo user
  *
@@ -380,13 +397,18 @@ function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $a
  * @param array IDs of organization
  * @return User The created demo user
  */
-function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
+function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 {
-	// TODO: erhsatingin> How to get group ID using group name?
 	global $DB;
 
 	$UserCache  = & get_UserCache();
 	$demo_user = & $UserCache->get_by_login( $login );
+
+	if( ! $group )
+	{ // No group specified, set to Normal Users
+		$GroupCache = & get_GroupCache();
+		$group = & $GroupCache->get_by_ID( 4, false, false ); // normal user group
+	}
 
 	if( ! $demo_user )
 	{
@@ -399,7 +421,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Wilson',
 						'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
 						'gender'    => 'F',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'Queen of Hearts' ),
 						'fields'    => array(
@@ -423,7 +445,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Parker',
 						'level'     => 3,
 						'gender'    => 'M',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Artist' ),
 						'fields'    => array(
@@ -447,7 +469,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Miller',
 						'level'     => 2,
 						'gender'    => 'M',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Writer' ),
 						'fields'    => array(
@@ -471,7 +493,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Jones',
 						'level'     => 1,
 						'gender'    => 'M',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Thinker' ),
 						'fields'    => array(
@@ -495,7 +517,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Smith',
 						'level'     => 0,
 						'gender'    => 'M',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'fields'    => array(
 								'Micro bio' => 'Hi there!',
 							)
@@ -512,7 +534,7 @@ function create_demo_user( $login, $group_ID = 4, $user_org_IDs = NULL )
 						'lastname'  => 'Adams',
 						'level'     => 0,
 						'gender'    => 'F',
-						'Group'     => $group_ID,
+						'Group'     => $group,
 						'fields'    => array(
 								'Micro bio' => 'Just me!',
 							)
@@ -559,7 +581,7 @@ function create_demo_comment( $item_ID, $use_demo_user , $status )
 	else
 	{
 		$user_ID = NULL;
-		$author = 'Anonymous Demo User' ;
+		$author = T_('Anonymous Demo User') ;
 		$author_email = 'anonymous@example.com';
 		$author_email_url = 'http://www.example.com';
 	}
@@ -598,6 +620,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Owner ID
  * @param boolean Use demo users as comment authors
  * @param integer Shift post time in ms
+ * @return integer ID of created blog
  */
 function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 0 )
 {
@@ -664,6 +687,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		// =======================================================================================================
+		case 'std':
 		case 'blog_b':
 			// Create group for Blog b
 			$blogb_Group = new Group(); // COPY !
@@ -709,7 +733,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		// =======================================================================================================
-		case 'photos':
+		case 'photo':
 			$blog_shortname = 'Photos';
 			$blog_stub = 'photos';
 			$blog_more_longdesc = '<br /><br />
@@ -728,7 +752,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		// =======================================================================================================
-		case 'forums':
+		case 'forum':
 			$blog_shortname = 'Forums';
 			$blog_stub = 'forums';
 			$blog_forums_ID = create_blog(
@@ -758,10 +782,31 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$owner_ID );
 			$blog_ID = $blog_manual_ID;
 			break;
+
+		// =======================================================================================================
+		case 'group':
+			$blog_shortname = 'Tracker';
+			$blog_stub = 'tracker';
+			$blog_group_ID = create_blog(
+					T_('Tracker Title'),
+					$blog_shortname,
+					$blog_stub,
+					T_('Tagline for Tracker'),
+					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+					1, // Skin ID
+					'group', 'any', 1, $default_blog_access_type, false, 'public',
+					$owner_ID );
+			$blog_ID = $blog_group_ID;
+			break;
+
+		default:
+			// do nothing
 	}
 
 	// Create sample contents for the collection
 	create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift );
+
+	return $blog_ID;
 }
 
 
@@ -788,9 +833,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$cat_home_b2evo = cat_create( 'b2evolution', 'NULL', $blog_ID, NULL, true );
 			$cat_home_contrib = cat_create( T_('Contributors'), 'NULL', $blog_ID, NULL, true );
 
-			// Sample posts
-			$timeshift = 0;
-
+			// Sample post
 			// Insert three ADVERTISEMENTS for home blog:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
@@ -922,7 +965,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			// Insert a PAGE:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About Blog A"), sprintf( get_filler_text( 'info_page' ), T_('Blog A') ), $now, $cat_ann_a,
+			$edited_Item->insert( $owner_ID, T_("About Blog A"), sprintf( get_filler_text( 'info_page'), T_('Blog A') ), $now, $cat_ann_a,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 			$item_IDs[] = $edited_Item->ID;
 
@@ -938,11 +981,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
 
 [pagebreak]
 
@@ -955,10 +998,10 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
-			$edited_Item->insert( $owner_ID, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').get_filler_text( 'lorem_1paragraph' )
+			$edited_Item->insert( $owner_ID, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').get_filler_text( 'lorem_1paragraph')
 .'[teaserbreak]
 
-'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more' ), $now, $cat_bg );
+'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more'), $now, $cat_bg );
 			$edited_Item->set_setting( 'hide_teaser', '1' );
 			$edited_Item->dbsave();
 			$item_IDs[] = $edited_Item->ID;
@@ -967,10 +1010,10 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo,demo' );
-			$edited_Item->insert( $owner_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').get_filler_text( 'lorem_1paragraph' )
+			$edited_Item->insert( $owner_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').get_filler_text( 'lorem_1paragraph')
 .'[teaserbreak]
 
-'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more' ), $now, $cat_bg );
+'.T_('<p>This is the extended text. You only see it when you have clicked the "more" link.</p>').get_filler_text( 'lorem_2more'), $now, $cat_bg );
 			$LinkOwner = new LinkItem( $edited_Item );
 			$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
 			$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
@@ -1045,6 +1088,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			break;
 
 		// =======================================================================================================
+		case 'std':
 		case 'blog_b':
 			// Sample categories
 			$cat_ann_b = cat_create( T_('Announcements'), 'NULL', $blog_ID );
@@ -1065,7 +1109,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			// Insert a PAGE:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About Blog B"), sprintf( get_filler_text( 'info_page' ), T_('Blog B') ), $now, $cat_ann_b,
+			$edited_Item->insert( $owner_ID, T_("About Blog B"), sprintf( get_filler_text( 'info_page'), T_('Blog B') ), $now, $cat_ann_b,
 				array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
@@ -1107,7 +1151,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 <p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>
 
-<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>").get_filler_text( 'lorem_1paragraph' ),
+<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>").get_filler_text( 'lorem_1paragraph'),
 					$now, $cat_b2evo, array( $cat_ann_b ) );
 			$edited_Item->set( 'featured', 1 );
 			$edited_Item->dbsave();
@@ -1177,7 +1221,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			break;
 
 		// =======================================================================================================
-		case 'photos':
+		case 'photo':
 			// Sample categories
 			$cat_photo_album = cat_create( T_('Landscapes'), 'NULL', $blog_ID, NULL, true );
 
@@ -1186,7 +1230,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			// Insert a PAGE:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_('About Photos'), sprintf( get_filler_text( 'info_page' ), T_('Photos') ), $now, $cat_photo_album,
+			$edited_Item->insert( $owner_ID, T_('About Photos'), sprintf( get_filler_text( 'info_page'), T_('Photos') ), $now, $cat_photo_album,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post into photoblog:
@@ -1204,7 +1248,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$edited_Item->insert( $owner_ID, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
+			$edited_Item->insert( $owner_ID, T_('Bus Stop Ahead'), T_('In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'),
 					$now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
 			$LinkOwner = new LinkItem( $edited_Item );
 			$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
@@ -1241,7 +1285,7 @@ a school bus stop where you wouldn\'t really expect it!
 			break;
 
 		// =======================================================================================================
-		case 'forums':
+		case 'forum':
 			$user_1 = $use_demo_user ? create_demo_user( 'mary' )->ID : $owner_ID;
 			$user_2 = $use_demo_user ? create_demo_user( 'jay' )->ID : $owner_ID;
 			$user_3 = $use_demo_user ? create_demo_user( 'dave' )->ID : $owner_ID;
@@ -1269,7 +1313,7 @@ a school bus stop where you wouldn\'t really expect it!
 			// Insert a PAGE:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
-			$edited_Item->insert( 1, T_("About Forums"), sprintf( get_filler_text( 'info_page' ), T_('Forums') ), $now, $cat_forums_ann,
+			$edited_Item->insert( 1, T_("About Forums"), sprintf( get_filler_text( 'info_page'), T_('Forums') ), $now, $cat_forums_ann,
 				array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
@@ -1277,7 +1321,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$edited_Item = new Item();
 			$edited_Item->insert( $user_1, T_('First Topic'), T_('<p>This is the first topic.</p>
 
-<p>It appears in a single category.</p>').get_filler_text( 'lorem_2more' ), $now, $cat_forums_ann );
+<p>It appears in a single category.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_ann );
 			$item_IDs[] = $edited_Item->ID;
 
 			// Insert a post:
@@ -1285,7 +1329,7 @@ a school bus stop where you wouldn\'t really expect it!
 			$edited_Item = new Item();
 			$edited_Item->insert( $user_2, T_('Second topic'), T_('<p>This is the second topic.</p>
 
-<p>It appears in multiple categories.</p>').get_filler_text( 'lorem_2more' ), $now, $cat_forums_news, array( $cat_forums_ann ) );
+<p>It appears in multiple categories.</p>').get_filler_text( 'lorem_2more'), $now, $cat_forums_news, array( $cat_forums_ann ) );
 			$item_IDs[] = $edited_Item->ID;
 
 			// Insert a post:
@@ -1312,11 +1356,11 @@ a school bus stop where you wouldn\'t really expect it!
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
 
 [pagebreak]
 
@@ -1373,7 +1417,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
-			$edited_Item->insert( $user_1, T_('Markdown examples'), get_filler_text( 'markdown_examples_content' ), $now, $cat_forums_news );
+			$edited_Item->insert( $user_1, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_forums_news );
 			$item_IDs[] = $edited_Item->ID;
 			break;
 
@@ -1423,7 +1467,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			// Insert a PAGE:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
-			$edited_Item->insert( $owner_ID, T_("About this manual"), sprintf( get_filler_text( 'info_page' ), T_('Manual') ), $now, $cat_manual_intro,
+			$edited_Item->insert( $owner_ID, T_("About this manual"), sprintf( get_filler_text( 'info_page'), T_('Manual') ), $now, $cat_manual_intro,
 					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 			// Insert a post:
@@ -1715,11 +1759,11 @@ Hello
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 2 ).get_filler_text( 'lorem_2more').'
 
 [pagebreak]
 
-'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph' ).'
+'.sprintf( T_("<p>This is page %d.</p>"), 3 ).get_filler_text( 'lorem_1paragraph').'
 
 [pagebreak]
 
@@ -1797,9 +1841,12 @@ Hello
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
-			$edited_Item->insert( $owner_ID, T_('Markdown examples'), get_filler_text( 'markdown_examples_content' ), $now, $cat_manual_userguide );
+			$edited_Item->insert( $owner_ID, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_manual_userguide );
 			$item_IDs[] = $edited_Item->ID;
 			break;
+
+		default:
+			// do nothing
 	}
 
 	// Create demo comments
