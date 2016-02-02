@@ -185,7 +185,7 @@ class RestApi
 			$BlogCache = & get_BlogCache();
 			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 			{	// Collection is not detected in DB by requested url name:
-				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection' );
+				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection', 404 );
 				// Exit here.
 			}
 
@@ -234,7 +234,7 @@ class RestApi
 
 		if( empty( $BlogCache->cache ) )
 		{	// No collections found:
-			$this->halt( 'No collections found', 'no_collections', 200 );
+			$this->halt( 'No collections found', 'no_collections', 404 );
 			// Exit here.
 		}
 
@@ -365,12 +365,12 @@ class RestApi
 		{	// No posts detected:
 			if( $post_ID )
 			{	// Wrong post request:
-				$this->halt( 'Invalid post ID', 'post_invalid_id' );
+				$this->halt( 'Invalid post ID', 'post_invalid_id', 404 );
 				// Exit here.
 			}
 			else
 			{	// No posts found:
-				$this->halt( 'No posts found for requested collection', 'no_posts', 200 );
+				$this->halt( 'No posts found for requested collection', 'no_posts', 404 );
 				// Exit here.
 			}
 		}
@@ -436,7 +436,7 @@ class RestApi
 		$search_result = $Session->get( 'search_result' );
 		if( empty( $search_result ) )
 		{	// Nothing found:
-			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 200 );
+			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 404 );
 			// Exit here.
 		}
 
@@ -666,7 +666,7 @@ class RestApi
 		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
 		{	// Current user has no access to public list of the users,
 			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 500 );
+			$this->halt( $access_error_message, 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -714,8 +714,8 @@ class RestApi
 		}
 
 		if( empty( $this->response ) )
-		{	// No posts found:
-			$this->halt( 'No users found', 'no_users', 200 );
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 404 );
 			// Exit here.
 		}
 	}
@@ -734,7 +734,7 @@ class RestApi
 		if( ( $access_error_message = check_access_user_profile( $user_ID, 'api' ) ) !== true )
 		{	// Current user has no access to public list of the users,
 			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 500 );
+			$this->halt( $access_error_message, 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -835,7 +835,7 @@ class RestApi
 
 		if( ! is_logged_in() )
 		{	// Must be logged in
-			$this->halt( T_( 'You are not logged in.' ), 'no_access', 500 );
+			$this->halt( T_( 'You are not logged in.' ), 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -856,7 +856,7 @@ class RestApi
 			if( ! $current_User->can_moderate_user( $edited_User->ID )
 			    && $edited_User->ID != $current_User->ID )
 			{	// Current user has no permission to delate the requested user:
-				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 500 );
+				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 				// Exit here.
 			}
 		}
@@ -874,7 +874,7 @@ class RestApi
 		$result = $edited_User->update_from_request( $is_new_user );
 		if( $result !== true )
 		{	// There are errors on update the requested user:
-			$this->halt( $Messages->messages_text[0], 'update_failed', 500 );
+			$this->halt( $Messages->messages_text[0], 'update_failed', 403 );
 			// Exit here.
 		}
 		else
@@ -894,7 +894,7 @@ class RestApi
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
 		{	// Current user has no permission to delate the requested user:
-			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 500 );
+			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -912,12 +912,12 @@ class RestApi
 
 		if( $User->ID == $current_User->ID )
 		{
-			$this->halt( T_('You can\'t delete yourself!'), 'no_access', 500 );
+			$this->halt( T_('You can\'t delete yourself!'), 'no_access', 403 );
 			// Exit here.
 		}
 		if( $User->ID == 1 )
 		{
-			$this->halt( T_('You can\'t delete User #1!'), 'no_access', 500 );
+			$this->halt( T_('You can\'t delete User #1!'), 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -927,7 +927,7 @@ class RestApi
 
 		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
 		{	// There are restrictions on delete the requested user:
-			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 500 );
+			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 403 );
 			// Exit here.
 		}
 
@@ -938,7 +938,7 @@ class RestApi
 		}
 		else
 		{	// Cannot delete the requested user
-			$this->halt( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ), 'delete_failed', 500 );
+			$this->halt( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ), 'delete_failed', 403 );
 			// Exit here.
 		}
 	}
