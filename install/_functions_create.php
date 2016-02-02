@@ -1314,39 +1314,6 @@ function create_demo_contents()
 	update_install_progress_bar();
 	task_end();
 
-
-	task_begin( 'Creating sample comments... ' );
-
-	/*
-	// Create two demo comments for each new created item
-	$new_created_item_IDs = $DB->get_col( 'SELECT post_ID FROM T_items__item ORDER BY post_ID' );
-	foreach( $new_created_item_IDs as $new_created_item_ID )
-	{
-		create_demo_comment( $new_created_item_ID, 'published' );
-		create_demo_comment( $new_created_item_ID, 'draft' );
-	}
-
-	if( $test_install_all_features && count( $additional_comments_item_IDs ) )
-	{ // Create the additional comments when we install all features
-		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
-		{
-			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
-			{ // Insert the comments from each user
-				$now = date( 'Y-m-d H:i:s' );
-				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
-					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
-						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
-
-This is a sample comment that has been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
-			}
-		}
-	}
-	*/
-	task_end();
-
-
 	if( $test_install_all_features )
 	{
 		task_begin( 'Creating fake hit statistics... ' );
@@ -1383,73 +1350,6 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages
 }
-
-
-/**
- * Create a demo comment
- *
- * @param integer Item ID
- * @param string Comment status
- */
- /*
-function create_demo_comment( $item_ID, $status )
-{
-	global $DB, $b2evo_demo_comment_users, $b2evo_demo_comment_user_num;
-
-	// Get next user ID for new creating comment
-	if( ! isset( $b2evo_demo_comment_user_num ) )
-	{
-		$b2evo_demo_comment_user_num = 0;
-	}
-	else
-	{
-		$b2evo_demo_comment_user_num++;
-		if( $b2evo_demo_comment_user_num > count( $b2evo_demo_comment_users ) - 1 )
-		{
-			$b2evo_demo_comment_user_num = 0;
-		}
-	}
-	$user_ID = $b2evo_demo_comment_users[ $b2evo_demo_comment_user_num ];
-	if( $user_ID > 0 )
-	{ // An existing user
-		$author = NULL;
-		$author_email = NULL;
-		$author_email_url = NULL;
-	}
-	else
-	{ // Anonymous user
-		$user_ID = NULL;
-		$author = 'miss b2';
-		$author_email = 'missb2@example.com';
-		$author_email_url = 'http://example.com';
-	}
-
-	// Set demo content depending on status
-	if( $status == 'published' )
-	{
-		$content = T_('Hi!
-
-This is a sample comment that has been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
-	}
-	else
-	{ // draft
-		$content = T_('Hi!
-
-This is a sample comment that has **not** been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
-	}
-
-	$now = date( 'Y-m-d H:i:s' );
-
-	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
-			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
-			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
-		VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
-			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
-}
-*/
 
 
 /**

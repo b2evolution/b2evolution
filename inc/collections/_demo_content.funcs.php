@@ -32,6 +32,7 @@ load_funcs( 'collections/model/_category.funcs.php' );
 load_class( 'users/model/_organization.class.php', 'Organization' );
 
 
+
 /**
  * Generate filler text for demo content
  *
@@ -622,13 +623,14 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Shift post time in ms
  * @return integer ID of created blog
  */
-function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 0 )
+function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
 	global $test_install_all_features, $DB, $admin_url, $timestamp;
 
 	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
 	$default_blog_access_type = 'relative';
 
+	$timestamp = time();
 	$blog_ID = NULL;
 
 	switch( $collection_type )
@@ -819,11 +821,13 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  * @param boolean Use demo users as comment authors
  * @param integer Shift post time in ms
  */
-function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 0 )
+function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $test_install_all_features, $timestamp, $admin_url;
+	global $DB, $test_install_all_features, $timestamp, $admin_url;
 
+	$timestamp = time();
 	$item_IDs = array();
+	$additional_comments_item_IDs = array();
 
 	switch( $collection_type )
 	{
@@ -1854,5 +1858,28 @@ Hello
 	{
 		create_demo_comment( $item_ID, $use_demo_user, 'published');
 		create_demo_comment( $item_ID, $use_demo_user, 'draft');
+	}
+
+	if( $test_install_all_features && count( $additional_comments_item_IDs ) && $use_demo_user )
+	{ // Create the additional comments when we install all features
+		$demo_users = array( 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
+		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
+		{
+			foreach( $demo_users as $demo_user )
+			{ // Insert the comments from each user
+				$demo_user = create_demo_user( $demo_user );
+				if( $demo_user )
+				{
+					$now = date( 'Y-m-d H:i:s' );
+					$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
+							comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+							VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $demo_user->ID ).', "127.0.0.1", '
+							.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
+
+This is a sample comment that has been approved by default!
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
+				}
+			}
+		}
 	}
 }
