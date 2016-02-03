@@ -329,14 +329,24 @@ div.log_container {
   padding: 20px 0 10px 30px;
   vertical-align: middle;
 }
-.well .evo_post_title h2 {
+.well .evo_post_title h2,
+.featurepost .evo_post_title h2 {
   display: table-cell;
   padding: 20px 0 10px;
 }
-.well .evo_post_title .btn-group {
+.well .evo_post_title .btn-group,
+.featurepost .evo_post_title .btn-group {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;
+}
+.evo_featured_post .panel {
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.evo_featured_post .panel .panel-body {
+  padding: 0;
 }
 footer.row {
   margin-top: 20px;

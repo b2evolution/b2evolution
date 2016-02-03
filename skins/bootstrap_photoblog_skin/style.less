@@ -341,7 +341,7 @@ div.action_messages, div.log_container {
 		vertical-align: middle;
 	}
 }
-.well .evo_post_title {
+.well .evo_post_title, .featurepost .evo_post_title { // featurepost is front page intro post
 	h2{
 		display: table-cell;
 		padding: 20px 0 10px;
@@ -350,6 +350,17 @@ div.action_messages, div.log_container {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
+	}
+}
+// Remove all additional panel option from disp=posts featured post
+.evo_featured_post {
+	.panel {
+		background-color: transparent;
+		border: 0;
+		box-shadow: none;
+		.panel-body {
+			padding: 0;
+		}
 	}
 }
 
