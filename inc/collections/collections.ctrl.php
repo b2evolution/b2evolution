@@ -131,8 +131,8 @@ switch( $action )
 					$demo_org_ID = create_demo_organization( $edited_Blog->owner_user_ID );
 				}
 				if( $create_demo_users )
-				{ // Create demo 'Normal' users
-					create_demo_users( NULL, array( $demo_org_ID ) );
+				{ // Create demo users
+					get_demo_users( NULL, array( $demo_org_ID ) );
 				}
 
 				// Switch locale to translate content

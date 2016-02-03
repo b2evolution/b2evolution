@@ -376,17 +376,27 @@ function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $a
 }
 
 
-function create_demo_users( $group = NULL, $user_org_IDs = NULL )
+
+/**
+ * Get all demo users and generates them if they do not exists
+ *
+ * @param object Group to assign demo users when created
+ * @param array Organization IDs to join the demo users where created
+ * @return array Demo users
+ */
+function get_demo_users( $group = NULL, $user_org_IDs = NULL )
 {
 	global $Messages;
 
-	$demo_users = array( 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
-	foreach( $demo_users as $demo_user )
+	$demo_user_logins = array( 'admin', 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
+	$demo_users = array();
+	foreach( $demo_user_logins as $demo_user )
 	{
-		create_demo_user( $demo_user, $group, $user_org_IDs );
+		$demo_users[] = create_demo_user( $demo_user, $group, $user_org_IDs );
 	}
-
 	$Messages->add( T_('Demo users has been created.'), 'success' );
+
+	return $demo_users;
 }
 
 
@@ -405,24 +415,20 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 	$UserCache  = & get_UserCache();
 	$demo_user = & $UserCache->get_by_login( $login );
 
-	if( ! $group )
-	{ // No group specified, set to Normal Users
-		$GroupCache = & get_GroupCache();
-		$group = & $GroupCache->get_by_ID( 4, false, false ); // normal user group
-	}
-
 	if( ! $demo_user )
 	{
+		$GroupCache = & get_GroupCache();
 		switch( $login )
 		{
 			case 'mary':
+				$default_group_id = 2;
 				$mary_moderator_ID = create_user( array(
 						'login'     => 'mary',
 						'firstname' => 'Mary',
 						'lastname'  => 'Wilson',
 						'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
 						'gender'    => 'F',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 2, false, false ),
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'Queen of Hearts' ),
 						'fields'    => array(
@@ -446,7 +452,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'lastname'  => 'Parker',
 						'level'     => 3,
 						'gender'    => 'M',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 2, false, false ),
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Artist' ),
 						'fields'    => array(
@@ -470,7 +476,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'lastname'  => 'Miller',
 						'level'     => 2,
 						'gender'    => 'M',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 3, false, false ),
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Writer' ),
 						'fields'    => array(
@@ -494,7 +500,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'lastname'  => 'Jones',
 						'level'     => 1,
 						'gender'    => 'M',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 3, false, false ),
 						'org_IDs'   => $user_org_IDs,
 						'org_roles' => array( 'The Thinker' ),
 						'fields'    => array(
@@ -518,7 +524,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'lastname'  => 'Smith',
 						'level'     => 0,
 						'gender'    => 'M',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 4, false, false ),
 						'fields'    => array(
 								'Micro bio' => 'Hi there!',
 							)
@@ -535,7 +541,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'lastname'  => 'Adams',
 						'level'     => 0,
 						'gender'    => 'F',
-						'Group'     => $group,
+						'Group'     => $group ? $group : $GroupCache->get_by_ID( 4, false, false ),
 						'fields'    => array(
 								'Micro bio' => 'Just me!',
 							)
@@ -795,7 +801,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for Tracker'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					1, // Skin ID
+					4, // Skin ID
 					'group', 'any', 1, $default_blog_access_type, false, 'public',
 					$owner_ID );
 			$blog_ID = $blog_group_ID;
@@ -1847,6 +1853,86 @@ Hello
 			$edited_Item->set_tags_from_string( 'demo' );
 			$edited_Item->insert( $owner_ID, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_manual_userguide );
 			$item_IDs[] = $edited_Item->ID;
+			break;
+
+		// =======================================================================================================
+		case 'group':
+			// Sample categories
+			$cat_group_bugs = cat_create( T_('Bug'), NULL, $blog_ID, NULL, true, 10 );
+			$cat_group_features = cat_create( T_('Feature Request'), NULL, $blog_ID, NULL, true, 20 );
+
+			// Sample posts
+			$tasks = 'ABCDEFGHIJKLMNOPQRST';
+			$priorities = array( 1, 2, 3, 4, 5 );
+			$task_status = array( 1, 2 ); // New, In Progress
+			$demo_users = get_demo_users( NULL, NULL );
+
+			// Check demo users if they can be assignee
+			$allowed_assignee = array();
+			foreach( $demo_users as $demo_user )
+			{
+				if( $demo_user->check_perm( 'blog_can_be_assignee', 'edit', false, $blog_ID ) )
+				{
+					$allowed_assignee[] = $demo_user->ID;
+				}
+			}
+
+			for( $i = 0, $j = 0, $k = 0, $m = 0; $i < 20; $i++ )
+			{
+				$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set( 'priority', $priorities[$j] );
+
+				if( $use_demo_user )
+				{ // Assign task to allowed assignee
+					$edited_Item->set( 'assigned_user_ID', $allowed_assignee[$m] );
+				}
+
+				// Insert item first before setting task status
+				$edited_Item->insert( $owner_ID, sprintf( T_('Task %s'), $tasks[$i] ),
+						sprintf( T_('<p>This is a demo task description for Task %s.</p>'), $tasks[$i] ),	$now, $cat_group_bugs );
+
+				// Now we can set the post status
+				$edited_Item->set( 'pst_ID', $task_status[$k] );
+				$edited_Item->dbupdate();
+
+				$item_IDs[] = $edited_Item->ID;
+
+
+				// Iterate through all priorities and repeat
+				if( $j < ( count( $priorities ) - 1 ) )
+				{
+					$j++;
+				}
+				else
+				{
+					$j = 0;
+				}
+
+				// Iterate through all status and repeat
+				if( $k < ( count( $task_status ) - 1 ) )
+				{
+					$k++;
+				}
+				else
+				{
+					$k = 0;
+				}
+
+				// Iterate through all allowed assignee, increment only if $i is odd
+				if( $m < ( count( $allowed_assignee ) - 1 ) )
+				{
+					if( $i % 2 )
+					{
+						$m++;
+					}
+				}
+				else
+				{
+					$m = 0;
+				}
+			}
 			break;
 
 		default:
