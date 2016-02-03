@@ -17,17 +17,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 mainlist_page_links( array(
-				'page_current_template' => ' ',
-				'block_start' => '<div class="page_navigation center">',
-				'next_start'  => '<div class="next_nav_section">',
-				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
-				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
-				'next_end'    => '</div>',
-				'prev_start'  => '<div class="prev_nav_section">',
-				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
-				'prev_no_item' => '',
-				'prev_end'    => '</div>',
-				'block_end'   => '</div>',
+						'block_start'           => '<div class="center"><ul class="pagination">',
+						'block_end'             => '</ul></div>',
+						'page_current_template' => '<span>$page_num$</span>',
+						'page_item_before'      => '<li>',
+						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
+						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 	) );
 // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
@@ -48,17 +46,15 @@ while( mainlist_get_item() )
 
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 mainlist_page_links( array(
-				'page_current_template' => ' ',
-				'block_start' => '<div class="page_navigation center">',
-				'next_start'  => '<div class="next_nav_section">',
-				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
-				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
-				'next_end'    => '</div>',
-				'prev_start'  => '<div class="prev_nav_section">',
-				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
-				'prev_no_item' => '',
-				'prev_end'    => '</div>',
-				'block_end'   => '</div>',
+						'block_start'           => '<div class="center"><ul class="pagination">',
+						'block_end'             => '</ul></div>',
+						'page_current_template' => '<span>$page_num$</span>',
+						'page_item_before'      => '<li>',
+						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
+						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 	) );
 // ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
