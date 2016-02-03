@@ -5499,7 +5499,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_group'] && $UserList->filters['group'] == -1 )
 	{ // List is ungrouped, Display column with group name
 		$UserList->cols[] = array(
-				'th' => T_('Primary Group'),
+				'th' => T_('Primary<br />Group'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
@@ -5510,11 +5510,11 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_sec_groups'] )
 	{	// Display column with count of secondary groups:
 		$UserList->cols[] = array(
-				'th' => T_('Sec. Groups'),
+				'th' => T_('Sec.<br />Groups'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '%conditional( #secondary_groups_count#, "<span class=\"label label-info\">#secondary_groups_count#</span>", "" )%',
+				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
 			);
 	}
 
@@ -5652,7 +5652,39 @@ function user_td_grp_name( $user_ID, $group_name, $group_level )
 	}
 
 	// Group level:
-	$r .= '<br />'.T_('Level').': '.$group_level;
+	$r .= '<div class="note">'.T_('Level').': '.$group_level.'</div>';
+
+	return $r;
+}
+
+
+/**
+ * Get info about secondary groups for cell of users table
+ *
+ * @param integer User ID
+ * @param integer Secondary groups count
+ * @return string
+ */
+function user_td_sec_groups( $user_ID, $secondary_groups_count )
+{
+	global $current_User;
+
+	if( empty( $secondary_groups_count ) )
+	{	// No secondary groups:
+		return '';
+	}
+
+	$r = $secondary_groups_count;
+
+	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
+	{	// Make a link to update the groups if current user can moderate this user:
+		global $admin_url;
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'" class="label label-info">'.$r.'</a>';
+	}
+	else
+	{
+		$r = '<span class="label label-info">'.$r.'</span>';
+	}
 
 	return $r;
 }
