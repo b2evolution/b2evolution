@@ -7225,10 +7225,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  AND ityp_name = "Page"' );
 		upg_task_end();
 	}
-	
+
 	if( upg_task_start( 11705, 'Upgrading users organization table...' ) )
-	{
+	{	// part of 6.7.0
 		db_add_col( 'T_users__organization', 'org_perm_role', "ENUM('owner and member', 'owner') COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member' AFTER org_accept" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11710, 'Deleting back-office skin "chicago"...' ) )
+	{	// part of 6.7.0
+		// Update the back-office skin of all users to default "bootstrap":
+		$DB->query( 'DELETE FROM T_users__usersettings WHERE uset_name = "admin_skin"' );
+		// Try to delete skin folder:
+		global $adminskins_path;
+		$skin_chicago_path = $adminskins_path.'chicago/';
+		if( file_exists( $skin_chicago_path ) && ! rmdir_r( $skin_chicago_path ) )
+		{	// Display a warning if no permissions to delete the skin folder:
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'
+					.'WARNING: the Chicago admin skin is no longer supported. Please delete the folder <code>'.$skin_chicago_path.'</code>'
+				.'</evo:warning></span>' );
+		}
 		upg_task_end();
 	}
 

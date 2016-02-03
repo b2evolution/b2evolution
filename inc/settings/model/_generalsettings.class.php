@@ -32,7 +32,7 @@ class GeneralSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
-		'admin_skin' => 'chicago',
+		'admin_skin' => 'bootstrap',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',

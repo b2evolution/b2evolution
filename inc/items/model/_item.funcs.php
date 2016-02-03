@@ -4150,7 +4150,7 @@ function item_row_status( $Item, $index )
 			.'</div>';
 	}
 	else
-	{ // Display only status badge when user has no permission to edit this post and for chicago skin
+	{ // Display only status badge when user has no permission to edit this post and for non-bootstrap skin
 		$r = $Item->get_format_status( array(
 			'template' => '<span class="note status_$status$"><span>$status_title$</span></span>',
 		) );

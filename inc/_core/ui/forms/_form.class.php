@@ -490,54 +490,6 @@ class Form extends Widget
 					$this->radio_oneline_end      = '';
 					break;
 
-				case 'chicago':		// Temporary dirty hack
-					$this->formclass      = '';
-					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->no_title_no_icons_fmt = "\n";
-					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end   = '</fieldset>'."\n";
-					$this->fieldstart     = '<fieldset$ID$>'."\n";
-					$this->labelstart     = '<div class="label">';
-					$this->labelend       = "</div>\n";
-					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart     = '<div class="input">';
-					$this->inputend       = "</div>\n";
-					$this->infostart      = '<div class="info">';
-					$this->infoend        = "</div>\n";
-					$this->fieldend       = "</fieldset>\n\n";
-					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend     = "</div></fieldset>\n\n";
-					$this->customstart    = '<div class="custom_content">';
-					$this->customend      = "</div>\n";
-					$this->note_format    = ' <span class="notes">%s</span>';
-					$this->formend        = '</div>';
-					// Additional params depending on field type:
-					// - checkbox
-					$this->fieldstart_checkbox    = $this->fieldstart;
-					$this->fieldend_checkbox      = $this->fieldend;
-					$this->inputclass_checkbox    = 'checkbox';
-					$this->inputstart_checkbox    = $this->inputstart;
-					$this->inputend_checkbox      = $this->inputend;
-					$this->checkbox_newline_start = '';
-					$this->checkbox_newline_end   = "<br />\n";
-					$this->checkbox_basic_start   = '<label>';
-					$this->checkbox_basic_end     = '</label>';
-					// - radio
-					$this->fieldstart_radio       = $this->fieldstart;
-					$this->fieldend_radio         = $this->fieldend;
-					$this->inputclass_radio       = 'radio';
-					$this->inputstart_radio       = $this->inputstart;
-					$this->inputend_radio         = $this->inputend;
-					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
-					$this->radio_newline_start    = "<div>\n";
-					$this->radio_newline_end      = "</div>\n";
-					$this->radio_oneline_start    = '';
-					$this->radio_oneline_end      = '';
-					break;
-
 				case 'linespan':
 					$this->formclass      = '';
 					$this->formstart      = '';

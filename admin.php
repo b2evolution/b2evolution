@@ -132,29 +132,21 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 			$Debuglog->add( 'The default admin skin ['.$admin_skin.'] does not exist!', array('skin','error') );
 		}
 
-		if( file_exists(sprintf( $admin_skin_path, 'chicago' )) )
-		{ // 'legacy' does exist
-			$admin_skin = 'chicago';
+		// Get the first one available one:
+		$admin_skin_dirs = get_admin_skins();
 
-			$Debuglog->add( 'Falling back to legacy admin skin.', 'skins' );
+		if( $admin_skin_dirs === false )
+		{
+			$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
+		}
+		elseif( empty($admin_skin_dirs) )
+		{ // No admin skin directories found
+			$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
 		}
 		else
-		{ // get the first one available one
-			$admin_skin_dirs = get_admin_skins();
-
-			if( $admin_skin_dirs === false )
-			{
-				$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
-			}
-			elseif( empty($admin_skin_dirs) )
-			{ // No admin skin directories found
-				$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
-			}
-			else
-			{
-				$admin_skin = array_shift($admin_skin_dirs);
-				$Debuglog->add( 'Falling back to first available skin.', 'skins' );
-			}
+		{
+			$admin_skin = array_shift($admin_skin_dirs);
+			$Debuglog->add( 'Falling back to first available skin.', 'skins' );
 		}
 	}
 }
