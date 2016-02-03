@@ -311,6 +311,54 @@ function display_attachments( & $LinkOwner, $params = array() )
 }
 
 
+/*
+ * Get a link destination
+ *
+ * @return string
+ */
+function link_destination()
+{
+	/**
+	 * @var File
+	 */
+	global $current_File;
+
+	if( empty( $current_File ) )
+	{
+		return '?';
+	}
+
+	$r = '';
+
+	// File relative path & name:
+	if( $current_File->is_dir() )
+	{ // Directory
+		$r .= $current_File->dget( '_name' );
+	}
+	else
+	{ // File
+		if( $view_link = $current_File->get_view_link() )
+		{
+			$r .= $view_link;
+			// Use this hidden field to solve the conflicts on quick upload
+			$r .= '<input type="hidden" value="'.$current_File->get_root_and_rel_path().'" />';
+		}
+		else
+		{ // File extension unrecognized
+			$r .= $current_File->dget( '_name' );
+		}
+	}
+
+	$title = $current_File->dget('title');
+	if( $title !== '' )
+	{
+		$r .= '<span class="filemeta"> - '.$title.'</span>';
+	}
+
+	return $r;
+}
+
+
 /**
  * Display link actions
  *
@@ -370,9 +418,23 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 	// Delete link.
 	if( $LinkOwner->check_perm( 'edit' ) )
 	{ // Check that we have permission to edit LinkOwner object:
-		$r .= action_icon( T_('Delete this link!'), 'unlink',
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+		if( $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file completely
+			$File = & $Link->get_File();
+			$r .= action_icon( T_('Delete this file!'), 'delete',
+						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+						array( 'onclick' => 'return confirm( \''
+								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
+								.'\' ) && item_unlink('.$link_ID.')' ) );
+		}
+		else
+		{	// If current user can only unlink
+			$r .= action_icon( T_('Delete this link!'), 'unlink',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		}
 	}
 
 	if( $link_type == 'item' && $current_File )

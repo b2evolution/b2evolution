@@ -288,6 +288,50 @@ class Link extends DataObject
 			return $File->get_view_url( false );
 		}
 	}
+
+
+	/**
+	 * Check if file of this link can be deleted by current user
+	 *
+	 * @return boolean
+	 */
+	function can_be_file_deleted()
+	{
+		global $current_User, $DB;
+
+		if( ! is_logged_in() )
+		{	// Not logged in user
+			return false;
+		}
+
+		$LinkOwner = & $this->get_LinkOwner();
+		if( empty( $LinkOwner ) || ! $LinkOwner->check_perm( 'edit' ) )
+		{	// User has no permission to edit current link owner
+			return false;
+		}
+
+		if( ! ( $File = & $this->get_File() ) ||
+		    ! ( $FileRoot = & $File->get_FileRoot() ) ||
+		    ! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		{	// Current user has no permission to edit this file
+			return false;
+		}
+
+		// Try to find at least one another link by same file ID:
+		$SQL = new SQL();
+		$SQL->SELECT( 'link_ID' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
+		$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
+		$SQL->LIMIT( '1' );
+		if( $DB->get_var( $SQL->get() ) )
+		{	// We cannot delete the file of this link because it is also linked to another object
+			return false;
+		}
+
+		// No any restriction, Current User can delete the file of this link from disk and DB completely:
+		return true;
+	}
 }
 
 ?>
