@@ -7248,6 +7248,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11715, 'Replace widgets "Simple Sidebar Links list" and "Simple Linkblog Links list" with "Universal Item list"...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "coll_item_list"
+			WHERE wi_type = "core"
+			  AND wi_code IN ( "linkblog", "coll_link_list" )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
