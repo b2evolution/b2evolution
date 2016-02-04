@@ -284,7 +284,7 @@ function create_user( $params = array() )
 		}
 	}
 
-	return $User->ID;
+	return $User;
 }
 
 
@@ -336,17 +336,17 @@ function assign_secondary_groups( $user_ID, $secondary_group_IDs )
  * @param integer Owner ID
  * @param string Demo organization name
  * @param boolean Add current user to the demo organization
- * @return integer Demo organization ID
+ * @return object Created organization
  */
-function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $add_current_user = true )
+function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_current_user = true )
 {
 	global $DB, $Messages, $current_User;
 
-	// Check if our demo organization already exists
+	// Check if our sample organization already exists
 	$demo_org_ID = NULL;
 	$OrganizationCache = & get_OrganizationCache();
 	$SQL = $OrganizationCache->get_SQL_object();
-	$SQL->WHERE_and( 'org_name = '.$DB->quote( $demo_org_name ) );
+	$SQL->WHERE_and( 'org_name = '.$DB->quote( $org_name ) );
 
 	$db_row = $DB->get_row( $SQL->get() );
 	if( $db_row )
@@ -354,49 +354,53 @@ function create_demo_organization( $owner_ID, $demo_org_name = 'Company XYZ', $a
 		$demo_org_ID = $db_row->org_ID;
 	}
 	else
-	{
+	{ // Sample organization does not exist, let's create one
 		$Organization = new Organization();
 		$Organization->set( 'owner_user_ID', $owner_ID );
-		$Organization->set( 'name', $demo_org_name );
+		$Organization->set( 'name', $org_name );
 		$Organization->set( 'url', 'http://b2evolution.net/' );
 		if( $Organization->dbinsert() )
-		{ // Use this organization for new created users
-			$demo_org_ID = $Organization->ID;
-			$Messages->add( sprintf( T_('The demo organization %s has been created.'), $demo_org_name ), 'success' );
+		{
+			$org_ID = $Organization->ID;
+			$Messages->add( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success' );
 		}
 	}
 
 	// Add current user to the demo organization
-	if( $demo_org_ID && isset( $current_User ) && $add_current_user )
+	if( $add_current_user && $org_ID && isset( $current_User ) )
 	{
-		$current_User->update_organizations( array( $demo_org_ID ), array(), true);
+		$current_User->update_organizations( array( $org_ID ), array(), true);
 	}
 
-	return $demo_org_ID;
+	return $Organization;
 }
 
 
 
 /**
- * Get all demo users and generates them if they do not exists
+ * Get all available demo users
  *
- * @param object Group to assign demo users when created
- * @param array Organization IDs to join the demo users where created
- * @return array Demo users
+ * @param boolean Create the demo users if they do not exist
+ * @param object Group where the created demo users be assigned
+ * @param array List of organization where  the created demo users will be added
+ * @return array List of available demo users
  */
-function get_demo_users( $group = NULL, $user_org_IDs = NULL )
+function get_demo_users( $create = false, $group = NULL, $user_org_IDs = NULL )
 {
 	global $Messages;
 
 	$demo_user_logins = array( 'admin', 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
-	$demo_users = array();
+	$available_demo_users = array();
 	foreach( $demo_user_logins as $demo_user )
 	{
-		$demo_users[] = create_demo_user( $demo_user, $group, $user_org_IDs );
+		$u = get_demo_user( $demo_user, $create, $group, $user_org_IDs );
+		if( $u )
+		{
+			$available_demo_users[] = $u;
+		}
 	}
-	$Messages->add( T_('Demo users has been created.'), 'success' );
 
-	return $demo_users;
+	return $available_demo_users;
 }
 
 
@@ -404,18 +408,20 @@ function get_demo_users( $group = NULL, $user_org_IDs = NULL )
  * Create a demo user
  *
  * @param string User $login
- * @param integer Group ID
+ * @param boolean Create demo user if it does not exist
+ * @param integer Group ID of user when created
  * @param array IDs of organization
- * @return User The created demo user
+ * @return object Demo user
  */
-function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
+function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = NULL )
 {
-	global $DB;
+	global $DB, $user_org_IDs;
+	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 
 	$UserCache  = & get_UserCache();
 	$demo_user = & $UserCache->get_by_login( $login );
 
-	if( ! $demo_user )
+	if( ! $demo_user && $create )
 	{
 		$GroupCache = & get_GroupCache();
 		switch( $login )
@@ -440,7 +446,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) );
+					) )->ID;
 				assign_profile_picture( $UserCache->get_by_ID( $mary_moderator_ID ) );
 				$demo_user = & $UserCache->get_by_ID( $mary_moderator_ID );
 				break;
@@ -464,7 +470,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) );
+					) )->ID;
 				assign_profile_picture( $UserCache->get_by_ID( $jay_moderator_ID ) );
 				$demo_user = & $UserCache->get_by_ID( $jay_moderator_ID );
 				break;
@@ -488,7 +494,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) );
+					) )->ID;
 				assign_profile_picture( $UserCache->get_by_ID( $dave_blogger_ID ) );
 				$demo_user = & $UserCache->get_by_ID( $dave_blogger_ID );
 				break;
@@ -512,7 +518,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
 								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 							)
-					) );
+					) )->ID;
 				assign_profile_picture( $UserCache->get_by_ID( $paul_blogger_ID ) );
 				$demo_user = & $UserCache->get_by_ID( $paul_blogger_ID );
 				break;
@@ -528,7 +534,7 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'fields'    => array(
 								'Micro bio' => 'Hi there!',
 							)
-					) );
+					) )->ID;
 				$larry_User = & $UserCache->get_by_ID( $larry_user_ID );
 				assign_profile_picture( $larry_User );
 				$demo_user = & $UserCache->get_by_ID( $larry_user_ID );
@@ -545,11 +551,13 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
 						'fields'    => array(
 								'Micro bio' => 'Just me!',
 							)
-					) );
+					) )->ID;
 				assign_profile_picture( $UserCache->get_by_ID( $kate_user_ID ) );
 				$demo_user = & $UserCache->get_by_ID( $kate_user_ID );
 				break;
 
+			case 'admin':
+				// erhsatingin> Should we recreate 'admin' user here if the initial admin user has a different login?
 			default:
 				// do nothing here
 		}
@@ -566,24 +574,22 @@ function create_demo_user( $login, $group = NULL, $user_org_IDs = NULL )
  * Create a demo comment
  *
  * @param integer Item ID
- * @param boolean Use demo user as comment author
+ * @param array List of users as comment authors
  * @param string Comment status
  */
-function create_demo_comment( $item_ID, $use_demo_user , $status )
+function create_demo_comment( $item_ID, $comment_users , $status )
 {
 	global $DB, $now;
 
 	// Get comment users
-	if( $use_demo_user )
+	if( $comment_users )
 	{
-		$demo_users = array( 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
-		$demo_user = $demo_users[ rand( 0, count( $demo_users ) - 1 ) ];
-		$demo_user = create_demo_user( $demo_user );
+		$comment_user = $comment_users[ rand( 0, count( $comment_users ) - 1 ) ];
 
-		$user_ID = $demo_user->ID;
-		$author = $demo_user->get( 'fullname' );
-		$author_email = $demo_user->email;
-		$author_email_url = $demo_user->url;
+		$user_ID = $comment_user->ID;
+		$author = $comment_user->get( 'fullname' );
+		$author_email = $comment_user->email;
+		$author_email_url = $comment_user->url;
 	}
 	else
 	{
@@ -1296,12 +1302,23 @@ a school bus stop where you wouldn\'t really expect it!
 
 		// =======================================================================================================
 		case 'forum':
-			$user_1 = $use_demo_user ? create_demo_user( 'mary' )->ID : $owner_ID;
-			$user_2 = $use_demo_user ? create_demo_user( 'jay' )->ID : $owner_ID;
-			$user_3 = $use_demo_user ? create_demo_user( 'dave' )->ID : $owner_ID;
-			$user_4 = $use_demo_user ? create_demo_user( 'paul' )->ID : $owner_ID;
-			$user_5 = $use_demo_user ? create_demo_user( 'larry' )->ID : $owner_ID;
-			$user_6 = $use_demo_user ? create_demo_user( 'kate' )->ID : $owner_ID;
+			$mary_demo_user = get_demo_user( 'mary' );
+			$user_1 = $mary_demo_user ? $mary_demo_user->ID : $owner_ID;
+
+			$jay_demo_user = get_demo_user( 'jay' );
+			$user_2 = $jay_demo_user ? $jay_demo_user->ID : $owner_ID;
+
+			$dave_demo_user = get_demo_user( 'dave' );
+			$user_3 = $dave_demo_user ? $dave_demo_user->ID : $owner_ID;
+
+			$paul_demo_user = get_demo_user( 'paul' );
+			$user_4 = $paul_demo_user ? $paul_demo_user->ID : $owner_ID;
+
+			$larry_demo_user = get_demo_user( 'larry' );
+			$user_5 = $larry_demo_user ? $larry_demo_user->ID : $owner_ID;
+
+			$kate_demo_user = get_demo_user( 'kate' );
+			$user_6 = $kate_demo_user ? $kate_demo_user->ID : $owner_ID;
 
 			// Sample categories
 			$cat_forums_forum_group = cat_create( T_('A forum group'), 'NULL', $blog_ID, NULL, true, 1, NULL, true );
@@ -1940,10 +1957,11 @@ Hello
 	}
 
 	// Create demo comments
+	$comment_users = $use_demo_user ? get_demo_users() : NULL;
 	foreach( $item_IDs as $item_ID )
 	{
-		create_demo_comment( $item_ID, $use_demo_user, 'published');
-		create_demo_comment( $item_ID, $use_demo_user, 'draft');
+		create_demo_comment( $item_ID, $comment_users, 'published');
+		create_demo_comment( $item_ID, $comment_users, 'draft');
 	}
 
 	if( $test_install_all_features && count( $additional_comments_item_IDs ) && $use_demo_user )

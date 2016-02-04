@@ -132,7 +132,7 @@ switch( $action )
 				}
 				if( $create_demo_users )
 				{ // Create demo users
-					get_demo_users( NULL, array( $demo_org_ID ) );
+					get_demo_users( true, NULL, array( $demo_org_ID ) );
 				}
 
 				// Switch locale to translate content

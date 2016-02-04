@@ -174,17 +174,13 @@ function create_default_data()
 	create_default_subregions();
 
 
-	task_begin( 'Creating admin user... ' );
-	global $timestamp, $admin_email, $default_locale, $default_country, $install_login, $install_password;
-	global $random_password;
-
-	// Create organization
+	// Do not create organization yet
 	global $user_org_IDs;
 	$user_org_IDs = NULL;
 
-	// A default organization will be created so that there will be something to
-	// display in the homepage's organization members widget
-	$user_org_IDs = array( create_demo_organization( 1 ) );
+	task_begin( 'Creating admin user... ' );
+	global $timestamp, $admin_email, $default_locale, $default_country, $install_login, $install_password;
+	global $random_password;
 
 	// Set default country from locale code
 	$country_code = explode( '-', $default_locale );
@@ -205,7 +201,8 @@ function create_default_data()
 		$random_password = $install_password;
 	}
 
-	create_user( array(
+	global $admin_user;
+	$admin_user = create_user( array(
 			'login'     => isset( $install_login ) ? $install_login : 'admin',
 			'firstname' => 'Johnny',
 			'lastname'  => 'Admin',
@@ -1114,33 +1111,25 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 
-/**
- * This is called only for fresh installs and fills the tables with
- * demo/tutorial things.
- */
-function create_demo_contents()
+function create_sample_organization()
 {
-	global $baseurl, $admin_url, $new_db_version;
-	global $random_password, $query;
-	global $timestamp, $admin_email;
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
-	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
-	global $DB;
-	global $default_locale, $default_country;
-	global $Plugins;
-	global $test_install_all_features;
+	global $user_org_IDs, $admin_user;
+
+	task_begin( 'Creating sample organization...' );
+	$user_org_IDs = array( create_demo_organization( 1 )->ID );
+	task_end();
+
+	task_begin( 'Adding admin user to sample organization...' );
+	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), true );
+	task_end();
+}
+
+
+function create_demo_users()
+{
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
+	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 	global $user_org_IDs;
-
-	/**
-	 * @var FileRootCache
-	 */
-	global $FileRootCache;
-
-	load_class( 'collections/model/_blog.class.php', 'Blog' );
-	load_class( 'files/model/_file.class.php', 'File' );
-	load_class( 'files/model/_filetype.class.php', 'FileType' );
-	load_class( 'links/model/_link.class.php', 'Link' );
-
 
 	task_begin('Assigning avatar to Admin... ');
 	$UserCache = & get_UserCache();
@@ -1193,45 +1182,98 @@ function create_demo_contents()
 	task_end();
 
 	task_begin('Creating demo user mary... ');
-	$mary_moderator_ID = create_demo_user( 'mary', $moderators_Group, $user_org_IDs )->ID;
+	$mary_moderator_ID = get_demo_user( 'mary', true, $moderators_Group, $user_org_IDs )->ID;
 	task_end();
 
 	task_begin('Creating demo user jay... ');
-	$jay_moderator_ID = create_demo_user( 'jay', $moderators_Group, $user_org_IDs )->ID;
+	$jay_moderator_ID = get_demo_user( 'jay', true, $moderators_Group, $user_org_IDs )->ID;
 	task_end();
 
 	task_begin('Creating demo user dave... ');
-	$dave_blogger_ID = create_demo_user( 'dave', $editors_Group, $user_org_IDs )->ID;
+	$dave_blogger_ID = get_demo_user( 'dave', true, $editors_Group, $user_org_IDs )->ID;
 	task_end();
 
 	task_begin('Creating demo user paul... ');
-	$paul_blogger_ID = create_demo_user( 'paul', $editors_Group, $user_org_IDs )->ID;
+	$paul_blogger_ID = get_demo_user( 'paul', true, $editors_Group, $user_org_IDs )->ID;
 	task_end();
 
 	task_begin('Creating demo user larry... ');
-	$larry_user_ID = create_demo_user( 'larry', $users_Group, NULL )->ID;
+	$larry_user_ID = get_demo_user( 'larry', true, $users_Group, NULL )->ID;
 	task_end();
 
 	task_begin('Creating demo user kate... ');
-	$kate_user_ID = create_demo_user( 'kate', $users_Group, NULL )->ID;
+	$kate_user_ID = get_demo_user( 'kate', true, $users_Group, NULL )->ID;
 	task_end();
+}
 
-	// Use only these users to create the demo comments, @see create_demo_comment()
-	global $b2evo_demo_comment_users;
-	$b2evo_demo_comment_users = array( $larry_user_ID, $kate_user_ID, 0 );
+/**
+ * This is called only for fresh installs and fills the tables with
+ * demo/tutorial things.
+ */
+function create_demo_contents()
+{
+	global $baseurl, $admin_url, $new_db_version;
+	global $random_password, $query;
+	global $timestamp, $admin_email;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
+	global $DB;
+	global $default_locale, $default_country;
+	global $Plugins;
+	global $test_install_all_features;
+	global $user_org_IDs;
+	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
+	global $admin_user;
 
-	global $default_locale, $query, $timestamp;
-	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID;
+	if( ! isset( $mary_moderator_ID ) )
+	{
+		$mary_moderator_ID = $admin_user->ID;
+	}
+
+	if( ! isset( $jay_moderator_ID ) )
+	{
+		$jay_moderator_ID = $admin_user->ID;
+	}
+
+	if( ! isset( $dave_blogger_ID ) )
+	{
+		$dave_blogger_ID = $admin_user->ID;
+	}
+
+	if( ! isset( $paul_blogger_ID ) )
+	{
+		$paul_blogger_ID = $admin_user->ID;
+	}
+
+	if( ! isset( $larry_user_ID ) )
+	{
+		$larry_user_ID = $admin_user->ID;
+	}
+
+	if( ! isset( $kate_user_ID ) )
+	{
+		$kate_user_ID = $admin_user->ID;
+	}
+
+	/**
+	 * @var FileRootCache
+	 */
+	global $FileRootCache;
+
+	load_class( 'collections/model/_blog.class.php', 'Blog' );
+	load_class( 'files/model/_file.class.php', 'File' );
+	load_class( 'files/model/_filetype.class.php', 'FileType' );
+	load_class( 'links/model/_link.class.php', 'Link' );
 
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 	if( $create_sample_contents == 'all' )
 	{	// Array contains which collections should be installed
-		$install_collection_home =   1;
-		$install_collection_bloga =  1;
-		$install_collection_blogb =  1;
-		$install_collection_photos = 1;
-		$install_collection_forums = 1;
-		$install_collection_manual = 1;
+		$install_collection_home =    1;
+		$install_collection_bloga =   1;
+		$install_collection_blogb =   1;
+		$install_collection_photos =  1;
+		$install_collection_forums =  1;
+		$install_collection_manual =  1;
+		$install_collection_tracker = 1;
 	}
 	else
 	{	// Array contains which collections should be installed
@@ -1242,6 +1284,7 @@ function create_demo_contents()
 		$install_collection_photos = in_array( 'photos', $collections );
 		$install_collection_forums = in_array( 'forums', $collections );
 		$install_collection_manual = in_array( 'manual', $collections );
+		$install_collection_tracker = in_array( 'group', $collections );
 	}
 
 	// Store the item IDs in this array in order to create additional comments
@@ -1299,6 +1342,15 @@ function create_demo_contents()
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
 		create_demo_collection( 'manual', $dave_blogger_ID, true, $timeshift );
+		update_install_progress_bar();
+		task_end();
+	}
+
+	if( $install_collection_tracker )
+	{ // Install Tracker blog
+		$timeshift += 86400;
+		task_begin( 'Creating Tracker collection...' );
+		create_demo_collection( 'group', $admin_user->ID, true, $timeshift );
 		update_install_progress_bar();
 		task_end();
 	}
