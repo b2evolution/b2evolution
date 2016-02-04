@@ -3403,7 +3403,7 @@ class Comment extends DataObject
 								OR ( bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
 								OR ( grp_perm_blogs = "editall" ) )
 							AND LENGTH(TRIM(user_email)) > 0';
-			$moderators_to_notify = $DB->get_results( $sql );
+			$moderators_to_notify = $DB->get_results( $sql, OBJECT, 'Get list of moderators to notify for comment' );
 
 			foreach( $moderators_to_notify as $moderator )
 			{
