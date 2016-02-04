@@ -1075,7 +1075,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 			$edit_File->link_to_Object( $LinkOwner, 2, 'teaser' );
 			$edit_File = new File( 'shared', 0, 'monument-valley' );
-			$edit_File->link_to_Object( $LinkOwner, 3, 'teaser' );
+			$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 			$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
 			$edit_File->link_to_Object( $LinkOwner, 4, 'aftermore' );
 			$item_IDs[] = $edited_Item->ID;
@@ -1270,13 +1270,13 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
 			$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
 			$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
-			$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+			$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 			$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
-			$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3 );
+			$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 			$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
-			$photo_link_4_ID = $edit_File->link_to_Object( $LinkOwner, 4 );
+			$photo_link_4_ID = $edit_File->link_to_Object( $LinkOwner, 4, 'aftermore' );
 			$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
-			$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5 );
+			$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5, 'aftermore' );
 			$item_IDs[] = $edited_Item->ID;
 
 			if( $test_install_all_features )
