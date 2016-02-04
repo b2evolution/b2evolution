@@ -81,9 +81,7 @@ $core_componentwidget_defs = array(
 	'content' => array(
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
-			'coll_link_list',         // Simple Sidebar Links list
 			'coll_related_post_list', // Simple Related Posts list
-			'linkblog',               // Simple Linkblog Links list
 			'coll_item_list',         // Universal Item list
 			'coll_featured_intro',    // Featured/Intro Post 
 			'coll_media_index',       // Photo index
