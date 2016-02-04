@@ -343,6 +343,13 @@ div.log_container {
   padding: 20px 0 10px 30px;
   vertical-align: middle;
 }
+.well.evo_featured_post .well {
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0;
+}
 footer.row {
   margin-top: 20px;
 }
