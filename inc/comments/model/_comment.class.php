@@ -3395,14 +3395,13 @@ class Comment extends DataObject
 		{ // we need the list of moderators:
 			$sql = 'SELECT DISTINCT user_email, user_ID, uset_value as notify_moderation
 						FROM T_users
-							LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID
-							LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID
 							LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"
 							LEFT JOIN T_groups ON grp_ID = user_grp_ID
-						WHERE ( ( bloguser_blog_ID = '.$edited_Blog->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
-								OR ( bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
-								OR ( grp_perm_blogs = "editall" ) )
-							AND LENGTH(TRIM(user_email)) > 0';
+						WHERE LENGTH( TRIM( user_email ) ) > 0 AND (
+								( grp_perm_blogs = "editall" )
+								OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$edited_Blog->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
+								OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
+							)';
 			$moderators_to_notify = $DB->get_results( $sql, OBJECT, 'Get list of moderators to notify for comment' );
 
 			foreach( $moderators_to_notify as $moderator )
