@@ -363,7 +363,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 	$Form->hidden( 'comment_status', $edited_Comment->status );
 	echo '<div class="btn-group dropup comment_status_dropdown">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Comment->status.'" name="actionArray[update]">'
-				.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
+				.'<span>'.T_( $status_options[ $edited_Comment->status ] ).'</span>'
 			.'</button>'
 			.'<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 				.'<span class="caret"></span>'
@@ -371,7 +371,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
