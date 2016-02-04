@@ -325,20 +325,23 @@ div.action_messages, div.log_container {
 }
 
 // Positions on the action buttons near page titles
-.evo_post .evo_post_title {
-	display: table;
-	h1 {
-		margin-top: 0;
-	}
-	h2, h3 {
-		display: table-cell;
-		margin: 0;
-		padding: 0 0 10px;
-	}
-	.btn-group {
-		display: table-cell;
-		padding: 20px 0 10px 30px;
-		vertical-align: middle;
+.evo_post .well {
+	padding: 15px;
+	.evo_post_title {
+		display: table;
+		h1 {
+			margin-top: 0;
+		}
+		h2, h3 {
+			display: table-cell;
+			margin: 0;
+			padding: 0 0 10px;
+		}
+		.btn-group {
+			display: table-cell;
+			padding: 20px 0 10px 30px;
+			vertical-align: middle;
+		}
 	}
 }
 .well .evo_post_title, .featurepost .evo_post_title { // featurepost is front page intro post
@@ -350,17 +353,6 @@ div.action_messages, div.log_container {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
-	}
-}
-// Remove all additional panel option from disp=posts featured post
-.evo_featured_post {
-	.panel {
-		background-color: transparent;
-		border: 0;
-		box-shadow: none;
-		.panel-body {
-			padding: 0;
-		}
 	}
 }
 

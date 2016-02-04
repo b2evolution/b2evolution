@@ -79,8 +79,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	
 	<?php 
 		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
-			echo '<section class="evo_post__full panel panel-default">';
-			echo '<div class="evo_post__full_text panel-body">';
+			echo '<section class="evo_post__full well">';
+			echo '<div class="evo_post__full_text">';
 		} else {
 			echo '<section class="evo_post__full">';
 			echo '<div class="evo_post__full_text">';
