@@ -64,6 +64,7 @@ class coll_link_list_Widget extends coll_item_list_Widget
 		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
+		$r['item_title_link_type']['defaultvalue'] = 'auto';
 		$r['disp_excerpt']['no_edit'] = true;
 		$r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;
