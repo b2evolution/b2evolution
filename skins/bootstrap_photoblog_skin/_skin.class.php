@@ -30,7 +30,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Photoblog';
+		return 'Bootstrap Photoblog Skin';
 	}
 
 
