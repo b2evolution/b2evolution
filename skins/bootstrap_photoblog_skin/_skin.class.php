@@ -64,6 +64,9 @@ class bootstrap_photoblog_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+		
+		
+				// Layout settings
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
@@ -103,7 +106,83 @@ class bootstrap_photoblog_Skin extends Skin
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
+				
+				
+				// Page color settings
+				'page_color_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Page Color Settings')
+				),
+					'background_color' => array(
+						'label' => T_('Page background color'),
+						'note' => T_('Default: #fff'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'page_text_color' => array(
+						'label' => T_('Page text color'),
+						'note' => T_('Default: #333'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+					'page_link_color' => array(
+						'label' => T_('Page link color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'page_link_h_color' => array(
+						'label' => T_('Page link hover color'),
+						'note' => T_('Default: #23527c'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'well_color' => array(
+						'label' => T_('Post background color'),
+						'note' => T_('Default: #f5f5f5'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
+				'page_color_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				
+				
+				// Navigation settings
+				'navigation_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Navigation Settings')
+				),
+					'active_color' => array(
+						'label' => T_('Active navigation link color'),
+						'note' => T_('Default: #555'),
+						'defaultvalue' => '#555',
+						'type' => 'color',
+					),
+					'default_color' => array(
+						'label' => T_('Default navigation links color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'default_h_color' => array(
+						'label' => T_('Default navigation links hover color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'default_bgh_color' => array(
+						'label' => T_('Default navigation links hover background-color'),
+						'note' => T_('Default: #eee'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+				'navigation_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				
 
+				// Colorbox settings
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
@@ -299,6 +378,47 @@ class bootstrap_photoblog_Skin extends Skin
 				break;
 			}
 		}
+		
+		
+		// Page background color
+		if ( $background_color = $this->get_setting( 'background_color' ) ) {
+			$custom_css .= 'body, .nav li.active a { background-color: '.$background_color."; }\n";
+		}		
+		// Page text color
+		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
+			$custom_css .= 'body { color: '.$page_text_color."; }\n";
+		}
+		// Page link color
+		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
+			$custom_css .= 'body a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+		}
+		// Page link hover color
+		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
+			$custom_css .= 'body a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+		}
+		// Posts background color
+		if ( $well_color = $this->get_setting( 'well_color' ) ) {
+			$custom_css .= '.well { background-color: '.$well_color."; }\n";
+		}
+		
+
+		// Navigation active link color
+		if ( $active_color = $this->get_setting( 'active_color' ) ) {
+			$custom_css .= 'ul.nav li.active a.selected { color: '.$active_color."; }\n";
+		}
+		// Navigation default link color
+		if ( $default_color = $this->get_setting( 'default_color' ) ) {
+			$custom_css .= 'ul.nav li a.default { color: '.$default_color."; }\n";
+		}
+		// Navigation default link hover color
+		if ( $default_h_color = $this->get_setting( 'default_h_color' ) ) {
+			$custom_css .= 'ul.nav li a.default:hover { color: '.$default_h_color."; }\n";
+		}
+		// Navigation default link hover background-color
+		if ( $default_bgh_color = $this->get_setting( 'default_bgh_color' ) ) {
+			$custom_css .= 'ul.nav li a.default:hover { background-color: '.$default_bgh_color."; }\n";
+		}
+		
 		
 		if( ! empty( $custom_css ) )
 		{ // Function for custom_css:
