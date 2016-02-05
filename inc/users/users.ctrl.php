@@ -104,6 +104,9 @@ if( !$Messages->has_errors() )
 { // no errors
 	switch( $action )
 	{
+		
+		/*
+		 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
@@ -114,8 +117,9 @@ if( !$Messages->has_errors() )
 			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
 
 			header_redirect();
-			/* EXITED */
+			// EXITED
 			break;
+		*/
 
 		case 'promote':
 			param( 'prom', 'string', true );

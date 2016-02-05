@@ -46,6 +46,8 @@ global $Plugins;
  */
 global $AdminUI;
 
+/*
+ * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 
 // Admin skin dropdown list handler
 // Display settings corresponding only for the current (loaded) admin skin
@@ -73,6 +75,7 @@ global $AdminUI;
 </script>
 <?php
 
+*/
 
 // Begin payload block:
 $this->disp_payload_begin();
@@ -109,6 +112,8 @@ $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_t
 
 $Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
 
+/*
+ * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 $value_admin_skin = get_param('edited_user_admin_skin');
 if( !$value_admin_skin )
 { // no value supplied through POST/GET
@@ -120,11 +125,15 @@ if( !$value_admin_skin )
 }
 
 $Form->hidden( 'current_admin_skin', $value_admin_skin );
+ */
 
 if( $action != 'view' )
 { // We can edit the values:
 
+	/*
+	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->select_input_array( 'edited_user_admin_skin', $value_admin_skin, get_admin_skins(), T_('Admin skin'), T_('The skin defines how the backoffice appears to you.'), array( 'onchange' => 'admin_skin_changed()' ) );
+	 */
 
   // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 	// Icon/text thresholds:
@@ -155,7 +164,11 @@ if( $action != 'view' )
 }
 else
 { // display only
+	
+	/*
+	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
+	 */
 
 	// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
 

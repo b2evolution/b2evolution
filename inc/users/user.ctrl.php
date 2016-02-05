@@ -356,6 +356,8 @@ if( !$Messages->has_errors() )
 
 			if( param( 'advanced_form', 'boolean', false ) )
 			{
+				/*
+				 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
 				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) &&
 					( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
@@ -363,6 +365,7 @@ if( !$Messages->has_errors() )
 					// edited user admin skin is the same as current user admin skin
 					$AdminUI->set_skin_settings( $edited_User->ID );
 				}
+				 */
 
 				if( $UserSettings->dbupdate() )
 				{

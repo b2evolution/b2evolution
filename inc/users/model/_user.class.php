@@ -1256,7 +1256,10 @@ class User extends DataObject
 
 		if( $is_advanced_form )
 		{
+			/*
+			 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 			$UserSettings->set( 'admin_skin', param( 'edited_user_admin_skin', 'string' ), $this->ID );
+			 */
 
 			// Action icon params:
 			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
