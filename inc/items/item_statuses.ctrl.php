@@ -58,7 +58,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_ItemStatus = duplicate( $edited_ItemStatus ); // PHP4/5 abstraction
+			$edited_ItemStatus = clone $edited_ItemStatus;
 			// Reset ID of new post status:
 			$edited_ItemStatus->ID = 0;
 		}

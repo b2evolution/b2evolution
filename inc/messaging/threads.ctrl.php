@@ -78,8 +78,8 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Thread = duplicate( $edited_Message->Thread ); // PHP4/5 abstraction
-			$edited_Message = duplicate( $edited_Message ); // PHP4/5 abstraction
+			$edited_Thread = clone $edited_Message->Thread;
+			$edited_Message = clone $edited_Message; // PHP4/5 abstraction
 			$edited_Message->ID = 0;
 		}
 		$edited_Message->Thread = & $edited_Thread;

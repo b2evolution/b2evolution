@@ -148,7 +148,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Country = duplicate( $edited_Country ); // PHP4/5 abstraction
+			$edited_Country = clone $edited_Country;
 			$edited_Country->ID = 0;
 		}
 		break;

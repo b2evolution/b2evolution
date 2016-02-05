@@ -2170,7 +2170,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 			}
 			else
 			{	// End of this post:
-				$new_Item = duplicate( $Item );
+				$new_Item = clone $Item;
 
 				$new_Item->set_param( 'title', 'string', $current_title );
 

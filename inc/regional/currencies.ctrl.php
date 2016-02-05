@@ -94,7 +94,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Currency = duplicate( $edited_Currency ); // PHP4/5 abstraction
+			$edited_Currency = clone $edited_Currency;
 			$edited_Currency->ID = 0;
 		}
 		break;
