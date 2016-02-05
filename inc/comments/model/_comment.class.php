@@ -721,7 +721,7 @@ class Comment extends DataObject
 	 */
 	function anchor()
 	{
-		echo '<a id="'.$this->get_anchor().'"></a>';
+		echo '<span id="'.$this->get_anchor().'"></span>';
 	}
 
 

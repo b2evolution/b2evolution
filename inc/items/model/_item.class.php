@@ -918,7 +918,7 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
-		echo '<a id="'.$this->get_anchor_id().'"></a>';
+		echo '<span id="'.$this->get_anchor_id().'"></span>';
 	}
 
 
