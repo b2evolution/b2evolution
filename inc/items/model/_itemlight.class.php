@@ -958,7 +958,7 @@ class ItemLight extends DataObject
 	{
 		if( empty($format) )
 		{
-			return mysql2date( locale_datefmt(), $this->datemodified, $useGM );
+			$format = locale_datefmt();
 		}
 
 		return mysql2date( $format, $this->datemodified, $useGM );
@@ -986,9 +986,11 @@ class ItemLight extends DataObject
 	function mod_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->datemodified, $useGM );
-		else
-			echo mysql2date( $format, $this->datemodified, $useGM );
+		{
+			$format = locale_timefmt();
+		}
+
+		echo $this->get_mod_date( $format, $useGM );
 	}
 
 
