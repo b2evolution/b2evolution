@@ -5033,6 +5033,7 @@ function users_results_block( $params = array() )
 			'join_region'         => $params['display_region'],
 			'join_subregion'      => $params['display_subregion'],
 			'join_country'        => $params['join_country'],
+			'join_colls'          => $params['display_blogs'],
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
@@ -5139,7 +5140,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User;
+	global $Settings, $current_User, $collections_Module;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(

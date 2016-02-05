@@ -246,6 +246,12 @@ class Results extends Table
 	var $nofollow_pagenav = false;
 
 	/**
+	 * Additional debug info prefix for each SQL query of this class.
+	 * Useful to detect what widget, plugin and etc. calls the SQL queries
+	 */
+	var $query_title_prefix = '';
+
+	/**
 	 * Constructor
 	 *
 	 * @todo we might not want to count total rows when not needed...
@@ -569,7 +575,7 @@ class Results extends Table
 		}
 
 		// Execute query and store results
-		$this->rows = $DB->get_results( $sql, OBJECT, $query_title );
+		$this->rows = $DB->get_results( $sql, OBJECT, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).$query_title );
 
 		if ( ! $this->order_callbacks || ! $add_limit )
 		{
@@ -846,7 +852,7 @@ class Results extends Table
 				// echo $sql_count;
 			}
 
-			$this->total_rows = $DB->get_var( $sql_count, 0, 0, get_class($this).'::count_total_rows()' ); //count total rows
+			$this->total_rows = $DB->get_var( $sql_count, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ); //count total rows
 		}
 
 		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);

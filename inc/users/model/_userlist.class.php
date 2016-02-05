@@ -57,6 +57,7 @@ class UserList extends DataObjectList2
 	 *                    'join_region'    => false,
 	 *                    'join_subregion' => false,
 	 *                    'join_city'      => true,
+	 *                    'join_colls'     => true,
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization
@@ -552,7 +553,11 @@ class UserList extends DataObjectList2
 			$Timer->start( 'Users_IDs', false );
 
 			$step1_SQL = new SQL();
-			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture, COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
+			if( ! empty( $this->query_params['join_colls'] ) )
+			{	// Initialize a count of collections (used on order by this field):
+				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			}
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
 			{	// Filter is set to 'Reported users'
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );

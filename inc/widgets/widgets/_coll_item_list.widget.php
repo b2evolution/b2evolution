@@ -344,6 +344,9 @@ class coll_item_list_Widget extends ComponentWidget
 			$ItemList = new ItemListLight( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCacheLight', $this->code.'_' );
 		}
 
+		// Set additional debug info prefix for SQL queries to know what widget executes it:
+		$ItemList->query_title_prefix = get_class( $this );
+
 		$cat_array = sanitize_id_list( $this->disp_params['cat_IDs'], true );
 
 		// Filter list:
