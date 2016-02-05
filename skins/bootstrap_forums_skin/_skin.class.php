@@ -69,7 +69,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout_general' => array(
 						'label' => T_('General Layout'),
 						'note' => '',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
@@ -315,16 +315,16 @@ class bootstrap_forums_Skin extends Skin
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
 		}
-		
+
 		// Add custom CSS:
 		$custom_css = '';
-		
-		
+
+
 		// If sidebar == true + col-lg
 		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
 		{
 			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date { 
+				.forums_list .ft_date {
 					white-space: normal;
 					margin-top: 11px;
 				}
@@ -334,7 +334,7 @@ class bootstrap_forums_Skin extends Skin
 				\n
 			}";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{ // Function for custom_css:
 		$custom_css = '<style type="text/css">
@@ -343,7 +343,7 @@ class bootstrap_forums_Skin extends Skin
 -->
 		</style>';
 		add_headline( $custom_css );
-		}			
+		}
 	}
 
 
