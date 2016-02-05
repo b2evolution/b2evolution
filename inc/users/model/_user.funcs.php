@@ -1497,7 +1497,7 @@ function profile_check_params( $params, $User = NULL )
 		{
 			param_error( $params['gender'][1], T_('Please select gender.') );
 		}
-		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
 		{
 			param_error( $params['gender'][1], 'Gender value is invalid' );
 		}
@@ -3072,6 +3072,7 @@ function callback_filter_userlist( & $Form )
 
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
+	$Form->checkbox( 'gender_other', get_param('gender_other'), T_('Other') );
 
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
@@ -5063,6 +5064,7 @@ function users_results_block( $params = array() )
 				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
 				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
 				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
+				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
 			);
 
 		if( is_admin_page() )

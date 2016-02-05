@@ -3907,6 +3907,9 @@ class User extends DataObject
 
 			case 'F':
 				return T_('A woman');
+
+			case 'O':
+				return T_('Other');
 		}
 
 		return NULL;
@@ -3937,6 +3940,9 @@ class User extends DataObject
 				break;
 			case 'F':
 				$gender_class .= ' woman';
+				break;
+			case 'O':
+				$gender_class .= ' other';
 				break;
 			default:
 				$gender_class .= ' nogender';

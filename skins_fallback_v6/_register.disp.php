@@ -209,6 +209,7 @@ if( $registration_require_gender != 'hidden' )
 	$Form->radio_input( 'gender', $gender, array(
 				array( 'value' => 'M', 'label' => T_('A man') ),
 				array( 'value' => 'F', 'label' => T_('A woman') ),
+				array( 'value' => 'O', 'label' => T_('Other') ),
 			), T_('I am'), array( 'required' => $registration_require_gender == 'required' ) );
 }
 
