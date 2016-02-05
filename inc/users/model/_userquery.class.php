@@ -51,6 +51,7 @@ class UserQuery extends SQL
 				'join_session' => false,
 				'join_country' => true,
 				'join_city'    => true,
+				'join_colls'   => true,
 				'grouped'      => false,
 			), $params );
 
@@ -83,14 +84,17 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( isset( $collections_Module ) )
-		{ // We are handling blogs:
-			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
-			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
-		}
-		else
-		{
-			$this->SELECT_add( ', 0 AS nb_blogs' );
+		if( $params['join_colls'] )
+		{	// Join a count of collections:
+			if( isset( $collections_Module ) )
+			{	// We are handling blogs:
+				$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+				$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
+			}
+			else
+			{
+				$this->SELECT_add( ', 0 AS nb_blogs' );
+			}
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
