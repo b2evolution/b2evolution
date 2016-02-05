@@ -7020,6 +7020,55 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Get last touch date (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_last_touch_date( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+		{
+			$format = locale_datefmt();
+		}
+
+		return mysql2date( $format, $this->last_touched_mts, $useGM );
+	}
+
+
+	/**
+	 * Template function: display last touched date (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function last_touch_date( $format = '', $useGM = false )
+	{
+		echo $this->get_last_touch_date( $format, $useGM );
+	}
+
+
+	/**
+	 * Template function: display last mod time (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default time format
+	 * @param boolean true if you want GMT
+	 */
+	function last_touch_time( $format = '', $useGM = false )
+	{
+		if( empty($format) )
+		{
+			$format = locale_timefmt();
+		}
+
+		echo $this->get_last_touch_date( $format, $useGM );
+	}
+
+
+	/**
+	 * Set last touched date (in microseconds, but only millisecond precision will be saved to DB)
+	 */
 	function set_last_touched_mts()
 	{
 		global $localmicrotimenow, $current_User;
