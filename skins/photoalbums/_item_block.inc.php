@@ -69,8 +69,8 @@ $params = array_merge( array(
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
 				// Template params for "Item Tags" widget
-				'widget_coll_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
-				'widget_coll_item_tags_after'     => '</p></div>',
+				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
+				'widget_item_tags_after'     => '</p></div>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_coll_item_content_params' => $params,
 			) );

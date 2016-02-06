@@ -90,7 +90,7 @@ $core_componentwidget_defs = array(
 	'infoitem' => array(
 			'coll_item_content',
 			'item_small_print',
-			'coll_item_tags',
+			'item_tags',
 			'coll_about_author',
 			'item_seen_by',
 		),

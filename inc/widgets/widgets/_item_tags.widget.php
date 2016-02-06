@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_item_tags Widget class.
+ * This file implements the item_tags Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_item_tags_Widget extends ComponentWidget
+class item_tags_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,18 @@ class coll_item_tags_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_item_tags' );
+		parent::__construct( $db_row, 'core', 'item_tags' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'item-tags-widget' );
 	}
 
 
@@ -111,9 +122,9 @@ class coll_item_tags_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
-				'widget_coll_item_tags_before'    => T_('Tags').': ',
-				'widget_coll_item_tags_after'     => '',
-				'widget_coll_item_tags_separator' => ', ',
+				'widget_item_tags_before'    => T_('Tags').': ',
+				'widget_item_tags_after'     => '',
+				'widget_item_tags_separator' => ', ',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -122,9 +133,9 @@ class coll_item_tags_Widget extends ComponentWidget
 
 		// List all tags attached to the Item:
 		$Item->tags( array(
-				'before'    => $this->disp_params['widget_coll_item_tags_before'],
-				'after'     => $this->disp_params['widget_coll_item_tags_after'],
-				'separator' => $this->disp_params['widget_coll_item_tags_separator'],
+				'before'    => $this->disp_params['widget_item_tags_before'],
+				'after'     => $this->disp_params['widget_item_tags_after'],
+				'separator' => $this->disp_params['widget_item_tags_separator'],
 			) );
 
 		echo $this->disp_params['block_body_end'];

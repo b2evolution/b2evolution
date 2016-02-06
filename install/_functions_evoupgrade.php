@@ -2140,7 +2140,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			add_basic_widget_9408( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
 			if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 			{ // Item Tags
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_item_tags', 'core', 20 );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 			}
 			if( $blog_id == $blog_b_ID )
 			{ // About Author
@@ -7058,7 +7058,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_content', 'core', 20 );
 			if( $coll_type != 'forum' )
 			{	// Item Tags:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_tags', 'core', 30 );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_tags', 'core', 30 );
 			}
 			if( $coll_type == 'std' )
 			{	// About Author:

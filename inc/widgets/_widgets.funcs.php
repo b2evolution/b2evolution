@@ -148,7 +148,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
 	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 	{ // Item Tags
-		add_basic_widget( $blog_id, 'Item Single', 'coll_item_tags', 'core', 20 );
+		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
 	if( $blog_id == $blog_b_ID )
 	{ // About Author
