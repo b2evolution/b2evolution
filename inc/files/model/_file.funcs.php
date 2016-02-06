@@ -538,7 +538,7 @@ function process_filename( & $filename, $force_validation = false, $autocrop_lon
 	if( $force_validation )
 	{ // replace every not valid characters
 		$filename = preg_replace( '/[^a-zA-Z0-9~!@#\$%\^&\(\)\-_=\+\[\]\{\}\p{L},\. ]+$/ui', '_', $filename );
-		
+
 		// Make sure the filename length doesn't exceed the maximum allowed. Remove characters from the end of the filename ( before the extension ) if required.
 		$extension_pos = strrpos( $filename, '.' );
 		$filename = fix_filename_length( $filename, strrpos( $filename, '.', ( $extension_pos ? $extension_pos : strlen( $filename ) ) ) );
@@ -786,7 +786,7 @@ function rel_path_to_base( $path )
 		$r .= ' [DEBUG: '.$path.']';
 	}
 	*/
-	
+
 	return $r;
 }
 
@@ -2329,9 +2329,9 @@ function display_dragdrop_upload_button( $params = array() )
 						{
 							// erhsatingin> this solution uses escape() which is already deprecated
 							var text = responseJSON.success.text;
-							text = text.replace(/\s/g,''); 
+							text = text.replace(/\s/g,'');
 							text = decodeURIComponent(escape(window.atob(text)));
-							
+
 							if( responseJSON.success.specialchars == 1 )
 							{
 								text = htmlspecialchars_decode( text );
@@ -2811,4 +2811,17 @@ function echo_file_properties()
 </script>
 <?php
 }
+
+
+/**
+ * Replacement for the basename function which alters strings that start with
+ * utf-8 characters for PHP version 5.5 and earlier. This was taken from
+ * http://www.abeautifulsite.net/stop-basename-from-changing-russian-and-other-non-latin-strings/
+ */
+function get_basename( $path, $suffix = NULL)
+{
+	$split = preg_split('/\//', rtrim($path, '/ '));
+  return substr(basename('X' . $split[count($split) - 1], $suffix), 1);
+}
+
 ?>

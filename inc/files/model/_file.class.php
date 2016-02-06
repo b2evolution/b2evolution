@@ -238,7 +238,7 @@ class File extends DataObject
 		{
 			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
-			// erhsatingin> using get_basename() instead of standard basename function to display UTF-8 characters properly 
+			// erhsatingin> using get_basename() instead of standard basename function to display UTF-8 characters properly
 			$this->_name = get_basename( $this->_adfp_full_path );
 			$this->_dir = dirname( $this->_adfp_full_path ).'/';
 			$this->_md5ID = md5( $this->_adfp_full_path );
@@ -2780,7 +2780,7 @@ class File extends DataObject
 			{
 				foreach( $FiletypeCache->cache as $Filetype )
 				{
-					
+
 					if( preg_match( '#^audio/#', $Filetype->mimetype ) &&
 					    in_array( $file_extension, $Filetype->get_extensions() ) )
 					{ // This is audio file
@@ -3030,7 +3030,7 @@ class File extends DataObject
 
 		return sprintf( $params['message'], $count, implode( ', ', $users ) );
 	}
-	
+
 	/**
 	 * Increments the number of times the file was downloaded
 	 *
@@ -3045,7 +3045,7 @@ class File extends DataObject
 
 		return $download_count;
 	}
-	
+
 	/**
 	 * Get total number of times the file was downloaded
 	 *
