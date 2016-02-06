@@ -65,7 +65,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	<?php
 		skin_widget( array(
 			// CODE for the widget:
-			'widget' => 'member_count',
+			'widget' => 'coll_member_count',
 			// Optional display params
 			'before' => '(',
 			'after'  => ')',

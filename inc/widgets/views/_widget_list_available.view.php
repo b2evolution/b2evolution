@@ -77,6 +77,7 @@ $core_componentwidget_defs = array(
 			'coll_tag_cloud',
 			'breadcrumb_path',
 			'coll_common_links',
+			'coll_current_filters',
 		),
 	'content' => array(
 			'coll_post_list',         // Simple Post list
@@ -99,7 +100,7 @@ $core_componentwidget_defs = array(
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
-			'coll_current_filters',
+			'coll_member_count',
 			'coll_xml_feeds',
 		),
 	'site' => array(
@@ -115,7 +116,6 @@ $core_componentwidget_defs = array(
 	'other' => array(
 			'org_members',
 			'online_users',
-			'member_count',
 			'mobile_skin_switcher',
 			'poll'
 		),
