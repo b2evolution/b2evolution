@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_item_content Widget class.
+ * This file implements the item_content Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_item_content.widget.php 10056 2015-10-16 12:47:15Z yura $
+ * @version $Id: _item_content.widget.php 10056 2015-10-16 12:47:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_item_content_Widget extends ComponentWidget
+class item_content_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,18 @@ class coll_item_content_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_item_content' );
+		parent::__construct( $db_row, 'core', 'item_content' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'item-content-widget' );
 	}
 
 
@@ -104,15 +115,31 @@ class coll_item_content_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
-				'widget_coll_item_content_params' => array(),
+				'widget_item_content_params' => array(),
 			), $this->disp_params );
+
+		// Get the params to be tranbsmitted to this widget:
+		if( isset($this->disp_params['widget_item_content_params']) )
+		{
+			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
+		}
+		else
+		{	// We have none, use an empty array:
+			$widget_item_content_params = array();
+		}
+
+		// Now, for some skins (2015), merge in the old name:
+		if( isset($this->disp_params['widget_coll_item_content_params']) )
+		{	// The new correct stuff gets precedence over the old stuff:
+			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
+		}		
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $this->disp_params['widget_coll_item_content_params'] );
+		skin_include( '_item_content.inc.php', $widget_item_content_params );
 		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------

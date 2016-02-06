@@ -88,10 +88,10 @@ $core_componentwidget_defs = array(
 			'coll_comment_list',      // Comment list
 		),
 	'infoitem' => array(
-			'coll_item_content',
+			'item_content',
 			'item_small_print',
 			'item_tags',
-			'coll_about_author',
+			'item_about_author',
 			'item_seen_by',
 		),
 	'collection' => array(

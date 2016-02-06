@@ -198,7 +198,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
 			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

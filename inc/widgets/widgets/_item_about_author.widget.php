@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_about_author Widget class.
+ * This file implements the item_about_author Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_about_author.widget.php 10056 2015-10-16 12:47:15Z yura $
+ * @version $Id: _item_about_author.widget.php 10056 2015-10-16 12:47:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_about_author_Widget extends ComponentWidget
+class item_about_author_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,18 @@ class coll_about_author_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_about_author' );
+		parent::__construct( $db_row, 'core', 'item_about_author' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'about-author-widget' );
 	}
 
 

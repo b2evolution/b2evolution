@@ -94,7 +94,7 @@ $params = array_merge( array(
 			'widget_item_tags_before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
 			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+			'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 	}

@@ -2137,14 +2137,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 
 			/* Item Single */
-			add_basic_widget_9408( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
+			add_basic_widget_9408( $blog_id, 'Item Single', 'item_content', 'core', 10 );
 			if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 			{ // Item Tags
 				add_basic_widget_9408( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 			}
 			if( $blog_id == $blog_b_ID )
 			{ // About Author
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_about_author', 'core', 25 );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 			}
 			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 			{ // Google Maps
@@ -7055,14 +7055,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		foreach( $collections as $coll_ID => $coll_type )
 		{
 			task_begin( 'Installing default "Item Single" widgets for collection #'.$coll_ID.'... ' );
-			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_content', 'core', 20 );
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'item_content', 'core', 20 );
 			if( $coll_type != 'forum' )
 			{	// Item Tags:
 				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_tags', 'core', 30 );
 			}
 			if( $coll_type == 'std' )
 			{	// About Author:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_about_author', 'core', 40 );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_about_author', 'core', 40 );
 			}
 			if( $coll_type == 'std' || $coll_type == 'manual' )
 			{	// Small Print:

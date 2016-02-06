@@ -146,7 +146,7 @@ while( $Item = & mainlist_get_item() )
 				'widget_item_small_print_before' => '<p class="postmetadata alt"><small>',
 				'widget_item_small_print_after'  => '</small></p>',
 				// Params for skin file "_item_content.inc.php"
-				'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+				'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

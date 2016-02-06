@@ -127,7 +127,7 @@ $params = array_merge( array(
 			'widget_item_small_print_after'          => '</p>',
 			'widget_item_small_print_display_author' => false,
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

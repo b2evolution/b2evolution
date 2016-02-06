@@ -72,7 +72,7 @@ $params = array_merge( array(
 				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
 				'widget_item_tags_after'     => '</p></div>',
 				// Params for skin file "_item_content.inc.php"
-				'widget_coll_item_content_params' => $params,
+				'widget_item_content_params' => $params,
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		}

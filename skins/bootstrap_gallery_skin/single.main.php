@@ -246,7 +246,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
 					// Params for skin file "_item_content.inc.php"
-					'widget_coll_item_content_params' => array(
+					'widget_item_content_params' => array(
 							'feature_block'          => false,
 							'item_class'             => 'evo_post',
 							'item_type_class'        => 'evo_post__ptyp_',

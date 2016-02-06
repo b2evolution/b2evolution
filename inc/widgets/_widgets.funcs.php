@@ -145,14 +145,14 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Item Single */
-	add_basic_widget( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
+	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
 	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
 	if( $blog_id == $blog_b_ID )
 	{ // About Author
-		add_basic_widget( $blog_id, 'Item Single', 'coll_about_author', 'core', 25 );
+		add_basic_widget( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 	}
 	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 	{ // Google Maps
