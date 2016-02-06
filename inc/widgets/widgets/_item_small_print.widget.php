@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_small_print Widget class.
+ * This file implements the item_small_print Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: _coll_small_print.widget.php 10056 2015-10-16 12:47:15Z yura $
+ * @version $Id: _item_small_print.widget.php 10056 2015-10-16 12:47:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_small_print_Widget extends ComponentWidget
+class item_small_print_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,18 @@ class coll_small_print_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_small_print' );
+		parent::__construct( $db_row, 'core', 'item_small_print' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'small-print-widget' );
 	}
 
 
@@ -121,14 +132,14 @@ class coll_small_print_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
-				'widget_coll_small_print_before' => '',
-				'widget_coll_small_print_after'  => '',
+				'widget_item_small_print_before' => '',
+				'widget_item_small_print_after'  => '',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['widget_coll_small_print_before'];
+		echo $this->disp_params['widget_item_small_print_before'];
 
 		if( $this->disp_params['format'] == 'standard' )
 		{ // Blog standard
@@ -205,7 +216,7 @@ class coll_small_print_Widget extends ComponentWidget
 				) );
 		}
 
-		echo $this->disp_params['widget_coll_small_print_after'];
+		echo $this->disp_params['widget_item_small_print_after'];
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 

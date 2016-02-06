@@ -160,7 +160,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	if( $blog_id == $blog_a_ID || $kind == 'manual' )
 	{ // Small Print
-		add_basic_widget( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
+		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
 	// Seen by
 	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,

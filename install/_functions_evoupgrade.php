@@ -2152,7 +2152,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			if( $blog_id == $blog_a_ID || $kind == 'manual' )
 			{ // Small Print
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 			}
 
 
@@ -7066,7 +7066,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			if( $coll_type == 'std' || $coll_type == 'manual' )
 			{	// Small Print:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
 			}
 			// Seen by:
 			add_basic_widget_11670( $coll_ID, 'Item Single', 'item_seen_by', 'core', 60, NULL,
