@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_seen_by Widget class.
+ * This file implements the item_seen_by Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -32,7 +32,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_seen_by_Widget extends ComponentWidget
+class item_seen_by_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -40,7 +40,18 @@ class coll_seen_by_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_seen_by' );
+		parent::__construct( $db_row, 'core', 'item_seen_by' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'seen-by-widget' );
 	}
 
 

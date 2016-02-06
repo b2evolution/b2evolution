@@ -7069,7 +7069,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
 			}
 			// Seen by:
-			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_seen_by', 'core', 60, NULL,
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'item_seen_by', 'core', 60, NULL,
 				// Disable this widget for "forum" collections by default:
 				$coll_type == 'forum' ? 0 : 1 );
 			task_end();
