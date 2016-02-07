@@ -440,7 +440,7 @@ class Results extends Table
 		}
 
 		// Make sure query has executed:
-		$this->query();
+		$this->run_query();
 
 		$this->current_idx = 0;
 
@@ -477,7 +477,7 @@ class Results extends Table
 	 * Will only run if it has not executed before.
 	 */
 	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
-										$query_title = 'Results::Query()' )
+										$query_title = 'Results::run_query()' )
 	{
 		global $DB, $Debuglog;
 		if( !is_null( $this->rows ) )
@@ -502,7 +502,7 @@ class Results extends Table
 
 			if( !preg_match( '#^(SELECT.*?(\([^)]*?FROM[^)]*\).*)*)FROM#six', $this->sql, $matches ) )
 			{
-				debug_die( 'Results->query() : No SELECT clause!' );
+				debug_die( 'Results->run_query() : No SELECT clause!' );
 			}
 			// Split requested columns by commata
 			foreach( preg_split( '#\s*,\s*#', $matches[1] ) as $l_select )

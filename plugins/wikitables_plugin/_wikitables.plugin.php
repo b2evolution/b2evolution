@@ -349,7 +349,7 @@ See manual for more.');
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 }
 
