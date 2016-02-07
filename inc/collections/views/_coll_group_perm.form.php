@@ -72,7 +72,7 @@ $SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
 if( !empty( $keywords ) )
 {
 	$SQL->add_search_field( 'grp_name' );
-	$SQL->WHERE_keywords( $keywords, 'AND' );
+	$SQL->WHERE_kw_search( $keywords, 'AND' );
 }
 
 // Display wide layout:

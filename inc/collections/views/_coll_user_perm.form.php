@@ -78,7 +78,7 @@ if( !empty( $keywords ) )
 	$SQL->add_search_field( 'user_lastname' );
 	$SQL->add_search_field( 'user_nickname' );
 	$SQL->add_search_field( 'user_email' );
-	$SQL->WHERE_keywords( $keywords, 'AND' );
+	$SQL->WHERE_kw_search( $keywords, 'AND' );
 }
 
 // Display wide layout:
