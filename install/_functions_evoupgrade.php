@@ -7257,6 +7257,36 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11720, 'Replace renamed widgets...' ) )
+	{	// part of 6.7.0
+		// It's ok to run several queries in a single block because they don't change the DB structure, so they practically can't fail:
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_seen_by"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_seen_by"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_small_print"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_small_print"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_tags"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_item_tags"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_content"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_item_content"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_about_author"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_about_author"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "coll_member_count"
+			WHERE wi_type = "core"
+			  AND wi_code = "member_count"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
