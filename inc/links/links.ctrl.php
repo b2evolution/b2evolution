@@ -174,11 +174,11 @@ switch( $action )
 
 			// HACK: go through order=0 to avoid duplicate key conflict
 			$edited_Link->set('order', 0);
-			$edited_Link->dbupdate( true );
-			$switch_Link->dbupdate( true );
+			$edited_Link->dbupdate();
+			$switch_Link->dbupdate();
 
 			$edited_Link->set('order', $i);
-			$edited_Link->dbupdate( true );
+			$edited_Link->dbupdate();
 
 
 			if( $action == 'link_move_up' )
