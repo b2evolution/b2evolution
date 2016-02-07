@@ -238,9 +238,9 @@ class CollectionSettings extends AbstractSettings
 	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $coll_ID, $arg, $arg3 = NULL )
+	function _load( $coll_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $coll_ID ) )
+		if( empty( $coll_ID ) || empty( $arg ) )
 		{
 			return false;
 		}

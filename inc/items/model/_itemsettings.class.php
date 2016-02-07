@@ -65,9 +65,9 @@ class ItemSettings extends AbstractSettings
 	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $item_ID, $arg, $arg3 = NULL )
+	function _load( $coll_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) )
+		if( empty( $coll_ID ) || empty( $arg ) )
 		{
 			return false;
 		}

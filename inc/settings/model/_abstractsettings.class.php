@@ -139,8 +139,7 @@ class AbstractSettings
 
 
 	/**
-	 * Loads the settings. Not meant to be called directly, but gets called
-	 * when needed.
+	 * Loads the settings. Not meant to be called directly, but gets called when needed.
 	 *
 	 * @access protected
 	 * @param string First column key
