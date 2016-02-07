@@ -385,11 +385,26 @@ class DataObject
 
 	/**
 	 * Update the DB based on previously recorded changes
+ 	 *
+	 * This will be typically overriden by child classses.
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		$this->dbupdate_worker();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
 	 *
 	 * @param boolean do we want to auto track the mod date?
 	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
-	function dbupdate( $auto_track_modification = true )
+	protected function dbupdate_worker( $auto_track_modification = true )
 	{
 		global $DB, $Plugins, $localtimenow, $current_User;
 

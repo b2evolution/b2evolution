@@ -5403,7 +5403,7 @@ class Item extends ItemLight
 			$this->set_last_touched_ts();
 		}
 
-		$parent_update = parent::dbupdate( $auto_track_modification );
+		$parent_update = $this->dbupdate_worker( $auto_track_modification );
 		if( $result && ( $parent_update !== false ) )
 		{ // We could update the item object:
 			$db_changed = $db_changed || ( $parent_update !== NULL );
