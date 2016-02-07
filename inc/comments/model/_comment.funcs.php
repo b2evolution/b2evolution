@@ -969,7 +969,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 
 		while( ( $iterator_Comment = & $CommentCache->get_next() ) != NULL )
 		{ // Delete all comments from CommentCache
-			$iterator_Comment->dbdelete( $mass_type == 'delete' );
+			$iterator_Comment->dbdelete( ($mass_type == 'delete') );
 		}
 
 		// Display progress dot

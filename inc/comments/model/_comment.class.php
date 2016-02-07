@@ -3899,7 +3899,7 @@ class Comment extends DataObject
 	/**
 	 * Trigger event AfterCommentDelete after calling parent method.
 	 *
-	 * @param boolean set true to force permanent delete, leave false otherwise
+	 * @param boolean set true to force permanent delete, leave false for "move to trash/recylce"
 	 * @param boolean TRUE to use transaction
 	 * @return boolean true on success
 	 */
@@ -3925,7 +3925,7 @@ class Comment extends DataObject
 		}
 
 		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
-		{
+		{	// Permamently delete comment from DB:
 			// remember ID, because parent method resets it to 0
 			$old_ID = $this->ID;
 

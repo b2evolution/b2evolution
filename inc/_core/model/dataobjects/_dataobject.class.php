@@ -624,7 +624,7 @@ class DataObject
 		}
 
 		if( ! $this->check_delete( T_('Some restrictions prevent deletion:'), $ignore_restrictions ) )
-		{ // Some restrictions still prevent deletion
+		{	// Some restrictions still prevent deletion
 			// Note: This restrictions must be handled previously before dbdelete is called.
 			// If this code is executed it means there is an implementation issue and restricitons must be check there.
 			$DB->rollback();
