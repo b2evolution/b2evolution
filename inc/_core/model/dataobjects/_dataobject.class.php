@@ -598,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate();
+			return $this->dbupdate_worker();
 		}
 	}
 
@@ -606,9 +606,25 @@ class DataObject
 	/**
 	 * Delete object from DB.
 	 *
+	 * This will be typically overriden by child classses.
+	 *
 	 * @return boolean true on success
 	 */
-	function dbdelete( $ignore_restrictions = array() )
+	function dbdelete()
+	{
+		$this->dbdelete_worker();
+	}
+
+
+	/**
+	 * Delete object from DB.
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
+	 *
+	 * @param array list of foreign keys to ignore
+	 * @return boolean true on success
+	 */
+	protected function dbdelete_worker( $ignore_restrictions = array() )
 	{
 		global $DB, $Messages, $Plugins, $db_config;
 

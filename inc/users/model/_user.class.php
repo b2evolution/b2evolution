@@ -3536,7 +3536,7 @@ class User extends DataObject
 	 *
 	 * @param Log Log object where output gets added (by reference).
 	 */
-	function dbdelete( & $Log )
+	function dbdelete( & $Log = array() )
 	{
 		global $DB, $Plugins;
 
