@@ -630,11 +630,12 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		$this->SkinBeginHtmlHead();
 	}

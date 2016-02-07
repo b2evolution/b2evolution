@@ -181,15 +181,14 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
+	 * User settings.
 	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param array Associative array of parameters.
-	 *    'for_editing': true, if the settings get queried for editing;
-	 *                   false, if they get queried for instantiating
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 * @see Plugin::GetDefaultUserSettings()
+	 * @see PluginUserSettings
+	 * @see Plugin::PluginUserSettingsValidateSet()
+	 * @return array
 	 */
-	function GetDefaultUserSettings( & $params )
+	function GetDefaultUserSettings()
 	{
 		return array(
 				'echo_random' => array(
@@ -311,7 +310,6 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */

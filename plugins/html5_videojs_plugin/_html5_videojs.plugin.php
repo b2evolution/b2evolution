@@ -69,7 +69,10 @@ class html5_videojs_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
