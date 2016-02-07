@@ -233,12 +233,12 @@ class CollectionSettings extends AbstractSettings
 	 * Loads the settings. Not meant to be called directly, but gets called
 	 * when needed.
 	 *
-	 * @access protected
 	 * @param string First column key
 	 * @param string Second column key
+	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $coll_ID, $arg )
+	function _load( $coll_ID, $arg, $arg3 = NULL )
 	{
 		if( empty( $coll_ID ) )
 		{
