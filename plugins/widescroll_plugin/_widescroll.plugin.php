@@ -59,7 +59,8 @@ class widescroll_plugin extends Plugin
 			}
 		}
 
-		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
+		$tmp_params = array_merge( $params, $default_params );
+		return parent::get_coll_setting_definitions( $tmp_params );
 	}
 
 
