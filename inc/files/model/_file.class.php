@@ -1837,7 +1837,7 @@ class File extends DataObject
 	 *
 	 * @return boolean true on success, false on failure / no changes
 	 */
-	function dbupdate( )
+	function dbupdate()
 	{
 		if( $this->meta == 'unknown' )
 		{

@@ -221,7 +221,7 @@ class EmailCampaign extends DataObject
 	 *
 	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
-	function dbupdate(  )
+	function dbupdate()
 	{
 		$this->update_message_fields();
 
