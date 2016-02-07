@@ -3627,7 +3627,8 @@ class Plugin
 	 */
 	function get_coll_default_setting( $parname, $blog_type = 'std' )
 	{
-		$params = $this->get_coll_setting_definitions( $tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type ) );
+		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
+		$params = $this->get_coll_setting_definitions( $tmp_params );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;
