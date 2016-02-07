@@ -1030,7 +1030,6 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'MainList': The "MainList" object (by reference).
 	 *   - 'limit': The number of posts to display
-	 *
 	 * @return boolean True if you've created your own MainList object and queried the database, false otherwise.
 	 */
 	function InitMainList( & $params )
@@ -1043,8 +1042,9 @@ class Plugin
 	/**
 	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource
-	 * files (CSS, JavaScript, ..)).
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
