@@ -121,18 +121,20 @@ switch( $action )
 			param( 'blog_locale', 'string' );
 			if( $create_demo_contents )
 			{
+				global $user_org_IDs;
+
 				load_funcs( 'collections/_demo_content.funcs.php' );
 				param( 'create_demo_org', 'boolean', false );
 				param( 'create_demo_users', 'boolean', false );
-				$demo_org_ID = NULL;
+				$user_org_IDs = NULL;
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
 				{ // Create the demo organization
-					$demo_org_ID = create_demo_organization( $edited_Blog->owner_user_ID );
+					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
 				}
 				if( $create_demo_users )
 				{ // Create demo users
-					get_demo_users( true, NULL, array( $demo_org_ID ) );
+					get_demo_users( true, NULL, $user_org_IDs );
 				}
 
 				// Switch locale to translate content

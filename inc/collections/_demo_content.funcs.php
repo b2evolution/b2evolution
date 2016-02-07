@@ -352,6 +352,7 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 	if( $db_row )
 	{
 		$demo_org_ID = $db_row->org_ID;
+		$Organization = & $OrganizationCache->get_by_ID( $demo_org_ID );
 	}
 	else
 	{ // Sample organization does not exist, let's create one
@@ -361,15 +362,15 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 		$Organization->set( 'url', 'http://b2evolution.net/' );
 		if( $Organization->dbinsert() )
 		{
-			$org_ID = $Organization->ID;
+			$demo_org_ID = $Organization->ID;
 			$Messages->add( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success' );
 		}
 	}
 
 	// Add current user to the demo organization
-	if( $add_current_user && $org_ID && isset( $current_User ) )
+	if( $add_current_user && $demo_org_ID && isset( $current_User ) )
 	{
-		$current_User->update_organizations( array( $org_ID ), array(), true);
+		$current_User->update_organizations( array( $demo_org_ID ), array(), true);
 	}
 
 	return $Organization;
@@ -387,7 +388,7 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
  */
 function get_demo_users( $create = false, $group = NULL, $user_org_IDs = NULL )
 {
-	global $Messages;
+	global $user_org_IDs;
 
 	$demo_user_logins = array( 'admin', 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
 	$available_demo_users = array();
