@@ -589,7 +589,18 @@ class tinymce_plugin extends Plugin
 	/**
 	 * Init the TinyMCE object (in front office).
 	 *
-	 * @return boolean
+	 * Event handler: Called when displaying editor buttons (in front-office).
+	 *
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{

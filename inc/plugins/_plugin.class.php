@@ -912,11 +912,10 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in front-office).
 	 *
-	 * This method, if implemented, should output the buttons
-	 * (probably as html INPUT elements) and return true, if
-	 * button(s) have been displayed.
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
 	 *
-	 * You should provide an unique html ID with your button.
+	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item'.
@@ -924,7 +923,7 @@ class Plugin
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
 	 */
-	function DisplayEditorButton( $params )
+	function DisplayEditorButton( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
