@@ -185,7 +185,7 @@ class UserQuery extends SQL
 	 *
 	 * @param string Keyword search string
 	 */
-	function where_keywords( $keywords )
+	function where_keywords( $keywords, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 
@@ -205,7 +205,7 @@ class UserQuery extends SQL
 
 		if( count( $search ) > 0 )
 		{
-			$this->WHERE_and( implode( ' AND ', $search ) );
+			$this->WHERE_and( implode( ' '.$search_kw_combine.' ', $search ) );
 		}
 	}
 
