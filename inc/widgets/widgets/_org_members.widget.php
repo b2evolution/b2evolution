@@ -264,7 +264,8 @@ class org_members_Widget extends ComponentWidget
 					// Organizational role
 					if( $this->disp_params['display_role'] == 1 )
 					{
-						echo '<div class="evo_org_role text-muted">'.$org_User->get_organizations_data()[$org_ID]['role'].'</div>';
+						$org_data = $org_User->get_organizations_data();
+						echo '<div class="evo_org_role text-muted">'.$org_data[$org_ID]['role'].'</div>';
 					}
 
 					if( $this->disp_params['display_icons'] )
