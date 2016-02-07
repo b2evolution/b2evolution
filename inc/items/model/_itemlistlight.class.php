@@ -785,7 +785,7 @@ class ItemListLight extends DataObjectList2
 
 		// echo DB::format_query( $this->sql );
 
-		parent::query( false, false, false, 'ItemListLight::query()' );
+		$this->run_query( false, false, false, 'ItemListLight::query()' );
 	}
 
 

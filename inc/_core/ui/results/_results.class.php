@@ -476,7 +476,7 @@ class Results extends Table
 	 *
 	 * Will only run if it has not executed before.
 	 */
-	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
 										$query_title = 'Results::Query()' )
 	{
 		global $DB, $Debuglog;

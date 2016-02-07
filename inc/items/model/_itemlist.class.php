@@ -208,8 +208,7 @@ class ItemList2 extends ItemListLight
 		$this->total_pages = 1;
 		$this->page = 1;
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'PREVIEW QUERY' );
+		$this->run_query( false, false, false, 'PREVIEW QUERY' );
 
 		// Clear cache to view new updated data of the post:
 		$this->Cache->clear();
@@ -317,8 +316,7 @@ class ItemList2 extends ItemListLight
 
 		//echo DB::format_query( $this->sql );
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'ItemList2::Query() Step 2' );
+		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
 	}
 
 

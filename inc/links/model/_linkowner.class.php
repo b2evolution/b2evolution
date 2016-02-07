@@ -300,7 +300,7 @@ class LinkOwner
 
 		$FileList->sql = $SQL->get();
 
-		$FileList->query( false, false, false, 'get_attachment_FileList' );
+		$FileList->run_query( false, false, false, 'get_attachment_FileList' );
 
 		if( $FileList->result_num_rows == 0 )
 		{	// Nothing found
@@ -363,7 +363,7 @@ class LinkOwner
 
 		$LinkList->sql = $SQL->get();
 
-		$LinkList->query( false, false, false, 'get_attachment_LinkList' );
+		$LinkList->run_query( false, false, false, 'get_attachment_LinkList' );
 
 		if( $LinkList->result_num_rows == 0 )
 		{ // Nothing found

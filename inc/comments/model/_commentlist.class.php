@@ -557,8 +557,7 @@ class CommentList2 extends DataObjectList2
 			$this->sql .= ' WHERE 0';
 		}
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'CommentList2::Query() Step 2' );
+		$this->run_query( false, false, false, 'CommentList2::Query() Step 2' );
 	}
 
 

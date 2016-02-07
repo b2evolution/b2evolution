@@ -607,8 +607,7 @@ class UserList extends DataObjectList2
 
 		$this->sql = $step2_SQL->get();
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'UserList::Query() Step 2' );
+		$this->run_query( false, false, false, 'UserList::Query() Step 2' );
 	}
 
 

@@ -268,7 +268,7 @@ class coll_media_index_Widget extends ComponentWidget
 		$FileList = new DataObjectList2( $FileCache );
 		$FileList->sql = $ItemQuery->get();
 
-		$FileList->query( false, false, false, 'Media index widget' );
+		$FileList->run_query( false, false, false, 'Media index widget' );
 
 		$layout = $this->disp_params['thumb_layout'];
 

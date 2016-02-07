@@ -318,7 +318,7 @@ class user_avatars_Widget extends ComponentWidget
 
 		$UserList->sql = $SQL->get();
 
-		$UserList->query( false, false, false, 'User avatars widget' );
+		$UserList->run_query( false, false, false, 'User avatars widget' );
 
 		$avatar_link_attrs = '';
 		if( $this->disp_params[ 'style' ] == 'badges' )
