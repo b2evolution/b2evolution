@@ -77,7 +77,7 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	function get_option_array( $ignore_IDs = array() )
 	{
-		return parent::get_option_array( 'get_name', $ignore_IDs );
+		return $this->get_option_array_worker( 'get_name', $ignore_IDs );
 	}
 
 

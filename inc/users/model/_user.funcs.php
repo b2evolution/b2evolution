@@ -3092,7 +3092,7 @@ function callback_filter_userlist( & $Form )
 		$group_options_array = array(
 				'-1' => T_('All (Ungrouped)'),
 				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array( 'get_name_without_level' );
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
 			// TRANS: Type: Primary Group, Secondary Group
 			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
@@ -3104,7 +3104,7 @@ function callback_filter_userlist( & $Form )
 		$GroupCache->all_loaded = true;
 		$group_options_array = array(
 				'0'  => T_('All'),
-			) + $GroupCache->get_option_array( 'get_name_without_level' );
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
 			// TRANS: Type: Primary Group, Secondary Group
 			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
