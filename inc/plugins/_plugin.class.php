@@ -411,8 +411,7 @@ class Plugin
 	// Plugin information (settings, DB layout, ..): {{{
 
 	/**
-	 * Define default settings here.
-	 * Those can then be edited in the backoffice.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
 	 * You can access them in the plugin through the member object
 	 * {@link Plugin::$Settings}, e.g.:
@@ -435,7 +434,7 @@ class Plugin
 	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
 	 * @todo name tentative get_general_param_definitions()
 	 *
-	 * @param array Associative array of parameters (since 1.9).
+	 * @param array Associative array of parameters (since v1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
 	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
 	 * @return array
