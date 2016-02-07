@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_item_tags Widget class.
+ * This file implements the item_content Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -21,7 +21,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @version $Id: $
+ * @version $Id: _item_content.widget.php 10056 2015-10-16 12:47:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class coll_item_tags_Widget extends ComponentWidget
+class item_content_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,18 @@ class coll_item_tags_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_item_tags' );
+		parent::__construct( $db_row, 'core', 'item_content' );
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'item-content-widget' );
 	}
 
 
@@ -51,7 +62,7 @@ class coll_item_tags_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Tags');
+		return T_('Item Content');
 	}
 
 
@@ -60,7 +71,7 @@ class coll_item_tags_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( T_('Item Tags') );
+		return format_to_output( T_('Item Content') );
 	}
 
 
@@ -69,7 +80,7 @@ class coll_item_tags_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display item tags.');
+		return T_('Display item content.');
 	}
 
 
@@ -101,31 +112,37 @@ class coll_item_tags_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
-
-		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
-			return;
-		}
-
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
-				'widget_coll_item_tags_before'    => T_('Tags').': ',
-				'widget_coll_item_tags_after'     => '',
-				'widget_coll_item_tags_separator' => ', ',
+				'widget_item_content_params' => array(),
 			), $this->disp_params );
+
+		// Get the params to be transmitted to this widget:
+		if( isset($this->disp_params['widget_item_content_params']) )
+		{	// We have an array, with the new name:
+			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
+		}
+		else
+		{	// We have none, use an empty array:
+			$widget_item_content_params = array();
+		}
+
+		// Now, for some skins (2015), merge in the OLD name:
+		if( isset($this->disp_params['widget_coll_item_content_params']) )
+		{	// The new correct stuff gets precedence over the old stuff:
+			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
+		}		
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// List all tags attached to the Item:
-		$Item->tags( array(
-				'before'    => $this->disp_params['widget_coll_item_tags_before'],
-				'after'     => $this->disp_params['widget_coll_item_tags_after'],
-				'separator' => $this->disp_params['widget_coll_item_tags_separator'],
-			) );
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+		skin_include( '_item_content.inc.php', $widget_item_content_params );
+		// Note: You can customize the default item content by copying the generic
+		// /skins/_item_content.inc.php file into the current skin folder.
+		// -------------------------- END OF POST CONTENT -------------------------
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -141,7 +158,7 @@ class coll_item_tags_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Blog;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

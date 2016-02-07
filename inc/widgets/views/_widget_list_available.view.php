@@ -77,31 +77,30 @@ $core_componentwidget_defs = array(
 			'coll_tag_cloud',
 			'breadcrumb_path',
 			'coll_common_links',
+			'coll_current_filters',
 		),
 	'content' => array(
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
-			'coll_link_list',         // Simple Sidebar Links list
 			'coll_related_post_list', // Simple Related Posts list
-			'linkblog',               // Simple Linkblog Links list
 			'coll_item_list',         // Universal Item list
 			'coll_featured_intro',    // Featured/Intro Post 
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 		),
 	'infoitem' => array(
-			'coll_item_content',
-			'coll_small_print',
-			'coll_item_tags',
-			'coll_about_author',
-			'coll_seen_by',
+			'item_content',
+			'item_small_print',
+			'item_tags',
+			'item_about_author',
+			'item_seen_by',
 		),
 	'collection' => array(
 			'coll_logo',
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
-			'coll_current_filters',
+			'coll_member_count',
 			'coll_xml_feeds',
 		),
 	'site' => array(
@@ -117,7 +116,6 @@ $core_componentwidget_defs = array(
 	'other' => array(
 			'org_members',
 			'online_users',
-			'member_count',
 			'mobile_skin_switcher',
 			'poll'
 		),

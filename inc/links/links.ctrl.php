@@ -29,6 +29,7 @@ switch( $action )
 	case 'set_link_position':
 		param('link_position', 'string', true);
 	case 'unlink':
+	case 'delete':
 	case 'link_move_up':
 	case 'link_move_down':
 		// Name of the iframe we want some action to come back to:
@@ -94,11 +95,11 @@ switch( $action )
 		require_js( 'links.js' );
 		break;
 
-	case 'unlink':
-		// Delete a link:
+	case 'unlink': // Unlink a file from object:
+	case 'delete': // Unlink and Delete a file from disk and DB completely:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( "link" );
+		$Session->assert_received_crumb( 'link' );
 
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
@@ -107,6 +108,12 @@ switch( $action )
 		{
 			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '<b>'.$link_File->get_name().'</b>', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
 		}
+
+		if( $action == 'delete' && $edited_Link->can_be_file_deleted() )
+		{	// Get a linked file to delete it after unlinking if it is allowed for current user:
+			$linked_File = & $edited_Link->get_File();
+		}
+
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
 		$edited_Link->dbdelete();
@@ -115,6 +122,11 @@ switch( $action )
 		$LinkOwner->after_unlink_action( $deleted_link_ID );
 
 		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+
+		if( $action == 'delete' && ! empty( $linked_File ) )
+		{	// Delete a linked file from disk and DB completely:
+			$linked_File->unlink();
+		}
 
 		header_redirect( $redirect_to );
 		break;

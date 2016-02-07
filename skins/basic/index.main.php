@@ -194,7 +194,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
-						'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+						'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				}

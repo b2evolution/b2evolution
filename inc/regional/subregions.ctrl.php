@@ -133,7 +133,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Subregion = duplicate( $edited_Subregion ); // PHP4/5 abstraction
+			$edited_Subregion = clone $edited_Subregion;
 			$edited_Subregion->ID = 0;
 		}
 		break;

@@ -132,7 +132,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Region = duplicate( $edited_Region ); // PHP4/5 abstraction
+			$edited_Region = clone $edited_Region;
 			$edited_Region->ID = 0;
 		}
 		break;

@@ -130,7 +130,7 @@ while( $Item = & mainlist_get_item() )
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
 					// Params for skin file "_item_content.inc.php"
-					'widget_coll_item_content_params' => array( 'image_size' => 'fit-256x256' ),
+					'widget_item_content_params' => array( 'image_size' => 'fit-256x256' ),
 				) );
 			// ----------------------------- END OF "Item - Single" CONTAINER -----------------------------
 		?>

@@ -1626,6 +1626,8 @@ class _core_Module extends Module
 			$entries['time']['href'] = $admin_url.'?ctrl=time';
 		}
 
+		/*
+		 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 		// ADMIN SKINS:
 		if( $is_admin_page )
 		{
@@ -1646,6 +1648,7 @@ class _core_Module extends Module
 				}
 			}
 		}
+		 */
 
 		$entries['userprefs']['entries'][] = array( 'separator' => true );
 

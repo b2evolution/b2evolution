@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage bootstrap_blog
+ * @subpackage bootstrap_photoblog_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -30,7 +30,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Photoblog';
+		return 'Bootstrap Photoblog Skin';
 	}
 
 
@@ -63,10 +63,9 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		// Load to use function get_available_thumb_sizes()
-		load_funcs( 'files/model/_image.funcs.php' );
-		
 		$r = array_merge( array(
+		
+		
 				// Layout settings
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -75,14 +74,32 @@ class bootstrap_photoblog_Skin extends Skin
 					'layout' => array(
 						'label' => T_('Layout'),
 						'note' => '',
-						'defaultvalue' => 'right_sidebar',
+						'defaultvalue' => 'single_column',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
 								'single_column_normal'       => T_('Single Column'),
 								'single_column_narrow'       => T_('Single Column Narrow'),
 								'single_column_extra_narrow' => T_('Single Column Extra Narrow'),
-								'left_sidebar'               => T_('Left Sidebar'),
-								'right_sidebar'              => T_('Right Sidebar'),
+							),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'note' => 'px',
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+					'font_size' => array(
+						'label' => T_('Font size'),
+						'note' => '',
+						'defaultvalue' => 'default',
+						'options' => array(
+								'default'        => T_('Default (14px)'),
+								'standard'       => T_('Standard (16px)'),
+								'medium'      	 => T_('Medium (18px)'),
+								'large' 		 => T_('Large (20px)'),
+								'very_large'     => T_('Very large (22px)'),
 							),
 						'type' => 'select',
 					),
@@ -91,146 +108,81 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 				
 				
-				// Images layout
-				'section_image_start' => array(
+				// Page color settings
+				'page_color_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Images Layout')
+					'label'  => T_('Page Color Settings')
 				),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'note' => 'px',
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'allow_empty' => true,
-					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size for media index'),
-						'note' => '',
-						'defaultvalue' => 'fit-80x80',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
-				'section_image_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Custom page styles
-				'section_page_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Custom Page Styles')
-				),
-					'page_bg_color' => array(
+					'background_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#666666',
+						'note' => T_('Default: #fff'),
+						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'menu_bg_color' => array(
-						'label' => T_('Menu background color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#333333',
-						'type' => 'color',
-					),
-					'menu_text_color' => array(
-						'label' => T_('Menu elements color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'menu_links_hover' => array(
-						'label' => T_('Menu links hover color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'post_bg_color' => array(
-						'label' => T_('Post info background color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#555555',
-						'type' => 'color',
-					),
-					'post_border_col' => array(
-						'label' => T_('Post border color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'post_text_color' => array(
-						'label' => T_('Post info text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
-						'defaultvalue' => '#AAAAAA',
-						'type' => 'color',
-					),
-					'main_link_color' => array(
-						'label' => T_('Main content links color'),
-						'note' => T_('E-g: #fff for white'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-					'panel_titles' => array(
-						'label' => T_('Panel titles color'),
-						'note' => T_('E-g: #fff for white'),
-						'defaultvalue' => '#fff',
-						'type' => 'color',
-					),
-				'section_page_end' => array(
-					'layout' => 'end_fieldset',
-				),
-				
-				
-				// Submit & preview styles
-				'subm_prev_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Submit and Preview buttons styles')
-				),
-					'prev_bgd' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
-						'type' => 'color',
-					),
-					'subm_bgd' => array(
-						'label' => T_('Panel titles color'),
+						'note' => T_('Default: #333'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
-				'subm_prev_end' => array(
+					'page_link_color' => array(
+						'label' => T_('Page link color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'page_link_h_color' => array(
+						'label' => T_('Page link hover color'),
+						'note' => T_('Default: #23527c'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'well_color' => array(
+						'label' => T_('Post background color'),
+						'note' => T_('Default: #f5f5f5'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
+				'page_color_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				
 				
-				// Footer styles
-				'footer_start' => array(
+				// Navigation settings
+				'navigation_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Submit and Preview buttons styles')
+					'label'  => T_('Navigation Settings')
 				),
-					'footer_bgd' => array(
-						'label' => T_('Footer background color'),
-						'defaultvalue' => '#aaa',
+					'active_color' => array(
+						'label' => T_('Active navigation link color'),
+						'note' => T_('Default: #555'),
+						'defaultvalue' => '#555',
 						'type' => 'color',
 					),
-					'footer_text' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
+					'default_color' => array(
+						'label' => T_('Default navigation links color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
-					'footer_links' => array(
-						'label' => T_('Panel titles color'),
-						'defaultvalue' => '#aaa',
+					'default_h_color' => array(
+						'label' => T_('Default navigation links hover color'),
+						'note' => T_('Default: #337ab7'),
+						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
-				'footer_end' => array(
+					'default_bgh_color' => array(
+						'label' => T_('Default navigation links hover background-color'),
+						'note' => T_('Default: #eee'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+				'navigation_end' => array(
 					'layout' => 'end_fieldset',
 				),
-
 				
-				// Colorbox image zoom
+
+				// Colorbox settings
 				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
@@ -282,7 +234,6 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 
 
-				// Username options
 				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
@@ -310,7 +261,6 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 
 
-				// Access layout
 				'section_access_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('When access is denied or requires login...')
@@ -323,8 +273,6 @@ class bootstrap_photoblog_Skin extends Skin
 							array( 'header',   sprintf( T_('"%s" container'), NT_('Header') ),    1 ),
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
-							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
-							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
 						),
 				'section_access_end' => array(
@@ -366,83 +314,121 @@ class bootstrap_photoblog_Skin extends Skin
 		if( $max_image_height > 0 )
 		{
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		}	
 		
 		// Add custom CSS:
 		$custom_css = '';
 		
-		if( $page_bg_color = $this->get_setting( 'page_bg_color' ) )
-		{ // Background color:
-			$custom_css .= 'body { background-color: '.$page_bg_color." }\n";
-		}
 		
-		if( $text_color = $this->get_setting( 'page_text_color' ) )
-		{ // Text color:
-			$custom_css .= 'body { color: '.$text_color." }\n";
-		}
-		
-		if( $menu_bg_color = $this->get_setting( 'menu_bg_color' ) )
-		{ // Menu background color:
-			$custom_css .= 'div.pageHeader { background-color: '.$menu_bg_color." }\n";
-		}
-		
-		if( $menu_t_color = $this->get_setting( 'menu_text_color' ) )
-		{ // Menu elements color:
-			$custom_css .= 'div.pageHeader, div.pageHeader a, div.pageHeader span { color: '.$menu_t_color." }\n";
-		}
-		
-		if( $menu_a_hover = $this->get_setting( 'menu_links_hover' ) )
-		{ // Menu links hover color:
-			$custom_css .= 'div.pageHeader a:hover { color: '.$menu_a_hover." }\n";
-		}
-		
-		if( $post_bg_color = $this->get_setting( 'post_bg_color' ) )
-		{ // Post background color:
-			$custom_css .= 'div.evo_post_details, .panel, #comment_preview { background-color: '.$post_bg_color." }\n";
-		}
-
-		if( $post_border_col = $this->get_setting( 'post_border_col' ) )
-		{ // Post border color:
-			$custom_css .= '.evo_post div.evo_post_details, .panel, .evo_featured_post div.evo_post_details, .featurepost div.evo_post_details { border: 1px solid '.$post_border_col." }\n";
-			$custom_css .= 'article.evo_intro_post .evo_post_details { border: 3px solid '.$post_border_col." }\n";
-			$custom_css .= '.main_content_container .panel-heading, .evo_comment__meta_info a, .evo_post_comment_notification a, .evo_comment__meta_info a:hover, .evo_post_comment_notification a:hover { background-color: '.$post_border_col." !important }\n";
-		}
-		
-		if( $post_text_color = $this->get_setting( 'post_text_color' ) )
-		{ // Post text color:
-			$custom_css .= 'div.evo_post_details { color: '.$post_text_color." }\n";
-		}
-
-		if( $main_link_color = $this->get_setting( 'main_link_color' ) )
-		{ // Links color (main section):
-			$custom_css .= 'div.main_content_container a { color: '.$main_link_color." }\n";
-			$custom_css .= '#bCalendarToday { background-color: '.$main_link_color." }\n";
-		}
-
-		if( $panel_titles = $this->get_setting( 'panel_titles' ) )
-		{ // Panel titles color:
-			$custom_css .= '.main_content_container .panel-heading h4, .main_content_container .panel-heading h3, .main_content_container .panel-heading a, legend.panel-heading { color: '.$panel_titles." }\n";
-		}
-		
-		if( $prev_bgd = $this->get_setting( 'prev_bgd' ) )
-		{ // Preview button background color:
-			$custom_css .= '.main_content_container .preview { background-color: '.$prev_bgd." }\n";
-		}
-
-		if( $subm_bgd = $this->get_setting( 'subm_bgd' ) )
-		{ // Submit button background color:
-			$custom_css .= '.main_content_container .submit { background-color: '.$subm_bgd." }\n";
-			$custom_css .= '.main_content_container .search_submit { border-color: '.$subm_bgd." }\n";
-		}
-		
-		if( !empty( $custom_css ) )
+		// Font size customization
+		if( $font_size = $this->get_setting( 'font_size' ) )
 		{
-			$custom_css = '<style type="text/css">
-	<!--
-'.$custom_css.'	-->
-	</style>';
-			add_headline( $custom_css );
+			switch( $font_size )
+			{
+				case 'default': // When default font size, no CSS entry
+				$custom_css = '';
+				break;
+				
+				case 'standard':// When standard layout
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 38px'." }\n";
+				$custom_css .= '.container h2 { font-size: 32px'." }\n";
+				$custom_css .= '.container h3 { font-size: 26px'." }\n";
+				$custom_css .= '.container h4 { font-size: 18px'." }\n";
+				$custom_css .= '.container h5 { font-size: 16px'." }\n";
+				$custom_css .= '.container h6 { font-size: 14px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+
+				case 'medium': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 40px'." }\n";
+				$custom_css .= '.container h2 { font-size: 34px'." }\n";
+				$custom_css .= '.container h3 { font-size: 28px'." }\n";
+				$custom_css .= '.container h4 { font-size: 20px'." }\n";
+				$custom_css .= '.container h5 { font-size: 18px'." }\n";
+				$custom_css .= '.container h6 { font-size: 16px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 42px'." }\n";
+				$custom_css .= '.container h2 { font-size: 36px'." }\n";
+				$custom_css .= '.container h3 { font-size: 30px'." }\n";
+				$custom_css .= '.container h4 { font-size: 22px'." }\n";
+				$custom_css .= '.container h5 { font-size: 20px'." }\n";
+				$custom_css .= '.container h6 { font-size: 18px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+				
+				case 'very_large': // When default font size, no CSS entry
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";				
+				$custom_css .= '.container input.search_field { height: 100%'." }\n";
+				$custom_css .= '.container h1 { font-size: 44px'." }\n";
+				$custom_css .= '.container h2 { font-size: 38px'." }\n";
+				$custom_css .= '.container h3 { font-size: 32px'." }\n";
+				$custom_css .= '.container h4 { font-size: 24px'." }\n";
+				$custom_css .= '.container h5 { font-size: 22px'." }\n";
+				$custom_css .= '.container h6 { font-size: 20px'." }\n";
+				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
+				break;
+			}
 		}
+		
+		
+		// Page background color
+		if ( $background_color = $this->get_setting( 'background_color' ) ) {
+			$custom_css .= 'body, .nav li.active a { background-color: '.$background_color."; }\n";
+		}		
+		// Page text color
+		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
+			$custom_css .= 'body { color: '.$page_text_color."; }\n";
+		}
+		// Page link color
+		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
+			$custom_css .= 'body a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+		}
+		// Page link hover color
+		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
+			$custom_css .= 'body a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+		}
+		// Posts background color
+		if ( $well_color = $this->get_setting( 'well_color' ) ) {
+			$custom_css .= '.well { background-color: '.$well_color."; }\n";
+		}
+		
+
+		// Navigation active link color
+		if ( $active_color = $this->get_setting( 'active_color' ) ) {
+			$custom_css .= 'ul.nav li.active a.selected { color: '.$active_color."; }\n";
+		}
+		// Navigation default link color
+		if ( $default_color = $this->get_setting( 'default_color' ) ) {
+			$custom_css .= 'ul.nav li a.default { color: '.$default_color."; }\n";
+		}
+		// Navigation default link hover color
+		if ( $default_h_color = $this->get_setting( 'default_h_color' ) ) {
+			$custom_css .= 'ul.nav li a.default:hover { color: '.$default_h_color."; }\n";
+		}
+		// Navigation default link hover background-color
+		if ( $default_bgh_color = $this->get_setting( 'default_bgh_color' ) ) {
+			$custom_css .= 'ul.nav li a.default:hover { background-color: '.$default_bgh_color."; }\n";
+		}
+		
+		
+		if( ! empty( $custom_css ) )
+		{ // Function for custom_css:
+		$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+		</style>';
+		add_headline( $custom_css );
+		}			
 	}
 
 
@@ -747,7 +733,7 @@ class bootstrap_photoblog_Skin extends Skin
 	/**
 	 * Check if we can display a widget container
 	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'footer'
 	 * @param string Skin setting name
 	 * @return boolean TRUE to display
 	 */
@@ -756,32 +742,6 @@ class bootstrap_photoblog_Skin extends Skin
 		$access = $this->get_setting( $setting_name );
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
-
-	/**
-	 * Check if we can display a sidebar for the current layout
-	 *
-	 * @param boolean TRUE to check if at least one sidebar container is visible
-	 * @return boolean TRUE to display a sidebar
-	 */
-	function is_visible_sidebar( $check_containers = false )
-	{
-		$layout = $this->get_setting( 'layout' );
-
-		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
-		{ // Sidebar is not displayed for selected skin layout
-			return false;
-		}
-
-		if( $check_containers )
-		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
-		}
-		else
-		{ // We should not check the visibility of the sidebar containers for this case
-			return true;
-		}
 	}
 
 
@@ -810,15 +770,6 @@ class bootstrap_photoblog_Skin extends Skin
 			case 'single_column_extra_narrow':
 				// Single Column Extra Narrow
 				return 'col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3';
-
-			case 'left_sidebar':
-				// Left Sidebar
-				return 'col-md-9 pull-right';
-
-			case 'right_sidebar':
-				// Right Sidebar
-			default:
-				return 'col-md-9';
 		}
 	}
 }

@@ -64,53 +64,9 @@ $Results->cols[] = array(
 					);
 
 
-/*
- * LINK column
- */
-function display_link()
-{
-	/**
-	 * @var File
-	 */
-	global $current_File;
-
-	if( empty( $current_File ) )
-	{
-		return '?';
-	}
-
-	$r = '';
-
-	// File relative path & name:
-	if( $current_File->is_dir() )
-	{ // Directory
-		$r .= $current_File->dget( '_name' );
-	}
-	else
-	{ // File
-		if( $view_link = $current_File->get_view_link() )
-		{
-			$r .= $view_link;
-			// Use this hidden field to solve the conflicts on quick upload
-			$r .= '<input type="hidden" value="'.$current_File->get_root_and_rel_path().'" />';
-		}
-		else
-		{ // File extension unrecognized
-			$r .= $current_File->dget( '_name' );
-		}
-	}
-
-	$title = $current_File->dget('title');
-	if( $title !== '' )
-	{
-		$r .= '<span class="filemeta"> - '.$title.'</span>';
-	}
-
-	return $r;
-}
 $Results->cols[] = array(
 						'th' => T_('Destination'),
-						'td' => '%display_link()%',
+						'td' => '%link_destination()%',
 						'td_class' => 'fm_filename',
 					);
 

@@ -68,7 +68,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Itemtype = duplicate( $edited_Itemtype ); // PHP4/5 abstraction
+			$edited_Itemtype = clone $edited_Itemtype;
 			// Load all custom fields of the copied post type
 			$edited_Itemtype->get_custom_fields();
 			// Reset ID of new post type

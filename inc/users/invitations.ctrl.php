@@ -54,7 +54,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_Invitation = duplicate( $edited_Invitation ); // PHP4/5 abstraction
+			$edited_Invitation = clone $edited_Invitation;
 			$edited_Invitation->ID = 0;
 		}
 		break;

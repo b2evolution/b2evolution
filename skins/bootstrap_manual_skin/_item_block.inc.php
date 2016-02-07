@@ -119,15 +119,15 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_coll_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
-			'widget_coll_item_tags_after'     => '</div>',
-			'widget_coll_item_tags_separator' => ', ',
+			'widget_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_separator' => ', ',
 			// Template params for "Small Print" widget
-			'widget_coll_small_print_before'         => '<p class="small text-muted">',
-			'widget_coll_small_print_after'          => '</p>',
-			'widget_coll_small_print_display_author' => false,
+			'widget_item_small_print_before'         => '<p class="small text-muted">',
+			'widget_item_small_print_after'          => '</p>',
+			'widget_item_small_print_display_author' => false,
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

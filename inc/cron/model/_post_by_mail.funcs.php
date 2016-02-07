@@ -346,7 +346,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		if( ! empty($is_cron_mode) )
 		{	// Assign current User if we are in cron mode. This is needed in order to check user permissions
 			global $current_User;
-			$current_User = duplicate($pbmUser);
+			$current_User = clone $pbmUser;
 		}
 
 		// Activate User's locale

@@ -43,6 +43,8 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		/**
@@ -76,7 +78,7 @@ class coll_media_index_Widget extends ComponentWidget
 				'note' => T_('What type of items do you want to list?'),
 				'type' => 'select',
 				'options' => $item_type_options,
-				'defaultvalue' => '1',
+				'defaultvalue' => isset( $Blog ) ? $Blog->get_setting( 'default_post_type' ) : '1',
 			),
 			'thumb_size' => array(
 				'label' => T_('Thumbnail size'),

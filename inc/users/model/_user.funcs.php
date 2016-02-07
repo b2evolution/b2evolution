@@ -1497,7 +1497,7 @@ function profile_check_params( $params, $User = NULL )
 		{
 			param_error( $params['gender'][1], T_('Please select gender.') );
 		}
-		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
 		{
 			param_error( $params['gender'][1], 'Gender value is invalid' );
 		}
@@ -3072,6 +3072,7 @@ function callback_filter_userlist( & $Form )
 
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
+	$Form->checkbox( 'gender_other', get_param('gender_other'), T_('Other') );
 
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
@@ -4571,6 +4572,236 @@ function get_users_IDs_by_logins( $logins )
 
 
 /**
+ * Check access to public list of the users
+ *
+ * @param string Mode: 'normal', 'api'
+ * @return boolean|string TRUE - if current user has an access,
+ *                        Error message - if not access(for 'api' mode) OR Redirect(for 'normal' mode)
+ */
+function check_access_users_list( $mode = 'normal' )
+{
+	global $current_User, $Settings, $Messages;
+
+	if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) ) 
+	{	// Redirect to the login page if not logged in and allow anonymous user setting is OFF:
+		$error_message = T_( 'You must log in to view the user directory.' );
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			$Messages->add( $error_message );
+			header_redirect( get_login_url( 'cannot see user' ), 302 );
+		}
+		// will have exited
+	}
+
+	if( is_logged_in() && ( ! check_user_status( 'can_view_users' ) ) )
+	{	// Current user status doesn't permit to view users list
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Current user is logged in but his/her account is not active yet
+			$error_message = T_( 'You must activate your account before you can view the user directory.' );
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				// Redirect to the account activation page:
+				$Messages->add( $error_message.' <b>'.T_( 'See below:' ).'</b>' );
+				header_redirect( get_activate_info_url(), 302 );
+			}
+			// will have exited
+		}
+
+		// Set where to redirect:
+		$error_message = T_( 'Your account status currently does not permit to view the user directory.' );
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			global $Blog, $baseurl;
+			$Messages->add( $error_message );
+			header_redirect( ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() ), 302 );
+		}
+		// will have exited
+	}
+
+	if( has_cross_country_restriction( 'users', 'list' ) && empty( $current_User->ctry_ID ) )
+	{	// User may browse other users only from the same country
+		$error_message = T_('Please specify your country before attempting to contact other users.');
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			$Messages->add( $error_message );
+			header_redirect( get_user_profile_url() );
+		}
+		// will have exited
+	}
+
+	// Current user has an access to public list of the users:
+	return true;
+}
+
+
+/**
+ * Check access to view a profile of the user
+ *
+ * @param integer User ID
+ * @param string Mode: 'normal', 'api'
+ * @return boolean|string TRUE - if current user has an access,
+ *                        Error message - if not access(for 'api' mode) OR Redirect(for 'normal' mode)
+ */
+function check_access_user_profile( $user_ID, $mode = 'normal' )
+{
+	global $Blog, $baseurl, $Settings, $current_User, $Settings;
+
+	// Set where to redirect in case of error:
+	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );
+
+	if( ! is_logged_in() )
+	{	// Redirect to the login page if not logged in and allow anonymous user setting is OFF:
+		$user_available_by_group_level = true;
+		if( ! empty( $user_ID ) )
+		{
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
+			{	// If user exists we can check if the anonymous users have an access to view the user by group level limitation
+				$User->get_Group();
+				$user_available_by_group_level = ( $User->Group->level >= $Settings->get( 'allow_anonymous_user_level_min' ) &&
+						$User->Group->level <= $Settings->get( 'allow_anonymous_user_level_max' ) );
+			}
+		}
+
+		if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level || empty( $user_ID ) )
+		{	// If this user is not available for anonymous users
+			$error_message = T_('You must log in to view this user profile.');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( get_login_url( 'cannot see user' ), 302 );
+			}
+			// will have exited
+		}
+	}
+
+	if( is_logged_in() && ! check_user_status( 'can_view_user', $user_ID ) )
+	{	// Current user is logged in, but his/her status doesn't permit to view user profile
+		if( check_user_status( 'can_be_validated' ) )
+		{ // Current user is logged in but his/her account is not active yet
+			$error_message = T_('You must activate your account before you can view this user profile.');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				// Redirect to the account activation page:
+				$Messages->add( $error_message.' <b>'.T_('See below:').'</b>' );
+				header_redirect( get_activate_info_url(), 302 );
+			}
+			// will have exited
+		}
+
+		$error_message = T_('Your account status currently does not permit to view this user profile.');
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			// Redirect to the account activation page:
+			$Messages->add( $error_message );
+			header_redirect( $error_redirect_to, 302 );
+		}
+		// will have exited
+	}
+
+	if( ! empty( $user_ID ) )
+	{
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false );
+
+		if( empty( $User ) )
+		{	// Wrong user request
+			$error_message = T_('The requested user does not exist!');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( $error_redirect_to );
+			}
+			// will have exited
+		}
+
+		if( $User->check_status( 'is_closed' ) )
+		{	// The requested user is closed
+			$error_message = T_('The requested user account is closed!');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( $error_redirect_to );
+			}
+			// will have exited
+		}
+
+		if( has_cross_country_restriction( 'any' ) )
+		{
+			if( empty( $current_User->ctry_ID  ) )
+			{	// Current User country is not set
+				$error_message = T_('Please specify your country before attempting to contact other users.');
+				if( $mode == 'api' )
+				{	// It is a request from REST API
+					return $error_message;
+				}
+				else
+				{	// Normal request
+					$Messages->add( $error_message );
+					header_redirect( get_user_profile_url() );
+				}
+				// will have exited
+			}
+
+			if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
+			{	// Current user country is different then edited user country and cross country user browsing is not enabled.
+				$error_message = T_('You don\'t have permission to view this user profile.');
+				if( $mode == 'api' )
+				{	// It is a request from REST API
+					return $error_message;
+				}
+				else
+				{	// Normal request
+					$Messages->add( $error_message );
+					header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );
+				}
+				// will have exited
+			}
+		}
+	}
+
+	// Current user has an access to view of the requested user profile:
+	return true;
+}
+
+
+/**
  * Display user's reposts results table
  *
  * @param array Params
@@ -4803,6 +5034,7 @@ function users_results_block( $params = array() )
 			'join_region'         => $params['display_region'],
 			'join_subregion'      => $params['display_subregion'],
 			'join_country'        => $params['join_country'],
+			'join_colls'          => $params['display_blogs'],
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
@@ -4832,6 +5064,7 @@ function users_results_block( $params = array() )
 				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
 				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
 				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
+				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
 			);
 
 		if( is_admin_page() )
@@ -4909,7 +5142,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User;
+	global $Settings, $current_User, $collections_Module;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -5269,7 +5502,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_group'] && $UserList->filters['group'] == -1 )
 	{ // List is ungrouped, Display column with group name
 		$UserList->cols[] = array(
-				'th' => T_('Primary Group'),
+				'th' => T_('Primary<br />Group'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
@@ -5280,11 +5513,11 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_sec_groups'] )
 	{	// Display column with count of secondary groups:
 		$UserList->cols[] = array(
-				'th' => T_('Sec. Groups'),
+				'th' => T_('Sec.<br />Groups'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '%conditional( #secondary_groups_count#, "<span class=\"label label-info\">#secondary_groups_count#</span>", "" )%',
+				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
 			);
 	}
 
@@ -5422,7 +5655,39 @@ function user_td_grp_name( $user_ID, $group_name, $group_level )
 	}
 
 	// Group level:
-	$r .= '<br />'.T_('Level').': '.$group_level;
+	$r .= '<div class="note">'.T_('Level').': '.$group_level.'</div>';
+
+	return $r;
+}
+
+
+/**
+ * Get info about secondary groups for cell of users table
+ *
+ * @param integer User ID
+ * @param integer Secondary groups count
+ * @return string
+ */
+function user_td_sec_groups( $user_ID, $secondary_groups_count )
+{
+	global $current_User;
+
+	if( empty( $secondary_groups_count ) )
+	{	// No secondary groups:
+		return '';
+	}
+
+	$r = $secondary_groups_count;
+
+	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
+	{	// Make a link to update the groups if current user can moderate this user:
+		global $admin_url;
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'" class="label label-info">'.$r.'</a>';
+	}
+	else
+	{
+		$r = '<span class="label label-info">'.$r.'</span>';
+	}
 
 	return $r;
 }

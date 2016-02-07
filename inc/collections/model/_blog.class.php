@@ -409,6 +409,7 @@ class Blog extends DataObject
 				$this->set_from_Request( 'locale' );
 				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
 				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
 			}
 
 			// Collection permissions:

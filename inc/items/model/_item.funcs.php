@@ -34,6 +34,9 @@ function init_MainList( $items_nb_limit )
 	{
 		$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
 
+		// Set additional debug info prefix for SQL queries to know what code executes it:
+		$MainList->query_title_prefix = '$MainList';
+
 		if( ! $preview )
 		{
 			if( $disp == 'page' || $disp == 'terms' )
@@ -219,6 +222,9 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		// Get ready to obtain 1 post only:
 		$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
+
+		// Set additional debug info prefix for SQL queries to know what code executes it:
+		$FeaturedList->query_title_prefix = '$FeaturedList';
 
 		$featured_list_filters = $MainList->filters;
 		if( ! empty( $cat ) )
@@ -1898,7 +1904,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	$Form->hidden( 'post_status', $edited_Item->status );
 	echo '<div class="btn-group dropup post_status_dropdown">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
-				.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
 			.'</button>'
 			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
@@ -1906,7 +1912,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
@@ -2164,7 +2170,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 			}
 			else
 			{	// End of this post:
-				$new_Item = duplicate( $Item );
+				$new_Item = clone $Item;
 
 				$new_Item->set_param( 'title', 'string', $current_title );
 
@@ -4150,7 +4156,7 @@ function item_row_status( $Item, $index )
 			.'</div>';
 	}
 	else
-	{ // Display only status badge when user has no permission to edit this post and for chicago skin
+	{ // Display only status badge when user has no permission to edit this post and for non-bootstrap skin
 		$r = $Item->get_format_status( array(
 			'template' => '<span class="note status_$status$"><span>$status_title$</span></span>',
 		) );

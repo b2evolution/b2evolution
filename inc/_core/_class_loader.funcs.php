@@ -1,8 +1,6 @@
 <?php
 /**
- * Function for handling Classes in PHP 5.
- *
- * In PHP4, _class4.funcs.php should be used instead.
+ * Functions for autoloading Classes in PHP 5 and above.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -62,9 +60,9 @@ else
 
 
 /**
- * In PHP4, this really loads the class. In PHP5, it's smarter than that:
- * It only registers the class & file name so that __autoload() can later
- * load the class IF and ONLY IF the class is actually needed during execution.
+ * In PHP4, this immediately loaded the class. In PHP5, it's smarter than that:
+ * It only registers the class & file name so that PHP can later load the class 
+ * IF and ONLY IF the class is actually needed during execution.
  */
 function load_class( $class_path, $classname )
 {
@@ -74,16 +72,6 @@ function load_class( $class_path, $classname )
 		$map_class_path[strtolower($classname)] = $inc_path.$class_path;
 	}
 	return true;
-}
-
-
-/**
- * Create a copy of an object (abstraction from PHP4 vs PHP5)
- */
-function duplicate( $Obj )
-{
-	$Copy = clone $Obj;
-	return $Copy;
 }
 
 ?>

@@ -143,10 +143,10 @@ while( $Item = & mainlist_get_item() )
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
 				// Template params for "Small Print" widget
-				'widget_coll_small_print_before' => '<p class="postmetadata alt"><small>',
-				'widget_coll_small_print_after'  => '</small></p>',
+				'widget_item_small_print_before' => '<p class="postmetadata alt"><small>',
+				'widget_item_small_print_after'  => '</small></p>',
 				// Params for skin file "_item_content.inc.php"
-				'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+				'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

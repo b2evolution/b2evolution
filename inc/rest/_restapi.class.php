@@ -185,7 +185,7 @@ class RestApi
 			$BlogCache = & get_BlogCache();
 			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 			{	// Collection is not detected in DB by requested url name:
-				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection' );
+				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection', 404 );
 				// Exit here.
 			}
 
@@ -234,7 +234,7 @@ class RestApi
 
 		if( empty( $BlogCache->cache ) )
 		{	// No collections found:
-			$this->halt( 'No collections found', 'no_collections', 200 );
+			$this->halt( 'No collections found', 'no_collections', 404 );
 			// Exit here.
 		}
 
@@ -365,12 +365,12 @@ class RestApi
 		{	// No posts detected:
 			if( $post_ID )
 			{	// Wrong post request:
-				$this->halt( 'Invalid post ID', 'post_invalid_id' );
+				$this->halt( 'Invalid post ID', 'post_invalid_id', 404 );
 				// Exit here.
 			}
 			else
 			{	// No posts found:
-				$this->halt( 'No posts found for requested collection', 'no_posts', 200 );
+				$this->halt( 'No posts found for requested collection', 'no_posts', 404 );
 				// Exit here.
 			}
 		}
@@ -436,7 +436,7 @@ class RestApi
 		$search_result = $Session->get( 'search_result' );
 		if( empty( $search_result ) )
 		{	// Nothing found:
-			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 200 );
+			$this->halt( T_('Sorry, we could not find anything matching your request, please try to broaden your search.'), 'no_search_results', 404 );
 			// Exit here.
 		}
 
@@ -611,12 +611,38 @@ class RestApi
 	 */
 	private function module_users()
 	{
-		// User controller ('list' by default):
-		$user_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
+		// Set user controller 'list' by default:
+		$user_controller = 'list';
 
-		if( intval( $user_controller ) > 0 )
-		{	// This is a request to view a details of single user:
-			$user_controller = 'view';
+		// Get user ID:
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		switch( $request_method )
+		{
+			case 'POST':
+				// Set controller to update the requested user OR create one new:
+				$user_controller = 'save';
+				break;
+
+			case 'DELETE':
+				// Set controller to delete the requested user:
+				if( $user_ID > 0 )
+				{	// Only if user ID is defined:
+					$user_controller = 'delete';
+				}
+				else
+				{	// Wrong user request:
+					$this->halt( 'Invalid user ID', 'user_invalid_id' );
+					// Exit here.
+				}
+				break;
+
+			case 'GET':
+			default:
+				// Set controller to view the requested user profile or ALL users:
+				$user_controller = ( $user_ID > 0 ) ? 'view' : 'list';
+				break;
 		}
 
 		if( ! method_exists( $this, 'controller_user_'.$user_controller ) )
@@ -636,6 +662,13 @@ class RestApi
 	private function controller_user_list()
 	{
 		global $Settings;
+
+		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
+		{	// Current user has no access to public list of the users,
+			// Display error message:
+			$this->halt( $access_error_message, 'no_access', 403 );
+			// Exit here.
+		}
 
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
@@ -681,20 +714,29 @@ class RestApi
 		}
 
 		if( empty( $this->response ) )
-		{	// No posts found:
-			$this->halt( 'No users found', 'no_users', 200 );
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 404 );
 			// Exit here.
 		}
 	}
 
 
 	/**
-	 * Call user controller to view a user
+	 * Call user controller to view a profile of the requested user
 	 */
 	private function controller_user_view()
 	{
-		// Get an user ID for request "<baseurl>/api/v1/users/<id>":
-		$user_ID = empty( $this->args[1] ) ? 0 : $this->args[1];
+		global $current_User;
+
+		// Get an user ID for request "GET <baseurl>/api/v1/users/<id>":
+		$user_ID = intval( empty( $this->args[1] ) ? 0 : $this->args[1] );
+
+		if( ( $access_error_message = check_access_user_profile( $user_ID, 'api' ) ) !== true )
+		{	// Current user has no access to public list of the users,
+			// Display error message:
+			$this->halt( $access_error_message, 'no_access', 403 );
+			// Exit here.
+		}
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );
@@ -707,23 +749,198 @@ class RestApi
 
 		// ID:
 		$user_data = array( 'id' => intval( $User->ID ) );
-		// Picture:
+		// Pictures:
+		// Main Picture:
 		$user_picture = $User->get_avatar_imgtag( is_logged_in() ? 'crop-top-320x320' : 'crop-top-320x320-blur-8' );
-		if( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) )
-		{
-			$user_data['picture'] = $user_picture[1];
+		$user_picture = ( preg_match( '#src="([^"]+)"#', $user_picture, $user_picture ) ) ? $user_picture[1] : '';
+		$user_data['picture'] = $user_picture;
+		// Other pictures:
+		$user_data['pictures'] = array();
+		if( is_logged_in() && $current_User->check_status( 'can_view_user', $user_ID ) )
+		{ // Display other pictures, but only for logged in and activated users:
+			$user_pic_links = $User->get_avatar_Links();
+			foreach( $user_pic_links as $user_pic_Link )
+			{
+				$user_pic_url = $user_pic_Link->get_tag( array(
+						'before_image'        => '',
+						'before_image_legend' => NULL,
+						'after_image_legend'  => NULL,
+						'after_image'         => '',
+						'image_size'          => 'crop-top-80x80',
+					) );
+				if( ( preg_match( '#src="([^"]+)"#', $user_pic_url, $user_pic_url ) ) )
+				{	// Extract image url:
+					$user_data['pictures'][] = $user_pic_url[1];
+				}
+			}
 		}
+
 		// Login:
 		$user_data['login'] = $User->get( 'login' );
-		// Full name:
-		$user_data['fullname'] = $User->get( 'fullname' );
-		// City:
-		$user_data['city'] = $User->get_city_name();
+		// First name:
+		$user_data['firstname'] = $User->get( 'firstname' );
+		// Last name:
+		$user_data['lastname'] = $User->get( 'lastname' );
 		// Gender:
 		$user_data['gender'] = $User->get( 'gender' );
 
+		// Location:
+		$user_data['location'] = array(
+				'country'   => empty( $User->ctry_ID )  ? NULL : array( 'id' => intval( $User->ctry_ID ),  'name' => $User->get_country_name() ),
+				'region'    => empty( $User->rgn_ID )   ? NULL : array( 'id' => intval( $User->rgn_ID ),   'name' => $User->get_region_name() ),
+				'subregion' => empty( $User->subrg_ID ) ? NULL : array( 'id' => intval( $User->subrg_ID ), 'name' => $User->get_subregion_name() ),
+				'city'      => empty( $User->city_ID )  ? NULL : array( 'id' => intval( $User->city_ID ),  'name' => $User->get_city_name() )
+			);
+
+		// Organizations:
+		$user_data['organizations'] = array();
+		$user_organizations = $User->get_organizations();
+		foreach( $user_organizations as $org )
+		{
+			$user_data['organizations'][] = array(
+					'name' => $org->name,
+					'url'  => $org->url,
+				);
+		}
+
+		// User fields:
+		$user_data['userfields'] = array();
+		// Load the user fields:
+		$User->userfields_load();
+		foreach( $User->userfields as $userfield )
+		{
+			if( ! isset( $user_data['userfields'][ $userfield->ufgp_name ] ) )
+			{	// Initalize an array for each group of the user fields:
+				$user_data['userfields'][ $userfield->ufgp_name ] = array();
+			}
+
+			$user_data['userfields'][ $userfield->ufgp_name ][] = array(
+					'code'  => $userfield->ufdf_code,
+					'name'  => $userfield->ufdf_name,
+					'value' => $userfield->uf_varchar
+				);
+		}
+
 		// Add user data in the response:
 		$this->response = $user_data;
+	}
+
+
+	/**
+	 * Call user controller to update the requested user OR create new one
+	 */
+	private function controller_user_save()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() )
+		{	// Must be logged in
+			$this->halt( T_( 'You are not logged in.' ), 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Get an user ID for request "POST <baseurl>/api/v1/users/<id>":
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		if( $user_ID > 0 )
+		{	// Initialize User object to update it:
+			$UserCache = & get_UserCache();
+			$edited_User = & $UserCache->get_by_ID( $user_ID, false, false );
+
+			if( ! $edited_User )
+			{	// Wrong user request:
+				$this->halt( 'Invalid user ID', 'user_invalid_id' );
+				// Exit here.
+			}
+
+			if( ! $current_User->can_moderate_user( $edited_User->ID )
+			    && $edited_User->ID != $current_User->ID )
+			{	// Current user has no permission to delate the requested user:
+				$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
+				// Exit here.
+			}
+		}
+		else
+		{ // Initialize User object to create new one:
+			$edited_User = new User();
+		}
+
+		// Clear all messages in order to keep only from function User->update_from_request() below:
+		global $Messages;
+		$Messages->clear();
+
+		// Create new user or Update the requested user:
+		$is_new_user = ( $edited_User->ID == 0 ? true : false );
+		$result = $edited_User->update_from_request( $is_new_user );
+		if( $result !== true )
+		{	// There are errors on update the requested user:
+			$this->halt( $Messages->messages_text[0], 'update_failed', 403 );
+			// Exit here.
+		}
+		else
+		{	// The requested user has been updated successfully
+			$this->halt( $Messages->messages_text[0], 'update_success', 200 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call user controller to delete the requested user
+	 */
+	private function controller_user_delete()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
+		{	// Current user has no permission to delate the requested user:
+			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Get an user ID for request "DELETE <baseurl>/api/v1/users/<id>":
+		$user_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+
+		if( ! $User )
+		{	// Wrong user request:
+			$this->halt( 'Invalid user ID', 'user_invalid_id' );
+			// Exit here.
+		}
+
+		if( $User->ID == $current_User->ID )
+		{
+			$this->halt( T_('You can\'t delete yourself!'), 'no_access', 403 );
+			// Exit here.
+		}
+		if( $User->ID == 1 )
+		{
+			$this->halt( T_('You can\'t delete User #1!'), 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Clear all messages in order to keep only from function User->check_delete() below:
+		global $Messages;
+		$Messages->clear();
+
+		if( ! $User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ) ) )
+		{	// There are restrictions on delete the requested user:
+			$this->halt( strip_tags( $Messages->messages_text[0] ), 'delete_restriction', 403 );
+			// Exit here.
+		}
+
+		if( $User->dbdelete( $Messages ) !== false )
+		{	// The requested user has been deleted successfully
+			$this->halt( sprintf( T_('User &laquo;%s&raquo; deleted.'), $User->get( 'login' ) ), 'delete_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// Cannot delete the requested user
+			$this->halt( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ), 'delete_failed', 403 );
+			// Exit here.
+		}
 	}
 
 

@@ -2137,14 +2137,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 
 			/* Item Single */
-			add_basic_widget_9408( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
+			add_basic_widget_9408( $blog_id, 'Item Single', 'item_content', 'core', 10 );
 			if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 			{ // Item Tags
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_item_tags', 'core', 20 );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 			}
 			if( $blog_id == $blog_b_ID )
 			{ // About Author
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_about_author', 'core', 25 );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 			}
 			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 			{ // Google Maps
@@ -2152,7 +2152,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			if( $blog_id == $blog_a_ID || $kind == 'manual' )
 			{ // Small Print
-				add_basic_widget_9408( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
+				add_basic_widget_9408( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 			}
 
 
@@ -7055,21 +7055,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		foreach( $collections as $coll_ID => $coll_type )
 		{
 			task_begin( 'Installing default "Item Single" widgets for collection #'.$coll_ID.'... ' );
-			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_content', 'core', 20 );
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'item_content', 'core', 20 );
 			if( $coll_type != 'forum' )
 			{	// Item Tags:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_item_tags', 'core', 30 );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_tags', 'core', 30 );
 			}
 			if( $coll_type == 'std' )
 			{	// About Author:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_about_author', 'core', 40 );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_about_author', 'core', 40 );
 			}
 			if( $coll_type == 'std' || $coll_type == 'manual' )
 			{	// Small Print:
-				add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
+				add_basic_widget_11670( $coll_ID, 'Item Single', 'item_small_print', 'core', 50, array( 'format' => ( $coll_type == 'std' ? 'standard' : 'revision' ) ) );
 			}
 			// Seen by:
-			add_basic_widget_11670( $coll_ID, 'Item Single', 'coll_seen_by', 'core', 60, NULL,
+			add_basic_widget_11670( $coll_ID, 'Item Single', 'item_seen_by', 'core', 60, NULL,
 				// Disable this widget for "forum" collections by default:
 				$coll_type == 'forum' ? 0 : 1 );
 			task_end();
@@ -7225,10 +7225,65 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  AND ityp_name = "Page"' );
 		upg_task_end();
 	}
-	
+
 	if( upg_task_start( 11705, 'Upgrading users organization table...' ) )
-	{
+	{	// part of 6.7.0
 		db_add_col( 'T_users__organization', 'org_perm_role', "ENUM('owner and member', 'owner') COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member' AFTER org_accept" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11710, 'Deleting back-office skin "chicago"...' ) )
+	{	// part of 6.7.0
+		// Update the back-office skin of all users to default "bootstrap":
+		$DB->query( 'DELETE FROM T_users__usersettings WHERE uset_name = "admin_skin"' );
+		// Try to delete skin folder:
+		global $adminskins_path;
+		$skin_chicago_path = $adminskins_path.'chicago/';
+		if( file_exists( $skin_chicago_path ) && ! rmdir_r( $skin_chicago_path ) )
+		{	// Display a warning if no permissions to delete the skin folder:
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'
+					.'WARNING: the Chicago admin skin is no longer supported. Please delete the folder <code>'.$skin_chicago_path.'</code>'
+				.'</evo:warning></span>' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11715, 'Replace widgets "Simple Sidebar Links list" and "Simple Linkblog Links list" with "Universal Item list"...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "coll_item_list"
+			WHERE wi_type = "core"
+			  AND wi_code IN ( "linkblog", "coll_link_list" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11720, 'Replace renamed widgets...' ) )
+	{	// part of 6.7.0
+		// It's ok to run several queries in a single block because they don't change the DB structure, so they practically can't fail:
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_seen_by"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_seen_by"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_small_print"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_small_print"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_tags"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_item_tags"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_content"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_item_content"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "item_about_author"
+			WHERE wi_type = "core"
+			  AND wi_code = "coll_about_author"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "coll_member_count"
+			WHERE wi_type = "core"
+			  AND wi_code = "member_count"' );
 		upg_task_end();
 	}
 

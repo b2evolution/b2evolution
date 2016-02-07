@@ -2147,7 +2147,7 @@ function param_check_gender( $var, $required = false )
 	}
 
 	$gender_value = $GLOBALS[$var];
-	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) )
+	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) && ( $gender_value != 'O' ) )
 	{
 		param_error( $var, 'Gender value is invalid' );
 		return false;

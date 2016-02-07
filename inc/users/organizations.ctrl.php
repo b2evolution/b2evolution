@@ -56,7 +56,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_Organization = duplicate( $edited_Organization ); // PHP4/5 abstraction
+			$edited_Organization = clone $edited_Organization;
 			$edited_Organization->ID = 0;
 			$edited_Organization->set( 'owner_user_ID', $current_User->ID );
 		}

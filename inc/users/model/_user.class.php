@@ -397,8 +397,14 @@ class User extends DataObject
 	{
 		global $DB, $Settings, $UserSettings, $GroupCache, $Messages, $action;
 		global $current_User, $Session, $localtimenow;
+		global $is_api_request;
 
+		// TRUE when we create new user:
 		$is_new_user = ( $this->ID == 0 );
+
+		// TRUE if we should request a second password to confirm:
+		// (Don't request it when we create new user from REST API)
+		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
 		$edited_user_login = param( 'edited_user_login', 'string' );
@@ -962,20 +968,31 @@ class User extends DataObject
 			global $edited_user_pass1, $edited_user_pass2;
 
 			$edited_user_pass1 = param( 'edited_user_pass1', 'string', true );
-			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
-
-			// Remove the invalid chars from password vars
+			// Remove the invalid chars from password var:
 			$edited_user_pass1 = preg_replace( '/[<>&]/', '', $edited_user_pass1 );
-			$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+
+			if( $request_password_confirmation )
+			{	// Request a password confirmation:
+				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+				// Remove the invalid chars from password var:
+				$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+			}
 
 			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
 			{ // current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
 
-				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-				{ // We can set password
-					$this->set_password( $edited_user_pass2 );
+				if( $request_password_confirmation )
+				{	// Request a password confirmation:
+					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+					{ // We can set password
+						$this->set_password( $edited_user_pass2 );
+					}
+				}
+				else
+				{	// Don't request a password confirmation and use only first entered password (Used on REST API):
+					$this->set_password( $edited_user_pass1 );
 				}
 			}
 			else
@@ -1239,7 +1256,10 @@ class User extends DataObject
 
 		if( $is_advanced_form )
 		{
+			/*
+			 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 			$UserSettings->set( 'admin_skin', param( 'edited_user_admin_skin', 'string' ), $this->ID );
+			 */
 
 			// Action icon params:
 			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
@@ -3887,6 +3907,9 @@ class User extends DataObject
 
 			case 'F':
 				return T_('A woman');
+
+			case 'O':
+				return T_('Other');
 		}
 
 		return NULL;
@@ -3917,6 +3940,9 @@ class User extends DataObject
 				break;
 			case 'F':
 				$gender_class .= ' woman';
+				break;
+			case 'O':
+				$gender_class .= ' other';
 				break;
 			default:
 				$gender_class .= ' nogender';

@@ -145,14 +145,14 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Item Single */
-	add_basic_widget( $blog_id, 'Item Single', 'coll_item_content', 'core', 10 );
+	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
 	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 	{ // Item Tags
-		add_basic_widget( $blog_id, 'Item Single', 'coll_item_tags', 'core', 20 );
+		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
 	if( $blog_id == $blog_b_ID )
 	{ // About Author
-		add_basic_widget( $blog_id, 'Item Single', 'coll_about_author', 'core', 25 );
+		add_basic_widget( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 	}
 	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
 	{ // Google Maps
@@ -160,10 +160,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	if( $blog_id == $blog_a_ID || $kind == 'manual' )
 	{ // Small Print
-		add_basic_widget( $blog_id, 'Item Single', 'coll_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
+		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
 	// Seen by
-	add_basic_widget( $blog_id, 'Item Single', 'coll_seen_by', 'core', 50, NULL,
+	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,
 		// Disable this widget for "forum" collections by default:
 		$kind == 'forum' ? 0 : 1 );
 
@@ -232,9 +232,13 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
 			{
 				$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
-				add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array(
-						'blog_ID' => $blog_home_ID,
-						'item_type' => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
+				add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 90, array(
+						'blog_ID'              => $blog_home_ID,
+						'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
+						'title'                => 'Linkblog',
+						'item_group_by'        => 'chapter',
+						'item_title_link_type' => 'auto',
+						'item_type_usage'      => 'special',
 					) );
 			}
 		}
@@ -253,7 +257,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
 		if( $blog_id == $blog_b_ID )
 		{
-			add_basic_widget( $blog_id, 'Sidebar 2', 'coll_link_list', 'core', 5, array( 'title' => 'Sidebar links', 'order_by' => 'RAND' ) );
+			add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
+					'title'                => 'Sidebar links',
+					'order_by'             => 'RAND',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) );
 		}
 		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
 		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );

@@ -54,6 +54,7 @@ class UserQuery extends SQL
 				'join_region'    => false,
 				'join_subregion' => false,
 				'join_city'      => true,
+				'join_colls'     => true,
 				'grouped'        => false,
 			), $params );
 
@@ -105,14 +106,17 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( isset( $collections_Module ) )
-		{ // We are handling blogs:
-			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
-			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
-		}
-		else
-		{
-			$this->SELECT_add( ', 0 AS nb_blogs' );
+		if( $params['join_colls'] )
+		{	// Join a count of collections:
+			if( isset( $collections_Module ) )
+			{	// We are handling blogs:
+				$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+				$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
+			}
+			else
+			{
+				$this->SELECT_add( ', 0 AS nb_blogs' );
+			}
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
@@ -209,7 +213,7 @@ class UserQuery extends SQL
 	/**
 	 * Restrict with gender
 	 *
-	 * @param string Gender ( M, F, MF )
+	 * @param string Gender ( M, F, O, MF, MO, FO, MFO )
 	 */
 	function where_gender( $gender )
 	{
@@ -220,13 +224,13 @@ class UserQuery extends SQL
 			return;
 		}
 
-		if( $gender == 'MF' )
-		{	// Get men AND women
-			$this->WHERE_and( 'user_gender IN ( "M", "F" )' );
-		}
-		else
-		{	// Get men OR women
-			$this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) );
+		switch( $gender )
+		{
+			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
+			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
+			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
+			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
+			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
 		}
 	}
 

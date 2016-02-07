@@ -142,7 +142,7 @@ if( $disp == 'single' )
 		'block_title_start' => '<h3>',
 		'block_title_end' => '</h3>',
 		// Params for skin file "_item_content.inc.php"
-		'widget_coll_item_content_params' => $params,
+		'widget_item_content_params' => $params,
 	) );
 	// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 }

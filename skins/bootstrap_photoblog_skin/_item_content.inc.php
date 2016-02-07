@@ -28,7 +28,8 @@ $params = array_merge( array(
 		// Wrap images and text:
 		'content_start_excerpt'    => '<section class="evo_post__excerpt">',		// In case of compact display
 		'content_end_excerpt'      => '</section>',
-		'content_start_full'       => '<section class="evo_post__full">',			// In case of full display
+		'content_start_full'       => '<section class="evo_post__full panel panel-default">',			// In case of full display
+		'content_start_full_intro' => '<section class="evo_post__full">',
 		'content_end_full'         => '</section>',
 
 		// In case we display a compact version of the post:
@@ -40,7 +41,8 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text">',
+		'content_start_full_text'  => '<div class="evo_post__full_text panel-body">',
+		'content_start_full_text_intro'  => '<div class="evo_post__full_text">',
 		'content_end_full_text'    => '</div>',
 
 		'before_content_teaser'    => '',
@@ -194,12 +196,25 @@ switch( $content_mode )
 	case 'normal':
 	default:
 		// Normal dislpay:  (and Full display if force_more is true)
-		echo $params['content_start_full'];
+		
+		/* This is written in _item.block.inc.php
+		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
+			echo $params['content_start_full'];
+		} else {
+			echo $params['content_start_full_intro'];
+		}
+		*/
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
-
-			echo $params['content_start_full_text'];
+	
+			/* This is written in _item.block.inc.php
+			if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
+				echo $params['content_start_full_text'];
+			} else {
+				echo $params['content_start_full_text_intro'];
+			}
+			*/
 
 			// URL link, if the post has one:
 			if( $params['url_link_position'] == 'top' )
@@ -281,7 +296,7 @@ switch( $content_mode )
 					'block_end'   => $params['footer_text_end'],
 				) );
 
-			echo $params['content_end_full_text'];
+			// echo $params['content_end_full_text'];  <-- We want to show this after the content footer in _item.block.inc.php
 		}
 
 		if( ! empty($params['limit_attach'])
@@ -306,7 +321,6 @@ switch( $content_mode )
 			$Item->custom_fields();
 		}
 
-		echo $params['content_end_full'];
-
+		// echo $params['content_end_full']; <-- We want to show this after the content footer in _item.block.inc.php
 }
 ?>

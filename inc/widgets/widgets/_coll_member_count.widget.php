@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class member_count_Widget extends ComponentWidget
+class coll_member_count_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class member_count_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'member_count' );
+		parent::__construct( $db_row, 'core', 'coll_member_count' );
 	}
 
 
@@ -73,11 +73,16 @@ class member_count_Widget extends ComponentWidget
 		global $Blog;
 
 		if( empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
-		{ // Use this widget only when blog is llowed only for members
+		{ // Use this widget only when blog is allowed only for members
 			return;
 		}
 
 		$this->init_display( $params );
+
+		$this->disp_params = array_merge( array(
+				'before'    => ' ',
+				'after'     => ' ',
+			), $this->disp_params );
 
 		echo $this->disp_params['before'];
 
@@ -120,7 +125,7 @@ class member_count_Widget extends ComponentWidget
 		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = grp_ID AND bloggroup_ismember = 1 )' );
 		$usergroups_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
 
-		$members_count_sql = 'SELECT COUNT( user_ID ) AS member_count FROM ( '
+		$members_count_sql = 'SELECT COUNT( user_ID ) AS coll_member_count FROM ( '
 			.$blogowner_SQL->get()
 			.' UNION '
 			.$userperms_SQL->get()

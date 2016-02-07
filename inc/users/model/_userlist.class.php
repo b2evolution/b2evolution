@@ -57,6 +57,7 @@ class UserList extends DataObjectList2
 	 *                    'join_region'    => false,
 	 *                    'join_subregion' => false,
 	 *                    'join_city'      => true,
+	 *                    'join_colls'     => true,
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization
@@ -95,7 +96,7 @@ class UserList extends DataObjectList2
 				'city'                => NULL,    // integer, City ID
 				'membersonly'         => false,   // boolean, Restrict by members
 				'keywords'            => NULL,    // string, Search words
-				'gender'              => NULL,    // string: 'M', 'F' or 'MF'
+				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
 				'account_status'      => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 				'reported'            => NULL,    // integer: 1 to show only reported users
@@ -185,6 +186,7 @@ class UserList extends DataObjectList2
 			 */
 			memorize_param( 'gender_men', 'integer', strpos( $this->default_filters['gender'], 'M' ) !== false, strpos( $this->filters['gender'], 'M' ) !== false );
 			memorize_param( 'gender_women', 'integer', strpos( $this->default_filters['gender'], 'F' ) !== false, strpos( $this->filters['gender'], 'F' ) !== false );
+			memorize_param( 'gender_other', 'integer', strpos( $this->default_filters['gender'], 'O' ) !== false, strpos( $this->filters['gender'], 'O' ) !== false );
 
 			/*
 			 * Restrict by status
@@ -329,15 +331,23 @@ class UserList extends DataObjectList2
 		 */
 		$gender_men = param( 'gender_men', 'boolean', strpos( $this->default_filters['gender'], 'M' ), true );
 		$gender_women = param( 'gender_women', 'boolean', strpos( $this->default_filters['gender'], 'F' ), true );
-		if( ( $gender_men && ! $gender_women ) || ( ! $gender_men && $gender_women ) )
-		{	// Find men OR women
-			$this->filters['gender'] = $gender_men ? 'M' : 'F';
+		$gender_other = param( 'gender_other', 'boolean', strpos( $this->default_filters['gender'], 'O' ), true );
+		if( $gender_men || $gender_women || $gender_other )
+		{
+			if( $gender_men ) 
+			{
+				$this->filters['gender'] = 'M';
+			}
+			if( $gender_women ) 
+			{
+				$this->filters['gender'] .= 'F';
+			}
+			if( $gender_other ) 
+			{
+				$this->filters['gender'] .= 'O';
+			}
 		}
-		else if( $gender_men && $gender_women )
-		{	// Find men AND women
-			$this->filters['gender'] = 'MF';
-		}
-
+		
 		/*
 		 * Restrict by status
 		 */
@@ -552,7 +562,11 @@ class UserList extends DataObjectList2
 			$Timer->start( 'Users_IDs', false );
 
 			$step1_SQL = new SQL();
-			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture, COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
+			if( ! empty( $this->query_params['join_colls'] ) )
+			{	// Initialize a count of collections (used on order by this field):
+				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			}
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
 			{	// Filter is set to 'Reported users'
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );

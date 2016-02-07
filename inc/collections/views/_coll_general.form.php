@@ -144,6 +144,13 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 					array( 'post', T_('Always force to post locale') ),
 					array( 'blog', T_('Follow navigation locale') ),
 			), T_('Content Display'), true );
+
+		$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
+				array(
+					array( 'use_coll', T_('Always use collection locale') ),
+					array( 'select_coll', T_('Allow select - use collection locale by default') ),
+					array( 'select_user', T_('Allow select - use user locale by default') ),
+			), T_('New Posts'), true );
 	}
 	else
 	{ // Only one locale
