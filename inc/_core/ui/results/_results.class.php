@@ -440,7 +440,7 @@ class Results extends Table
 		}
 
 		// Make sure query has executed:
-		$this->query( $this->sql );
+		$this->query();
 
 		$this->current_idx = 0;
 
