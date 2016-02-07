@@ -38,6 +38,7 @@ class item_small_print_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
+	 * @param object $db_row
 	 */
 	function __construct( $db_row = NULL )
 	{
@@ -88,7 +89,8 @@ class item_small_print_Widget extends ComponentWidget
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
+	 * @param array $params local params like 'for_editing' => true
+	 * @return array
 	 */
 	function get_param_definitions( $params )
 	{
@@ -118,7 +120,8 @@ class item_small_print_Widget extends ComponentWidget
 	/**
 	 * Display the widget!
 	 *
-	 * @param array MUST contain at least the basic display params
+	 * @param array $params MUST contain at least the basic display params
+	 * @return bool
 	 */
 	function display( $params )
 	{
@@ -126,7 +129,7 @@ class item_small_print_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
-			return;
+			return false;
 		}
 
 		$this->init_display( $params );
@@ -148,6 +151,9 @@ class item_small_print_Widget extends ComponentWidget
 
 		if( $this->disp_params['format'] == 'standard' )
 		{ // Blog standard
+			/**
+			 * @global Skin
+			 */
 			global $Skin;
 
 			$Item->author( array(

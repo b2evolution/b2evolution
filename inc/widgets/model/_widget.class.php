@@ -535,6 +535,7 @@ class ComponentWidget extends DataObject
 	 * @todo fp> handle custom params for each widget
 	 *
 	 * @param array MUST contain at least the basic display params
+	 * @return bool true if the widget displayed something (other than a debug message)
 	 */
 	function display( $params )
 	{

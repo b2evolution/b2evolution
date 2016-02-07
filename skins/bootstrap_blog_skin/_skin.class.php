@@ -60,6 +60,7 @@ class bootstrap_blog_Skin extends Skin
 	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
+	 * @return array
 	 */
 	function get_param_definitions( $params )
 	{
