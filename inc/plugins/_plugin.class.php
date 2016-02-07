@@ -525,7 +525,7 @@ class Plugin
 
 
 	/**
-	 * Define here default user settings that are then available in the backoffice.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * You can access them in the plugin through the member object
 	 * {@link $UserSettings}, e.g.:

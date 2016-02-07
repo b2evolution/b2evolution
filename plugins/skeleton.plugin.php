@@ -81,9 +81,15 @@ class pluginname_plugin extends Plugin
 
 
 	/**
-	 * Define user settings that the plugin uses/provides.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array();
 	}

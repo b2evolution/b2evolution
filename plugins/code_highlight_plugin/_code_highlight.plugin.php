@@ -144,15 +144,15 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 *
-	 * @return array
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'display_toolbar' => array(
