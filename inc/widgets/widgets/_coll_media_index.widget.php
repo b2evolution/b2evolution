@@ -224,7 +224,7 @@ class coll_media_index_Widget extends ComponentWidget
 		// Display photos:
 		// TODO: permissions, complete statuses...
 		// TODO: A FileList object based on ItemListLight but adding File data into the query?
-		//          overriding ItemListLigth::query() for starters ;)
+		//          overriding ItemListLight::query() for starters ;)
 
 		// Init caches
 		$FileCache = & get_FileCache();
