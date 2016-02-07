@@ -118,9 +118,9 @@ class item_content_Widget extends ComponentWidget
 				'widget_item_content_params' => array(),
 			), $this->disp_params );
 
-		// Get the params to be tranbsmitted to this widget:
+		// Get the params to be transmitted to this widget:
 		if( isset($this->disp_params['widget_item_content_params']) )
-		{
+		{	// We have an array, with the new name:
 			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
 		}
 		else
@@ -128,7 +128,7 @@ class item_content_Widget extends ComponentWidget
 			$widget_item_content_params = array();
 		}
 
-		// Now, for some skins (2015), merge in the old name:
+		// Now, for some skins (2015), merge in the OLD name:
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
 		{	// The new correct stuff gets precedence over the old stuff:
 			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );

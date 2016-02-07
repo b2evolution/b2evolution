@@ -131,6 +131,11 @@ class item_small_print_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		// We renamed some params; older skin may use the old names; let's convert those params now:
+		$this->convert_legacy_param( 'widget_coll_small_print_before', 'widget_item_small_print_before' );
+		$this->convert_legacy_param( 'widget_coll_small_print_after', 'widget_item_small_print_after' );
+		$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
+
 		$this->disp_params = array_merge( array(
 				'widget_item_small_print_before' => '',
 				'widget_item_small_print_after'  => '',

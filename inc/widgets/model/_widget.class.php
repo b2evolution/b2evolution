@@ -342,6 +342,7 @@ class ComponentWidget extends DataObject
 
 	/**
  	 * Get param value.
+ 	 *
  	 * @param string
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
@@ -507,6 +508,22 @@ class ComponentWidget extends DataObject
 		$widget_ID = ( !empty($params[ 'widget_ID' ]) ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
 		// replace the values
 		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
+	}
+
+
+	/**
+	 * Convert old display params to new name.
+	 *
+ 	 * Use this function if some params were renamed.
+	 * This function will look for the old params and convert them if no new param is present
+	 */
+	function convert_legacy_param( $old_name, $new_name )
+	{
+		//pre_dump( $this->disp_params );
+		if( isset($this->disp_params[$old_name]) && !isset($this->disp_params[$new_name]) )
+		{	// We have old param but NOT new param, duplicate old to new:
+			$this->disp_params[$new_name] = $this->disp_params[$old_name];
+		}
 	}
 
 

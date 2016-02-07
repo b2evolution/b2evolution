@@ -121,6 +121,11 @@ class item_tags_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		// We renamed some params; older skin may use the old names; let's convert those params now:
+		$this->convert_legacy_param( 'widget_coll_item_tags_before', 'widget_item_tags_before' );
+		$this->convert_legacy_param( 'widget_coll_item_tags_after', 'widget_item_tags_after' );
+		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
+
 		$this->disp_params = array_merge( array(
 				'widget_item_tags_before'    => T_('Tags').': ',
 				'widget_item_tags_after'     => '',
