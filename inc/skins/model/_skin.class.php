@@ -792,9 +792,12 @@ class Skin extends DataObject
 	 *
 	 * @param array of possible features you want to include. If empty, will default to {'b2evo_base', 'style', 'colorbox'} for backwards compatibility.
 	 */
-	function display_init( $features = array() )
+	function display_init( /*optional: $features = array() */ )
 	{
 		global $debug, $Messages, $disp;
+
+		// We get the optional arg this way for PHP7 comaptibility:
+		list( $features ) = func_get_args();
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
