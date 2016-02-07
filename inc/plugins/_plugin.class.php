@@ -287,8 +287,9 @@ class Plugin
 	 *
 	 * Should set name and description in a localizable fashion.
 	 *
-	 * This gets called on every instantiated plugin, also if it's just for
-	 * discovering the list of available plugins in the backoffice.
+	 * You DON'T NEED to include this, if you override this method.
+	 *
+	 * This gets called on every instantiated plugin, also if it's just for discovering the list of available plugins in the backoffice.
 	 *
 	 * Use this to validate Settings/requirements and/or cache them into class properties.
 	 *
@@ -301,8 +302,8 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since
-		//       b2evolution 1.9. You don't have to include this, if you override this method.
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9. 
+		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
 		{ // may have been set in plugin's constructor (which is deprecated since 1.9)

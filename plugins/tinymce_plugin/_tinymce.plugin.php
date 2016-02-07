@@ -41,7 +41,7 @@ class tinymce_plugin extends Plugin
 	var $number_of_installs = 1;
 
 
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = $this->T_('Javascript WYSIWYG editor');
 	}
