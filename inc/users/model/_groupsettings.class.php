@@ -92,7 +92,7 @@ class GroupSettings extends AbstractSettings
 
 			if( $update_permissions )
 			{	// We can update permission as there are some new permnissions
-				$this->dbupdate( $grp_ID );
+				$this->update( $grp_ID );
 			}
 
 			$DB->commit();
@@ -156,12 +156,13 @@ class GroupSettings extends AbstractSettings
 		return true;
 	}
 
+
 	/**
-	 * Update the DB based on previously recorded changes
+	 * Update all of the group permissions
 	 *
 	 * @param integer Group ID
 	 */
-	function dbupdate( $grp_ID )
+	function update( $grp_ID )
 	{
 		if( ! empty( $this->_permissions ) )
 		{	// Set temporary permissions. It is only for the new creating group
@@ -174,7 +175,7 @@ class GroupSettings extends AbstractSettings
 		}
 
 		// Update permissions
-		return parent::dbupdate();
+		return $this->dbupdate();
 	}
 
 

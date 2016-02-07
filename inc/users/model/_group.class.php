@@ -515,7 +515,7 @@ class Group extends DataObject
 
 		// Create group permissions/settings for the current group
 		$GroupSettings = & $this->get_GroupSettings();
-		$GroupSettings->dbupdate( $this->ID );
+		$GroupSettings->update( $this->ID );
 
 		$DB->commit();
 	}
@@ -534,7 +534,7 @@ class Group extends DataObject
 
 		// Update group permissions/settings of the current group
 		$GroupSettings = & $this->get_GroupSettings();
-		$GroupSettings->dbupdate( $this->ID );
+		$GroupSettings->update( $this->ID );
 
 		$DB->commit();
 	}
