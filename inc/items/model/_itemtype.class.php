@@ -372,6 +372,7 @@ class ItemType extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get the name of the ItemType
 	 * @return string
@@ -380,6 +381,7 @@ class ItemType extends DataObject
 	{
 		return $this->name;
 	}
+
 
 	/**
 	 * Check existence of specified post type ID in ityp_ID unique field.
@@ -391,8 +393,8 @@ class ItemType extends DataObject
 		global $DB;
 
 		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
+					 FROM $this->dbtablename
+					WHERE $this->dbIDname = $this->ID";
 
 		return $DB->get_var( $sql );
 	}
