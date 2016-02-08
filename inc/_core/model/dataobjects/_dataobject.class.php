@@ -677,6 +677,8 @@ class DataObject
 	/**
 	 * Check existence of specified value in unique field.
 	 *
+	 * fp> Is this function for finding duplicates to the current ID  based on some other field?
+	 *
 	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
 	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if value exists otherwise NULL/false
