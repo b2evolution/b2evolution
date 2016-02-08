@@ -639,7 +639,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 
 
