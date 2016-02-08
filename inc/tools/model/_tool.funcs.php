@@ -15,6 +15,82 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Create sample collections and display a process of creating
+ *
+ * @param integer Number of collections
+ * @param array Kind of setting "Permission management": 'simple', 'advanced'
+ * @param array Kind of setting "Allow access to": 'public', 'users', 'members'
+ */
+function tool_create_sample_collections( $num_collections, $perm_management, $allow_access )
+{
+	global $DB, $Debuglog, $Plugins, $Messages;
+
+	echo T_('Creating of the sample collections...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	$count = 1;
+	$perm_management_num = 0;
+	$perm_management_count = count( $perm_management );
+	$allow_access_num = 0;
+	$allow_access_count = count( $allow_access );
+	for( $i = 0; $i < $num_collections; $i++ )
+	{
+		// Create and save a new collection:
+		$new_Blog = new Blog( NULL );
+		$shortname = generate_random_passwd();
+		$new_Blog->set( 'owner_user_ID', 1 );
+		$new_Blog->set( 'shortname', $shortname );
+		$new_Blog->set( 'name', $shortname );
+		$new_Blog->set( 'urlname', urltitle_validate( strtolower( $shortname ), $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+
+		$new_Blog->set( 'advanced_perms', $perm_management[ $perm_management_num++ ] == 'advanced' ? 1 : 0 );
+		if( $perm_management_num > $perm_management_count - 1 )
+		{	// Reset a key to start of array:
+			$perm_management_num = 0;
+		}
+
+		$new_Blog->set_setting( 'allow_access', $allow_access[ $allow_access_num++ ] );
+		if( $allow_access_num > $allow_access_count - 1 )
+		{	// Reset a key to start of array:
+			$allow_access_num = 0;
+		}
+
+		// Define collection settings by its kind:
+		$Plugins->trigger_event( 'InitCollectionKinds', array(
+				'Blog' => & $new_Blog,
+				'kind' => 'std',
+			) );
+
+		// Do a creating new collection:
+		$new_Blog->create();
+
+		// Clear the messages because we have at least 4 messages after each $new_Blog->create() which are the same:
+		$Messages->clear();
+
+		$count++;
+
+		if( $count % 100 == 0 )
+		{	// Display a process of creating by one dot for 100 comments:
+			echo ' .';
+			evo_flush();
+		}
+
+		// Clear all debug messages, To avoid an error about full memory:
+		$Debuglog->clear( 'all' );
+	}
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d collections.'), $count - 1 ), 'success' );
+}
+
+
+/**
  * Create sample comments and display a process of creating
  *
  * @param integer Blog ID

@@ -32,6 +32,12 @@ if( !empty( $template_action ) )
 			tool_test_flush();
 			break;
 
+		case 'create_sample_collections':
+			// Create the collections and display a process of creating:
+			global $num_collections, $perm_management, $allow_access;
+			tool_create_sample_collections( $num_collections, $perm_management, $allow_access );
+			break;
+
 		case 'create_sample_comments':
 			// Create the comments and display a process of creating
 			global $blog_ID, $num_comments, $num_posts;
@@ -76,6 +82,7 @@ if( $current_User->check_perm('options', 'edit') )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=test_flush&amp;'.url_crumb('tools')).'">'.T_('Test flush').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_collections&amp;'.url_crumb('tools')).'">'.T_('Create sample collections').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_comments&amp;'.url_crumb('tools')).'">'.T_('Create sample comments').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_users&amp;'.url_crumb('tools')).'">'.T_('Create sample users').'</a></li>';

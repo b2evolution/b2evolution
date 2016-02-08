@@ -148,6 +148,32 @@ if( empty($tab) )
 			Hitlist::dbprune(); // will prune once per day, according to Settings
 			break;
 
+		case 'create_sample_collections':
+			// Create sample collections:
+			$num_collections = param( 'num_collections', 'integer', 0 );
+
+			$perm_management = param( 'perm_management', 'array:string' );
+			if( empty( $perm_management ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Permission management') ), 'error' );
+			}
+
+			$allow_access = param( 'allow_access', 'array:string' );
+			if( empty( $allow_access ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Allow access to') ), 'error' );
+			}
+
+			if( param_errors_detected() )
+			{ // param errors
+				$action = 'show_create_collections';
+				break;
+			}
+
+			// Execute a creating of collections inside template in order to see a process:
+			$template_action = 'create_sample_collections';
+			break;
+
 		case 'create_sample_comments':
 			$blog_ID = param( 'blog_ID', 'string', 0 );
 			$num_comments = param( 'num_comments', 'string', 0 );
@@ -378,6 +404,10 @@ if( empty($tab) )
 
 		case 'find_broken_slugs':
 			$AdminUI->disp_view( 'tools/views/_broken_slugs.view.php' );
+			break;
+
+		case 'show_create_collections':
+			$AdminUI->disp_view( 'tools/views/_create_collections.form.php' );
 			break;
 
 		case 'show_create_comments':
