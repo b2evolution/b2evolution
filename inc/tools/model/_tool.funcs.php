@@ -273,10 +273,11 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 /**
  * Create sample users and display a process of creating
  *
- * @param integer Group ID
- * @param integer Number of users
+ * @param array Group IDs
+ * @param integer Number of users per group
+ * @param array Kind of advanced user perms
  */
-function tool_create_sample_users( $group_ID, $num_users )
+function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perms )
 {
 	global $Messages, $DB, $Debuglog;
 
@@ -289,38 +290,41 @@ function tool_create_sample_users( $group_ID, $num_users )
 	$DB->log_queries = false;
 
 	$count = 1;
-	for( $i = 1; $i <= $num_users; $i++ )
-	{
-		$login = generate_random_passwd();
-		while( user_exists( $login ) )
-		{ // Generate new unique login
+	foreach( $user_groups as $user_group_ID )
+	{	// Create $num_users users per each group:
+		for( $i = 1; $i <= $num_users; $i++ )
+		{
 			$login = generate_random_passwd();
+			while( user_exists( $login ) )
+			{ // Generate new unique login
+				$login = generate_random_passwd();
+			}
+
+			$User = new User();
+			// Create out of range hashes for better security
+			$User->set( 'pass', generate_random_passwd() );
+			$User->set( 'login', $login );
+			$User->set( 'email', 'test_'.$i.'@test.com' );
+			$User->set( 'firstname', 'Test user '.$i );
+			$User->set( 'url', 'http://www.test-'.rand(1,3).'.com/test_user_'.$i );
+			$User->set( 'grp_ID', $user_group_ID );
+			$User->dbinsert();
+			$count++;
+
+			if( $count % 100 == 0 )
+			{ // Display a process of creating by one dot for 100 users
+				echo ' .';
+				evo_flush();
+			}
+
+			// Clear all debug messages, To avoid an error about full memory
+			$Debuglog->clear( 'all' );
 		}
-
-		$User = new User();
-		// Create out of range hashes for better security
-		$User->set( 'pass', generate_random_passwd() );
-		$User->set( 'login', $login );
-		$User->set( 'email', 'test_'.$i.'@test.com' );
-		$User->set( 'firstname', 'Test user '.$i );
-		$User->set( 'url', 'http://www.test-'.rand(1,3).'.com/test_user_'.$i );
-		$User->set( 'grp_ID', $group_ID );
-		$User->dbinsert();
-		$count++;
-
-		if( $count % 100 == 0 )
-		{ // Display a process of creating by one dot for 100 users
-			echo ' .';
-			evo_flush();
-		}
-
-		// Clear all debug messages, To avoid an error about full memory
-		$Debuglog->clear( 'all' );
 	}
 
 	echo ' OK.';
 
-	$Messages->add( sprintf( T_('Created %d users.'), $num_users ), 'success' );
+	$Messages->add( sprintf( T_('Created %d users.'), $count - 1 ), 'success' );
 }
 
 

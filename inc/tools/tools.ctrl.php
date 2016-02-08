@@ -165,7 +165,7 @@ if( empty($tab) )
 			}
 
 			if( param_errors_detected() )
-			{ // param errors
+			{	// If some param errors then stop a creating and display a form to correct:
 				$action = 'show_create_collections';
 				break;
 			}
@@ -228,10 +228,22 @@ if( empty($tab) )
 
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
-			$group_ID = param( 'group_ID', 'string', 0 );
+			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
 
-			if( ! param_check_number( 'num_users', T_('"How many users" field must be a number'), true ) )
-			{ // param errors
+			$user_groups = param( 'user_groups', 'array:integer' );
+			if( empty( $user_groups ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
+			}
+
+			/*$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
+			if( empty( $advanced_user_perms ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to use') ), 'error' );
+			}*/
+
+			if( param_errors_detected() )
+			{	// If some param errors then stop a creating and display a form to correct:
 				$action = 'show_create_users';
 				break;
 			}

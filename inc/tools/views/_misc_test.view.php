@@ -52,8 +52,8 @@ if( !empty( $template_action ) )
 
 		case 'create_sample_users':
 			// Create the users and display a process of creating
-			global $group_ID, $num_users;
-			tool_create_sample_users( $group_ID, $num_users );
+			global $user_groups, $num_users, $advanced_user_perms;
+			tool_create_sample_users( $user_groups, $num_users, $advanced_user_perms );
 			break;
 
 		case 'create_sample_hits':
