@@ -2117,6 +2117,8 @@ class Results extends Table
 
 		$page_prev_i = $this->page - 1;
 		$page_next_i = $this->page + 1;
+		$pib = add_tag_class( $this->params['page_item_before'], '**active_distance_**' );
+
 		for( $i=$min; $i<=$max; $i++)
 		{
 			if( $i == $this->page && isset( $this->params['page_item_current_before'] ) )
@@ -2125,7 +2127,9 @@ class Results extends Table
 			}
 			elseif( isset( $this->params['page_item_before'] ) )
 			{ // other page
-				$list .= $this->params['page_item_before'];
+				//$list .= $this->params['page_item_before'];
+				$active_dist = abs( $this->page - $i );
+				$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
 			}
 
 			if( $i == $this->page )

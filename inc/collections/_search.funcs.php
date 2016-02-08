@@ -114,7 +114,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
  *
  * @param string Text to score
  * @param string The search keywords to score by
- * @param integer Score multiplier 
+ * @param integer Score multiplier
  * @return integer Result score
  */
 function score_tags( $tag_name, $search_term, $score_weight = 4 )
@@ -511,7 +511,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 
 
 /**
- * Perform a scrored search 
+ * Perform a scrored search
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
@@ -681,7 +681,7 @@ function search_result_block( $params = array() )
 	$search_params = $Session->get( 'search_params' );
 	$search_result = $Session->get( 'search_result' );
 	$search_result_loaded = false;
-	if( empty( $search_params ) 
+	if( empty( $search_params )
 		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
 		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
 		|| ( $search_result === NULL ) )
@@ -694,14 +694,14 @@ function search_result_block( $params = array() )
 		// Flush first part of the page before starting search, which can be long...
 		evo_flush();
 
-		$search_params = array( 
-			'search_keywords' => $search_keywords, 
-			'search_blog' => $Blog->ID 
+		$search_params = array(
+			'search_keywords' => $search_keywords,
+			'search_blog' => $Blog->ID
 		);
 
 		// Perform new search:
 		$search_result = perform_scored_search( $search_keywords );
-		
+
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
 		$Session->set( 'search_result', $search_result );
@@ -849,13 +849,13 @@ function search_result_block( $params = array() )
 				{ // This Item was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
-				
+
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
 					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
 				);
-				
+
 				if( $params['use_editor'] )
 				{ // Get editor info to display:
 					$lastedit_User = & $Item->get_lastedit_User();
@@ -926,7 +926,7 @@ function search_result_block( $params = array() )
 				);
 				break;
 
-			default: 
+			default:
 				// Other type of result is not implemented
 
 				// TODO: maybe find collections (especially in case of aggregation)? users? files?
@@ -1040,9 +1040,11 @@ function search_page_links( $params = array() )
 
 	$page_prev_i = $current_page - 1;
 	$page_next_i = $current_page + 1;
+	$pib = add_tag_class( $params['page_item_before'], '**active_distance_**' );
+
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-		
+
 		if( $i == $current_page )
 		{ // Current page
 			echo $params['page_item_current_before'];
@@ -1060,7 +1062,9 @@ function search_page_links( $params = array() )
 			{ // Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
-			echo $params['page_item_before'];
+			//echo $params['page_item_before'];
+			$active_dist = abs( $current_page - $i );
+			echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
 			echo $params['page_item_after'];
 		}
@@ -1246,7 +1250,7 @@ function display_score_map( $params )
 					// Example: We searched [several images attached] and we matched it in:
 					//  - [This post has several images attached to it]
 					// OR we searched [wild] and we matched it in:
-					//  - [I was bewildered!] 
+					//  - [I was bewildered!]
 					//  - [A wild cat!]
 					echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
 					continue;

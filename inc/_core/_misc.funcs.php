@@ -2003,6 +2003,34 @@ function get_atags( $content )
 
 
 /**
+ * Add class to an html tag
+ *
+ * @param string HTML content
+ * @param string Class to add to the tag in the HTML
+ * @param integer Number of tags to add the class to
+ * @return string HTML content with the added class
+ */
+function add_tag_class( $content, $class, $limit = 1 )
+{
+	// Check if there's an opening tag
+	if( preg_match( '/<.*>/i', $content ) )
+	{
+		// Check if class attribute is already defined
+		if( preg_match( '/\sclass\s*=/i', $content) )
+		{ // Insert class
+			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		}
+		else
+		{
+			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
  * Get all "img" tags from the given content
  *
  * @param string content
@@ -6994,7 +7022,7 @@ function evo_error_handler()
 		$evo_last_handled_error = $error;
 	}
 
-	// fp> WTF?!? and what about warnings? 
+	// fp> WTF?!? and what about warnings?
 	// fp> And where do we die()? why is there not a debug_die() here?
 	// There should be ONE MILLION COMMENTS in this function to explain what we do!
 
@@ -7192,7 +7220,7 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 /**
  * Get html code of bootstrap dropdown element
- * 
+ *
  * @param array Params
  */
 function get_status_dropdown_button( $params = array() )
@@ -7395,7 +7423,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 
 /**
  * Compares two "PHP-standardized" version number strings
- * 
+ *
  * @param string First version number
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
@@ -7442,7 +7470,7 @@ function get_install_format_text( $text, $format = 'string' )
 	// Remove all new lines because we build them from requested format:
 	$text = str_replace( array( "\n", "\r" ), '', $text );
 
-	// Keep all URLs and display them 
+	// Keep all URLs and display them
 	$text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $text );
 
 	// Remove HTML tags from text:
