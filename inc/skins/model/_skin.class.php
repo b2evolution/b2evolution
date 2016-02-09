@@ -173,8 +173,8 @@ class Skin extends DataObject
 				'main' => 'maybe',
 				'std' => 'maybe',		// Blog
 				'photo' => 'maybe',
-				'forum' => 'maybe',
-				'manual' => 'maybe',
+				'forum' => 'no',
+				'manual' => 'no',
 				'group' => 'maybe',  // Tracker
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
