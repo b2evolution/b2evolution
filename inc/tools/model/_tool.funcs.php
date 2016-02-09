@@ -34,10 +34,8 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 	$DB->log_queries = false;
 
 	$count = 1;
-	$perm_management_num = 0;
-	$perm_management_count = count( $perm_management );
-	$allow_access_num = 0;
-	$allow_access_count = count( $allow_access );
+	$perm_management_max_index = count( $perm_management ) - 1;
+	$allow_access_max_index = count( $allow_access ) - 1;
 	for( $i = 0; $i < $num_collections; $i++ )
 	{
 		// Create and save a new collection:
@@ -47,18 +45,13 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		$new_Blog->set( 'shortname', $shortname );
 		$new_Blog->set( 'name', $shortname );
 		$new_Blog->set( 'urlname', urltitle_validate( strtolower( $shortname ), $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
-
-		$new_Blog->set( 'advanced_perms', $perm_management[ $perm_management_num++ ] == 'advanced' ? 1 : 0 );
-		if( $perm_management_num > $perm_management_count - 1 )
-		{	// Reset a key to start of array:
-			$perm_management_num = 0;
-		}
-
-		$new_Blog->set_setting( 'allow_access', $allow_access[ $allow_access_num++ ] );
-		if( $allow_access_num > $allow_access_count - 1 )
-		{	// Reset a key to start of array:
-			$allow_access_num = 0;
-		}
+		// Set random of "Permission management" from the selected options:
+		$new_Blog->set( 'advanced_perms', $perm_management[ rand( 0, $perm_management_max_index ) ] == 'advanced' ? 1 : 0 );
+		// Set random of "Allow access to" from the selected options:
+		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );
+		// Don't show a sample collection on top menu in back-office:
+		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+		$new_Blog->set( 'favorite', 0 );
 
 		// Define collection settings by its kind:
 		$Plugins->trigger_event( 'InitCollectionKinds', array(

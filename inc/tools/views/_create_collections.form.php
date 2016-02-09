@@ -32,13 +32,13 @@ $Form->begin_form( 'fform',  T_('Create sample collections for testing moderatio
 	$Form->checklist( array(
 			array( 'perm_management[]', 'simple', T_('Simple permissions'), is_null( $perm_management ) || in_array( 'simple', $perm_management ) ),
 			array( 'perm_management[]', 'advanced', T_('Advanced permissions'), is_null( $perm_management ) || in_array( 'advanced', $perm_management ) ),
-		), 'perm_management', T_('Permission management'), true );
+		), 'perm_management', T_('Permission management'), true, false, array( 'note' => T_('Please check what options should be random assigned to new sample collections.') ) );
 
 	$Form->checklist( array(
 			array( 'allow_access[]', 'public', T_('Everyone (Public Blog)'), is_null( $allow_access ) || in_array( 'public', $allow_access ) ),
 			array( 'allow_access[]', 'users', T_('Logged in users'), is_null( $allow_access ) || in_array( 'users', $allow_access ) ),
 			array( 'allow_access[]', 'members', T_('Owner / Member only'), is_null( $allow_access ) || in_array( 'members', $allow_access ) ),
-		), 'allow_access', T_('Allow access to'), true );
+		), 'allow_access', T_('Allow access to'), true, false, array( 'note' => T_('Please check what options should be random assigned to new sample collections.') ) );
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Create'), 'SaveButton' ) ) );
 
