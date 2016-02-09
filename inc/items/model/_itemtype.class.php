@@ -384,23 +384,6 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Check existence of specified post type ID in ityp_ID unique field.
-	 *
-	 * @return int ID if post type exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-					 FROM $this->dbtablename
-					WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
-	}
-
-
-	/**
 	 * Insert object into DB based on previously recorded changes.
 	 */
 	function dbinsert()
