@@ -5038,7 +5038,7 @@ class Item extends ItemLight
 			$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 		}
 
-		$this->set_last_touched_mts();
+		$this->set_last_touched_ts();
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
@@ -5262,7 +5262,7 @@ class Item extends ItemLight
 
 		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_mts'] ) ) )
 		{ // Update last_touched_mts field only if it wasn't updated yet and the datemodified will be updated for sure.
-			$this->set_last_touched_mts();
+			$this->set_last_touched_ts();
 		}
 
 		$parent_update = parent::dbupdate( $auto_track_modification );
@@ -7069,7 +7069,7 @@ class Item extends ItemLight
 	/**
 	 * Set last touched date (in microseconds, but only millisecond precision will be saved to DB)
 	 */
-	function set_last_touched_mts()
+	function set_last_touched_ts()
 	{
 		global $localmicrotimenow, $current_User;
 
@@ -7097,7 +7097,7 @@ class Item extends ItemLight
 
 		if( $update_item_date )
 		{
-			$this->set_last_touched_mts();
+			$this->set_last_touched_ts();
 			$this->dbupdate( false, false, false );
 		}
 
