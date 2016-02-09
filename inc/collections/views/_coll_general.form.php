@@ -18,9 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-
-
 global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales;
+global $Settings;
 
 $Form = new Form();
 
@@ -65,6 +64,31 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
 					.T_('Change collection type / Reset')
 			.'</a></p>';
+		}
+	}
+	if( $edited_Blog->get( 'type' ) == 'main' )
+	{
+		$set_as_label_shown = false;
+		if( ! $Settings->get( 'info_blog_ID' ) )
+		{
+			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
+			$set_as_label_shown = true;
+			$Form->checkbox( 'set_as_info_blog', param( 'set_as_info_blog', 'integer', 0 ), $set_collection_label, T_('Collection for info pages') );
+		}
+
+		if( ! $Settings->get( 'login_blog_ID' ) )
+		{
+
+			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
+			$set_as_label_shown = true;
+			$Form->checkbox( 'set_as_login_blog', param( 'set_as_login_blog', 'integer', 0 ), $set_collection_label, T_('Collection for login/registration') );
+		}
+
+		if( ! $Settings->get( 'msg_blog_ID' ) )
+		{
+			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
+			$set_as_label_shown = true;
+			$Form->checkbox( 'set_as_msg_blog', param( 'set_as_msg_blog', 'integer', 0 ), $set_collection_label, T_('Collection for profiles/messaging') );
 		}
 	}
 $Form->end_fieldset();

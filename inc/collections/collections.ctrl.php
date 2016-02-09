@@ -116,6 +116,26 @@ switch( $action )
 			// create the new blog
 			$edited_Blog->create( $kind );
 
+			global $Settings;
+
+			param( 'set_as_info_blog', 'boolean' );
+			param( 'set_as_login_blog', 'boolean' );
+			param( 'set_as_msg_blog', 'boolean' );
+
+			if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+			{
+				$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+			{
+				$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+			{
+				$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+			}
+			$Settings->dbupdate();
+
 			// create demo contents for the new blog
 			param( 'create_demo_contents', 'boolean' );
 			param( 'blog_locale', 'string' );
