@@ -45,11 +45,130 @@ class RestApi
 	 */
 	public function __construct( $request )
 	{
+		// Authenticate a user:
+		$this->user_authentication();
+
+		// Set arguments from request string:
 		$this->args = explode( '/', $request );
 
 		if( isset( $this->args[0] ) )
 		{	// Initialize module name:
 			$this->module = $this->args[0];
+		}
+	}
+
+
+	/**
+	 * Log in a user
+	 *
+	 * @param string Login
+	 * @param string Password
+	 * @return boolean TRUE on success log in, HALT on error
+	 */
+	private function user_log_in( $entered_login, $entered_password )
+	{
+		global $current_User, $failed_logins_lockout, $UserSettings, $Settings, $Session, $localtimenow;
+
+		$UserCache = & get_UserCache();
+
+		// Note: login and password cannot include ' or " or > or <
+		$entered_login = utf8_strtolower( utf8_strip_tags( remove_magic_quotes( $entered_login ) ) );
+		$entered_password = utf8_strip_tags( remove_magic_quotes( $entered_password ) );
+
+		if( is_email( $entered_login ) )
+		{	// We have an email address instead of login name
+			// Get user by email and password:
+			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $entered_login, $entered_password );
+		}
+		elseif( is_valid_login( $entered_login ) )
+		{	// Make sure that we can load the user:
+			$User = & $UserCache->get_by_login( $entered_login );
+		}
+
+		if( empty( $User ) )
+		{	// Wrong authentication because user is not found by requested login/email and password in DB:
+			if( is_logged_in() )
+			{	// Logout current user:
+				logout();
+			}
+			$this->halt( T_('Wrong login/password.'), 'wrong_login_pass', '403' );
+			// Exit here.
+		}
+
+		if( is_logged_in() )
+		{	// If current user is logged in
+			if( $User->ID == $current_User->ID )
+			{	// The requested user is already logged in, Don't relog in it on each request:
+				return true;
+				// Exit here.
+			}
+			else
+			{	// Log out current user because we should log in new user:
+				logout();
+			}
+		}
+
+		// Check user login attempts:
+		$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
+		$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
+		if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+		{	// User already has a maximum value of the attempts:
+			$first_attempt = explode( '|', $login_attempts[0] );
+			if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
+			{	// User has used 9 attempts during X minutes, Display error and Refuse login
+				$this->halt( sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) ), 'login_attempt_failed', 403 );
+				// Exit here.
+			}
+		}
+
+		if( $User->pass != md5( $User->salt.$entered_password, true ) )
+		{	// The entered password is not right for requested user
+			// Save new login attempt into DB:
+			if( count( $login_attempts ) == 9 )
+			{ // Unset first attempt to clear a space for new attempt
+				unset( $login_attempts[0] );
+			}
+			$login_attempts[] = $localtimenow.'|'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
+			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
+			$UserSettings->dbupdate();
+
+			$this->halt( T_('Wrong login/password.'), 'wrong_login_pass', '403' );
+			// Exit here.
+		}
+
+		if( $User->check_status( 'is_closed' ) )
+		{	// User account was closed, don't log in it:
+			$this->halt( T_('This account is closed. You cannot log in.'), 'closed_account', '403' );
+			// Exit here.
+		}
+		elseif( $Settings->get( 'system_lock' ) && ! $User->check_perm( 'users', 'edit' ) )
+		{ // System is locked for maintenance and current user has no permission to log in this mode
+			$this->halt( T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.'), 'system_maintenance', '403' );
+			// Exit here.
+		}
+
+		// All checks are good, so we can log in the requested user:
+		$current_User = $User;
+		$Session->set_User( $current_User );
+
+		if( ! empty( $login_attempts ) )
+		{	// Clear the attempts list:
+			$UserSettings->delete( 'login_attempts', $current_User->ID );
+			$UserSettings->dbupdate();
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Authenticate a user
+	 */
+	private function user_authentication()
+	{
+		if( isset( $_SERVER, $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Do basic HTTP authentication:
+			$this->user_log_in( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] );
 		}
 	}
 
