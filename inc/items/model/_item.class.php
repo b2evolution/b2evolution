@@ -7021,6 +7021,23 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get creation date (datetime) of Item
+	 *
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_datecreated( $format = '', $useGM = false )
+	{
+		if( empty( $format ) )
+		{
+			$format = locale_datefmt();
+		}
+
+		return mysql2date( $format, $this->datecreated, $useGM );
+	}
+
+
+	/**
 	 * Get last touch date (datetime) of Item
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
@@ -7028,12 +7045,12 @@ class Item extends ItemLight
 	 */
 	function get_last_touch_date( $format = '', $useGM = false )
 	{
-		if( empty($format) )
+		if( empty( $format ) )
 		{
 			$format = locale_datefmt();
 		}
 
-		return mysql2date( $format, $this->last_touched_mts, $useGM );
+		return date_i18n( $format, $this->last_touched_mts, $useGM );
 	}
 
 
@@ -7057,7 +7074,7 @@ class Item extends ItemLight
 	 */
 	function last_touch_time( $format = '', $useGM = false )
 	{
-		if( empty($format) )
+		if( empty( $format ) )
 		{
 			$format = locale_timefmt();
 		}

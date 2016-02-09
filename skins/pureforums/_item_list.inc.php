@@ -117,7 +117,7 @@ else
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Started by');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+				echo ', '.$Item->get_datecreated( 'D M j, Y H:i' );
 				echo '</div>';
 			?></td>
 			<td class="ft_count"><?php

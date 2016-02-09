@@ -99,15 +99,15 @@ skin_widget( array(
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Thread started by');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+				echo ', '.$Item->get_datecreated( 'D M j, Y H:i' );
 				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.date( 'D M j, Y H:i', $Item->get( 'last_touched_mts' ) )
+						.T_('Last touched:').' '.$Item->get_last_touch_date( 'D M j, Y H:i' )
 					.'</span>';
 				echo '</div>';
 				// Author info - shrinked:
 				echo '<div class="ft_author_info shrinked">'.T_('Started by');
 				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
+				echo ', '.$Item->get_datecreated( 'm/j/y' );
 				echo '</div>';
 		?>
 	</div>

@@ -109,12 +109,12 @@ elseif( $comments_number > 25 )
 					// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
 					echo T_('Started by');
 					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-					echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+					echo ', '.$Item->get_datecreated( 'D M j, Y H:i' );
 					echo '</div>';
 					// Super small screen size Author info:
 					echo '<div class="ft_author_info shrinked ellipsis">'.T_('By');
 					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-					echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
+					echo ', '.$Item->get_datecreated( 'M j, Y' );
 				?>
 				</div>
 			</div>
