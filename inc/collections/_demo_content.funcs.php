@@ -680,8 +680,16 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		// =======================================================================================================
+		case 'std':
 		case 'blog_a':
-			$blog_shortname = 'Blog A';
+			if( $collection_type == 'blog_a' )
+			{
+				$blog_shortname = 'Blog A';
+			}
+			else
+			{
+				$blog_shortname = 'Blog';
+			}
 			$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
 			$blog_stub = 'a';
 			$blog_a_ID = create_blog(
@@ -702,7 +710,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		// =======================================================================================================
-		case 'std':
 		case 'blog_b':
 			// Create group for Blog b
 			$blogb_Group = new Group(); // COPY !
@@ -841,6 +848,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$timestamp = time();
 	$item_IDs = array();
 	$additional_comments_item_IDs = array();
+	$demo_users = get_demo_users( $use_demo_user );
 
 	switch( $collection_type )
 	{
@@ -942,6 +950,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			break;
 
 		// =======================================================================================================
+		case 'std':
 		case 'blog_a':
 			// Sample categories
 			$cat_ann_a = cat_create( T_('Welcome'), 'NULL', $blog_ID, NULL, true );
@@ -1105,7 +1114,6 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			break;
 
 		// =======================================================================================================
-		case 'std':
 		case 'blog_b':
 			// Sample categories
 			$cat_ann_b = cat_create( T_('Announcements'), 'NULL', $blog_ID );
@@ -1883,7 +1891,6 @@ Hello
 			$tasks = 'ABCDEFGHIJKLMNOPQRST';
 			$priorities = array( 1, 2, 3, 4, 5 );
 			$task_status = array( 1, 2 ); // New, In Progress
-			$demo_users = get_demo_users( NULL, NULL );
 
 			// Check demo users if they can be assignee
 			$allowed_assignee = array();
@@ -1958,7 +1965,7 @@ Hello
 	}
 
 	// Create demo comments
-	$comment_users = $use_demo_user ? get_demo_users() : NULL;
+	$comment_users = $use_demo_user ? get_demo_users( $use_demo_user ) : NULL;
 	foreach( $item_IDs as $item_ID )
 	{
 		create_demo_comment( $item_ID, $comment_users, 'published');
@@ -1967,23 +1974,18 @@ Hello
 
 	if( $test_install_all_features && count( $additional_comments_item_IDs ) && $use_demo_user )
 	{ // Create the additional comments when we install all features
-		$demo_users = array( 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
 			foreach( $demo_users as $demo_user )
 			{ // Insert the comments from each user
-				$demo_user = create_demo_user( $demo_user );
-				if( $demo_user )
-				{
-					$now = date( 'Y-m-d H:i:s' );
-					$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-							comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
-							VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $demo_user->ID ).', "127.0.0.1", '
-							.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
+				$now = date( 'Y-m-d H:i:s' );
+				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
+						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+						VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $demo_user->ID ).', "127.0.0.1", '
+						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
-				}
 			}
 		}
 	}

@@ -279,8 +279,8 @@ class Blog extends DataObject
 
 			case 'photo':
 				$this->set( 'type', 'photo' );
-				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
+				$this->set( 'name', empty($name) ? T_('Photos') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photos') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
@@ -299,16 +299,16 @@ class Blog extends DataObject
 
 			case 'group':
 				$this->set( 'type', 'group' );
-				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
+				$this->set( 'name', empty($name) ? T_('Tracker Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
 				break;
 
 			case 'forum':
 				$this->set( 'type', 'forum' );
-				$this->set( 'name', empty($name) ? T_('My forum') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
+				$this->set( 'name', empty($name) ? T_('Forums Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forums') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
 				$this->set( 'advanced_perms', 1 );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -337,7 +337,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$this->set( 'type', 'manual' );
-				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'name', empty($name) ? T_('Manual Title') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -361,7 +361,7 @@ class Blog extends DataObject
 			case 'std':
 			default:
 				$this->set( 'type', 'std' );
-				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
