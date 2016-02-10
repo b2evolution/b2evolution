@@ -17,7 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-
 global $admin_url, $Session;
 
 $skin_type = param( 'skin_type', 'string', 'normal' );
@@ -28,16 +27,16 @@ $display_same_as_normal = false;
 switch( $skin_type )
 {
 	case 'normal':
-		$block_item_Widget->title = T_('Choose a skin').get_manual_link( 'skins-for-this-blog' );
+		$block_item_Widget->title = sprintf( T_('Recommended skins for a "%s" collection'), $edited_Blog->type ).get_manual_link( 'skins-for-this-blog' );
 		break;
 
 	case 'mobile':
-		$block_item_Widget->title = T_('Choose a Mobile Phone skin');
+		$block_item_Widget->title = sprintf( T_('Recommended Mobile Phone skins for a "%s" collection'), $edited_Blog->type ).get_manual_link( 'skins-for-this-blog' );
 		$display_same_as_normal = true;
 		break;
 
 	case 'tablet':
-		$block_item_Widget->title = T_('Choose a Tablet skin');
+		$block_item_Widget->title = sprintf( T_('Recommended Tablet skins for a "%s" collection'), $edited_Blog->type).get_manual_link( 'skins-for-this-blog' );
 		$display_same_as_normal = true;
 		break;
 
@@ -54,6 +53,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
+$SkinCache = & get_SkinCache();
+$SkinCache->load_all();
+
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="skin_selector_block">';
@@ -65,9 +67,6 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 				.T_('Install New').' &raquo;'
 			.'</a>';
 	}
-
-	$SkinCache = & get_SkinCache();
-	$SkinCache->load_all();
 
 	if( $display_same_as_normal )
 	{
@@ -88,6 +87,11 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	{
 		if( $iterator_Skin->type != $skin_type )
 		{	// This skin cannot be used here...
+			continue;
+		}
+
+		if( $iterator_Skin->supports_coll_kind( $edited_Blog->type ) != 'yes' )
+		{
 			continue;
 		}
 
@@ -113,6 +117,91 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<div class="clear"></div>';
 	echo '</div>';
 
+$block_item_Widget->disp_template_replaced( 'block_end' );
+
+$block_item_Widget = new Widget( 'block_item' );
+$block_item_Widget->title = sprintf( T_('Skins that are not optimal for a "%s" collection'), $edited_Blog->type );
+$block_item_Widget->disp_template_replaced( 'block_start' );
+	echo '<div class="skin_selector_block">';
+	$fadeout_array = $Session->get( 'fadeout_array' );
+
+	$SkinCache->rewind();
+	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
+	{
+		if( $iterator_Skin->type != $skin_type )
+		{	// This skin cannot be used here...
+			continue;
+		}
+
+		if( $iterator_Skin->supports_coll_kind( $edited_Blog->type ) != 'partial' )
+		{
+			continue;
+		}
+
+		$selected = ( $current_skin_ID == $iterator_Skin->ID );
+		$blog_skin_param = $skin_type.'_skin_ID=';
+		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
+		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($iterator_Skin->folder) );
+
+		$disp_params = array(
+			'function'     => 'select',
+			'selected'     => $selected,
+			'select_url'   => $select_url,
+			'function_url' => $preview_url,
+			'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
+		);
+		// Display skinshot:
+		Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
+	}
+
+	// Flush fadeout
+	$Session->delete( 'fadeout_array');
+
+	echo '<div class="clear"></div>';
+	echo '</div>';
+
+$block_item_Widget->disp_template_replaced( 'block_end' );
+
+$block_item_Widget = new Widget( 'block_item' );
+$block_item_Widget->title = sprintf( T_('Other skins that might work for a "%s" collection'), $edited_Blog->type );
+$block_item_Widget->disp_template_replaced( 'block_start' );
+	echo '<div class="skin_selector_block">';
+	$fadeout_array = $Session->get( 'fadeout_array' );
+
+	$SkinCache->rewind();
+	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
+	{
+		if( $iterator_Skin->type != $skin_type )
+		{	// This skin cannot be used here...
+			continue;
+		}
+
+		if( $iterator_Skin->supports_coll_kind( $edited_Blog->type ) != 'maybe' )
+		{
+			continue;
+		}
+
+		$selected = ( $current_skin_ID == $iterator_Skin->ID );
+		$blog_skin_param = $skin_type.'_skin_ID=';
+		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
+		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($iterator_Skin->folder) );
+
+		$disp_params = array(
+			'function'     => 'select',
+			'selected'     => $selected,
+			'select_url'   => $select_url,
+			'function_url' => $preview_url,
+			'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
+		);
+		// Display skinshot:
+		Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
+	}
+
+	// Flush fadeout
+	$Session->delete( 'fadeout_array');
+
+	echo '<div class="clear"></div>';
+	echo '</div>';
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 ?>
