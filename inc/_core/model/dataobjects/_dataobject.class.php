@@ -392,7 +392,7 @@ class DataObject
 	 */
 	function dbupdate()
 	{
-		$this->dbupdate_worker();
+		return $this->dbupdate_worker();
 	}
 
 
@@ -612,7 +612,7 @@ class DataObject
 	 */
 	function dbdelete()
 	{
-		$this->dbdelete_worker();
+		return $this->dbdelete_worker();
 	}
 
 
