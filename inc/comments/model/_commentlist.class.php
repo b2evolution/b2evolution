@@ -781,25 +781,25 @@ class CommentList2 extends DataObjectList2
 		 * @var DB
 		 */
 		global $DB;
-		global $Debuglog, $Settings, $localtimenow;
+		global $Debuglog, $Settings, $localtimenow, $localmicrotimenow;
 
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_empty_trash_done' );
-		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
+		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
 			return T_('Pruning of recycled comments has already been done today');
 		}
 
-		$time_prune_before = $localtimenow - ( $Settings->get('auto_empty_trash') * 86400 ); // 1 day = 86400 seconds
+		$time_prune_before = $localmicrotimenow - ( $Settings->get( 'auto_empty_trash' ) * 86400 ); // 1 day = 86400 seconds
 
 		$rows_affected = Comment::db_delete_where( 'Comment', 'comment_status = "trash"
-			AND comment_last_touched_ts < '.$DB->quote( date2mysql( $time_prune_before ) ) );
+			AND comment_last_touched_mts < '.$DB->quote( $time_prune_before ) );
 		$Debuglog->add( 'CommentList2::dbprune(): autopruned '.$rows_affected.' rows from T_comments.', 'request' );
 
 		// Optimizing tables
 		$DB->query('OPTIMIZE TABLE T_comments');
 
-		$Settings->set( 'auto_empty_trash_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
+		$Settings->set( 'auto_empty_trash_done', date( 'Y-m-d H:i:s', $localtimenow ) ); // save exact datetime
 		$Settings->dbupdate();
 
 		return ''; /* ok */

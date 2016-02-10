@@ -2785,10 +2785,11 @@ Hello
 			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
+				$now_mts = microtime( true );
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+						comment_date, comment_last_touched_mts, comment_content, comment_renderers, comment_notif_status )
 					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
-						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
+						.$DB->quote( $now ).', '.$DB->quote( $now_mts ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
@@ -2968,13 +2969,14 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	}
 
 	$now = date( 'Y-m-d H:i:s' );
+	$now_mts = microtime( true );
 
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
-			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+			comment_date, comment_last_touched_mts, comment_content, comment_renderers, comment_notif_status )
 		VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
+			.$DB->quote( $now ).', '.$DB->quote( $now_mts ).', '.$DB->quote( $content ).', "default", "finished" )' );
 }
 
 

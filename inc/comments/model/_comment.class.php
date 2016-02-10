@@ -186,7 +186,7 @@ class Comment extends DataObject
 	 * Date when comment was edited last time (timestamp)
 	 * @var integer
 	 */
-	var $last_touched_ts;
+	var $last_touched_mts;
 
 	/**
 	 * Constructor
@@ -227,7 +227,7 @@ class Comment extends DataObject
 			$this->author_IP = $db_row->comment_author_IP;
 			$this->IP_ctry_ID = $db_row->comment_IP_ctry_ID;
 			$this->date = $db_row->comment_date;
-			$this->last_touched_ts = $db_row->comment_last_touched_ts;
+			$this->last_touched_mts = $db_row->comment_last_touched_mts;
 			$this->content = $db_row->comment_content;
 			$this->renderers = $db_row->comment_renderers;
 			$this->rating = $db_row->comment_rating;
@@ -4037,23 +4037,23 @@ class Comment extends DataObject
 
 
 	/**
-	 * Set field last_touched_ts
+	 * Set last touched date (in microseconds, but only millisecond precision will be saved to DB)
 	 */
 	function set_last_touched_date()
 	{
-		global $localtimenow;
-		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
+		global $localmicrotimenow;
+		$this->set_param( 'last_touched_mts', 'number', $localmicrotimenow );
 	}
 
 
 	/**
-	 * Update field last_touched_ts
+	 * Update field last_touched_mts
 	 *
 	 * @param boolean update comment's post last touched ts as well or not
 	 */
 	function update_last_touched_date( $update_item_date = true )
 	{
-		global $localtimenow, $current_User;
+		global $localmicrotimenow, $current_User;
 
 		if( $this->is_meta() )
 		{ // Don't touch Item when this Comment is meta
@@ -4067,11 +4067,9 @@ class Comment extends DataObject
 			return;
 		}
 
-		$timestamp = date2mysql( $localtimenow );
-
-		if( $this->ID && ( $this->last_touched_ts !== $timestamp ) )
-		{ // If the comment was not deleted then update last touched date
-			$this->set_param( 'last_touched_ts', 'date', $timestamp );
+		if( $this->ID && ( settype( $this->last_touched_mts, 'string' ) !== settype( $localmicrotimenow, 'string' ) ) )
+		{	// If the comment was not deleted then update last touched date:
+			$this->set_last_touched_date();
 			$this->dbupdate();
 		}
 

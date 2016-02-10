@@ -41,7 +41,7 @@ $display_errors_on_production = true;
 $script_start_time = time();
 $localtimenow = $script_start_time; // used e.g. for post_datemodified (sample posts)
 $servertimenow = $script_start_time; // used e.g. for itpr_datemodified, cmpr_datemodified, mspr_datemodified (sample data)
-$localmicrotimenow = microtime( true ); // used e.g. for post_last_touched_mts (sample posts)
+$localmicrotimenow = microtime( true ); // used e.g. for post_last_touched_mts (sample posts) and comment_last_touched_mts (sample comments)
 
 if( ! $config_is_done )
 {	// Base config is not done yet, try to guess some values needed for correct display:

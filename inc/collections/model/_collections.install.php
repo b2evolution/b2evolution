@@ -198,7 +198,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_author_IP          varchar(45) COLLATE ascii_general_ci NOT NULL default '',"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
 			comment_IP_ctry_ID         int(10) unsigned NULL,
 			comment_date               datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			comment_last_touched_mts   DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0,
 			comment_content            text NOT NULL,
 			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			comment_rating             TINYINT(1) NULL DEFAULT NULL,

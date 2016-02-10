@@ -6590,6 +6590,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  AND cset_value = "last_touched_ts"' );
 		task_end();
 
+		task_begin( 'Upgrade table comments... ' );
+		db_add_col( 'T_comments', 'comment_last_touched_mts', 'DOUBLE(13,3) UNSIGNED NOT NULL DEFAULT 0 AFTER comment_last_touched_ts' );
+		$DB->query( 'UPDATE T_comments
+			SET comment_last_touched_mts = UNIX_TIMESTAMP( comment_last_touched_ts )' );
+		db_drop_col( 'T_comments', 'comment_last_touched_ts' );
+		task_end();
+
 		// set_upgrade_checkpoint( '11500' );
 	}
 
