@@ -7250,10 +7250,43 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 11715, 'Replace widgets "Simple Sidebar Links list" and "Simple Linkblog Links list" with "Universal Item list"...' ) )
 	{	// part of 6.7.0
-		$DB->query( 'UPDATE T_widget
-			  SET wi_code = "coll_item_list"
+		$old_widgets = $DB->get_results( 'SELECT wi_ID, wi_code, wi_params
+			 FROM T_widget
 			WHERE wi_type = "core"
-			  AND wi_code IN ( "linkblog", "coll_link_list" )' );
+			  AND wi_code IN ( "linkblog", "coll_link_list" )', OBJECT,
+			'Get widgets "linkblog" and "coll_link_list" to replace them with "coll_item_list"' );
+		foreach( $old_widgets as $old_widget )
+		{
+			// Get current params of each widget to don't miss default settings:
+			$widget_params = empty( $old_widget->wi_params ) ? array() : unserialize( $old_widget->wi_params );
+			// Rewrite default params with existing widget params from DB:
+			switch( $old_widget->wi_code )
+			{
+				case 'linkblog':
+					// Keep default params for old widget "Simple Linkblog Links list":
+					$widget_params = array_merge( array(
+							'title'                => T_('Linkblog'),
+							'item_group_by'        => 'chapter',
+							'item_title_link_type' => 'auto',
+							'item_type'            => '',
+							'item_type_usage'      => 'special',
+						), $widget_params );
+					break;
+
+				case 'coll_link_list':
+					// Keep default params for old widget "Simple Sidebar Links list":
+					$widget_params = array_merge( array(
+							'title'                => T_('Links'),
+							'item_title_link_type' => 'auto',
+							'item_type'            => '',
+							'item_type_usage'      => 'special',
+						), $widget_params );
+					break;
+			}
+			$DB->query( 'UPDATE T_widget
+					SET wi_code = "coll_item_list", wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$old_widget->wi_ID );
+		}
 		upg_task_end();
 	}
 
