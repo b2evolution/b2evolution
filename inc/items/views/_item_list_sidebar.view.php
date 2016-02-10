@@ -295,6 +295,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 				'link_type' => 'context',
 				'display_checkboxes' => 1,
 				'show_locked' => true,
+				'max_colls' => 15,
 			) );
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 
