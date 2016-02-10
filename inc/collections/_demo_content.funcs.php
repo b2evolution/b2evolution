@@ -370,7 +370,14 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 	// Add current user to the demo organization
 	if( $add_current_user && $demo_org_ID && isset( $current_User ) )
 	{
-		$current_User->update_organizations( array( $demo_org_ID ), array(), true);
+		// Get current user's organization data
+		$org_roles = array();
+		$org_data = $current_User->get_organizations_data();
+		if( isset( $org_data[$demo_org_ID] ) )
+		{
+			$org_roles = array( $org_data[$demo_org_ID]['role'] );
+		}
+		$current_User->update_organizations( array( $demo_org_ID ), $org_roles, true);
 	}
 
 	return $Organization;
@@ -1965,7 +1972,7 @@ Hello
 	}
 
 	// Create demo comments
-	$comment_users = $use_demo_user ? get_demo_users( $use_demo_user ) : NULL;
+	$comment_users = $use_demo_user ? $demo_users : NULL;
 	foreach( $item_IDs as $item_ID )
 	{
 		create_demo_comment( $item_ID, $comment_users, 'published');

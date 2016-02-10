@@ -69,11 +69,25 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 	if( $edited_Blog->get( 'type' ) == 'main' )
 	{
 		$set_as_label_shown = false;
+		$set_as_checked = 0;
+
+		switch( $action )
+		{
+			case 'edit':
+				$set_as_checked = 0;
+				break;
+
+			case 'new-name':
+			case 'create':
+				$set_as_checked = 1;
+				break;
+		}
+
 		if( ! $Settings->get( 'info_blog_ID' ) )
 		{
 			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
 			$set_as_label_shown = true;
-			$Form->checkbox( 'set_as_info_blog', param( 'set_as_info_blog', 'integer', 0 ), $set_collection_label, T_('Collection for info pages') );
+			$Form->checkbox( 'set_as_info_blog', param( 'set_as_info_blog', 'integer', $set_as_checked ), $set_collection_label, T_('Collection for info pages') );
 		}
 
 		if( ! $Settings->get( 'login_blog_ID' ) )
@@ -81,14 +95,14 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 
 			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
 			$set_as_label_shown = true;
-			$Form->checkbox( 'set_as_login_blog', param( 'set_as_login_blog', 'integer', 0 ), $set_collection_label, T_('Collection for login/registration') );
+			$Form->checkbox( 'set_as_login_blog', param( 'set_as_login_blog', 'integer', $set_as_checked ), $set_collection_label, T_('Collection for login/registration') );
 		}
 
 		if( ! $Settings->get( 'msg_blog_ID' ) )
 		{
 			$set_collection_label = $set_as_label_shown ? '' : T_('Automatically set as');
 			$set_as_label_shown = true;
-			$Form->checkbox( 'set_as_msg_blog', param( 'set_as_msg_blog', 'integer', 0 ), $set_collection_label, T_('Collection for profiles/messaging') );
+			$Form->checkbox( 'set_as_msg_blog', param( 'set_as_msg_blog', 'integer', $set_as_checked ), $set_collection_label, T_('Collection for profiles/messaging') );
 		}
 	}
 $Form->end_fieldset();
