@@ -129,6 +129,13 @@ class coll_category_list_Widget extends ComponentWidget
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
 																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
+			'max_colls' => array(
+					'type' => 'text',
+					'label' => T_('Max collections'),
+					'note' => T_('This allows to limit processing time and list length in case of large aggregated collections.'),
+					'defaultvalue' => 15,
+					'size' => 2,
+				),
 			'start_level' => array(
 					'type' => 'text',
 					'label' => T_('Start level'),
@@ -295,8 +302,17 @@ class coll_category_list_Widget extends ComponentWidget
 			{
 				$coll_ID_array = sanitize_id_list($aggregate_coll_IDs, true);
 			}
-			foreach( $coll_ID_array as $curr_blog_ID )
+
+			// Get max allowed collections for this widget:
+			$max_colls = intval( $this->disp_params['max_colls'] );
+
+			foreach( $coll_ID_array as $c => $curr_blog_ID )
 			{
+				if( $max_colls > 0 && $max_colls <= $c )
+				{	// Limit by max collections number:
+					break;
+				}
+
 				// Get blog:
 				$loop_Blog = & $BlogCache->get_by_ID( $curr_blog_ID, false );
 				if( empty($loop_Blog) )

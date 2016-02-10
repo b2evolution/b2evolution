@@ -2430,6 +2430,10 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
+			// Reset "all_loaded" flag in order to allow get new created collection by ID:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->all_loaded = false;
+
 			if( $set_default_blog_ID )
 			{ // Use this blog as default because it is probably first created
 				$Settings->set( 'default_blog_ID', $this->ID );
