@@ -205,6 +205,25 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 
 
 	/**
+	 * Check a file for correct extension
+	 *
+	 * @param File
+	 * @return boolean true if extension of file supported by plugin
+	 */
+	function is_url_supported( $url )
+	{
+		if( preg_match( '#\.([a-z0-9]+)(\?.+)?$#', $url, $match ) )
+		{
+			$url_extenssion = strtolower( $match[1] );
+
+			return in_array( $url_extenssion, $this->allow_ext );
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Event handler: Called when displaying item attachment.
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
@@ -225,54 +244,24 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 
 		if( $File->exists() )
 		{
-			/**
-			 * @var integer A number to assign each video/ausio player new id attribute
-			 */
-			global $html5_mediaelementjs_number;
-			$html5_mediaelementjs_number++;
-
-			if( $in_comments )
-			{
-				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
-			}
-
-			$params['data'] .= '<div class="mediajs_block">';
-
-			if( $File->is_audio() )
-			{	// Audio file:
-				$params['data'] .= '<audio class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'">'.
-					'<source src="'.$File->get_url().'" type="'.$this->get_file_mimetype( $File ).'" align="center" />'.
-				'</audio>';
+			if( ! $File->is_audio() && $placeholder_File = & $Item->get_placeholder_File( $File ) )
+			{	// Get placeholder/poster when image file is linked to the Item with same name as current video File:
+				$video_poster_url = $placeholder_File->get_url();
 			}
 			else
-			{	// Video file:
-				if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
-				{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
-					$video_placeholder_attr = ' poster="'.$placeholder_File->get_url().'"';
-				}
-				else
-				{ // No placeholder for current video File
-					$video_placeholder_attr = '';
-				}
-
-				$params['data'] .= '<video class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'"'.$video_placeholder_attr.'>'.
-					'<source src="'.$File->get_url().'" type="'.$this->get_file_mimetype( $File ).'" align="center" />'.
-				'</video>';
+			{	// No poster file
+				$video_poster_url = '';
 			}
 
-			if( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) )
-			{ // Display caption
-				$params['data'] .= '<div class="mediajs_text">'.$File->get( 'desc' ).'</div>';
-			}
-
-			if( $this->get_coll_setting( 'allow_download', $item_Blog ) )
-			{	// Allow to download the files:
-				$params['data'] .= '<div class="mediajs_text"><a href="'.$File->get_url().'">'
-						.( $File->is_audio() ? T_('Download this audio') : T_('Download this video') )
-					.'</a></div>';
-			}
-
-			$params['data'] .= '</div>';
+			// Get video/audio player:
+			$params['data'] .= $this->get_player( array(
+					'before'           => $in_comments ? '<div style="clear: both; height: 0px; font-size: 0px"></div>' : '',
+					'Blog'             => $item_Blog,
+					'file_type'        => $File->is_audio() ? 'audio' : 'video',
+					'file_url'         => $File->get_url(),
+					'file_caption'     => ( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) ) ? $File->get( 'desc' ) : '',
+					'video_poster_url' => $video_poster_url,
+				) );
 
 			return true;
 		}
@@ -294,6 +283,112 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 
 		return $this->RenderItemAttachment( $params, true );
 	}
+
+
+	/**
+	 * Event handler: Called when displaying item attachment.
+	 *
+	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
+	 * @param boolean TRUE - when render in comments
+	 * @return boolean true if plugin rendered this attachment
+	 */
+	function RenderURL( & $params )
+	{
+		global $Blog;
+
+		if( empty( $params['url'] ) || ! $this->is_url_supported( $params['url'] ) )
+		{	// This file is not supported by plugin, Exit here:
+			return false;
+		}
+
+		$player_Blog = NULL;
+		if( ! empty( $params['Item'] ) )
+		{	// Get collection of the Item;
+			$player_Blog = & $params['Item']->get_Blog();
+		}
+		else
+		{	// Use current collection:
+			global $Blog;
+			$player_Blog = $Blog;
+		}
+
+		// Get video/audio player:
+		$params['data'] .= $this->get_player( array(
+				'file_url'  => $params['url'],
+				'file_type' => 'audio',
+				'Blog'      => $player_Blog,
+			) );
+
+		return true;
+	}
+
+
+	/**
+	 * Get video/audio player
+	 *
+	 * @param array Params
+	 * @return string HTML text of player
+	 */
+	function get_player( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'           => '',
+				'after'            => '',
+				'before_player'    => '<div class="mediajs_block">',
+				'after_player'     => '</div>',
+				'Blog'             => NULL,
+				'file_type'        => 'video', // 'audio' | 'video'
+				'file_url'         => '',
+				'file_caption'     => '',
+				'video_poster_url' => '',
+			), $params );
+
+		/**
+		 * @var integer A number to assign each video/ausio player new id attribute
+		 */
+		global $html5_mediaelementjs_number;
+		$html5_mediaelementjs_number++;
+
+		$r = $params['before'];
+
+		$r .= $params['before_player'];
+
+		if( $params['file_type'] == 'audio' )
+		{	// Audio file:
+			$r .= '<audio class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'">'.
+				'<source src="'.$params['file_url'].'" type="'.$this->get_file_mimetype( $params['file_url'] ).'" align="center" />'.
+			'</audio>';
+		}
+		else
+		{	// Video file:
+
+			// Initialize placeholder/poster attribute:
+			$video_placeholder_attr = empty( $params['video_poster_url'] ) ? '' : ' poster="'.$params['video_poster_url'].'"';
+
+			$r .= '<video class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'"'.$video_placeholder_attr.'>'.
+				'<source src="'.$params['file_url'].'" type="'.$this->get_file_mimetype( $params['file_url'] ).'" align="center" />'.
+			'</video>';
+		}
+
+		if( ! empty( $params['file_caption'] ) )
+		{	// Display caption:
+			$r .= '<div class="mediajs_text">'.$params['file_caption'].'</div>';
+		}
+
+		if( $params['Blog'] && $this->get_coll_setting( 'allow_download', $params['Blog'] ) )
+		{	// Allow to download the files:
+			$r .= '<div class="mediajs_text"><a href="'.$params['file_url'].'">'
+					.( $params['file_type'] == 'audio' ? T_('Download this audio') : T_('Download this video') )
+				.'</a></div>';
+		}
+
+		$r .= $params['after_player'];
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
 
 	/**
 	 * Get a list of the skins
@@ -361,17 +456,51 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 * Get audio/video mimetype
 	 *
 	 * @param object File
-	 * @return string Mimetype
+	 * @return string Mime-type
 	 */
-	function get_file_mimetype( $File )
+	function get_file_mimetype( $file_url )
 	{
-		if( $Filetype = & $File->get_Filetype() )
-		{	// Get mimetype from file type:
-			$mimetype = $Filetype->mimetype;
+		if( preg_match( '#\.([a-z0-9]+)(\?.+)?$#', $file_url, $match ) )
+		{	// Get file extenssion from url string:
+			$file_extenssion = strtolower( $match[1] );
 		}
-		else
-		{	// Unknown file type:
-			$mimetype = $File->is_audio() ? 'audio' : 'video';
+
+		if( empty( $file_extenssion ) )
+		{	// Use this mime-type by default on unknown extenssion:
+			return 'video/mp4';
+		}
+
+		// Get mime-type from file type:
+		$FiletypeCache = & get_FiletypeCache();
+		if( $Filetype = & $FiletypeCache->get_by_extension( $file_extenssion, false ) )
+		{
+			return $Filetype->mimetype;
+		}
+
+		// Get mime-type by extenssion:
+		switch( $file_extenssion )
+		{
+			case 'flv':
+			case 'f4v':
+				$mimetype = 'video/flv';
+				break;
+
+			case 'm4v':
+				$mimetype = 'video/m4v';
+				break;
+
+			case 'ogv':
+				$mimetype = 'video/ogg';
+				break;
+
+			case 'webm':
+				$mimetype = 'video/webm';
+				break;
+
+			case 'mp4':
+			default:
+				$mimetype = 'video/mp4';
+				break;
 		}
 
 		return $mimetype;
