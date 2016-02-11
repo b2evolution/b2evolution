@@ -48,8 +48,12 @@ if( $action == 'new-selskin' )
 
 		if( $current_User->check_perm( 'options', 'edit', false ) )
 		{ // A link to install new skin:
-			echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab=current_skin&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ),
-					$admin_url ) ).'" class="skinshot skinshot_new">'.get_icon( 'new' ).T_('Install New').' &raquo;'.'</a>';
+
+			echo '<a href="'.$admin_url.'?ctrl=skins&amp;action=new&amp;kind='.$kind.
+					// erhsatingin> regenerate_url should be used instead of relying on $_SERVER['REQUEST_URI']
+					//'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ),
+					'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $_SERVER['REQUEST_URI'], $admin_url ) ).
+					'" class="skinshot skinshot_new">'.get_icon( 'new' ).T_('Install New').' &raquo;'.'</a>';
 		}
 
 		if( isset( $skins['yes'] ) )
