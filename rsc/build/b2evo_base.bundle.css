@@ -1221,6 +1221,18 @@ div#evo_toolbar .actions_right {
   list-style: none;
   text-align: center;
 }
+.bubbletip_user__buttons {
+  text-align: center;
+  margin: 0;
+  color: #FFF;
+}
+.bubbletip_user__buttons a.btn {
+  color: #FFF;
+  margin: 5px 0 0 0;
+}
+.bubbletip_user__buttons a.btn:first-child {
+  margin: 0;
+}
 .bubbletip_anon {
   text-align: center;
 }

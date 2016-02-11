@@ -153,7 +153,7 @@ switch( $action )
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
-				$moderation_buttons = '<p class="text-center">'
+				$moderation_buttons = '<p class="bubbletip_user__buttons">'
 						.'<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
 							.T_('Edit in Back-Office')
 						.'</a>';
