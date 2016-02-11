@@ -45,6 +45,9 @@ $CommentList->set_filters( array(
 		'comments' => $Blog->get_setting('comments_per_feed'),
 	) );
 
+// Run SQL query to get results depending on current filters:
+$CommentList->query();
+
 // Get ready for display (runs the query):
 $CommentList->display_init();
 

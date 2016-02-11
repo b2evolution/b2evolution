@@ -4255,7 +4255,8 @@ class Comment extends DataObject
 		$current_status = $this->get( 'status' );
 
 		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item) )
+		if( $this->is_meta() && ( $commented_Item = & $this->get_Item() ) &&
+		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
 		{
 			$comment_allowed_status = 'protected';
 		}

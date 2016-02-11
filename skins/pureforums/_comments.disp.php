@@ -29,6 +29,9 @@ $CommentList->set_filters( array(
 		// 'timestamp_max' => $Blog->get_timestamp_max(),
 	) );
 
+// Run SQL query to get results depending on current filters:
+$CommentList->query();
+
 // Get ready for display (runs the query):
 $CommentList->display_init();
 

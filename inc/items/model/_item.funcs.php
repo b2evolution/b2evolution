@@ -2596,6 +2596,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		$CommentList->restore_filterset();
 	}
 
+	// Run SQL query to get results depending on current filters:
+	$CommentList->query();
+
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
 

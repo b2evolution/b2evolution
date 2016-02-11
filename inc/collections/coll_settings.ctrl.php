@@ -448,6 +448,9 @@ if( $action == 'dashboard' )
 					'comments' => 30,
 				) );
 
+			// Run SQL query to get results depending on current filters:
+			$CommentList->query();
+
 			// Set param prefix for URLs
 			$param_prefix = 'cmnt_fullview_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -609,6 +612,9 @@ if( $action == 'dashboard' )
 					'order' => 'DESC',
 					'comments' => 5,
 				) );
+
+			// Run SQL query to get results depending on current filters:
+			$CommentList->query();
 
 			// Set param prefix for URLs:
 			$param_prefix = 'cmnt_meta_';
