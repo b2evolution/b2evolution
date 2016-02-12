@@ -339,6 +339,16 @@ form#user_checkchanges.bComment {
   height: 9px;
   margin: 0 3px 0 2px;
 }
+.ficon.width_increase {
+  background-position: 0 -75px;
+  width: 32px;
+  height: 32px;
+}
+.ficon.width_decrease {
+  background-position: -32px -75px;
+  width: 32px;
+  height: 32px;
+}
 
 .form_add_contacts .controls {
   padding-left: 0;
