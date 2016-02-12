@@ -588,7 +588,7 @@ class ArchiveList extends Results
 	function restart()
 	{
 		// Make sure query has executed at least once:
-		$this->query();
+		$this->run_query();
 
 		$this->current_idx = 0;
 		$this->arc_w_last = '';
