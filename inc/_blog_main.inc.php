@@ -579,6 +579,21 @@ elseif( $disp == '-' )
 		}
 	}
 
+	if( $disp == 'single' )
+	{	// We must find first item from disp=posts and display it on front page:
+		if( $Item = & $Blog->get_first_mainlist_Item() )
+		{	// The item is found, Use it:
+			set_param( 'p', $Item->ID );
+			$c = 1; // Display comments
+		}
+
+		if( empty( $Item ) )
+		{	// If item is not found, display 404 page with below error message:
+			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
+			$disp = '404';
+		}
+	}
+
 	if( $disp == 'page' )
 	{ // Specific page is displayed on front page
 		set_param( 'p', $Blog->get_setting('front_post_ID') );

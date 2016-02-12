@@ -437,9 +437,12 @@ class ItemLight extends DataObject
 		}
 
 		$this->get_Blog();
-		if( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
-		    $this->Blog->get_setting( 'front_post_ID' ) == $this->ID )
-		{ // This item is used as front specific page on the blog's home
+		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
+		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
+		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
+		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
+		      $first_mainlist_Item->ID == $this->ID ) )
+		{ // This item is used as front specific page or as first post on the blog's home
 			$permalink_type = 'none';
 		}
 		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
@@ -473,8 +476,9 @@ class ItemLight extends DataObject
 				return $this->get_chapter_url( $blogurl, $glue );
 
 			case 'none':
-				// This happens when we try to permalink to an Item that cannot be addressed directly:
-				return NULL;
+				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
+				// Link to blog home:
+				return $this->Blog->gen_blogurl();
 
 			case 'cat':
 				// Link to permanent url of main chapter:

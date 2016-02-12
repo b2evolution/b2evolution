@@ -3862,6 +3862,28 @@ class Blog extends DataObject
 			$DB->query( $insert_sql );
 		}
 	}
+
+
+	/**
+	 * Get first Item in Main List on disp=posts
+	 *
+	 * @return object Item
+	 */
+	function & get_first_mainlist_Item()
+	{
+		$ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max(), 1, 'ItemCache', 'first', 'first' );
+
+		// Set additional debug info prefix for SQL queries to know what code executes it:
+		$ItemList2->query_title_prefix = 'Blog->get_first_mainlist_Item()';
+
+		// Run the query:
+		$ItemList2->query();
+
+		// Get the expected Item:
+		$first_mainlist_Item = & $ItemList2->get_item();
+
+		return $first_mainlist_Item;
+	}
 }
 
 ?>
