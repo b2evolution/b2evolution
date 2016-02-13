@@ -1056,8 +1056,9 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	// Init cat display param
 	$cat_display_params = array( 'total_count' => 0 );
 
-	if( get_allow_cross_posting() >= 2 ||
-	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) )
+	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
+		( get_allow_cross_posting() >= 2 ||
+	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
 		/**
 		 * @var BlogCache
@@ -1558,7 +1559,7 @@ function get_item_type_tabs()
 /**
  * Get tab name by item type usage value
  *
- * @return array|boolean 
+ * @return array|boolean
  */
 function get_tab_by_item_type_usage( $type_usage )
 {
