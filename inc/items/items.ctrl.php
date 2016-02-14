@@ -726,6 +726,9 @@ switch( $action )
 			$post_status = load_publish_status( true );
 		}
 
+		// Check if allowed to cross post.
+		check_cross_posting( NULL, $post_category, $post_extracats );
+
 		// Check if new category was started to create. If yes check if it is valid.
 		check_categories( $post_category, $post_extracats );
 

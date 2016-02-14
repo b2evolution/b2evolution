@@ -2203,7 +2203,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  * @param Array Post extra categories (by reference).
  * @return boolean true - if current user is allowed to cross post.
  */
-function check_cross_posting( $item, & $post_category, & $post_extracats )
+function check_cross_posting( $item = NULL, & $post_category, & $post_extracats )
 {
 	global $Messages, $blog, $current_User;
 	$result = true;
@@ -2211,7 +2211,14 @@ function check_cross_posting( $item, & $post_category, & $post_extracats )
 	$post_category = param( 'post_category', 'integer', -1 );
 	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 
-	$main_cat = $item->main_cat_ID;
+	if( $item )
+	{
+		$main_cat = $item->main_cat_ID;
+	}
+	else
+	{ // new item, no need to check for previous main category
+		$main_cat = $post_category;
+	}
 	$current_blog = get_catblog( $main_cat );
 	$is_blog_admin = $current_User->check_perm( 'blog_admin', '' );
 	$allow_cross_posting = get_allow_cross_posting();
@@ -2219,7 +2226,7 @@ function check_cross_posting( $item, & $post_category, & $post_extracats )
 	// Check if any of the extracats belong to a blog other than the current one
 	foreach( $post_extracats as $key => $cat )
 	{
-		if( (get_catblog( $cat ) != $current_blog ) && ! ( $allow_cross_posting % 2 == 1 &&  $is_blog_admin ) )
+		if( (get_catblog( $cat ) != get_catblog( $post_category ) ) && ! ( $allow_cross_posting % 2 == 1 &&  $is_blog_admin ) )
 		{ // this cat is not from the main category
 			$Messages->add( T_('You are not allowed to cross post to several collections.') );
 			$result = false;
@@ -2231,7 +2238,7 @@ function check_cross_posting( $item, & $post_category, & $post_extracats )
 	}
 
 	// Check if current main cat is different from the post_category
-	if( $current_blog != get_catblog( $post_category ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
+	if( $item && ( $current_blog != get_catblog( $post_category ) ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
 	{
 		$Messages->add( T_('You are not allowed to move post between collections.') );
 		$result = false;
