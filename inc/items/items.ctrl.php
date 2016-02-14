@@ -922,6 +922,12 @@ switch( $action )
 			$post_status = load_publish_status();
 		}
 
+		// Check if allowed to cross post.
+		if( ! check_cross_posting( $edited_Item, $post_category, $post_extracats ) )
+		{
+			break;
+		}
+
 		// Check if new category was started to create.  If yes check if it is valid.
 		$isset_category = check_categories( $post_category, $post_extracats );
 
@@ -1508,7 +1514,7 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_( 'Workflow view' ), '?ctrl=items&amp;blog=$blog$&amp;tab=tracker&amp;filter=restore' );
 
 			$AdminUI->set_page_manual_link( 'workflow-features' );
-			
+
 			// JS to edit priority of items from list view
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;

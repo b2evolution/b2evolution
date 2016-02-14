@@ -1056,7 +1056,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	// Init cat display param
 	$cat_display_params = array( 'total_count' => 0 );
 
-	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
+	if( $current_User->check_perm( 'blog_admin', '' ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -1259,7 +1259,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
 		if( !$thisChapter->meta
-			&& ( ($current_blog_ID == $blog) || (get_allow_cross_posting( $blog ) >= 2) ) )
+			&& ( ( $current_blog_ID == $blog ) || ( get_allow_cross_posting( $blog ) >= 2 ) ) )
 		{ // This is current blog or we allow moving posts accross blogs
 			if( $cat_select_form_fields )
 			{	// We want a form field:
@@ -2191,6 +2191,55 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 	return $Items;
 }
+
+
+/**
+ * Checks if current user is allowed to post with extra categories that belong to a different collection
+ * than the current main category or move the post with a main category in a different collection than
+ * the previous main category collection.
+ *
+ * @param Object Item being edited
+ * @param Object Post category (by reference).
+ * @param Array Post extra categories (by reference).
+ * @return boolean true - if current user is allowed to cross post.
+ */
+function check_cross_posting( $item, & $post_category, & $post_extracats )
+{
+	global $Messages, $blog, $current_User;
+	$result = true;
+
+	$post_category = param( 'post_category', 'integer', -1 );
+	$post_extracats = param( 'post_extracats', 'array:integer', array() );
+
+	$main_cat = $item->main_cat_ID;
+	$current_blog = get_catblog( $main_cat );
+	$is_blog_admin = $current_User->check_perm( 'blog_admin', '' );
+	$allow_cross_posting = get_allow_cross_posting();
+
+	// Check if any of the extracats belong to a blog other than the current one
+	foreach( $post_extracats as $key => $cat )
+	{
+		if( (get_catblog( $cat ) != $current_blog ) && ! ( $allow_cross_posting % 2 == 1 &&  $is_blog_admin ) )
+		{ // this cat is not from the main category
+			$Messages->add( T_('You are not allowed to cross post to several collections.') );
+			$result = false;
+		}
+		if( ! $result )
+		{ // no need to check other extracats
+			break;
+		}
+	}
+
+	// Check if current main cat is different from the post_category
+	if( $current_blog != get_catblog( $post_category ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
+	{
+		$Messages->add( T_('You are not allowed to move post between collections.') );
+		$result = false;
+	}
+
+	return $result;
+}
+
 
 /**
  *
