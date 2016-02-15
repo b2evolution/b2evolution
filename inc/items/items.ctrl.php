@@ -727,7 +727,7 @@ switch( $action )
 		}
 
 		// Check if allowed to cross post.
-		check_cross_posting( NULL, $post_category, $post_extracats );
+		check_cross_posting( $post_category, $post_extracats );
 
 		// Check if new category was started to create. If yes check if it is valid.
 		check_categories( $post_category, $post_extracats );
@@ -926,7 +926,7 @@ switch( $action )
 		}
 
 		// Check if allowed to cross post.
-		if( ! check_cross_posting( $edited_Item, $post_category, $post_extracats ) )
+		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
 		{
 			break;
 		}

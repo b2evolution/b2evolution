@@ -2198,12 +2198,12 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  * than the current main category or move the post with a main category in a different collection than
  * the previous main category collection.
  *
- * @param Object Item being edited
  * @param Object Post category (by reference).
  * @param Array Post extra categories (by reference).
+ * @param integer previous post main category
  * @return boolean true - if current user is allowed to cross post.
  */
-function check_cross_posting( $item = NULL, & $post_category, & $post_extracats )
+function check_cross_posting( & $post_category, & $post_extracats, $prev_main_cat = NULL )
 {
 	global $Messages, $blog, $current_User;
 	$result = true;
@@ -2211,15 +2211,11 @@ function check_cross_posting( $item = NULL, & $post_category, & $post_extracats 
 	$post_category = param( 'post_category', 'integer', -1 );
 	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 
-	if( $item )
-	{
-		$main_cat = $item->main_cat_ID;
-	}
-	else
+	if( is_null( $prev_main_cat ) )
 	{ // new item, no need to check for previous main category
-		$main_cat = $post_category;
+		$prev_main_cat = $post_category;
 	}
-	$current_blog = get_catblog( $main_cat );
+	$prev_cat_blog = get_catblog( $prev_main_cat );
 	$is_blog_admin = $current_User->check_perm( 'blog_admin', '' );
 	$allow_cross_posting = get_allow_cross_posting();
 
@@ -2237,8 +2233,8 @@ function check_cross_posting( $item = NULL, & $post_category, & $post_extracats 
 		}
 	}
 
-	// Check if current main cat is different from the post_category
-	if( $item && ( $current_blog != get_catblog( $post_category ) ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
+	// Check if post_category belongs to a collection different from the previous main cat collection
+	if( $prev_main_cat && ( $prev_cat_blog != get_catblog( $post_category ) ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
 	{
 		$Messages->add( T_('You are not allowed to move post between collections.') );
 		$result = false;
