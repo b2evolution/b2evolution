@@ -53,9 +53,9 @@ $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitud
 
 	$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), $name_editing_options, T_('Nickname'), true );
 
-	$Form->radio( 'uset_firstname_editing', $Settings->get( 'firstname_editing' ), $name_editing_options, T_('Firstname'), true );
+	$Form->radio( 'uset_firstname_editing', $Settings->get( 'firstname_editing' ), $name_editing_options, T_('First name'), true );
 
-	$Form->radio( 'uset_lastname_editing', $Settings->get( 'lastname_editing' ), $name_editing_options, T_('Lastname'), true );
+	$Form->radio( 'uset_lastname_editing', $Settings->get( 'lastname_editing' ), $name_editing_options, T_('Last name'), true );
 
 	$location_options = array(
 			array( 'optional', T_('Optional') ),
