@@ -923,6 +923,10 @@ function dbm_cleanup_slugs()
 		{	// Add new slug with replaced underscores:
 			$DB->query( 'INSERT INTO T_slug ( slug_title, slug_type, slug_itm_ID )
 				VALUES ( '.$DB->quote( $clean_slug_title ).', "item", "'.$slug->slug_itm_ID.'" )' );
+			// Use new slug as main for the item:
+			$DB->query( 'UPDATE T_items__item
+				  SET post_urltitle = '.$DB->quote( $clean_slug_title ).'
+				WHERE post_ID = '.$slug->slug_itm_ID );
 		}
 
 		if( $i % 100 )
