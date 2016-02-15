@@ -833,7 +833,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 	{	// $pattern matches, call the callback method on full text except of matching blocks
 
 		// Create an unique string in order to replace all matching blocks temporarily
-		$unique_replacement = md5( mktime() + rand() );
+		$unique_replacement = md5( time() + rand() );
 
 		$matches_search = array();
 		$matches_replace = array();
@@ -2828,7 +2828,9 @@ function debug_info( $force = false, $force_clean = false )
 		if( stripos($header, 'content-type:') !== false )
 		{ // content type sent
 			# "Content-Type:text/html;charset=utf-8" => "text/html"
-			$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+			$content_type = explode( ':', $header, 2 );
+			$content_type = explode( ';', array_pop( $content_type ) );
+			$content_type = trim( array_shift( $content_type ) );
 			break;
 		}
 	}

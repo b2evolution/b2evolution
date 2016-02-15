@@ -194,7 +194,8 @@ switch( $action )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 					if( empty($pluginsettings) )
 					{
 						continue;
@@ -207,7 +208,8 @@ switch( $action )
 					}
 
 					// Let plugins process settings
-					$Plugins->call_method( $loop_Plugin->ID, 'PluginCollSettingsUpdateAction', $tmp_params = array() );
+					$tmp_params = array();
+					$Plugins->call_method( $loop_Plugin->ID, 'PluginCollSettingsUpdateAction', $tmp_params );
 				}
 
 				if(	! param_errors_detected() )

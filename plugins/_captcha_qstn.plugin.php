@@ -241,15 +241,14 @@ class captcha_qstn_plugin extends Plugin
 	 * for other events we're hooking into.
 	 *
 	 * @param array Associative array of parameters.
-	 * @param string Form type ( comment|register|message )
 	 * @return boolean|NULL
 	 */
-	function CaptchaValidated( & $params, $form_type )
+	function CaptchaValidated( & $params )
 	{
 		global $DB, $localtimenow, $Session;
 
-		if( ! $this->does_apply( $params, $form_type ) )
-		{
+		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		{	// We should not apply captcha to the requested form:
 			return;
 		}
 
@@ -259,7 +258,7 @@ class captcha_qstn_plugin extends Plugin
 		{
 			$this->debug_log( 'captcha_qstn_'.$this->ID.'_answer' );
 			$params['validate_error'] = $this->T_('Please enter the captcha answer.');
-			if( $form_type == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
+			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
 			}
@@ -284,7 +283,7 @@ class captcha_qstn_plugin extends Plugin
 		{
 			$this->debug_log( 'Posted ('.$posted_answer.') and saved ('.$question->cptq_answers.') answer do not match!' );
 			$params['validate_error'] = $this->T_('The entered answer is incorrect.');
-			if( $form_type == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
+			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
 			}
@@ -415,15 +414,15 @@ class captcha_qstn_plugin extends Plugin
 	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
 	 *   - 'form_use_fieldset':
 	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 * @param string Form type ( comment|register|message )
+	 *   - 'form_type': Form type ( comment|register|message )
 	 * @return boolean|NULL true, if displayed; false, if error; NULL if it does not apply
 	 */
-	function CaptchaPayload( & $params, $form_type )
+	function CaptchaPayload( & $params )
 	{
 		global $DB, $Session;
 
-		if( ! $this->does_apply( $params, $form_type ) )
-		{
+		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		{	// We should not apply captcha to the requested form:
 			return;
 		}
 
@@ -479,7 +478,8 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function DisplayCommentFormFieldset( & $params )
 	{
-		$this->CaptchaPayload( $params, 'comment' );
+		$params['form_type'] = 'comment';
+		$this->CaptchaPayload( $params );
 	}
 
 
@@ -490,17 +490,36 @@ class captcha_qstn_plugin extends Plugin
 	 * being posted.
 	 *
 	 * @param array Associative array of parameters.
-	 * @param string Form type ( comment|register|message )
 	 */
-	function BeforeCommentFormInsert( & $params, $form_type = 'comment' )
+	function BeforeCommentFormInsert( & $params )
+	{
+		$params['form_type'] = 'comment';
+		$this->validate_form_by_captcha( $params );
+	}
+
+
+	/**
+	 * Validate the answer against our stored one.
+	 *
+	 * In case of error we add a message of category 'error' which prevents the comment from
+	 * being posted.
+	 *
+	 * @param array Associative array of parameters.
+	 */
+	function validate_form_by_captcha( & $params )
 	{
 		if( ! empty( $params['is_preview'] ) )
-		{
+		{	// Don't validate on preview action:
 			return;
 		}
 
-		if( $this->CaptchaValidated( $params, $form_type ) === false )
-		{
+		if( empty( $params['form_type'] ) )
+		{	// Form type must be defined:
+			return;
+		}
+
+		if( $this->CaptchaValidated( $params ) === false )
+		{	// Some error on captcha validation:
 			$validate_error = $params['validate_error'];
 			param_error( 'captcha_qstn_'.$this->ID.'_answer', $validate_error );
 		}
@@ -512,7 +531,8 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function DisplayRegisterFormFieldset( & $params )
 	{
-		$this->CaptchaPayload( $params, 'register' );
+		$params['form_type'] = 'register';
+		$this->CaptchaPayload( $params );
 	}
 
 
@@ -524,7 +544,8 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function RegisterFormSent( & $params )
 	{
-		$this->BeforeCommentFormInsert( $params, 'register' ); // we do the same as when validating comment forms
+		$params['form_type'] = 'register';
+		$this->validate_form_by_captcha( $params );
 	}
 
 
@@ -533,7 +554,8 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function DisplayMessageFormFieldset( & $params )
 	{
-		$this->CaptchaPayload( $params, 'message' );
+		$params['form_type'] = 'message';
+		$this->CaptchaPayload( $params );
 	}
 
 
@@ -545,7 +567,8 @@ class captcha_qstn_plugin extends Plugin
 	 */
 	function MessageFormSent( & $params )
 	{
-		$this->BeforeCommentFormInsert( $params, 'message' ); // we do the same as when validating comment forms
+		$params['form_type'] = 'message';
+		$this->validate_form_by_captcha( $params );
 	}
 
 
@@ -554,14 +577,11 @@ class captcha_qstn_plugin extends Plugin
 	/**
 	 * Checks if we should captcha the current request, according to the settings made.
 	 *
-	 * @param array Associative array of parameters.
 	 * @param string Form type ( comment|register|message )
 	 * @return boolean
 	 */
-	function does_apply( $params, $form_type )
+	function does_apply( $form_type )
 	{
-		global $current_User;
-
 		switch( $form_type )
 		{
 			case 'comment':

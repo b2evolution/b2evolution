@@ -81,7 +81,7 @@ class whosonline_plugin extends Plugin
 	 * @param array Associative array of parameters.
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		global $Plugins;
 

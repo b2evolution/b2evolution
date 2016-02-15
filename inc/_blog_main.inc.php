@@ -792,7 +792,8 @@ if( !empty( $skin ) )
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin( $skin ) )
 		{
-			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array( 'skin' => $skin ) );
+			$tmp_params = array( 'skin' => $skin );
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params );
 		}
 		else
 		{

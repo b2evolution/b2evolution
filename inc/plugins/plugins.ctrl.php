@@ -575,14 +575,16 @@ switch( $action )
 			load_funcs('plugins/_plugin.funcs.php');
 
 			// Loop through settings for this plugin:
-			foreach( $edit_Plugin->GetDefaultSettings( $dummy = array('for_editing' => true) ) as $set_name => $set_meta )
+			$dummy = array( 'for_editing' => true );
+			foreach( $edit_Plugin->GetDefaultSettings( $dummy ) as $set_name => $set_meta )
 			{
 				autoform_set_param_from_request( $set_name, $set_meta, $edit_Plugin, 'Settings' );
 			}
 
 			// Let the plugin handle custom fields:
 			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
-			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+			$tmp_params = array();
+			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
 
 			if( $ok_to_update === false )
 			{	// Rollback settings: the plugin has said they should not get updated.
@@ -652,7 +654,8 @@ switch( $action )
 		$admin_Plugins->save_events( $edit_Plugin, array() );
 
 		// Inform Plugin that it gets edited:
-		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params = array() );
+		$tmp_params = array();
+		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params );
 
 		// Params for form:
 		$edited_plugin_name = $edit_Plugin->name;

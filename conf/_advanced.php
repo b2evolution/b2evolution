@@ -36,14 +36,7 @@ $debug_pwd = '';
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run without any notices! (plugins too!)
-if( version_compare( phpversion(), '5.3', '>=' ) )
-{	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
-	error_reporting( E_ALL & ~E_STRICT );
-}
-else
-{
-	error_reporting( E_ALL );
-}
+error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
  *

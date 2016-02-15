@@ -2477,7 +2477,8 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		echo '</div>';
 		echo '<div class="skin_settings_form">';
 
-		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array( 'for_editing' => true ) );
+		$tmp_params = array( 'for_editing' => true );
+		$skin_params = $edited_Skin->get_param_definitions( $tmp_params );
 
 		if( empty( $skin_params ) )
 		{ // Advertise this feature!!

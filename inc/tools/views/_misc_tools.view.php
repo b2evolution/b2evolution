@@ -173,7 +173,8 @@ foreach( $tool_plugins as $loop_Plugin )
 {
 	$block_item_Widget->title = format_to_output($loop_Plugin->name);
 	$block_item_Widget->disp_template_replaced( 'block_start' );
-	$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
+	$params = array();
+	$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params );
 	$block_item_Widget->disp_template_raw( 'block_end' );
 }
 

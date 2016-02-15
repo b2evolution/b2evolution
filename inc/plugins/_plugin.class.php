@@ -3716,7 +3716,8 @@ class Plugin
 		}
 
 		// Try default values:
-		$params = $this->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_msg_setting_definitions( $tmp_params );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -3748,7 +3749,8 @@ class Plugin
 		}
 
 		// Try default values:
-		$params = $this->get_email_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_email_setting_definitions( $tmp_params );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;

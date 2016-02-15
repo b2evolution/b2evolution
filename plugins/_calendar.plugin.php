@@ -196,7 +196,7 @@ class calendar_plugin extends Plugin
 	 *      - 'link_type' : 'canonic'|'context' (default: canonic)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		// Prefix of the ItemList object
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';

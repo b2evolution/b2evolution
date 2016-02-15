@@ -205,7 +205,8 @@ if( $action != 'view' )
 
 		ob_start();
 		// UserSettings:
-		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true, 'user_ID' => $edited_User->ID) );
+		$tmp_params = array( 'for_editing' => true, 'user_ID' => $edited_User->ID );
+		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 		if( is_array($plugin_user_settings) )
 		{
 			foreach( $plugin_user_settings as $l_name => $l_meta )
@@ -216,8 +217,8 @@ if( $action != 'view' )
 		}
 
 		// fp> what's a use case for this event? (I soooo want to nuke it...)
-		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
-			$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
+		$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User );
+		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter', $tmp_params );
 
 		$has_contents = strlen( ob_get_contents() );
 		$Form->end_fieldset();

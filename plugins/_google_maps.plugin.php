@@ -835,7 +835,7 @@ function locate()
 	}
 
 
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		global $Item;
 		global $Blog;
@@ -931,7 +931,7 @@ function locate()
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 * @see Plugin::BeforeUninstall()
 	 */
-	function BeforeUninstall()
+	function BeforeUninstall( & $params )
 	{
 		$this->msg( T_('Google Maps plugin sucessfully un-installed.') );
 		return true;

@@ -1659,7 +1659,8 @@ class Item extends ItemLight
 			if( empty($Plugin->code) )
 				continue;
 
-			$plugin_r = $Plugin->ItemApplyAsRenderer( $tmp_params = array('Item' => & $this) );
+			$tmp_params = array( 'Item' => & $this );
+			$plugin_r = $Plugin->ItemApplyAsRenderer( $tmp_params );
 
 			if( is_bool($plugin_r) )
 			{

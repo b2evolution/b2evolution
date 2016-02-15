@@ -523,7 +523,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminToolPayload()
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		echo 'Hello, This is the AdminToolPayload for the TEST plugin.';
 	}
@@ -713,7 +713,7 @@ class test_plugin extends Plugin
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 * @see Plugin::BeforeUninstall()
 	 */
-	function BeforeUninstall()
+	function BeforeUninstall( & $params )
 	{
 		$this->msg( 'TEST plugin sucessfully un-installed. All the hard work we did was adding this message.. ;)' );
 		return true;
@@ -724,7 +724,7 @@ class test_plugin extends Plugin
 	 * Event handler: called when a new user has registered.
 	 * @see Plugin::AfterUserRegistration()
 	 */
-	function AfterUserRegistration( $params )
+	function AfterUserRegistration( & $params )
 	{
 		$this->msg( 'The TEST plugin welcomes the new user '.$params['User']->dget('login').'!' );
 	}
@@ -838,7 +838,7 @@ class test_plugin extends Plugin
 	/**
 	 * @see Plugin::BeforeSessionsDelete()
 	 */
-	function BeforeSessionsDelete( $params )
+	function BeforeSessionsDelete( & $params )
 	{
 		$this->debug_log('BeforeSessionsDelete: Could have prevented the deletion of all sessions older than ' ).date('Y-m-d H:i:s', $params['cutoff_timestamp' ] );
 		return;

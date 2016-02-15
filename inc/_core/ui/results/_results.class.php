@@ -2117,7 +2117,7 @@ class Results extends Table
 
 		$page_prev_i = $this->page - 1;
 		$page_next_i = $this->page + 1;
-		$pib = add_tag_class( $this->params['page_item_before'], '**active_distance_**' );
+		$pib = isset( $this->params['page_item_before'] ) ? add_tag_class( $this->params['page_item_before'], '**active_distance_**' ) : '';
 
 		for( $i=$min; $i<=$max; $i++)
 		{

@@ -79,7 +79,7 @@ class archives_plugin extends Plugin
 	 *                - 'day_date_format' : (Default: conf.)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		global $month;
 
@@ -536,7 +536,7 @@ class ArchiveList extends Results
 	 * These queries are complex enough for us not to have to rewrite them:
 	 * dh> ???
 	 */
-	function count_total_rows()
+	function count_total_rows( $sql_count = NULL )
 	{
 		global $DB;
 

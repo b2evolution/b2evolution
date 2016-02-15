@@ -525,7 +525,7 @@ jQuery( document ).ready( function()
 	 *
 	 * @see Plugin::AdminToolPayload()
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		$action = param_action();
 

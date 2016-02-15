@@ -372,7 +372,8 @@ $user_from_country_suffix = '';
 $Plugins->restart();
 while( $loop_Plugin = & $Plugins->get_next() )
 {
-	$user_from_country_suffix .= $loop_Plugin->GetUserFromCountrySuffix( $tmp_params = array( 'User' => & $edited_User ) );
+	$tmp_params = array( 'User' => & $edited_User );
+	$user_from_country_suffix .= $loop_Plugin->GetUserFromCountrySuffix( $tmp_params );
 }
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );

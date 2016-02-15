@@ -142,14 +142,18 @@ class Subregion extends DataObject
 	/**
 	 * Check existence of specified sub-region code in subrg_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if region + sub-region code exist otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = array( 'subrg_rgn_ID', 'subrg_code' ), $values = NULL )
 	{
-		return parent::dbexists(
-				array( 'subrg_rgn_ID', 'subrg_code' ),
-				array( $this->rgn_ID, $this->code )
-			);
+		if( is_null( $values ) )
+		{
+			$values = array( $this->rgn_ID, $this->code );
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

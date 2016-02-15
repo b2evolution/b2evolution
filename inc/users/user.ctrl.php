@@ -379,7 +379,8 @@ if( !$Messages->has_errors() )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 					if( empty($pluginusersettings) )
 					{
 						continue;
@@ -392,8 +393,8 @@ if( !$Messages->has_errors() )
 					}
 
 					// Let the plugin handle custom fields:
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-						'User' => & $edited_User, 'action' => 'save' ) );
+					$tmp_params = array( 'User' => & $edited_User, 'action' => 'save' );
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 					if( $ok_to_update === false )
 					{
@@ -469,7 +470,8 @@ if( !$Messages->has_errors() )
 			$Plugins->restart();
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+				$tmp_params = array( 'for_editing' => true );
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 
 				if( empty($pluginusersettings) )
 				{
@@ -487,8 +489,8 @@ if( !$Messages->has_errors() )
 				}
 
 				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-					'User' => & $edited_User, 'action' => 'reset' ) );
+				$tmp_params = array( 'User' => & $edited_User, 'action' => 'reset' );
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 				if( $ok_to_update === false )
 				{

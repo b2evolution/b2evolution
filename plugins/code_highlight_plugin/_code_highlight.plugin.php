@@ -466,7 +466,7 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-	function BeforeCommentFormInsert( $params )
+	function BeforeCommentFormInsert( & $params )
 	{
 		$Comment = & $params['Comment'];
 		$comment_Item = & $Comment->get_Item();
