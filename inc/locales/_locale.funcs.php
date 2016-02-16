@@ -1483,6 +1483,51 @@ function locale_insert_default()
 
 
 /**
+ * Restore default values of locales
+ *
+ * @param array Locale keys/codes
+ */
+function locale_restore_defaults( $restored_locales )
+{
+	global $DB, $locales;
+
+	if( empty( $restored_locales ) && ! is_array( $restored_locales ) )
+	{	// No locales to restore, Exit here:
+		return;
+	}
+
+	foreach( $restored_locales as $restored_locale_key )
+	{
+		if( ! isset( $locales[ $restored_locale_key ] ) )
+		{	// Skip an incorrect locale:
+			continue;
+		}
+
+		$restored_locale = $locales[ $restored_locale_key ];
+
+		// Make sure default transliteration_map is set:
+		$transliteration_map = '';
+		if( isset( $restored_locale['transliteration_map'] ) && is_array( $restored_locale['transliteration_map'] ) )
+		{
+			$transliteration_map = base64_encode( serialize( $restored_locale['transliteration_map'] ) );
+		}
+
+		// Restore all locale fields to default values:
+		$DB->query( 'UPDATE T_locales SET
+			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
+			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
+			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? $restored_locale['timefmt'] : $restored_locale['shorttimefmt'] ).',
+			loc_startofweek         = '.$DB->quote( $restored_locale['startofweek'] ).',
+			loc_name                = '.$DB->quote( $restored_locale['name'] ).',
+			loc_messages            = '.$DB->quote( $restored_locale['messages'] ).',
+			loc_priority            = '.$DB->quote( $restored_locale['priority'] ).',
+			loc_transliteration_map = '.$DB->quote( $transliteration_map ).'
+			WHERE loc_locale = '.$DB->quote( $restored_locale_key ) );
+	}
+}
+
+
+/**
  * Check default locale and enable if it is not yet
  * Used after each upgrade process
  */
