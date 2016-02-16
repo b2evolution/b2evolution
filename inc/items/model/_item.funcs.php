@@ -1040,7 +1040,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	$cat_select_form_fields = $form_fields;
 	$ChapterCache = & get_ChapterCache();
 
-	$r .= '<table cellspacing="0" class="catselect table table-striped table-hover table-condensed">';
+	$r .= '<table cellspacing="0" id="cat_sel_group" class="catselect table table-striped table-hover table-condensed">';
 	if( get_post_cat_setting($blog) == 3 )
 	{ // Main + Extra cats option is set, display header
 		$r .= cat_select_header( $params );
@@ -1076,8 +1076,11 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
 				continue;
-
-			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
+			$r .= '<td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '</tbody>';
+			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
 
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
@@ -1088,6 +1091,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			{
 				$r .= cat_select_new( $cat_display_params );
 			}
+
+			$r .= '</tbody>';
 		}
 	}
 	else
@@ -1113,6 +1118,11 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	{
 		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
 			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
+			var $catSelTable = jQuery("table#cat_sel_group");
+			var $accordionPanels = $catSelTable.find("tbody.accordion_panel");
+			$accordionPanels.on("show.bs.collapse", function() {
+				$catSelTable.find("tbody.collapse.in").collapse("hide");
+			});
 		});</script>';
 	}
 }
