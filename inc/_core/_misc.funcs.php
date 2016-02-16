@@ -1994,11 +1994,14 @@ function is_windows()
  */
 function get_atags( $content )
 {
-	$tag = 'a';
-	$regexp = '{<'.$tag.'[^>]*>(.*?)</'.$tag.'>}';
+	$tags = array();
 
-	preg_match_all( $regexp, $content, $result );
-	return $result[0];
+	if( preg_match_all( '#(<a[^>]+>(.*?)</a>|&lt;a.+&gt;(.*?)&lt;/a&gt;)#i', $content, $result ) )
+	{
+		$tags = $result[0];
+	}
+
+	return $tags;
 }
 
 
