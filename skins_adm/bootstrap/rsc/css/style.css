@@ -1429,3 +1429,8 @@ table.diff td.diff-title-addedline {
   height: 12px;
   min-width: 1px;
 }
+.red-bordered-checkbox {
+  background-color: #F00;
+  padding: 1px;
+  padding-top: 0;
+}

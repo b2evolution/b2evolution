@@ -513,7 +513,7 @@ class tinymce_plugin extends Plugin
 									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
 									if( ! inst ) return null;
 									return inst.selection.getContent();
-								} );
+								}, true );
 
 							// add a callback, that wraps a selection:
 							b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
@@ -532,7 +532,7 @@ class tinymce_plugin extends Plugin
 									inst.selection.setContent(value);
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that replaces a string
 							b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
@@ -543,14 +543,14 @@ class tinymce_plugin extends Plugin
 									inst.setContent( inst.getContent().replace( params.search, params.replace ) );
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that lets us insert raw content:
 							// DEPRECATED, used in b2evo 1.10.x
 							b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
 									tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
 									return true;
-							} );
+							}, true );
 						}
 					}
 
