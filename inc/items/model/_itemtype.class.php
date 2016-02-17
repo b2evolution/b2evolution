@@ -27,6 +27,9 @@ class ItemType extends DataObject
 	var $description;
 	var $usage;
 	var $template_name;
+	var $front_instruction = 0;
+	var $back_instruction = 0;
+	var $instruction = '';
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -91,6 +94,9 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->front_instruction = $db_row->ityp_front_instruction;
+			$this->back_instruction = $db_row->ityp_back_instruction;
+			$this->instruction = $db_row->ityp_instruction;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
 			$this->podcast = $db_row->ityp_podcast;
@@ -154,6 +160,8 @@ class ItemType extends DataObject
 	 */
 	function load_from_Request()
 	{
+		global $admin_url, $current_User;
+
 		// Name
 		param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
@@ -173,6 +181,21 @@ class ItemType extends DataObject
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// Show instruction in front-office
+		param( 'ityp_front_instruction', 'integer' );
+		$this->set_from_Request( 'front_instruction' );
+
+		// Show instruction in back-office
+		param( 'ityp_back_instruction', 'integer' );
+		$this->set_from_Request( 'back_instruction' );
+
+		// Post instruction
+		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
+		{
+			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+			$this->set_from_Request( 'instruction', NULL, true );
+		}
 
 		// Use title
 		param( 'ityp_use_title', 'string' );

@@ -105,6 +105,20 @@ $Form->begin_form( '', '', $params );
 <div class="left_col col-lg-9 col-md-8">
 
 	<?php
+	// ############################ INSTRUCTIONS ##############################
+	$ItemType = & $edited_Item->get_ItemType();
+	if( $ItemType && $ItemType->get( 'back_instruction' ) == 1 && $ItemType->get( 'instruction' ) )
+	{
+		?>
+		<div class="alert alert-dismissable alert-info fade in">
+			<button type="button" class="close" data-dismiss="alert">
+				<span aria-hidden="true">x</span>
+			</button>
+			<?php echo $ItemType->get( 'instruction' );?>
+		</div>
+		<?php
+	}
+
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );

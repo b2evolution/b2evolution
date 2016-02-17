@@ -60,8 +60,14 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// ================================ START OF EDIT FORM ================================
+// =================================== INSTRUCTION ====================================
+$ItemType = & $edited_Item->get_ItemType();
+if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
+{
+	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
+}
 
+// ================================ START OF EDIT FORM ================================
 $form_params = array();
 $iframe_name = NULL;
 if( !empty( $bozo_start_modified ) )
@@ -251,7 +257,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			);
 	}
 	else
-	{ // Don't use two columns layout 
+	{ // Don't use two columns layout
 		$two_columns_layout = array(
 				'before'       => '',
 				'column_start' => '',

@@ -62,6 +62,14 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->checklist( array(
+		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
+		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )
+	), 'ityp_instruction_enable', T_('Display instructions') );
+	$Form->textarea_input( 'ityp_instruction', $edited_Itemtype->instruction, 5, T_('Instructions'), array( 'cols' => 47 ) );
+$Form->end_fieldset();
+
 $options = array(
 		array( 'required', T_('Required') ),
 		array( 'optional', T_('Optional') ),

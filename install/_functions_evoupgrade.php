@@ -122,7 +122,7 @@ function upg_task_end( $print_result = true )
 
 /**
  * Create DB table
- * 
+ *
  * @param string Table name
  * @param string Fields
  * @param string Options
@@ -792,7 +792,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD INDEX post_issue_date( post_issue_date ),
 							ADD UNIQUE post_urltitle( post_urltitle )";
 		$DB->query( $query );
-		
+
 		$query = "ALTER TABLE {$tableprefix}posts
 					DROP INDEX post_date";
 		$DB->query( $query );
@@ -1174,7 +1174,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							DROP INDEX post_issue_date,
 							DROP INDEX post_category";
 		$DB->query( $query );
-		
+
 		$query = "ALTER TABLE {$tableprefix}posts
 							DROP COLUMN post_karma,
 							DROP COLUMN post_autobr,
@@ -6335,7 +6335,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{ // part 18.k trunk aka 13th part of "i7"
 
 		task_begin( 'Upgrading skin names... ' );
-		$DB->query( 'UPDATE T_skins__skin 
+		$DB->query( 'UPDATE T_skins__skin
 							 SET skin_folder = CASE
 									WHEN skin_folder = "bootstrap"        THEN "bootstrap_blog_skin"
 									WHEN skin_folder = "bootstrap_main"   THEN "bootstrap_main_skin"
@@ -7339,6 +7339,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  SET wi_code = "coll_member_count"
 			WHERE wi_type = "core"
 			  AND wi_code = "member_count"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11725, 'Upgrade table post type...' ) )
+	{	// part of 6.7.0
+		db_add_col( 'T_items__type', 'ityp_front_instruction', 'tinyint default 0 AFTER ityp_template_name' );
+		db_add_col( 'T_items__type', 'ityp_back_instruction', 'tinyint default 0 AFTER ityp_front_instruction' );
+		db_add_col( 'T_items__type', 'ityp_instruction', 'text NULL default NULL AFTER ityp_back_instruction' );
 		upg_task_end();
 	}
 
