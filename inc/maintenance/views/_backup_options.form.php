@@ -20,7 +20,7 @@ load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 /**
  * @var back up configuration
  */
-global $backup_paths, $backup_tables, $backup_path;
+global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders;
 
 /**
  * @var instance of Backup class
@@ -48,6 +48,28 @@ foreach( $backup_paths as $name => $settings )
 
 		$Form->checkbox( 'bk_'.$name, $current_Backup->backup_paths[$name], $settings['label'], $note );
 	}
+}
+
+// Display checkboxes to exclude the paths:
+$backup_exclude_checkboxes = array();
+foreach( $backup_exclude_folders as $name => $settings )
+{
+	if( count( $settings['path'] ) > 2 )
+	{
+		$exclude_folder_name_last = $settings['path'][ count( $settings['path'] ) - 1 ];
+		array_pop( $settings['path'] );
+		$exclude_folder_names = '<code>'.implode( '</code>, <code>', $settings['path'] ).'</code>';
+		$exclude_folder_names .= ' '.T_('or').' <code>'.$exclude_folder_name_last.'</code>';
+	}
+	else
+	{
+		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+	}
+	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( T_('Exclude all %s folders'), $exclude_folder_names ), $settings['excluded'] );
+}
+if( count( $backup_exclude_checkboxes ) )
+{
+	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
 }
 
 // Display checkboxes

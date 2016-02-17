@@ -904,4 +904,34 @@ function svnupgrade_display_steps( $current_step )
 
 	echo get_tool_steps( $steps, $current_step );
 }
+
+
+/**
+ * Callback function to decide what folders backup on zip
+ *
+ * @param integer Event number, e.g. PCLZIP_CB_PRE_ADD, see class PclZip
+ * @param array Params of current file/folder
+ * @return integer 1 - to include, 0 - to exclude
+ */
+function callback_backup_files( $p_event, & $p_header )
+{
+	global $backup_current_exclude_folders;
+
+	if( empty( $backup_current_exclude_folders ) )
+	{	// Nothing to exclude:
+		return 1;
+	}
+
+	foreach( $backup_current_exclude_folders as $exclude_folder_name )
+	{
+		if( $p_header['stored_filename'] == $exclude_folder_name ||
+		    strpos( $p_header['stored_filename'].'/', '/'.$exclude_folder_name.'/' ) !== false )
+		{	// Skip this file/folder:
+			return 0;
+		}
+	}
+
+	// Include this file/folder to backup zip archive:
+	return 1;
+}
 ?>
