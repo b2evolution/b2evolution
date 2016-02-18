@@ -541,7 +541,7 @@ class UserList extends DataObjectList2
 			$step1_SQL = new SQL();
 			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 			if( ! empty( $this->query_params['join_colls'] ) )
-			{	// Initialize a count of collections (used on order by this field):
+			{	// Initialize count of collections (used on order by this field):
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
 			}
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )

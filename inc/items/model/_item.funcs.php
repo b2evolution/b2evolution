@@ -34,7 +34,7 @@ function init_MainList( $items_nb_limit )
 	{
 		$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
 
-		// Set additional debug info prefix for SQL queries to know what code executes it:
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
 		$MainList->query_title_prefix = '$MainList';
 
 		if( ! $preview )
@@ -220,7 +220,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		// Get ready to obtain 1 post only:
 		$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
 
-		// Set additional debug info prefix for SQL queries to know what code executes it:
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
 		$FeaturedList->query_title_prefix = '$FeaturedList';
 
 		$featured_list_filters = $MainList->filters;

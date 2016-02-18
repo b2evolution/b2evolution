@@ -299,7 +299,6 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
-			// we prolluy don't need this: $this->set( 'status', 'published' );
 			$this->set( 'priority', 3 );
 			if( ! empty( $Blog ) )
 			{ // Get default post type from blog setting
@@ -5163,11 +5162,11 @@ class Item extends ItemLight
 
 		$this->set_last_touched_ts();
 
-		// Check what locale we can use for this creating item:
+		// Check which locale we can use for this item:
 		$item_Blog = & $this->get_Blog();
 		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' && 
 		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
-		{	// Force to use only collection locale because it is restricted by collection setting:
+		{	// Force to use collection locale because it is restricted by collection setting:
 			$this->set( 'locale', $item_Blog->get( 'locale' ) );
 		}
 
