@@ -35,6 +35,7 @@ class markdown_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		require_once( dirname( __FILE__ ).'/_parsedown.inc.php' );
+		require_once( dirname( __FILE__ ).'/_parsedown_extra.inc.php' );
 
 		$this->short_desc = T_('Markdown');
 		$this->long_desc = T_('Accepted formats:<br />
@@ -175,22 +176,26 @@ class markdown_plugin extends Plugin
 			return;
 		}
 
-		// Init parser class with blog settings
-		$Parsedown = Parsedown::instance();
+		// Initialize object to parse markdown code:
+		$ParsedownExtra = new ParsedownExtra();
+		$ParsedownExtra->setBreaksEnabled( true );
+
+		// TODO: Allow to enable/disable these features in new parsedown:
+		/*
 		$Parsedown->parse_font_styles = $text_styles_enabled;
 		$Parsedown->parse_links = $links_enabled;
-		$Parsedown->parse_images = $images_enabled;
+		$Parsedown->parse_images = $images_enabled;*/
 
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $Parsedown, 'text' ) );
+				array( $ParsedownExtra, 'text' ) );
 		}
 		else
 		{ // No code/pre blocks, replace on the whole thing
-			$content = $Parsedown->text( $content );
+			$content = $ParsedownExtra->text( $content );
 		}
 
 		return true;
