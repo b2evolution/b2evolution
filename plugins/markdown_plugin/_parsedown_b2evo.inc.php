@@ -117,6 +117,43 @@ class ParsedownB2evo extends ParsedownExtra
 			return;
 		}
 	}
+
+
+	/**
+	 * Parse text
+	 *
+	 * @param string Text
+	 * @return string
+	 */
+	function text( $text )
+	{
+		if( strpos( $text, '&gt;' ) !== false )
+		{	// Fix the encoded chars ">" to correct parsing of blockquote:
+			$text = preg_replace_callback( '/(^|\n)((&gt; ?)+)/', array( $this, 'b2evo_html_decode_blockquote' ), $text );
+		}
+
+		if( strpos( $text, '&quot;' ) !== false )
+		{	// Fix the encoded chars '"' to correct parsing of links and images:
+			$text = preg_replace( '/\((.+)&quot;(.+)&quot;\)/', '($1"$2")', $text );
+		}
+
+		// Parse markdown code:
+		$text = parent::text( $text );
+
+		return $text;
+	}
+
+
+	/**
+	 * Callback function to replace all encoded chars ">" from "&gt;"
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function b2evo_html_decode_blockquote( $matches )
+	{
+		return str_replace( '&gt;', '>', $matches[0] );
+	}
 }
 
 ?>
