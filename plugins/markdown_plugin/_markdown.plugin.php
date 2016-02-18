@@ -186,11 +186,11 @@ class markdown_plugin extends Plugin
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $Parsedown, 'parse' ) );
+				array( $Parsedown, 'text' ) );
 		}
 		else
 		{ // No code/pre blocks, replace on the whole thing
-			$content = $Parsedown->parse( $content );
+			$content = $Parsedown->text( $content );
 		}
 
 		return true;
