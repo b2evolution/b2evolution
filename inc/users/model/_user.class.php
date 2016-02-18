@@ -3231,6 +3231,9 @@ class User extends DataObject
 				$new_Blog->set( 'name', $shortname.'\'s blog' );
 				$new_Blog->set( 'locale', $this->get( 'locale' ));
 				$new_Blog->set( 'urlname', urltitle_validate( $shortname, $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs', $this->get( 'locale' ) ) );
+				// Don't show a sample collection on top menu in back-office:
+				// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+				$new_Blog->set( 'favorite', 0 );
 
 				// Defines blog settings by its kind.
 				$Plugins->trigger_event( 'InitCollectionKinds', array(

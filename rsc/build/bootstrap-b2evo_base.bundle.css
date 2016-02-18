@@ -2780,6 +2780,7 @@ div.messages {
   border-bottom: 1px solid #bbb;
 }
 .popover {
+  max-width: 100%;
   color: #333;
 }
 .popover.right {

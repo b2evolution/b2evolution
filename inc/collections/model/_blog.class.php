@@ -2099,7 +2099,7 @@ class Blog extends DataObject
 		{
 			$warning = T_('ATTENTION: advanced <a href="%s">user</a> & <a href="%s">group</a> permissions are enabled and some logged in users may have less permissions than anonymous users.');
 			$advanced_perm_url = url_add_param( $admin_url, 'ctrl=coll_settings&amp;blog='.$this->ID.'&amp;tab=' );
-			return ' <span class="warning">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</span>';
+			return ' <b class="warning text-danger">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</b>';
 		}
 
 		return NULL;
@@ -2305,6 +2305,10 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
+			// Reset "all_loaded" flag in order to allow get new created collection by ID:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->all_loaded = false;
+
 			if( $set_default_blog_ID )
 			{ // Use this blog as default because it is probably first created
 				$Settings->set( 'default_blog_ID', $this->ID );

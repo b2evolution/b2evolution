@@ -351,12 +351,19 @@ function b2evo_Callbacks() {
 };
 
 b2evo_Callbacks.prototype = {
-	register_callback : function(event, f) {
+	register_callback : function(event, f, single_event) {
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
 			this.eventHandlers[event] = new Array();
 		}
-		this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		if( typeof( single_event ) != 'undefined' && single_event )
+		{	// Use only single last registered event:
+			this.eventHandlers[event][0] = f;
+		}
+		else
+		{	// Keep all registered events:
+			this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		}
 	},
 
 	/**

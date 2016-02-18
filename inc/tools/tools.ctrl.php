@@ -236,11 +236,11 @@ if( empty($tab) )
 				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
 			}
 
-			/*$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
+			$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
 			if( empty( $advanced_user_perms ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to use') ), 'error' );
-			}*/
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
+			}
 
 			if( param_errors_detected() )
 			{	// If some param errors then stop a creating and display a form to correct:

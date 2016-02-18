@@ -34,10 +34,8 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 	$DB->log_queries = false;
 
 	$count = 1;
-	$perm_management_num = 0;
-	$perm_management_count = count( $perm_management );
-	$allow_access_num = 0;
-	$allow_access_count = count( $allow_access );
+	$perm_management_max_index = count( $perm_management ) - 1;
+	$allow_access_max_index = count( $allow_access ) - 1;
 	for( $i = 0; $i < $num_collections; $i++ )
 	{
 		// Create and save a new collection:
@@ -47,18 +45,13 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		$new_Blog->set( 'shortname', $shortname );
 		$new_Blog->set( 'name', $shortname );
 		$new_Blog->set( 'urlname', urltitle_validate( strtolower( $shortname ), $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
-
-		$new_Blog->set( 'advanced_perms', $perm_management[ $perm_management_num++ ] == 'advanced' ? 1 : 0 );
-		if( $perm_management_num > $perm_management_count - 1 )
-		{	// Reset a key to start of array:
-			$perm_management_num = 0;
-		}
-
-		$new_Blog->set_setting( 'allow_access', $allow_access[ $allow_access_num++ ] );
-		if( $allow_access_num > $allow_access_count - 1 )
-		{	// Reset a key to start of array:
-			$allow_access_num = 0;
-		}
+		// Set random of "Permission management" from the selected options:
+		$new_Blog->set( 'advanced_perms', $perm_management[ rand( 0, $perm_management_max_index ) ] == 'advanced' ? 1 : 0 );
+		// Set random of "Allow access to" from the selected options:
+		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );
+		// Don't show a sample collection on top menu in back-office:
+		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+		$new_Blog->set( 'favorite', 0 );
 
 		// Define collection settings by its kind:
 		$Plugins->trigger_event( 'InitCollectionKinds', array(
@@ -289,37 +282,159 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 	 */
 	$DB->log_queries = false;
 
-	$count = 1;
-	foreach( $user_groups as $user_group_ID )
-	{	// Create $num_users users per each group:
-		for( $i = 1; $i <= $num_users; $i++ )
-		{
-			$login = generate_random_passwd();
-			while( user_exists( $login ) )
-			{ // Generate new unique login
-				$login = generate_random_passwd();
-			}
+	// Check if we should assign at least one advanced permission:
+	$assign_adv_user_perms = ! empty( array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) ) );
 
-			$User = new User();
-			// Create out of range hashes for better security
-			$User->set( 'pass', generate_random_passwd() );
-			$User->set( 'login', $login );
-			$User->set( 'email', 'test_'.$i.'@test.com' );
-			$User->set( 'firstname', 'Test user '.$i );
-			$User->set( 'url', 'http://www.test-'.rand(1,3).'.com/test_user_'.$i );
-			$User->set( 'grp_ID', $user_group_ID );
-			$User->dbinsert();
+	if( $assign_adv_user_perms )
+	{ // Get all collections with advanced perms:
+		$coll_SQL = new SQL();
+		$coll_SQL->SELECT( 'blog_ID' );
+		$coll_SQL->FROM( 'T_blogs' );
+		$coll_SQL->WHERE( 'blog_advanced_perms = 1' );
+		$adv_perm_coll_IDs = $DB->get_col( $coll_SQL->get(), 0, 'Get all collections with advanced perms for tool "Create sample users"' );
+	}
+
+	// Load all selected groups in cache:
+	$GroupCache = & get_GroupCache();
+	$GroupCache->load_list( $user_groups );
+
+	$count = 1;
+	$user_groups_max_index = count( $user_groups ) - 1;
+	$advanced_user_perms_max_index = count( $advanced_user_perms ) - 1;
+	for( $i = 1; $i <= $num_users; $i++ )
+	{
+		$login = generate_random_passwd();
+		while( user_exists( $login ) )
+		{ // Generate new unique login
+			$login = generate_random_passwd();
+		}
+
+		$User = new User();
+		// Create out of range hashes for better security
+		$User->set( 'pass', generate_random_passwd() );
+		$User->set( 'login', $login );
+		$User->set( 'email', 'test_'.$i.'@test.com' );
+		$User->set( 'firstname', 'Test user '.$i );
+		$User->set( 'url', 'http://www.test-'.rand(1,3).'.com/test_user_'.$i );
+		if( $rand_Group = & $GroupCache->get_by_ID( $user_groups[ rand( 0, $user_groups_max_index) ], false, false ) )
+		{	// Set a random group from checked options if a group really exists in DB:
+			$User->set_Group( $rand_Group );
+		}
+
+		if( $User->dbinsert() )
+		{	// If user has been created successfully
 			$count++;
 
-			if( $count % 100 == 0 )
-			{ // Display a process of creating by one dot for 100 users
-				echo ' .';
-				evo_flush();
-			}
+			if( $assign_adv_user_perms && ! empty( $adv_perm_coll_IDs ) )
+			{	// Grant advanced user perms on existing collections with advanced perms:
+				$adv_perm_coll_insert_values = array();
+				foreach( $adv_perm_coll_IDs as $adv_perm_coll_ID )
+				{	// Select random kind of advanced permissions:
+					switch( $advanced_user_perms[ rand( 0, $advanced_user_perms_max_index ) ] )
+					{
+						case 'member':
+							// Set member permissions:
+							$adv_perm_coll_insert_values[] = implode( ',', array(
+									'blog_ID'              => $adv_perm_coll_ID,
+									'user_ID'              => $User->ID,
+									'ismember'             => 1,
+									'can_be_assignee'      => 0,
+									'perm_poststatuses'    => '""',
+									'perm_item_type'       => '"standard"',
+									'perm_edit'            => '"no"',
+									'perm_delpost'         => 0,
+									'perm_edit_ts'         => 0,
+									'perm_delcmts'         => 0,
+									'perm_recycle_owncmts' => 0,
+									'perm_vote_spam_cmts'  => 0,
+									'perm_cmtstatuses'     => '""',
+									'perm_edit_cmt'        => '"no"',
+									'perm_cats'            => 0,
+									'perm_properties'      => 0,
+									'perm_admin'           => 0,
+									'perm_media_upload'    => 0,
+									'perm_media_browse'    => 0,
+									'perm_media_change'    => 0,
+								) );
+							break;
 
-			// Clear all debug messages, To avoid an error about full memory
-			$Debuglog->clear( 'all' );
+						case 'moderator':
+							// Set moderator permissions:
+							$adv_perm_coll_insert_values[] = implode( ',', array(
+									'blog_ID'              => $adv_perm_coll_ID,
+									'user_ID'              => $User->ID,
+									'ismember'             => 1,
+									'can_be_assignee'      => 1,
+									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated"',
+									'perm_item_type'       => '"restricted"',
+									'perm_edit'            => '"le"',
+									'perm_delpost'         => 1,
+									'perm_edit_ts'         => 1,
+									'perm_delcmts'         => 1,
+									'perm_recycle_owncmts' => 1,
+									'perm_vote_spam_cmts'  => 1,
+									'perm_cmtstatuses'     => '"published,community,protected,review,private,draft,deprecated"',
+									'perm_edit_cmt'        => '"le"',
+									'perm_cats'            => 0,
+									'perm_properties'      => 0,
+									'perm_admin'           => 0,
+									'perm_media_upload'    => 1,
+									'perm_media_browse'    => 1,
+									'perm_media_change'    => 1,
+								) );
+							break;
+
+						case 'admin':
+							// Set administrator permissions:
+							$adv_perm_coll_insert_values[] = implode( ',', array(
+									'blog_ID'              => $adv_perm_coll_ID,
+									'user_ID'              => $User->ID,
+									'ismember'             => 1,
+									'can_be_assignee'      => 1,
+									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated,redirected"',
+									'perm_item_type'       => '"admin"',
+									'perm_edit'            => '"all"',
+									'perm_delpost'         => 1,
+									'perm_edit_ts'         => 1,
+									'perm_delcmts'         => 1,
+									'perm_recycle_owncmts' => 1,
+									'perm_vote_spam_cmts'  => 1,
+									'perm_cmtstatuses'     => '"published,community,protected,review,private,draft,deprecated"',
+									'perm_edit_cmt'        => '"all"',
+									'perm_cats'            => 1,
+									'perm_properties'      => 1,
+									'perm_admin'           => 1,
+									'perm_media_upload'    => 1,
+									'perm_media_browse'    => 1,
+									'perm_media_change'    => 1,
+								) );
+							break;
+					}
+				}
+				if( ! empty( $adv_perm_coll_insert_values ) )
+				{	// Insert advanced user perms for new created user in single query for all collections with advanced perms:
+					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
+							bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
+							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
+							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
+							bloguser_perm_media_browse, bloguser_perm_media_change )
+						VALUES ( '.implode( '), (', $adv_perm_coll_insert_values ).' )' );
+				}
+			}
 		}
+
+		// Clear the messages because we have at least 4 messages after each $new_Blog->create() on user creating with group that has an appropriate setting:
+		// (Those messages are the duplicated, so they fill a screen very large)
+		$Messages->clear();
+
+		if( $count % 20 == 0 )
+		{	// Display a process of creating by one dot for 20 users:
+			echo ' .';
+			evo_flush();
+		}
+
+		// Clear all debug messages, To avoid an error about full memory:
+		$Debuglog->clear( 'all' );
 	}
 
 	echo ' OK.';
