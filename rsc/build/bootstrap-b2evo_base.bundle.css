@@ -1630,6 +1630,16 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+@media only screen and (max-width: 360px) {
+  li[class^="active_distance_"],
+  li[class*=" active_distance_"] {
+    display: none;
+  }
+  li[class~="active_distance_1"],
+  li[class~="active_distance_2"] {
+    display: inline;
+  }
+}
 main .well {
   padding: 15px 15px 25px 15px;
 }
