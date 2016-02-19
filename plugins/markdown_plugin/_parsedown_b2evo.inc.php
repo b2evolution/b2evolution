@@ -184,20 +184,35 @@ class ParsedownB2evo extends ParsedownExtra
 	 */
 	protected function element( array $Element )
 	{
+		$r = '';
+
+		if( isset( $Element['before'] ) )
+		{	// Prepend additional text:
+			$r .= $Element['before'];
+		}
+
 		if( isset( $Element['name'] ) && $Element['name'] == 'notag' )
 		{	// Don't apply any html tag, Use simple text:
 			if( isset( $Element['handler'] ) )
 			{	// Use handler function:
-				return $this->{$Element['handler']}($Element['text']);
+				$r .= $this->{$Element['handler']}($Element['text']);
 			}
 			else
 			{	// No handler, just text:
-				return $Element['text'];
+				$r .= $Element['text'];
 			}
 		}
+		else
+		{	// Use standard preparing for other cases:
+			$r .= parent::element( $Element );
+		}
 
-		// Use standard preparing for other cases:
-		return parent::element( $Element );
+		if( isset( $Element['after'] ) )
+		{	// Append additional text:
+			$r .= $Element['after'];
+		}
+
+		return $r;
 	}
 
 
@@ -218,6 +233,89 @@ class ParsedownB2evo extends ParsedownExtra
 		else
 		{	// Call standard preparing:
 			return parent::blockListContinue( $Line, $Block );
+		}
+	}
+
+
+	/**
+	 * Callback after code block is completed
+	 *
+	 * @param array Block
+	 * @return array Block
+	 */
+	protected function blockCodeComplete( $Block )
+	{
+		if( ! isset( $Block['element']['attributes'] ) )
+		{	// Initialize attributes:
+			$Block['element']['attributes'] = array();
+		}
+
+		// Append class "codeblock":
+		if( isset( $Block['element']['attributes']['class'] ) )
+		{
+			$Block['element']['attributes']['class'] .= ' codeblock';
+		}
+		else
+		{
+			$Block['element']['attributes']['class'] = 'codeblock';
+		}
+
+		// Add these params for correct code detecting by codehighlight plugin:
+		$element_attrs = 'line=1'; // set this param because codehighlight plugin doesn't detect language without this
+		if( isset( $Block['element']['text']['attributes']['class'] ) &&
+		    preg_match( '/language-([a-z]+)/i', $Block['element']['text']['attributes']['class'], $lang_match ) )
+		{
+			$element_attrs .= ' lang='.$lang_match[1];
+			// Unset this because codehighlight plugin doesn't detect codeblock when tag <code> has any attributes:
+			unset( $Block['element']['text']['attributes']['class'] );
+		}
+		$Block['element']['before'] = '<!-- codeblock '.$element_attrs.' -->';
+		$Block['element']['after'] = '<!-- /codeblock -->'."\n";
+
+		return $Block;
+		// Don't call parent function because it encodes HMTL entities,
+		// but we don't need this in b2evolution, because we have plugin "escape_code" for such purpose.
+	}
+
+
+	/**
+	 * Callback after fenced code block is completed
+	 *
+	 * @param array Block
+	 * @return array Block
+	 */
+	protected function blockFencedCodeComplete( $Block )
+	{
+		// Do same preparing as for normal code blocks:
+		return $this->blockCodeComplete( $Block );
+	}
+
+
+	/**
+	 * Inline code preparing
+	 * NOTE: We rewrite this function completely and don't use of parent
+	 *       because we don't want "htmlspecialchars()" and we need class "codespan"
+	 *
+	 * @param array Excerpt
+	 * @return array Excerpt
+	 */
+	protected function inlineCode( $Excerpt )
+	{
+		$marker = $Excerpt['text'][0];
+
+		if( preg_match( '/^('.$marker.'+)[ ]*(.+?)[ ]*(?<!'.$marker.')\1(?!'.$marker.')/s', $Excerpt['text'], $matches ) )
+		{
+			$text = $matches[2];
+			$text = preg_replace( '/[ ]*\n/', ' ', $text );
+
+			return array(
+					'extent'  => strlen( $matches[0] ),
+					'element' => array(
+						'name'       => 'code',
+						'text'       => $text,
+						'attributes' => array( 'class' => 'codespan' )
+					),
+				);
 		}
 	}
 }
