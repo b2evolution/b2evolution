@@ -318,7 +318,8 @@ class ItemQuery extends SQL
 		{ // Get the status restrictions for all blogs
 			global $DB;
 			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
-			// Load all collections in single query, because otherwise we may have very much queries(a query for each collection) by below code:
+			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
+			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
 		}

@@ -162,7 +162,7 @@ $Form->begin_form( '', '', $params );
 	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
 	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
 	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
-	{	// Force to use only collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
+	{	// Force to use  collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
 		$locale_options = array( $edited_Item->get( 'locale' ), $locales[ $edited_Item->get( 'locale' ) ]['name'] );
 	}
 	else
