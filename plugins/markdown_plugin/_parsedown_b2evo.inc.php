@@ -199,6 +199,27 @@ class ParsedownB2evo extends ParsedownExtra
 		// Use standard preparing for other cases:
 		return parent::element( $Element );
 	}
+
+
+	/**
+	 * Prepare each line on a list element
+	 *
+	 * @param array Line
+	 * @param array Block
+	 * @return array
+	 */
+	protected function blockListContinue( $Line, array $Block )
+	{
+		if( ! empty( $Block['interrupted'] ) )
+		{	// If a list is interrupted now(for example, new line after list line),
+			// then we should end this list in order to start one new if that exists:
+			// Do nothing here in order to end the current list element.
+		}
+		else
+		{	// Call standard preparing:
+			return parent::blockListContinue( $Line, $Block );
+		}
+	}
 }
 
 ?>
