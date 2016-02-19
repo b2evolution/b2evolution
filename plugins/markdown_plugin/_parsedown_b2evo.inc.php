@@ -125,7 +125,7 @@ class ParsedownB2evo extends ParsedownExtra
 	 * @param string Text
 	 * @return string
 	 */
-	function text( $text )
+	public function text( $text )
 	{
 		if( strpos( $text, '&gt;' ) !== false )
 		{	// Fix the encoded chars ">" to correct parsing of blockquote:
@@ -150,9 +150,54 @@ class ParsedownB2evo extends ParsedownExtra
 	 * @param array Matches
 	 * @return string
 	 */
-	function b2evo_html_decode_blockquote( $matches )
+	private function b2evo_html_decode_blockquote( $matches )
 	{
 		return str_replace( '&gt;', '>', $matches[0] );
+	}
+
+
+	/**
+	 * Handle paragraph line
+	 *
+	 * @param string Line
+	 */
+	protected function paragraph( $Line )
+	{
+		if( $Line['text'] == '[teaserbreak]' || $Line['text'] == '[pagebreak]' )
+		{	// Don't apply <p> around item content separators:
+			return array(
+					'element' => array(
+						'name' => 'notag',
+						'text' => $Line['text']
+				) );
+		}
+
+		// Use standard preparing for other cases:
+		return parent::paragraph( $Line );
+	}
+
+
+	/**
+	 * Mark up element
+	 *
+	 * @param array Element
+	 */
+	protected function element( array $Element )
+	{
+		if( isset( $Element['name'] ) && $Element['name'] == 'notag' )
+		{	// Don't apply any html tag, Use simple text:
+			if( isset( $Element['handler'] ) )
+			{	// Use handler function:
+				return $this->{$Element['handler']}($Element['text']);
+			}
+			else
+			{	// No handler, just text:
+				return $Element['text'];
+			}
+		}
+
+		// Use standard preparing for other cases:
+		return parent::element( $Element );
 	}
 }
 
