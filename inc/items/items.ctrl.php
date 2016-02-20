@@ -951,6 +951,33 @@ switch( $action )
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesful
+
+			// get current extra_cats that are in collections where current user is not a coll admin
+			$ChapterCache = & get_ChapterCache();
+
+			$prev_extra_cat_IDs = postcats_get_byID( $edited_Item->ID );
+			$off_limit_cats = array();
+			$r = array();
+
+			foreach( $prev_extra_cat_IDs as $cat )
+			{
+				$cat_blog = get_catblog( $cat );
+				if( ! $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) )
+				{
+					$Chapter = $ChapterCache->get_by_ID( $cat );
+					$off_limit_cats[$cat] = $Chapter;
+					$r[] = '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->dget( 'name' ).'</a>';
+				}
+			}
+
+			if( $off_limit_cats )
+			{
+				$Messages->add( sprintf( T_('Please note: this item is also cross-posted to the following other categories/collections: %s'),
+						implode( ', ', $r ) ), 'note' );
+			}
+
+			$post_extracats = array_unique( array_merge( $post_extracats,array_keys( $off_limit_cats ) ) );
+
 			$edited_Item->set( 'main_cat_ID', $post_category );
 			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 		}

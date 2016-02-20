@@ -1056,7 +1056,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	// Init cat display param
 	$cat_display_params = array( 'total_count' => 0 );
 
-	if( $current_User->check_perm( 'blog_admin', '' ) &&
+	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
@@ -1074,7 +1074,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			if( ! blog_has_cats( $l_Blog->ID ) )
 				continue;
 
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
+			// Skip collection if current user do not have the appropriate permissions
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) || ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
 				continue;
 			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
 			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
@@ -2226,13 +2227,14 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 		$prev_main_cat = $post_category;
 	}
 	$prev_cat_blog = get_catblog( $prev_main_cat );
-	$is_blog_admin = $current_User->check_perm( 'blog_admin', '' );
+	$post_cat_blog = get_catblog( $post_category );
 	$allow_cross_posting = get_allow_cross_posting();
 
 	// Check if any of the extracats belong to a blog other than the current one
 	foreach( $post_extracats as $key => $cat )
 	{
-		if( (get_catblog( $cat ) != get_catblog( $post_category ) ) && ! ( $allow_cross_posting % 2 == 1 &&  $is_blog_admin ) )
+		$cat_blog = get_catblog( $cat );
+		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) ) )
 		{ // this cat is not from the main category
 			$Messages->add( T_('You are not allowed to cross post to several collections.') );
 			$result = false;
@@ -2244,7 +2246,8 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 	}
 
 	// Check if post_category belongs to a collection different from the previous main cat collection
-	if( $prev_main_cat && ( $prev_cat_blog != get_catblog( $post_category ) ) && ! ( $allow_cross_posting >= 2 && $is_blog_admin ) )
+	if( $prev_main_cat && ( $prev_cat_blog != $post_cat_blog ) &&
+			! ( $allow_cross_posting >= 2 && $current_User->check_perm( 'blog_admin', '', false, $prev_cat_blog ) && $current_User->check_perm( 'blog_admin', '', false, $post_cat_blog ) ) )
 	{
 		$Messages->add( T_('You are not allowed to move post between collections.') );
 		$result = false;
