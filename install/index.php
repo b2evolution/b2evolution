@@ -1010,7 +1010,7 @@ switch( $action )
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
 		// Progress bar
-		start_install_progress_bar( T_('Uprade in progress'), get_upgrade_steps_count() );
+		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
