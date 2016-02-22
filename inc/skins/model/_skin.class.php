@@ -794,7 +794,7 @@ class Skin extends DataObject
 	 */
 	function display_init( $features = array() )
 	{
-		global $debug, $Messages, $disp;
+		global $debug, $Messages, $disp, $UserSettings;
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
@@ -1050,6 +1050,12 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_avatar':
@@ -1059,6 +1065,26 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
+					break;
+
+				case 'disp_pwdchange':
+					// Specific features for disp=pwdchange:
+				case 'disp_userprefs':
+					// Specific features for disp=userprefs:
+				case 'disp_subs':
+					// Specific features for disp=subs:
+
+					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit':
@@ -1086,6 +1112,12 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit_comment':
