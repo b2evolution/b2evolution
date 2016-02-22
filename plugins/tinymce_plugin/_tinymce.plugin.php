@@ -731,6 +731,18 @@ class tinymce_plugin extends Plugin
 			$tmce_language = 'en';
 		}
 
+		// custom conf:
+		$tmce_custom_conf = $this->Settings->get('tmce_custom_conf');
+		// Extract plugins from the list
+		$regex = '/plugins : \"(.*)\"/';
+		if( preg_match($regex, $tmce_custom_conf, $matches) ) {
+			// Adding extra plugins to the default list
+			$tmce_plugins .= ','.$matches[1];
+
+			// Remove plugins from the param to do not add them twice
+			$tmce_custom_conf = preg_replace($regex, '', $tmce_custom_conf);
+		}
+
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
 		// Convert one specifc textarea to use TinyMCE:
@@ -808,7 +820,7 @@ class tinymce_plugin extends Plugin
 		$init = implode( ",\n", $init_options );
 
 		// custom conf:
-		if( $tmce_custom_conf = $this->Settings->get('tmce_custom_conf') )
+		if( $tmce_custom_conf )
 		{
 			$init .= ",\n// tmce_custom_conf (from PluginSettings):\n".$tmce_custom_conf;
 		}
