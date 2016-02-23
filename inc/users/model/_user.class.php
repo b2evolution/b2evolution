@@ -4634,11 +4634,16 @@ class User extends DataObject
 				$this->send_account_changed_notification();
 			}
 		}
-		else
-		{
+		elseif( $is_new_user )
+		{	// Some error on inserting new user in DB:
 			$DB->rollback();
 			$update_success = false;
 			$Messages->add( 'New user creation error', 'error' );
+		}
+		else
+		{	// Nothing to update:
+			$DB->commit();
+			$update_success = true;
 		}
 
 		// Update user status settings
