@@ -901,18 +901,28 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace(), 'str_onve' -> to replace only first match
  * @return string Replaced content
  */
 function replace_content( $content, $search, $replace, $type = 'preg' )
 {
-	if( $type == 'str' )
+	switch( $type )
 	{
-		return str_replace( $search, $replace, $content );
-	}
-	else
-	{
-		return preg_replace( $search, $replace, $content );
+		case 'str':
+			return str_replace( $search, $replace, $content );
+
+		case 'str_once':
+			$pos = strpos( $content, $search );
+			if( $pos !== false )
+			{	// Do replace only if string is found:
+				return substr_replace( $content, $replace, $pos, strlen( $search ) );
+			}
+			// Nothing to replace, Return original string:
+			return $content;
+
+		case 'preg':
+		default:
+			return preg_replace( $search, $replace, $content );
 	}
 }
 
