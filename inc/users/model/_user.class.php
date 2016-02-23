@@ -1618,8 +1618,8 @@ class User extends DataObject
 
 		if( is_null($this->$Object) && !empty($this->$ID ) )
 		{
-			$Cache = & call_user_func( 'get_'.$Object.'Cache' );
-			$this->$Object = $Cache->get_by_ID( $this->$ID, false );
+			$Cache = call_user_func( 'get_'.$Object.'Cache' );
+			$this->$Object = & $Cache->get_by_ID( $this->$ID, false );
 		}
 
 		return $this->$Object;
@@ -6126,7 +6126,7 @@ class User extends DataObject
 			$field_was_changed = ( isset( $this->significant_changed_values[ $user_field_name ] ) && ( ! empty( $this->significant_changed_values[ $user_field_name ] ) ) );
 			if( isset( $user_field_data['className'] ) )
 			{ // The field value is an object ID, get the object name
-				$Cache = & call_user_func( 'get_'.$user_field_data['className'].'Cache' );
+				$Cache = call_user_func( 'get_'.$user_field_data['className'].'Cache' );
 				$Object = & $Cache->get_by_ID( $this->get( $user_field_name ), false, false );
 				$user_field_data['new'] = empty( $Object ) ? NULL : $Object->get_name();
 				if( $field_was_changed )
