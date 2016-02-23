@@ -1910,7 +1910,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 	// Step 1
 	// Forbid the following characters in logins
-	if( preg_match( '~[\'"><@\s]~', $login ) )
+	if( preg_match( '~[\'"><@&\s]~', $login ) )
 	{	// WARNING: allowing ' or " or > or < will open security issues!
 		// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
 		// NOTE: we do not allow whitespace in logins
