@@ -768,7 +768,7 @@ function param_check_valid_login( $var )
 		}
 		else
 		{
-			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @' );
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @, &' );
 		}
 		param_error( $var, $msg );
 		return false;
