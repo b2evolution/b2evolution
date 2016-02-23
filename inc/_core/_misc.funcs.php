@@ -1028,15 +1028,17 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @param string Url delimeter
  * @param string Callback function name
  * @param string Additional attributes for tag <a>
+ * @param boolean TRUE to exclude links from header tags like h1, h2, etc.
  * @return string
  */
-function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '' )
+function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '', $exclude_headers = false )
 {
 	$r = '';
 	$inside_tag = false;
 	$in_a_tag = false;
 	$in_code_tag = false;
 	$in_tag_quote = false;
+	$in_header_tag = false;
 	$from_pos = 0;
 	$i = 0;
 	$n = strlen($text);
@@ -1091,6 +1093,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_a_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1110,6 +1113,24 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_code_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
+					}
+					break;
+			}
+		}
+		elseif( $in_header_tag )
+		{	// In a code but no longer inside <h#>...</h#> tags or any other embedded tag like <strong> or whatever
+			switch( $text[$i] )
+			{
+				case '<':
+					if( strtolower( substr( $text, $i+1, 3 ) ) == '/'.$in_header_tag )
+					{	// Ok, this is the end tag of the header:
+						$i += 5;
+						$r .= substr( $text, $from_pos, $i - $from_pos );
+						$from_pos = $i;
+						$in_code_tag = false;
+						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1135,6 +1156,11 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			if( ( substr( $text, $i+1, 4 ) == 'code') )
 			{ // opening "code" tag
 				$in_code_tag = true;
+			}
+
+			if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
+			{	// opening "h1" - "h6" tags:
+				$in_header_tag = $h_match[0];
 			}
 
 			// Make the text before the opening < clickable:

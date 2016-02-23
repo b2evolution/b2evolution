@@ -530,12 +530,12 @@ class autolinks_plugin extends Plugin
 
 		if( $this->Settings->get( 'autolink_urls' ) )
 		{	// First, make the URLs clickable:
-			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs );
+			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs, true );
 		}
 
 		if( !empty( $this->replacement_link_array ) )
 		{	// Make the desired remaining terms/definitions clickable:
-			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs );
+			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs, true );
 		}
 
 		return true;
