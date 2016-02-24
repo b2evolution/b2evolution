@@ -7350,6 +7350,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11730, 'Upgrade table invitation codes...' ) )
+	{	// part of 6.7.0
+		db_add_col( 'T_users__invitation_code', 'ivc_level', 'int unsigned NULL' );
+		$DB->query( 'ALTER TABLE T_users__invitation_code
+			MODIFY COLUMN ivc_grp_ID int(4) NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

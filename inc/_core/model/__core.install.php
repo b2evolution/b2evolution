@@ -176,7 +176,8 @@ $schema_queries = array(
 			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
 			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ivc_source    varchar(30) NULL,
-			ivc_grp_ID    int(4) NOT NULL,
+			ivc_grp_ID    int(4) NULL,
+			ivc_level     int unsigned NULL,
 			PRIMARY KEY ( ivc_ID ),
 			UNIQUE ivc_code ( ivc_code )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

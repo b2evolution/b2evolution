@@ -303,19 +303,23 @@ switch( $action )
 		if( ! empty( $invitation ) )
 		{ // Invitation code was entered on the form
 			$SQL = new SQL();
-			$SQL->SELECT( 'ivc_source, ivc_grp_ID' );
+			$SQL->SELECT( 'ivc_source, ivc_grp_ID, ivc_level' );
 			$SQL->FROM( 'T_users__invitation_code' );
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
 			if( $invitation_code = $DB->get_row( $SQL->get() ) )
 			{	// Set source and group from invitation code:
 				if( ! empty( $invitation_code->ivc_source ) )
-				{	// Change current source only if invitation code has it filled:
+				{	// Use invitation source only if it is filled:
 					$new_User->set( 'source', $invitation_code->ivc_source );
+				}
+				if( ! empty( $invitation_code->ivc_level ) )
+				{	// Use invitation level only if it is filled:
+					$new_User->set( 'level', $invitation_code->ivc_level );
 				}
 				$GroupCache = & get_GroupCache();
 				if( $new_user_Group = & $GroupCache->get_by_ID( $invitation_code->ivc_grp_ID, false, false ) )
-				{
+				{	// Use invitation group only if it is filled:
 					$new_User->set_Group( $new_user_Group );
 				}
 			}
