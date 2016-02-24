@@ -75,10 +75,22 @@ if( !empty( $params['trigger_url'] ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Trigger Page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['trigger_url'], '', '.a' ).'</td></tr>'."\n";
 }
 
-if( !empty ( $params['initial_hit'] ) )
+if( ! empty( $params['initial_hit'] ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+}
+
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+if( ! empty( $params['level'] ) )
+{	// User level:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Level').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['level'].'</td></tr>'."\n";
+}
+
+if( ! empty( $params['group'] ) )
+{	// User group:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Group').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['group'].'</td></tr>'."\n";
 }
 
 echo '</table>'."\n";

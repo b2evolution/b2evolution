@@ -81,9 +81,21 @@ if( !empty( $initial_blog_ID ) )
 	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
 }
 
+echo "\n";
+
+if( ! empty( $activated_User->level ) )
+{	// User level:
+	echo T_('Assigned Level').": ".$activated_User->level."\n";
+}
+
+if( $user_Group = & $activated_User->get_Group() )
+{	// User group:
+	echo T_('Assigned Group').": ".$user_Group->get_name()."\n";
+}
+
 // A count of user's pictures:
 $user_pictures_count = count( $activated_User->get_avatar_Links( false ) );
-echo sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
+echo "\n".sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
 
 
 echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$activated_User->ID."\n";

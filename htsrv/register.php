@@ -381,6 +381,8 @@ switch( $action )
 				'source'      => $new_User->get( 'source' ),
 				'trigger_url' => $session_registration_trigger_url,
 				'initial_hit' => $initial_hit,
+				'level'       => $new_User->get( 'level' ),
+				'group'       => ( ( $user_Group = & $new_User->get_Group() ) ? $user_Group->get_name() : '' ),
 				'login'       => $login,
 				'email'       => $email,
 				'new_user_ID' => $new_User->ID,

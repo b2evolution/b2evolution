@@ -84,6 +84,18 @@ if( !empty( $initial_blog_ID ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $activated_User->ID ), '', '.a' ).'</td></tr>'."\n";
 }
 
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+if( ! empty( $activated_User->level ) )
+{	// User level:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Level').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->level.'</td></tr>'."\n";
+}
+
+if( $user_Group = & $activated_User->get_Group() )
+{	// User group:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Group').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Group->get_name().'</td></tr>'."\n";
+}
+
 echo '</table>'."\n";
 
 // User's pictures:

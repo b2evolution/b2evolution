@@ -81,6 +81,18 @@ if( !empty ( $params['initial_hit'] ) )
 }
 
 echo "\n";
+
+if( ! empty ( $params['level'] ) )
+{	// User level:
+	echo T_('Assigned Level').": ".$params['level']."\n";
+}
+
+if( ! empty ( $params['group'] ) )
+{	// User group:
+	echo T_('Assigned Group').": ".$params['group']."\n";
+}
+
+echo "\n";
 echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['new_user_ID']."\n";
 echo T_('Recent registrations').': '.$admin_url.'?ctrl=users&action=show_recent'."\n";
 
