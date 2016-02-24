@@ -847,6 +847,7 @@ class autolinks_plugin extends Plugin
 			return $content;
 		}
 
+		$new_linked_tags = array();
 		$tag_search_patterns = array();
 		$tag_replace_strings = array();
 		foreach( $this->tags_array as $tag_name )
@@ -860,7 +861,7 @@ class autolinks_plugin extends Plugin
 				$tag_search_patterns[] = '#(^|\W)('.preg_quote( $tag_name, '#' ).')(\W|$)#iu';
 				$tag_replace_strings[] = '$1'.$this->current_Blog->get_tag_link( $tag_name, "$2" ).'$3';
 				// Mark this tag as linked and don't link it twice:
-				$this->already_linked_tags[] = $tag_name;
+				$new_linked_tags[] = $tag_name;
 			}
 		}
 
@@ -875,6 +876,25 @@ class autolinks_plugin extends Plugin
 			{	// Replace in whole content:
 				$content = replace_content( $content, $tag_search_patterns, $tag_replace_strings, 'preg', 1 );
 			}
+		}
+
+		foreach( $new_linked_tags as $n => $new_linked_tag )
+		{
+			if( stristr( $content, $new_linked_tag.'</a>' ) === false )
+			{	// This tag was not linked really in this call, Skip it:
+				// It may happens when one tag is a substring of other tag, Example:
+				//     - First tag is "long tag"
+				//     - Second tag is "test long tag name"
+				//     - $text = "1 test long tag name 2"
+				//     So we should not mark the second as linked because only the first tag is linked only first time,
+				//     and we should keep the second tag for other strings.
+				unset( $new_linked_tags[ $n ] );
+			}
+		}
+
+		if( count( $new_linked_tags ) )
+		{	// Append new linked tags to skip them in next times:
+			$this->already_linked_tags = array_merge( $this->already_linked_tags, $new_linked_tags );
 		}
 
 		return $content;
