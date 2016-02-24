@@ -308,8 +308,11 @@ switch( $action )
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
 			if( $invitation_code = $DB->get_row( $SQL->get() ) )
-			{ // Set source and group from invitation code
-				$new_User->set( 'source', $invitation_code->ivc_source );
+			{	// Set source and group from invitation code:
+				if( ! empty( $invitation_code->ivc_source ) )
+				{	// Change current source only if invitation code has it filled:
+					$new_User->set( 'source', $invitation_code->ivc_source );
+				}
 				$GroupCache = & get_GroupCache();
 				if( $new_user_Group = & $GroupCache->get_by_ID( $invitation_code->ivc_grp_ID, false, false ) )
 				{
