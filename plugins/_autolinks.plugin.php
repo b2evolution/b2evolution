@@ -529,17 +529,13 @@ class autolinks_plugin extends Plugin
 	 */
 	function render_content( & $content, $item_Blog = NULL )
 	{
-		// Prepare existing links
+		// Prepare existing links:
 		$content = $this->prepare_existing_links( $content );
 
-		// reset already linked usernames
+		// Reset already linked usernames:
 		$this->already_linked_usernames = array();
-		if( $this->setting_autolink_username )
-		{	// Replace @usernames with user identity link:
-			$content = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $content, array( $this, 'replace_usernames' ) );
-		}
 
-		// load global defs
+		// Load global defs:
 		$this->load_link_array( $item_Blog );
 
 		// Load all tags of current collection:
@@ -629,6 +625,9 @@ class autolinks_plugin extends Plugin
 
 		// Cleanup words to be deleted:
 		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
+
+		// Replace @usernames with user identity link:
+		$text = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
 
 		// Make tag names clickable:
 		$text = $this->replace_tags( $text );
@@ -763,8 +762,8 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_usernames( $content, $search_list, $replace_list )
 	{
-		if( empty( $this->current_Blog ) )
-		{	// No Blog, Exit here
+		if( empty( $this->setting_autolink_username ) || empty( $this->current_Blog ) )
+		{	// No data to correct username linking, Exit here:
 			return $content;
 		}
 
@@ -844,7 +843,7 @@ class autolinks_plugin extends Plugin
 	function replace_tags( $content )
 	{
 		if( empty( $this->setting_autolink_tag ) || empty( $this->tags_array ) || empty( $this->current_Blog ) )
-		{ // No data to correct tag linking, Exit here:
+		{	// No data to correct tag linking, Exit here:
 			return $content;
 		}
 
