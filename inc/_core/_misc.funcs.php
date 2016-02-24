@@ -901,28 +901,45 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Source content
  * @param array|string Search list
  * @param array|string Replace list
- * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace(), 'str_onve' -> to replace only first match
+ * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
-function replace_content( $content, $search, $replace, $type = 'preg' )
+function replace_content( $content, $search, $replace, $type = 'preg', $limit = -1 )
 {
+	if( $limit == 0 )
+	{	// Strange request to nothing replace, Return original content:
+		return $content;
+	}
+
 	switch( $type )
 	{
 		case 'str':
-			return str_replace( $search, $replace, $content );
-
-		case 'str_once':
-			$pos = strpos( $content, $search );
-			if( $pos !== false )
-			{	// Do replace only if string is found:
-				return substr_replace( $content, $replace, $pos, strlen( $search ) );
+			if( $limit == -1 )
+			{	// Unlimited replace:
+				return str_replace( $search, $replace, $content );
 			}
-			// Nothing to replace, Return original string:
-			return $content;
+			else
+			{	// Limited replace:
+				$pos = strpos( $content, $search );
+				if( $pos !== false )
+				{	// Do the limited replacements:
+					for( $p = 0; $p < $limit; $p++ )
+					{
+						if( $pos === false )
+						{	// Stop searching:
+							break;
+						}
+						$content = substr_replace( $content, $replace, $pos, strlen( $search ) );
+						// Go to next searched substring:
+						$pos = strpos( $content, $search, $pos + strlen( $replace ) );
+					}
+				}
+				return $content;
+			}
 
-		case 'preg':
-		default:
-			return preg_replace( $search, $replace, $content );
+		default: // 'preg'
+			return preg_replace( $search, $replace, $content, $limit );
 	}
 }
 

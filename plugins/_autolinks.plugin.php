@@ -848,25 +848,33 @@ class autolinks_plugin extends Plugin
 			return $content;
 		}
 
+		$tag_search_patterns = array();
+		$tag_replace_strings = array();
 		foreach( $this->tags_array as $tag_name )
 		{
 			if( in_array( $tag_name, $this->already_linked_tags ) )
 			{	// Skip this tag because it has been already linked before:
 				continue;
 			}
-			if( strpos( $content, $tag_name ) !== false )
+			if( stristr( $content, $tag_name ) !== false )
 			{	// Replace tag name with its link if it is found in text:
-				if( stristr( $content, '<a' ) !== false )
-				{	// Don't link tags in body of already existing links:
-					$content = callback_on_non_matching_blocks( $content, '~<a[^>]*>.*?</a>~is',
-						'replace_content', array( $tag_name, $this->current_Blog->get_tag_link( $tag_name ), 'str_once' ) );
-				}
-				else
-				{
-					$content = replace_content( $content, $tag_name, $this->current_Blog->get_tag_link( $tag_name ), 'str_once' );
-				}
+				$tag_search_patterns[] = '#(^|\W)('.preg_quote( $tag_name, '#' ).')(\W|$)#iu';
+				$tag_replace_strings[] = '$1'.$this->current_Blog->get_tag_link( $tag_name, "$2" ).'$3';
 				// Mark this tag as linked and don't link it twice:
 				$this->already_linked_tags[] = $tag_name;
+			}
+		}
+
+		if( count( $tag_search_patterns ) )
+		{	// Do replacement if at least one tag is found in content:
+			if( stristr( $content, '<a' ) !== false )
+			{	// Don't link tags in body of already existing links:
+				$content = callback_on_non_matching_blocks( $content, '~<a[^>]*>.*?</a>~is',
+					'replace_content', array( $tag_search_patterns, $tag_replace_strings, 'preg', 1 ) );
+			}
+			else
+			{	// Replace in whole content:
+				$content = replace_content( $content, $tag_search_patterns, $tag_replace_strings, 'preg', 1 );
 			}
 		}
 
