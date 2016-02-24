@@ -345,15 +345,15 @@ $Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') 
 
 	$Form->info( T_('Number of posts'), $edited_User->get_reputation_posts() );
 
-	$Form->info( T_('Comments'), $edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ) );
+	$Form->info( T_('Comments'), '<span class="reputation_message">'.$edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ).'</span>' );
 
-	$Form->info( T_('Photos'), $edited_User->get_reputation_files( array( 'file_type' => 'image', 'view_type' => 'extended' ) ) );
+	$Form->info( T_('Photos'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'image', 'view_type' => 'extended' ) ).'</span>' );
 
-	$Form->info( T_('Audio'), $edited_User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+	$Form->info( T_('Audio'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
-	$Form->info( T_('Other files'), $edited_User->get_reputation_files( array( 'file_type' => 'other' ) ) );
+	$Form->info( T_('Other files'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
 
-	$Form->info( T_('Spam fighter score'), $edited_User->get_reputation_spam() );
+	$Form->info( T_('Spam fighter score'), '<span class="reputation_message">'.$edited_User->get_reputation_spam().'</span>' );
 
 $Form->end_fieldset(); // Reputation
 
