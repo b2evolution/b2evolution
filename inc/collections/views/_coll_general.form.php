@@ -72,7 +72,9 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
-	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
+	$name_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'name' ) ) );
+	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
+		.' ('.sprintf( T_('%s characters'), '<span id="blog_name_chars_count">'.$name_chars_count.'</span>' ).')', 255 );
 
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
@@ -228,5 +230,10 @@ jQuery( 'input[name=advanced_perms]' ).click( function()
 		jQuery( '#allow_access_members_simple_title, #allow_access_members_simple_note' ).show();
 		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).hide();
 	}
+} );
+
+jQuery( '#blog_name' ).keyup( function()
+{	// Count characters of collection title(each html entity is counted as single char):
+	jQuery( '#blog_name_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
 } );
 </script>
