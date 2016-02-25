@@ -177,7 +177,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	{
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 		$LinkOwner = new LinkComment( $edited_Comment );
-		attachment_iframe( $Form, $LinkOwner );
+		attachment_iframe( $Form, $LinkOwner, NULL, false, true );
 	}
 
 	// ####################### PLUGIN FIELDSETS #########################
@@ -194,7 +194,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	if( $comment_Item->can_rate()
 		|| !empty( $edited_Comment->rating ) )
 	{	// Rating is editable
-		$Form->begin_fieldset( T_('Rating') );
+		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 
 		echo '<p>';
 		$edited_Comment->rating_input( array( 'reset' => true ) );
@@ -210,7 +210,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	// ####################### ADVANCED PROPERTIES #########################
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		$Form->begin_fieldset( T_('Date & Time') );
+		$Form->begin_fieldset( T_('Date & Time'), array( 'id' => 'cmntform_datetime', 'fold' => true ) );
 
 		$Form->switch_layout( 'fieldset' );
 
@@ -225,7 +225,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// ####################### LINKS #########################
-	$Form->begin_fieldset( T_('Links') );
+	$Form->begin_fieldset( T_('Links'), array( 'id' => 'cmntform_html', 'fold' => true ) );
 		echo '<p>';
 		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
 		// TODO: apply to all links  -- note: see basic antispam plugin that does this for x hours
@@ -234,7 +234,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	// ####################### FEEDBACK INFO #########################
-	$Form->begin_fieldset( T_('Feedback info') );
+	$Form->begin_fieldset( T_('Feedback info'), array( 'id' => 'cmntform_info', 'fold' => true ) );
 ?>
 
 	<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
@@ -250,7 +250,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	// ####################### TEXT RENDERERS #########################
 	global $Plugins;
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
 	$Form->end_fieldset();
 	?>
@@ -265,4 +265,6 @@ $Form->end_form();
 
 // JS code for status dropdown select button
 echo_status_dropdown_button_js( 'comment' );
+// JS code for fieldset folding:
+echo_fieldset_folding_js();
 ?>

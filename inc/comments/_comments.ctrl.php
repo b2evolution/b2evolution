@@ -245,6 +245,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
+		// Update the folding positions for current user per collection:
+		save_fieldset_folding_values( $Blog->ID );
+
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
 			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )

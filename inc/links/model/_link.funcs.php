@@ -148,7 +148,11 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	// Get a count of links in order to deny folding when there is at least one link
 	$links_count = count( $LinkOwner->get_Links() );
 
-	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold, 'deny_fold' => ( $links_count > 0 ) ) );
+	$Form->begin_fieldset( $fieldset_title, array(
+			'id' => $LinkOwner->type == 'comment' ? 'cmntform_links' : 'itemform_links',
+			'fold' => $fold,
+			'deny_fold' => ( $links_count > 0 )
+		) );
 
 	echo '<div id="attachmentframe_wrapper">'
 				.'<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type
