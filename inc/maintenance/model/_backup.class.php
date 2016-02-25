@@ -253,7 +253,7 @@ class Backup
 		// Backup directories and files
 		if( $success && $this->has_included( $this->backup_paths ) )
 		{
-			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
+			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'www/';
 
 			// Prepare files backup directory
 			if( $success = prepare_maintenance_dir( $backup_files_path, false ) )
@@ -265,12 +265,10 @@ class Backup
 		// Backup database
 		if( $success && $this->has_included( $this->backup_tables ) )
 		{
-			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
-
 			// Prepare database backup directory
-			if( $success = prepare_maintenance_dir( $backup_tables_path, false ) )
+			if( $success = prepare_maintenance_dir( $cbackup_path, false ) )
 			{	// We can backup database
-				$success = $this->backup_database( $backup_tables_path );
+				$success = $this->backup_database( $cbackup_path );
 			}
 		}
 
@@ -352,7 +350,7 @@ class Backup
 
 		if( $this->pack_backup_files )
 		{ // Create ZIPped backup
-			$zip_filepath = $backup_dirpath.'files.zip';
+			$zip_filepath = $backup_dirpath.'www.zip';
 
 			// Pack using 'zlib' extension and PclZip wrapper
 
@@ -374,6 +372,7 @@ class Backup
 				evo_flush();
 
 				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ),
+					PCLZIP_OPT_ADD_PATH, 'www',
 					PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ),
 					PCLZIP_CB_PRE_ADD, 'callback_backup_files' );
 				if( $file_list == 0 )
