@@ -338,7 +338,7 @@ class Backup
 				foreach( $this->path_to_array( $backup_exclude_folders[$name]['path'] ) as $name )
 				{
 					// Exclude root folder with name:
-					$excluded_files[] = $name;
+					$excluded_files[] = $name.'/';
 					// Exclude all subfolders with name:
 					$backup_current_exclude_folders[] = $name;
 				}
