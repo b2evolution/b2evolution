@@ -6,28 +6,40 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header_http_response('403 Forbidden');
-headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
+header_http_response( '403 Forbidden' );
+headers_content_mightcache( 'text/html', 0 ); // Do NOT cache error messages! (Users would not see they fixed them)
+
+// Page title:
+$page_title = T_('Back-office access denied');
+
+// Header:
+require dirname( __FILE__ ).'/login/_html_header.inc.php';
+
+$secure_httsrv_url = get_secure_htsrv_url();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<title><?php echo T_('Back-office access denied') ?></title>
-	</head>
-<body>
-	<div style="background-color:#fee; border: 1px solid red; text-align:center;">
-		<h1><?php echo T_('Back-office access denied') ?></h1>
-		<p><?php echo T_('Sorry, you don\'t have permission to access the back-office / admin interface.') ?></p>
+<div class="wrap">
+	<div class="panel panel-danger">
+		<div class="panel-heading">
+			<h3 class="panel-title"><?php echo $page_title; ?></h3>
+		</div>
+		<div class="panel-body">
+			<p><?php echo T_('Sorry, you don\'t have permission to access the back-office / admin interface.'); ?></p>
+			<p style="margin-bottom:20px">
+				<a href="<?php echo $baseurl; ?>" class="btn btn-primary btn-lg">
+					<?php echo '&laquo; '.T_('Back to home page'); ?>
+				</a>
+				<a href="<?php echo $secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $ReqURL, $secure_httsrv_url ) ); ?>" class="btn btn-default btn-lg pull-right">
+					<?php echo T_('Log out').'!'; ?>
+				</a>
+			</p>
+		</div>
 	</div>
-	<p style="text-align:center;"><?php
-		$secure_httsrv_url = get_secure_htsrv_url();
-		echo '<a href="'.$baseurl.'">&laquo; '.T_('Back to home page').'</a>
-			&nbsp; &bull; &nbsp; 
-		<a href="'.$secure_httsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($ReqURL, $secure_httsrv_url)).'">'.T_('Log out').'!</a>';
-	?></p>
-</body>
-</html>
+</div>
 <?php
-	exit(0);
+
+// Footer:
+require dirname (__FILE__ ).'/login/_html_footer.inc.php';
+
+// Exit here to don't call any code to initalize controller and etc.
+exit(0);
 ?>
