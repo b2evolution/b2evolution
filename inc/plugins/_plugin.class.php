@@ -478,7 +478,7 @@ class Plugin
 	 * 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
 	 * 'no_edit': if true, the setting is not editable. This is useful for internal settings.
 	 * 'allow_none': set this to true to have "None" in the options list for types 'select_group' and 'select_user'.
-	 * 'allow_empty': set this to true to allow save the empty values, e.g. when type=integer and setting may be empty
+	 * 'allow_empty': true to allow empty values, e.g. when type=integer but the value is not required
 	 * 'valid_pattern': A regular expression pattern that the value must match.
 	 *                      This is either just a regexp pattern as string or an array
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
