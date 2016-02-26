@@ -47,6 +47,8 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
+	case 'copy':
+		// Copy collection:
 		// Check permissions:
 		if( ! $current_User->check_perm( 'blogs', 'create' ) )
 		{
@@ -121,6 +123,26 @@ switch( $action )
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
+		break;
+
+	case 'duplicate':
+		// Duplicate collection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( $edited_Blog->duplicate() )
+		{	// The collection has been duplicated successfully:
+			$Messages->add( T_('The new collection has been duplicated.'), 'success' );
+
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+		}
+
+		// 
+		$action = 'copy';
 		break;
 
 
@@ -446,6 +468,17 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		$next_action = 'create';
+
+		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
+	case 'copy':
+		$AdminUI->disp_payload_begin();
+
+		$next_action = 'duplicate';
 
 		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
 

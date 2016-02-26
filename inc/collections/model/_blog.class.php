@@ -2396,6 +2396,8 @@ class Blog extends DataObject
 
 	/**
 	 * Insert into the DB
+	 *
+	 * @return boolean Result
 	 */
 	function dbinsert()
 	{
@@ -2464,9 +2466,15 @@ class Blog extends DataObject
 			$this->enable_default_item_types();
 
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
+
+			$DB->commit();
+
+			return true;
 		}
 
-		$DB->commit();
+		$DB->rollback();
+
+		return false;
 	}
 
 
@@ -2564,6 +2572,155 @@ class Blog extends DataObject
 		// Commit changes in cache:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->add( $this );
+	}
+
+
+	/**
+	 * Duplicate collection to new one
+	 *
+	 * @return boolean Result
+	 */
+	function duplicate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// Remember ID of the duplicated collection and Reset it to allow create new one:
+		$duplicated_coll_ID = $this->ID;
+		$this->ID = 0;
+
+		// Get all fields of the duplicated collection:
+		$source_fields_SQL = new SQL( 'Get all fields of the duplicating collection #'.$duplicated_coll_ID );
+		$source_fields_SQL->SELECT( '*' );
+		$source_fields_SQL->FROM( 'T_blogs' );
+		$source_fields_SQL->WHERE( 'blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_fields = $DB->get_row( $source_fields_SQL->get(), ARRAY_A, NULL, $source_fields_SQL->title );
+		// Use field values of duplicated collection by default:
+		foreach( $source_fields as $source_field_name => $source_field_value )
+		{
+			// Cut prefix "blog_" of each field:
+			$source_field_name = substr( $source_field_name, 5 );
+			if( $source_field_name == 'ID' )
+			{	// Skip field ID:
+				continue;
+			}
+			if( isset( $this->$source_field_name ) )
+			{	// Unset current value in order to assing new below, especially to update this in array $this->dbchanges:
+				unset( $this->$source_field_name );
+			}
+			$this->set( $source_field_name, $source_field_value );
+		}
+
+		// Get all settings of the duplicated collection:
+		$source_settings_SQL = new SQL( 'Get all settings of the duplicating collection #'.$duplicated_coll_ID );
+		$source_settings_SQL->SELECT( 'cset_name, cset_value' );
+		$source_settings_SQL->FROM( 'T_coll_settings' );
+		$source_settings_SQL->WHERE( 'cset_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_settings = $DB->get_assoc( $source_settings_SQL->get(), $source_settings_SQL->title );
+		// Use setting values of duplicated collection by default:
+		foreach( $source_settings as $source_setting_name => $source_setting_value )
+		{
+			$this->set_setting( $source_setting_name, $source_setting_value );
+		}
+
+		// Call this firstly to find all possible errors before inserting:
+		// Also to set new values from submitted form:
+		if( ! $this->load_from_Request() )
+		{	// Error on handle new values from form:
+			$this->ID = $duplicated_coll_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Try insert new collection in DB:
+		if( ! $this->dbinsert() )
+		{	// Error on insert collection in DB:
+			$this->ID = $duplicated_coll_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Initialize fields of collection permission tables which must be duplicated:
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
+				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
+				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
+				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change';
+
+		// Copy all permissions "collection per user" from duplicated collection to new created:
+		$coll_user_perm_fields = 'bloguser_user_ID, '.str_replace( '{prefix}', 'bloguser_', $coll_perm_fields );
+		$DB->query( 'INSERT INTO T_coll_user_perms
+			  ( bloguser_blog_ID, '.$coll_user_perm_fields.' )
+			SELECT '.$this->ID.', '.$coll_user_perm_fields.'
+			  FROM T_coll_user_perms
+			 WHERE bloguser_blog_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all coll-user permissions from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all permissions "collection per group" from duplicated collection to new created:
+		$coll_group_perm_fields = 'bloggroup_group_ID, '.str_replace( '{prefix}', 'bloggroup_', $coll_perm_fields );
+		$DB->query( 'INSERT INTO T_coll_group_perms
+			 ( bloggroup_blog_ID, '.$coll_group_perm_fields.' )
+			SELECT '.$this->ID.', '.$coll_group_perm_fields.'
+			  FROM T_coll_group_perms
+			 WHERE bloggroup_blog_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all coll-group permissions from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all widgets from duplicated collection to new created:
+		$DB->query( 'INSERT INTO T_widget
+			        ( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+			SELECT '.$this->ID.', wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params
+			  FROM T_widget
+			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all categories from duplicated collection to new created:
+		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
+		$source_cats_SQL->SELECT( '*' );
+		$source_cats_SQL->FROM( 'T_categories' );
+		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_cats = $DB->get_results( $source_cats_SQL->get(), ARRAY_A, $source_cats_SQL->title );
+		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
+		$ChapterCache = & get_ChapterCache();
+		foreach( $source_cats as $source_cat_fields )
+		{	// Copy each category separately because of uniwue field "cat_urlname":
+			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
+			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
+			{
+				// Cut prefix "cat_" of each field:
+				$source_cat_field_name = substr( $source_cat_field_name, 4 );
+				if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
+				{	// Skip these fields, they must be new:
+					continue;
+				}
+				$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
+			}
+			// Insert the duplicated category:
+			if( $new_Chapter->dbinsert() )
+			{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
+				// Key - ID of copied category, Value - new created category:
+				$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+			}
+		}
+		foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
+		{	// Update wrong parent IDs to IDs of new created categories:
+			$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
+			if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
+			{
+				$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
+				$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
+				$new_Chapter->dbupdate();
+			}
+		}
+
+		// The duplicating is successful, So commit all above changes:
+		$DB->commit();
+
+		// Commit changes in cache:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->add( $this );
+
+		return true;
 	}
 
 

@@ -33,6 +33,12 @@ if( $edited_Blog->ID == 0 )
 
 	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3, 3 );
 }
+elseif( $action == 'copy' )
+{	// Copy collection form:
+	$form_title = sprintf( T_('Duplicate "%s" collection'), $edited_Blog->get( 'shortname' ) ).':';
+
+	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.T_('Abort duplicating collection'), 3, 3 );
+}
 
 $Form->begin_form( 'fform', $form_title );
 
@@ -60,8 +66,8 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 			.' &ndash; '
 			.$collection_kinds[ $edited_Blog->get( 'type' ) ]['desc']
 		.'</p>';
-		if( $edited_Blog->ID > 0 )
-		{
+		if( $edited_Blog->ID > 0 && $action != 'copy' )
+		{	// Display a link to change collection kind:
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
 					.T_('Change collection type / Reset')
 			.'</a></p>';
@@ -212,7 +218,7 @@ $Form->begin_fieldset( T_('Description').get_manual_link( 'collection-descriptio
 $Form->end_fieldset();
 
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? sprintf( T_('Save and duplicate all settings from %s'), $edited_Blog->get( 'shortname' ) ) : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 $Form->end_form();
 
