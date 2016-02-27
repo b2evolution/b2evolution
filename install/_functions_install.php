@@ -681,6 +681,11 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
 		install_plugin( 'cookie_consent_plugin', false );
 	}
+
+	if( $old_db_version < 11730 )
+	{
+		install_plugin( 'custom_tags_plugin', false );
+	}
 }
 
 
