@@ -57,6 +57,17 @@ switch( $action )
 			header_redirect( $redirect_to );
 		}
 
+		$user_Group = $current_User->get_Group();
+		$max_allowed_blogs = $user_Group->get_GroupSettings()->get( 'perm_max_createblog_num', $user_Group->ID );
+		$user_blog_count = $current_User->get_num_blogs();
+
+		if( $max_allowed_blogs != '' && $max_allowed_blogs <= $user_blog_count )
+		{
+			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
 
@@ -141,7 +152,7 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 
-		// 
+		//
 		$action = 'copy';
 		break;
 

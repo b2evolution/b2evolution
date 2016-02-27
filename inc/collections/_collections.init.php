@@ -421,12 +421,14 @@ class collections_Module extends Module
 				$permapi = 'always'; // Can use APIs
 				$permcreateblog = 'allowed'; // Creating new blogs
 				$permgetblog = 'denied'; // Automatically add a new blog to the new users
+				$permmaxcreateblognum = '';
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
 				$permapi = 'always';
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 
 			case 3:		// Editors (group ID 3) have permission by default:
@@ -434,6 +436,7 @@ class collections_Module extends Module
 				$permapi = 'always';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 
 			default:
@@ -441,12 +444,18 @@ class collections_Module extends Module
 				$permapi = 'never';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_api' => $permapi, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
+		return $permissions = array(
+				'perm_api' => $permapi,
+				'perm_createblog' => $permcreateblog,
+				'perm_getblog' => $permgetblog,
+				'perm_max_createblog_num' => $permmaxcreateblognum
+				);
 	}
 
 
@@ -489,6 +498,15 @@ class collections_Module extends Module
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
 				'note' => T_( 'New users automatically get a new blog'),
+				),
+			'perm_max_createblog_num' => array(
+				'label' => T_('Maximum number of blogs allowed'),
+				'user_func' => 'check_createblog_user_perm',
+				'group_funct' => 'check_createblog_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'text_input',
+				'maxlength' => 2,
+				'note' => T_('Leave empty for no limit'),
 				),
 			);
 		return $permissions;
