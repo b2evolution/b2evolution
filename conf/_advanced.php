@@ -335,18 +335,19 @@ else
 	// fp> pb with domains like .co.uk !?
 }
 
-// echo $cookie_domain;
-
-/**#@+
- * Names for cookies.
+/**
+ * Name used for session cookies.
  */
-// The following remember the comment meta data for non registered users:
+$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
+
+/**
+ * Names used for other cookies.
+ *
+ * The following remember the comment meta data for non registered users:
+ */
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
-// The following handles the session:
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
-/**#@-*/
 
 /**
  * Expiration for comment meta data cookies.
