@@ -739,12 +739,19 @@ class bootstrap_gallery_Skin extends Skin
 	 * Check if we can display a widget container
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @param string Skin setting name
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key, $setting_name = 'access_login_containers' )
+	function is_visible_container( $container_key )
 	{
-		$access = $this->get_setting( $setting_name );
+		global $Blog;
+
+		if( $Blog->has_access() )
+		{	// If current user has an access to this collection then don't restrict containers:
+			return true;
+		}
+
+		// Get what containers are available for this skin when access is denied or requires login:
+		$access = $this->get_setting( 'access_login_containers' );
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}

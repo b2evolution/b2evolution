@@ -3662,6 +3662,35 @@ class Blog extends DataObject
 
 
 	/**
+	 * Has current user an access to this collection depending on settings
+	 *
+	 * @return boolean TRUE on success
+	 */
+	function has_access()
+	{
+		global $current_User;
+
+		$allow_access = $this->get_setting( 'allow_access' );
+
+		if( $allow_access == 'public' )
+		{	// Everyone has an access to this collection:
+			return true;
+		}
+
+		if( ! is_logged_in() )
+		{	// Only logged in users have an access to this collection:
+			return false;
+		}
+		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		{	// Current user must be a member of this collection:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Check if current user has access to this blog depending on settings
 	 *
 	 * @return boolean TRUE on success

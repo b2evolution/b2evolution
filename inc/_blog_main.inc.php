@@ -832,6 +832,7 @@ if( !empty( $skin ) )
 					'access_requires_login' => 'access_requires_login.main.php',
 					'tags'           => 'tags.main.php',
 					'terms'          => 'terms.main.php',
+					'help'           => 'help.main.php',
 					// All others will default to index.main.php
 				);
 
