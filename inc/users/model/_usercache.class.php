@@ -180,7 +180,7 @@ class UserCache extends DataObjectCache
 			$index++;
 			if( empty( $pwd_hashed ) )
 			{
-				if( $row->user_pass != md5( $row->user_salt.$pass ) )
+				if( $row->user_pass != md5( $row->user_salt.$pass, true ) )
 				{ // password doesn't match
 					continue;
 				}
@@ -190,7 +190,7 @@ class UserCache extends DataObjectCache
 				$pwd_matched = false;
 				foreach( $pwd_hashed as $encrypted_password )
 				{
-					$pwd_matched = ( sha1($row->user_pass.$pwd_salt) == $encrypted_password );
+					$pwd_matched = ( sha1( bin2hex( $row->user_pass ).$pwd_salt ) == $encrypted_password );
 					if( $pwd_matched )
 					{ // The corresponding user was found
 						break;
