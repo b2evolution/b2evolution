@@ -43,6 +43,7 @@ global $Blog;
 global $dispatcher;
 
 $action = param_action( 'list' );
+$orig_action = $action; // Used to know what action is called really
 
 $AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 
