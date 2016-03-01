@@ -1254,20 +1254,21 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 		{	// Keep these statuses in array only to set $status_is_allowed in order to know when we can start allow the statuses:
 			continue;
 		}
-		if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+		if( ( $allow_status != $status && ! $status_is_allowed ) || ! ( is_logged_in() && $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) ) )
 		{	// This status is not allowed
 			$result[] = $status;
 		}
 	}
 
 	// 'redirected' status is allowed to view/edit only in case of posts, and only if user has permission
-	if( ( $prefix == 'blog_post!' ) && !$current_User->check_perm( $prefix.'redirected', 'create', false, $blog_ID ) )
+	if( $prefix == 'blog_comment!' ||
+	    ( $prefix == 'blog_post!' && ! ( is_logged_in() && $current_User->check_perm( $prefix.'redirected', 'create', false, $blog_ID ) ) ) )
 	{ // not allowed
 		$result[] = 'redirected';
 	}
 
 	// 'trash' status is allowed only in case of comments, and only if user has global editall permission
-	if( ( $prefix == 'blog_comment!' ) && !$current_User->check_perm( 'blogs', 'editall', false ) )
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blogs', 'editall', false ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}
@@ -1283,7 +1284,8 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 			{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 				$status_is_allowed = true;
 			}
-			if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+			if( ( $allow_status != $status && ! $status_is_allowed ) ||
+			    ! ( is_logged_in() && $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) ) )
 			{	// This status is not allowed
 				$result[] = $status;
 			}

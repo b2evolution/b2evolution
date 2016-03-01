@@ -4254,8 +4254,10 @@ class Comment extends DataObject
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
 
+		$commented_Item = & $this->get_Item();
+
 		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && ( $commented_Item = & $this->get_Item() ) &&
+		if( $this->is_meta() && $commented_Item &&
 		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
 		{
 			$comment_allowed_status = 'protected';
@@ -4264,6 +4266,11 @@ class Comment extends DataObject
 		{
 			// Restrict status to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
+			if( empty( $comment_allowed_status ) && ! is_logged_in() &&
+			    $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
+			{	// If min allowed status is not found then use what default status is allowed for anonymous users:
+				$comment_allowed_status = get_highest_publish_status( 'comment', $item_Blog->ID, false );
+			}
 		}
 
 		if( $update_status )
