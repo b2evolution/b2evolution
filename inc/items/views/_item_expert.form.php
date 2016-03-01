@@ -46,7 +46,7 @@ global $mode, $admin_url, $rsc_url, $locales;
 global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
-global $redirect_to;
+global $redirect_to, $orig_action;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -255,7 +255,8 @@ $Form->begin_form( '', '', $params );
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		$LinkOwner = new LinkItem( $edited_Item );
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, true );
+		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
+		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, $fold_images_attachments_block );
 	}
 	// ############################ ADVANCED #############################
 
