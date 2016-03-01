@@ -304,6 +304,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
 
 
+	/* Contact Page Main Area */
+	add_basic_widget( $blog_id, 'Contact Page Main Area', 'contact_form', 'core', 10 );
+
+
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'mobile_skin_switcher', 'core', 20 );

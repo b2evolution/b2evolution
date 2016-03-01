@@ -117,7 +117,8 @@ $core_componentwidget_defs = array(
 			'org_members',
 			'online_users',
 			'mobile_skin_switcher',
-			'poll'
+			'poll',
+			'contact_form',
 		),
 );
 
