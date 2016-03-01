@@ -322,7 +322,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
 			itcf_label   VARCHAR(255) NOT NULL,
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
-			itcf_type    ENUM( 'double', 'varchar' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( 'double', 'varchar', 'text', 'html' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
@@ -369,7 +369,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__item_settings (
 			iset_item_ID  int(10) unsigned NOT NULL,
 			iset_name     varchar( 50 ) COLLATE ascii_general_ci NOT NULL,
-			iset_value    varchar( 2000 ) NULL,
+			iset_value    varchar( 10000 ) NULL,
 			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

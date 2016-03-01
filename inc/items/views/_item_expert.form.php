@@ -283,17 +283,28 @@ $Form->begin_form( '', '', $params );
 	echo '<table cellspacing="0" class="compose_layout">';
 
 	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // All CUSTOM FIELDS are hidden by post type
+	{	// All CUSTOM FIELDS are hidden by post type:
 		display_hidden_custom_fields( $Form, $edited_Item );
 	}
 	else
-	{ // CUSTOM FIELDS varchar
-		$custom_fields = $edited_Item->get_type_custom_fields( 'varchar' );
+	{	// CUSTOM FIELDS:
+		$custom_fields = $edited_Item->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $custom_fields as $custom_field )
-		{ // Loop through custom varchar fields
-			echo '<tr><td class="label"><label for="item_varchar_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
+		{	// Loop through custom fields:
+			echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
 			echo '<td class="input" width="97%">';
-			$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+			switch( $custom_field['type'] )
+			{
+				case 'varchar':
+					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+					break;
+				case 'text':
+					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '' );
+					break;
+				case 'html':
+					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => T_('This field allows HTML code') ) );
+					break;
+			}
 			echo '</td></tr>';
 		}
 	}
