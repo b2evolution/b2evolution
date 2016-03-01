@@ -4266,9 +4266,8 @@ class Comment extends DataObject
 		{
 			// Restrict status to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
-			if( empty( $comment_allowed_status ) && ! is_logged_in() &&
-			    $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
-			{	// If min allowed status is not found then use what default status is allowed for anonymous users:
+			if( empty( $comment_allowed_status ) && $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
+			{	// If min allowed status is not found then use what default status is allowed:
 				$comment_allowed_status = get_highest_publish_status( 'comment', $item_Blog->ID, false );
 			}
 		}
