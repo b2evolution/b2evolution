@@ -644,10 +644,13 @@ fieldset ul {
   display: block;
 }
 #itemform_adv_props div.tile,
-#itemform_adv_props div.controls {
+#itemform_custom_tags div.tile,
+#itemform_adv_props div.controls,
+#itemform_custom_tags div.controls {
   width: 100%;
 }
-#itemform_adv_props td.label {
+#itemform_adv_props td.label,
+#itemform_custom_tags td.label {
   background: none;
   color: #000;
   text-shadow: none;
@@ -655,7 +658,8 @@ fieldset ul {
   vertical-align: top;
   padding: 9px 10px 0 0;
 }
-#itemform_adv_props .help-inline label {
+#itemform_adv_props .help-inline label,
+#itemform_custom_tags .help-inline label {
   font-weight: normal;
   display: block;
 }
