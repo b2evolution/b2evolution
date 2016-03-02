@@ -388,7 +388,7 @@ switch( $action )
 			$Messages->add( T_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -407,7 +407,7 @@ switch( $action )
 			$Messages->add( T_('The email address was deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;

@@ -234,7 +234,7 @@ function emlog_result_info( $result, $params = array() )
 				if( $params['link_blocked'] && !empty( $params['email'] ) )
 				{	// Create a link for email address
 					global $admin_url;
-					$result_info .= ' <a href="'.$admin_url.'?ctrl=email&amp;tab=blocked&amp;email='.$params['email'].'">'.T_('Blocked').'</a>';
+					$result_info .= ' <a href="'.$admin_url.'?ctrl=email&amp;email='.$params['email'].'&amp;all_statuses=1">'.T_('Blocked').'</a>';
 				}
 				else
 				{	// Display only text
