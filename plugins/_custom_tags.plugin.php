@@ -12,7 +12,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 class custom_tags_plugin extends Plugin
 {
 	var $code = 'b2evCTag';
@@ -27,9 +26,9 @@ class custom_tags_plugin extends Plugin
 
 	// Internal
 	var $configurable_post_list = true;
-	var $configurable_comment_list = false;
-	var $configurable_message_list = false;
-	var $configurable_email_list = false;
+	var $configurable_comment_list = true;
+	var $configurable_message_list = true;
+	var $configurable_email_list = true;
 
 	var $post_search_list;
 	var $post_replace_list;
@@ -40,10 +39,11 @@ class custom_tags_plugin extends Plugin
 	var $email_search_list;
 	var $email_replace_list;
 
-	var $default_search_list = '#\[warning](.+?)\[/warning]#is\n
-															#\[info](.+?)\[/info]#is';
-	var $default_replace_list = '<div class="alert alert-warning">$1</div>\n
-	                             <div class="alert alert-info">$1</div>';
+	var $default_search_list = '#\[warning](.+?)\[/warning]#is
+#\[info](.+?)\[/info]#is';
+
+	var $default_replace_list = '<div class="alert alert-warning">$1</div>
+<div class="alert alert-info">$1</div>';
 
 
 	/**
@@ -56,30 +56,62 @@ class custom_tags_plugin extends Plugin
 	}
 
 
-	function prepareSearchList( $search_list_string )
+	/**
+	 * Prepares the search list
+	 *
+	 * @param string String value of a search list
+	 * @return array The search list as array
+	 */
+	function prepare_search_list( $search_list_string )
 	{
-		$search_list_array = explode( "\n", str_replace( "\r", "", $search_list_string ) );
+		if( ! $search_list_string )
+		{ // No search list string, use default search list string
+			$search_list_string = $this->default_search_list;
+		}
 
+		$search_list_array = explode( "\n", str_replace( "\r", "", $search_list_string ) );
 		return $search_list_array;
 	}
 
-	function prepareReplaceList( $replace_list_string )
-	{
-		$replace_list_array = explode( "\n", str_replace( "\r", "", $replace_list_string ) );
 
+	/**
+	 * Prepares the replace list
+	 *
+	 * @param string String value of a replacement list
+	 * @return array The replacement list as array
+	 */
+	function prepare_replace_list( $replace_list_string )
+	{
+		if( ! $replace_list_string )
+		{ // No replace list string, use default replace list string
+			$replace_list_string = $this->default_replace_list;
+		}
+
+		$replace_list_array = explode( "\n", str_replace( "\r", "", $replace_list_string ) );
 		return $replace_list_array;
 	}
 
+
 	/**
-	 * This is the meat of the plugin. You most probably want to customize this function
+	 * This is supposedly the meat of the plugin. You most probably want to override this function
 	 * to your specific needs.
+	 *
+	 * @param string Content
+	 * @param array Search list
+	 * @param array Replace list
 	 */
-	function replaceCallback( $content, $search, $replace )
+	function replace_callback( $content, $search, $replace )
 	{
 		return preg_replace( $search, $replace, $content );
 	}
 
 
+	/**
+	 * Define here the default collection/blog settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
@@ -95,7 +127,6 @@ class custom_tags_plugin extends Plugin
 					'cols' => 60,
 					'defaultvalue' => $this->default_search_list
 				);
-
 			$plugin_params['coll_post_replace_list'] = array(
 					'label' => $this->T_('Replace list for posts'),
 					'type' => 'html_textarea',
@@ -116,7 +147,6 @@ class custom_tags_plugin extends Plugin
 					'cols' => 60,
 					'defaultvalue' => $this->default_search_list
 				);
-
 			$plugin_params['coll_comment_replace_list'] = array(
 					'label' => $this->T_('Replace list for comments'),
 					'type' => 'html_textarea',
@@ -130,11 +160,18 @@ class custom_tags_plugin extends Plugin
 		return array_merge( parent::get_coll_setting_definitions( $default_params ), $plugin_params );
 	}
 
+
+	/**
+	 * Define here the default message settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
 	function get_msg_setting_definitions( & $params )
 	{
 		$plugin_params = array();
 
-		if( $this->configurable_messsage_list )
+		if( $this->configurable_message_list )
 		{
 			$plugin_params['msg_search_list'] = array(
 				'label' => $this->T_('Search list for messages'),
@@ -144,7 +181,6 @@ class custom_tags_plugin extends Plugin
 				'cols' => 60,
 				'defaultvalue' => $this->default_search_list
 			);
-
 			$plugin_params['msg_replace_list'] = array(
 				'label' => $this->T_('Replace list for messages'),
 				'type' => 'html_textarea',
@@ -158,6 +194,13 @@ class custom_tags_plugin extends Plugin
 		return array_merge( parent::get_msg_setting_definitions( $params ), $plugin_params );
 	}
 
+
+	/**
+	 * Define here the default email settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
 	function get_email_setting_definitions( & $params )
 	{
 		$plugin_params = array();
@@ -172,7 +215,6 @@ class custom_tags_plugin extends Plugin
 				'cols' => 60,
 				'defaultvalue' => $this->default_search_list
 			);
-
 			$plugin_params['email_replace_list'] = array(
 				'label' => $this->T_('Replace list for email messages'),
 				'type' => 'html_textarea',
@@ -193,25 +235,36 @@ class custom_tags_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-			$content = & $params['data'];
-			$Item = $params['Item'];
-			$item_Blog = & $Item->get_Blog();
+		$content = & $params['data'];
+		$Item = $params['Item'];
+		$item_Blog = & $Item->get_Blog();
 
-			if( ! isset( $this->post_search_list ) )
+		if( ! isset( $this->post_search_list ) )
+		{
+			$search_list = $this->get_coll_setting( 'coll_post_search_list', $item_Blog );
+			if( ! $search_list )
 			{
-				$this->post_search_list = $this->prepareSearchList( $this->get_coll_setting( 'coll_post_search_list', $item_Blog ) );
+				$search_list = $this->default_search_list;
 			}
+			$this->post_search_list = $this->prepare_search_list( $search_list );
+		}
 
-			if( ! isset( $this->post_replace_list ) )
+		if( ! isset( $this->post_replace_list ) )
+		{
+			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $item_Blog );
+			if( ! $replace_list )
 			{
-				$this->post_replace_list = $this->prepareReplaceList( $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) );
+				$replace_list = $this->default_replace_list;
 			}
+			$this->post_replace_list = $this->prepare_replace_list( $replace_list );
+		}
 
-			$callback = array( $this, 'replaceCallback' );
-			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-			$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+		$callback = array( $this, 'replace_callback' );
 
-			return true;
+		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+
+		return true;
 	}
 
 	/**
@@ -221,23 +274,34 @@ class custom_tags_plugin extends Plugin
 	 */
 	function RenderMessageAsHtml( & $params )
 	{
-			$content = & $params['data'];
+		$content = & $params['data'];
 
-			if( ! isset( $this->msg_search_list ) )
+		if( ! isset( $this->msg_search_list ) )
+		{
+			$search_list = $this->get_msg_setting( 'msg_search_list' );
+			if( ! $search_list )
 			{
-				$this->msg_search_list = $this->prepareSearchList( $this->get_msg_setting( 'msg_search_list' ) );
+				$search_list = $this->default_search_list;
 			}
+			$this->msg_search_list = $this->prepare_search_list( $search_list );
+		}
 
-			if( ! isset( $this->msg_replace_list ) )
+		if( ! isset( $this->msg_replace_list ) )
+		{
+			$replace_list = $this->get_msg_setting( 'msg_replace_list' );
+			if( ! $replace_list )
 			{
-				$this->msg_replace_list = $this->prepareReplaceList( $this->get_msg_setting( 'msg_replace_list' ) );
+				$replace_list = $this->default_replace_list;
 			}
+			$this->msg_replace_list = $this->prepare_replace_list( $replace_list );
+		}
 
-			$callback = array( $this, 'replaceCallback' );
-			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-			$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
+		$callback = array( $this, 'replace_callback' );
 
-			return true;
+		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
+
+		return true;
 	}
 
 	/**
@@ -247,23 +311,34 @@ class custom_tags_plugin extends Plugin
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
-			$content = & $params['data'];
+		$content = & $params['data'];
 
-			if( ! isset( $this->email_search_list ) )
+		if( ! isset( $this->email_search_list ) )
+		{
+			$search_list = $this->get_email_setting( 'email_search_list' );
+			if( ! $search_list )
 			{
-				$this->email_search_list = $this->prepareSearchList( $this->get_email_setting( 'email_search_list' ) );
+				$search_list = $this->default_search_list;
 			}
+			$this->email_search_list = $this->prepare_search_list( $search_list );
+		}
 
-			if( ! isset( $this->email_replace_list ) )
+		if( ! isset( $this->email_replace_list ) )
+		{
+			$replace_list = $this->get_email_setting( 'email_replace_list' );
+			if( ! $replace_list )
 			{
-				$this->email_replace_list = $this->prepareReplaceList( $this->get_email_setting( 'email_replace_list' ) );
+				$replace_list = $this->default_replace_list;
 			}
+			$this->email_replace_list = $this->prepare_replace_list( $replace_list );
+		}
 
-			$callback = array( $this, 'replaceCallback' );
-			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-			$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, $callback );
+		$callback = array( $this, 'replace_callback' );
 
-			return true;
+		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, $callback );
+
+		return true;
 	}
 }
 ?>

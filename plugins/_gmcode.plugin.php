@@ -12,6 +12,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '../plugins/_custom_tags.plugin.php', 'custom_tags_plugin' );
+
 /**
  * Replaces GreyMatter markup in HTML (not XML).
  *
@@ -20,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @package plugins
  */
-class gmcode_plugin extends Plugin
+class gmcode_plugin extends custom_tags_plugin
 {
 	var $code = 'b2evGMco';
 	var $name = 'GM code';
@@ -31,39 +33,24 @@ class gmcode_plugin extends Plugin
 	var $version = '5.0.0';
 	var $number_of_installs = 1;
 
+	var $configurable_post_list = false;
+	var $configurable_comment_list = false;
+	var $configurable_message_list = false;
+	var $configurable_email_list = false;
 
-	/**
-	 * GreyMatter formatting search array
-	 *
-	 * @access private
-	 */
-	var $search = array(
-			'# \*\* (.+?) \*\* #x',                // **bold**
-			'# \\\\ (.+?) \\\\ #x',                // \\italics\\
-			'# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x', // //italics// (not preceded by : as in http://)
-			'# __ (.+?) __ #x',                    // __underline__
-			'/ \#\# (.+?) \#\# /x',                // ##tt##
-			'/ %%
-				( \s*? \n )?      # Eat optional blank line after %%%
-				(.+?)
-				( \n \s*? )?      # Eat optional blank line before %%%
-				%%
-			/sx'                                   // %%codeblock%%
-		);
+	var $default_search_list = '# \*\* (.+?) \*\* #x
+	# \\\\ (.+?) \\\\ #x
+	# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x
+	# __ (.+?) __ #x
+	/ \#\# (.+?) \#\# /x
+	/ %% ( \s*? \n )? (.+?) ( \n \s*? )? %% /sx';
 
-	/**
-	 * HTML replace array
-	 *
-	 * @access private
-	 */
-	var $replace = array(
-			'<strong>$1</strong>',
-			'<em>$1</em>',
-			'<em>$1</em>',
-			'<span style="text-decoration:underline">$1</span>',
-			'<tt>$1</tt>',
-			'<div class="codeblock"><pre><code>$2</code></pre></div>'
-		);
+	var $default_replace_list = '<strong>$1</strong>
+	<em>$1</em>
+	<em>$1</em>
+	<span style="text-decoration: underline">$1</span>
+	<tt>$1</tt>
+	<div class="codeblock"><pre><code>$2</code></pre></div>';
 
 
 	/**
@@ -76,51 +63,24 @@ class gmcode_plugin extends Plugin
 	}
 
 
+	function replace_callback( $content, $search, $replace )
+	{ // Replace text outside of html tags
+		return callback_on_non_matching_blocks( $content, '~<[^>]*>~s', array( $this, 'second_replace_callback' ), array( $search, $replace ) );
+	}
+
+
+	function second_replace_callback( $content, $search, $replace)
+	{
+		return preg_replace( $search, $replace, $content );
+	}
+
 	/**
-	 * Perform rendering
-	 *
-	 * @see Plugin::RenderItemAsHtml()
+	 * The following function are here so the events will be registered
+	 * @see Plugins_admin::get_registered_events()
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
-
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
-		{	// Call replace_content() on everything outside code/pre:
-			$content = callback_on_non_matching_blocks( $content,
-				'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
-				array( $this, 'replace_out_tags' ) );
-		}
-		else
-		{	// No code/pre blocks, replace on the whole thing
-			$content = $this->replace_out_tags( $content );
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * Replace text outside of html tags
-	 *
-	 * @param string
-	 * @return string
-	 */
-	function replace_out_tags( $text )
-	{
-		return callback_on_non_matching_blocks( $text, '~<[^>]*>~s', array( $this, 'replace_callback' ) );
-	}
-
-
-	/**
-	 * Replace callback
-	 *
-	 * @param string
-	 * @return string
-	 */
-	function replace_callback( $text )
-	{
-		return preg_replace( $this->search, $this->replace, $text );
+		parent::RenderItemAsHtml( $params );
 	}
 
 }

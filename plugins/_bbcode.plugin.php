@@ -12,11 +12,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '../plugins/_custom_tags.plugin.php', 'custom_tags_plugin' );
 
 /**
  * @package plugins
  */
-class bbcode_plugin extends Plugin
+class bbcode_plugin extends custom_tags_plugin
 {
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
@@ -31,6 +32,11 @@ class bbcode_plugin extends Plugin
 	/*
 	 * Internal
 	 */
+	var $configurable_post_list = true;
+	var $configurable_comment_list = true;
+	var $configurable_message_list = true;
+	var $configurable_email_list = true;
+
 	var $post_search_list;
 	var $post_replace_list;
 	var $comment_search_list;
@@ -39,6 +45,7 @@ class bbcode_plugin extends Plugin
 	var $msg_replace_list;
 	var $email_search_list;
 	var $email_replace_list;
+
 	var $default_search_list = '[b] #\[b](.+?)\[/b]#is
 [i] #\[i](.+?)\[/i]#is
 [s] #\[s](.+?)\[/s]#is
@@ -55,6 +62,7 @@ class bbcode_plugin extends Plugin
 [*] #\[\*](.+?)(\n|\[/list\])#is
 [bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
 [clear] #\[clear]#is';
+
 	var $default_replace_list = '<strong>$1</strong>
 <em>$1</em>
 <span style="text-decoration:line-through">$1</span>
@@ -81,197 +89,6 @@ class bbcode_plugin extends Plugin
 		$this->short_desc = T_('BB formatting e-g [b]bold[/b]');
 		$this->long_desc = T_('Supported tags and the BB code toolbar are configurable.
 Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [quote] [list=1] [list=a] [list] [*] [bg=] [clear]');
-	}
-
-
-	/**
-	 * Define here default collection/blog settings that are to be made available in the backoffice.
-	 *
-	 * @param array Associative array of parameters.
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 */
-	function get_coll_setting_definitions( & $params )
-	{
-		// TODO: Post and comment search/replace lists must be also converted to coll plugin settings
-		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'coll_post_search_list' => array(
-					'label' => $this->T_( 'Search list for posts'),
-					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_search_list,
-				),
-				'coll_post_replace_list' => array(
-					'label' => $this->T_( 'Replace list for posts'),
-					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_replace_list,
-				),
-				'coll_comment_search_list' => array(
-					'label' => $this->T_( 'Search list for comments'),
-					'note' => $this->T_( 'This is the BBcode search array for COMMENTS (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_search_list,
-				),
-				'coll_comment_replace_list' => array(
-					'label' => $this->T_( 'Replace list for comments'),
-					'note' => $this->T_( 'This is the replace array for COMMENTS (one per line) it must match the exact order of the search array' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_replace_list,
-				),
-			)
-		);
-	}
-
-
-	/**
-	 * Define here default message settings that are to be made available in the backoffice.
-	 *
-	 * @param array Associative array of parameters.
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 */
-	function get_msg_setting_definitions( & $params )
-	{
-		return array_merge( parent::get_msg_setting_definitions( $params ),
-			array(
-				'search_list' => array(
-					'label' => $this->T_( 'Search list for messages'),
-					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_search_list,
-				),
-				'replace_list' => array(
-					'label' => $this->T_( 'Replace list for messages'),
-					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_replace_list,
-				),
-			)
-		);
-	}
-
-
-	/**
-	 * Define here default email settings that are to be made available in the backoffice.
-	 *
-	 * @param array Associative array of parameters.
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 */
-	function get_email_setting_definitions( & $params )
-	{
-		return array_merge( parent::get_email_setting_definitions( $params ),
-			array(
-				'search_list' => array(
-					'label' => $this->T_( 'Search list for messages'),
-					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_search_list,
-				),
-				'replace_list' => array(
-					'label' => $this->T_( 'Replace list for messages'),
-					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
-					'type' => 'html_textarea',
-					'rows' => 10,
-					'cols' => 60,
-					'defaultvalue' => $this->default_replace_list,
-				),
-			)
-		);
-	}
-
-
-	/**
-	 * Perform rendering
-	 *
-	 * @see Plugin::RenderItemAsHtml()
-	 */
-	function RenderItemAsHtml( & $params )
-	{
-		$content = & $params['data'];
-		$Item = $params['Item'];
-		$item_Blog = & $Item->get_Blog();
-		if( ! isset( $this->post_search_list ) )
-		{	// Init post search list only first time:
-			$this->post_search_list = $this->prepare_search_list( $this->get_coll_setting( 'coll_post_search_list', $item_Blog ) );
-		}
-
-		if( ! isset( $this->post_replace_list ) )
-		{	// Init post replace list only first time:
-			$this->post_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) );
-		}
-
-		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, array( $this, 'parse_bbcode' ) );
-
-		return true;
-	}
-
-
-	/**
-	 * Perform rendering of Message content
-	 *
-	 * NOTE: Use default coll settings of comments as messages settings
-	 *
-	 * @see Plugin::RenderMessageAsHtml()
-	 */
-	function RenderMessageAsHtml( & $params )
-	{
-		$content = & $params['data'];
-
-		if( ! isset( $this->msg_search_list ) )
-		{	// Init message search list only first time:
-			$this->msg_search_list = $this->prepare_search_list( $this->get_msg_setting( 'search_list' ) );
-		}
-
-		if( ! isset( $this->msg_replace_list ) )
-		{	// Init message replace list only first time:
-			$this->msg_replace_list = $this->prepare_replace_list( $this->get_msg_setting( 'replace_list' ) );
-		}
-
-		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, array( $this, 'parse_bbcode' ) );
-
-		return true;
-	}
-
-
-	/**
-	 * Perform rendering of Email content
-	 *
-	 * NOTE: Use default coll settings of comments as messages settings
-	 *
-	 * @see Plugin::RenderEmailAsHtml()
-	 */
-	function RenderEmailAsHtml( & $params )
-	{
-		$content = & $params['data'];
-
-		if( ! isset( $this->email_search_list ) )
-		{	// Init email search list only first time:
-			$this->email_search_list = $this->prepare_search_list( $this->get_email_setting( 'search_list' ) );
-		}
-
-		if( ! isset( $this->email_replace_list ) )
-		{	// Init email replace list only first time:
-			$this->email_replace_list = $this->prepare_replace_list( $this->get_email_setting( 'replace_list' ) );
-		}
-
-		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, array( $this, 'parse_bbcode' ) );
-
-		return true;
 	}
 
 
@@ -422,6 +239,25 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		}
 
 		return $content;
+	}
+
+	/**
+	 * The following function are here so the events will be registered
+	 * @see Plugins_admin::get_registered_events()
+	 */
+	function RenderItemAsHtml( & $params )
+	{
+		parent::RenderItemAsHtml( $params );
+	}
+
+	function RenderMessageAsHtml( & $params )
+	{
+		parent::RenderMessageAsHtml( $params );
+	}
+
+	function RenderEmailAsHtml( & $params )
+	{
+		parent::RenderItemAsHtml( $params );
 	}
 
 
@@ -816,18 +652,6 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		}
 
 		return $search_list_array;
-	}
-
-
-	/**
-	 * Prepare a replace list
-	 *
-	 * @param string String value of a replace list
-	 * @return array The replace list as array
-	 */
-	function prepare_replace_list( $replace_list_string )
-	{
-		return explode( "\n", str_replace( "\r", '', $replace_list_string ) );
 	}
 }
 
