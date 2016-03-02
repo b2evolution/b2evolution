@@ -7582,4 +7582,57 @@ function get_install_format_text( $text, $format = 'string' )
 
 	return $text;
 }
+
+
+/**
+ * // Check if current user has an issue of email delivery and display a warning with link to solve it
+ *
+ * @return boolean TRUE if user's email has no issue
+ */
+function check_user_email_delivery_issue()
+{
+	global $current_User, $Messages, $Blog, $ReqURL;
+
+	if( ! is_logged_in() )
+	{	// User should be logged in for this checking:
+		return true;
+	}
+
+	$EmailAddressCache = & get_EmailAddressCache();
+	if( ! ( $user_EmailAddress = & $EmailAddressCache->get_by_name( $current_User->get( 'email' ), false, false ) ) )
+	{	// User's email is not contained in DB table, so it is not restricted:
+		return true;
+	}
+
+	if( $user_EmailAddress->get( 'status' ) == 'unknown' )
+	{	// User's email has no restricted status:
+		return true;
+	}
+	// ELSE User's email has one of the restricted statuses:
+
+	if( is_admin_page() )
+	{	// Initialize URL for back-office:
+		global $admin_url;
+		$subs_url = $admin_url.'?ctrl=user&amp;user_tab=subs&amp;user_ID='.$current_User->ID;
+	}
+	else
+	{	// Initialize URL for front-office:
+		if( ! empty( $Blog ) )
+		{
+			$subs_url = $Blog->get( 'subsurl', array( 'url_suffix' => false ) );
+		}
+		else
+		{
+			global $baseurl;
+			$subs_url = $baseurl.'?disp=subs';
+		}
+	}
+
+	if( ! is_same_url( $ReqURL, str_replace( '&amp;', '&', $subs_url ) ) )
+	{	// Display a warning only on not same page where we send user to solve the issue:
+		$Messages->add( sprintf( T_('It seems you don\'t get our emails, <a %s>click here to resolve</a>'), 'href="'.$subs_url.'"' ), 'warning' );
+	}
+
+	return false;
+}
 ?>

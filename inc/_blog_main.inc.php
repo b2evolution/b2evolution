@@ -757,6 +757,10 @@ $Timer->log_duration( '_BLOG_MAIN.inc' );
 skin_init_global_vars();
 
 
+// Check if current user has an issue of email delivery and display a warning with link to solve it:
+check_user_email_delivery_issue();
+
+
 // Check if current user has acces to this blog
 $Blog->check_access();
 

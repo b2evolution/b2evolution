@@ -128,13 +128,19 @@ $Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-no
 
 	if( $action != 'view' )
 	{ // We can edit the values:
+		if( ! check_user_email_delivery_issue() )
+		{	// If user's email is restricted we should inform about this:
+			$EmailAddressCache = & get_EmailAddressCache();
+			$user_EmailAddress = & $EmailAddressCache->get_by_name( $current_User->get( 'email' ), false, false );
+			$email_address_statuses = emadr_get_status_titles();
+			$email_fieldnote .= ' <span class="red">'.sprintf( T_('WARNING: You can\'t get our emails because email address %s is restricted with status "%s". Please use a different email address.'),
+				'<b>'.$edited_User->email.'</b>', '<b>'.$email_address_statuses[ $user_EmailAddress->get( 'status' ) ].'</b>' ).'</span>';
+		}
 		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
-		$disabled = false;
 	}
 	else
 	{ // display only
 		$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-		$disabled = true;
 	}
 
 	$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(

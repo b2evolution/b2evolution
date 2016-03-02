@@ -1982,7 +1982,7 @@ class Blog extends DataObject
 
 		$params = array_merge( array(
 				'glue'       => '&amp;',
-				'url_suffix' => '', // additional url params are appended at the end
+				'url_suffix' => '', // additional url params are appended at the end, use FALSE to ignore the suffix completely
 			), $params );
 
 		switch( $parname )
@@ -2052,7 +2052,10 @@ class Blog extends DataObject
 
 			case 'subsurl':
 				$disp_param = 'subs';
-				$params['url_suffix'] .= '#subs';
+				if( $params['url_suffix'] !== false )
+				{	// Append this only if it is allowed:
+					$params['url_suffix'] .= '#subs';
+				}
 				break;
 
 			case 'userurl':

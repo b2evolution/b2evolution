@@ -68,6 +68,9 @@ if( !$current_User->check_status( 'can_access_admin' ) )
 	}
 }
 
+// Check if current user has an issue of email delivery and display a warning with link to solve it:
+check_user_email_delivery_issue();
+
 // Check that the request doesn't exceed the post max size
 // This is required because another way not even the $ctrl param can be initialized and the request may freeze
 check_post_max_size_exceeded();
