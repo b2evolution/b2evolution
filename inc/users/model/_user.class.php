@@ -6260,7 +6260,7 @@ class User extends DataObject
 
 			if( isset( $insert_orgs[ $organization_ID ] ) )
 			{	// Don't join this user to same organization twice:
-				$Messages->add( sprintf( T_('User cannot be joined to the same organization &laquo;%s&raquo; twice.'), $user_Organization->get_name() ), 'error' );
+				$Messages->add( sprintf( T_('You are already a member of "%s".'), $user_Organization->get_name() ), 'error' );
 			}
 			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
