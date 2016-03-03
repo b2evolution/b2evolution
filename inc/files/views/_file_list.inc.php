@@ -309,6 +309,9 @@ $Form->begin_form();
 						echo action_icon( T_('Use this as my profile picture!'), 'link',
 									regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 									NULL, NULL, NULL, array() );
+						echo action_icon( T_('Duplicate into my profile_pictures folder'), 'user',
+									regenerate_url( 'fm_selected', 'action=duplicate_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+									NULL, NULL, NULL, array() );
 						echo ' ';
 					}
 				}

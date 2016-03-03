@@ -1233,6 +1233,7 @@ switch( $action )
 
 
 	case 'link_user':
+	case 'duplicate_user':
 		// TODO: We don't need the Filelist, move UP!
 
 		// Check that this action request is not a CSRF hacked request:
@@ -1254,6 +1255,39 @@ switch( $action )
 			break;
 		}
 		$edited_File = & $selected_Filelist->get_by_idx(0);
+
+		if( $action == 'duplicate_user' )
+		{	// Copy file to the folder "profile_pictures" before linking:
+
+			// Change current location to "profile_pictures" of the edited user:
+			$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
+			$selected_Filelist = new Filelist( $user_FileRoot );
+
+			$old_path = $edited_File->get_rdfp_rel_path();
+			$new_path = $selected_Filelist->get_rds_list_path().$edited_File->get_name();
+
+			if( $old_path == $new_path && $edited_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
+			{	// File path has not changed:
+				$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
+			}
+			else
+			{
+				// Get a pointer on dest file:
+				$dest_File = & $FileCache->get_by_root_and_path( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path );
+
+				// Perform copy:
+				if( ! $edited_File->copy_to( $dest_File ) )
+				{	// Failed copying:
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+				}
+				else
+				{	// Success copying:
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'success' );
+					// Change old file to new copied in order to link it to profile:
+					$edited_File = $dest_File;
+				}
+			}
+		}
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$edited_File->load_meta( true );

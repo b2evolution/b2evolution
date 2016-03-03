@@ -398,6 +398,14 @@ function get_icon_info( $name )
 			'glyph' => 'user',
 			'fa' => 'users'
 		);
+		case 'user': return array(
+			'rollover' => true,
+			'alt' => T_('User'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'user'
+		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
 			'size' => array( 14, 15 ),
