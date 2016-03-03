@@ -48,9 +48,6 @@ if( $disp == 'posts' )
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'edit_text_create'  => T_('New topic'),
-	'edit_text_update'  => T_('Edit topic'),
-	'edit_text_copy'    => T_('Duplicate topic'),
 	'catdir_text'       => T_('Forum'),
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
@@ -170,7 +167,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				// TODO: fp>yura : this MUST NOT be in the skin. It must be in the b2evolution core (somewhere where we determine $disp)
 				$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			}
-			
+
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h2 class="page_title">',
@@ -179,9 +176,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
 					'display_edit_links'=> false,
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
@@ -288,10 +282,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Sending a message'),
-					// Edit post form
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -464,7 +454,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

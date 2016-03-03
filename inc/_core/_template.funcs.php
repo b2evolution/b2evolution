@@ -440,9 +440,6 @@ function get_request_title( $params = array() )
 			'subs_text'           => T_('Notifications'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
-			'edit_text_create'    => T_('New post'),
-			'edit_text_update'    => T_('Editing post'),
-			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
 			'posts_text'          => '#',		// Automatic - display filters
@@ -634,7 +631,7 @@ function get_request_title( $params = array() )
 				$after = $params['title_'.$disp.'_after'];
 			}
 			break;
-	
+
 		case 'download':
 			// We are displaying a download page:
 			global $download_Link;
@@ -670,21 +667,24 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'edit':
+			global $edited_Item;
+			$type_name = $edited_Item->get_ItemType()->get_name();
+
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = $params['edit_text_update'];
+				$title = sprintf( T_('Edit %s'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = $params['edit_text_copy'];
+				$title = sprintf( T_('Duplicate %s'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = $params['edit_text_create'];
+				$title = sprintf( T_('New %s'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -1959,7 +1959,7 @@ function credits( $params = array() )
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 
-	return $max_credits;	
+	return $max_credits;
 }
 
 
