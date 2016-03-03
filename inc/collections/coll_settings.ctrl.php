@@ -551,11 +551,13 @@ if( $action == 'dashboard' )
 			// Comments Awaiting Moderation Block
 			if( $have_comments_to_moderate )
 			{
+				load_funcs( 'comments/model/_comment_js.funcs.php' );
+
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
 					) );
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \''.request_from().'\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
+				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 				$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
