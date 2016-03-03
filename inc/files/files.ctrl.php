@@ -117,11 +117,21 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
  */
 $fm_mode = param( 'fm_mode', 'string', NULL, true );
 
+/**
+ * @var string Root of the source files that may be moved/copied from one root to another
+ */
+$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
+
 $action = param_action();
 if( $action == 'group_action' )
 { // Get the real action from the select:
 	$action = param( 'group_action', 'string', '' );
 	// NOTE/TODO: dh> action "img_tag" appears to be unimplemented for non-JS
+}
+
+if( $action == 'move_copy' )
+{ // Memorize action to select another directory for moving/copying files
+	memorize_param( 'action', 'string', '', $action );
 }
 
 if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
@@ -321,13 +331,11 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  *
  * @global Filelist
  */
-$selected_Filelist = new Filelist( $fm_FileRoot, false );
+$selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 foreach( $fm_selected as $l_source_path )
 {
-	// echo '<br>'.$l_source_path;
 	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 }
-
 
 
 /*
@@ -739,8 +747,11 @@ switch( $action )
 
 
 	case 'rename':
+	case 'move_copy':
+	case 'move':
+	case 'copy':
 		// TODO: We don't need the Filelist, move UP!
-		// Rename a file:
+		// Rename/Move/Copy a file:
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
 		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
@@ -752,7 +763,17 @@ switch( $action )
 
 		$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
 
-		if( ! $selected_Filelist->count() )
+		$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
+		if( $sources_Root )
+		{ // Instantiate the source list for the selected sources
+			$source_Filelist = new Filelist( $sources_Root );
+			foreach( $fm_selected as $l_source_path )
+			{
+				$source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+			}
+		}
+
+		if( ! $selected_Filelist->count() && ( ! $source_Filelist || ! $source_Filelist->count() ) )
 		{ // There is nothing to rename
 			$Messages->add( T_('Nothing selected.'), 'error' );
 			$action = 'list';
@@ -763,7 +784,7 @@ switch( $action )
 		param( 'new_names', 'array:string', array() );
 
 		// Check params for each file to rename:
-		while( $loop_src_File = & $selected_Filelist->get_next() )
+		while( $loop_src_File = & $source_Filelist->get_next() )
 		{
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
@@ -785,23 +806,79 @@ switch( $action )
 		{ // Rename is confirmed, let's proceed:
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'file' );
-			$selected_Filelist->restart();
-			while( $loop_src_File = & $selected_Filelist->get_next() )
+			$source_Filelist->restart();
+			$FileCache = & get_FileCache();
+			while( $loop_src_File = & $source_Filelist->get_next() )
 			{
-				$old_name = $loop_src_File->get_name();
-				$new_name = $new_names[$loop_src_File->get_md5_ID()];
+				$success_message = '';
 
-				if( $new_name == $old_name )
-				{ // Name has not changed...
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
-					continue;
-				}
-				// Perform rename:
-				if( ! $loop_src_File->rename_to( $new_name ) )
+				switch( $action )
 				{
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-						$old_name, $new_name ), 'error' );
-					continue;
+					case 'rename':
+						// Rename file
+						$old_name = $loop_src_File->get_name();
+						$new_name = $new_names[$loop_src_File->get_md5_ID()];
+
+						if( $new_name == $old_name )
+						{ // Name has not changed...
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
+							continue;
+						}
+						// Perform rename:
+						if( ! $loop_src_File->rename_to( $new_name ) )
+						{
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error' );
+							continue;
+						}
+
+						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
+						break;
+
+					case 'copy':
+						// Copy file
+						$old_path = $loop_src_File->get_rdfp_rel_path();
+						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+
+						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
+						{ // File path has not changed...
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
+							continue;
+						}
+
+						// Get a pointer on dest file
+						$dest_File = & $FileCache->get_by_root_and_path( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path );
+
+						// Perform copy:
+						if( ! $loop_src_File->copy_to( $dest_File ) )
+						{ // failed
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							continue;
+						}
+
+						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
+						break;
+
+					case 'move':
+						// Move file
+						$old_path = $loop_src_File->get_rdfp_rel_path();
+						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+
+						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
+						{ // File path has not changed...
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note' );
+							continue;
+						}
+
+						// Perform move:
+						if( ! $loop_src_File->move_to( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path ) )
+						{ // failed
+							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							continue;
+						}
+
+						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );
+						break;
 				}
 
 				// We have moved in same dir, update caches:
@@ -812,13 +889,18 @@ switch( $action )
 					$fm_Filelist->add( $File );
 				}
 
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-						$old_name, $new_name ), 'success' );
+				if( ! empty( $success_message ) )
+				{
+					$Messages->add( $success_message, 'success' );
+				}
 			}
 
+			// Remove a memorized param to reset a source root after moving/coping
+			forget_param( 'fm_sources_root' );
+
 			// REDIRECT / EXIT
- 			header_redirect( regenerate_url( '', '', '', '&' ) );
- 		  // $action = 'list';
+			header_redirect( regenerate_url( '', '', '', '&' ) );
+			// $action = 'list';
 		}
 		break;
 
@@ -1416,8 +1498,6 @@ switch( $fm_mode )
 		// Get the source list
 		if( $fm_sources = param( 'fm_sources', 'array:string', array(), true ) )
 		{
-			$fm_sources_root = param( 'fm_sources_root', 'string', '', true );
-
 			$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
 
 			if( $sources_Root )
@@ -1735,6 +1815,11 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 	// Action displays:
 	switch( $action )
 	{
+		case 'move_copy':
+			// Copy/Move files dialog:
+			$AdminUI->disp_view( 'files/views/_file_move_copy.form.php' );
+			break;
+
 		case 'rename':
 			// Rename files dialog:
 			$AdminUI->disp_view( 'files/views/_file_rename.form.php' );

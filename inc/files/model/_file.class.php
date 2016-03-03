@@ -1634,11 +1634,11 @@ class File extends DataObject
 
 
  	/**
-	 * Copy this file to a new location
+	 * Copy this file/folder to a new location
 	 *
 	 * Also copy meta data in Object
 	 *
-	 * @param File the target file (expected to not exist)
+	 * @param object File the target file (expected to not exist)
 	 * @return boolean true on success, false on failure
 	 */
 	function copy_to( & $dest_File )
@@ -1652,7 +1652,8 @@ class File extends DataObject
 		// TODO: fp> what happens if someone else creates the destination file right at this moment here?
 		//       dh> use a locking mechanism.
 
-		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
+		$new_folder_name = $this->is_dir() ? '' : NULL;
+		if( ! copy_r( $this->get_full_path(), $dest_File->get_full_path(), $new_folder_name ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
 			// this is probably a permission problem
 			syslog_insert( sprintf( 'File %s could not be copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );

@@ -68,6 +68,11 @@ $Form->begin_form();
 	$Form->hidden( 'md5_filelist', $fm_Filelist->md5_checksum() );
 	$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
 	$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
+
+	if( get_param( 'fm_sources_root' ) == '' )
+	{ // Set the root only when it is not defined, otherwise it is gone from memorized param
+		$Form->hidden( 'fm_sources_root', $fm_Filelist->_FileRoot->ID );
+	}
 ?>
 <table class="filelist table table-striped table-bordered table-hover table-condensed">
 	<thead>
@@ -612,6 +617,11 @@ $Form->begin_form();
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
 				$field_options['make_posts_pre'] = T_('Make multiple posts (1 per image)');
+			}
+
+			if( $edit_allowed_perm )
+			{ // User can edit:
+				$field_options['move_copy'] = T_('Copy/Move to another directory...');
 			}
 
 			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )
