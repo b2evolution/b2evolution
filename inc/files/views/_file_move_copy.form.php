@@ -13,22 +13,27 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @global Filelist
- */
-global $source_Filelist;
 
-/**
- * @global string
- */
-global $new_names;
+global $source_Filelist, $new_names, $action;
 
 
 $Form = new Form( NULL, 'fm_movecopy_checkchanges' );
 
 $Form->global_icon( T_('Cancel move/copy!'), 'close', regenerate_url('fm_selected,action,fm_sources_root') );
 
-$Form->begin_form( 'fform', T_('Move/Copy') );
+if( $action == 'file_move' )
+{
+	$form_title = T_('Move');
+}
+elseif( $action == 'file_copy' )
+{
+	$form_title = T_('Copy');
+}
+else
+{
+	$form_title = T_('Move').'/'.T_('Copy');
+}
+$Form->begin_form( 'fform', $form_title );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
@@ -46,11 +51,16 @@ $Form->begin_form( 'fform', T_('Move/Copy') );
 		$Form->end_fieldset();
 	}
 
-
-$Form->end_form( array(
-		array( 'submit', 'actionArray[move]', T_('Move'), 'SaveButton' ),
-		array( 'submit', 'actionArray[copy]', T_('Copy'), 'SaveButton' )
-	) );
+$buttons = array();
+if( $action == 'move_copy' || $action == 'file_move' )
+{	// Display a button to move files/folders:
+	$buttons[] = array( 'submit', 'actionArray[move]', T_('Move'), 'SaveButton' );
+}
+if( $action == 'move_copy' || $action == 'file_copy' )
+{	// Display a button to copy files/folders:
+	$buttons[] = array( 'submit', 'actionArray[copy]', T_('Copy'), 'SaveButton' );
+}
+$Form->end_form( $buttons );
 
 echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 				.'</strong> '.T_('Please navigate to the desired target location.').'</p>';

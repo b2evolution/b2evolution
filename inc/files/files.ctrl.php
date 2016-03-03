@@ -129,14 +129,13 @@ if( $action == 'group_action' )
 	// NOTE/TODO: dh> action "img_tag" appears to be unimplemented for non-JS
 }
 
-if( $action == 'move_copy' )
-{ // Memorize action to select another directory for moving/copying files
+if( in_array( $action, array( 'move_copy', 'file_move', 'file_copy' ) ) )
+{	// Memorize action to select another directory for moving/copying files:
 	memorize_param( 'action', 'string', '', $action );
 }
 
-if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
+if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' )
 {	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...)
-	// file_move & file_copy shouldn't actually be modes
 	$fm_mode = '';
 }
 
@@ -748,6 +747,8 @@ switch( $action )
 
 	case 'rename':
 	case 'move_copy':
+	case 'file_move':
+	case 'file_copy':
 	case 'move':
 	case 'copy':
 		// TODO: We don't need the Filelist, move UP!
@@ -1455,272 +1456,6 @@ switch( $action )
  */
 switch( $fm_mode )
 {
-	case 'file_copy':
-	case 'file_move':
-		// ------------------------
-		// copy/move a file:
-		// ------------------------
-		/*
-		 * fplanque>> This whole thing is flawed:
-		 * 1) only geeks can possibly like to use the same interface for renaming, moving and copying
-		 * 2) even the geeky unix commands won't pretend copying and moving are the same thing. They are not!
-		 *    Only moving and renaming are similar, and again FOR GEEKS ONLY.
-		 * 3) The way this works it breaks the File meta data (I'm working on it).
-		 * 4) For Move and Copy, this should use a "destination directory tree" on the right (same as for upload)
-		 * 5) Given all the reasons above copy, move and rename should be clearly separated into 3 different interfaces.
-		 *
-		 * blueyed>> it was never meant to only use a single interface. The original mode
-		 *   'file_cmr' was just a mode to handle it internally easier/more central.
-		 *   'copy' is just 'move and keep the source', while 'rename' is 'move in the same dir'
-		 *
-		 */
-
-		/*
-		TODO: On error notes use prefixed names, if the roots differ.
-		      Something like $fm_Filelist->get_names_realtive_to( $a_File, $b_File, $root_type, $root_ID, $rel_path )
-		      that returns an array containing the name of $a_File and $b_File relative to the Root path given as
-		      param 3, 4, 5.
-		      This would allow to say "Copied «users/admin/test_me.jpg» to «test_me.jpg»." rather than just
-		      "Copied «test_me.jpg» to «test_me.jpg».".
-			// fp>> I don't really understand this (probably missing a verb) but I do think that extending the Fileman object is not the right direction to go on the long term
-			// blueyed>> Tried to make it clearer. If it wasn't a Filemanager method, it has to be a function or
-			//   a method of the File class. IMHO it should be a method of the (to be killed) Filemanager object.
-			// fp>> Okay. It should *definitely* be a method of the File object and we should ask for ONE file at a time. Any question about 'where is the file?' (what/where/when/who, etc) should be asked to the File object itself.
-		*/
-
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
-		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
-			$fm_mode = NULL;
-			break;
-		}
-
-		// Get the source list
-		if( $fm_sources = param( 'fm_sources', 'array:string', array(), true ) )
-		{
-			$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
-
-			if( $sources_Root )
-			{ // instantiate the source list for the selected sources
-				$fm_source_Filelist = new Filelist( $sources_Root );
-			}
-			else
-			{ // Fallback: source files are considered to be in the current root
-				$fm_source_Filelist = new Filelist( $fm_Filelist->get_FileRoot() );
-				$Debuglog->add( 'SourceList without explicit root!', 'error' );
-			}
-
-			if( $fm_source_Filelist )
-			{
-				// TODO: should fail for non-existant sources, or sources where no read-perm
-				foreach( $fm_sources as $l_source_path )
-				{
-					// echo '<br>'.$lSourcePath;
-					$fm_source_Filelist->add_by_subpath( urldecode($l_source_path), true );
-				}
-			}
-			else
-			{ // Without SourceList there's no mode
-				$fm_mode = false;
-			}
-		}
-		else
-		{
-			$fm_source_Filelist = false;
-			$fm_sources = NULL;
-			$fm_sources_root = NULL;
-		}
-
-		if( ! $fm_source_Filelist || ! $fm_source_Filelist->count() )
-		{
-			$Messages->add( T_('No source files!'), 'error' );
-			$fm_mode = NULL;
-			break;
-		}
-
-		param( 'confirm', 'integer', 0 );
-		param( 'new_names', 'array:string', array() );
-		param( 'overwrite', 'array:integer', array() );
-
-		// Check params for each file to rename:
-		while( $loop_src_File = & $fm_source_Filelist->get_next() )
-		{
-			if( ! $loop_src_File->exists() )
-			{ // this can happen on reloading the page
-				$fm_source_Filelist->remove($loop_src_File);
-				continue;
-			}
-			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{ // We have not yet provided a name to rename to...
-				$confirm = 0;
-				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get('name');
-				continue;
-			}
-
-			// Check if provided name is okay:
-			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-
-			if( !$loop_src_File->is_dir() )
-			{
-				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()] ) )
-				{ // Not a file name or not an allowed extension
-					$confirm = 0;
-					$Messages->add( $error_filename , 'error' );
-					syslog_insert( sprintf( 'The copied file %s has an unrecognized extension', '<b>'.$new_names[$loop_src_File->get_md5_ID()].'</b>' ), 'warning', 'file', $loop_src_File->ID );
-					continue;
-				}
-			}
-			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{ // Not a directory name
-				$confirm = 0;
-				$Messages->add( $error_dirname, 'error' );
-				continue;
-			}
-
-			// If the source is a directory, then we must check if the target path length is allowed or not
-			$FileCache = & get_FileCache();
-			$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
-			if( $loop_src_File->is_dir() && ( strlen( $dest_File->get_full_path() ) > $dirpath_max_length ) )
-			{ // The path would be too long we can not allowe to move this folder
-				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('The target path is too long for this folder.') );
-				$confirm = 0;
-				continue;
-			}
-
-			// Check if destination file exists:
-			if( $dest_File && $dest_File->exists() )
-			{ // Target exists
-				if( $dest_File === $loop_src_File )
-				{
-					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', T_('Source and target files are the same. Please choose another name or directory.') );
-					$confirm = 0;
-					continue;
-				}
-
-				if( ! isset( $overwrite[$loop_src_File->get_md5_ID()] ) )
-				{ // We have not yet asked to overwrite:
-					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('The file &laquo;%s&raquo; already exists.'), $dest_File->get_rdfp_rel_path() ) );
-					$overwrite[$loop_src_File->get_md5_ID()] = 0;
-					$confirm = 0;
-					continue;
-				}
-
-				// We have asked to overwite...
-				if( $fm_mode == 'file_copy' )
-				{ // We are making a copy: no problem, we'll recycle the file ID anyway.
-					continue;
-				}
-
-				// We are moving, we'll need to unlink the target file and drop it's meta data:
-				// Check if there are delete restrictions on this file:
-				$restriction_Messages = $dest_File->check_relations( 'delete_restrictions' );
-
-				if( $restriction_Messages->count() )
-				{ // There are restrictions:
-					// TODO: work on a better output display here...
-					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
-
-					$confirm = 0;
-					break;	// stop whole file list processing
-				}
-			}
-		}
-
-		if( $confirm && $fm_source_Filelist->count() )
-		{ // Copy/move is confirmed (and we still have files to copy/move), let's proceed:
-
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'file' );
-
-			// Loop through files:
-			$fm_source_Filelist->restart();
-			while( $loop_src_File = & $fm_source_Filelist->get_next() )
-			{
-				// Get a pointer on dest file
-				$FileCache = & get_FileCache();
-				$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
-
-				if( $fm_mode == 'file_copy' )
-				{ // COPY
-
-					// Do the copy
-					if( $loop_src_File->copy_to( $dest_File ) )
-					{ // Success:
-						$Messages->add( sprintf( T_('Copied &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ), 'success' );
-
-						if( $fm_Filelist->contains( $dest_File ) === false )
-						{
-							$fm_Filelist->add( $dest_File );
-						}
-					}
-					else
-					{ // Failure:
-						param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
-																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
-					}
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( regenerate_url( 'fm_mode', '', '', '&' ), 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-				}
-				elseif( $fm_mode == 'file_move' )
-				{ // MOVE
-					// NOTE: DB integrity is handled by the File object itself
-					$DB->begin();
-
-					if( isset( $overwrite[$loop_src_File->get_md5_ID()] )
-							&& $overwrite[$loop_src_File->get_md5_ID()] )
-					{ // We want to overwrite, let's unlink the old file:
-						if( ! $dest_File->unlink() )
-						{ // Unlink failed:
-							$DB->rollback();
-
-							$Messages->add( sprintf( ( $dest_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).') : T_('Could not delete the file &laquo;%s&raquo;.') ), $dest_File->dget('name') ), 'error' );
-
-							// Move on to next file:
-							continue;
-						}
-					}
-
-					// Do the move:
-					$rdfp_oldpath = $loop_src_File->get_rdfp_rel_path();
-					$rdfp_newpath = $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
-
-					if( $loop_src_File->move_to( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $rdfp_newpath ) )
-					{ // successfully moved
-						$Messages->add( sprintf( T_('Moved &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ), 'success' );
-
-						// We may have moved in same dir, update caches:
-						$fm_Filelist->update_caches();
-						// We remove the file from the source list, after refreshing the cache
-						$fm_source_Filelist->update_caches();
-						$fm_source_Filelist->remove( $loop_src_File );
-
-						if( $fm_Filelist->contains( $loop_src_File ) === false )
-						{ // File not in filelist (expected if not same dir)
-							$fm_Filelist->add( $loop_src_File );
-						}
-					}
-					else
-					{ // move failed
-						param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not move &laquo;%s&raquo; to &laquo;%s&raquo;.'), $rdfp_oldpath, $rdfp_newpath ) );
-						// Note: we do not rollback, since unlinking is already done on disk :'(
-					}
-
-					$DB->commit();
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( regenerate_url( 'fm_mode', '', '', '&' ), 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-				}
-				else debug_die( 'Unhandled file copy/move mode' );
-			}
-
-			// EXIT MODE:
-			$fm_mode = NULL;
-		}
-		break;
-
-
 	case 'link_object':
 		// We want to link file(s) to an object or view linked files to an object:
 		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
@@ -1736,7 +1471,6 @@ switch( $fm_mode )
 
 		$LinkOwner->check_perm( 'view', true );
 		break;
-
 }
 
 
@@ -1816,6 +1550,8 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 	switch( $action )
 	{
 		case 'move_copy':
+		case 'file_move':
+		case 'file_copy':
 			// Copy/Move files dialog:
 			$AdminUI->disp_view( 'files/views/_file_move_copy.form.php' );
 			break;
@@ -1869,12 +1605,6 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
  */
 switch( $fm_mode )
 {
-	case 'file_copy':
-	case 'file_move':
-		// CMR dialog:
-		$AdminUI->disp_view( 'files/views/_file_copy_move.form.php' );
-		break;
-
 	case 'link_object':
 		// Links dialog:
 		$AdminUI->disp_view( 'files/views/_file_links.view.php' );
