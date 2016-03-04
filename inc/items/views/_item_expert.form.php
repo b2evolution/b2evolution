@@ -290,7 +290,7 @@ $Form->begin_form( '', '', $params );
 
 		if( count( $custom_fields ) )
 		{	// Display fieldset with custom fields only if at least one exists:
-			$Form->begin_fieldset( T_('Custom tags').get_manual_link( 'post-custom-tags-panel' ), array( 'id' => 'itemform_custom_tags', 'fold' => true ) );
+			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
 
 			echo '<table cellspacing="0" class="compose_layout">';
 
