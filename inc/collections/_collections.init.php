@@ -1083,6 +1083,64 @@ class collections_Module extends Module
 				header_redirect( $redirect_to );
 				break;
 
+			case 'subs_update':
+				// Subscribe/Unsubscribe user on the selected collection
+
+				if( $demo_mode && ( $current_User->ID <= 3 ) )
+				{ // don't allow default users profile change on demo mode
+					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
+								. T_('Back to profile') . '</a>]' );
+				}
+
+				// Get params
+				$blog = param( 'subscribe_blog', 'integer', true );
+				$notify_items = param( 'sub_items', 'integer', NULL );
+				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
+				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
+					$Messages->add( 'Invalid params!', 'error' );
+				}
+
+				if( ! is_email( $current_User->get( 'email' ) ) )
+				{ // user doesn't have a valid email address
+					$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
+				}
+
+				if( $Messages->has_errors() )
+				{ // errors detected
+					header_redirect();
+					// already exited here
+				}
+
+				if( set_user_subscription( $current_User->ID, $blog, $notify_items, $notify_comments ) )
+				{
+					if( $notify_items === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new posts notifications.' ), 'success' );
+					}
+					elseif( $notify_items === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new posts notifications.' ), 'success' );
+					}
+
+					if( $notify_comments === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new comments notifications.' ), 'success' );
+					}
+					elseif( $notify_comments === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new comments notifications.' ), 'success' );
+					}
+				}
+				else
+				{
+					$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
+				}
+
+				header_redirect();
+				break; // already exited here
+
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item
 

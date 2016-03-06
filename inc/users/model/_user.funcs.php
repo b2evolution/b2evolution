@@ -2505,6 +2505,23 @@ function get_user_isubscription( $user_ID, $item_ID )
 
 
 /**
+ * Get if user is subscribed to get emails, when a new post or comment is published on this collection.
+ *
+ * @param integer user ID
+ * @param integer blog ID
+ * @return object with properties sub_items and sub_comments. Each property value is true if user is subscribed and false otherwise
+ */
+function get_user_subscription( $user_ID, $blog )
+{
+	global $DB;
+	$result = $DB->get_row( 'SELECT sub_items, sub_comments
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$blog );
+	return $result;
+}
+
+
+/**
  * Set user item subscription
  *
  * @param integer user ID
@@ -2522,6 +2539,47 @@ function set_user_isubscription( $user_ID, $item_ID, $value )
 
 	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.' )' );
+}
+
+
+/**
+ * Set user collection subscription
+ *
+ * @param integer user ID
+ * @param integer blog ID
+ * @param integer value 0 for unsubscribe and 1 for subscribe to new posts
+ * @param integer value 0 for unsubscribe and 1 for subscribe to new comments
+ */
+function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL )
+{
+	global $DB;
+	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
+
+	if( ( $items < 0 ) || ( $items > 1 ) || ( $comments < 0 ) || ( $comments > 1 ) )
+	{
+		return false;
+	}
+
+	if( ! is_null( $items ) )
+	{
+		$sub_items = $items;
+	}
+	else
+	{
+		$sub_items = $sub ? $sub->sub_items : 0;
+	}
+
+	if( ! is_null( $comments ) )
+	{
+		$sub_comments = $comments;
+	}
+	else
+	{
+		$sub_comments = $sub ? $sub->sub_comments : 0;
+	}
+
+	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_comments.' )' );
 }
 
 
@@ -4582,7 +4640,7 @@ function check_access_users_list( $mode = 'normal' )
 {
 	global $current_User, $Settings, $Messages;
 
-	if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) ) 
+	if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
 	{	// Redirect to the login page if not logged in and allow anonymous user setting is OFF:
 		$error_message = T_( 'You must log in to view the user directory.' );
 		if( $mode == 'api' )
