@@ -65,6 +65,13 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			return false;
 		} );
 
+		var url_params = '&vote_ID=' + voting_layout.find( '#votingID' ).val();
+
+		if( voting_layout.find( '#widgetID' ).length > 0 )
+		{	// Add widget ID to action URL:
+			url_params = '&widget_ID=' + voting_layout.find( '#widgetID' ).val();
+		}
+
 		voting_layout.on( 'click', '#votingLike', function()
 		{ // Action for "Like" button
 			jQuery( this ).removeAttr( 'id' );
@@ -75,7 +82,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=like&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=like' + url_params,
 				success: function( result )
 				{
 					voting_layout.html( ajax_debug_clear( result ) );
@@ -95,7 +102,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=noopinion&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=noopinion' + url_params,
 				success: function( result )
 				{
 					voting_layout.html( ajax_debug_clear( result ) );
@@ -115,7 +122,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=dontlike&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=dontlike' + url_params,
 				success: function( result )
 				{
 					voting_layout.html( ajax_debug_clear( result ) );
@@ -143,7 +150,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=inappropriate&checked=' + checked + '&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=inappropriate&checked=' + checked + url_params,
 				success: function( result )
 				{
 					votingFadeIn( voting_layout, voting_bg_color );
@@ -169,7 +176,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=spam&checked=' + checked + '&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=spam&checked=' + checked + url_params,
 				success: function( result )
 				{
 					votingFadeIn( voting_layout, voting_bg_color );

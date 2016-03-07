@@ -263,6 +263,19 @@ class Item extends ItemLight
 	var $ItemType;
 
 	/**
+	 * Voting result of all votes
+	 *
+	 * @var integer
+	 */
+	var $addvotes;
+	/**
+	 * A count of all votes
+	 *
+	 * @var integer
+	 */
+	var $countvotes;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -377,6 +390,9 @@ class Item extends ItemLight
 				$this->city_ID = $db_row->post_city_ID;
 			}
 
+			// Voting fields:
+			$this->addvotes = $db_row->post_addvotes;
+			$this->countvotes = $db_row->post_countvotes;
 		}
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $this ) );
@@ -7807,6 +7823,311 @@ class Item extends ItemLight
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Check if user can vote on this item
+	 *
+	 * @return boolean
+	 */
+	function can_vote()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If user is NOT logged in:
+			return false;
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		if( empty( $item_Blog ) || ! $item_Blog->get_setting( 'voting_positive' ) )
+		{	// If current collection doesn't allow a voting on items:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Display buttons to vote on item if user is logged
+	 *
+	 * @param array Params
+	 */
+	function display_voting_panel( $params = array() )
+	{
+		global $current_User;
+
+		$params = array_merge( array(
+				'before'      => '',
+				'after'       => '',
+				'label_text'             => T_('My vote:'),
+				'title_like'             => T_('Mark this item as positive!'),
+				'title_like_voted'       => T_('You think this item is positive'),
+				'title_noopinion'        => T_('Mark this item as neutral!'),
+				'title_noopinion_voted'  => T_('You think this item is neutral'),
+				'title_dontlike'         => T_('Mark this item as not negative!'),
+				'title_dontlike_voted'   => T_('You think this item is negative'),
+				'title_empty'            => T_('No user votes yet.'),
+				'display_summary'        => 'replace', // 'no' - Don't display, 'replace' - Replace label after vote, 'always' - Always display after icons
+				'display_summary_author' => true, // Display summary for author
+			), $params );
+
+		if( ! $this->can_vote() )
+		{	// Don't display the voting panel if a voting on this item is not allowed by some reason:
+			return;
+		}
+
+		echo $params['before'];
+
+		echo '<span id="vote_item_'.$this->ID.'">';
+
+		if( $current_User->ID == $this->creator_user_ID )
+		{	// Display only vote summary for users on their own items:
+			if( $params['display_summary_author'] )
+			{
+				$params['result_title_undecided'] = T_('Voting:');
+				$params['after_result'] = '.';
+				$result_summary = $this->get_vote_summary( $params );
+				echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+			}
+		}
+		else
+		{	// Display form to vote:
+			$title_text = $params['label_text'];
+			$after_voting_form = '';
+
+			if( $params['display_summary'] != 'no' )
+			{	// If we should display summary:
+				$vote_result = $this->get_vote_disabled();
+
+				if( $vote_result['is_voted'] && $params['display_summary'] == 'replace' )
+				{	// Replace title with vote summary if user already voted on this item:
+					$title_text = $this->get_vote_summary( $params );
+				}
+
+				if( $params['display_summary'] == 'always' )
+				{	// Always display vote summary after icons:
+					$after_voting_form = $this->get_vote_summary( $params );
+				}
+			}
+
+			$item_Blog = & $this->get_Blog();
+
+			display_voting_form( array_merge( array(
+					'vote_type'             => 'item',
+					'vote_ID'               => $this->ID,
+					'display_like'          => $item_Blog->get_setting( 'voting_positive' ),
+					'display_noopinion'     => $item_Blog->get_setting( 'voting_neutral' ),
+					'display_dontlike'      => $item_Blog->get_setting( 'voting_negative' ),
+					'display_inappropriate' => false,
+					'display_spam'          => false,
+					'title_text'            => $title_text.' ',
+				), $params ) );
+
+			echo $after_voting_form;
+		}
+
+		echo '</span>';
+
+		echo $params['after'];
+	}
+
+
+	/**
+	 * Set the vote, as a number.
+	 *
+	 * @param string Vote value (positive, neutral, negative)
+	 * @access protected
+	 */
+	function set_vote( $vote_value )
+	{
+		global $DB, $current_User, $servertimenow;
+
+		if( ! $this->can_vote() )
+		{	// A voting on this item is not allowed by some reason:
+			return;
+		}
+
+		switch ( $vote_value )
+		{	// Set a value for voting:
+			case 'positive':
+				$vote = '1';
+				break;
+			case 'neutral':
+				$vote = '0';
+				break;
+			case 'negative':
+				$vote = '-1';
+				break;
+			default:
+				// $vote_value is not correct from ajax request
+				return;
+		}
+
+		$DB->begin();
+
+		$SQL = new SQL( 'Check if current user already voted on item #'.$this->ID );
+		$SQL->SELECT( 'itvt_item_ID' );
+		$SQL->FROM( 'T_items__votes' );
+		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
+		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
+		if( ! $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		{	// Add a new vote for first time:
+			$DB->query( 'INSERT INTO T_items__votes
+				       ( itvt_item_ID, itvt_user_ID, itvt_updown, itvt_ts )
+				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )',
+				'Add new vote on item #'.$this->ID );
+		}
+		else
+		{	// Update a vote:
+			$DB->query( 'UPDATE T_items__votes
+				  SET itvt_updown = '.$DB->quote( $vote ).'
+				WHERE itvt_item_ID = '.$DB->quote( $this->ID ).'
+				  AND itvt_user_ID = '.$DB->quote( $current_User->ID ),
+				'Update a vote on item #'.$this->ID );
+		}
+
+		$vote_SQL = new SQL( 'Get voting results of item #'.$this->ID );
+		$vote_SQL->SELECT( 'COUNT( itvt_updown ) AS c, SUM( itvt_updown ) AS s' );
+		$vote_SQL->FROM( 'T_items__votes' );
+		$vote_SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
+		$vote_SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
+		$vote = $DB->get_row( $vote_SQL->get(), OBJECT, NULL, $vote_SQL->title );
+
+		// Update fields with vote counters for this item:
+		$DB->query( 'UPDATE T_items__item
+			  SET post_addvotes = '.$DB->quote( $vote->s ).',
+			      post_countvotes = '.$DB->quote( $vote->c ).'
+			WHERE post_ID = '.$DB->quote( $this->ID ),
+			'Update fields with vote counters for item #'.$this->ID );
+		$this->addvotes = $vote->s;
+		$this->countvotes = $vote->c;
+
+		$DB->commit();
+
+		return;
+	}
+
+
+	/**
+	 * Get the vote helpful type disabled, as array.
+	 *
+	 * @return array Result:
+	 *               'is_voted' - TRUE if current user already voted on this comment
+	 *               'icons_statuses': array( 'yes', 'no' )
+	 */
+	function get_vote_disabled()
+	{
+		global $DB, $current_User;
+
+		$result = array(
+				'is_voted' => false,
+				'icons_statuses' => array(
+					'yes' => '',
+					'no' => ''
+			) );
+
+		if( ! $this->can_vote() )
+		{	// A voting on this item is not allowed by some reason:
+			$result;
+		}
+
+		$SQL = new SQL( 'Get a vote result for current for item #'.$this->ID );
+		$SQL->SELECT( 'itvt_updown' );
+		$SQL->FROM( 'T_items__votes' );
+		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
+		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
+		$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
+
+		if( $vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		{	// Get a vote for current user and this item:
+			$result['is_voted'] = true;
+			$class_disabled = 'disabled';
+			$class_voted = 'voted';
+			switch ( $vote->itvt_updown )
+			{
+				case '1': // 
+					$result['icons_statuses']['yes'] = $class_voted;
+					$result['icons_statuses']['no'] = $class_disabled;
+					break;
+				case '-1': // NO
+					$result['icons_statuses']['no'] = $class_voted;
+					$result['icons_statuses']['yes'] = $class_disabled;
+					break;
+			}
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Get the vote summary, as a string.
+	 *
+	 * @param type Vote type (spam, helpful)
+	 * @param srray Params
+	 * @return string
+	 */
+	function get_vote_summary( $params = array() )
+	{
+		$params = array_merge( array(
+				'result_title'           => '',
+				'result_title_undecided' => '',
+				'after_result'           => '',
+			), $params );
+
+		if( ! $this->can_vote() )
+		{	// A voting on this item is not allowed by some reason:
+			return '';
+		}
+
+		if( $this->countvotes == 0 )
+		{	// No votes for current comment:
+			return '';
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		if( $item_Blog->get_setting( 'voting_positive' ) &&
+		    ! $item_Blog->get_setting( 'voting_neutral' ) &&
+		    ! $item_Blog->get_setting( 'voting_negative' ) )
+		{	// Only the likes are enabled, Display a count of them:
+			$summary = ( $this->countvotes > 0 ) ? sprintf( T_('%s Likes'), $this->countvotes ) : T_('No likes');
+		}
+		else
+		{	// Calculate vote summary in percents:
+			$summary = ceil( $this->addvotes / $this->countvotes * 100 );
+
+			if( $summary < -20 )
+			{	// Item is positive
+				$summary = abs( $summary ).'% '.T_('Negative');
+			}
+			else if( $summary >= -20 && $summary <= 20 )
+			{	// Item is UNDECIDED:
+				$summary = T_('UNDECIDED');
+				if( !empty( $params['result_title_undecided'] ) )
+				{	// Display title before undecided results:
+					$summary = $params['result_title_undecided'].' '.$summary;
+				}
+			}
+			else if( $summary > 20 )
+			{	// Item is negative:
+				$summary .= '% '.T_('Positive');
+			}
+		}
+
+		if( !empty( $params['result_title'] ) )
+		{	// Display title before results:
+			$summary = $params['result_title'].' '.$summary;
+		}
+
+		return $summary.$params['after_result'].' ';
 	}
 }
 ?>

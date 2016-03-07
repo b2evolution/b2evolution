@@ -682,7 +682,7 @@ class Comment extends DataObject
 
 		if( $summary < -20 )
 		{	// Comment is OK
-			$summary = abs($summary).'% '.( $type == 'spam' ? T_('OK') : T_('not helpful') );
+			$summary = abs($summary).'% '.( $type == 'spam' ? T_('OK') : T_('Negative') );
 		}
 		else if( $summary >= -20 && $summary <= 20 )
 		{	// Comment is UNDECIDED
@@ -694,7 +694,7 @@ class Comment extends DataObject
 		}
 		else if( $summary > 20 )
 		{	// Comment is SPAM
-			$summary .= '% '.( $type == 'spam' ? T_('SPAM') : T_('helpful') );
+			$summary .= '% '.( $type == 'spam' ? T_('SPAM') : T_('Positive') );
 		}
 
 		if( !empty( $params['result_title'] ) )
@@ -1854,7 +1854,7 @@ class Comment extends DataObject
 				'title_noopinion_voted' => T_('You have no opinion about this comment'),
 				'title_no'              => T_('Mark this comment as not helpful!'),
 				'title_no_voted'        => T_('You think this comment is not helpful'),
-				'title_empty'           => T_('No votes on helpfulness yet.'),
+				'title_empty'           => T_('No user votes yet.'),
 				'class'                 => '',
 			), $params );
 

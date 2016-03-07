@@ -696,6 +696,11 @@ class Blog extends DataObject
 				}
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+
+			// Voting options:
+			$this->set_setting( 'voting_positive', param( 'voting_positive', 'integer', 0 ) );
+			$this->set_setting( 'voting_neutral', param( 'voting_neutral', 'integer', 0 ) );
+			$this->set_setting( 'voting_negative', param( 'voting_negative', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )

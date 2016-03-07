@@ -529,6 +529,80 @@ switch( $action )
 
 				$Comment->vote_helpful( '', '', '&amp;', true, true );
 				break;
+
+			case 'item':
+				// Vote on items:
+
+				$item_ID = intval( $vote_ID );
+				if( empty( $item_ID ) )
+				{	// No item ID
+					break 2;
+				}
+
+				$ItemCache = & get_ItemCache();
+				$Item = $ItemCache->get_by_ID( $item_ID, false );
+				if( ! $Item )
+				{	// Incorrect item ID:
+					break 2;
+				}
+
+				if( $current_User->ID == $Item->creator_user_ID )
+				{	// Do not allow users to vote on their own comments:
+					break 2;
+				}
+
+				$item_Blog = & $Item->get_Blog();
+
+				if( empty( $item_Blog ) || ! $item_Blog->get_setting( 'voting_positive' ) )
+				{	// If Users cannot vote:
+					break 2;
+				}
+
+				if( ! empty( $vote_action ) )
+				{	// Vote for the item:
+					switch( $vote_action )
+					{ // Set field value
+						case 'like':
+							$field_value = 'positive';
+							break;
+
+						case 'noopinion':
+							$field_value = 'neutral';
+							break;
+
+						case 'dontlike':
+							$field_value = 'negative';
+							break;
+					}
+
+					if( isset( $field_value ) )
+					{ // Update a vote of current user
+						$Item->set_vote( $field_value );
+						$Item->dbupdate();
+					}
+				}
+
+				if( ! empty( $redirect_to ) )
+				{	// Redirect to back page, It is used by browsers without JavaScript:
+					header_redirect( $redirect_to, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+
+				$widget_ID = param( 'widget_ID', 'integer', 0 );
+				if( $widget_ID > 0 )
+				{	// If request is from widget:
+					$WidgetCache = & get_WidgetCache();
+					$item_Widget = & $WidgetCache->get_by_ID( $widget_ID, false, false );
+					if( $item_Widget && $item_Widget->code == 'item_vote' )
+					{	// Request widget to display a voting panel:
+						$item_Widget->display_voting_panel( $Item );
+						break 2;
+					}
+				}
+
+				// Display a voting panel:
+				$Item->display_voting_panel();
+				break;
 		}
 		break;
 

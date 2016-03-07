@@ -3845,6 +3845,7 @@ function display_voting_form( $params = array() )
 	$params = array_merge( array(
 			'vote_type'              => 'link',
 			'vote_ID'                => 0,
+			'widget_ID'              => 0,
 			'display_like'           => true,
 			'display_noopinion'      => true,
 			'display_dontlike'       => true,
@@ -3981,6 +3982,18 @@ function display_voting_form( $params = array() )
 			$vote = $DB->get_row( $SQL->get() );
 
 			break;
+
+		case 'item':
+			// Item
+			$SQL = new SQL();
+			$SQL->SELECT( 'itvt_updown AS result' );
+			$SQL->FROM( 'T_items__votes' );
+			$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $params['vote_ID'] ) );
+			$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
+			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
+			$vote = $DB->get_row( $SQL->get() );
+
+			break;
 	}
 
 	if( empty( $vote ) || is_null( $vote->result ) )
@@ -4056,6 +4069,11 @@ function display_voting_form( $params = array() )
 		$url .= '&redirect_to='.$redirect_to;
 	}
 
+	if( ! empty( $params['widget_ID'] ) )
+	{	// Append widget ID for action URL:
+		$url .= '&widget_ID='.intval( $params['widget_ID'] );
+	}
+
 	if( $params['display_like'] )
 	{	// Display 'Like' icon
 		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
@@ -4124,6 +4142,11 @@ function display_voting_form( $params = array() )
 
 	// Create a hidden input with current ID
 	echo '<input type="hidden" id="votingID" value="'.$params['vote_ID'].'" />';
+
+	if( ! empty( $params['widget_ID'] ) )
+	{	// Create a hidden input with widget ID:
+		echo '<input type="hidden" id="widgetID" value="'.$params['widget_ID'].'" />';
+	}
 }
 
 
