@@ -156,6 +156,18 @@ class Skin extends DataObject
 
 
 	/**
+	 * What CSS framework does has this skin been designed with?
+	 *
+	 * This may impact default markup returned by Skin::get_template() for example
+	 */
+	function get_css_framework()
+	{
+		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
+	}
+
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.

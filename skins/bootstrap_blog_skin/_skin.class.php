@@ -56,6 +56,17 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * What CSS framework does has this skin been designed with?
+	 *
+	 * This may impact default markup returned by Skin::get_template() for example
+	 */
+	function get_css_framework()
+	{
+		return 'bootstrap';
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
