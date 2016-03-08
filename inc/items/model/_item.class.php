@@ -1778,26 +1778,47 @@ class Item extends ItemLight
 	 */
 	function get_content_page( $page = NULL, $format = 'htmlbody' )
 	{
+		global $preview;
+
 		// Get requested content page:
 		if( ! isset($page) || $page === '#' )
 		{ // We want to display the page requested by the user:
-			$page = isset($GLOBALS['page']) ? $GLOBALS['page'] : 1;
+			$page = isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1;
 		}
 
 		// Make sure, the pages are split up:
 		$this->split_pages( $format );
 
-		if( $page < 1 )
-		{
-			$page = 1;
-		}
+		if( $preview && $this->pages > 1 && ! $this->ID )
+		{ // This is a preview of an unsaved  multipage item
+			$preview_content = '';
 
-		if( $page > $this->pages )
-		{
-			$page = $this->pages;
-		}
+			foreach( $this->content_pages[$format] as $page => $page_content )
+			{
+				if( $page !== 0 )
+				{
+					$preview_content .= '<span class="badge badge-info">Page '.( $page + 1 ).'</span>';
+				}
 
-		return $this->content_pages[$format][$page-1];
+				$preview_content .= $page_content;
+			}
+
+			return $preview_content;
+		}
+		else
+		{
+			if( $page < 1 )
+			{
+				$page = 1;
+			}
+
+			if( $page > $this->pages )
+			{
+				$page = $this->pages;
+			}
+
+			return $this->content_pages[$format][$page-1];
+		}
 	}
 
 
@@ -2502,6 +2523,8 @@ class Item extends ItemLight
 	 */
 	function page_links()
 	{
+		global $preview;
+
 		$num_args = func_num_args();
 		$args = func_get_args();
 
@@ -2522,7 +2545,14 @@ class Item extends ItemLight
 			$params['format']		= 'htmlbody';
 		}
 
-		echo $this->get_page_links( $params, $params['format'] );
+		if( $preview && $this->pages > 1 && ! $this->ID )
+		{ // Do not render page links if it is a preview of a unsaved multipage item
+			echo '';
+		}
+		else
+		{
+			echo $this->get_page_links( $params, $params['format'] );
+		}
 	}
 
 
@@ -4487,7 +4517,7 @@ class Item extends ItemLight
 				// DEPRECATED: instead use something like: $Item->format_status( array(	'template' => '<div class="evo_status__banner evo_status__$status$">$status_title$</div>' ) );
 				$r .= get_styled_status( $this->status, $this->get('t_status'), $params['class'] );
 				break;
-				
+
 			default: // other formats
 				$r .= format_to_output( $this->get('t_status'), $params['format'] );
 				break;
@@ -4528,7 +4558,7 @@ class Item extends ItemLight
 	/**
 	 * Get status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables: 
+	 * There are 2 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
 	 *
@@ -4544,7 +4574,7 @@ class Item extends ItemLight
 
 		$r = str_replace( '$status$', $this->status, $params['template'] );
 		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
-	
+
 		return format_to_output( $r, $params['format'] );
 	}
 
@@ -4552,7 +4582,7 @@ class Item extends ItemLight
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables: 
+	 * There are 2 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
 	 *
@@ -5172,7 +5202,7 @@ class Item extends ItemLight
 
 		// Check which locale we can use for this item:
 		$item_Blog = & $this->get_Blog();
-		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' && 
+		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
 		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
 		{	// Force to use collection locale because it is restricted by collection setting:
 			$this->set( 'locale', $item_Blog->get( 'locale' ) );
