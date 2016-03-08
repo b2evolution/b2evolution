@@ -2301,7 +2301,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				$allow_javascript = $Group->perm_xhtml_javascript;
 				$allow_iframes    = $Group->perm_xhtml_iframes;
 				$allow_objects    = $Group->perm_xhtml_objects;
-				$bypass_antispam  = $Group->perm_bypass_antispam;	
+				$bypass_antispam  = $Group->perm_bypass_antispam;
 			}
 			// Do not add error messages in this context
 			$verbose = false;
@@ -2318,6 +2318,27 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	// ANTISPAM check:
 	$error = ( ( ! $bypass_antispam ) && ( $block = antispam_check($content) ) );
+
+	// Log incident in system log
+	if( $error )
+	{
+		switch( $context )
+		{
+			case 'commenting':
+				$object_type = 'comment';
+				break;
+
+			case 'posting':
+			case 'xmlrpc_posting':
+				$object_type = 'item';
+				break;
+
+			default:
+				$object_type = NULL;
+		}
+		syslog_insert( sprintf( T_('Antispam: Illegal content found. Content contains blacklisted word "%s".'), $block ), 'error', $object_type );
+	}
+
 	if( $error && $verbose )
 	{ // Add error message
 		if( $context == 'xmlrpc_posting' )

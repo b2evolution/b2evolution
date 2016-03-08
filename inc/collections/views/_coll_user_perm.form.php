@@ -64,11 +64,11 @@ $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 a
 	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_meta_comment, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change,'
-	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, bloguser_ismember ) AS bloguser_ismember,'
+	. 'IF( ( user_ID = "'.$edited_Blog->owner_user_ID.'" OR grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloguser_ismember ) AS bloguser_ismember,'
 	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, 0 ) AS bloguser_is_owner' );
-$SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
-				 						user_ID = bloguser_user_ID
-										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
+$SQL->FROM( 'T_users' );
+$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
+$SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
 $SQL->ORDER_BY( 'bloguser_is_owner DESC, bloguser_ismember DESC, *, user_login, user_ID' );
 
 if( !empty( $keywords ) )

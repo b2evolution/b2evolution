@@ -64,6 +64,42 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
+	$always_enabled = false;
+
+	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
+		$always_enabled = true;
+	}
+	else
+	{	// Check if permission is always enabled by group setting:
+		if( ! empty( $row->user_ID ) )
+		{	// User perm:
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+			{	// Get user group:
+				$perm_Group = & $User->get_Group();
+			}
+		}
+		elseif( ! empty( $row->grp_ID ) )
+		{	// Group perm:
+			$GroupCache = & get_GroupCache();
+			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+		}
+
+		if( ! empty( $perm_Group ) )
+		{	// Check global group setting permission:
+			$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
+			if( $group_perm_blogs == 'editall' )
+			{	// If the group has a global permission to edit ALL collections:
+				$always_enabled = true;
+			}
+			elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
+			{	// If the group has a global permission to view or edit ALL collections:
+				$always_enabled = true;
+			}
+		}
+	}
+
 	$r = '<input type="checkbox"';
 	if( !empty($id) )
 	{
@@ -71,12 +107,12 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 	}
 	$r .= ' name="blog_'.$perm.'_'.$row->{$row_id_coll}.'"';
 
-	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $edited_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties)
+	if( $always_enabled )
+	{	// This perm option is always enabled:
 		$r .= ' checked="checked" disabled="disabled"';
 	}
 	else
-	{	// Not owner
+	{	// Check if perm option is enabled or/and disabled:
 		if( !empty( $row->{$prefix.$perm} ) )
 		{
 			$r .= ' checked="checked"';
@@ -88,6 +124,7 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 		}
 	}
 	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
+
 	return $r;
 }
 
@@ -164,6 +201,34 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 			debug_die('Invalid $type param on advanced perms form!');
 	}
 
+	$always_enabled = false;
+
+	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
+	{	// Collection owner has the permissions to edit all item/comment statuses by default:
+		$always_enabled = true;
+	}
+	else
+	{	// Check if permission is always enabled by group setting:
+		if( ! empty( $row->user_ID ) )
+		{	// User perm:
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+			{	// Get user group:
+				$perm_Group = & $User->get_Group();
+			}
+		}
+		elseif( ! empty( $row->grp_ID ) )
+		{	// Group perm:
+			$GroupCache = & get_GroupCache();
+			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+		}
+
+		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			$always_enabled = true;
+		}
+	}
+
 	$r = '<input type="checkbox"';
 	if( !empty($id) )
 	{
@@ -171,12 +236,12 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 	}
 	$r .= ' name="blog_perm_'.$perm_status.'_'.$type_param.$row->{$row_id_coll}.'"';
 
-	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the permissions to edit all item/comment statuses by default
+	if( $always_enabled )
+	{	// This perm option is always enabled:
 		$r .= ' checked="checked" disabled="disabled"';
 	}
 	else
-	{	// Not owner
+	{	// Check if perm option is enabled or/and disabled:
 		if( get_status_permvalue( $perm_status ) & $row->{$perm_statuses} )
 		{
 			$r .= ' checked="checked"';
@@ -212,14 +277,42 @@ function coll_perm_edit( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$r = '<select id="blog_perm_edit_'.$row->{$row_id_coll}.'" name="blog_perm_edit_'.$row->{$row_id_coll}.'"';
+	$always_enabled = false;
+
 	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
 	{	// Collection owner has the max permission to edit items:
+		$always_enabled = true;
+	}
+	else
+	{	// Check if permission is always enabled by group setting:
+		if( ! empty( $row->user_ID ) )
+		{	// User perm:
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+			{	// Get user group:
+				$perm_Group = & $User->get_Group();
+			}
+		}
+		elseif( ! empty( $row->grp_ID ) )
+		{	// Group perm:
+			$GroupCache = & get_GroupCache();
+			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+		}
+
+		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			$always_enabled = true;
+		}
+	}
+
+	$r = '<select id="blog_perm_edit_'.$row->{$row_id_coll}.'" name="blog_perm_edit_'.$row->{$row_id_coll}.'"';
+	if( $always_enabled )
+	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_value = 'all';
 	}
 	else
-	{	// Not owner
+	{	// Check if perm option is enabled or/and disabled:
 		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
 		{
 			$r .= ' disabled="disabled"';
@@ -249,14 +342,42 @@ function coll_perm_edit_cmt( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$r = '<select id="blog_perm_edit_cmt'.$row->{$row_id_coll}.'" name="blog_perm_edit_cmt_'.$row->{$row_id_coll}.'"';
+	$always_enabled = false;
+
 	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the max permission to edit items:
+	{	// Collection owner has the max permission to edit comments:
+		$always_enabled = true;
+	}
+	else
+	{	// Check if permission is always enabled by group setting:
+		if( ! empty( $row->user_ID ) )
+		{	// User perm:
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+			{	// Get user group:
+				$perm_Group = & $User->get_Group();
+			}
+		}
+		elseif( ! empty( $row->grp_ID ) )
+		{	// Group perm:
+			$GroupCache = & get_GroupCache();
+			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+		}
+
+		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			$always_enabled = true;
+		}
+	}
+
+	$r = '<select id="blog_perm_edit_cmt'.$row->{$row_id_coll}.'" name="blog_perm_edit_cmt_'.$row->{$row_id_coll}.'"';
+	if( $always_enabled )
+	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_cmt_value = 'all';
 	}
 	else
-	{	// Not owner
+	{	// Check if perm option is enabled or/and disabled:
 		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
 		{
 			$r .= ' disabled="disabled"';
@@ -287,14 +408,42 @@ function coll_perm_item_type( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$r = '<select id="blog_perm_item_type_'.$row->{$row_id_coll}.'" name="blog_perm_item_type_'.$row->{$row_id_coll}.'"';
+	$always_enabled = false;
+
 	if( $prefix == 'bloguser_' && $edited_Blog->owner_user_ID == $row->user_ID )
 	{	// Collection owner has the max permission to edit item types:
+		$always_enabled = true;
+	}
+	else
+	{	// Check if permission is always enabled by group setting:
+		if( ! empty( $row->user_ID ) )
+		{	// User perm:
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+			{	// Get user group:
+				$perm_Group = & $User->get_Group();
+			}
+		}
+		elseif( ! empty( $row->grp_ID ) )
+		{	// Group perm:
+			$GroupCache = & get_GroupCache();
+			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+		}
+
+		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			$always_enabled = true;
+		}
+	}
+
+	$r = '<select id="blog_perm_item_type_'.$row->{$row_id_coll}.'" name="blog_perm_item_type_'.$row->{$row_id_coll}.'"';
+	if( $always_enabled )
+	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_value = 'admin';
 	}
 	else
-	{	// Not owner
+	{	// Check if perm option is enabled or/and disabled:
 		if( ! $permission_to_change_admin && $row->{$prefix.'perm_admin'} )
 		{
 			$r .= ' disabled="disabled"';
