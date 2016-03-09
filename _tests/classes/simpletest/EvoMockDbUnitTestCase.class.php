@@ -51,7 +51,7 @@ class EvoMockDbUnitTestCase extends EvoUnitTestCase
 
 		$classname = 'EvoMockDbUnitTestCase_DB_'.get_class($this);
 		$this->MockDB = new $classname($this);
-		$this->MockDB->DB( $testDB_conf ); // this will do 2-3 calls to query() already
+		$this->MockDB->__construct( $testDB_conf ); // this will do 2-3 calls to query() already
 
 		$this->old_DB_EvoMockDbUnitTestCase = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->MockDB;

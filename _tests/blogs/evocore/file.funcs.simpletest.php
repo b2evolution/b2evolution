@@ -118,6 +118,49 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		$this->assertIdentical( get_canonical_path( '.evocache' ), '.evocache/' );
 		$this->assertIdentical( get_canonical_path( '.evocache/../' ), '' );
 	}
+
+	function test_get_basename()
+	{
+		// Tests on normal strings
+		$this->assertIdentical( get_basename( '/hello/world.d', '.d' ),  'world' );
+		$this->assertIdentical( get_basename( '/hello/world.d' ), 'world.d' );
+		$this->assertIdentical( get_basename( '/hello/world' ),  'world' );
+		$this->assertIdentical( get_basename( '/hello/world/' ),  'world' );
+		$this->assertIdentical( get_basename( 'hello/world.d', '.d' ),  'world' );
+		$this->assertIdentical( get_basename( 'hello/world.d' ), 'world.d' );
+		$this->assertIdentical( get_basename( 'hello/world' ),  'world' );
+		$this->assertIdentical( get_basename( 'hello/world/' ),  'world' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\world.d', '.d' ),  'world' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\world.d' ), 'world.d' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\world' ),  'world' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\world\\' ),  'world' );
+		$this->assertIdentical( get_basename( '.' ),  '.' );
+		$this->assertIdentical( get_basename( '/' ),  '' );
+		$this->assertIdentical( get_basename( '' ),  '' );
+		$this->assertIdentical( get_basename( '/.////.///../hello' ),  'hello' );
+
+
+		// Tests on utf-8 strings
+		$this->assertIdentical( get_basename( '/hello/英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( '/hello/英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( '/hello/英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( 'C:\\hello\\英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( 'hello/英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标).docx', '.docx' ),  '英语四级历年高频词汇(带音标)' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标).docx' ), '英语四级历年高频词汇(带音标).docx' );
+		$this->assertIdentical( get_basename( '英语/英语四级历年高频词汇(带音标)' ),  '英语四级历年高频词汇(带音标)' );
+
+	}
 }
 
 

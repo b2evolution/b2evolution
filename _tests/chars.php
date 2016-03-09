@@ -12,8 +12,8 @@
  *
  * @package tests
  */
-require_once(dirname(__FILE__).'/../blogs/conf/_config.php');
-require_once(dirname(__FILE__).'/../blogs/'.$core_subdir.'_main.inc.php');
+require_once(dirname(__FILE__).'/../conf/_config.php');
+require_once(dirname(__FILE__).'/../'.$core_subdir.'_main.inc.php');
 
 $test = "<strong>Hé 'man\"!</strong> € &lt;fake & &wrong &eacute;&gt;";
 echo '[',$test,"] => \n";

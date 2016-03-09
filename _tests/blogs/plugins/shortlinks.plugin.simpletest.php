@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the {@link wikilinks_plugin Wiki links plugin}.
+ * Tests for the {@link shortlinks_plugin Wiki links plugin}.
  * @package tests
  */
 
@@ -13,18 +13,18 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 /**
  * @package tests
  */
-class WikilinksPluginTestCase extends EvoPluginUnitTestCase
+class ShortlinksPluginTestCase extends EvoPluginUnitTestCase
 {
 	function __construct()
 	{
-		parent::__construct( 'Wiki links plugin test' );
+		parent::__construct( 'Short links plugin test' );
 	}
 
 
 	function setUp()
 	{
 		parent::setup();
-		$this->Plugin = $this->get_Plugin('wikilinks_plugin');
+		$this->Plugin = $this->get_Plugin('shortlinks_plugin');
 	}
 
 
@@ -53,7 +53,7 @@ class WikilinksPluginTestCase extends EvoPluginUnitTestCase
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
-	$test = new WikilinksPluginTestCase();
+	$test = new ShortlinksPluginTestCase();
 	$test->run_html_or_cli();
 	unset( $test );
 }

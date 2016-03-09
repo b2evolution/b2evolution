@@ -55,25 +55,25 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->TestSettings->load_all();
 		$this->assertEqual( 'abc', $this->TestSettings->get_default( 'default_abc' ) );
 
-		$this->assertEqual( 'abc', $this->TestSettings->get( 'default_abc' ) );
+		$this->assertEqual( 'abc', $this->TestSettings->getx( 'default_abc' ) );
 
 		// After delete it should return the default again:
-		$this->TestSettings->set( 'default_abc', 'foo' );
+		$this->TestSettings->setx( 'default_abc', 'foo' );
 		$this->TestSettings->delete( 'default_abc' );
-		$this->assertEqual( 'abc', $this->TestSettings->get( 'default_abc' ) );
+		$this->assertEqual( 'abc', $this->TestSettings->getx( 'default_abc' ) );
 
 		// dbupdate should not kick in, when it has been set to the default (what delete does):
 		$this->MockDB->returns('query', 1);
 		$this->assertFalse($this->TestSettings->dbupdate());
 
 		// setting the default value should not cause an update:
-		$this->TestSettings->set( 'default_abc', $this->TestSettings->get_default('default_abc') );
+		$this->TestSettings->setx( 'default_abc', $this->TestSettings->get_default('default_abc') );
 		$this->assertFalse($this->TestSettings->dbupdate());
 
 		// Saving int gets converted to string => no update:
-		$this->TestSettings->set('default_1', 1 /* int not string */);
+		$this->TestSettings->setx('default_1', 1 /* int not string */);
 		$this->assertFalse($this->TestSettings->dbupdate()); // still, should get saved as string (=> no update)
-		$this->assertIdentical($this->TestSettings->get('default_1'), '1');
+		$this->assertIdentical($this->TestSettings->getx('default_1'), '1');
 	}
 
 
@@ -89,24 +89,24 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 		$s->load_all();
 
-		$this->assertEqual( $s->get(1, 2, 3), 'dbval' );
+		$this->assertEqual( $s->getx(1, 2, 3), 'dbval' );
 		$this->assertEqual( $s->get_default(3), 'defaultval' );
 
 		// Setting it to default value (with another value in DB) should update:
-		$this->assertTrue( $s->set(1, 2, 3, 'defaultval') );
+		$this->assertTrue( $s->setx(1, 2, 3, 'defaultval') );
 		$this->assertTrue( $s->dbupdate() );
 
 		$this->assertTrue( $s->delete(1, 2, 3) );
-		$this->assertEqual( $s->get(1, 2, 3), 'defaultval' );
+		$this->assertEqual( $s->getx(1, 2, 3), 'defaultval' );
 		// If db value is the default value (set explicitly), do not remove (or update) it:
 		$this->assertFalse( $s->dbupdate() );
 
 		// Reload mocked db values.
 		$s->reset();
 		// Deleting a value should cause an update.
-		$this->assertEqual( $s->get(1, 2, 3), 'dbval' );
+		$this->assertEqual( $s->getx(1, 2, 3), 'dbval' );
 		$this->assertTrue( $s->delete(1, 2, 3) );
-		$this->assertEqual( $s->get(1, 2, 3), 'defaultval' );
+		$this->assertEqual( $s->getx(1, 2, 3), 'defaultval' );
 		$this->assertTrue( $s->dbupdate() );
 	}
 
@@ -117,12 +117,12 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	function test_PreferExplicitSet()
 	{
 		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i'), ARRAY_A, 'Settings::load' ), 'DB select ok.' );
-		$this->TestSettings->set( 'lala', 1 );
+		$this->TestSettings->setx( 'lala', 1 );
 
 		$this->TestSettings->load_all();
 
-		$this->assertEqual( $this->TestSettings->get( 'lala' ), 1, 'Prefer setting which was set before explicit load().' );
-		$this->assertNull( $this->TestSettings->get( 'lala_notset' ), 'Return NULL for non-existing setting.' );
+		$this->assertEqual( $this->TestSettings->getx( 'lala' ), 1, 'Prefer setting which was set before explicit load().' );
+		$this->assertNull( $this->TestSettings->getx( 'lala_notset' ), 'Return NULL for non-existing setting.' );
 	}
 
 
@@ -138,7 +138,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->assertFalse( $this->TestSettings->dbupdate() );
 
 		// Should do a query:
-		$this->assertTrue( $this->TestSettings->set('foobar', 1) );
+		$this->assertTrue( $this->TestSettings->setx('foobar', 1) );
 		$this->assertFalse( $this->TestSettings->delete('does-not-exist') );
 		$this->TestSettings->dbupdate(); // TODO: should return true, but is mocked.
 
@@ -151,8 +151,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	function test_multicolumndelete()
 	{
 		$TestSettings = new AbstractSettings( 'testtable', array( 'test_key1', 'test_key2' ), 'test_value' );
-		$this->assertFalse( $TestSettings->set('foobar', 1) );
-		$this->assertTrue( $TestSettings->set('foobar', 1, 1) );
+		$this->assertFalse( $TestSettings->setx('foobar', 1) );
+		$this->assertTrue( $TestSettings->setx('foobar', 1, 1) );
 	}
 
 
@@ -173,8 +173,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/^\s*SELECT key1, key2, val\s+FROM T_test$/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 0 );
-		$s->get(1, 'foo');
-		$s->get(2, 'bar');
+		$s->getx(1, 'foo');
+		$s->getx(2, 'bar');
 	}
 
 
@@ -184,8 +184,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 			'/SELECT key1, key2, val\s+FROM T_test WHERE key1 = \'1\'/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 1 );
-		$s->get(1, 'foo');
-		$s->get(1, 'bar');
+		$s->getx(1, 'foo');
+		$s->getx(1, 'bar');
 	}
 
 
@@ -199,13 +199,13 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2', 'key3' ), 'val', 2 );
 		// 1st query
-		$s->get(1, 2, 3);
-		$s->get(1, 2, 3);
-		$s->get(1, 2, '3_2');
+		$s->getx(1, 2, 3);
+		$s->getx(1, 2, 3);
+		$s->getx(1, 2, '3_2');
 
 		// 2nd
-		$s->get('1_2', 2, 3);
-		$s->get('1_2', 2, '3_2');
+		$s->getx('1_2', 2, 3);
+		$s->getx('1_2', 2, '3_2');
 	}
 
 
@@ -217,8 +217,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 			new IdenticalExpectation("REPLACE INTO T_test (key1, key2, val) VALUES ( '1', 'foo', '1' )") ), 'DB REPLACE-INTO ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 0 );
-		$s->get(1, 'foo');
-		$s->set(1, 'foo', 1);
+		$s->getx(1, 'foo');
+		$s->setx(1, 'foo', 1);
 		$s->dbupdate();
 	}
 
@@ -228,13 +228,13 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$s = $this->TestSettings;
 		$s->_defaults = array('foo' => 'bar');
 
-		$this->assertEqual('bar', $s->get('foo'));
-		$s->set('foo', 'barbar');
+		$this->assertEqual('bar', $s->getx('foo'));
+		$s->setx('foo', 'barbar');
 		$s->dbupdate();
-		$this->assertEqual('barbar', $s->get('foo'));
+		$this->assertEqual('barbar', $s->getx('foo'));
 
 		$s->delete('foo');
-		$this->assertEqual('bar', $s->get('foo'));
+		$this->assertEqual('bar', $s->getx('foo'));
 	}
 
 
@@ -266,8 +266,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->MockDB->returns('query', 1);
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2', 'key3' ), 'val', 0 );
-		$this->assertTrue( $s->set(1, 2, 3, 'value'));
-		$this->assertEqual($s->get(1, 2, 3), 'value');
+		$this->assertTrue( $s->setx(1, 2, 3, 'value'));
+		$this->assertEqual($s->getx(1, 2, 3), 'value');
 		$this->assertTrue( $s->dbupdate());
 		$this->assertFalse($s->dbupdate());
 		$this->assertTrue( $s->delete(1, 2, 3));
@@ -294,10 +294,10 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->MockDB->setReturnValueAt(0, 'get_results', $r);
 
 		// Should return the saved value, not default:
-		$this->assertEqual( $s->get(1, 2, 3), '4' );
-		$this->assertEqual( $s->get(1, 22, 3), '44' );
+		$this->assertEqual( $s->getx(1, 2, 3), '4' );
+		$this->assertEqual( $s->getx(1, 22, 3), '44' );
 
-		$this->assertEqual($s->get(2, 2, 2), 2 );
+		$this->assertEqual($s->getx(2, 2, 2), 2 );
 	}
 
 
@@ -308,8 +308,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->MockDB->expectOnce('get_results');
 
 		$s = new AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 0 );
-		$s->get( "1", "cache_enabled" );
-		$s->get( "17", "title_link_type" );
+		$s->getx( "1", "cache_enabled" );
+		$s->getx( "17", "title_link_type" );
 	}
 }
 

@@ -2817,11 +2817,20 @@ function echo_file_properties()
  * Replacement for the basename function which alters strings that start with
  * utf-8 characters for PHP version 5.5 and earlier. This was taken from
  * http://www.abeautifulsite.net/stop-basename-from-changing-russian-and-other-non-latin-strings/
+ * and slightly modified
  */
 function get_basename( $path, $suffix = NULL)
 {
-	$split = preg_split('/\//', rtrim($path, '/ '));
-  return substr(basename('X' . $split[count($split) - 1], $suffix), 1);
+	$split = preg_split('/\/|\\\\/', rtrim($path, '/\ '));
+	$basename = basename('X' . $split[count($split) - 1], $suffix);
+	if( $basename === 'X' )
+	{ // prevent function from return boolean FALSE on empty string
+		return '';
+	}
+	else
+	{
+		return substr( $basename, 1 );
+	}
 }
 
 ?>

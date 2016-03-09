@@ -31,7 +31,10 @@ class PluginsTestCase extends EvoDbUnitTestCase
 
 		ob_start();
 		$this->create_current_tables(); // we need current tables for Plugins to work
-		ob_end_clean();
+		if( ob_get_length() )
+		{
+			ob_end_clean();
+		}
 
 		$this->Plugins = new Plugins_admin();
 	}

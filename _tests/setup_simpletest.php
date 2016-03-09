@@ -3,7 +3,7 @@ if( ! defined('EVODIR') )
 {
 	require dirname(__FILE__).'/config.php';
 }
-require EVODIR.'blogs/inc/_main.inc.php';
+require EVODIR.'inc/_main.inc.php';
 load_funcs('_core/_param.funcs.php');
 
 param('action', 'string', '');
@@ -40,11 +40,11 @@ if( $action == 'unzip_simpletest' )
 	{
 		$commands[] = 'tar xjv -f '.escapeshellarg($source_file).' 2>&1';
 	}
-	
+
 	if( empty($commands) && @file_exists( 'C:\Program Files\7-Zip\7z.exe' ) )
 	{	// 7-Zip is installed, let's use it
 		echo '<p><strong>GOOD NEWS! "7-Zip" is found, we\'ll use it instead.</strong></p>';
-		
+
 		$source_bz = $source_file;
 		$source_tar = str_replace( '.bz2', '', $source_file );
 
@@ -54,7 +54,7 @@ if( $action == 'unzip_simpletest' )
 		// Extract the files
 		$commands[] = '"C:\Program Files\7-Zip\7z.exe" e '.escapeshellarg($target_dir.'/'.$source_tar).' -y -o'.escapeshellarg($target_dir).'/simpletest';
 	}
-	
+
 	if( ! is_dir($target_dir) || ! is_writable($target_dir) )
 	{
 		printf('<p><strong>ERROR: Target directory (%s) is not writable (for me).</strong></p>', htmlspecialchars($target_dir));
