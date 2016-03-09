@@ -24,11 +24,11 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class ComponentWidget extends DataObject
 {
-	var $coll_ID;
 	/**
-	 * Container name
+	 * Widget container ID
 	 */
-	var $sco_name;
+	var $wico_ID;
+
 	var $order;
 	/**
 	 * @var string Type of the plugin ("core" or "plugin")
@@ -72,10 +72,18 @@ class ComponentWidget extends DataObject
 	var $BlockCache;
 
 	/**
+	 * The widget container where this widget belongs to
+	 *
+	 * Lazy instantiated.
+	 *
+	 * @var WidgetContainer
+	 */
+	var $WidgetContainer;
+
+	/**
 	* @var Blog
 	*/
 	var $Blog = NULL;
-
 
 	/**
 	 * Constructor
@@ -85,7 +93,7 @@ class ComponentWidget extends DataObject
 	function __construct( $db_row = NULL, $type = 'core', $code = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( 'T_widget', 'wi_', 'wi_ID' );
+		parent::__construct( 'T_widget__widget', 'wi_', 'wi_ID' );
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
@@ -96,8 +104,7 @@ class ComponentWidget extends DataObject
 		else
 		{	// We are loading an object:
 			$this->ID       = $db_row->wi_ID;
-			$this->coll_ID  = $db_row->wi_coll_ID;
-			$this->sco_name = $db_row->wi_sco_name;
+			$this->wico_ID  = $db_row->wi_wico_ID;
 			$this->type     = $db_row->wi_type;
 			$this->code     = $db_row->wi_code;
 			$this->params   = $db_row->wi_params;
@@ -129,6 +136,29 @@ class ComponentWidget extends DataObject
 		}
 
 		return $this->Plugin;
+	}
+
+
+	/**
+	 * Get WidgetContainer
+	 */
+	function & get_WidgetContainer()
+	{
+		if( ! isset( $this->WidgetContainer ) )
+		{
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			$this->WidgetContainer = & $WidgetContainerCache->get_by_ID( $this->wico_ID );
+		}
+		return $this->WidgetContainer;
+	}
+
+
+	/**
+	 * Get the collection ID where this widget belongs to
+	 */
+	function get_coll_ID()
+	{
+		return $this->get_WidgetContainer()->get( 'coll_ID' );
 	}
 
 
@@ -300,7 +330,7 @@ class ComponentWidget extends DataObject
 			}
 		}
 
-		$r_standart = array(
+		$r_standard = array(
 				'widget_css_class' => array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -319,7 +349,7 @@ class ComponentWidget extends DataObject
 				),
 			);
 
-		return array_merge($r,$r_standart);;
+		return array_merge( $r, $r_standard );
 	}
 
 
@@ -862,9 +892,8 @@ class ComponentWidget extends DataObject
 
 		$order_max = $DB->get_var(
 			'SELECT MAX(wi_order)
-				 FROM T_widget
-				WHERE wi_coll_ID = '.$this->coll_ID.'
-					AND wi_sco_name = '.$DB->quote($this->sco_name), 0, 0, 'Get current max order' );
+				 FROM T_widget__widget
+				WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
 
 		$this->set( 'order', $order_max+1 );
 
@@ -901,7 +930,7 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->get_coll_ID() );
 		}
 
 		return $this->Blog;

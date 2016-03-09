@@ -54,6 +54,20 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top', 'front_page_secondary_area' ),
+				'_item_block.inc.php' => array( 'item_single' ),
+			) );
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()

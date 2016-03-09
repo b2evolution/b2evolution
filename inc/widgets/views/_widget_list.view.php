@@ -13,17 +13,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $admin_url;
+global $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
 
-global $container_list;
+global $blog_container_list, $skins_container_list, $embedded_containers;
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
-	echo action_icon( TS_('Reload containers!'), 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+		echo action_icon( TS_('Add a new container!'), 'add',
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;'.url_crumb('widget'), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
+		echo action_icon( TS_('Recheck declared skin containers!'), 'reload',
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Recheck skin containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
 }
 
@@ -35,20 +37,36 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
  * @param string Title of the container. This gets passed to T_()!
  * @param string Suffix of legend
  */
-function display_container( $container, $legend_suffix = '' )
+function display_container( $WidgetContainer, $legend_suffix = '' )
 {
-	global $Blog, $admin_url;
+	global $Blog, $admin_url, $embedded_containers;
 	global $Session;
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
+	$Table->title = '<span class="container_name">'.T_( $WidgetContainer->get( 'name' ) ).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
-	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
+	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
+	{
+		$table_id = 'wico_ID_'.$WidgetContainer->ID;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_ID='.$WidgetContainer->ID.'&amp;container='.$table_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
+	}
+	else
+	{
+		$wico_code = $WidgetContainer->get( 'code' );
+		$table_id = 'wico_code_'.$wico_code;
+		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$table_id );
+		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code );
+	}
 
-	$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id, 'class' => 'action_icon btn-primary' ) );
+	if( ! empty( $legend_suffix ) )
+	{ // Legend suffix is not empty when the container is not included into the selected skin
+		// TODO: asimo> Implement cleaner condition for this
+		$Table->global_icon( T_('Destroy container'), 'delete', $destroy_container_url, T_('Destroy container'), 3, 4 );
+	}
+	$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id, 'class' => 'action_icon btn-primary' ) );
 
 	$Table->cols = array(
 			array(
@@ -104,7 +122,7 @@ function display_container( $container, $legend_suffix = '' )
 	 * @var WidgetCache
 	 */
 	$WidgetCache = & get_WidgetCache();
-	$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $container );
+	$Widget_array = & $WidgetCache->get_by_container_ID( $WidgetContainer->ID );
 
 	if( empty($Widget_array) )
 	{	// TODO: cleanup
@@ -131,6 +149,14 @@ function display_container( $container, $legend_suffix = '' )
 			else
 			{
 				$fadeout = false;
+			}
+
+			if( $ComponentWidget->get( 'code' ) == 'subcontainer' )
+			{
+				$container_code = $ComponentWidget->get_param( 'container' );
+				if( ! isset( $embedded_containers[$container_code] ) ) {
+					$embedded_containers[$container_code] = true;
+				}
 			}
 
 			$Table->display_line_start( false, $fadeout );
@@ -176,7 +202,7 @@ function display_container( $container, $legend_suffix = '' )
 			{
 				echo get_icon( 'nomove', 'imgtag', array( 'class'=>'action_icon' ) );
 			}
-			if( $widget_count < count($Widget_array))
+			if( $widget_count < count($Widget_array) )
 			{
 				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
@@ -242,19 +268,58 @@ $Form->begin_form();
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-// Start by displaying all containers we know are in the current skin: (may be different in i8?)
-foreach( $container_list as $container )
+// Display containers for current skin:
+$displayed_containers = array();
+$embedded_containers = array();
+$WidgetContainerCache = & get_WidgetContainerCache();
+foreach( $skins_container_list as $container_code => $container_name )
 {
-	display_container( $container );
+	$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+	if( ! $WidgetContainer )
+	{
+		$WidgetContainer = new WidgetContainer();
+		$WidgetContainer->set( 'code', $container_code );
+		$WidgetContainer->set( 'name', $container_name );
+		$WidgetContainer->set( 'coll_ID', $Blog->ID );
+	}
+
+	display_container( $WidgetContainer );
+	if( $WidgetContainer->ID > 0 )
+	{ // Container exists in the database
+		$displayed_containers[$container_code] = $WidgetContainer->ID;
+	}
 }
 
-// Now display all other containers that also have widgets in them, just in case we need them:
-foreach( $container_Widget_array as $container=>$dummy )
+// Display embedded containers
+reset( $embedded_containers );
+while( count( $embedded_containers ) > 0 )
 {
-	if( !in_array( $container, $container_list ) )
-	{	// No already displayed, display now:
-		display_container( $container );
+	// Get the first item key, and remove the first item from the array
+	$container_code = key( $embedded_containers );
+	array_shift( $embedded_containers );
+	if( isset( $displayed_containers[$container_code] ) )
+	{ // This container was already displayed
+		continue;
 	}
+
+	$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+	if( $WidgetContainer )
+	{ // Confirmed that it is part of the blog's containers in the database
+		display_container( $WidgetContainer );
+		$displayed_containers[$container_code] = $WidgetContainer->ID;
+	}
+}
+
+// Display other blog containers which are not in the current skin
+foreach( $blog_container_list as $container_ID )
+{
+	if( in_array( $container_ID, $displayed_containers ) )
+	{
+		continue;
+	}
+
+	$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
+	display_container( $WidgetContainer, ' '.T_('[NOT USED IN CURRENT SKINS!]') );
 }
 
 echo '</fieldset>'."\n";

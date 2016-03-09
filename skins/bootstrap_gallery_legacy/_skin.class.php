@@ -54,6 +54,19 @@ class bootstrap_gallery_legacy_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top' )
+			) );
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()

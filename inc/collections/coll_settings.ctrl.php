@@ -155,6 +155,7 @@ switch( $action )
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
+						$edited_Blog->db_save_main_containers();
 						$Messages->add( T_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 						if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
@@ -285,15 +286,19 @@ switch( $action )
 		}
 
 		if( $reset )
-		{	// Reset all settings
-			// Remove previous widgets, plugin and skin settings
-			$DB->query( 'DELETE FROM T_widget WHERE wi_coll_ID = '.$DB->quote( $edited_Blog->ID ) );
+		{ // Reset all settings
+			// Remove previous widgets, widget containers, plugin and skin settings
+			$DB->query( 'DELETE wico, wi
+				FROM T_widget__container AS wico
+			 	LEFT JOIN T_widget__widget AS wi ON wi_wico_ID = wico_ID
+			 	WHERE wico_coll_ID = '.$DB->quote( $edited_Blog->ID ) );
+
 			$DB->query( 'DELETE FROM T_coll_settings
 				WHERE cset_coll_ID = '.$DB->quote( $edited_Blog->ID ).'
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
 			// ADD DEFAULT WIDGETS:
 			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID, false, $type );
+			insert_basic_widgets( $edited_Blog->ID, $edited_Blog->get_skin_ids(), false, $type );
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );

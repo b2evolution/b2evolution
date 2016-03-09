@@ -56,6 +56,20 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top', 'sidebar', 'sidebar_2' ),
+				'_item_block.inc.php' => array( 'item_single' ),
+			) );
+	}
+
+
+	/**
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example

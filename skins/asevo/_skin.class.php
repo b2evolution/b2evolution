@@ -27,12 +27,26 @@ class asevo_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
 	{
 		return 'normal';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'menu', 'sidebar' ),
+				'_item_block.inc.php' => array( 'item_single' )
+			) );
 	}
 
 

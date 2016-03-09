@@ -54,6 +54,21 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top' ),
+				'_item_block.inc.php' => array( 'item_single' ),
+				'_front.disp.php' => array()
+			) );
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()

@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class evopress_Skin extends Skin
 {
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -27,12 +27,31 @@ class evopress_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
 	{
 		return 'normal';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'_body_header.inc.php' => array( 'header', 'page_top' ),
+				'index.main.php' => array( 'menu' ),
+				'_sidebar.inc.php' => array( 'sidebar' ),
+				'page.main.php' => array( 'menu' ),
+				'posts.main.php' => array( 'menu' ),
+				'search.main.php' => array( 'menu' ),
+				'single.main.php' => array( 'menu', 'item_single' )
+			) );
 	}
 
 

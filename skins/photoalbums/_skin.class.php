@@ -38,6 +38,20 @@ class photoalbums_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'menu', 'page_top' ),
+				'_item_block.inc.php' => array( 'item_single' )
+			) );
+	}
+
+
+	/**
 	 * What evoSkins API does has this skin been designed with?
 	 *
 	 * This determines where we get the fallback templates from (skins_fallback_v*)

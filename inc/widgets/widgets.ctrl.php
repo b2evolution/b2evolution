@@ -23,7 +23,10 @@ global $Plugins;
 $UserSettings->set( 'pref_coll_settings_tab', 'widgets' );
 $UserSettings->dbupdate();
 
+load_funcs( 'widgets/_widgets.funcs.php' );
+
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/model/_widgetcontainer.class.php', 'WidgetContainer' );
 
 
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
@@ -75,6 +78,8 @@ switch( $action )
 	case 'nil':
 	case 'list':
 	case 'reload':
+	case 'new_container':
+	case 'create_container':
 	case 'activate':
 	case 'deactivate':
 		// Do nothing
@@ -85,20 +90,15 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 		param( 'container', 'string', true, true );	// memorize
-		// Change the symbols back to normal view as they are stored in DB
-		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
 		break;
 
 	case 're-order' : // js request
 		param( 'container_list', 'string', true );
-		$containers_list = explode( ',', $container_list );
+		$containers_list = explode( ',', trim( $container_list, ',' ) );
 		$containers = array();
 		foreach( $containers_list as $a_container )
-		{	// add each container and grab its widgets:
-			if( $container_name = trim( str_replace( array( 'container_', '_', '-' ), array( '', ' ', ':' ), $a_container ), ',' ) )
-			{
-				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
-			}
+		{ // add each container and grab its widgets:
+			$containers[substr( $a_container, 10 )] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
 		}
 		break;
 
@@ -114,15 +114,24 @@ switch( $action )
 		param( 'wi_ID', 'integer', true );
 		$WidgetCache = & get_WidgetCache();
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
-		// Take blog from here!
-		// echo $edited_ComponentWidget->coll_ID;
-		set_working_blog( $edited_ComponentWidget->coll_ID );
+		// Take blog from Widget if it is not in a shared container ( coll_ID is not set in case of shared containers )!
+		$WidgetContainer = & $edited_ComponentWidget->get_WidgetContainer();
+		if( ! empty( $WidgetContainer->coll_ID ) )
+		{
+			set_working_blog( $WidgetContainer->coll_ID );
+		}
 		$BlogCache = & get_BlogCache();
 		/**
 		* @var Blog
 		*/
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
+		break;
+
+	case 'destroy_container':
+		param( 'wico_ID', 'integer', 0 );
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
 	default:
@@ -156,7 +165,11 @@ $blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 // Make sure containers are loaded for that skin:
-$container_list = $Skin->get_containers();
+$skins_container_list = $Blog->get_main_containers();
+// Get widget containers from database
+$WidgetContainerCache = & get_WidgetContainerCache();
+$WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID );
+$blog_container_list = $WidgetContainerCache->get_ID_array();
 
 
 /**
@@ -170,14 +183,22 @@ switch( $action )
 		// Do nothing
 		break;
 
+	case 'new_container':
+		// Display form for creating a new widget category
+
+		$edited_WidgetContainer = new WidgetContainer();
+		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		break;
+
 	case 'create':
 		// Add a Widget to container:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		if( !in_array( $container, $container_list ) )
-		{
+		$WidgetContainer = & get_widget_container( $Blog->ID, $container );
+		if( !in_array( $WidgetContainer->get( 'code' ), array_keys( $skins_container_list ) ) )
+		{ // The container is not part of the current skin
 			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
 		}
 
@@ -206,12 +227,19 @@ switch( $action )
 				debug_die( 'Unhandled widget type' );
 		}
 
-		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
-		$edited_ComponentWidget->set( 'sco_name', $container );
+		$DB->begin();
+
+		if( $WidgetContainer->ID == 0 )
+		{ // New widget container needs to be saved
+			$WidgetContainer->dbinsert();
+		}
+		$edited_ComponentWidget->set( 'wico_ID', $WidgetContainer->ID );
 		$edited_ComponentWidget->set( 'enabled', 1 );
 
 		// INSERT INTO DB:
 		$edited_ComponentWidget->dbinsert();
+
+		$DB->commit();
 
 		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
 					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
@@ -289,7 +317,6 @@ switch( $action )
 		}
 		break;
 
-
 	case 'move_up':
 		// Move the widget up:
 
@@ -301,12 +328,12 @@ switch( $action )
 
  		// Get the previous element
 		$row = $DB->get_row( 'SELECT *
-														FROM T_widget
-													 WHERE wi_coll_ID = '.$Blog->ID.'
-													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
-														 AND wi_order < '.$order.'
-													 ORDER BY wi_order DESC
-													 LIMIT 0,1' );
+				FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_ComponentWidget->wico_ID.' AND wi_order < '.$order.'
+				ORDER BY wi_order DESC
+				LIMIT 0,1'
+			);
+
 		if( !empty( $row) )
 		{
 			$prev_ComponentWidget = new ComponentWidget( $row );
@@ -336,12 +363,12 @@ switch( $action )
 
  		// Get the next element
 		$row = $DB->get_row( 'SELECT *
-														FROM T_widget
-													 WHERE wi_coll_ID = '.$Blog->ID.'
-													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
-														 AND wi_order > '.$order.'
-													 ORDER BY wi_order ASC
-													 LIMIT 0,1' );
+				FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_ComponentWidget->wico_ID.' AND wi_order > '.$order.'
+				ORDER BY wi_order ASC
+				LIMIT 0,1'
+			);
+
 		if( !empty( $row ) )
 		{
 			$next_ComponentWidget = new ComponentWidget( $row );
@@ -436,10 +463,11 @@ switch( $action )
 
 		if( count( $widgets ) )
 		{ // Enable/Disable the selected widgets
-			$updated_widgets = $DB->query( 'UPDATE T_widget
+			$updated_widgets = $DB->query( 'UPDATE T_widget__widget
+				INNER JOIN T_widget__container ON wico_ID = wi_wico_ID
 				  SET wi_enabled = '.$DB->quote( $action == 'activate' ? '1' : '0' ).'
 				WHERE wi_ID IN ( '.$DB->quote( $widgets ).' )
-				  AND wi_coll_ID = '.$DB->quote( $Blog->ID ) );
+				  AND wico_coll_ID = '.$DB->quote( $Blog->ID ) );
 		}
 
 		if( ! empty( $updated_widgets ) )
@@ -493,33 +521,37 @@ switch( $action )
 
  		$DB->begin();
 
- 		// Reset the current orders and make container names temp to avoid duplicate entry errors
-		$DB->query( 'UPDATE T_widget
-										SET wi_order = wi_order * -1,
-												wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
-									WHERE wi_coll_ID = '.$Blog->ID );
+ 		$blog_container_ids = implode( ',', $blog_container_list );
+ 		// Reset the current orders to avoid duplicate entry errors
+		$DB->query( 'UPDATE T_widget__widget
+			SET wi_order = wi_order * -1
+			WHERE wi_wico_ID IN ( '.$blog_container_ids.' )' );
 
-		foreach( $containers as $container => $widgets )
-		{	// loop through each container and set new order
+		foreach( $containers as $container_fieldset_id => $widgets )
+		{ // loop through each container and set new order
+			$WidgetContainer = & get_widget_container( $Blog->ID, $container_fieldset_id );
+			if( ( $WidgetContainer->ID == 0 ) && ( count( $widgets ) > 0 ) )
+			{ // Widget was moved to an empty main widget container, it needs to be created
+				$WidgetContainer->dbinsert();
+			}
 			$order = 0; // reset counter for this container
 			foreach( $widgets as $widget )
-			{	// loop through each widget
+			{ // loop through each widget
 				if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
 				{ // valid widget id
 					$order++;
-					$DB->query( 'UPDATE T_widget
-													SET wi_order = '.$order.',
-															wi_sco_name = '.$DB->quote( $container ).'
-												WHERE wi_ID = '.$widget.'
-												  AND wi_coll_ID = '.$Blog->ID );	// Doh! Don't trust the client request!!
+					$DB->query( 'UPDATE T_widget__widget
+						SET wi_order = '.$order.',
+							wi_wico_ID = '.$WidgetContainer->ID.'
+						WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_ids.' )' );	// Doh! Don't trust the client request!!
 				}
 			}
 		}
 
 		// Cleanup deleted widgets and empty temp containers
-		$DB->query( 'DELETE FROM T_widget
-									WHERE wi_order < 1
-										AND wi_coll_ID = '.$Blog->ID ); // Doh! Don't touch other blogs!
+		$DB->query( 'DELETE FROM T_widget__widget
+			WHERE wi_order < 1
+			AND wi_wico_ID IN ( '.$blog_container_ids.' )' ); // Doh! Don't touch other blogs!
 
 		$DB->commit();
 
@@ -537,16 +569,44 @@ switch( $action )
  		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$SkinCache = & get_SkinCache();
-		/**
-		 * @var Skin
-		 */
-		$edited_Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
-
-		// Save to DB:
-		$edited_Skin->db_save_containers();
+		// Save to DB, and display correpsonding messages
+		$Blog->db_save_main_containers( true );
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		break;
+
+	case 'create_container':
+		// Create a new widget container:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+ 		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$edited_WidgetContainer = new WidgetContainer();
+		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		if( $edited_WidgetContainer->load_from_Request() )
+		{
+			$edited_WidgetContainer->dbinsert();
+			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		}
+		break;
+
+	case 'destroy_container':
+		// Destroy a widget container
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+		$success_msg = sprintf( T_('Widget container &laquo;%s&raquo; removed.'), $edited_WidgetContainer->get( 'name' ) );
+		// Remove the widget container from the database
+		$edited_WidgetContainer->dbdelete();
+		unset( $edited_WidgetContainer );
+		forget_param( 'wico_ID' );
+		$Messages->add( $success_msg, 'success' );
+
+		header_redirect( '?ctrl=widgets&blog='.$blog );
 		break;
 
 	default:
@@ -633,6 +693,17 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'new_container':
+	case 'create_container':
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+
+		// Display VIEW:
+		$AdminUI->disp_view( 'widgets/views/_widget_container.form.php' );
+
+		// End payload block:
+		$AdminUI->disp_payload_end();
+		break;
 
 	case 'edit':
 	case 'update':	// on error

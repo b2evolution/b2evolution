@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class dating_mood_Skin extends Skin
 {
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -27,7 +27,7 @@ class dating_mood_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
@@ -35,10 +35,24 @@ class dating_mood_Skin extends Skin
 		return 'normal';
 	}
 
-	
+
 	/**
-   * Get definitions for editable params
-   *
+	 * Get the container codes of the skin main containers
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		return array_merge( parent::get_declared_containers(), array(
+				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top', 'sidebar' ),
+				'_item_block.inc.php' => array(	'item_single' )
+			) );
+	}
+
+
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */

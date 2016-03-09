@@ -2003,7 +2003,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		echo "OK.<br />\n";
 
 		echo 'Creating widgets table... ';
-		$DB->query( 'CREATE TABLE T_widget (
+		$DB->query( 'CREATE TABLE '.$tableprefix.'widget (
  						wi_ID					INT(10) UNSIGNED auto_increment,
 						wi_coll_ID    INT(11) UNSIGNED NOT NULL,
 						wi_sco_name   VARCHAR( 40 ) NOT NULL,
@@ -2326,7 +2326,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			// Check if there are widgets to create
 			if( ! empty( $basic_widgets_insert_sql_rows ) )
 			{ // Insert the widget records by single SQL query
-				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) '
+				$DB->query( 'INSERT INTO '.$tableprefix.'widget ( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params ) '
 									 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 			}
 		}
@@ -2687,7 +2687,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading widgets table... ' );
-		$DB->query( "ALTER TABLE T_widget
+		$DB->query( "ALTER TABLE '.$tableprefix.'widget
 			CHANGE COLUMN wi_order wi_order INT(10) NOT NULL" );
 		task_end();
 
@@ -2798,7 +2798,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading widgets table... ' );
-		db_add_col( 'T_widget', 'wi_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order' );
+		db_add_col( $tableprefix.'widget', 'wi_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order' );
 		task_end();
 	}
 	if( $old_db_version < 9930 )
@@ -5092,14 +5092,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Updating widgets setting...' );
 		// Unset those widgets allow blockcache value which current settings allow blockcache but the caching is always forbidden on runtime;
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 				SET wi_params = REPLACE( wi_params, \'s:16:"allow_blockcache";i:1\', \'s:16:"allow_blockcache";i:0\' )
 				WHERE wi_params LIKE \'%s:16:"allow_blockcache";i:1%\' AND (
 					wi_code = "user_tools" OR wi_code = "user_login" OR ( wi_code = "msg_menu_link" AND wi_params LIKE \'%s:9:"link_type";s:8:"messages"%\' )
 					OR ( wi_code = "menu_link" AND ( wi_params LIKE \'%s:9:"link_type";s:5:"login"%\' OR wi_params LIKE \'%s:9:"link_type";s:8:"register"%\' ) )
 					)' );
 		// Unset 'show_badge' setting in case of msg_menu_link widgets where the link_type is contacts
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 				SET wi_params = REPLACE( wi_params, \'s:10:"show_badge";i:1\', \'s:10:"show_badge";i:0\' )
 				WHERE wi_code = "msg_menu_link" AND wi_params LIKE \'%s:9:"link_type";s:8:"contacts"%\' AND wi_params LIKE \'%s:10:"show_badge";i:1%\'' );
 		task_end();
@@ -7103,7 +7103,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO '.$tableprefix.'widget ( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for container "Item Single": ---- END */
@@ -7273,7 +7273,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11715, 'Replace widgets "Simple Sidebar Links list" and "Simple Linkblog Links list" with "Universal Item list"...' ) )
 	{	// part of 6.7.0
 		$old_widgets = $DB->get_results( 'SELECT wi_ID, wi_code, wi_params
-			 FROM T_widget
+			 FROM '.$tableprefix.'widget
 			WHERE wi_type = "core"
 			  AND wi_code IN ( "linkblog", "coll_link_list" )', OBJECT,
 			'Get widgets "linkblog" and "coll_link_list" to replace them with "coll_item_list"' );
@@ -7305,7 +7305,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						), $widget_params );
 					break;
 			}
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE '.$tableprefix.'widget
 					SET wi_code = "coll_item_list", wi_params = '.$DB->quote( serialize( $widget_params ) ).'
 				WHERE wi_ID = '.$old_widget->wi_ID );
 		}
@@ -7315,27 +7315,27 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11720, 'Replace renamed widgets...' ) )
 	{	// part of 6.7.0
 		// It's ok to run several queries in a single block because they don't change the DB structure, so they practically can't fail:
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "item_seen_by"
 			WHERE wi_type = "core"
 			  AND wi_code = "coll_seen_by"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "item_small_print"
 			WHERE wi_type = "core"
 			  AND wi_code = "coll_small_print"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "item_tags"
 			WHERE wi_type = "core"
 			  AND wi_code = "coll_item_tags"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "item_content"
 			WHERE wi_type = "core"
 			  AND wi_code = "coll_item_content"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "item_about_author"
 			WHERE wi_type = "core"
 			  AND wi_code = "coll_about_author"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "coll_member_count"
 			WHERE wi_type = "core"
 			  AND wi_code = "member_count"' );
@@ -7355,6 +7355,107 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_users__invitation_code', 'ivc_level', 'int unsigned NULL' );
 		$DB->query( 'ALTER TABLE T_users__invitation_code
 			MODIFY COLUMN ivc_grp_ID int(4) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11735, 'Creating table for widget container...' ) )
+	{	// part of 6.7.0
+		db_create_table( 'T_widget__container', '
+			wico_ID       INT(10) UNSIGNED auto_increment,
+			wico_code     VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			wico_name     VARCHAR( 40 ) NOT NULL,
+			wico_coll_ID  INT(10) NULL DEFAULT NULL,
+			wico_order    INT(10) NOT NULL,
+			PRIMARY KEY ( wico_ID ),
+			UNIQUE wico_order( wico_coll_ID, wico_name, wico_order )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11740, 'Inserting widget containers...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'INSERT INTO T_widget__container ( wico_name, wico_coll_ID, wico_order )
+			SELECT wi_sco_name, wi_coll_ID, @order := @order + 1 AS wico_order
+			FROM '.$tableprefix.'widget INNER JOIN ( SELECT @order := 0 ) order_count
+			GROUP BY wi_coll_ID, wi_sco_name' );
+		$container_codes_byname = array(
+			'Header'                    => 'header',
+			'Footer'                    => 'footer',
+			'Menu'                      => 'menu',
+			'Item Single'               => 'item_single',
+			'Menu Top'                  => 'menu_top',
+			'Page Top'                  => 'page_top',
+			'Sidebar'                   => 'sidebar',
+			'Sidebar 2'                 => 'sidebar_2',
+			'Sidebar Single'            => 'sidebar_single',
+			'Front Page Main Area'      => 'front_page_main_area',
+			'Front Page Secondary Area' => 'front_page_secondary_area',
+			'Contact Page Main Area'    => 'contact_page_main_area',
+			'Mobile: Footer'            => 'mobile_footer',
+			'Mobile: Navigation Menu'   => 'mobile_navigation_menu',
+			'Mobile: Tools Menu'        => 'mobile_tools_menu'
+		);
+		$set_wico_codes_query = 'UPDATE T_widget__container SET wico_code = CASE';
+		foreach( $container_codes_byname as $wico_name => $wico_code )
+		{
+			$set_wico_codes_query .= ' WHEN wico_name = "'.$wico_name.'" THEN "'.$wico_code.'"';
+		}
+		$DB->query( $set_wico_codes_query.' END' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11745, 'Upgrading widgets table...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'RENAME TABLE '.$tableprefix.'widget TO T_widget__widget' );
+		db_add_col( 'T_widget__widget', 'wi_wico_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER wi_ID' );
+		$DB->query( 'UPDATE T_widget__widget
+				SET wi_wico_ID = (
+					SELECT wico_ID FROM T_widget__container
+					WHERE wico_coll_ID = wi_coll_ID AND wico_name = wi_sco_name
+				)'
+		);
+		$DB->query( "ALTER TABLE T_widget__widget
+				DROP INDEX wi_order,
+				DROP COLUMN wi_coll_ID,
+				DROP COLUMN wi_sco_name,
+				CHANGE COLUMN wi_wico_ID wi_wico_ID INT(10) UNSIGNED NOT NULL,
+				ADD UNIQUE wi_order( wi_wico_ID, wi_order )"
+		);
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11750, 'Updating widget containers content...' ) )
+	{	// part of 6.7.0
+		// Create Item Single containers and a content widget to make sure item contents will be displayed in every collection:
+		$widget_containers_sql_rows = array();
+		$widgets_insert_sql_rows = array();
+		// Select those blog ids where Item Single container not exists yet:
+		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs WHERE blog_ID NOT IN (
+				SELECT wico_coll_ID FROM T_widget__container WHERE wico_code = "item_single" )' );
+		foreach( $blog_ids as $blog_ID )
+		{	// Create Item single container rows:
+			$widget_containers_sql_rows[] = '( "item_single", "Item Single", '.$blog_ID.', 4 )';
+		}
+		if( ! empty( $widget_containers_sql_rows ) )
+		{	// Insert Item Single containers:
+			$DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
+					.implode( ', ', $widget_containers_sql_rows ) );
+		}
+		// Get those Item Single containers where the item content widget doesn't exist:
+		$item_single_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
+				WHERE wico_code = "item_single" AND wico_ID NOT IN (
+					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "coll_item_content" )' );
+		foreach( $item_single_containers as $wico_ID )
+		{
+			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "coll_item_content", NULL )';
+		}
+		if( ! empty( $widgets_insert_sql_rows ) )
+		{	// There are widgets to create, insert previously built widget records:
+			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
+					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_containers ).' )
+					ORDER BY wi_wico_ID, wi_order DESC' );
+			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
+					.implode( ', ', $widgets_insert_sql_rows ) );
+		}
 		upg_task_end();
 	}
 

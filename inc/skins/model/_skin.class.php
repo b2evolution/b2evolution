@@ -49,7 +49,6 @@ class Skin extends DataObject
 	 */
 	var $_trans = array();
 
-
 	/**
 	 * Constructor
 	 *
@@ -402,23 +401,61 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get the container codes which which usage are declared in some of the skin files
+	 *
+	 * @protected It should be called from this class and from the subclasses
+	 *
+	 * @return array( skin file => array of container codes )
+	 */
+	function get_declared_containers()
+	{
+		return array(
+			'_front.disp.php' => array( 'front_page_main_area' ),
+			'_msgform.disp.php' => array( 'contact_page_main_area' ),
+			'_mobile_footer.inc.php' => array( 'mobile_footer' )
+		);
+	}
+
+
+	/**
 	 * Get the list of containers that have been previously discovered for this skin.
 	 *
 	 * @return array
 	 */
 	function get_containers()
 	{
-		/**
-		 * @var DB
-		 */
-		global $DB;
+		// Get global main containers definitions
+		$main_containers = & get_widget_containers();
 
 		if( is_null( $this->container_list ) )
 		{
-			$this->container_list = $DB->get_col(
-				'SELECT sco_name
-					 FROM T_skins__container
-					WHERE sco_skin_ID = '.$this->ID, 0, 'get list of containers for skin' );
+			$merged_container_codes = array();
+			foreach( $this->get_declared_containers() as $container_codes )
+			{
+				$merged_container_codes = array_merge_recursive( $merged_container_codes, $container_codes );
+			}
+
+			// Create ordered array with unique items from the skin containers
+			$ordered_merged_containers = array();
+			foreach( $merged_container_codes as $container_code )
+			{
+				if( isset( $main_containers[$container_code] ) )
+				{ // Check if the skin container really declared as an allowed container
+					$order = $main_containers[$container_code]['wico_order'];
+					if( ! isset( $ordered_merged_containers[$order] ) )
+					{
+						$ordered_merged_containers[$order] = $container_code;
+					}
+				}
+			}
+			ksort( $ordered_merged_containers );
+
+			// Fill final container list
+			$this->container_list = array();
+			foreach( $ordered_merged_containers as $container_code )
+			{
+				$this->container_list[$container_code] = $main_containers[$container_code]['wico_name'];
+			}
 		}
 
 		return $this->container_list;
@@ -480,10 +517,12 @@ class Skin extends DataObject
 
 		// Get a list of all currently empty containers:
 		$sql = 'SELECT sco_name
-						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
-						 WHERE sco_skin_ID = '.$this->ID.'
-						 GROUP BY sco_name
-						HAVING COUNT(wi_ID) = 0';
+			FROM T_skins__container
+				LEFT JOIN T_widget__container ON sco_name = wico_name
+				LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID
+			WHERE sco_skin_ID = '.$this->ID.'
+			GROUP BY sco_name
+			HAVING COUNT(wi_ID) = 0';
 		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
 		//pre_dump( $empty_containers_list );
 

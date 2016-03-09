@@ -60,7 +60,8 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__container'         => $tableprefix.'skins__container',
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
-		'T_widget'                   => $tableprefix.'widget',
+		'T_widget__container'        => $tableprefix.'widget__container',
+		'T_widget__widget'           => $tableprefix.'widget__widget',
 	) );
 
 /**
@@ -352,6 +353,26 @@ function & get_WidgetCache()
 	return $WidgetCache;
 }
 
+
+/**
+ * Get the WidgetContainerCache
+ *
+ * @return WidgetContainerCache
+ */
+function & get_WidgetContainerCache()
+{
+	global $WidgetContainerCache;
+
+	if( ! isset( $WidgetContainerCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcontainercache.class.php', 'WidgetContainerCache' );
+		$WidgetContainerCache = new WidgetContainerCache();
+	}
+
+	return $WidgetContainerCache;
+}
+
+
 /**
  * Get the EnabledWidgetCache
  *
@@ -373,6 +394,40 @@ function & get_EnabledWidgetCache()
 	}
 
 	return $EnabledWidgetCache;
+}
+
+
+/**
+ * Get main widget containers which are used in the b2evolution skins
+ * All of the containers which are used in the skins must be defined here
+ *
+ * @return array<string - widget container code, array - widget container data>
+ */
+function & get_widget_containers()
+{
+	global $main_containers;
+
+	if( !isset( $main_containers ) )
+	{
+		$main_containers = array(
+			'header'                    => array( 'wico_name' => NT_('Header'),                    'wico_order' => 1, 'wico_ID' => NULL ),
+			'footer'                    => array( 'wico_name' => NT_('Footer'),                    'wico_order' => 2, 'wico_ID' => NULL ),
+			'menu'                      => array( 'wico_name' => NT_('Menu'),                      'wico_order' => 3, 'wico_ID' => NULL ),
+			'item_single'               => array( 'wico_name' => NT_('Item Single'),               'wico_order' => 4, 'wico_ID' => NULL ),
+			'page_top'                  => array( 'wico_name' => NT_('Page Top'),                  'wico_order' => 5, 'wico_ID' => NULL ),
+			'sidebar'                   => array( 'wico_name' => NT_('Sidebar'),                   'wico_order' => 6, 'wico_ID' => NULL ),
+			'sidebar_2'                 => array( 'wico_name' => NT_('Sidebar 2'),                 'wico_order' => 7, 'wico_ID' => NULL ),
+			'sidebar_single'            => array( 'wico_name' => NT_('Sidebar Single'),            'wico_order' => 8, 'wico_ID' => NULL ),
+			'front_page_main_area'      => array( 'wico_name' => NT_('Front Page Main Area'),      'wico_order' => 9, 'wico_ID' => NULL ),
+			'front_page_secondary_area' => array( 'wico_name' => NT_('Front Page Secondary Area'), 'wico_order' => 10, 'wico_ID' => NULL ),
+			'contact_page_main_area'    => array( 'wico_name' => NT_('Contact Page Main Area'),    'wico_order' => 11, 'wico_ID' => NULL ),
+			'mobile_footer'             => array( 'wico_name' => NT_('Mobile: Footer'),            'wico_order' => 12, 'wico_ID' => NULL ),
+			'mobile_navigation_menu'    => array( 'wico_name' => NT_('Mobile: Navigation Menu'),   'wico_order' => 13, 'wico_ID' => NULL ),
+			'mobile_tools_menu'         => array( 'wico_name' => NT_('Mobile: Tools Menu'),        'wico_order' => 14, 'wico_ID' => NULL ),
+		);
+	}
+
+	return $main_containers;
 }
 
 
