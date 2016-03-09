@@ -1630,14 +1630,25 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+li[class^="listnav_distance_"],
+li[class*=" listnav_distance_"] {
+  display: none;
+}
 @media only screen and (max-width: 360px) {
   li[class^="active_distance_"],
   li[class*=" active_distance_"] {
     display: none;
   }
-  li[class~="active_distance_1"],
-  li[class~="active_distance_2"] {
+  li[class~="active_distance_1"] {
     display: inline;
+  }
+  li[class^="listnav_distance_"],
+  li[class*=" listnav_distance_"] {
+    display: inline;
+  }
+  li.nav_prev_list,
+  li.nav_next_list {
+    display: none;
   }
 }
 main .well {

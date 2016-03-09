@@ -8,14 +8,30 @@
 
 @import "inc/star_rating.inc.less";
 
-// Hides pager elements with active_distance >= 3 on small devices
+// Hides pager elements with active_distance > 1 on small devices
+
+// this will hide pseudo prev_list and pseudo next_list links by default
+li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+	display: none;
+}
+
 @media only screen and (max-width: 360px) {
 	li[class^="active_distance_"], li[class*=" active_distance_"] {
 		display: none;
 	}
 
-	li[class~="active_distance_1"], li[class~="active_distance_2"], {
+	li[class~="active_distance_1"] {
 		display: inline;
+	}
+
+	// this will show pseudo prev_list and pseudo next_list links on small screens
+	li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+		display: inline;
+	}
+
+	// hide .nav_next_list and .nav_prev_list on this screen size
+	li.nav_prev_list, li.nav_next_list {
+		display: none;
 	}
 }
 
