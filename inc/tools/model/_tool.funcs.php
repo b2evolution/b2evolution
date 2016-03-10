@@ -284,7 +284,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 	$DB->log_queries = false;
 
 	// Check if we should assign at least one advanced permission:
-	$assign_adv_user_perms = ! empty( array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) ) );
+	$array_intersect = array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) );
+	$assign_adv_user_perms = ! empty( $array_intersect );
 
 	if( $assign_adv_user_perms )
 	{ // Get all collections with advanced perms:
