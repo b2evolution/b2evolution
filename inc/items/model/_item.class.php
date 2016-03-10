@@ -7053,16 +7053,19 @@ class Item extends ItemLight
 		// No code/pre blocks, replace on the whole thing
 
 		$params = array_merge( array(
-				'before'              => '<div>',
-				'before_image'        => '<div class="image_block">',
-				'before_image_legend' => '<div class="image_legend">',
-				'after_image_legend'  => '</div>',
-				'after_image'         => '</div>',
-				'after'               => '</div>',
-				'image_size'          => 'fit-400x320',
-				'image_link_to'       => 'original', // Can be 'orginal' (image) or 'single' (this post)
-				'limit'               => 1000, // Max # of images displayed
+				'before'                   => '<div>',
+				'before_image'             => '<div class="image_block">',
+				'before_image_legend'      => '<div class="image_legend">',
+				'after_image_legend'       => '</div>',
+				'after_image'              => '</div>',
+				'after'                    => '</div>',
+				'image_size'               => 'fit-400x320',
+				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
+				'limit'                    => 1000, // Max # of images displayed
+				'get_rendered_attachments' => true,
 			), $params );
+
+		global $Plugins;
 
 		// Find all matches with inline tags
 		preg_match_all( '/\[(image|file|inline):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
@@ -7108,6 +7111,10 @@ class Item extends ItemLight
 					continue;
 				}
 
+				$params['File'] = $File;
+				$params['Link'] = $Link;
+				$params['Item'] = $this;
+
 				$current_image_params = $params;
 				$current_file_params = array();
 				if( ! empty( $inlines[3][$i] ) )
@@ -7145,6 +7152,28 @@ class Item extends ItemLight
 							$current_file_params['class'] = $image_extraclass;
 						}
 					}
+				}
+
+				if( ! $current_image_params['get_rendered_attachments'] )
+				{ // Save $r to temp var in order to don't get the rendered data from plugins
+					$temp_r = $r;
+				}
+
+				$temp_params = $current_image_params;
+				foreach( $current_image_params as $param_key => $param_value )
+				{ // Pass all params by reference, in order to give possibility to modify them by plugin
+					// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+					$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+				}
+
+				if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
+				{ // Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+					if( ! $current_image_params['get_rendered_attachments'] )
+					{ // Restore $r value and mark this item has the rendered attachments
+						$r = $temp_r;
+						$plugin_render_attachments = true;
+					}
+					continue;
 				}
 
 				if( $inline_type == 'image' && $File->is_image() )
