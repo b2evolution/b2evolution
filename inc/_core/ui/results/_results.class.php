@@ -1803,7 +1803,7 @@ class Results extends Table
 				$r = '';
 				if( isset( $this->params['page_item_before'] ) )
 				{
-					$r .= $this->params['page_item_before'];
+					$r .= add_tag_class( $this->params['page_item_before'], 'listnav_prev' );
 				}
 				$r .= '<a href="'
 						.regenerate_url( $this->page_param, (($this->page > 2) ? $this->page_param.'='.($this->page-1) : ''), $this->params['page_url'] ).'"';
@@ -1838,7 +1838,7 @@ class Results extends Table
 				$r = '';
 				if( isset( $this->params['page_item_before'] ) )
 				{
-					$r .= $this->params['page_item_before'];
+					$r .= add_tag_class( $this->params['page_item_before'], 'listnav_next' );
 				}
 				$r .= '<a href="'
 						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] ).'"';
@@ -1948,12 +1948,12 @@ class Results extends Table
 		{
 			if( isset( $this->params['page_item_current_before'] ) )
 			{
-				$r .= $this->params['page_item_current_before'];
+				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
 			}
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
-			$r .= $this->params['page_item_before'];
+			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_first' );
 		}
 
 		$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
@@ -1977,12 +1977,12 @@ class Results extends Table
 		{
 			if( isset( $this->params['page_item_current_before'] ) )
 			{
-				$r .= $this->params['page_item_current_before'];
+				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
 			}
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
-			$r .= $this->params['page_item_before'];
+			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_last' );
 		}
 
 		$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
@@ -2008,7 +2008,7 @@ class Results extends Table
 			$r = '';
 			if( isset( $this->params['page_item_before'] ) )
 			{
-				$r .= add_tag_class( $this->params['page_item_before'], 'nav_prev_list' );
+				$r .= add_tag_class( $this->params['page_item_before'], 'listnav_prev_list' );
 			}
 
 			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
@@ -2037,7 +2037,7 @@ class Results extends Table
 			$r = '';
 			if( isset( $this->params['page_item_before'] ) )
 			{
-				$r .= add_tag_class( $this->params['page_item_before'], 'nav_next_list' );;
+				$r .= add_tag_class( $this->params['page_item_before'], 'listnav_next_list' );;
 			}
 
 			$r .= '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.$page_no, $page_url ).'">'
@@ -2165,7 +2165,6 @@ class Results extends Table
 			elseif( isset( $this->params['page_item_before'] ) )
 			{ // other page
 				//$list .= $this->params['page_item_before'];
-
 				$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
 			}
 
@@ -2224,7 +2223,7 @@ class Results extends Table
 
 			if( ( $active_dist == $hidden_active_distance ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
 			{ // show pseudo next_list
-				$page_no = ceil($this->first()/2);
+				$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
 				if( isset( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
