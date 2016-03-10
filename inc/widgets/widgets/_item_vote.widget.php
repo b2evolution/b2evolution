@@ -118,19 +118,29 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Item, $current_User, $DB;
+		global $Blog, $current_User, $DB;
 
-		if( empty( $Item ) || ! $Item->can_vote() )
+		$this->init_display( $params );
+
+		if( empty( $this->disp_params['Item'] ) )
+		{	// Use current global Item:
+			global $Item;
+			$widget_Item = & $Item;
+		}
+		else
+		{	// Use a specific Item:
+			$widget_Item = & $this->disp_params['Item'];
+		}
+
+		if( empty( $widget_Item ) || ! $widget_Item->can_vote() )
 		{	// Don't display the voting panel if a voting on the item is not allowed by some reason:
 			return;
 		}
 
-		$this->init_display( $params );
-
 		echo $this->disp_params['block_start'];
 		echo $this->disp_params['block_body_start'];
 
-		$this->display_voting_panel( $Item, $params );
+		$this->display_voting_panel( $widget_Item, $params );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -150,12 +160,12 @@ class item_vote_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Display buttons to vote on item:
-		$Item->display_voting_panel( array(
+		$Item->display_voting_panel( array_merge( array(
 				'label_text'             => $this->disp_params['label'],
 				'display_summary'        => $this->disp_params['display_summary'],
 				'display_summary_author' => $this->disp_params['display_summary_author'],
 				'widget_ID'              => $this->ID,
-			) );
+			), $params ) );
 	}
 
 

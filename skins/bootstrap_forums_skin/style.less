@@ -522,6 +522,7 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 // Voting panels
 .vote_spam {
 	float: left;
+	height: 22px;
 	line-height: 22px;
 	.action_icon {
 		margin: 0;
@@ -530,11 +531,25 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 a.btn+.vote_spam {
 	margin-left: 5px;
 }
-.vote_helpful {
+.evo_voting_panel {
 	float: left;
-	display: block;
 	margin-right: 10px;
+	height: 22px;
 	line-height: 22px;
+	span.fa {
+		line-height: 20px;
+	}
+}
+// A link to reply on comment:
+.comment_reply {
+	height: 22px;
+	line-height: 22px;
+	margin-right: 10px;
+}
+
+// Button to quote a reply/topic:
+.quote_button {
+	margin-right: 10px;
 }
 
 // Form elements on item edit page
@@ -908,7 +923,7 @@ label.control-label[for=post_title] {
 // Comment-footer link TO TOP size FIX
 a.to_top {
 	font-size: 14px !important;
-	margin-right: 5px;
+	margin-right: 10px;
 	float: left;
 }
 

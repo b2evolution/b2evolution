@@ -3846,6 +3846,7 @@ function display_voting_form( $params = array() )
 			'vote_type'              => 'link',
 			'vote_ID'                => 0,
 			'widget_ID'              => 0,
+			'skin_ID'                => 0,
 			'display_like'           => true,
 			'display_noopinion'      => true,
 			'display_dontlike'       => true,
@@ -4074,6 +4075,11 @@ function display_voting_form( $params = array() )
 		$url .= '&widget_ID='.intval( $params['widget_ID'] );
 	}
 
+	if( ! empty( $params['skin_ID'] ) )
+	{	// Append skin ID for action URL:
+		$url .= '&skin_ID='.intval( $params['skin_ID'] );
+	}
+
 	if( $params['display_like'] )
 	{	// Display 'Like' icon
 		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
@@ -4146,6 +4152,11 @@ function display_voting_form( $params = array() )
 	if( ! empty( $params['widget_ID'] ) )
 	{	// Create a hidden input with widget ID:
 		echo '<input type="hidden" id="widgetID" value="'.$params['widget_ID'].'" />';
+	}
+
+	if( ! empty( $params['skin_ID'] ) )
+	{	// Create a hidden input with skin ID:
+		echo '<input type="hidden" id="skinID" value="'.$params['skin_ID'].'" />';
 	}
 }
 

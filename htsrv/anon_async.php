@@ -527,7 +527,18 @@ switch( $action )
 					// We have EXITed already at this point!!
 				}
 
-				$Comment->vote_helpful( '', '', '&amp;', true, true );
+				if( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_comment_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_comment_voting_panel( $Comment, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array( 'display_wrapper' => false ) );
 				break;
 
 			case 'item':
@@ -588,20 +599,29 @@ switch( $action )
 					// We have EXITed already at this point!!
 				}
 
-				$widget_ID = param( 'widget_ID', 'integer', 0 );
-				if( $widget_ID > 0 )
+				if( param( 'widget_ID', 'integer', 0 ) > 0 )
 				{	// If request is from widget:
 					$WidgetCache = & get_WidgetCache();
-					$item_Widget = & $WidgetCache->get_by_ID( $widget_ID, false, false );
+					$item_Widget = & $WidgetCache->get_by_ID( get_param( 'widget_ID' ), false, false );
 					if( $item_Widget && $item_Widget->code == 'item_vote' )
-					{	// Request widget to display a voting panel:
-						$item_Widget->display_voting_panel( $Item );
+					{	// Request widget to display a voting panel for item:
+						$item_Widget->display_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+				elseif( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_item_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_item_voting_panel( $Item, array( 'display_wrapper' => false ) );
 						break 2;
 					}
 				}
 
-				// Display a voting panel:
-				$Item->display_voting_panel();
+				// Display a voting panel for item:
+				$Item->display_voting_panel( array( 'display_wrapper' => false ) );
 				break;
 		}
 		break;

@@ -641,6 +641,10 @@ div.filters .filter_item div {
   border-top: 1px solid #5133ab;
   background-color: #f7f4ff;
 }
+.evo_voting_panel > span.fa {
+  margin-right: 4px;
+  margin-left: 2px;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.

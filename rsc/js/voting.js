@@ -72,6 +72,11 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			url_params = '&widget_ID=' + voting_layout.find( '#widgetID' ).val();
 		}
 
+		if( voting_layout.find( '#skinID' ).length > 0 )
+		{	// Add skin ID to action URL:
+			url_params = '&skin_ID=' + voting_layout.find( '#skinID' ).val();
+		}
+
 		voting_layout.on( 'click', '#votingLike', function()
 		{ // Action for "Like" button
 			jQuery( this ).removeAttr( 'id' );

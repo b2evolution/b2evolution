@@ -946,6 +946,49 @@ class bootstrap_forums_Skin extends Skin
 		// Print out the button:
 		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right btn_recent_topics">'.$btn_title.'</a>';
 	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Item
+	 * @param array Params
+	 */
+	function display_item_voting_panel( $Item, $params = array() )
+	{
+		skin_widget( array_merge( array(
+				// CODE for the widget:
+				'widget'      => 'item_vote',
+				// Optional display params
+				'Item'        => $Item,
+				'block_start' => '',
+				'block_end'   => '',
+				'skin_ID'     => $this->ID,
+			), $params ) );
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Comment
+	 * @param array Params
+	 */
+	function display_comment_voting_panel( $Comment, $params = array() )
+	{
+		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+				'before_title'          => '',
+				'helpful_text'          => T_('Is this reply helpful?'),
+				'title_yes'             => T_('Mark this reply as helpful!'),
+				'title_yes_voted'       => T_('You think this reply is helpful'),
+				'title_noopinion'       => T_('Mark this reply as no opinion!'),
+				'title_noopinion_voted' => T_('You have no opinion about this reply'),
+				'title_no'              => T_('Mark this reply as not helpful!'),
+				'title_no_voted'        => T_('You think this reply is not helpful'),
+				'class'                 => 'vote_helpful',
+				'skin_ID'               => $this->ID,
+			), $params ) );
+	}
 }
 
 ?>

@@ -264,15 +264,8 @@ echo $params['comment_info_after'];
 	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
 
 	if( $params['display_vote_helpful'] )
-	{ // Display a voting tool
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array(
-				'helpful_text'    => T_('Is this reply helpful?'),
-				'title_yes'       => T_('Mark this reply as helpful!'),
-				'title_yes_voted' => T_('You think this reply is helpful'),
-				'title_no'        => T_('Mark this reply as not helpful!'),
-				'title_no_voted'  => T_('You think this reply is not helpful'),
-				'class'           => 'vote_helpful'
-			) );
+	{	// Display a voting panel for comment:
+		$Skin->display_comment_voting_panel( $Comment );
 	}
 
 	// Display Spam Voting system

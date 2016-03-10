@@ -1847,6 +1847,8 @@ class Comment extends DataObject
 	function vote_helpful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $params = array() )
 	{
 		$params = array_merge( array(
+				'before_title'          => ' &nbsp; ',
+				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Mark this comment as helpful!'),
 				'title_yes_voted'       => T_('You think this comment is helpful'),
@@ -1856,6 +1858,7 @@ class Comment extends DataObject
 				'title_no_voted'        => T_('You think this comment is not helpful'),
 				'title_empty'           => T_('No user votes yet.'),
 				'class'                 => '',
+				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
 			), $params );
 
 		if( $this->is_meta() )
@@ -1875,13 +1878,12 @@ class Comment extends DataObject
 
 		echo $before;
 
-		$class = '';
-		if( !empty( $params['class'] ) )
-		{
-			$class = ' class="'.$params['class'].'"';
+		if( $params['display_wrapper'] )
+		{	// Display wrapper:
+			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
-		echo '<span id="vote_helpful_'.$this->ID.'"'.$class.'> &nbsp; ';
+		echo $params['before_title'];
 
 		if( $current_User->ID == $this->author_user_ID )
 		{ // Display only vote summary for users on their own comments
@@ -1906,6 +1908,7 @@ class Comment extends DataObject
 			display_voting_form( array(
 					'vote_type'             => 'comment',
 					'vote_ID'               => $this->ID,
+					'skin_ID'               => $params['skin_ID'],
 					'display_inappropriate' => false,
 					'display_spam'          => false,
 					'title_text'            => $title_text.' ',
@@ -1918,7 +1921,10 @@ class Comment extends DataObject
 				) );
 		}
 
-		echo '</span>';
+		if( $params['display_wrapper'] )
+		{	// Display end of wrapper:
+			echo '</span>';
+		}
 
 		echo $after;
 	}

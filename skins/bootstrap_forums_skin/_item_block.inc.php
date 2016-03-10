@@ -205,7 +205,7 @@ skin_widget( array(
 			</div>
 		</div><!-- ../panel-body -->
 		
-		<div class="panel-footer clearfix">
+		<div class="panel-footer clearfix small">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
 			// Check if BBcode plugin is enabled for current blog
@@ -223,6 +223,10 @@ skin_widget( array(
 			{	// Display button to quote this post
 				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 			}
+
+			// Display a panel with voting buttons for item:
+			$Skin->display_item_voting_panel( $Item );
+
 			echo '<div class="floatright">';
 			$Item->edit_link( array(
 					'before' => ' ',

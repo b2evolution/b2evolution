@@ -7864,8 +7864,11 @@ class Item extends ItemLight
 		global $current_User;
 
 		$params = array_merge( array(
-				'before'      => '',
-				'after'       => '',
+				'before'                 => '',
+				'after'                  => '',
+				'class'                  => '',
+				'widget_ID'              => 0,
+				'skin_ID'                => 0,
 				'label_text'             => T_('My vote:'),
 				'title_like'             => T_('Cast a positive vote!'),
 				'title_like_voted'       => T_('You sent a positive vote.'),
@@ -7876,6 +7879,7 @@ class Item extends ItemLight
 				'title_empty'            => T_('No user votes yet.'),
 				'display_summary'        => 'replace', // 'no' - Don't display, 'replace' - Replace label after vote, 'always' - Always display after icons
 				'display_summary_author' => true, // Display summary for author
+				'display_wrapper'        => true, // Use FALSE when you update this from AJAX request
 			), $params );
 
 		if( ! $this->can_vote() )
@@ -7885,7 +7889,10 @@ class Item extends ItemLight
 
 		echo $params['before'];
 
-		echo '<span id="vote_item_'.$this->ID.'">';
+		if( $params['display_wrapper'] )
+		{	// Display wrapper:
+			echo '<span id="vote_item_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+		}
 
 		if( $current_User->ID == $this->creator_user_ID )
 		{	// Display only vote summary for users on their own items:
@@ -7933,7 +7940,10 @@ class Item extends ItemLight
 			echo $after_voting_form;
 		}
 
-		echo '</span>';
+		if( $params['display_wrapper'] )
+		{	// Display wrapper:
+			echo '</span>';
+		}
 
 		echo $params['after'];
 	}
