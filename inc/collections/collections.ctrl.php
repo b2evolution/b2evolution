@@ -304,11 +304,6 @@ switch( $action )
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
-		// Large site logo url
-		param( 'notification_logo_large', 'string', '' );
-		param_check_url( 'notification_logo_large', 'http-https' );
-		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
-
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
