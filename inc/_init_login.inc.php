@@ -413,6 +413,9 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 	{
 		$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
 
+		// Check expiration for secondary group membership:
+		$current_User->check_secondary_group_membership();
+
 		if( ! empty( $login_action ) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
 			$redirect_to = param( 'redirect_to', 'url', $baseurl );

@@ -7358,6 +7358,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11735, 'Upgrade table of secondary user groups...' ) )
+	{	// part of 6.7.0
+		db_add_col( 'T_users__secondary_user_groups', 'sug_date', 'DATE NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

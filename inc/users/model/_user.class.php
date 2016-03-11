@@ -458,7 +458,8 @@ class User extends DataObject
 			if( $is_admin_form )
 			{	// Save secondary groups for this user:
 				$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', array() );
-				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
+				$edited_user_secondary_grp_dates = param( 'edited_user_secondary_grp_date', 'array:string', array() );
+				$this->update_secondary_groups( $edited_user_secondary_grp_IDs, $edited_user_secondary_grp_dates );
 			}
 
 			param( 'edited_user_source', 'string', true );
@@ -6331,8 +6332,9 @@ class User extends DataObject
 	 * Update user's secondary groups in DB
 	 *
 	 * @param array Secondary group IDs
+	 * @param array Secondary group expire dates
 	 */
-	function update_secondary_groups( $secondary_group_IDs )
+	function update_secondary_groups( $secondary_group_IDs, $secondary_group_dates )
 	{
 		global $DB, $current_User;
 
@@ -6372,9 +6374,9 @@ class User extends DataObject
 
 		if( count( $secondary_group_IDs ) )
 		{	// Update new secondary groups:
-			$new_secondary_grp_IDs = array();
+			$new_secondary_grp_rows = array();
 
-			foreach( $secondary_group_IDs as $secondary_group_ID )
+			foreach( $secondary_group_IDs as $s => $secondary_group_ID )
 			{
 				if( ! empty( $secondary_group_ID ) )
 				{
@@ -6382,18 +6384,45 @@ class User extends DataObject
 					    $edited_user_secondary_Group->can_be_assigned() )
 					{	// We can add this secondary group because current user has a permission:
 						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
-						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
+						    ! isset( $new_secondary_grp_rows[ $secondary_group_ID ] ) )
 						{	// Add except of primary user group and the duplicates:
-							$new_secondary_grp_IDs[] = $secondary_group_ID;
+							//$secondary_group_date = empty( $secondary_group_dates[ $s ] ) ? 'NULL' : $secondary_group_dates[ $s ];
+							set_param( 'user_secondary_group_date', $secondary_group_dates[ $s ] );
+							$user_secondary_group_date = param_date( 'user_secondary_group_date', T_('Please enter a valid date.'), false );
+							$user_secondary_group_date = empty( $user_secondary_group_date ) ? NULL : $user_secondary_group_date;
+							$new_secondary_grp_rows[ $secondary_group_ID ] = $this->ID.', '.$secondary_group_ID.', '.$DB->quote( $user_secondary_group_date );
 						}
 					}
 				}
 			}
 
-			if( ! empty( $new_secondary_grp_IDs ) )
+			if( ! empty( $new_secondary_grp_rows ) )
 			{	// Insert new secondary groups:
-				$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID )
-					VALUES ( '.$this->ID.', '.implode( ' ), ( '.$this->ID.', ', $new_secondary_grp_IDs ).' )' );
+				$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID, sug_date )
+					VALUES ( '.implode( ' ), ( ', $new_secondary_grp_rows ).' )' );
+			}
+		}
+	}
+
+
+	/**
+	 * Check expiration for secondary group membership
+	 */
+	function check_secondary_group_membership()
+	{
+		global $localtimenow, $Debuglog;
+
+		$user_secondary_groups = $this->get_secondary_groups();
+
+		foreach( $user_secondary_groups as $user_secondary_Group )
+		{
+			$membership_expire_date = $user_secondary_Group->get_expire_date( $this );
+			if( ! empty( $membership_expire_date ) )
+			{
+				if( strtotime( $membership_expire_date ) < $localtimenow )
+				{	// The membership is expired for this user:
+					$Debuglog->add( sprintf( 'Secondary Group "%s" membership has expired for user "%s".', $user_secondary_Group->get_name(), $this->get( 'login' ) ), '_init_login' );
+				}
 			}
 		}
 	}

@@ -210,6 +210,7 @@ $schema_queries = array(
 		"CREATE TABLE T_users__secondary_user_groups (
 			sug_user_ID INT(11) UNSIGNED NOT NULL,
 			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+			sug_date    DATE NULL DEFAULT NULL,
 			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

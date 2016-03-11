@@ -1498,12 +1498,16 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 		for (i=0;i<dayNamesMin.length;i++)
 			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
 
-		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
-			firstDay: '.locale_startofweek().'
-		})
+		jQuery( document ).on( "focus", ".form_date_input", function()
+		{
+			jQuery( this ).datepicker(
+			{
+				dateFormat: "'.$datefmt.'",
+				monthNames: monthNames,
+				dayNamesMin: dayNamesMin,
+				firstDay: '.locale_startofweek().'
+			} );
+		} );
 	})' );
 }
 

@@ -812,6 +812,9 @@ if( $display_mode != 'js')
 			load_funcs( 'tools/model/_email.funcs.php' );
 			load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
+			// Initialize date picker:
+			init_datepicker_js();
+
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-admin-tab' );
 			break;

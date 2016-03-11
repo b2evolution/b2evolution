@@ -2784,7 +2784,7 @@ class Form extends Widget
 		{ // No ID in case there's no id/name given for a field.
 			$ffield_id = '';
 		}
-		$r = $this->fieldstart;
+
 		if( !empty( $field_params['class'] ) )
 		{
 			if( strpos( $r, 'class="' ) === false )

@@ -78,6 +78,12 @@ class Group extends DataObject
 	 */
 	var $GroupSettings;
 
+	/**
+	 * @var array Dates of expiration for secondary group membership per user,
+	 *            key - User ID, value - expire date
+	 */
+	var $expire_dates;
+
 
 	/**
 	 * Constructor
@@ -593,6 +599,52 @@ class Group extends DataObject
 
 		// Current user can assign this group if his group level is more than level of this group
 		return ( $this->get( 'level' ) < $user_Group->get( 'level' ) );
+	}
+
+
+	/**
+	 * Get date of expiration date for secondary group membership
+	 *
+	 * @param object User
+	 * @param string Date format
+	 * @return string|boolean|NULL Date, FALSE - user has no membership, NULL - no limit by expire date for the user on this group
+	 */
+	function get_expire_date( $User = NULL, $date_format = 'Y-m-d' )
+	{
+		if( empty( $this->ID ) )
+		{	// Group must be created firstly:
+			return false;
+		}
+
+		if( is_null( $User ) )
+		{	// Use current user by default:
+			global $current_User;
+			if( ! is_logged_in() )
+			{	// only if logged in:
+				return false;
+			}
+			$User = $current_User;
+		}
+
+		if( ! is_array( $this->expire_dates ) )
+		{	// Initialize the array first time:
+			global $DB;
+			$membership_SQL = new SQL( 'Get membership for ALL users on secondary group #'.$this->ID );
+			$membership_SQL->SELECT( 'sug_user_ID, sug_date' );
+			$membership_SQL->FROM( 'T_users__secondary_user_groups' );
+			$membership_SQL->WHERE( 'sug_grp_ID = '.$this->ID );
+			$this->expire_dates = $DB->get_assoc( $membership_SQL->get(), $membership_SQL->title );
+		}
+
+		// Get a value from cache:
+		if( array_key_exists( $User->ID, $this->expire_dates ) )
+		{	// User has a membership with this secondary group
+			return empty( $this->expire_dates[ $User->ID ] ) ? NULL : mysql2date( $date_format, $this->expire_dates[ $User->ID ].' 00:00:00' );
+		}
+		else
+		{	// User has no membership:
+			return false;
+		}
 	}
 }
 

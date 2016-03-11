@@ -115,31 +115,30 @@ foreach( $user_secondary_groups as $s => $user_secondary_Group )
 		$field_title = '';
 	}
 
-	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
-
 	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
 	{	// Current user has a permission to assign this group:
-		$user_secondary_group_ID = empty( $user_secondary_Group ) ? 0 : $user_secondary_Group->ID;
-		$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $field_title, array(
-				'allow_none' => true,
-				'field_suffix' => $field_add_icon
-			) );
+		$Form->begin_line( $field_title );
+			$user_secondary_group_ID = empty( $user_secondary_Group ) ? 0 : $user_secondary_Group->ID;
+			$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, '', array( 'allow_none' => true ) );
+			$user_secondary_group_date = empty( $user_secondary_Group ) ? '' : $user_secondary_Group->get_expire_date( $edited_User );
+			$Form->date( 'edited_user_secondary_grp_date[]', $user_secondary_group_date, T_('Expires').':' );
+		$Form->end_line();
 	}
 	else
 	{	// Current user has no permission to assign this group:
-		$Form->info_field( $field_title, $user_secondary_Group->get_name().' '.$field_add_icon, array(
-				// Use this param to add html attribute "id" for the fieldset in order to add new group by JS:
-				'name' => 'edited_user_secondary_grp_ID_'.$user_secondary_Group->ID
-			) );
+		$Form->info_field( $field_title, $user_secondary_Group->get_name().' &nbsp; '.T_('Expires').': '.$user_secondary_Group->get_expire_date( $edited_User, locale_datefmt() ) );
 	}
 }
 // Use this hidden select element as template for JS code to add new secondary groups:
-echo '<div id="template_secondary_group_block" style="display:none">';
-$Form->select_input_object( 'template_secondary_group_select', 0, $GroupCache, '', array(
-		'allow_none' => true,
-		'field_suffix' => $field_add_icon
-	) );
-echo '</div>';
+ob_start();
+$Form->begin_line( NULL );
+	$Form->select_input_object( 'edited_user_secondary_grp_ID[]', 0, $GroupCache, '', array( 'allow_none' => true ) );
+	$Form->date( 'edited_user_secondary_grp_date[]', '', T_('Expires').':' );
+$Form->end_line();
+$template_secondary_group = str_replace( array( "'", "\r", "\n" ), array( "\\'", ' ', ' ' ), ob_get_clean() );
+
+
+$Form->info_field( '', '<span id="add_secondary_group" style="cursor:pointer">'.get_icon( 'add' ).' '.T_('Add secondary group membership').'</span>', array( 'name' => 'add_secondary_group_membership' ) );
 
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change level:
@@ -532,18 +531,14 @@ jQuery( '#edited_user_status' ).change( function()
 	}
 } );
 
-jQuery( document ).on( 'click', '.add_secondary_group', function()
+jQuery( '#add_secondary_group' ).click( function()
 {	// Add new select element for new secondary group:
-	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );
+	var new_fieldset = jQuery( '<?php echo $template_secondary_group; ?>' );
 
-	// Clone template fieldset to add one new:
-	var new_fieldset = jQuery( '#ffield_template_secondary_group_select' ).clone();
+	// Remove the duplicated IDs to correct working of datepicker plugin:
+	new_fieldset.find( 'input.form_date_input' ).removeAttr( 'id' );
 
-	// Set correct field name that is used on form submit:
-	new_fieldset.find( 'select' ).attr( 'name', 'edited_user_secondary_grp_ID[]' );
-
-	// Add new fieldset after current:
-	current_fieldset.after( new_fieldset );
+	jQuery( '#ffield_add_secondary_group_membership' ).before( new_fieldset );
 } );
 
 <?php
