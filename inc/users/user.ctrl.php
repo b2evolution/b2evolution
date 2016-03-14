@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string', '', true );
-if( empty($user_tab) )
+if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
@@ -49,14 +49,14 @@ if( $user_profile_only )
 
 $UserCache = & get_UserCache();
 
-if( ! is_null($user_ID) )
+if( ! is_null( $user_ID ) )
 { // User selected
 	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -1019,6 +1019,9 @@ switch( $action )
 				}
 				$image_width = param( 'image_width', 'integer' );
 				$image_height = param( 'image_height', 'integer' );
+				$aspect_ratio = param( 'aspect_ratio', 'double' );
+				$content_width = param( 'content_width', 'integer' );
+				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

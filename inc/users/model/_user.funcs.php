@@ -1186,7 +1186,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	{
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
 		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
-		{ // Use blog url when user has no access to backoffice 
+		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
 				$BlogCache = & get_BlogCache();
@@ -1204,7 +1204,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 			}
 
 			if( ! empty( $current_Blog ) )
-			{ // We should use blog url when at least one blog exist 
+			{ // We should use blog url when at least one blog exist
 				if( $is_admin_tab )
 				{ // Deny all admin tabs for such users
 					$user_tab = 'user';
@@ -4273,35 +4273,44 @@ echo_modalwindow_js();
 		// Set sizes for modal window:
 		var window_width = viewport_width;
 		var window_height = viewport_height;
+		var aspect_ratio = window_height / window_width;
+
 		// Limit window with max & min sizes:
 		window_height = ( window_height > max_size ) ? max_size : ( ( window_height < min_size ) ? min_size : window_height );
 		window_width = ( window_width > max_size ) ? max_size : ( ( window_width < min_size ) ? min_size : window_width );
 		//console.log( 'window', window_width, window_height );
 
 		// Set margins for normal view of wide screens:
-		var margin_size_width = 170;
-		var margin_size_height = viewport_height > max_size ? 170 : 205;
-		if( viewport_width <= 900 )
-		{ // When width is less than 900px then preview thumbnails are located under big picture, so height margin should be more
-			margin_size_width = 35;
-			margin_size_height = 325;
-		}
-		//console.log( 'margins', margin_size_width, margin_size_height );
+		var margin_size_width = 10;
+		var margin_size_height = 10;
 
-		// Set image sizes:
-		var image_width = window_width - margin_size_width;
-		var image_height = window_height - margin_size_height;
-		var image_min_size = 130;
-		// Limit image with min size:
-		image_width = ( image_width < image_min_size ) ? image_min_size : image_width;
-		image_height = ( image_height < image_min_size ) ? image_min_size : image_height;
-		//console.log( 'image', image_width, image_height );
+		margin_size_width = ( window_width - ( margin_size_width * 2 ) ) > min_size ? 10 : 0;
+		margin_size_height = ( window_height - ( margin_size_height * 2 ) ) > min_size ? 10: 0;
+
+		// Set modal size:
+		var modal_width = ( window_width > max_size ? max_size : window_width );
+		var modal_height = ( window_height > max_size ? max_size : window_height );
+
 
 		// Open modal window with loading animation while ajax request is executing below:
-		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-			window_width+'px', window_height+'px', true,
-			'<?php echo TS_('Crop profile picture'); ?>',
-			[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ], true );
+		openModalWindow(
+				'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+				modal_width + 'px',
+				modal_height + 'px',
+				true,
+				'<?php echo TS_('Crop profile picture'); ?>',
+				[ '<?php echo TS_('Crop'); ?>', 'btn-primary' ],
+				true );
+
+		// Get content size
+		var modal_body_padding = {
+			top: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingTop' ) ),
+			right: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingRight' ) ),
+			bottom: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingBottom' ) ),
+			left: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingLeft' ) )
+		};
+		var content_height = parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css('min-height') ) - ( modal_body_padding.top + modal_body_padding.bottom );
+		var content_width = modal_width - ( modal_body_padding.left + modal_body_padding.right );
 
 		// Execute ajax request to load a crop tool:
 		jQuery.ajax(
@@ -4313,18 +4322,24 @@ echo_modalwindow_js();
 				<?php echo $ajax_params; ?>
 				'user_ID': user_ID,
 				'file_ID': file_ID,
-				'image_width'  : image_width,
-				'image_height' : image_height,
+				'aspect_ratio' : aspect_ratio,
+				'content_width' : content_width,
+				'content_height' : content_height,
 				'display_mode': 'js',
 				'crumb_user': '<?php echo get_crumb( 'user' ); ?>',
 			},
 			success: function( result )
 			{
-				openModalWindow( result, window_width+'px', window_height+'px', true,
-				'<?php echo TS_('Crop profile picture'); ?>',
-				[ '<?php echo TS_('Crop'); ?>', 'btn-primary hide' ] );
+				openModalWindow(
+					result,
+					modal_width+'px',
+					modal_height+'px',
+					true,
+					'<?php echo TS_('Crop profile picture'); ?>',
+					[ '<?php echo TS_('Crop'); ?>', 'btn-primary' ] );
 			}
-		} );
+		});
+
 		return false;
 	}
 </script>
@@ -5056,7 +5071,7 @@ function users_results( & $UserList, $params = array() )
 				'td' => '$user_firstname$ $user_lastname$',
 			);
 	}
-	
+
 	if( $params['display_role'] )
 	{ // Display organizational role
 		$UserList->cols[] = array(
