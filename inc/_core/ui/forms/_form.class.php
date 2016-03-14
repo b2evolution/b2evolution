@@ -1582,7 +1582,7 @@ class Form extends Widget
 				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
 					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = ceil( $duration / $period['size'] );
+					$duration_value = floor( $duration / $period['size'] );
 					foreach( $periods_values as $v => $value )
 					{
 						if( $duration_value <= $value )
