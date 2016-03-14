@@ -115,7 +115,7 @@ class org_members_Widget extends ComponentWidget
 				),
 				'order_by' => array(
 					'label' => T_('Order by'),
-					'note' => T_('Field used to sort the order in which the members are displayed'),
+					'note' => T_('Field used to determine the order in which the members are displayed'),
 					'type' => 'select',
 					'options' => array(
 							'user_id' => 'User ID', 

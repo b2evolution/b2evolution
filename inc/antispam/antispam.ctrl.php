@@ -159,12 +159,12 @@ switch( $action )
 
 		if( $Messages->has_errors() )
 		{ // Reset js display mode in order to display a correct view after confirmation
-			$display_mode = '';
-			$mode = '';
+			//$display_mode = '';
+			//$mode = '';
 		}
 
 		param( 'request', 'string', '' );
-		if( $display_mode == 'js' && $request != 'checkban' )
+		/*if( $display_mode == 'js' && $request != 'checkban' )
 		{
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
@@ -174,7 +174,7 @@ switch( $action )
 			{
 				send_javascript_message( array( 'closeModalWindow' => array() ), true );
 			}
-		}
+		}*/
 
 		// We'll ask the user later what to do, if no "sub-action" given.
 		break;
@@ -569,16 +569,16 @@ if( $display_mode != 'js' )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
-
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-	
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-
-	// Begin payload block:
-	$AdminUI->disp_payload_begin();
 }
+
+// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+$AdminUI->disp_html_head();
+
+// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+$AdminUI->disp_body_top();
+
+// Begin payload block:
+$AdminUI->disp_payload_begin();
 
 switch( $tab3 )
 {
@@ -654,12 +654,8 @@ switch( $tab3 )
 }
 
 // End payload block:
-if( $display_mode != 'js')
-{
-	$AdminUI->disp_payload_end();
+$AdminUI->disp_payload_end();
 
-	// Display body bottom, debug info and close </html>:
-	$AdminUI->disp_global_footer();
-}
-
+// Display body bottom, debug info and close </html>:
+$AdminUI->disp_global_footer();
 ?>
