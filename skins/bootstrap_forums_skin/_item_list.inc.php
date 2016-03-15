@@ -61,15 +61,23 @@ elseif( $comments_number > 25 )
 	$status_alt = T_('Popular topic');
 	$legend_icons['topic_popular'] = 1;
 }
+$Item->load_Blog();
 ?>
-		<article class="container group_row posts_panel">	
-			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">		
-			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i></div>
+		<article class="container group_row posts_panel">
+			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">
+			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"
+			<?php
+				if( $Item->Blog->get_setting( 'use_workflow' ) )
+				{
+					$priority_color = item_priority_color( $Item->priority );
+					echo ' style="color: '.$priority_color.'; border-color: '.$priority_color.';"';
+				}
+			?>></i></div>
 				<div class="ft_title"><?php
 					echo '<div class="posts_panel_title_wrapper">';
 					echo '<div class="cell1"><div class="wrap">';
 					echo $status_title;
-					$Item->load_Blog();
+
 					if( $Item->Blog->get_setting( 'track_unread_content' ) )
 					{ // Display icon about unread status
 						$Item->display_unread_status();
@@ -177,7 +185,7 @@ elseif( $comments_number > 25 )
 					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
 			?></div>
-			
+
 			<!-- This is shrinked date that applies on lower screen res -->
 			<div class="ft_date_shrinked item_list"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
@@ -197,5 +205,5 @@ elseif( $comments_number > 25 )
 						) );
 					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
-			?></div>	
+			?></div>
 		</article>
