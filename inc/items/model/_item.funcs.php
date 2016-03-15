@@ -3418,11 +3418,11 @@ function item_priority_titles( $include_null_value = true )
 function item_priority_colors()
 {
 	return array(
-			1 => 'CB4D4D', // Highest
-			2 => 'E09952', // High
-			3 => 'DBDB57', // Medium
-			4 => '34B27D', // Low
-			5 => '4D77CB', // Lowest
+			1 => 'EB5A46', // Highest
+			2 => 'FFAB4A', // High
+			3 => 'F2D600', // Medium
+			4 => '61BD4F', // Low
+			5 => '00C2E0', // Lowest
 		);
 }
 
