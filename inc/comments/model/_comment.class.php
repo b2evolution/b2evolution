@@ -511,39 +511,53 @@ class Comment extends DataObject
 
 		$DB->begin();
 
-		$SQL = new SQL( 'Check if current user already voted on this comment' );
-		$SQL->SELECT( 'cmvt_cmt_ID' );
+		$SQL = new SQL( 'Check if current user already voted on comment #'.$this->ID );
+		$SQL->SELECT( 'cmvt_cmt_ID, cmvt_'.$vote_type.' AS value' );
 		$SQL->FROM( 'T_comments__votes' );
 		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		if( !$DB->get_row( $SQL->get() ) )
-		{ // Add a new vote for first time
+		$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+
+		if( $existing_vote === NULL )
+		{	// Add a new vote for first time:
+			// Use a replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other:
 			$DB->query( 'INSERT INTO T_comments__votes
-			                         ( cmvt_cmt_ID, cmvt_user_ID, cmvt_'.$vote_type.' )
-			                  VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).' )' );
+				       ( cmvt_cmt_ID, cmvt_user_ID, cmvt_'.$vote_type.' )
+				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).' )',
+				'Add new vote on comment #'.$this->ID );
 		}
 		else
-		{ // Update a vote
+		{ // Update a vote:
+			if( $existing_vote->value == $vote )
+			{	// Undo previous vote:
+				$vote = NULL;
+			}
 			$DB->query( 'UPDATE T_comments__votes
-			                SET cmvt_'.$vote_type.' = '.$DB->quote( $vote ).'
-			              WHERE cmvt_cmt_ID = '.$DB->quote( $this->ID ).'
-			                AND cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
+				  SET cmvt_'.$vote_type.' = '.$DB->quote( $vote ).'
+				WHERE cmvt_cmt_ID = '.$DB->quote( $this->ID ).'
+				  AND cmvt_user_ID = '.$DB->quote( $current_User->ID ),
+				'Update a vote on comment #'.$this->ID );
 		}
 
-		$vote_SQL = new SQL( 'Get voting results of this comment' );
-		$vote_SQL->SELECT( 'COUNT( cmvt_'.$vote_type.' ) AS c, SUM( cmvt_'.$vote_type.' ) AS s' );
+		$vote_SQL = new SQL( 'Get voting results of comment #'.$this->ID );
+		$vote_SQL->SELECT( 'COUNT( cmvt_'.$vote_type.' ) AS votes_count, SUM( cmvt_'.$vote_type.' ) AS votes_sum' );
 		$vote_SQL->FROM( 'T_comments__votes' );
 		$vote_SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'cmvt_'.$vote_type.' IS NOT NULL' );
 		$vote = $DB->get_row( $vote_SQL->get() );
 
+		// These values must be number and not NULL:
+		$vote->votes_sum = intval( $vote->votes_sum );
+		$vote->votes_count = intval( $vote->votes_count );
+
 		// Update fields with vote counters for this comment
 		$DB->query( 'UPDATE T_comments
-		                SET comment_'.$vote_type.'_addvotes = '.$DB->quote( $vote->s ).',
-		                    comment_'.$vote_type.'_countvotes = '.$DB->quote( $vote->c ).'
-		              WHERE comment_ID = '.$DB->quote( $this->ID ) );
-		$this->{$vote_type.'_addvotes'} = $vote->s;
-		$this->{$vote_type.'_countvotes'} = $vote->c;
+			  SET comment_'.$vote_type.'_addvotes = '.$DB->quote( $vote->votes_sum ).',
+			      comment_'.$vote_type.'_countvotes = '.$DB->quote( $vote->votes_count ).'
+			WHERE comment_ID = '.$DB->quote( $this->ID ),
+			'Update fields with vote counters for comment #'.$this->ID );
+		$this->{$vote_type.'_addvotes'} = $vote->votes_sum;
+		$this->{$vote_type.'_countvotes'} = $vote->votes_count;
 
 		$DB->commit();
 
@@ -1697,32 +1711,19 @@ class Comment extends DataObject
 		}
 		$class = str_replace( 'disabled', '', $class );
 
-		$r = '';
-		if( !$is_voted )
-		{ // If user didn't vote for this we should create a link for voting
-			$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
-			if( $save_context )
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
-			$r .= '"';
-
-			if( $ajax_button )
-			{
-				$r .= ' onclick="setCommentVote('.$this->ID.', \''.$vote_type.'\' , \''.$vote_value.'\' ); return false;"';
-			}
-
-			$r .= ' title="'.$title.'" class="'.$class.'">'.$text.'</a>';
-		}
-		else
+		$r = '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
+		if( $save_context )
 		{
-			$r .= '<span';
-			if( !empty( $class ) )
-			{
-				$r .= ' class="'.$class.'"';
-			}
-			$r .= '>'.$text.'</span>';
+			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
+		$r .= '"';
+
+		if( $ajax_button )
+		{
+			$r .= ' onclick="setCommentVote('.$this->ID.', \''.$vote_type.'\' , \''.$vote_value.'\' ); return false;"';
+		}
+
+		$r .= ' title="'.$title.'" class="'.$class.'">'.$text.'</a>';
 
 		return $r;
 	}

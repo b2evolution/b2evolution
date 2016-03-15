@@ -892,15 +892,16 @@ function get_icon_info( $name )
 			'size' => array( 13, 13 ),
 			'xy' => array( 112, 128 ),
 			'glyph' => 'ban-circle',
-			'fa' => 'ban',
+			'fa' => 'ban fa-x-rollover-grey',
 			'color' => '#C00'
 		);
 		case 'ban_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Ban'),
 			'size' => array( 13, 13 ),
 			'xy' => array( 96, 128 ),
 			'glyph' => 'ban-circle',
-			'fa' => 'ban',
+			'fa' => 'ban fa-x-rollover-red',
 			'color' => '#7e7e7e'
 		);
 		case 'play': return array( // used to write an e-mail, visit site or contact through IM
@@ -985,15 +986,16 @@ function get_icon_info( $name )
 			'size' => array( 15, 15 ),
 			'xy' => array( 112, 144 ),
 			'glyph' => 'thumbs-up',
-			'fa' => 'thumbs-up',
+			'fa' => 'thumbs-up fa-x-rollover-grey',
 			'color' => '#0C0'
 		);
 		case 'thumb_up_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Thumb Up'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 96, 144 ),
 			'glyph' => 'thumbs-up',
-			'fa' => 'thumbs-up',
+			'fa' => 'thumbs-up fa-x-rollover-green',
 			'color' => '#7f7f7f'
 		);
 		case 'thumb_down': return array(
@@ -1001,15 +1003,16 @@ function get_icon_info( $name )
 			'size' => array( 15, 15 ),
 			'xy' => array( 144, 144 ),
 			'glyph' => 'thumbs-down',
-			'fa' => 'thumbs-down',
+			'fa' => 'thumbs-down fa-x-rollover-grey',
 			'color' => '#ee2a2a'
 		);
 		case 'thumb_down_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Thumb Down'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 128, 144 ),
 			'glyph' => 'thumbs-down',
-			'fa' => 'thumbs-down',
+			'fa' => 'thumbs-down fa-x-rollover-red-light',
 			'color' => '#7f7f7f'
 		);
 

@@ -3997,48 +3997,38 @@ function display_voting_form( $params = array() )
 			break;
 	}
 
-	if( empty( $vote ) || is_null( $vote->result ) )
-	{	// Current user didn't vote for this file yet
-		$icon_like = 'thumb_up';
-		$icon_noopinion = 'ban';
-		$icon_dontlike = 'thumb_down';
-		$type_voted = '';
-	}
-	else
+	// Set all icons disabled by default:
+	$icon_like = 'thumb_up_disabled';
+	$icon_noopinion = 'ban_disabled';
+	$icon_dontlike = 'thumb_down_disabled';
+	$type_voted = '';
+
+	if( ! empty( $vote ) && ! is_null( $vote->result ) )
 	{	// Current user already voted for this file, We should set a disabled icons correctly
 		switch( $vote->result )
 		{
 			case '-1':
 				// Don't like
 				$type_voted = 'dontlike';
-				$icon_like = 'thumb_up_disabled';
-				$icon_noopinion = 'ban_disabled';
 				$icon_dontlike = 'thumb_down';
 				$params_dontlike['class'] = 'voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
-				unset( $params_dontlike['id'] );
 				break;
 
 			case '0':
 				// No opinion
 				$type_voted = 'noopinion';
-				$icon_like = 'thumb_up_disabled';
 				$icon_noopinion = 'ban';
-				$icon_dontlike = 'thumb_down_disabled';
 				$params_noopinion['class'] = 'voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
-				unset( $params_noopinion['id'] );
 				break;
 
 			case '1':
 				// Like
 				$type_voted = 'like';
 				$icon_like = 'thumb_up';
-				$icon_noopinion = 'ban_disabled';
-				$icon_dontlike = 'thumb_down_disabled';
 				$params_like['class'] = 'voted';
 				$params_like['title'] = $params['title_like_voted'];
-				unset( $params_like['id'] );
 				break;
 		}
 	}
@@ -4060,13 +4050,13 @@ function display_voting_form( $params = array() )
 	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
-	// Set this url for case when JavaScript is not enabled
+	// Set this url for case when JavaScript is not enabled:
 	$url = get_secure_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
-	// Save action url here in order to have new crumb on every voting form loading
+	// Save action url here in order to have new crumb on every voting form loading:
 	echo '<input type="hidden" id="voting_action" value="'.$url.'&b2evo_icons_type='.$b2evo_icons_type.'" />';
 	$redirect_to = regenerate_url();
 	if( strpos( $redirect_to, 'async.php' ) === false )
-	{	// Append a redirect param
+	{	// Append a redirect param:
 		$url .= '&redirect_to='.$redirect_to;
 	}
 
@@ -4081,57 +4071,27 @@ function display_voting_form( $params = array() )
 	}
 
 	if( $params['display_like'] )
-	{	// Display 'Like' icon
-		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
-		if( $type_voted == 'like' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_like = $url.'&vote_action=like';
-			$class = ( strpos( $icon_like, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_like.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'Like' icon:
+		echo action_icon( '', $icon_like, $url.'&vote_action=like', '', 0, 0, array(), $params_like );
 	}
 
 	if( $params['display_noopinion'] )
-	{	// Display 'No opinion' icon
-		$tag_icon = get_icon( $icon_noopinion, 'imgtag', $params_noopinion );
-		if( $type_voted == 'noopinion' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_noopinion = $url.'&vote_action=noopinion';
-			$class = ( strpos( $icon_noopinion, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_noopinion.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'No opinion' icon:
+		echo action_icon( '', $icon_noopinion, $url.'&vote_action=noopinion', '', 0, 0, array(), $params_noopinion );
 	}
 
 	if( $params['display_dontlike'] )
-	{	// Display 'Dont like' icon
-		$tag_icon = get_icon( $icon_dontlike, 'imgtag', $params_dontlike );
-		if( $type_voted == 'dontlike' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_dontlike = $url.'&vote_action=dontlike';
-			$class = ( strpos( $icon_dontlike, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_dontlike.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'Dont like' icon:
+		echo action_icon( '', $icon_dontlike, $url.'&vote_action=dontlike', '', 0, 0, array(), $params_dontlike );
 	}
 
 	if( $params['display_inappropriate'] || $params['display_spam'] )
-	{	// Display separator between icons and checkboxes
+	{	// Display separator between icons and checkboxes:
 		echo '<span class="separator">&nbsp;</span>';
 	}
 
 	if( $params['display_inappropriate'] )
-	{	// Display 'Inappropriate' checkbox
+	{	// Display 'Inappropriate' checkbox:
 		echo '<label for="'.$params_inappropriate['id'].'" title="'.$params_inappropriate['title'].'">'.
 				'<input type="checkbox" id="'.$params_inappropriate['id'].'" name="'.$params_inappropriate['id'].'"'.$checked_inappropriate.' />'.
 				'<span>'.T_('Inappropriate').'</span>'.
@@ -4139,14 +4099,14 @@ function display_voting_form( $params = array() )
 	}
 
 	if( $params['display_spam'] )
-	{	// Display 'Spam' checkbox
+	{	// Display 'Spam' checkbox:
 		echo '<label for="'.$params_spam['id'].'" class="'.$params_spam['class'].'" title="'.$params_spam['title'].'">'.
 				'<input type="checkbox" id="'.$params_spam['id'].'" name="'.$params_spam['id'].'"'.$checked_spam.' />'.
 				'<span>'.T_('Spam').'</span>'.
 			'</label>';
 	}
 
-	// Create a hidden input with current ID
+	// Create a hidden input with current ID:
 	echo '<input type="hidden" id="votingID" value="'.$params['vote_ID'].'" />';
 
 	if( ! empty( $params['widget_ID'] ) )

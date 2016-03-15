@@ -7983,41 +7983,58 @@ class Item extends ItemLight
 		$DB->begin();
 
 		$SQL = new SQL( 'Check if current user already voted on item #'.$this->ID );
-		$SQL->SELECT( 'itvt_item_ID' );
+		$SQL->SELECT( 'itvt_updown' );
 		$SQL->FROM( 'T_items__votes' );
 		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		if( ! $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		$existing_vote = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+
+		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
-			$DB->query( 'INSERT INTO T_items__votes
+			// Use a replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other:
+			$DB->query( 'REPLACE INTO T_items__votes
 				       ( itvt_item_ID, itvt_user_ID, itvt_updown, itvt_ts )
 				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )',
 				'Add new vote on item #'.$this->ID );
 		}
 		else
 		{	// Update a vote:
-			$DB->query( 'UPDATE T_items__votes
-				  SET itvt_updown = '.$DB->quote( $vote ).'
-				WHERE itvt_item_ID = '.$DB->quote( $this->ID ).'
-				  AND itvt_user_ID = '.$DB->quote( $current_User->ID ),
-				'Update a vote on item #'.$this->ID );
+			if( $existing_vote == $vote )
+			{	// Undo previous vote:
+				$DB->query( 'DELETE FROM T_items__votes
+					WHERE itvt_item_ID = '.$DB->quote( $this->ID ).'
+						AND itvt_user_ID = '.$DB->quote( $current_User->ID ),
+					'Undo previous vote on item #'.$this->ID );
+			}
+			else
+			{	// Set new vote:
+				$DB->query( 'UPDATE T_items__votes
+						SET itvt_updown = '.$DB->quote( $vote ).'
+					WHERE itvt_item_ID = '.$DB->quote( $this->ID ).'
+						AND itvt_user_ID = '.$DB->quote( $current_User->ID ),
+					'Update a vote on item #'.$this->ID );
+			}
 		}
 
 		$vote_SQL = new SQL( 'Get voting results of item #'.$this->ID );
-		$vote_SQL->SELECT( 'COUNT( itvt_updown ) AS c, SUM( itvt_updown ) AS s' );
+		$vote_SQL->SELECT( 'COUNT( itvt_updown ) AS votes_count, SUM( itvt_updown ) AS votes_sum' );
 		$vote_SQL->FROM( 'T_items__votes' );
 		$vote_SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 		$vote = $DB->get_row( $vote_SQL->get(), OBJECT, NULL, $vote_SQL->title );
 
+		// These values must be number and not NULL:
+		$vote->votes_sum = intval( $vote->votes_sum );
+		$vote->votes_count = intval( $vote->votes_count );
+
 		// Update fields with vote counters for this item:
 		$DB->query( 'UPDATE T_items__item
-			  SET post_addvotes = '.$DB->quote( $vote->s ).',
-			      post_countvotes = '.$DB->quote( $vote->c ).'
+			  SET post_addvotes = '.$DB->quote( $vote->votes_sum ).',
+			      post_countvotes = '.$DB->quote( $vote->votes_count ).'
 			WHERE post_ID = '.$DB->quote( $this->ID ),
 			'Update fields with vote counters for item #'.$this->ID );
-		$this->addvotes = $vote->s;
-		$this->countvotes = $vote->c;
+		$this->addvotes = $vote->votes_sum;
+		$this->countvotes = $vote->votes_count;
 
 		$DB->commit();
 
