@@ -747,6 +747,12 @@ class Blog extends DataObject
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
+			// Show post types:
+			$checked_item_types = param( 'show_post_types', 'array:integer', array() );
+			$unchecked_item_types = array_diff( $this->get_enabled_item_types( 'post' ), $checked_item_types );
+			// Store only unchecked item types in order to keep all new item types enabled by default:
+			$this->set_setting( 'show_post_types', implode( ',', $unchecked_item_types ) );
+
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );
 
@@ -4039,30 +4045,39 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get all enabled item types for this collection
+	 * Get enabled item types for this collection by usage
 	 *
+	 * @param string|NULL Item type usage: 'post', 'page', 'intro-front' and etc.
 	 * @return array
 	 */
-	function get_enabled_item_types()
+	function get_enabled_item_types( $usage = NULL )
 	{
 		if( empty( $this->ID ) )
-		{ // This is new blog, it doesn't have the enabled item types
+		{	// This is new blog, it doesn't have the enabled item types:
 			return array();
 		}
 
 		if( ! isset( $this->enabled_item_types ) )
-		{ // Get all enabled item types by one sql query and only first time to cache result:
+		{	// Get all enabled item types by one sql query and only first time to cache result:
 			global $DB;
 
-			$SQL = new SQL();
-			$SQL->SELECT( 'itc_ityp_ID' );
+			$SQL = new SQL( 'Get all enabled item types for collection #'.$this->ID );
+			$SQL->SELECT( 'itc_ityp_ID, ityp_usage' );
 			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
 		}
 
-		return $this->enabled_item_types;
+		if( $usage === NULL )
+		{	// Get all item types:
+			return array_keys( $this->enabled_item_types );
+		}
+		else
+		{	// Restrict item types by requested usage value:
+			return array_keys( $this->enabled_item_types, $usage );
+		}
 	}
 
 
