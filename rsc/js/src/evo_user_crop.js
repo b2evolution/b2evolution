@@ -28,41 +28,52 @@ function user_crop_avatar( user_ID, file_ID, user_tab_from )
 	// Set sizes for modal window:
 	var window_width = viewport_width;
 	var window_height = viewport_height;
+	var aspect_ratio = window_height / window_width;
+
 	// Limit window with max & min sizes:
 	window_height = ( window_height > max_size ) ? max_size : ( ( window_height < min_size ) ? min_size : window_height );
 	window_width = ( window_width > max_size ) ? max_size : ( ( window_width < min_size ) ? min_size : window_width );
 	//console.log( 'window', window_width, window_height );
 
 	// Set margins for normal view of wide screens:
-	var margin_size_width = 170;
-	var margin_size_height = viewport_height > max_size ? 170 : 205;
-	if( viewport_width <= 900 )
-	{ // When width is less than 900px then preview thumbnails are located under big picture, so height margin should be more
-		margin_size_width = 35;
-		margin_size_height = 325;
-	}
-	//console.log( 'margins', margin_size_width, margin_size_height );
+	var margin_size_width = 10;
+	var margin_size_height = 10;
 
-	// Set image sizes:
-	var image_width = window_width - margin_size_width;
-	var image_height = window_height - margin_size_height;
-	var image_min_size = 130;
-	// Limit image with min size:
-	image_width = ( image_width < image_min_size ) ? image_min_size : image_width;
-	image_height = ( image_height < image_min_size ) ? image_min_size : image_height;
-	//console.log( 'image', image_width, image_height );
+	margin_size_width = ( window_width - ( margin_size_width * 2 ) ) > min_size ? 10 : 0;
+	margin_size_height = ( window_height - ( margin_size_height * 2 ) ) > min_size ? 10: 0;
+
+	// Set modal size:
+	var modal_width = ( window_width > max_size ? max_size : window_width );
+	var modal_height = ( window_height > max_size ? max_size : window_height );
+
 
 	// Open modal window with loading animation while ajax request is executing below:
-	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
-		window_width+'px', window_height+'px', true,
-		evo_js_lang_crop_profile_pic, [ evo_js_lang_crop, 'btn-primary hide' ], true );
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			modal_width + 'px',
+			modal_height + 'px',
+			true,
+			evo_js_lang_crop_profile_pic,
+			[ evo_js_lang_crop, 'btn-primary' ],
+			true );
+
+	// Get content size
+	var modal_body_padding = {
+		top: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingTop' ) ),
+		right: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingRight' ) ),
+		bottom: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingBottom' ) ),
+		left: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingLeft' ) )
+	};
+	var content_height = parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css('min-height') ) - ( modal_body_padding.top + modal_body_padding.bottom );
+	var content_width = modal_width - ( modal_body_padding.left + modal_body_padding.right );
 
 	// Initialize params for ajax request:
 	var ajax_data = {
 		'user_ID': user_ID,
 		'file_ID': file_ID,
-		'image_width'  : image_width,
-		'image_height' : image_height,
+		'aspect_ratio' : aspect_ratio,
+		'content_width' : content_width,
+		'content_height' : content_height,
 		'display_mode': 'js',
 		'crumb_user': evo_js_crumb_user,
 	};
@@ -88,8 +99,13 @@ function user_crop_avatar( user_ID, file_ID, user_tab_from )
 		data: ajax_data,
 		success: function( result )
 		{
-			openModalWindow( result, window_width+'px', window_height+'px', true,
-			evo_js_lang_crop_profile_pic, [ evo_js_lang_crop, 'btn-primary hide' ] );
+			openModalWindow(
+				result,
+				modal_width+'px',
+				modal_height+'px',
+				true,
+				evo_js_lang_crop_profile_pic,
+				[ evo_js_lang_crop, 'btn-primary' ] );
 		}
 	} );
 

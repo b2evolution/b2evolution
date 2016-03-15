@@ -31,9 +31,9 @@ $Form = new Form( NULL, 'file_edit' );
 	$Form->hidden( 'action', 'update_file' );
 	$Form->hiddens_by_key( get_memorized() );
 
-	$Form->textarea_input( 'file_content', $edited_File->content, 25, '', array( 'cols' => '80' ) );
+	$Form->textarea_input( 'file_content', $edited_File->content, 25, '', array( 'cols' => '80', 'style' => 'width: 100%;' ) );
 
-	echo '<div class="center" style="margin: 10px 0">';
+	echo '<div class="center" style="margin: 25px 0 10px 0;">';
 	$Form->buttons( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
 	echo '</div>';
 

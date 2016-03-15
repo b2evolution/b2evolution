@@ -1503,7 +1503,8 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 			if( $correct_Filetype && $correct_Filetype->is_allowed() )
 			{ // A FileType with the given mime type exists in database and it is an allowed file type for current User
 				// The "correct" extension is a plausible one, proceed...
-				$correct_extension = array_shift($correct_Filetype->get_extensions());
+				$correct_extension = $correct_Filetype->get_extensions();
+				$correct_extension = array_shift( $correct_extension );
 				$path_info = pathinfo($newName);
 				$current_extension = $path_info['extension'];
 
