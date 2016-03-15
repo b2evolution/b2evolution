@@ -62,12 +62,13 @@ elseif( $comments_number > 25 )
 	$legend_icons['topic_popular'] = 1;
 }
 $Item->load_Blog();
+$use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 ?>
 		<article class="container group_row posts_panel">
 			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">
 			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"
 			<?php
-				if( $Item->Blog->get_setting( 'use_workflow' ) )
+				if( $use_workflow )
 				{
 					$priority_color = item_priority_color( $Item->priority );
 					echo ' style="color: '.$priority_color.'; border-color: '.$priority_color.';"';
@@ -116,7 +117,7 @@ $Item->load_Blog();
 					<?php echo sprintf( T_('In %s'), $Item->get_chapter_links() ); ?>
 				</div>
 				<div class="ft_author_info ellipsis">
-					<?php
+				<?php
 					// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
 					echo T_('Started by');
 					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
@@ -129,7 +130,8 @@ $Item->load_Blog();
 				?>
 				</div>
 			</div>
-			<div class="ft_count col-lg-1 col-md-1 col-sm-2 col-xs-2"><?php
+			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">
+			<?php
 				if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 				{ // The comments are disabled:
 					echo T_('n.a.');
@@ -144,50 +146,71 @@ $Item->load_Blog();
 				}
 			?>
 			</div>
-			<div class="ft_date col-lg-3 col-md-3 col-sm-4"><?php
-				if( $latest_Comment = & $Item->get_latest_Comment() )
-				{ // Display info about last comment
-					$latest_Comment->author2( array(
-								'before'      => '',
-								'after'       => '',
-								'before_user' => '',
-								'after_user'  => '',
-								'link_text'   => 'only_avatar',
-								'link_class'  => 'ft_author_avatar',
-								'thumb_class' => 'ft_author_avatar',
-							) );
-					$latest_Comment->date('D M j, Y H:i');
-					$latest_Comment->author2( array(
-							'before'      => '<br />',
-							'before_user' => '<br />',
-							'after'       => '',
-							'after_user'  => '',
-							'link_text'   => 'login'
-						) );
+			<?php
+			if( $use_workflow )
+			{
+				echo '<div class="ft_assigned col-lg-1 col-md-1 col-sm-2 col-xs-3">';
+				echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'assigned', $Item ).'</span> ';
+				echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'status', $Item ).'</span>';
+				echo '</div>';
 
-					echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+				echo '<div class="ft_date col-lg-2 col-md-2 col-sm-3">';
+			}
+			else
+			{
+				echo '<div class="ft_date col-lg-3 col-md-3 col-sm-4">';
+			}
+			if( $latest_Comment = & $Item->get_latest_Comment() )
+			{ // Display info about last comment
+				$latest_Comment->author2( array(
+							'before'      => '',
+							'after'       => '',
+							'before_user' => '',
+							'after_user'  => '',
+							'link_text'   => 'only_avatar',
+							'link_class'  => 'ft_author_avatar',
+							'thumb_class' => 'ft_author_avatar',
+						) );
+				if( $use_workflow )
+				{
+					$latest_Comment->date( 'm/d/y' );
 				}
 				else
-				{ // No comments, Display info of post
-					$Item->author( array(
-								'before'      => '',
-								'after'       => '',
-								'before_user' => '',
-								'after_user'  => '',
-								'link_text'   => 'only_avatar',
-								'link_class'  => 'ft_author_avatar'
-							) );
-					echo $Item->get_mod_date( 'D M j, Y H:i' );
-					echo $Item->author( array(
-							'before'    => '<br />',
-							'link_text' => 'login',
-						) );
-					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+				{
+					$latest_Comment->date('D M j, Y H:i');
 				}
-			?></div>
+				$latest_Comment->author2( array(
+						'before'      => '<br />',
+						'before_user' => '<br />',
+						'after'       => '',
+						'after_user'  => '',
+						'link_text'   => 'login'
+					) );
+
+				echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+			}
+			else
+			{ // No comments, Display info of post
+				$Item->author( array(
+							'before'      => '',
+							'after'       => '',
+							'before_user' => '',
+							'after_user'  => '',
+							'link_text'   => 'only_avatar',
+							'link_class'  => 'ft_author_avatar'
+						) );
+				echo $Item->get_mod_date( 'D M j, Y H:i' );
+				echo $Item->author( array(
+						'before'    => '<br />',
+						'link_text' => 'login',
+					) );
+				echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+			}
+			echo '</div>';
+			?>
 
 			<!-- This is shrinked date that applies on lower screen res -->
-			<div class="ft_date_shrinked item_list"><?php
+			<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' col-xs-3' : ' col-xs-6';?>"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
 					$latest_Comment->date('m/j/y ');

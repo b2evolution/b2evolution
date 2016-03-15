@@ -90,6 +90,10 @@ ol.breadcrumb {
   text-align: center;
   background: #FFF;
   border: 2px solid #306595;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
   border-radius: 50%;
   width: 21px;
   height: 21px;
@@ -121,6 +125,10 @@ ol.breadcrumb {
 }
 .forums_list .panel-heading:not(:first-child) {
   border-top: 1px solid #ddd;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
   border-radius: 0;
 }
 .forums_list .panel-heading h2 {
@@ -188,6 +196,9 @@ ol.breadcrumb {
 .forums_list .posts_panel .ft_count {
   margin-top: 8px;
 }
+.forums_list .posts_panel .ft_assigned {
+  margin-top: 14px;
+}
 .forums_list .ft_status {
   width: 30px;
   padding: 0px;
@@ -207,6 +218,10 @@ ol.breadcrumb {
 .forums_list .ft_count a,
 .forums_list .ft_count div {
   font-size: 16px;
+}
+.forums_list .ft_assigned {
+  margin-top: 5px;
+  font-size: 90%;
 }
 .forums_list .ft_date {
   margin-top: 17px;
@@ -240,6 +255,10 @@ ol.breadcrumb {
   display: block;
 }
 .forums_list .ft_author_avatar img {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
   border-radius: 3px;
 }
 .forums_list .ft_author_avatar .ft_author_avatar {
@@ -516,6 +535,10 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar > a:before,
 body.round_avatars .single_topic .evo_content_block .ft_avatar > a,
 body.round_avatars .single_topic .evo_content_block .ft_avatar > span,
 body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
   border-radius: 50%;
 }
 .vote_spam {
@@ -610,6 +633,9 @@ label.control-label[for=post_title] {
   .ft_date {
     display: none !important;
   }
+  .ft_assigned {
+    margin-top: 4px;
+  }
   .ft_date_shrinked {
     display: inline-block !important;
     text-align: center;
@@ -623,11 +649,13 @@ label.control-label[for=post_title] {
     margin: 0px;
     text-align: left;
     margin-top: 0px !important;
-    margin-left: 45px;
-    padding-left: 5px;
+    padding-left: 50px;
   }
   .posts_panel .ft_count div {
     display: inline-block;
+  }
+  .posts_panel .ft_assigned {
+    margin-top: 4px;
   }
   .posts_panel .ft_date_shrinked {
     text-align: left;
@@ -693,7 +721,6 @@ label.control-label[for=post_title] {
   .table-hover .group_row .ft_count {
     text-align: left;
     margin-top: 2px !important;
-    width: 80px;
     padding-right: 5px;
   }
   .table-hover .group_row .ft_count div {
@@ -703,10 +730,16 @@ label.control-label[for=post_title] {
     padding-left: 0px;
     margin-left: 0px;
   }
+  .table-hover .group_row .ft_assigned {
+    padding-left: 0px;
+    margin-top: 4px;
+    margin-left: 5px;
+  }
   .table-hover .group_row .ft_date_shrinked {
     text-align: right;
     float: right;
     margin-top: 6px;
+    margin-left: 5px;
   }
   .front_panel .ft_count {
     display: inline-block !important;
@@ -715,6 +748,9 @@ label.control-label[for=post_title] {
   }
   .front_panel .ft_count:second_of_class {
     margin-left: 0px !important;
+  }
+  .front_panel .ft_assigned {
+    margin-top: 4px;
   }
   .front_panel .ft_date_shrinked {
     margin-top: 4px;
@@ -754,7 +790,7 @@ label.control-label[for=post_title] {
     padding-right: 15px;
     margin-top: 2px;
     color: #8b96a1;
-    font-size: 90%;
+    font-size: 80%;
   }
   .single_page_title .ft_author_info {
     display: none;
@@ -782,8 +818,14 @@ label.control-label[for=post_title] {
   }
   .posts_panel .ft_count {
     margin-top: 0px;
-    margin-left: 50px;
-    padding-left: 0px;
+    padding-left: 50px;
+  }
+  .posts_panel .ft_assigned {
+    font-size: 90%;
+  }
+  .posts_panel .ft_date_shrinked.item_list {
+    font-size: 90%;
+    margin-top: 4px;
   }
   .posts_panel .ft_author_info {
     display: none !important;
@@ -875,6 +917,10 @@ a.to_top {
   vertical-align: middle;
 }
 .popover img {
+  -webkit-border-radius: 4px !important;
+  -moz-border-radius: 4px !important;
+  -ms-border-radius: 4px !important;
+  -o-border-radius: 4px !important;
   border-radius: 4px !important;
 }
 .forums_list.front_panel {
@@ -898,6 +944,8 @@ a.to_top {
   text-align: left;
 }
 .raised img {
+  -webkit-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
 }
 .thumbnail {

@@ -88,7 +88,7 @@ ol.breadcrumb {
 		.post_button {
 			float: left;
 			vertical-align: top;
-		}		
+		}
 		.pagination {
 			display: inline-block;
 			vertical-align: top;
@@ -168,6 +168,9 @@ ol.breadcrumb {
 		.ft_count {
 			margin-top: 8px;
 		}
+		.ft_assigned {
+			margin-top: 14px;
+		}
 	}
 	.ft_status {
 		width: 30px;
@@ -187,6 +190,10 @@ ol.breadcrumb {
 		a, div {
 			font-size: 16px;
 		}
+	}
+	.ft_assigned {
+		margin-top: 5px;
+		font-size: 90%;
 	}
 	.ft_date {
 		margin-top: 17px;
@@ -262,7 +269,7 @@ ol.breadcrumb {
 		&:hover {
 			color: #23527c;
 		}
-	}	
+	}
 }
 .bCommentAvatar {
 	border-radius: 50%;
@@ -449,7 +456,7 @@ ul.legend {
 
 // Single topic view
 .single_page_title {
-	margin-bottom: 20px;	
+	margin-bottom: 20px;
 		.ft_author_info.shrinked {
 			display: none;
 		}
@@ -604,7 +611,7 @@ label.control-label[for=post_title] {
 	}
 	.posts_panel {
 		.ft_count {
-			margin-top: 10px !important;			
+			margin-top: 10px !important;
 		}
 	}
 }
@@ -635,6 +642,9 @@ label.control-label[for=post_title] {
 	.ft_date {
 		display: none !important;
 	}
+	.ft_assigned {
+		margin-top: 4px;
+	}
 	.ft_date_shrinked {
 		display: inline-block !important;
 		text-align: center;
@@ -651,11 +661,14 @@ label.control-label[for=post_title] {
 			margin: 0px;
 			text-align: left;
 			margin-top: 0px !important;
-			margin-left: 45px;
-			padding-left: 5px;
+			padding-left: 50px;
+			//padding-left: 5px;
 			div {
 				display: inline-block;
 			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
 		}
 		.ft_date_shrinked {
 			text-align: left;
@@ -729,7 +742,7 @@ label.control-label[for=post_title] {
 		.ft_count {
 			text-align: left;
 			margin-top: 2px !important;
-			width: 80px;
+			//width: 80px;
 			padding-right: 5px;
 			div {
 				display: inline-block !important;
@@ -739,10 +752,16 @@ label.control-label[for=post_title] {
 				margin-left: 0px;
 			}
 		}
+		.ft_assigned {
+			padding-left: 0px;
+			margin-top: 4px;
+			margin-left: 5px;
+		}
 		.ft_date_shrinked {
 			text-align: right;
 			float: right;
 			margin-top: 6px;
+			margin-left: 5px;
 		}
 	}
 	.front_panel {
@@ -750,9 +769,12 @@ label.control-label[for=post_title] {
 			display: inline-block !important;
 			padding-left: 5px !important;
 			margin-left: 55px;
-			&:second_of_class {				
+			&:second_of_class {
 			margin-left: 0px !important;
 			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
 		}
 		.ft_date_shrinked {
 			margin-top: 4px;
@@ -761,7 +783,7 @@ label.control-label[for=post_title] {
 		}
 	}
 	.posts_panel {
-		.small { 
+		.small {
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
@@ -794,9 +816,9 @@ label.control-label[for=post_title] {
 		padding-right: 15px;
 		margin-top: 2px;
 		color: #8b96a1;
-		font-size: 90%;
+		font-size: 80%;
 	}
-	.single_page_title {		
+	.single_page_title {
 		.ft_author_info {
 			display: none;
 			&.shrinked {
@@ -815,20 +837,27 @@ label.control-label[for=post_title] {
 				margin-left: 5px;
 			}
 		}
-		.ft_date_shrinked {			
+		.ft_date_shrinked {
 			width: 70px;
 		}
 	}
 	/* Disp posts */
-	.posts_panel {		
+	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
 			margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;
-			margin-left: 50px;
-			padding-left: 0px;
+			padding-left: 50px;
+			//padding-left: 0px;
+		}
+		.ft_assigned {
+			font-size: 90%;
+		}
+		.ft_date_shrinked.item_list {
+			font-size: 90%;
+			margin-top: 4px;
 		}
 		.ft_author_info {
 			display: none !important;
@@ -862,7 +891,7 @@ label.control-label[for=post_title] {
 				float: none;
 				vertical-align: top;
 				margin-bottom: 15px;
-			}		
+			}
 			.pagination {
 				float: none;
 				display: block;
@@ -927,7 +956,7 @@ a.to_top {
 	}
 }
 
-// 
+//
 .popover img {
 	.border-radius !important;
 }
