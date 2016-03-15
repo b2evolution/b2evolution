@@ -4543,7 +4543,7 @@ function item_td_task_cell( $type, $Item )
 			$title = '';
 	}
 
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item
 		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
 	}
