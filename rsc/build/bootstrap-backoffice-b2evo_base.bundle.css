@@ -301,21 +301,21 @@ span.loader_img.loader_user_deldata {
   margin: 0;
   display: inline-block;
 }
-.widget_core_coll_category_list .meta {
+.widget_core_coll_category_list .evo_cat_meta {
   font-weight: bold;
   color: #000;
   list-style: square;
   margin-left: 20px;
 }
-.widget_core_coll_category_list .meta label,
-.widget_core_coll_category_list .meta a {
+.widget_core_coll_category_list .evo_cat_meta label,
+.widget_core_coll_category_list .evo_cat_meta a {
   font-weight: bold;
   color: #000;
 }
-.widget_core_coll_category_list .meta ul {
+.widget_core_coll_category_list .evo_cat_meta ul {
   font-weight: normal;
 }
-.widget_core_coll_category_list .meta input[disabled="disabled"] {
+.widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   display: none;
 }
 .widget_core_coll_category_list .tile label {
