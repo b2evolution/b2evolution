@@ -2305,7 +2305,7 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			// Reset "all_loaded" flag in order to allow get new created collection by ID:
+			// Reset "all_loaded" flag in order to allow getting new created collection by ID:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->all_loaded = false;
 
