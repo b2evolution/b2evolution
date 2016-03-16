@@ -169,6 +169,9 @@ class ItemQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 											INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 
+		// Filter out item types that are not enabled for the collection:
+		$this->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = post_ityp_ID AND itc_coll_ID = cat_blog_ID' );
+
 		$BlogCache = & get_BlogCache();
 		$current_Blog = $BlogCache->get_by_ID( $blog );
 
@@ -245,6 +248,9 @@ class ItemQuery extends SQL
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
+
+		// Filter out item types that are not enabled for the collection:
+		$this->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = post_ityp_ID AND itc_coll_ID = cat_blog_ID' );
 
 		if( ! empty( $coll_IDs ) )
 		{ // Force to aggregate the collection IDs from current param and not from blog setting
