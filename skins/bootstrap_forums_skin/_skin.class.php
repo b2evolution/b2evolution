@@ -308,7 +308,7 @@ class bootstrap_forums_Skin extends Skin
 			require_js( '#jqueryUI#', 'blog' );
 		}
 		
-				// Add custom CSS:
+		// Add custom CSS:
 		$custom_css = '';
 		
 		// If sidebar == true + col-lg
