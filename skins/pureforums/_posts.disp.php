@@ -40,9 +40,6 @@ if( $cat > 0 )
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
 
-	// Load read statuses if required
-	$MainList->load_content_read_statuses();
-
 	// Breadcrumbs
 	$Skin->display_breadcrumbs( $cat );
 }

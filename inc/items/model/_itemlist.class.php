@@ -317,6 +317,9 @@ class ItemList2 extends ItemListLight
 		//echo DB::format_query( $this->sql );
 
 		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
+
+		// Load the post read statuses if it is allowed by current collection:
+		$this->load_content_read_statuses();
 	}
 
 
