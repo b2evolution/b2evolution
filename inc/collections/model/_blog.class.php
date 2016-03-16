@@ -1093,7 +1093,7 @@ class Blog extends DataObject
 								if( $error = validate_dirname($subdir) )
 								{
 									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
-									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$subdir.'</b>' ), 'warning', 'file' );
+									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$subdir.']]' ), 'warning', 'file' );
 								}
 							}
 						}

@@ -171,7 +171,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => 'Message',
 		'order' => 'slg_message',
-		'td' => '%format_to_output( #slg_message#, \'htmlspecialchars\' )%' // Escape syslog messages because it may contain special characters
+		'td' => ' %format_to_output( #slg_message#, \'syslog\' )%' // Escape syslog messages because it may contain special characters
 	);
 
 /**

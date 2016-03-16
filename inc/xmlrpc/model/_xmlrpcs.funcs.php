@@ -175,7 +175,7 @@ function _wp_mw_newmediaobject($m)
 		if( $error = validate_dirname($filepath_part) )
 		{	// invalid relative path:
 			logIO( $error );
-			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$filepath_part.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$filepath_part.']]' ), 'warning', 'file' );
 			return xmlrpcs_resperror( 6, $error );
 		}
 

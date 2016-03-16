@@ -356,6 +356,12 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = trim($content);
 			break;
 
+		case 'syslog':
+			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
+			break;
+
 		default:
 			debug_die( 'Output format ['.$format.'] not supported.' );
 	}

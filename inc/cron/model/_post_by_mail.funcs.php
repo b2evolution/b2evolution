@@ -690,7 +690,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		if( $error_filename = process_filename( $filename, true ) )
 		{
 			pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
-			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 			continue;
 		}
 
@@ -710,7 +710,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 				if( $error_in_filename = process_filename( $filename, true ) )
 				{ // The file name is not valid, this is an unexpected situation, because the file name was already validated before
 					pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
-					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
+					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 					break;
 				}
 			}

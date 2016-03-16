@@ -122,13 +122,13 @@ class LinkUser extends LinkOwner
 		if( $edited_Link->dbinsert() )
 		{
 			if( ! is_null( $this->Links ) )
-			{ // If user Links were already loaded update its content 
+			{ // If user Links were already loaded update its content
 				$this->Links[$edited_Link->ID] = & $edited_Link;
 			}
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
 
 			return $edited_Link->ID;
 		}

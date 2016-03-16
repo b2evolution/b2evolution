@@ -302,7 +302,7 @@ if( $upload )
 		$message['text'] = $error_filename;
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
-		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '[['.$newName.']]' ), 'warning', 'file' );
 		exit();
 	}
 

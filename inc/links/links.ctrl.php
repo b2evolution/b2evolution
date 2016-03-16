@@ -106,7 +106,7 @@ switch( $action )
 
 		if( $link_File = & $edited_Link->get_File() )
 		{
-			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '<b>'.$link_File->get_name().'</b>', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
 		}
 
 		if( $action == 'delete' && $edited_Link->can_be_file_deleted() )
