@@ -177,7 +177,7 @@ $Form->end_form();
 
 	var initial_crop_selection = [];
 
-	console.debug( 'Content: ', content_width, content_height );
+	//console.debug( 'Content: ', content_width, content_height );
 
 	// We'll use this function to determine which mode will provide the larger working image
 	function get_working_image_dimensions( w_height, w_width, image_aspect_ratio )
@@ -209,7 +209,14 @@ $Form->end_form();
 
 		if( ! preview_size )
 		{ // assume will use a large preview image
-			preview_size = large_preview_size;
+			if( aspect_ratio < 1 && ( large_preview_size > ( content_width / 3 ) ) || aspect_ratio > 1 && ( large_preview_size > ( content_height / 3 ) ) )
+			{
+				preview_size = small_preview_size;
+			}
+			else
+			{
+				preview_size = large_preview_size;
+			}
 		}
 
 		// Try landscape mode first
@@ -274,13 +281,13 @@ $Form->end_form();
 				show_small_preview = true;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_height > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.5 * ( content_width < content_height ? content_width : content_height ) ) >= large_preview_size ) )
+			else if( ( content_height > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= large_preview_size ) )
 			{
 				show_large_preview = true;
 				show_small_preview = false;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_height > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.5 * ( content_width < content_height ? content_width : content_height ) ) >= small_preview_size ) )
+			else if( ( content_height > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= small_preview_size ) )
 			{
 				show_large_preview = false;
 				show_small_preview = true;
@@ -294,10 +301,10 @@ $Form->end_form();
 			}
 		}
 
-		console.debug( 'Render mode: ', render_mode );
-		console.debug( 'Show large preview: ', show_large_preview );
-		console.debug( 'Show small preview: ', show_small_preview );
-		console.debug( 'Preview Size: ', preview_size );
+		//console.debug( 'Render mode: ', render_mode );
+		//console.debug( 'Show large preview: ', show_large_preview );
+		//console.debug( 'Show small preview: ', show_small_preview );
+		//console.debug( 'Preview Size: ', preview_size );
 	}
 
 	function init_workarea()
@@ -314,7 +321,7 @@ $Form->end_form();
 		}
 		workarea_aspect_ratio = ( workarea_height / workarea_width );
 
-		console.debug( 'Workarea: ', workarea_width, workarea_height );
+		//console.debug( 'Workarea: ', workarea_width, workarea_height );
 	}
 
 	function init_working_image()
@@ -324,26 +331,26 @@ $Form->end_form();
 			working_image_height = workarea_height;
 			working_image_width = workarea_width;
 			size_ratio = original_image_height / working_image_width;
-			console.debug( 'Limiting dimension: ', 'both' );
+			//console.debug( 'Limiting dimension: ', 'both' );
 		}
 		else if( workarea_aspect_ratio > original_image_aspect_ratio )
 		{
 			working_image_width = workarea_width;
 			working_image_height = workarea_width * original_image_aspect_ratio;
 			size_ratio = original_image_width / working_image_width;
-			console.debug( 'Limiting dimension: ', 'width' );
+			//console.debug( 'Limiting dimension: ', 'width' );
 		}
 		else
 		{
 			working_image_height = workarea_height;
 			working_image_width = workarea_height / original_image_aspect_ratio;
 			size_ratio = original_image_height / working_image_height;
-			console.debug( 'Limiting dimension: ', 'height' );
+			//console.debug( 'Limiting dimension: ', 'height' );
 		}
 		// Should be always equal to original image aspect ratio
 		working_image_aspect_ratio = working_image_height / working_image_width;
 
-		console.debug( 'Image: ', working_image_width, working_image_height );
+		//console.debug( 'Image: ', working_image_width, working_image_height );
 	}
 
 	function set_initial_crop_selection()
@@ -353,17 +360,27 @@ $Form->end_form();
 
 		if( original_image_aspect_ratio > 1 )
 		{
-			crop_size = original_image_width * 0.90;
+			crop_size = original_image_width;
 		}
 		else
 		{
-			crop_size = original_image_height * 0.90;
+			crop_size = original_image_height;
 		}
 
-		initial_crop_selection.push( ( original_image_width / 2 ) - ( crop_size / 2 ) );
-		initial_crop_selection.push( ( original_image_height / 2 ) - ( crop_size / 2 ) );
-		initial_crop_selection.push( ( original_image_width / 2 ) + ( crop_size / 2 ) );
-		initial_crop_selection.push( ( original_image_height / 2 ) + ( crop_size / 2 ) );
+		if( original_image_aspect_ratio > 1 )
+		{
+			initial_crop_selection.push( 0 );
+			initial_crop_selection.push( 0 );
+			initial_crop_selection.push( crop_size );
+			initial_crop_selection.push( crop_size );
+		}
+		else
+		{
+			initial_crop_selection.push( ( original_image_width / 2 ) - ( crop_size / 2 ) );
+			initial_crop_selection.push( ( original_image_height / 2 ) - ( crop_size / 2 ) );
+			initial_crop_selection.push( ( original_image_width / 2 ) + ( crop_size / 2 ) );
+			initial_crop_selection.push( ( original_image_height / 2 ) + ( crop_size / 2 ) );
+		}
 	}
 
 	function render_content()
@@ -431,6 +448,7 @@ $Form->end_form();
 			previews.css({
 				'background-color': '#ffffff',
 				height: preview_size + 'px',
+				width: content_width + 'px',
 				'text-align': 'center',
 				'margin-top': gutter + 'px'
 			});
@@ -475,7 +493,7 @@ $Form->end_form();
 				'background-color': '#ffffff',
 				float: 'left',
 				width: preview_size + 'px',
-				height: workarea_height + 'px',
+				height: content_height + 'px',
 				'text-align': 'center',
 				'margin-left': gutter + 'px'
 			});
@@ -508,8 +526,34 @@ $Form->end_form();
 			content.append( jQuery( '<div />', { style: { clear: 'both' } } ) );
 
 			preview_images = jQuery( 'div.preview_cropped_image' );
-			preview_images.css( 'margin-bottom', 0 );
-			preview_images.css( 'margin-right', preview_margin + 'px' );
+			preview_images.css( 'margin-bottom', preview_margin + 'px' );
+			preview_images.css( 'margin-right', 0 );
+		}
+
+		// Adjust modal dimensions and content to minimize workarea margin
+		var wah_margin = workarea_height - working_image_height;
+		var waw_margin = workarea_width - working_image_width;
+		var modal_dialog = jQuery( 'div.modal-dialog' );
+		var modal_body = jQuery( 'div.modal-body' );
+		var content = jQuery( 'div#content' );
+
+		workarea.css( 'height', ( workarea_height - wah_margin ) + 'px' );
+		workarea.css( 'width', ( workarea_width - waw_margin ) + 'px' );
+		content.css( 'height', ( content_height - wah_margin ) + 'px' );
+		content.css( 'width', ( content_width - waw_margin ) + 'px' );
+		modal_body.css( 'height', ( parseInt( modal_body.css( 'height' ) ) - wah_margin  ) + 'px' );
+		modal_body.css( 'min-height', ( parseInt( modal_body.css( 'min-height' ) ) - wah_margin  ) + 'px' );
+		modal_body.css( 'width', ( parseInt( modal_body.css( 'width' ) ) - waw_margin ) + 'px' );
+		modal_dialog.css( 'height', ( parseInt( modal_dialog.css( 'height' ) ) - wah_margin ) + 'px' );
+		modal_dialog.css( 'width', ( parseInt( modal_dialog.css( 'width' ) ) - waw_margin ) + 'px' );
+
+		if( render_mode == 'portrait' )
+		{
+			previews.css( 'width', ( parseInt( previews.css( 'width' ) ) - waw_margin ) + 'px' );
+		}
+		else
+		{
+			previews.css( 'height', ( parseInt( previews.css( 'height' ) ) - wah_margin ) + 'px' );
 		}
 	}
 
