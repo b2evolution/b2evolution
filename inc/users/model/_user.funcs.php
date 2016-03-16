@@ -1982,7 +1982,7 @@ function load_user_read_statuses( $post_ids = NULL )
 		return;
 	}
 
-	if( !empty( $user_post_read_statuses ) )
+	if( is_array( $user_post_read_statuses ) )
 	{ // User read statuses were already set
 		return;
 	}
@@ -1994,13 +1994,13 @@ function load_user_read_statuses( $post_ids = NULL )
 	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
 
 	// SELECT current User's post and comment read statuses for all post with the given ids
-	$SQL = new SQL();
+	$SQL = new SQL( 'Load all read post date statuses per user #'.$current_User->ID );
 	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
 	$SQL->FROM( 'T_users__postreadstatus' );
 	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$user_post_read_statuses = $DB->get_assoc( $SQL->get() );
+	$user_post_read_statuses = $DB->get_assoc( $SQL->get(), $SQL->title );
 
 	if( empty( $post_ids ) )
 	{ // The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user
