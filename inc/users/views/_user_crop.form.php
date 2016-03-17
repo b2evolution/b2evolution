@@ -156,6 +156,7 @@ $Form->end_form();
 	var small_preview_size = 64;
 	var preview_size;
 	var preview_margin = 10;
+	var preview_orientation = 'portrait';
 	var aspect_ratio = <?php echo $aspect_ratio;?>;
 	var render_mode = 'landscape';
 
@@ -178,6 +179,7 @@ $Form->end_form();
 	var initial_crop_selection = [];
 
 	//console.debug( 'Content: ', content_width, content_height );
+	//console.debug( 'Original Image: ', original_image_width, original_image_height );
 
 	// We'll use this function to determine which mode will provide the larger working image
 	function get_working_image_dimensions( w_height, w_width, image_aspect_ratio )
@@ -207,16 +209,14 @@ $Form->end_form();
 		var pw_width, pw_height, pw_area, pw_aspect_ratio;
 		var i_width, i_height, i_area;
 
-		if( ! preview_size )
-		{ // assume will use a large preview image
-			if( aspect_ratio < 1 && ( large_preview_size > ( content_width / 3 ) ) || aspect_ratio > 1 && ( large_preview_size > ( content_height / 3 ) ) )
-			{
-				preview_size = small_preview_size;
-			}
-			else
-			{
-				preview_size = large_preview_size;
-			}
+
+		if( aspect_ratio < 1 && ( large_preview_size > ( content_width / 3 ) ) || aspect_ratio > 1 && ( large_preview_size > ( content_height / 3 ) ) )
+		{
+			preview_size = small_preview_size;
+		}
+		else
+		{
+			preview_size = large_preview_size;
 		}
 
 		// Try landscape mode first
@@ -248,19 +248,19 @@ $Form->end_form();
 		// Determine if we can show all the preview images
 		if( render_mode == 'portrait' )
 		{
-			if( content_width > ( ( ( large_preview_size + preview_margin ) * 2 ) + ( ( small_preview_size + preview_margin ) * 2 ) ) )
+			if( ( content_width < original_image_width ? content_width : original_image_width ) > ( ( ( large_preview_size + preview_margin ) * 2 ) + ( ( small_preview_size + preview_margin ) * 2 ) ) )
 			{
 				show_large_preview = true;
 				show_small_preview = true;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_width > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * content_height ) >= large_preview_size ) )
+			else if( ( ( content_width < original_image_width ? content_width : original_image_width ) > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * content_height ) >= large_preview_size ) )
 			{
 				show_large_preview = true;
 				show_small_preview = false;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_width > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( render_mode == 'landscape' ? content_width : content_height ) ) >= small_preview_size ) )
+			else if( ( ( content_width < original_image_width ? content_width : original_image_width ) > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( render_mode == 'landscape' ? content_width : content_height ) ) >= small_preview_size ) )
 			{
 				show_large_preview = false;
 				show_small_preview = true;
@@ -275,23 +275,31 @@ $Form->end_form();
 		}
 		else
 		{
-			if( content_height > ( ( ( large_preview_size + preview_margin ) * 2 ) + ( ( small_preview_size + preview_margin ) * 2 ) ) )
+			if( ( content_height < original_image_height ? content_height : original_image_height ) > ( ( ( large_preview_size + preview_margin ) * 2 ) + ( ( small_preview_size + preview_margin ) * 2 ) ) )
 			{
 				show_large_preview = true;
 				show_small_preview = true;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_height > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= large_preview_size ) )
+			else if( ( ( content_height < original_image_height ? content_height : original_image_height ) > ( ( large_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= large_preview_size ) )
 			{
 				show_large_preview = true;
 				show_small_preview = false;
 				preview_size = large_preview_size;
 			}
-			else if( ( content_height > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= small_preview_size ) )
+			else if( ( ( content_height < original_image_height ? content_height : original_image_height ) > ( ( small_preview_size + preview_margin ) * 2 ) ) && ( ( 0.25 * ( content_width < content_height ? content_width : content_height ) ) >= small_preview_size ) )
 			{
 				show_large_preview = false;
 				show_small_preview = true;
 				preview_size = small_preview_size;
+			}
+			else if( ( content_height < original_image_height ? content_height : original_image_height ) > ( ( small_preview_size ) )
+					&& ( ( content_width )  > ( lw_width + ( small_preview_size * 2 ) ) ) )
+			{ // This is a special case when there is not enough room for a vertical preview but a horizontal preview can be accomodated
+				show_large_preview = false;
+				show_small_preview = true;
+				preview_size = small_preview_size;
+				preview_orientation = 'landscape';
 			}
 			else
 			{
@@ -477,7 +485,7 @@ $Form->end_form();
 			content.append( workarea );
 			content.append( previews );
 
-			preview_images = jQuery( 'div.preview_cropped_image' );
+			preview_images = jQuery( 'div#preview div.preview_cropped_image:not(:last-child)' );
 			preview_images.css( 'margin-bottom', 0 );
 			preview_images.css( 'margin-right', preview_margin + 'px' );
 		}
@@ -492,7 +500,7 @@ $Form->end_form();
 			previews.css({
 				'background-color': '#ffffff',
 				float: 'left',
-				width: preview_size + 'px',
+				width: ( preview_orientation == 'portrait' ? preview_size : ( ( preview_size + preview_margin ) * 2 ) ) + 'px',
 				height: content_height + 'px',
 				'text-align': 'center',
 				'margin-left': gutter + 'px'
@@ -525,27 +533,41 @@ $Form->end_form();
 			content.append( previews );
 			content.append( jQuery( '<div />', { style: { clear: 'both' } } ) );
 
-			preview_images = jQuery( 'div.preview_cropped_image' );
-			preview_images.css( 'margin-bottom', preview_margin + 'px' );
-			preview_images.css( 'margin-right', 0 );
+			preview_images = jQuery( 'div#preview div.preview_cropped_image:not(:last-child)' );
+			if( preview_orientation == 'portrait' )
+			{
+				preview_images.css( 'margin-bottom', preview_margin + 'px' );
+				preview_images.css( 'margin-right', 0 );
+			}
+			else
+			{
+				preview_images.css( 'margin-bottom', 0 );
+				preview_images.css( 'margin-right', preview_margin + 'px' );
+			}
 		}
 
 		// Adjust modal dimensions and content to minimize workarea margin
-		var wah_margin = workarea_height - working_image_height;
-		var waw_margin = workarea_width - working_image_width;
+		var wah_margin = workarea_height - ( original_image_height < working_image_height ? original_image_height : working_image_height );
+		var waw_margin = workarea_width - ( original_image_width < working_image_width ? original_image_width : working_image_width );
+		//var wah_margin = workarea_height - working_image_height;
+		//var waw_margin = workarea_width - working_image_width;
 		var modal_dialog = jQuery( 'div.modal-dialog' );
 		var modal_body = jQuery( 'div.modal-body' );
 		var content = jQuery( 'div#content' );
 
+		//console.debug( 'Margin: ', wah_margin, waw_margin );
+		//console.debug( 'Workarea: ', workarea_height, workarea_width );
+		//console.debug( 'Working Image: ', working_image_height, working_image_width );
+
 		workarea.css( 'height', ( workarea_height - wah_margin ) + 'px' );
 		workarea.css( 'width', ( workarea_width - waw_margin ) + 'px' );
 		content.css( 'height', ( content_height - wah_margin ) + 'px' );
-		content.css( 'width', ( content_width - waw_margin ) + 'px' );
+		content.css( 'width', ( content_width - waw_margin + ( preview_orientation == 'landscape' ? preview_size + preview_margin + gutter : 0 ) ) + 'px' );
 		modal_body.css( 'height', ( parseInt( modal_body.css( 'height' ) ) - wah_margin  ) + 'px' );
 		modal_body.css( 'min-height', ( parseInt( modal_body.css( 'min-height' ) ) - wah_margin  ) + 'px' );
-		modal_body.css( 'width', ( parseInt( modal_body.css( 'width' ) ) - waw_margin ) + 'px' );
+		modal_body.css( 'width', ( parseInt( modal_body.css( 'width' ) ) - waw_margin + ( preview_orientation == 'landscape' ? preview_size + preview_margin + gutter : 0 ) ) + 'px' );
 		modal_dialog.css( 'height', ( parseInt( modal_dialog.css( 'height' ) ) - wah_margin ) + 'px' );
-		modal_dialog.css( 'width', ( parseInt( modal_dialog.css( 'width' ) ) - waw_margin ) + 'px' );
+		modal_dialog.css( 'width', ( parseInt( modal_dialog.css( 'width' ) ) - waw_margin + ( preview_orientation == 'landscape' ? preview_size + preview_margin + gutter : 0 ) ) + 'px' );
 
 		if( render_mode == 'portrait' )
 		{
