@@ -1969,7 +1969,9 @@ function get_status_permvalue( $status )
 
 
 /**
- * Load current_User post read statuses
+ * Load user data (post/comment) read statuses for current user for a list of post IDs.
+ *
+ * @todo Rename to load_user_data_for_items() and move to _item.funcs.php
  *
  * @param array Load only for posts with these ids
  */

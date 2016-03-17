@@ -866,7 +866,9 @@ class ItemList2 extends ItemListLight
 
 
 	/**
-	 * Load posts and comments read statuses for current User in case of each post from this Item List current page
+	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
+	 *
+	 * @todo rename to load_user_data_for_items()
 	 */
 	function load_content_read_statuses()
 	{
@@ -881,6 +883,7 @@ class ItemList2 extends ItemListLight
 			return;
 		}
 
+		// Delegate query: 
 		load_user_read_statuses( $page_post_ids );
 	}
 }
