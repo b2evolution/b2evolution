@@ -738,6 +738,8 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_phone', param( 'userdir_phone', 'integer', 0 ) );
 			$this->set_setting( 'userdir_soclinks', param( 'userdir_soclinks', 'integer', 0 ) );
 			$this->set_setting( 'userdir_lastseen', param( 'userdir_lastseen', 'integer', 0 ) );
+			$this->set_setting( 'userdir_lastseen_view', param( 'userdir_lastseen_view', 'string' ) );
+			$this->set_setting( 'userdir_lastseen_cheat', param( 'userdir_lastseen_cheat', 'integer', 0 ) );
 		}
 
 		if( in_array( 'other', $groups ) )

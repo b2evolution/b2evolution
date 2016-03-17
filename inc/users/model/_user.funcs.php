@@ -5228,6 +5228,8 @@ function users_results( & $UserList, $params = array() )
 			'display_regcountry' => true,
 			'display_update'     => true,
 			'display_lastvisit'  => true,
+			'display_lastvisit_view' => 'exact_date',
+			'display_lastvisit_cheat' => 0,
 			'display_contact'    => true,
 			'display_reported'   => true,
 			'display_group'      => true,
@@ -5527,7 +5529,7 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => $params['td_class_lastvisit'],
 				'order' => 'user_lastseen_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedate( #user_lastseen_ts#, "M-d" )%',
+				'td' => '%get_lastseen_date( #user_lastseen_ts#, \''.$params['display_lastvisit_view'].'\', '.$params['display_lastvisit_cheat'].' )%',
 			);
 	}
 

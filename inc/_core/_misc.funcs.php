@@ -1756,6 +1756,44 @@ function get_duration_title( $duration, $titles = array() )
 	}
 }
 
+function get_lastseen_date( $date, $view = 'exact_date', $cheat = 0 )
+{
+	$result = mysql2localedate( $date );
+
+	if( $view == 'blurred_date' )
+	{
+		$result = (int)( ( ( time() - strtotime( $date ) ) / 86400 ) - $cheat);
+
+		if( $result < 0 )
+		{
+			$result = 0;
+		}
+
+		if( $result < 3 )
+		{
+			$result = T_('less than 3 days ago');
+		}
+		elseif( $result < 7 )
+		{
+			$result = T_('less than a week ago');
+		}
+		elseif( $result < 30 )
+		{
+			$result = T_('less than a month ago');
+		}
+		elseif( $result < 90 )
+		{
+			$result = T_('less than 3 months ago');
+		}
+		else
+		{
+			$result = T_('more than 3 months ago');
+		}
+	}
+
+	return $result;
+}
+
 
 /**
  * Validate variable
