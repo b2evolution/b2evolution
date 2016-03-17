@@ -7449,12 +7449,12 @@ class Item extends ItemLight
 
 		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
 		{ // Get the read post date only one time from DB and store it in cache array
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get the read post date status of item #'.$this->ID.' per user #'.$current_User->ID );
 			$SQL->SELECT( 'uprs_read_post_ts' );
 			$SQL->FROM( 'T_users__postreadstatus' );
 			$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $this->ID ) );
-			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get() );
+			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 		}
 
 		if( ! isset( $user_post_read_statuses[ $this->ID ] ) )

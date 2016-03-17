@@ -45,9 +45,6 @@ if( $single_cat_ID )
 		) );
 	$MainList->query();
 	$MainList->nav_target = $single_cat_ID; // set navigation target, we are always navigating through category in this skin
-
-	// Load read statuses if required
-	$MainList->load_content_read_statuses();
 }
 
 // Breadcrumbs
