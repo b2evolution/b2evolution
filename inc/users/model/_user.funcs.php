@@ -1994,7 +1994,7 @@ function load_user_read_statuses( $post_ids = NULL )
 	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
 
 	// SELECT current User's post and comment read statuses for all post with the given ids
-	$SQL = new SQL( 'Load all read post date statuses per user #'.$current_User->ID );
+	$SQL = new SQL( 'Load all read post date statuses for user #'.$current_User->ID );
 	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
 	$SQL->FROM( 'T_users__postreadstatus' );
 	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
