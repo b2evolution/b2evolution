@@ -1071,7 +1071,7 @@ class Skin extends DataObject
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1086,7 +1086,7 @@ class Skin extends DataObject
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1100,7 +1100,7 @@ class Skin extends DataObject
 				case 'disp_subs':
 					// Specific features for disp=subs:
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1133,7 +1133,7 @@ class Skin extends DataObject
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
