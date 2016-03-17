@@ -412,7 +412,7 @@ class File extends DataObject
 			$this->dbsave();
 		}
 
-		syslog_insert( sprintf( $syslog_message, '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( $syslog_message, '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
 
 		return $success;
 	}
@@ -1474,7 +1474,7 @@ class File extends DataObject
 		// but then we have an integrity issue!! :(
 		if( file_exists($this->_dir.$newname) )
 		{
-			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1504,7 +1504,7 @@ class File extends DataObject
 
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
-			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 			$DB->rollback();
 			return false;
 		}
@@ -1540,11 +1540,11 @@ class File extends DataObject
 				if( ! @rename( $this->_adfp_full_path, $this->_dir.$oldname ) )
 				{ // rename failed
 					$DB->rollback();
-					syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+					syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 					return false;
 				}
 				// Maybe needs a specific error message here, the db and the disk is out of sync
-				syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+				syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 				return false;
 			}
 		}
@@ -1561,7 +1561,7 @@ class File extends DataObject
 
 		$DB->commit();
 
-		syslog_insert( sprintf( 'File %s was renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1589,7 +1589,7 @@ class File extends DataObject
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
-			syslog_insert( sprintf( 'File %s could not be moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be moved to %s', '[['.$old_file_name.']]', '[['.$rdfp_rel_path.']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1628,7 +1628,7 @@ class File extends DataObject
 			$this->load_meta();
 		}
 
-		syslog_insert( sprintf( 'File %s was moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was moved to %s', '[['.$old_file_name.']]', '[['.$rdfp_rel_path.']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1645,7 +1645,7 @@ class File extends DataObject
 	{
 		if( ! $this->exists() || $dest_File->exists() )
 		{
-			syslog_insert( sprintf( 'File %s could not be copied', '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be copied', '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1656,7 +1656,7 @@ class File extends DataObject
 		if( ! copy_r( $this->get_full_path(), $dest_File->get_full_path(), $new_folder_name ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
 			// this is probably a permission problem
-			syslog_insert( sprintf( 'File %s could not be copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be copied to %s', '[['.$this->get_name().']]', '[['.$dest_File->get_name().']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1678,7 +1678,7 @@ class File extends DataObject
 			$dest_File->dbsave();
 		}
 
-		syslog_insert( sprintf( 'File %s was copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was copied to %s', '[['.$this->get_name().']]', '[['.$dest_File->get_name().']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1734,7 +1734,7 @@ class File extends DataObject
 			$syslog_message .= ' - not exists';
 		}
 
-		syslog_insert( sprintf( $syslog_message, '<b>'.$old_file_name.'</b>' ), 'info', 'file', $old_file_ID );
+		syslog_insert( sprintf( $syslog_message, '[['.$old_file_name.']]' ), 'info', 'file', $old_file_ID );
 
 		if( $file_exists )
 		{
@@ -1781,12 +1781,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
-			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
-			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
@@ -2780,7 +2780,7 @@ class File extends DataObject
 			{
 				foreach( $FiletypeCache->cache as $Filetype )
 				{
-					
+
 					if( preg_match( '#^audio/#', $Filetype->mimetype ) &&
 					    in_array( $file_extension, $Filetype->get_extensions() ) )
 					{ // This is audio file
@@ -3030,7 +3030,7 @@ class File extends DataObject
 
 		return sprintf( $params['message'], $count, implode( ', ', $users ) );
 	}
-	
+
 	/**
 	 * Increments the number of times the file was downloaded
 	 *
@@ -3045,7 +3045,7 @@ class File extends DataObject
 
 		return $download_count;
 	}
-	
+
 	/**
 	 * Get total number of times the file was downloaded
 	 *

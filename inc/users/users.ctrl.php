@@ -104,7 +104,7 @@ if( !$Messages->has_errors() )
 { // no errors
 	switch( $action )
 	{
-		
+
 		/*
 		 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 		case 'change_admin_skin':
@@ -208,6 +208,7 @@ if( !$Messages->has_errors() )
 					unset( $edited_User );
 					forget_param( 'user_ID' );
 					$Messages->add( $msg, 'success' );
+					syslog_insert( sprintf( 'User %s was deleted.', '[['.$deleted_user_login.']]' ), 'info', 'user', $deleted_user_ID );
 
 					// Find other users with the same email address:
 					$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );

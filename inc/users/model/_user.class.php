@@ -2461,7 +2461,7 @@ class User extends DataObject
 			case 'blog_item_type_restricted':
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
-				// The owner of a collection has automatic permission to so many things: 
+				// The owner of a collection has automatic permission to so many things:
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
@@ -2679,7 +2679,7 @@ class User extends DataObject
 							$perm = true;
 							break;
 						}
-						
+
 						// Check perms to Delete meta based on user/group settings
 						if( $Comment->author_user_ID == $this->ID &&
 								( $this->check_perm_blogusers( 'meta_comment', 'any', $Item->get_blog_ID() )
@@ -3235,7 +3235,7 @@ class User extends DataObject
 	 * Get messaging possibilities between current user and $this user
 	 *
 	 * @param object Current User (the one trying to send the PM)
-	 * @param string Type of contact method to check first: 'PM' > 'email'  
+	 * @param string Type of contact method to check first: 'PM' > 'email'
 	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
 	function get_msgform_possibility( $current_User = NULL, $check_level = 'PM' )
@@ -4610,6 +4610,7 @@ class User extends DataObject
 				if( $update_success )
 				{
 					$Messages->add( T_('Profile has been updated.'), 'success' );
+					syslog_insert( sprintf( 'User %s was renamed to %s', '[['.$user_old_login.']]', '[['.$this->login.']]' ), 'info', 'user', $this->ID );
 				}
 			}
 
