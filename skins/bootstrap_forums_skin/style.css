@@ -73,14 +73,17 @@
   text-align: center !important;
   float: left;
 }
-.evo_comment_text {
-  padding-right: 0px;
-}
 .evo_comment_avatar > span > img,
 .evo_comment_avatar > a > img {
   border-radius: 50%;
   float: none !important;
   margin: 0px 0px 14px 0px !important;
+}
+.evo_comment_avatar a.user {
+  display: block;
+}
+.evo_comment_text {
+  padding-right: 0px;
 }
 ol.breadcrumb {
   margin-left: 0;
