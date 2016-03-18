@@ -3325,12 +3325,12 @@ class Comment extends DataObject
 			}
 		}
 
+		// SECOND: we will send notidications about published comments to everyone else (including moderators in case of status change)
+
 		if( $this->status != 'published' )
 		{ // Don't send notifications about non-published comments:
 			return;
 		}
-
-		// SECOND: we will send notidications to everyone else (including moderators in case of status change)
 
 		// Get parent Item:
 		$edited_Item = & $this->get_Item();
