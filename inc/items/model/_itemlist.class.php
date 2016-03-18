@@ -319,7 +319,7 @@ class ItemList2 extends ItemListLight
 		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
 
 		// Load the post read statuses if it is allowed by current collection:
-		$this->load_content_read_statuses();
+		$this->load_user_data_for_items();
 	}
 
 
@@ -867,10 +867,8 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
-	 *
-	 * @todo rename to load_user_data_for_items()
 	 */
-	function load_content_read_statuses()
+	function load_user_data_for_items()
 	{
 		if( !$this->Blog->get_setting( 'track_unread_content' ) )
 		{ // tracking unread content in this blog is turned off
@@ -884,7 +882,7 @@ class ItemList2 extends ItemListLight
 		}
 
 		// Delegate query: 
-		load_user_read_statuses( $page_post_ids );
+		load_user_data_for_items( $page_post_ids );
 	}
 }
 

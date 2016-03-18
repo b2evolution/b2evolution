@@ -3868,6 +3868,56 @@ function item_inskin_display( $Item )
 
 
 /**
+ * Load user data (post/comment) read statuses for current user for a list of post IDs.
+ *
+ * @param array Load only for posts with these ids
+ */
+function load_user_data_for_items( $post_ids = NULL )
+{
+	global $DB, $current_User, $user_post_read_statuses;
+
+	if( ! is_logged_in() )
+	{	// There are no logged in user:
+		return;
+	}
+
+	if( is_array( $user_post_read_statuses ) )
+	{	// User read statuses were already set:
+		return;
+	}
+	else
+	{	// Init with an empty array:
+		$user_post_read_statuses = array();
+	}
+
+	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
+
+	// SELECT current User's post and comment read statuses for all post with the given ids:
+	$SQL = new SQL( 'Load all read post date statuses for user #'.$current_User->ID );
+	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
+	$SQL->FROM( 'T_users__postreadstatus' );
+	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL->WHERE_and( $post_condition );
+	// Set those post read statuses which were opened before:
+	$user_post_read_statuses = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+	if( empty( $post_ids ) )
+	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
+		return;
+	}
+
+	// Set new posts read statuses:
+	foreach( $post_ids as $post_ID )
+	{	// Make sure to set read statuses for each requested post ID:
+		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
+		{	// Set each read status to 0:
+			$user_post_read_statuses[ $post_ID ] = 0;
+		}
+	}
+}
+
+
+/**
  * Initialize Results object for items list
  *
  * @param object Results
