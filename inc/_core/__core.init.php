@@ -65,7 +65,6 @@ $db_config['aliases'] = array(
 		'T_users__invitation_code' => $tableprefix.'users__invitation_code',
 		'T_users__reports'         => $tableprefix.'users__reports',
 		'T_users__usersettings'    => $tableprefix.'users__usersettings',
-		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
 		'T_users__organization'    => $tableprefix.'users__organization',
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',

@@ -147,11 +147,11 @@ class item_seen_by_Widget extends ComponentWidget
 
 		// Get post read statuses for all collection members of the current Item:
 		$SQL = new SQL();
-		$SQL->SELECT( 'uprs_user_ID, IF( uprs_read_post_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
-		$SQL->FROM( 'T_users__postreadstatus' );
-		$SQL->FROM_add( 'INNER JOIN T_users ON uprs_user_ID = user_ID' );
-		$SQL->WHERE( 'uprs_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
-		$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $Item->ID ) );
+		$SQL->SELECT( 'itud_user_ID, IF( itud_read_item_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
+		$SQL->FROM( 'T_items__user_data' );
+		$SQL->FROM_add( 'INNER JOIN T_users ON itud_user_ID = user_ID' );
+		$SQL->WHERE( 'itud_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
+		$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $Item->ID ) );
 		$SQL->ORDER_BY( 'read_post_status, user_login' );
 		$read_statuses = $DB->get_assoc( $SQL->get(), 'Get post read statuses for all collection members of the Item#'.$Item->ID );
 

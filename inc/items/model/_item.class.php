@@ -7280,7 +7280,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Update field uprs_read_post_ts for current User
+	 * Update field itud_read_item_ts for current User
 	 *
 	 * @param boolean TRUE to update a post read timestamp
 	 * @param boolean TRUE to update a comments read timestamp
@@ -7324,7 +7324,7 @@ class Item extends ItemLight
 			$update_fields = '';
 			if( $read_post )
 			{	// Update a post read timestamp:
-				$update_fields = 'uprs_read_post_ts = '.$DB->quote( $timestamp );
+				$update_fields = 'itud_read_item_ts = '.$DB->quote( $timestamp );
 			}
 			if( $read_comments )
 			{	// Update a comments read timestamp:
@@ -7332,12 +7332,12 @@ class Item extends ItemLight
 				{
 					$update_fields .= ', ';
 				}
-				$update_fields .= 'uprs_read_comment_ts = '.$DB->quote( $timestamp );
+				$update_fields .= 'itud_read_comments_ts = '.$DB->quote( $timestamp );
 			}
-			$DB->query( 'UPDATE T_users__postreadstatus
+			$DB->query( 'UPDATE T_items__user_data
 				  SET '.$update_fields.'
-				WHERE uprs_user_ID = '.$DB->quote( $current_User->ID ).'
-				  AND uprs_post_ID = '.$DB->quote( $this->ID ) );
+				WHERE itud_user_ID = '.$DB->quote( $current_User->ID ).'
+				  AND itud_item_ID = '.$DB->quote( $this->ID ) );
 		}
 		else
 		{	// Insert new read status:
@@ -7345,7 +7345,7 @@ class Item extends ItemLight
 			$insert_values = '';
 			if( $read_post )
 			{	// Update a post read timestamp:
-				$insert_fields = 'uprs_read_post_ts';
+				$insert_fields = 'itud_read_item_ts';
 				$insert_values = $DB->quote( $timestamp );
 			}
 			if( $read_comments )
@@ -7355,10 +7355,10 @@ class Item extends ItemLight
 					$insert_fields .= ', ';
 					$insert_values .= ', ';
 				}
-				$insert_fields .= 'uprs_read_comment_ts';
+				$insert_fields .= 'itud_read_comments_ts';
 				$insert_values .= $DB->quote( $timestamp );
 			}
-			$DB->query( 'INSERT INTO T_users__postreadstatus ( uprs_user_ID, uprs_post_ID, '.$insert_fields.' )
+			$DB->query( 'INSERT INTO T_items__user_data ( itud_user_ID, itud_item_ID, '.$insert_fields.' )
 				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$insert_values.' )' );
 		}
 
@@ -7450,10 +7450,10 @@ class Item extends ItemLight
 		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
 		{ // Get the read post date only one time from DB and store it in cache array
 			$SQL = new SQL( 'Get the read post date status of item #'.$this->ID.' for user #'.$current_User->ID );
-			$SQL->SELECT( 'uprs_read_post_ts' );
-			$SQL->FROM( 'T_users__postreadstatus' );
-			$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-			$SQL->WHERE_and( 'uprs_post_ID = '.$DB->quote( $this->ID ) );
+			$SQL->SELECT( 'itud_read_item_ts' );
+			$SQL->FROM( 'T_items__user_data' );
+			$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
+			$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $this->ID ) );
 			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 		}
 

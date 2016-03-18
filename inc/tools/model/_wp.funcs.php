@@ -162,7 +162,7 @@ function wpxml_import()
 				$DB->query( 'DELETE l, lv FROM T_links AS l
 											 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
 											WHERE l.link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
-				$DB->query( 'DELETE FROM T_users__postreadstatus WHERE uprs_post_ID IN ( '.implode( ', ', $old_posts ).' )' );
+				$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
 		}
 		echo T_('OK').'<br />';
