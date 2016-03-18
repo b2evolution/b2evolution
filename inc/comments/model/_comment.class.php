@@ -3296,9 +3296,25 @@ class Comment extends DataObject
 	{
 		global $Settings;
 
+		// Immediate notifications? Asynchronous? Off?
+		$notifications_mode = $Settings->get('outbound_notifications_mode');
+
+		if( $notifications_mode == 'off' )
+		{ // Don't send notification:
+			return false;
+		}
+
+		if( $this->get( 'notif_status' ) != 'noreq' )
+		{ // Notification for this comment are already done or in progress...
+			return false;
+		}
+
 		if( $just_posted )
-		{	// send email notification to moderators or to users with "meta comments" notification:
-			$this->send_email_notifications( true, false, $executed_by_userid );
+		{	// New comment, potentially awaiting moderation:
+
+			// Send email notification ONLY to moderators or users with "meta comments" notification:
+			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */false, $executed_by_userid );
+			
 			if( $this->is_meta() )
 			{	// Record that processing has been done in case of this meta comment:
 				$this->set( 'notif_status', 'finished' );
@@ -3306,26 +3322,16 @@ class Comment extends DataObject
 			}
 		}
 
+		/* we can remove this because of eralier check: $this->get( 'notif_status' ) != 'noreq' 
 		if( $this->is_meta() )
 		{	// Meta comments were already notified when they were posted:
 			return;
 		}
+		*/
 
 		if( $this->status != 'published' )
-		{ // don't send notificaitons about non published comments
+		{ // Don't send notifications about non-published comments:
 			return;
-		}
-
-		$notifications_mode = $Settings->get('outbound_notifications_mode');
-
-		if( $notifications_mode == 'off' )
-		{ // don't send notification
-			return false;
-		}
-
-		if( $this->get( 'notif_status' ) != 'noreq' )
-		{ // notification have been done before, or is in progress
-			return false;
 		}
 
 		$edited_Item = & $this->get_Item();
