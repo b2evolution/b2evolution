@@ -240,19 +240,19 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 4 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 6 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js', 'rsc/js/src/evo_rest_api.js', 'rsc/js/src/evo_item_flag.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 6 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js', 'rsc/js/src/evo_rest_api.js', 'rsc/js/src/evo_item_flag.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:

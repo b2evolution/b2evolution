@@ -7308,18 +7308,18 @@ class Item extends ItemLight
 			return;
 		}
 
-		global $DB, $current_User, $localtimenow, $user_post_read_statuses;
+		global $DB, $current_User, $localtimenow, $cache_items_user_data;
 
 		$timestamp = date2mysql( $localtimenow );
 
-		$read_date = $this->get_read_date();
+		$read_date = $this->get_user_data( 'item_date' );
 
 		if( $timestamp == $read_date )
 		{	// The read status is already updated, Don't repeat it:
 			return;
 		}
 
-		if( ! empty( $read_date ) )
+		if( ! is_null( $read_date ) )
 		{	// Update the read status:
 			$update_fields = '';
 			if( $read_post )
@@ -7362,8 +7362,8 @@ class Item extends ItemLight
 				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$insert_values.' )' );
 		}
 
-		// Update the cached date:
-		$user_post_read_statuses[ $this->ID ] = $timestamp;
+		// Update the cached item date:
+		$this->set_user_data( 'item_date', $timestamp );
 	}
 
 
@@ -7413,7 +7413,7 @@ class Item extends ItemLight
 
 		global $DB, $current_User;
 
-		$read_date = $this->get_read_date();
+		$read_date = $this->get_user_data( 'item_date' );
 
 		if( empty( $read_date ) )
 		{	// This post is recent for current user
@@ -7434,35 +7434,62 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get the read dates from DB or from Cached array of this post for current User
+	 * Get the user data from DB or from Cached array of this post for current User
 	 *
-	 * @return string The read date of this post
+	 * @param string|NULL Field name: 'item_date', 'comments_date', 'item_flag', NULL - to get all fields as array
+	 * @return array|string Array of all fields OR value of single field
 	 */
-	function get_read_date()
+	function get_user_data( $field = NULL )
 	{
-		global $DB, $current_User, $user_post_read_statuses;
+		global $DB, $current_User, $cache_items_user_data;
 
-		if( !is_array( $user_post_read_statuses ) )
-		{ // Init array first time
-			$user_post_read_statuses = array();
+		if( ! is_array( $cache_items_user_data ) )
+		{	// Init array first time:
+			$cache_items_user_data = array();
 		}
 
-		if( !isset( $user_post_read_statuses[ $this->ID ] ) )
+		if( ! isset( $cache_items_user_data[ $this->ID ] ) )
 		{ // Get the read post date only one time from DB and store it in cache array
-			$SQL = new SQL( 'Get the read post date status of item #'.$this->ID.' for user #'.$current_User->ID );
-			$SQL->SELECT( 'itud_read_item_ts' );
+			$SQL = new SQL( 'Get the data of item #'.$this->ID.' for user #'.$current_User->ID );
+			$SQL->SELECT( 'IFNULL( itud_read_item_ts, 0 ) AS item_date, IFNULL( itud_read_comments_ts, 0 ) AS comments_date, itud_flagged_item AS item_flag' );
 			$SQL->FROM( 'T_items__user_data' );
 			$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $this->ID ) );
-			$user_post_read_statuses[ $this->ID ] = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
 		}
 
-		if( ! isset( $user_post_read_statuses[ $this->ID ] ) )
-		{	// Init empty read date:
-			$user_post_read_statuses[ $this->ID ] = 0;
+		if( isset( $cache_items_user_data[ $this->ID ] ) && is_array( $cache_items_user_data[ $this->ID ] ) &&  empty( $cache_items_user_data[ $this->ID ] ) )
+		{	// Init empty user item data:
+			$cache_items_user_data[ $this->ID ] = NULL;
 		}
 
-		return $user_post_read_statuses[ $this->ID ];
+		if( is_null( $field ) || ! isset( $cache_items_user_data[ $this->ID ][ $field ] ) )
+		{	// Return all fields as array:
+			return $cache_items_user_data[ $this->ID ];
+		}
+		else
+		{	// Return a value of single field:
+			return $cache_items_user_data[ $this->ID ][ $field ];
+		}
+	}
+
+
+	/**
+	 * Set the user data to global cache array of this post for current User
+	 *
+	 * @param string Field name: 'item_date', 'comments_date', 'item_flag'
+	 * @param string Value
+	 */
+	function set_user_data( $field, $value )
+	{
+		global $cache_items_user_data;
+
+		if( ! isset( $cache_items_user_data[ $this->ID ] ) || ! is_array( $cache_items_user_data[ $this->ID ] ) )
+		{	// Initialize array:
+			$cache_items_user_data[ $this->ID ][ $field ] = array();
+		}
+
+		$cache_items_user_data[ $this->ID ] = $value;
 	}
 
 
@@ -7866,6 +7893,107 @@ class Item extends ItemLight
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Check if user can flag this item
+	 *
+	 * @return boolean
+	 */
+	function can_flag()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet:
+			return false;
+		}
+
+		if( ! is_logged_in() )
+		{	// If user is NOT logged in:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Display button to flag item
+	 *
+	 * @param array Params
+	 */
+	function flag( $params = array() )
+	{
+		global $current_User;
+
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'title_flag'   => T_('Click to flag this.'),
+				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
+			), $params );
+
+		if( ! $this->can_flag() )
+		{	// Don't display the flag button if it is not allowed by some reason:
+			return;
+		}
+
+		echo $params['before'];
+
+		// Get current state of flag:
+		$is_flagged = $this->get_user_data( 'item_flag' );
+
+		echo action_icon( '', ( $is_flagged ? 'flag_on' : 'flag_off' ), '#', '', 0, 0, array(
+				'class'   => 'action_icon evo_post_flag_btn',
+				'data-id' => $this->ID,
+			),
+			array( 'title' => ( $is_flagged ? $params['title_unflag'] : $params['title_flag'] ) ) );
+
+		echo $params['after'];
+	}
+
+
+	/**
+	 * Flag or unflag item for current user
+	 *
+	 * @param string Vote value (positive, neutral, negative)
+	 * @access protected
+	 */
+	function update_flag()
+	{
+		global $DB, $current_User, $servertimenow;
+
+		if( ! $this->can_flag() )
+		{	// Don't display the flag button if it is not allowed by some reason:
+			return;
+		}
+
+		$DB->begin();
+
+		// Get current state of flag:
+		$is_flagged = $this->get_user_data( 'item_flag' );
+
+		$new_flag_value = ( $is_flagged ? 0 : 1 );
+
+		if( is_null( $is_flagged ) )
+		{	// Flag item for current user:
+			$DB->query( 'REPLACE INTO T_items__user_data
+				       ( itud_user_ID, itud_item_ID, itud_flagged_item )
+				VALUES ( '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).', '.$new_flag_value.' )',
+				'Insert user item data row to flag item #'.$this->ID );
+		}
+		else
+		{	// Update flag of this item for current user:
+			$DB->query( 'UPDATE T_items__user_data
+				  SET itud_flagged_item = '.$new_flag_value.'
+				WHERE itud_user_ID = '.$DB->quote( $current_User->ID ).'
+				  AND itud_item_ID = '.$DB->quote( $this->ID ),
+				'Update user item data row to flag item #'.$this->ID );
+		}
+
+		$this->set_user_data( 'item_flag', $new_flag_value );
+
+		$DB->commit();
 	}
 }
 ?>

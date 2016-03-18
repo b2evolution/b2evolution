@@ -468,6 +468,13 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
 $htsrv_url_sensitive = $htsrv_url;
 
 /**
+ * URL to the REST API.
+ *
+ * @global string
+ */
+$restapi_url = $baseurl.'api/v1/';
+
+/**
  * Location of the XML SeRVices folder.
  * @global string $xmlsrv_subdir
  */

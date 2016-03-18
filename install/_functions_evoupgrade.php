@@ -7364,8 +7364,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( "ALTER TABLE T_items__user_data
 			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,
 			CHANGE uprs_post_ID         itud_item_ID          INT(11) UNSIGNED NOT NULL,
-			CHANGE uprs_read_post_ts    itud_read_item_ts     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			CHANGE uprs_read_comment_ts itud_read_comments_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			CHANGE uprs_read_post_ts    itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			CHANGE uprs_read_comment_ts itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
 			ADD                         itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0" );
 		upg_task_end();
 	}
