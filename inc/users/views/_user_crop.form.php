@@ -42,9 +42,16 @@ global $current_User;
 global $cropped_File;
 
 global $aspect_ratio, $content_width, $content_height;
+
 $aspect_ratio = param( 'aspect_ratio', 'double' );
 $content_width = param( 'content_width', 'integer' );
 $content_height = param( 'content_height', 'integer' );
+
+$original_image_size = explode( 'x', $cropped_File->get_image_size() );
+$image_height = $original_image_size[1];
+$image_width = $original_image_size[0];;
+$min_avatar_size = $Settings->get( 'min_picture_size' );
+$can_crop = ( $image_height >= $min_avatar_size && $image_width >= $min_avatar_size );
 
 if( $display_mode != 'js' )
 {
@@ -121,12 +128,21 @@ if( $display_mode == 'js' )
 	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
 
-$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Crop'), 'class' => 'SaveButton btn-primary' ) );
+if( $can_crop )
+{
+	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Crop'), 'class' => 'SaveButton btn-primary' ) );
+}
 
 // Start displaying content
 echo '<div id="content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
+if( ! $can_crop )
+{
+	echo '<div style="text-align: center;">'.sprintf( T_('Only images larger than %dx%d pixels can be cropped.'), $min_avatar_size, $min_avatar_size ).'</div>';
+}
 echo '</div>';
 $Form->end_form();
+if( $can_crop )
+{
 ?>
 <style>
 	#workarea img {
@@ -164,11 +180,8 @@ $Form->end_form();
 	var workarea_width;
 	var workarea_aspect_ratio;
 
-	<?php
-	$original_image_size = explode( 'x', $cropped_File->get_image_size() );
-	?>
-	var original_image_height = <?php echo $original_image_size[1];?>;
-	var original_image_width = <?php echo $original_image_size[0];?>;
+	var original_image_height = <?php echo $image_height;?>;
+	var original_image_width = <?php echo $image_width;?>;
 	var original_image_aspect_ratio = original_image_height / original_image_width;
 
 	var size_ratio = 1;
@@ -620,11 +633,13 @@ $Form->end_form();
 
 	function init_jcrop_tool( image )
 	{
+		var minAvatarSize = <?php echo $min_avatar_size;?>;
+
 		options = {
 					boxWidth: working_image_width,
 					boxHeight: working_image_height,
 					aspectRatio: 1,
-					minSize: [ 64, 64 ],
+					minSize: [ minAvatarSize, minAvatarSize ],
 					onChange: updatePreview,
 					onSelect: updatePreview
 				};
@@ -651,3 +666,6 @@ $Form->end_form();
 			init_jcrop_tool( jQuery( this ) );
 		});
 </script>
+<?php
+}
+?>
