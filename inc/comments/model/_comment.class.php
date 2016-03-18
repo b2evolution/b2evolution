@@ -3300,7 +3300,7 @@ class Comment extends DataObject
 		$notifications_mode = $Settings->get('outbound_notifications_mode');
 
 		if( $notifications_mode == 'off' )
-		{ // Don't send notification:
+		{ // Don't send notifications:
 			return false;
 		}
 
@@ -3308,6 +3308,8 @@ class Comment extends DataObject
 		{ // Notification for this comment are already done or in progress...
 			return false;
 		}
+
+		// FIRST we will send notifications to moderators and those notifications will always be immediate (fp> !?):
 
 		if( $just_posted )
 		{	// New comment, potentially awaiting moderation:
@@ -3319,7 +3321,7 @@ class Comment extends DataObject
 			{	// Record that processing has been done in case of this meta comment:
 				$this->set( 'notif_status', 'finished' );
 				$this->dbupdate();
-				return;	// No further processing
+				return;	// No further processing for meta comments
 			}
 		}
 
@@ -3328,13 +3330,15 @@ class Comment extends DataObject
 			return;
 		}
 
+		// SECOND: we will send notidications to everyone else (including moderators in case of status change)
+
 		// Get parent Item:
 		$edited_Item = & $this->get_Item();
 
 		if( $notifications_mode == 'immediate' )
 		{	// Send email notifications now!:
 
-			$this->send_email_notifications( false, $just_posted, $executed_by_userid );
+			$this->send_email_notifications( /* $only_moderators = */ false, /* $except_moderators = */ $just_posted, $executed_by_userid );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
