@@ -3296,16 +3296,18 @@ class Comment extends DataObject
 	{
 		global $Settings;
 
-		if( $this->is_meta() )
-		{	// Meta comment
-			if( $just_posted )
-			{	// Send email notification ONLY to users with "meta comments" notification:
-				$this->send_email_notifications( true, false, $executed_by_userid );
-				// Record that processing has been done in case of this meta comment:
+		if( $just_posted )
+		{	// send email notification to moderators or to users with "meta comments" notification:
+			$this->send_email_notifications( true, false, $executed_by_userid );
+			if( $this->is_meta() )
+			{	// Record that processing has been done in case of this meta comment:
 				$this->set( 'notif_status', 'finished' );
 				$this->dbupdate();
 			}
-			// Meta comments were already notified when they were posted.
+		}
+
+		if( $this->is_meta() )
+		{	// Meta comments were already notified when they were posted:
 			return;
 		}
 
