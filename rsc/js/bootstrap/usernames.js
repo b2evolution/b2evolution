@@ -60,6 +60,7 @@ jQuery( document ).ready(function()
 
 			var popover_params = {
 				trigger: 'hover',
+				container: 'body',
 				placement: 'top',
 				html: true,
 				delay: { 'hide': 400 },
