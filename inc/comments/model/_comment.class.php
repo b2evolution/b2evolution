@@ -3313,38 +3313,36 @@ class Comment extends DataObject
 		{	// New comment, potentially awaiting moderation:
 
 			// Send email notification ONLY to moderators or users with "meta comments" notification:
-			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */false, $executed_by_userid );
+			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */ false, $executed_by_userid );
 			
 			if( $this->is_meta() )
 			{	// Record that processing has been done in case of this meta comment:
 				$this->set( 'notif_status', 'finished' );
 				$this->dbupdate();
+				return;	// No further processing
 			}
 		}
-
-		/* we can remove this because of eralier check: $this->get( 'notif_status' ) != 'noreq' 
-		if( $this->is_meta() )
-		{	// Meta comments were already notified when they were posted:
-			return;
-		}
-		*/
 
 		if( $this->status != 'published' )
 		{ // Don't send notifications about non-published comments:
 			return;
 		}
 
+		// Get parent Item:
 		$edited_Item = & $this->get_Item();
 
 		if( $notifications_mode == 'immediate' )
-		{ // Send email notifications now!
+		{	// Send email notifications now!:
+
 			$this->send_email_notifications( false, $just_posted, $executed_by_userid );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
+
 		}
 		else
-		{ // Create scheduled job to send notifications
+		{	// Create scheduled job to send notifications:
+
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$edited_Cronjob = new Cronjob();
@@ -3367,7 +3365,8 @@ class Comment extends DataObject
 			// Record that processing has been scheduled:
 			$this->set( 'notif_status', 'todo' );
 		}
-		// update comment notification params
+
+		// update comment notification params:
 		$this->dbupdate();
 	}
 
