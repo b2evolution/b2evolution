@@ -496,6 +496,7 @@ if( $action == 'dashboard' )
 		echo '<div class="row browse">';
 
 		// Block Group 1
+		$Timer->start( 'Block 1' );
 		echo '<!-- Start of Block Group 1 -->';
 		echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 
@@ -544,11 +545,13 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
+		$Timer->stop( 'Block 1' );
 		evo_flush();
 
 		// Block Group 2
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
+			$Timer->start( 'Block 2' );
 			echo '<!-- Start of Block Group 2 -->';
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
 
@@ -575,7 +578,12 @@ if( $action == 'dashboard' )
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				echo '<div id="comments_container">';
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
+				$Timer->start( 'show_comments_awaiting_moderation' );
+
+				// erhsatingin > this takes up most of the rendering time!
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
+
+				$Timer->stop( 'show_comments_awaiting_moderation' );
 				echo '</div>';
 				$block_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div></div>';
@@ -595,10 +603,12 @@ if( $action == 'dashboard' )
 			// The following div is required to ensure that Block Group 3 will align properly on large screen media
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
+			$Timer->stop( 'Block 2' );
 		}
 		evo_flush();
 
 		// Block Group 3
+		$Timer->start( 'Block 3' );
 		echo '<!-- Start of Block Group 3 -->';
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
@@ -668,6 +678,7 @@ if( $action == 'dashboard' )
 				echo '<!-- End of Latest Meta Comments Block-->';
 			}
 		}
+		$Timer->stop( 'Block 3' );
 
 		// Recently Edited Posts Block
 		// Create empty List:
