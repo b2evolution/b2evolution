@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['de_DE'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'utf-8'),
-'' => "Project-Id-Version: b2evolution\nReport-Msgid-Bugs-To: http://fplanque.com/\nPOT-Creation-Date: 2016-03-13 02:07+0100\nPO-Revision-Date: 2016-03-13 01:07+0000\nLast-Translator: Francois Planque\nLanguage-Team: German (Germany) (http://www.transifex.com/fplanque/b2evolution/language/de_DE/)\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nLanguage: de_DE\nPlural-Forms: nplurals=2; plural=(n != 1);\n",
+'' => "Project-Id-Version: b2evolution\nReport-Msgid-Bugs-To: http://fplanque.com/\nPOT-Creation-Date: 2016-03-19 23:41+0100\nPO-Revision-Date: 2016-03-19 22:41+0000\nLast-Translator: Francois Planque\nLanguage-Team: German (Germany) (http://www.transifex.com/fplanque/b2evolution/language/de_DE/)\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nLanguage: de_DE\nPlural-Forms: nplurals=2; plural=(n != 1);\n",
 'Folder' => 'Ordner',
 'Unknown file' => 'Unbekannte Datei',
 'Empty file' => 'Leere Datei',
