@@ -51,7 +51,8 @@ $original_image_size = explode( 'x', $cropped_File->get_image_size() );
 $image_height = $original_image_size[1];
 $image_width = $original_image_size[0];;
 $min_avatar_size = $Settings->get( 'min_picture_size' );
-$can_crop = ( $image_height >= $min_avatar_size && $image_width >= $min_avatar_size );
+$can_crop = ( $image_height >= $min_avatar_size && $image_width >= $min_avatar_size
+		&& ! ( $image_height == $min_avatar_size && $image_width == $min_avatar_size ) );
 
 if( $display_mode != 'js' )
 {
@@ -134,12 +135,18 @@ if( $can_crop )
 }
 
 // Start displaying content
-echo '<div id="content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
+
 if( ! $can_crop )
 {
-	echo '<div style="text-align: center;">'.sprintf( T_('Only images larger than %dx%d pixels can be cropped.'), $min_avatar_size, $min_avatar_size ).'</div>';
+	echo '<div style="height: '.$content_height.'px; width: '. $content_width.'px; position=relative; text-align: center;">';
+	echo '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">'.sprintf( T_('Only images larger than %dx%d pixels can be cropped.'), $min_avatar_size, $min_avatar_size ).'</div>';
+	echo '</div>';
 }
-echo '</div>';
+else
+{
+	echo '<div id="content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
+	echo '</div>';
+}
 $Form->end_form();
 if( $can_crop )
 {
@@ -159,6 +166,7 @@ if( $can_crop )
 		transform: translateY(-50%);
 	}
 </style>
+
 <script type="text/javascript">
 	var jcrop_api;
 	var image_url = '<?php echo $cropped_File->get_url(); ?>';
@@ -194,9 +202,9 @@ if( $can_crop )
 	//console.debug( 'Content: ', content_width, content_height );
 	//console.debug( 'Original Image: ', original_image_width, original_image_height );
 
-	// We'll use this function to determine which mode will provide the larger working image
+
 	function get_working_image_dimensions( w_height, w_width, image_aspect_ratio )
-	{
+	{ // We'll use this function to determine which mode will provide the larger working image
 		var w_aspect_ratio = w_height / w_width;
 
 		if( w_aspect_ratio > image_aspect_ratio )
@@ -328,6 +336,7 @@ if( $can_crop )
 		//console.debug( 'Preview Size: ', preview_size );
 	}
 
+
 	function init_workarea()
 	{
 		if( render_mode == 'portrait' )
@@ -344,6 +353,7 @@ if( $can_crop )
 
 		//console.debug( 'Workarea: ', workarea_width, workarea_height );
 	}
+
 
 	function init_working_image()
 	{
@@ -374,7 +384,7 @@ if( $can_crop )
 		//console.debug( 'Image: ', working_image_width, working_image_height );
 	}
 
-	function set_initial_crop_selection()
+	function init_crop_selection()
 	{
 		var crop_size;
 		initial_crop_selection = [];
@@ -402,7 +412,10 @@ if( $can_crop )
 			initial_crop_selection.push( ( original_image_width / 2 ) + ( crop_size / 2 ) );
 			initial_crop_selection.push( ( original_image_height / 2 ) + ( crop_size / 2 ) );
 		}
+
+		//console.debug( 'Initial selection: ', initial_crop_selection );
 	}
+
 
 	function render_content()
 	{
@@ -431,6 +444,7 @@ if( $can_crop )
 				}
 			});
 
+		// Large square preview
 		var preview_lg_sq = jQuery( '<div />', {
 				class: 'preview_cropped_image'
 			}).css({
@@ -438,6 +452,7 @@ if( $can_crop )
 				height: '128px',
 			}).append( working_image.clone() );
 
+		// Small square preview
 		var preview_sm_sq = jQuery( '<div />', {
 				class: 'preview_cropped_image'
 			}).css({
@@ -445,6 +460,7 @@ if( $can_crop )
 					height: '64px',
 			}).append( working_image.clone() );
 
+		// Large circle preview
 		var preview_lg_c = jQuery( '<div />', {
 				class: 'preview_cropped_image circle'
 			}).css({
@@ -452,6 +468,7 @@ if( $can_crop )
 					height: '128px',
 			}).append( working_image.clone() );
 
+		// Small circle preview
 		var preview_sm_c = jQuery( '<div />', {
 				class: 'preview_cropped_image circle'
 			}).css({
@@ -466,6 +483,7 @@ if( $can_crop )
 				height: workarea_height + 'px',
 				width: workarea_width + 'px'
 			});
+
 			previews.css({
 				'background-color': '#ffffff',
 				height: preview_size + 'px',
@@ -510,6 +528,7 @@ if( $can_crop )
 				width: workarea_width + 'px',
 				height: workarea_height + 'px'
 			});
+
 			previews.css({
 				'background-color': '#ffffff',
 				float: 'left',
@@ -520,7 +539,9 @@ if( $can_crop )
 			});
 
 			workarea.prepend( working_image );
+
 			var preview_wrapper = jQuery( '<div />' );
+
 			if( show_large_preview )
 			{
 				preview_wrapper.append( preview_lg_sq );
@@ -547,6 +568,7 @@ if( $can_crop )
 			content.append( jQuery( '<div />', { style: { clear: 'both' } } ) );
 
 			preview_images = jQuery( 'div#preview div.preview_cropped_image:not(:last-child)' );
+
 			if( preview_orientation == 'portrait' )
 			{
 				preview_images.css( 'margin-bottom', preview_margin + 'px' );
@@ -562,8 +584,6 @@ if( $can_crop )
 		// Adjust modal dimensions and content to minimize workarea margin
 		var wah_margin = workarea_height - ( original_image_height < working_image_height ? original_image_height : working_image_height );
 		var waw_margin = workarea_width - ( original_image_width < working_image_width ? original_image_width : working_image_width );
-		//var wah_margin = workarea_height - working_image_height;
-		//var waw_margin = workarea_width - working_image_width;
 		var modal_dialog = jQuery( 'div.modal-dialog' );
 		var modal_body = jQuery( 'div.modal-body' );
 		var content = jQuery( 'div#content' );
@@ -592,7 +612,8 @@ if( $can_crop )
 		}
 	}
 
-	function updatePreview( coords )
+
+	function update_preview( coords )
 	{
 		var target_cropped_image_width = original_image_width;
 		var target_cropped_image_height = original_image_height;
@@ -631,17 +652,25 @@ if( $can_crop )
 		});
 	}
 
+
+	function selection_release()
+	{ // Reset to initial selection if selection is released
+		jcrop_api.setSelect( initial_crop_selection );
+	}
+
+
 	function init_jcrop_tool( image )
 	{
-		var minAvatarSize = <?php echo $min_avatar_size;?>;
+		var min_avatar_size = <?php echo $min_avatar_size;?>;
 
 		options = {
 					boxWidth: working_image_width,
 					boxHeight: working_image_height,
 					aspectRatio: 1,
-					minSize: [ minAvatarSize, minAvatarSize ],
-					onChange: updatePreview,
-					onSelect: updatePreview
+					minSize: [ min_avatar_size, min_avatar_size ],
+					onChange: update_preview,
+					onSelect: update_preview,
+					onRelease: selection_release
 				};
 
 		image.Jcrop( options, function() {
@@ -655,7 +684,7 @@ if( $can_crop )
 	init_layout();
 	init_workarea();
 	init_working_image();
-	set_initial_crop_selection();
+	init_crop_selection();
 
 	// Render everything
 	render_content();

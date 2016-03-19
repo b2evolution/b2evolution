@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['fr_FR'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'utf-8'),
-'' => "Project-Id-Version: b2evolution\nReport-Msgid-Bugs-To: http://fplanque.com/\nPOT-Creation-Date: 2016-03-13 02:07+0100\nPO-Revision-Date: 2016-03-13 01:12+0000\nLast-Translator: Francois Planque\nLanguage-Team: French (France) (http://www.transifex.com/fplanque/b2evolution/language/fr_FR/)\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nLanguage: fr_FR\nPlural-Forms: nplurals=2; plural=(n > 1);\n",
+'' => "Project-Id-Version: b2evolution\nReport-Msgid-Bugs-To: http://fplanque.com/\nPOT-Creation-Date: 2016-03-19 23:41+0100\nPO-Revision-Date: 2016-03-19 22:42+0000\nLast-Translator: Francois Planque\nLanguage-Team: French (France) (http://www.transifex.com/fplanque/b2evolution/language/fr_FR/)\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nLanguage: fr_FR\nPlural-Forms: nplurals=2; plural=(n > 1);\n",
 'Folder' => 'Dossier',
 'Unknown file' => 'Fichier inconnu',
 'Empty file' => 'Fichier vide',
@@ -736,6 +736,7 @@ $trans['fr_FR'] = array(
 'The keyword &laquo;%s&raquo; has been blacklisted locally.' => 'Le mot clef &laquo;%s&raquo; a été banni localement.',
 'Failed to add the keyword %s to black list locally.' => 'Impossible d\'ajouter le mot clef %s à la liste noire locale.',
 'Please select at least one action to ban the keyword.' => 'Merci de sélectionner au moins une action pour bannir le mot clef.',
+'Open Antispam Blacklist' => 'Ouvrir Liste Noire Antispam',
 'Removing entry #%d from the ban list...' => 'Suppression de l\'entrée n°%d de la liste noire...',
 'The threshold must be between -100 and 100.' => 'Le niveau limite doit être compris entre -100 et 100.',
 'Spam weight has to be in the range of 0-100.' => 'Le poids doit être compris dans l\'intervalle 0-100.',
@@ -5203,6 +5204,7 @@ $trans['fr_FR'] = array(
 'More functions' => 'Plus de fonctions',
 'Please activate Javascript in your browser in order to use this feature.' => 'Merci d\'activer Javascript dans votre navigateur pour pouvoir utiliser cette fonction.',
 'Close this window' => 'Fermer cette fenêtre',
+'Only images larger than %dx%d pixels can be cropped.' => 'Seules les images de plus de %dx%d pixels peuvent être recadrées.',
 '%s posts' => '%s posts',
 '%s comments' => '%s commentaires',
 '%s private messages' => '%s messages privés',

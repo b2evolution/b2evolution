@@ -183,7 +183,10 @@ param( 'display', 'string', 'normal' );
 // - 'test'  - Default: test if htacess is supported, and try to install the file if it doesn't exist
 // - 'force' - Force updating htaccess to latest version
 // - 'skip'  - Skip this process entirely
+// pre_dump( $htaccess );
+// WARNING: be sure you do not force this in a config file (frequent on developer machines)
 param( 'htaccess', 'string', 'test' );
+// pre_dump( $htaccess );
 
 // check if we should try to connect to db if config is not done
 switch( $action )
@@ -1014,12 +1017,15 @@ switch( $action )
 
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
-		echo '<h2>'.T_('Checking files...').'</h2>';
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( true ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( true, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status
