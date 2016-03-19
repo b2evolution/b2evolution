@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -170,7 +170,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 			foreach( $response as $key=>$data )
 			{
-				$global_Cache->set( $key, serialize($data) );
+				$global_Cache->setx( $key, serialize($data) );
 			}
 
 			$global_Cache->delete( 'evonet_updates' );	// Cleanup

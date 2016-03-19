@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -79,7 +79,7 @@ class LinkCache extends DataObjectCache
 	 */
 	function LinkCache()
 	{
-		parent::DataObjectCache( 'Link', false, 'T_links', 'link_', 'link_ID' );
+		parent::__construct( 'Link', false, 'T_links', 'link_', 'link_ID' );
 	}
 
 

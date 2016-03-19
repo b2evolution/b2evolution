@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1437,6 +1437,7 @@ class User extends DataObject
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
 				'login_mask'     => '', // example: 'text $login$ text'
+				'login_class'    => 'identity_link_username',  // No used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -1498,9 +1499,13 @@ class User extends DataObject
 			}
 			// Add class "login" to detect logins by js plugins
 			$class .= ( $link_login == $this->login ? ' login' : '' );
-			if( $params['login_mask'] != '' )
+			if( !empty($params['login_mask']) )
 			{ // Apply login mask
 				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+			}
+			elseif( !empty($params['login_class']) )
+			{
+				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</a>';
 			}
 		}
 
@@ -3226,6 +3231,9 @@ class User extends DataObject
 				$new_Blog->set( 'name', $shortname.'\'s blog' );
 				$new_Blog->set( 'locale', $this->get( 'locale' ));
 				$new_Blog->set( 'urlname', urltitle_validate( $shortname, $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs', $this->get( 'locale' ) ) );
+				// Don't show a sample collection on top menu in back-office:
+				// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+				$new_Blog->set( 'favorite', 0 );
 
 				// Defines blog settings by its kind.
 				$Plugins->trigger_event( 'InitCollectionKinds', array(

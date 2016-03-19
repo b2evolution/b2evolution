@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -58,7 +58,6 @@ $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-s
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with email settings'), array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), T_('Shared with email settings'), array( 'maxlength' => 255 ) );
 	$Form->text_input( 'notification_logo', $Settings->get( 'notification_logo' ), 50, T_( 'Small site logo (URL)' ), T_('Shared with email settings'), array( 'maxlength' => 5000 ) );
-	$Form->text_input( 'notification_logo_large', $Settings->get( 'notification_logo_large' ), 50, T_( 'Large site logo (URL)' ), '', array( 'maxlength' => 5000 ) );
 	$Form->text_input( 'site_footer_text', $Settings->get( 'site_footer_text' ), 50, T_('Site footer text'), '', array( 'maxlength' => 5000 ) );
 	$Form->checkbox_input( 'site_skins_enabled', $Settings->get( 'site_skins_enabled' ), T_('Enable site skins'), array( 'note' => T_('Enables a sitewide header and footer') ) );
 	$Form->text_input( 'site_terms', $Settings->get( 'site_terms' ), 7, T_('Terms & Conditions'), T_('Enter ID of the page containing the terms & conditions.'), array( 'maxlength' => 11 ) );

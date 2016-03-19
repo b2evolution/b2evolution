@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo dh> AFAICS there are three params used for "item ID": "p", "post_ID"
  *       and "item_ID". This should get cleaned up.
@@ -43,6 +43,7 @@ global $Blog;
 global $dispatcher;
 
 $action = param_action( 'list' );
+$orig_action = $action; // Used to know what action is called really
 
 $AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 

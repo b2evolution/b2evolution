@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -331,10 +331,17 @@ function stat_session_login( $login )
  * @param string session ID
  * @param string link text
  */
-function stat_session_hits( $sess_ID,  $link_text )
+function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog;
-	return '<strong><a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
+	global $blog, $admin_url;
+
+	$tab = get_param( 'tab' );
+	if( empty( $tab ) )
+	{
+		$tab = 'hits';
+	}
+
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
 

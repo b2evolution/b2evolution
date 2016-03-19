@@ -1,3 +1,11 @@
+// ------------- Organization Members widget -------------
+@import "../../rsc/less/_org_members_widget.module.less";
+	// Override constants used in the module:
+	@widget_core_org_members-color: #333;
+	@widget_core_org_members-user-link-color: #000;
+	@widget_core_org_members-user-link-hover-color: #23527c;
+// -------------------------------------------------------
+
 // Header
 .evo_container__header {
 	margin-bottom: 30px;
@@ -12,7 +20,7 @@ div.widget_core_coll_tagline {
 	margin-bottom: 30px;
 }
 
-// Footer
+// Secondary Area:
 .secondary_area {
 	background-color: #FFF;
 	width: 100%;
@@ -20,9 +28,11 @@ div.widget_core_coll_tagline {
 		margin-top: 10px;
 	}
 }
-body.pictured .secondary_area {
+
+// Footer
+body.pictured .secondary_area footer {
 	color: #666;
-	a:not([class^=ufld_]) {
+	a {
 		color: #666;
 	}
 }
@@ -547,51 +557,5 @@ body.pictured .front_main_content .ufld_icon_links a {
 	.fa {
 		font-size: 30px;
 		line-height: 60px;
-	}
-}
-
-// Organization Members widget
-.widget_core_org_members {
-	margin: 5em 0 30px;
-	color: #333;
-	img {
-		width: 200px;
-		height: 200px;
-		display: inline-block;
-	}
-	h2.page-header {
-		margin-top: 0;
-	}
-	p.user_field {
-		margin-bottom: 40px;
-		line-height: 1.5;
-		text-overflow: ellipsis;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		// These default properties can be changed by param "Lines of extra info" of the widget "Organization Members":
-		-webkit-line-clamp: 2;
-		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
-	}
-}
-body.pictured .secondary_area .widget_core_org_members {
-	a.user_link {
-		color: #000;
-		&:hover {
-			color: #23527c;
-		}
-	}
-}
-
-// Responsive layout
-@media (max-width: 640px) {
-	body.pictured .front_main_content .ufld_icon_links a {
-		width: 45px;
-		height: 45px;
-		margin: 5px;
-		.fa {
-			font-size: 20px;
-			line-height: 45px;
-		}
 	}
 }

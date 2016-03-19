@@ -210,4 +210,6 @@ div.prism-show-language > div.prism-show-language-label {
 /* Custom b2evo styles */
 pre[class*="language-"] {
 	max-height: 28em;
+	padding-top: 0;
+	padding-bottom: 0;
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -42,11 +42,11 @@ global $pagenow;
 
 global $Session;
 
-global $mode, $admin_url, $rsc_url;
+global $mode, $admin_url, $rsc_url, $locales;
 global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
-global $redirect_to;
+global $redirect_to, $orig_action;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -145,14 +145,22 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// -- Language chooser BEGIN --
-	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
+	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
+	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
+	{	// Force to use  collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
+		$locale_options = array( $edited_Item->get( 'locale' ), $locales[ $edited_Item->get( 'locale' ) ]['name'] );
+	}
+	else
+	{	// Allow to select a locale:
+		$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	}
 
 	if( is_array( $locale_options ) )
 	{ // We've only one enabled locale.
 		// Tblue> The locale name is not really needed here, but maybe we
 		//        want to display the name of the only locale?
 		$Form->hidden( 'post_locale', $locale_options[0] );
-		//pre_dump( $locale_options );
 	}
 	else
 	{ // More than one locale => select field.
@@ -247,7 +255,8 @@ $Form->begin_form( '', '', $params );
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		$LinkOwner = new LinkItem( $edited_Item );
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, true );
+		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
+		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, $fold_images_attachments_block );
 	}
 	// ############################ ADVANCED #############################
 

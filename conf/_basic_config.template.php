@@ -90,6 +90,16 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 
 
 /**
+ * If you are a developer and you are making repeated installs of b2evolution, you might want to
+ * automatically force the install of the .htaccess file that matches the current version without
+ * requiring an extra confirmation.
+ *
+ * DO THIS ON DEVELOPMENT MACHINES ONLY! MAY BE DANGEROUS ON A PRODUCTION SERVER!
+ */
+// $htaccess = 'force';
+
+
+/**
  * $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
  * It should be set to the URL where you can find the blog templates and/or the blog stub files,
  * that means index.php, blog1.php, blog2.php, etc. as well as admin.php.

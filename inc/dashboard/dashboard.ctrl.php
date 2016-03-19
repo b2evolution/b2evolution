@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -605,11 +605,11 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		// Display info & error messages
 		$Messages->display();
 
-		$version_status_msg = $global_Cache->get( 'version_status_msg' );
+		$version_status_msg = $global_Cache->getx( 'version_status_msg' );
 		if( !empty($version_status_msg) )
 		{	// We have managed to get updates (right now or in the past):
 			echo '<p>'.$version_status_msg.'</p>';
-			$extra_msg = $global_Cache->get( 'extra_msg' );
+			$extra_msg = $global_Cache->getx( 'extra_msg' );
 			if( !empty($extra_msg) )
 			{
 				echo '<p>'.$extra_msg.'</p>';

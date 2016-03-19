@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -123,6 +123,13 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 					array( 'post', T_('Always force to post locale') ),
 					array( 'blog', T_('Follow navigation locale') ),
 			), T_('Content Display'), true );
+
+		$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
+				array(
+					array( 'use_coll', T_('Always use collection locale') ),
+					array( 'select_coll', T_('Allow select - use collection locale by default') ),
+					array( 'select_user', T_('Allow select - use user locale by default') ),
+			), T_('New Posts'), true );
 	}
 	else
 	{ // Only one locale

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @todo dh> Lazily handle properties through getters (and do not detect/do much in the constructor)!
@@ -228,7 +228,7 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
+	function __construct( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
 	{
 		global $debug;
 

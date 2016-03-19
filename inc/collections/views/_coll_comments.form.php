@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -90,17 +90,16 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedback-options') );
 
-	$advanced_perms_warning = $edited_Blog->get_advanced_perms_warning();
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
-										$advanced_perms_warning, 'onclick="show_hide_feedback_details(this);"'),
+										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'registered', T_('Registered users only'),  '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ),
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'never', T_('Not allowed'), '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Comment posting by'), true );
+					), T_('Comment posting by'), true, $edited_Blog->get_advanced_perms_warning() );
 
 	echo '<div class="feedback_details_container">';
 

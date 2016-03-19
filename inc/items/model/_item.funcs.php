@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -33,6 +33,9 @@ function init_MainList( $items_nb_limit )
 	if( ! $Plugins->trigger_event_first_true('InitMainList', array( 'MainList' => &$MainList, 'limit' => $items_nb_limit ) ) )
 	{
 		$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_nb_limit );	// COPY (FUNC)
+
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
+		$MainList->query_title_prefix = '$MainList';
 
 		if( ! $preview )
 		{
@@ -216,6 +219,9 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		// Get ready to obtain 1 post only:
 		$FeaturedList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1 );
+
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
+		$FeaturedList->query_title_prefix = '$FeaturedList';
 
 		$featured_list_filters = $MainList->filters;
 		if( ! empty( $cat ) )
@@ -1832,7 +1838,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	$Form->hidden( 'post_status', $edited_Item->status );
 	echo '<div class="btn-group dropup post_status_dropdown">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
-				.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
 			.'</button>'
 			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
@@ -1840,7 +1846,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';

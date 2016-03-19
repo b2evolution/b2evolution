@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -564,7 +564,7 @@ var downloadInterval = setInterval( function()
 					$disp = 'login';
 					param( 'action', 'string', 'req_login' );
 					// override redirect to param
-					param( 'redirect_to', 'url', regenerate_url(), true, true );
+					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 					{ // Redirect to special blog for messaging actions if it is defined in general settings
 						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
@@ -1603,7 +1603,7 @@ var downloadInterval = setInterval( function()
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
 	global $global_Cache, $credit_links;
-	$credit_links = $global_Cache->get( 'creds' );
+	$credit_links = $global_Cache->getx( 'creds' );
 
 	$Timer->pause( 'skin_init' );
 

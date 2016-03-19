@@ -1,6 +1,7 @@
 <?php
 /**
- * This is the main public interface file.
+ * This is the main public interface file. It will try to detect which collection is being requested
+ * or display the default collection. If there is none, it will call default.php.
  *
  * ---------------------------------------------------------------------------------------------------------------
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
@@ -12,9 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
- *
- * {@internal Note: we need at least one file in the main package}}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package main
  */

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -622,10 +622,10 @@ class Skin extends DataObject
 					break;
 
 				case 'select':
-					// Display a link to preview the skin
-					if( ! empty( $skin_url ) )
+					// Display a link to preview the skin:
+					if( ! empty( $disp_params['function_url'] ) )
 					{
-						echo '<a href="'.$skin_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+						echo '<a href="'.$disp_params['function_url'].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
 						echo T_('Preview').'</a>';
 					}
 					break;
@@ -794,7 +794,7 @@ class Skin extends DataObject
 	 */
 	function display_init( $features = array() )
 	{
-		global $debug, $Messages, $disp;
+		global $debug, $Messages, $disp, $UserSettings;
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
@@ -1050,6 +1050,12 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_avatar':
@@ -1059,13 +1065,36 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
+					break;
+
+				case 'disp_pwdchange':
+					// Specific features for disp=pwdchange:
+				case 'disp_userprefs':
+					// Specific features for disp=userprefs:
+				case 'disp_subs':
+					// Specific features for disp=subs:
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit':
 					// Specific features for disp=edit:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					init_tokeninput_js( 'blog' );
 
@@ -1083,13 +1112,22 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit_comment':
 					// Specific features for disp=edit_comment:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
@@ -1110,7 +1148,10 @@ class Skin extends DataObject
 					// Specific features for disp=usercomments:
 
 					// Require results.css to display item/comment query results in a table
-					require_css( 'results.css' ); // Results/tables styles
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Require functions.js to show/hide a panel with filters
 					require_js( 'functions.js', 'blog' );

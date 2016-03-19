@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -468,8 +468,6 @@ class ComponentWidget extends DataObject
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
-					'item_last_start' => '<li class="last">',
-					'item_last_end' => '</li>',
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 					'grid_end' => '</table>',
 					'grid_nb_cols' => 2,

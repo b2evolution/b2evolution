@@ -18,10 +18,20 @@
 
 Notes for site administrators:
 
-If you're ever stuck in maintenance mode and want to get OUT of it,
-rename the /conf/maintenance.html file to /conf/_maintenance.html .
+GETTING OUT OF MAINTENANCE MODE:
 
-In order to put b2evolution into maintenance mode, rename this file to maintenance.html (with NO _ at the beginning).
+If you're ever stuck in maintenance mode and want to get OUT of it,
+rename the /conf/maintenance.html or /conf/imaintenance.html or /conf/umaintenance.html file 
+to /conf/_maintenance.html (with an _ at the beggining).
+
+WARNING: If you just had an upgrade fail in the middle of it, it is a very bad idea to just
+get out of maintenance mode without immdiately restoring a DB backup first. Continuing without
+a clean DB may make it impossible to ever ugrade your b2evolution in the future.
+
+GETTING INTO MAINTENANCE MODE:
+
+In order to put b2evolution into maintenance mode, rename this file to maintenance.html 
+(with NO _ at the beginning).
 
 In order to put b2evolution into maintenance mode but still allow access to the install script,
 rename this file to imaintenance.html (with an i at the beginning).

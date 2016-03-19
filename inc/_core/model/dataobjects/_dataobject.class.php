@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -644,7 +644,9 @@ class DataObject
 
 
 	/**
-	 * Check existence of specified value in unique field.
+	 * Check existence of a specified (key) value in a UNIQUE field.
+	 * Exclude the current DataObject->ID.
+	 * This is for finding a potential Duplicate or Conflicting DataObject in the DB.
 	 *
 	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
 	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
@@ -669,9 +671,9 @@ class DataObject
 		}
 
 		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $sql_where
-						   AND $this->dbIDname != $this->ID";
+					 FROM $this->dbtablename
+					WHERE $sql_where
+					  AND $this->dbIDname != $this->ID";
 
 		return $DB->get_var( $sql );
 	}

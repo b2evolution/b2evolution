@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -317,16 +317,31 @@ class ItemQuery extends SQL
 		{ // Get the status restrictions for all blogs
 			global $DB;
 			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
+			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
+			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_all();
 		}
 		else
 		{ // Get the status restrictions for several blogs
 			$blog_IDs = explode( ',', $aggregate_coll_IDs );
 		}
 
-		$status_restrictions = array();
+		$status_coll_clauses = array();
 		foreach( $blog_IDs as $blog_ID )
-		{ // Check status permission for each blog separately
-			$status_restrictions[] = 'cat_blog_ID='.$blog_ID.' AND '.statuses_where_clause( $show_statuses, $this->dbprefix, $blog_ID, 'blog_post!', true, $this->author );
+		{	// Check status permission for each blog separately:
+			$statuses_where_clause = statuses_where_clause( $show_statuses, $this->dbprefix, $blog_ID, 'blog_post!', true, $this->author );
+			if( ! isset( $status_coll_clauses[ $statuses_where_clause ] ) )
+			{	// Initialize array item for each different status condition:
+				$status_coll_clauses[ $statuses_where_clause ] = array();
+			}
+			// Group collections by same status condition:
+			$status_coll_clauses[ $statuses_where_clause ][] = $blog_ID;
+		}
+		$status_restrictions = array();
+		foreach( $status_coll_clauses as $status_coll_clause => $status_coll_IDs )
+		{	// Initialize status permission restriction for each grouped condition that is formed above:
+			$status_restrictions[] = 'cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
 		}
 
 		$this->WHERE_and( '( '.implode( ' ) OR ( ', $status_restrictions ).' )' );

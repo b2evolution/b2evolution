@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -62,15 +62,15 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled'),
 		array( 'note' => sprintf(T_('Note: This feature needs PHP version 5.2 or higher ( Currently installed: %s )' ), phpversion() ) ) );
 
-	$Form->text_input( 'smtp_server_host', $Settings->get('smtp_server_host'), 25, T_('SMTP Host'), T_('Hostname or IP address of your SMTP server.'), array( 'maxlength' => 255 ) );
-
-	$Form->text_input( 'smtp_server_port', $Settings->get('smtp_server_port'), 5, T_('Port Number'), T_('Port number of your SMTP server (Defaults: SSL: 443, TLS: 587).'), array( 'maxlength' => 6 ) );
+	$Form->text_input( 'smtp_server_host', $Settings->get('smtp_server_host'), 25, T_('SMTP Server'), T_('Hostname or IP address of your SMTP server.'), array( 'maxlength' => 255 ) );
 
 	$Form->radio( 'smtp_server_security', $Settings->get('smtp_server_security'), array(
-																		array( 'none', T_('None'), ),
-																		array( 'ssl', T_('SSL'), ),
-																		array( 'tls', T_('TLS'), ),
-																	), T_('Encryption Method') );
+				array( 'none', T_('None'), ),
+				array( 'ssl', T_('SSL'), ),
+				array( 'tls', T_('TLS'), ),
+			), T_('Encryption Method') );
+
+	$Form->text_input( 'smtp_server_port', $Settings->get('smtp_server_port'), 5, T_('Port Number'), T_('Port number of your SMTP server (Defaults: SSL: 443, TLS: 587).'), array( 'maxlength' => 6 ) );
 
 	$Form->text_input( 'smtp_server_username', $Settings->get( 'smtp_server_username' ), 25,
 				T_('SMTP Username'), T_('User name for authenticating on your SMTP server.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );

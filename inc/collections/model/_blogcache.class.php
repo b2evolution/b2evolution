@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -40,9 +40,9 @@ class BlogCache extends DataObjectCache
 	 *
 	 * @param string Name of the order field or NULL to use name field
 	 */
-	function BlogCache( $order_by = 'blog_order' )
+	function __construct( $order_by = 'blog_order' )
 	{
-		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, $order_by,
+		parent::__construct( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, $order_by,
 			/* TRANS: "None" select option */ NT_('No blog'), 0 );
 	}
 
@@ -403,9 +403,10 @@ class BlogCache extends DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
 	 * @param string Callback method name
+	 * @param array IDs to ignore.
 	 * @return string HTML tags <option>
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name' )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
 	{
 		// We force a full load!
 		$this->load_all();

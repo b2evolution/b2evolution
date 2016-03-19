@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -41,9 +41,9 @@ class UserCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function UserCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'User', false, 'T_users', 'user_', 'user_ID', NULL, '',
+		parent::__construct( 'User', false, 'T_users', 'user_', 'user_ID', NULL, '',
 			/* TRANS: "None" select option */ NT_('No user') );
 	}
 
@@ -180,7 +180,7 @@ class UserCache extends DataObjectCache
 			$index++;
 			if( empty( $pwd_hashed ) )
 			{
-				if( $row->user_pass != md5( $row->user_salt.$pass ) )
+				if( $row->user_pass != md5( $row->user_salt.$pass, true ) )
 				{ // password doesn't match
 					continue;
 				}
@@ -190,7 +190,7 @@ class UserCache extends DataObjectCache
 				$pwd_matched = false;
 				foreach( $pwd_hashed as $encrypted_password )
 				{
-					$pwd_matched = ( sha1($row->user_pass.$pwd_salt) == $encrypted_password );
+					$pwd_matched = ( sha1( bin2hex( $row->user_pass ).$pwd_salt ) == $encrypted_password );
 					if( $pwd_matched )
 					{ // The corresponding user was found
 						break;

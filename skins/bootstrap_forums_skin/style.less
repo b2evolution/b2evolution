@@ -1,3 +1,11 @@
+// ------------- Organization Members widget -------------
+@import "../../rsc/less/_org_members_widget.module.less";
+	// Override constants used in the module:
+	@widget_core_org_members-color: #333;
+	@widget_core_org_members-user-link-color: #000;
+	@widget_core_org_members-user-link-hover-color: #23527c;
+// -------------------------------------------------------
+
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -38,14 +46,17 @@
 	padding-right: 0px;
 	text-align: center !important;
 	float: left;
+	> span > img, > a > img {
+		border-radius: 50%;
+		float: none !important;
+		margin: 0px 0px 14px 0px !important;
+	}
+	a.user {
+		display: block;
+	}
 }
 .evo_comment_text {
 	padding-right: 0px;
-}
-.evo_comment_avatar > span > img, .evo_comment_avatar > a > img {
-	border-radius: 50%;
-	float: none !important;
-	margin: 0px 0px 14px 0px !important;
 }
 
 // Breadcrumbs
@@ -142,6 +153,7 @@ ol.breadcrumb {
 			font-size: 90%;
 			color: #8b96a1;
 			display: inline-block;
+			white-space: normal !important;
 		}
 		.ft_author_info.shrinked {
 			display: none;

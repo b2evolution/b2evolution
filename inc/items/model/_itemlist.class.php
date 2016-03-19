@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -299,7 +299,7 @@ class ItemList2 extends ItemListLight
 		// echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, 'ItemList2::Query() Step 1: Get ID list' ) );
+		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).'ItemList2::Query() Step 1: Get ID list' ) );
 
 		// *** STEP 2 ***
 		$this->sql = 'SELECT *'.$select_temp_order.'
@@ -853,7 +853,7 @@ class ItemList2 extends ItemListLight
 		//echo DB::format_query( $step1_sql );
 
 		// Get list of the IDs we need:
-		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );
+		$next_ID = $DB->get_var( $step1_sql, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).'Get ID of next item' );
 
 		//pre_dump( $next_ID );
 

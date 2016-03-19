@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -299,14 +299,32 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
-			// we prolluy don't need this: $this->set( 'status', 'published' );
-			$this->set( 'locale', $default_locale );
 			$this->set( 'priority', 3 );
 			if( ! empty( $Blog ) )
 			{ // Get default post type from blog setting
 				$default_post_type = $Blog->get_setting('default_post_type');
 			}
 			$this->set( 'ityp_ID', ( empty( $default_post_type ) ? 1 /* Post */ : $default_post_type ) );
+			// Set default locale for new item:
+			if( ! empty( $Blog ) )
+			{	// Set locale depending on collection setting:
+				switch( $Blog->get_setting( 'new_item_locale_source' ) )
+				{
+					case 'use_coll':
+					case 'select_coll':
+						// Use locale of current collection by default:
+						$new_item_locale = $Blog->get( 'locale' );
+						break;
+					case 'select_user':
+						// Use locale of current user by default:
+						if( is_logged_in() )
+						{	// If current user is logged in
+							$new_item_locale = $current_User->get( 'locale' );
+						}
+						break;
+				}
+			}
+			$this->set( 'locale', ( isset( $new_item_locale ) ? $new_item_locale : $default_locale ) );
 		}
 		else
 		{
@@ -5143,6 +5161,14 @@ class Item extends ItemLight
 		}
 
 		$this->set_last_touched_ts();
+
+		// Check which locale we can use for this item:
+		$item_Blog = & $this->get_Blog();
+		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' && 
+		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
+		{	// Force to use collection locale because it is restricted by collection setting:
+			$this->set( 'locale', $item_Blog->get( 'locale' ) );
+		}
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 

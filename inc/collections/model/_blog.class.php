@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
@@ -126,13 +126,18 @@ class Blog extends DataObject
 	 */
 	var $favorite = 1;
 
+	/**
+	 * @var array IDs of moderators which must be notified about new comments
+	 */
+	var $comment_moderator_user_IDs;
+
 
 	/**
 	 * Constructor
 	 *
 	 * @param object DB row
 	 */
-	function Blog( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		global $Timer;
 
@@ -401,6 +406,7 @@ class Blog extends DataObject
 				$this->set_from_Request( 'locale' );
 				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
 				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
 			}
 
 			// Collection permissions:
@@ -2098,7 +2104,7 @@ class Blog extends DataObject
 		{
 			$warning = T_('ATTENTION: advanced <a href="%s">user</a> & <a href="%s">group</a> permissions are enabled and some logged in users may have less permissions than anonymous users.');
 			$advanced_perm_url = url_add_param( $admin_url, 'ctrl=coll_settings&amp;blog='.$this->ID.'&amp;tab=' );
-			return ' <span class="warning">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</span>';
+			return ' <b class="warning text-danger">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</b>';
 		}
 
 		return NULL;
@@ -2293,8 +2299,9 @@ class Blog extends DataObject
 		}
 
 		if( $set_default_blog_ID )
-		{ // No default blog yet, Use for first base url as "Default collection on baseurl"
-			$this->set( 'access_type', 'baseurl' );
+		{	// No default blog yet, Use for first base url as "Default collection in index.php"
+			// We need an URL scheme that uses "index.php" so that permalinks to info pages can work even when .htaccess is not properly configured.
+			$this->set( 'access_type', 'default' );
 		}
 		else
 		{ // For all other blogs use "Extra path on index.php"
@@ -2303,6 +2310,10 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
+			// Reset "all_loaded" flag in order to allow getting new created collection by ID:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->all_loaded = false;
+
 			if( $set_default_blog_ID )
 			{ // Use this blog as default because it is probably first created
 				$Settings->set( 'default_blog_ID', $this->ID );
@@ -3671,6 +3682,34 @@ class Blog extends DataObject
 		{	// Insert records to enable the default item types for this collection:
 			$DB->query( $insert_sql );
 		}
+	}
+
+
+	/**
+	 * Get IDs of moderators which must be notified about new comment
+	 *
+	 * @return array
+	 */
+	function get_comment_moderator_user_IDs()
+	{
+		if( ! isset( $this->comment_moderator_user_IDs ) )
+		{	// Get it from DB only first time and then cache in array:
+			global $DB;
+
+			$SQL = new SQL( 'Get list of moderators to notify for comment for collection #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, uset_value as notify_moderation' );
+			$SQL->FROM( 'T_users' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
+			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
+				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
+				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
+
+			$this->comment_moderator_user_IDs = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		}
+
+		return $this->comment_moderator_user_IDs;
 	}
 }
 

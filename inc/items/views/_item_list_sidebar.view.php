@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -295,6 +295,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 				'link_type' => 'context',
 				'display_checkboxes' => 1,
 				'show_locked' => true,
+				'max_colls' => 15,
 			) );
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 

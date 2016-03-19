@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -46,7 +46,7 @@ function pbm_connect( $cron = false )
 {
 	if( ! extension_loaded( 'imap' ) )
 	{	// Exit here if imap extension is not loaded:
-		pbm_msg( '<b class="red">'.T_( 'IMAP extension is NOT loaded! ').'</b>', $cron );
+		pbm_msg( '<b class="red">'.( 'IMAP extension is NOT loaded! ').'</b>', $cron );
 		return false;
 	}
 
@@ -55,7 +55,7 @@ function pbm_connect( $cron = false )
 	$host = $Settings->get('eblog_server_host').':'.$Settings->get('eblog_server_port');
 	$mailserver = '{'.$host;
 
-	pbm_msg( sprintf( T_('Connecting and authenticating to mail server %s'), '<b>'.$host.'</b>' ), $cron );
+	pbm_msg( sprintf( ('Connecting and authenticating to mail server %s'), '<b>'.$host.'</b>' ), $cron );
 
 	switch( $Settings->get('eblog_encrypt') )
 	{
@@ -104,10 +104,10 @@ function pbm_connect( $cron = false )
 			$error = implode( "<br />\n", $error );
 		}
 
-		pbm_msg( sprintf( /* TRANS: %s is the error message */ T_('Connection failed: %s'), $error ), $cron );
+		pbm_msg( sprintf( ('Connection failed: %s'), $error ), $cron );
 		return false;
 	}
-	pbm_msg( '<b class="green">'.T_('Successfully connected!').'</b>', $cron );
+	pbm_msg( '<b class="green">'.('Successfully connected!').'</b>', $cron );
 
 	@imap_errors();
 
@@ -138,7 +138,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 	$del_cntr = 0;
 	for( $index = 1; $index <= $limit; $index++ )
 	{	// Repeat for as many messages as allowed...
-		pbm_msg( '<hr /><h3>'.sprintf( T_('Processing message %s:'), '#'.$index ).'</h3>', $cron );
+		pbm_msg( '<hr /><h3>'.sprintf( ('Processing message %s:'), '#'.$index ).'</h3>', $cron );
 
 		$html_body = '';
 		$strbody = '';
@@ -150,7 +150,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		// Save email to a temporary file on hard drive, otherwise BIG attachments may take a lot of RAM:
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
-			pbm_msg( T_('Could not create temporary file.'), $cron );
+			pbm_msg( ('Could not create temporary file.'), $cron );
 			continue;
 		}
 		// Save the whole body of a specific message from the mailbox:
@@ -182,19 +182,19 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, $decodedMIME ) )
 		{	// error:
-			pbm_msg( sprintf( T_('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
+			pbm_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
 		}
 		else
 		{	// the specified message data was parsed successfully:
-			pbm_msg( T_('MIME message decoding successful'), $cron );
+			pbm_msg( ('MIME message decoding successful'), $cron );
 
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
 			{	// error:
-				pbm_msg( sprintf( T_('MIME message analyze error: %s'), $mimeParser->error ), $cron );
+				pbm_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -219,7 +219,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 				{	// HTML posting enabled
 					if( $debug )
 					{	// Display this info only in debug mode:
-						pbm_msg( sprintf( T_('HTML message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
+						pbm_msg( sprintf( ('HTML message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
 					}
 					$html_body = file_get_contents( $parsedMIME['DataFile'] );
 				}
@@ -230,7 +230,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 					{	// HTML text:
 						if( $debug )
 						{	// Display this info only in debug mode:
-							pbm_msg( sprintf( T_('HTML alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
+							pbm_msg( sprintf( ('HTML alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
 						}
 						$strbody = file_get_contents( $alternative['DataFile'] );
 						break; // stop after first alternative
@@ -239,7 +239,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 					{	// Plain text:
 						if( $debug )
 						{	// Display this info only in debug mode:
-							pbm_msg( sprintf( T_('Text alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
+							pbm_msg( sprintf( ('Text alternative message part saved as %s'), $alternative['DataFile'] ), $cron );
 						}
 						$strbody = file_get_contents( $alternative['DataFile'] );
 						break; // stop after first alternative
@@ -250,7 +250,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			{	// Mail is plain text:
 				if( $debug )
 				{	// Display this info only in debug mode:
-					pbm_msg( sprintf( T_('Plain-text message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
+					pbm_msg( sprintf( ('Plain-text message part saved as %s'), $parsedMIME['DataFile'] ), $cron );
 				}
 				$strbody = file_get_contents( $parsedMIME['DataFile'] );
 			}
@@ -261,7 +261,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 				$hasAttachment = true;
 				foreach( $parsedMIME['Attachments'] as $file )
 				{
-					pbm_msg( sprintf( T_('Attachment: %s stored as %s'), $file['FileName'], $file['DataFile'] ), $cron );
+					pbm_msg( sprintf( ('Attachment: %s stored as %s'), $file['FileName'], $file['DataFile'] ), $cron );
 				}
 			}
 
@@ -271,16 +271,16 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 				$hasRelated = true;
 				foreach( $parsedMIME['Related'] as $file )
 				{
-					pbm_msg( sprintf( T_('Related file with content ID: %s stored as %s'), $file['ContentID'], $file['DataFile'] ), $cron );
+					pbm_msg( sprintf( ('Related file with content ID: %s stored as %s'), $file['ContentID'], $file['DataFile'] ), $cron );
 				}
 			}
 
 			if( count( $mimeParser->warnings ) > 0 )
 			{
-				pbm_msg( '<h4>'.sprintf( T_('%d warnings during decode:'), count( $mimeParser->warnings ) ).'</h4>', $cron );
+				pbm_msg( '<h4>'.sprintf( ('%d warnings during decode:'), count( $mimeParser->warnings ) ).'</h4>', $cron );
 				foreach( $mimeParser->warnings as $k => $v )
 				{
-					pbm_msg( sprintf( T_('Warning: %s at position %s'), $v, $k ), $cron );
+					pbm_msg( sprintf( ('Warning: %s at position %s'), $v, $k ), $cron );
 				}
 			}
 		}
@@ -288,8 +288,8 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 
 		if( empty( $html_body ) )
 		{	// Plain-text message
-			pbm_msg( sprintf( T_('Message type: %s'), 'TEXT' ), $cron );
-			pbm_msg( sprintf( T_('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' ), $cron );
+			pbm_msg( sprintf( ('Message type: %s'), 'TEXT' ), $cron );
+			pbm_msg( sprintf( ('Message body: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $strbody ).'</pre>' ), $cron );
 
 			// Process body. First fix different line-endings (dos, mac, unix), remove double newlines
 			$content = str_replace( array( "\r", "\n\n" ), "\n", trim( $strbody ) );
@@ -309,7 +309,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		}
 		else
 		{	// HTML message
-			pbm_msg( sprintf( T_('Message type: %s'), 'HTML' ), $cron );
+			pbm_msg( sprintf( ('Message type: %s'), 'HTML' ), $cron );
 
 			if( ( $parsed_message = pbm_prepare_html_message( $html_body, $cron ) ) === false )
 			{	// No 'auth' tag provided, skip to the next message
@@ -325,7 +325,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 
 		if( empty($user_login) || empty($user_pass) )
 		{
-			pbm_msg( sprintf( T_('Please add username and password in message body in format %s.'),
+			pbm_msg( sprintf( ('Please add username and password in message body in format %s.'),
 						'"&lt;auth&gt;username:password&lt;/auth&gt;"' ), $cron );
 
 			rmdir_r( $tmpDirMIME );
@@ -333,11 +333,11 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		}
 
 		// Authenticate user
-		pbm_msg( T_('Authenticating user').': &laquo;'.$user_login.'&raquo;', $cron );
+		pbm_msg( ('Authenticating User').': &laquo;'.$user_login.'&raquo;', $cron );
 		$pbmUser = & pbm_validate_user_password( $user_login, $user_pass );
 		if( ! $pbmUser )
 		{
-			pbm_msg( sprintf( T_( 'Authentication failed for user &laquo;%s&raquo;' ), htmlspecialchars( $user_login ) ), $cron );
+			pbm_msg( sprintf( ( 'Authentication failed for user &laquo;%s&raquo;' ), htmlspecialchars( $user_login ) ), $cron );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
@@ -352,27 +352,27 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		// Activate User's locale
 		locale_activate( $pbmUser->get('locale') );
 
-		pbm_msg( '<b class="green">'.T_('Success').'</b>', $cron );
+		pbm_msg( '<b class="green">'.('Success').'</b>', $cron );
 
 		if( $post_categories = xmlrpc_getpostcategories( $content ) )
 		{
 			$main_cat_ID = array_shift($post_categories);
 			$extra_cat_IDs = $post_categories;
 
-			pbm_msg( T_('Extra categories').': '.implode( ', ', $extra_cat_IDs ), $cron );
+			pbm_msg( ('Extra categories').': '.implode( ', ', $extra_cat_IDs ), $cron );
 		}
 		else
 		{
 			$main_cat_ID = $Settings->get('eblog_default_category');
 			$extra_cat_IDs = array();
 		}
-		pbm_msg( T_('Main category ID').': '.$main_cat_ID, $cron );
+		pbm_msg( ('Main category ID').': '.$main_cat_ID, $cron );
 
 		$ChapterCache = & get_ChapterCache();
 		$pbmChapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false );
 		if( empty($pbmChapter) )
 		{
-			pbm_msg( sprintf( T_('Requested category %s does not exist!'), $main_cat_ID ), $cron );
+			pbm_msg( sprintf( ('Requested category %s does not exist!'), $main_cat_ID ), $cron );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
@@ -384,13 +384,13 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		$pbmBlog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		if( empty($pbmBlog) )
 		{
-			pbm_msg( sprintf( T_('Requested blog %s does not exist!'), $blog_ID ), $cron );
+			pbm_msg( sprintf( ('Requested collection %s does not exist!'), $blog_ID ), $cron );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
 
 		// Check permission:
-		pbm_msg( sprintf( T_('Checking permissions for user &laquo;%s&raquo; to post to Blog #%d'), $user_login, $blog_ID ), $cron );
+		pbm_msg( sprintf( ('Checking permissions for User &laquo;%s&raquo; to post to Collection #%d'), $user_login, $blog_ID ), $cron );
 		if( !$pbmUser->check_perm( 'blog_post!published', 'edit', false, $blog_ID ) )
 		{
 			pbm_msg( T_('Permission denied.'), $cron );
@@ -400,11 +400,11 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 
 		if( ($hasAttachment || $hasRelated) && !$pbmUser->check_perm( 'files', 'add', false, $blog_ID ) )
 		{
-			pbm_msg( T_( 'You have no permission to add/upload files.' ), $cron );
+			pbm_msg( ( 'You have no permission to add/upload files.' ), $cron );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
-		pbm_msg( '<b class="green">'.T_('Success').'</b>', $cron );
+		pbm_msg( '<b class="green">'.('Success').'</b>', $cron );
 
 		// Remove content after terminator
 		$eblog_terminator = $Settings->get('eblog_body_terminator');
@@ -441,12 +441,12 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 				}
 				else
 				{
-					pbm_msg( T_('Unable to access media directory. No attachments processed.'), $cron );
+					pbm_msg( ('Unable to access media directory. No attachments processed.'), $cron );
 				}
 			}
 			else
 			{
-				pbm_msg( T_('Files module is disabled or missing!'), $cron );
+				pbm_msg( ('Files module is disabled or missing!'), $cron );
 			}
 		}
 
@@ -455,7 +455,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		$renderer_params = array( 'Blog' => & $pbmBlog, 'setting_name' => 'coll_apply_rendering' );
 		$renderers = $Plugins->validate_renderer_list( $Settings->get('eblog_renderers'), $renderer_params );
 
-		pbm_msg( sprintf( T_('Applying the following text renderers: %s'), implode( ', ', $renderers ) ), $cron );
+		pbm_msg( sprintf( ('Applying the following text renderers: %s'), implode( ', ', $renderers ) ), $cron );
 
 		// Do some optional filtering on the content
 		// Typically stuff that will help the content to validate
@@ -465,7 +465,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		$params = array( 'object_type' => 'Item', 'object_Blog' => & $pbmBlog );
 		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers, $params );
 
-		pbm_msg( sprintf( T_('Filtered post content: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ), $cron );
+		pbm_msg( sprintf( ('Filtered post content: %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ), $cron );
 
 		$context = $Settings->get('eblog_html_tag_limit') ? 'commenting' : 'posting';
 		$post_title = check_html_sanity( $post_title, $context, $pbmUser );
@@ -475,8 +475,8 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		if( $Messages->has_errors() )
 		{
 			// Make it easier for user to find and correct the errors
-			pbm_msg( "\n".sprintf( T_('Processing message: %s'), $post_title ), $cron );
-			pbm_msg( $Messages->get_string( T_('Cannot post, please correct these errors:'), 'error' ), $cron );
+			pbm_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
+			pbm_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
@@ -485,7 +485,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 
 		if( $test_mode_on )
 		{	// Test mode
-			pbm_msg( '<b class="green">'.T_('It looks like the post can be successfully saved in the database. However we will not do it in test mode.').'</b>', $cron );
+			pbm_msg( '<b class="green">'.('It looks like the post can be successfully saved in the database. However we will not do it in test mode.').'</b>', $cron );
 		}
 		else
 		{
@@ -495,7 +495,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 
 			$post_status = 'published';
 
-			pbm_msg( '<h4>'.sprintf( T_('Saving item "%s" in the database'), $post_title ).'</h4>', $cron );
+			pbm_msg( '<h4>'.sprintf( ('Saving item "%s" in the database'), $post_title ).'</h4>', $cron );
 
 			// INSERT NEW POST INTO DB:
 			$edited_Item = new Item();
@@ -517,7 +517,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			// INSERT INTO DB:
 			$edited_Item->dbinsert();
 
-			pbm_msg( sprintf( T_('Item created?: %s'), ( isset( $edited_Item->ID ) ? 'yes' : 'no' ) ), $cron );
+			pbm_msg( sprintf( ('Item created?: %s'), ( isset( $edited_Item->ID ) ? 'yes' : 'no' ) ), $cron );
 
 			// Execute or schedule notifications & pings:
 			$edited_Item->handle_post_processing( true );
@@ -529,13 +529,13 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 				$order = 1;
 				foreach( $pbm_item_files as $filename )
 				{
-					pbm_msg( sprintf( T_('Saving file "%s" in the database'), $filename ), $cron );
+					pbm_msg( sprintf( ('Saving file "%s" in the database'), $filename ), $cron );
 					$pbmFile = & $FileCache->get_by_root_and_path( 'collection', $pbmBlog->ID, $filename );
 					$pbmFile->meta = 'notfound'; // Save time and don't try to load meta from DB, it's not there anyway
 					$pbmFile->dbsave();
-					pbm_msg( sprintf( T_('File saved?: %s'), ( isset( $pbmFile->ID ) ? 'yes' : 'no' ) ), $cron );
+					pbm_msg( sprintf( ('File saved?: %s'), ( isset( $pbmFile->ID ) ? 'yes' : 'no' ) ), $cron );
 
-					pbm_msg( sprintf( T_('Attaching file "%s" to the post'), $filename ), $cron );
+					pbm_msg( sprintf( ('Attaching file "%s" to the post'), $filename ), $cron );
 					// Let's make the link!
 					$pbmLink = new Link();
 					$pbmLink->set( 'itm_ID', $edited_Item->ID );
@@ -543,7 +543,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 					$pbmLink->set( 'position', 'aftermore' );
 					$pbmLink->set( 'order', $order++ );
 					$pbmLink->dbinsert();
-					pbm_msg( sprintf( T_('File attached?: %s'), ( isset( $pbmLink->ID ) ? 'yes' : 'no' ) ), $cron );
+					pbm_msg( sprintf( ('File attached?: %s'), ( isset( $pbmLink->ID ) ? 'yes' : 'no' ) ), $cron );
 				}
 
 				// Invalidate blog's media BlockCache
@@ -556,14 +556,14 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			++$post_cntr;
 		}
 
-		pbm_msg( T_('Message posting successful'), $cron );
+		pbm_msg( ('Message posting successful'), $cron );
 
 		// Delete temporary directory
 		rmdir_r( $tmpDirMIME );
 
 		if( ! $test_mode_on && $Settings->get('eblog_delete_emails') )
 		{
-			pbm_msg( sprintf( T_('Marking message for deletion from inbox: %s'), $index ), $cron );
+			pbm_msg( sprintf( ('Marking message for deletion from inbox: %s'), $index ), $cron );
 			imap_delete( $mbox, $index );
 			++$del_cntr;
 		}
@@ -596,7 +596,7 @@ function pbm_process_header( $header, & $subject, & $post_date, $cron = false )
 
 	if( utf8_substr($subject, 0, utf8_strlen($prefix)) !== $prefix )
 	{
-		pbm_msg( sprintf( T_('Subject prefix is not "%s", skip this email'), $prefix ), $cron );
+		pbm_msg( sprintf( ('Subject prefix is not "%s", skip this email'), $prefix ), $cron );
 		return false;
 	}
 
@@ -608,7 +608,7 @@ function pbm_process_header( $header, & $subject, & $post_date, $cron = false )
 		$ddate_U = @strtotime($ddate);
 		if( empty($ddate_U) || strlen($ddate_U) < 2 )
 		{
-			pbm_msg( sprintf( T_('Could not parse date header "%s"'), $ddate ), $cron );
+			pbm_msg( sprintf( ('Could not parse date header "%s"'), $ddate ), $cron );
 			return false;
 		}
 	}
@@ -636,7 +636,7 @@ function pbm_process_header( $header, & $subject, & $post_date, $cron = false )
 
 		if( ! isset( $dmonths[$match[3]] ) )
 		{
-			pbm_msg( T_('Invalid month name in message date string.'), $cron );
+			pbm_msg( ('Invalid month name in message date string.'), $cron );
 			return false;
 		}
 		$ddate_m = $dmonths[$match[3]];
@@ -667,7 +667,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 {
 	global $Settings, $pbm_item_files, $filename_max_length;
 
-	pbm_msg( '<h4>'.T_('Processing attachments').'</h4>', $cron );
+	pbm_msg( '<h4>'.('Processing attachments').'</h4>', $cron );
 
 	foreach( $mailAttachments as $attachment )
 	{
@@ -683,13 +683,13 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		if( $filename == '' )
 		{
 			$filename = 'upload_'.uniqid().'.'.$attachment['SubType'];
-			pbm_msg( sprintf( T_('Attachment without name. Using "%s".'), htmlspecialchars( $filename ) ), $cron );
+			pbm_msg( sprintf( ('Attachment without name. Using "%s".'), htmlspecialchars( $filename ) ), $cron );
 		}
 
 		// Check valid filename/extension: (includes check for locked filenames)
 		if( $error_filename = process_filename( $filename, true ) )
 		{
-			pbm_msg( T_('Invalid filename').': '.$error_filename, $cron );
+			pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
 			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
 			continue;
 		}
@@ -709,7 +709,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 				$filename = fix_filename_length( $filename, strlen( $prename ) - 1 );
 				if( $error_in_filename = process_filename( $filename, true ) )
 				{ // The file name is not valid, this is an unexpected situation, because the file name was already validated before
-					pbm_msg( T_('Invalid filename').': '.$error_filename, $cron );
+					pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
 					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
 					break;
 				}
@@ -720,15 +720,15 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		{ // Don't create file with invalid file name
 			continue;
 		}
-		pbm_msg( sprintf( T_('New file name is %s'), '<b>'.$filename.'</b>' ), $cron );
+		pbm_msg( sprintf( ('New file name is %s'), '<b>'.$filename.'</b>' ), $cron );
 
 		$imginfo = NULL;
 		if( ! $Settings->get('eblog_test_mode') )
 		{
-			pbm_msg( sprintf( T_('Saving file to: %s'), htmlspecialchars( $mediadir.$filename ) ), $cron );
+			pbm_msg( sprintf( ('Saving file to: %s'), htmlspecialchars( $mediadir.$filename ) ), $cron );
 			if( !copy( $attachment['DataFile'], $mediadir.$filename ) )
 			{
-				pbm_msg( sprintf( T_('Unable to copy uploaded file to %s'), htmlspecialchars( $mediadir.$filename ) ), $cron );
+				pbm_msg( sprintf( ('Unable to copy uploaded file to %s'), htmlspecialchars( $mediadir.$filename ) ), $cron );
 				continue;
 			}
 
@@ -737,7 +737,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 			@chmod( $mediadir.$filename, octdec( $chmod ) );
 
 			$imginfo = @getimagesize($mediadir.$filename);
-			pbm_msg( sprintf( T_('Is this an image?: %s'), ( is_array( $imginfo ) ? 'yes' : 'no' ) ), $cron );
+			pbm_msg( sprintf( ('Is this an image?: %s'), ( is_array( $imginfo ) ? 'yes' : 'no' ) ), $cron );
 		}
 
 		if( $type == 'attach' )
@@ -749,7 +749,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 			}
 			else
 			{
-				pbm_msg( sprintf( T_('The file %s will be attached to the post later, after we save the post in the database.'), '<b>'.$filename.'</b>' ), $cron );
+				pbm_msg( sprintf( ('The file %s will be attached to the post later, after we save the post in the database.'), '<b>'.$filename.'</b>' ), $cron );
 				$pbm_item_files[] = $filename;
 			}
 			$content .= "\n";
@@ -827,7 +827,7 @@ function pbm_get_auth_tag( & $content )
  */
 function pbm_prepare_html_message( $message, $cron = false )
 {
-	pbm_msg( sprintf( T_('Message body (original): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $message ).'</pre>' ), $cron );
+	pbm_msg( sprintf( ('Message body (original): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $message ).'</pre>' ), $cron );
 
 	$marker = 0;
 	if( preg_match( '~<body[^>]*>(.*?)</body>~is', $message, $result ) )
@@ -854,7 +854,7 @@ function pbm_prepare_html_message( $message, $cron = false )
 
 	if( ($auth = pbm_get_auth_tag($content)) === false )
 	{	// No 'auth' tag provided, exit
-		pbm_msg( sprintf( T_('&lt;auth&gt; tag not found! Please add username and password in message body in format %s.'),
+		pbm_msg( sprintf( ('&lt;auth&gt; tag not found! Please add username and password in message body in format %s.'),
 					'"&lt;auth&gt;username:password&lt;/auth&gt;"' ), $cron );
 		return false;
 	}
@@ -870,7 +870,7 @@ function pbm_prepare_html_message( $message, $cron = false )
 	);
 	$content = preg_replace( $patterns, '', $content );
 
-	pbm_msg( sprintf( T_('Message body (processed): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ), $cron );
+	pbm_msg( sprintf( ('Message body (processed): %s'), '<pre style="font-size:10px">'.htmlspecialchars( $content ).'</pre>' ), $cron );
 
 	return array( $auth, $content );
 }

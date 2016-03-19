@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -2282,7 +2282,7 @@ class File extends DataObject
 			{	// Add attributes "width" & "height" only when they are not disabled:
 				$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
 				if( $tag_size !== NULL )
-				{	// Change size values
+				{ // Change size values
 					$tag_size = explode( 'x', $tag_size );
 					$img_attribs['width'] = $tag_size[0];
 					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
@@ -2293,7 +2293,7 @@ class File extends DataObject
 					$img_attribs += $size_arr;
 				}
 				elseif( $thumb_sizes = $this->get_thumb_size( $size_name ) )
-				{	// Get sizes that are used for thumbnail really
+				{	// Get sizes of the generated thumbnail:
 					$img_attribs['width'] = $thumb_sizes[0];
 					$img_attribs['height'] = $thumb_sizes[1];
 				}

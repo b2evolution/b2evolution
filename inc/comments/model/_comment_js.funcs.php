@@ -366,29 +366,11 @@ echo_modalwindow_js();
 // Ban comment url
 function ban_url( authorurl )
 {
-	openModalWindow( '<span class="loader_img loader_ban_url absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+	openModalWindow( '<span class="loader_img loader_ban_url absolute_center" title="<?php echo T_('Loading...'); ?>"></span>' +
+			'<iframe id="modal_window_frame_ban" src="<?php echo $admin_url; ?>?ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl + '&crumb_antispam=<?php echo get_crumb('antispam'); ?>" width="100%" height="500px" frameborder="0" style="display:none"></iframe>',
 			'90%', '', true,
 			'<?php echo TS_('Confirm ban & delete'); ?>',
-			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ], true );
-	jQuery.ajax({
-		type: 'POST',
-		url: '<?php echo $admin_url; ?>',
-		data:
-			{ 'ctrl': 'antispam',
-				'action': 'ban',
-				'display_mode': 'js',
-				'mode': 'iframe',
-				'request': 'checkban',
-				'keyword': authorurl,
-				'crumb_antispam': '<?php echo get_crumb('antispam'); ?>',
-			},
-		success: function(result)
-		{
-			openModalWindow( result, '90%', '', true,
-				'<?php echo TS_('Confirm ban & delete'); ?>',
-				[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ] );
-		}
-	});
+			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ], true, false, 'modal_window_frame_ban' );
 }
 
 // Refresh comments on dashboard after ban url -> delete comment
@@ -401,6 +383,19 @@ function refreshAfterBan( deleted_ids )
 	}
 	var item_id = get_itemid();
 	refresh_item_comments( item_id );
+}
+
+function updateModalAfterBan( button )
+{
+	var modal_window = jQuery( '#modal_window' );
+
+	if( modal_window.length == 0 )
+	{	// Modal windown is not found on page:
+		return;
+	}
+
+	// Add button in modal bottom:
+	jQuery( '.modal-footer', modal_window ).prepend( '<button type="button" class="' + button.class + '" onclick="location.href=\'' + button.url + '\'">' + button.title + '</button>' );
 }
 
 //Process result after publish/deprecate/delete action has been completed

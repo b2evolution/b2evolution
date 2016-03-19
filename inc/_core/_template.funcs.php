@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1948,7 +1948,7 @@ function credits( $params = array() )
 		), $params );
 
 
-	$cred_links = $global_Cache->get( 'creds' );
+	$cred_links = $global_Cache->getx( 'creds' );
 	if( empty( $cred_links ) )
 	{	// Use basic default:
 		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:3:"CMS";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
@@ -2019,7 +2019,7 @@ function powered_by( $params = array() )
 
 	$img_url = str_replace( '$rsc$', $rsc_uri, $params['img_url'] );
 
-	$evo_links = $global_Cache->get( 'evo_links' );
+	$evo_links = $global_Cache->getx( 'evo_links' );
 	if( empty( $evo_links ) )
 	{	// Use basic default:
 		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:26:"powered by b2evolution CMS";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by an open-source CMS";}}}}}');
@@ -3212,7 +3212,7 @@ function init_fontawesome_icons( $icons_type = 'fontawesome' )
 	$b2evo_icons_type = $icons_type;
 
 	// Load main CSS file of font-awesome icons
-	require_css( '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css' );
+	require_css( '#fontawesome#', 'rsc_url' );
 }
 
 ?>

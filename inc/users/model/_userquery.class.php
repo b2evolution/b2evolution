@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -51,6 +51,7 @@ class UserQuery extends SQL
 				'join_session' => false,
 				'join_country' => true,
 				'join_city'    => true,
+				'join_colls'   => true,
 				'grouped'      => false,
 			), $params );
 
@@ -83,14 +84,17 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( isset( $collections_Module ) )
-		{ // We are handling blogs:
-			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
-			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
-		}
-		else
-		{
-			$this->SELECT_add( ', 0 AS nb_blogs' );
+		if( $params['join_colls'] )
+		{	// Join a count of collections:
+			if( isset( $collections_Module ) )
+			{	// We are handling blogs:
+				$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+				$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
+			}
+			else
+			{
+				$this->SELECT_add( ', 0 AS nb_blogs' );
+			}
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
@@ -439,7 +443,7 @@ class UserQuery extends SQL
 		}
 
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 

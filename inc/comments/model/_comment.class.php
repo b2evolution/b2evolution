@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -3296,49 +3296,57 @@ class Comment extends DataObject
 	{
 		global $Settings;
 
-		if( $just_posted )
-		{ // send email notification to moderators or to users with "meta comments" notification
-			$this->send_email_notifications( true, false, $executed_by_userid );
-			if( $this->is_meta() )
-			{ // Record that processing has been done in case of this meta comment
-				$this->set( 'notif_status', 'finished' );
-				$this->dbupdate();
-			}
-		}
-
-		if( $this->is_meta() )
-		{ // Meta comments were already notified when they were posted.
-			return;
-		}
-
-		if( $this->status != 'published' )
-		{ // don't send notificaitons about non published comments
-			return;
-		}
-
+		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get('outbound_notifications_mode');
 
 		if( $notifications_mode == 'off' )
-		{ // don't send notification
+		{ // Don't send notifications:
 			return false;
 		}
 
 		if( $this->get( 'notif_status' ) != 'noreq' )
-		{ // notification have been done before, or is in progress
+		{ // Notification for this comment are already done or in progress...
 			return false;
 		}
 
+		// FIRST we will send notifications to moderators and those notifications will always be immediate (fp> !?):
+
+		if( $just_posted )
+		{	// New comment, potentially awaiting moderation:
+
+			// Send email notification ONLY to moderators or users with "meta comments" notification:
+			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */ false, $executed_by_userid );
+			
+			if( $this->is_meta() )
+			{	// Record that processing has been done in case of this meta comment:
+				$this->set( 'notif_status', 'finished' );
+				$this->dbupdate();
+				return;	// No further processing for meta comments
+			}
+		}
+
+		// SECOND: we will send notidications about published comments to everyone else (including moderators in case of status change)
+
+		if( $this->status != 'published' )
+		{ // Don't send notifications about non-published comments:
+			return;
+		}
+
+		// Get parent Item:
 		$edited_Item = & $this->get_Item();
 
 		if( $notifications_mode == 'immediate' )
-		{ // Send email notifications now!
-			$this->send_email_notifications( false, $just_posted, $executed_by_userid );
+		{	// Send email notifications now!:
+
+			$this->send_email_notifications( /* $only_moderators = */ false, /* $except_moderators = */ $just_posted, $executed_by_userid );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
+
 		}
 		else
-		{ // Create scheduled job to send notifications
+		{	// Create scheduled job to send notifications:
+
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$edited_Cronjob = new Cronjob();
@@ -3361,7 +3369,8 @@ class Comment extends DataObject
 			// Record that processing has been scheduled:
 			$this->set( 'notif_status', 'todo' );
 		}
-		// update comment notification params
+
+		// update comment notification params:
 		$this->dbupdate();
 	}
 
@@ -3393,17 +3402,7 @@ class Comment extends DataObject
 
 		if( ! $this->is_meta() && ( $only_moderators || $except_moderators ) )
 		{ // we need the list of moderators:
-			$sql = 'SELECT DISTINCT user_email, user_ID, uset_value as notify_moderation
-						FROM T_users
-							LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID
-							LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID
-							LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"
-							LEFT JOIN T_groups ON grp_ID = user_grp_ID
-						WHERE ( ( bloguser_blog_ID = '.$edited_Blog->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
-								OR ( bloggroup_blog_ID = '.$edited_Blog->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) )
-								OR ( grp_perm_blogs = "editall" ) )
-							AND LENGTH(TRIM(user_email)) > 0';
-			$moderators_to_notify = $DB->get_results( $sql );
+			$moderators_to_notify = $edited_Blog->get_comment_moderator_user_IDs();
 
 			foreach( $moderators_to_notify as $moderator )
 			{

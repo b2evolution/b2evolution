@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -1582,7 +1582,7 @@ class Form extends Widget
 				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
 					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = ceil( $duration / $period['size'] );
+					$duration_value = floor( $duration / $period['size'] );
 					foreach( $periods_values as $v => $value )
 					{
 						if( $duration_value <= $value )

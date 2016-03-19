@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,6 +52,7 @@ class coll_link_list_Widget extends coll_item_list_Widget
 		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
+		$r['item_title_link_type']['defaultvalue'] = 'auto';
 		$r['disp_excerpt']['no_edit'] = true;
 		$r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -1446,6 +1446,7 @@ class _core_Module extends Module
 					'href'    => $admin_url.'#',
 					'text'    => '<span class="fa fa-wrench"></span> Dev',
 					'entries' => $dev_entries,
+					'class'   => 'debug_dev_button',
 				);
 		}
 

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -536,7 +536,7 @@ class autolinks_plugin extends Plugin
 				// An optional previous required word (allows to create groups of 2 words)
 				$previous = $this->previous_lword;
 				// Url for current word
-				$url = 'http://'.$this->replacement_link_array[ $lword ][ $this->previous_lword ];
+				$url = $this->replacement_link_array[ $lword ][ $this->previous_lword ];
 			}
 			else
 			{ // No previous word, it is a single word
@@ -544,6 +544,11 @@ class autolinks_plugin extends Plugin
 				{ // Initialize an optional previous required word and url as first of the current word
 					break;
 				}
+			}
+
+			if( ! preg_match( '#(^|[a-z]+:)//#', $url ) )
+			{	// Use default URL scheme if it is not defined by config:
+				$url = 'http://'.$url;
 			}
 
 			if( in_array( $url, $this->already_linked_array ) || in_array( $lword, $this->already_linked_usernames ) )

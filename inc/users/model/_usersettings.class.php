@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -139,9 +139,9 @@ class UserSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function UserSettings()
+	function __construct()
 	{ // constructor
-		parent::AbstractSettings( 'T_users__usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
+		parent::__construct( 'T_users__usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
 	}
 
 
@@ -172,7 +172,7 @@ class UserSettings extends AbstractSettings
 			$user_ID = $current_User->ID;
 		}
 
-		$result = parent::get( $user_ID, $setting );
+		$result = parent::getx( $user_ID, $setting );
 		if( $result == NULL )
 		{
 			$result = $Settings->get( 'def_'.$setting );
@@ -202,7 +202,7 @@ class UserSettings extends AbstractSettings
 			$user_ID = $current_User->ID;
 		}
 
-		return parent::set( $user_ID, $setting, $value );
+		return parent::setx( $user_ID, $setting, $value );
 	}
 
 

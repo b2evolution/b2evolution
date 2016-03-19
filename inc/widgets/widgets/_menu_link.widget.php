@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -538,9 +538,9 @@ class menu_link_Widget extends ComponentWidget
 		}
 
 		// Override default link text?
-		if( ! empty( $this->param_array['link_text'] ) )
+		if( ! empty( $this->disp_params['link_text'] ) )
 		{ // We have a custom link text:
-			$text = $this->param_array['link_text'];
+			$text = $this->disp_params['link_text'];
 		}
 
 		echo $this->disp_params['block_start'];

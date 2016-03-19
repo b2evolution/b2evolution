@@ -1,3 +1,55 @@
+.widget_core_org_members {
+  margin: 5em 0 30px;
+  color: #333333;
+}
+.widget_core_org_members div.evo_org_member {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.widget_core_org_members img {
+  display: inline-block;
+}
+.widget_core_org_members h3.evo_user_name {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+.widget_core_org_members div.evo_org_role {
+  margin-top: 10px;
+  margin-bottom: 0;
+  min-height: 25px;
+  font-size: 18px;
+}
+.widget_core_org_members a.user_link {
+  color: #000000;
+}
+.widget_core_org_members a.user_link:hover {
+  color: #23527c;
+}
+.widget_core_org_members div.ufld_icon_links {
+  margin-top: 10px;
+  min-height: 44px;
+}
+.widget_core_org_members p.user_field {
+  margin-top: 10px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  height: 3em;
+}
+@media (max-width: 640px) {
+  body.pictured .front_main_content .ufld_icon_links a {
+    width: 45px;
+    height: 45px;
+    margin: 5px;
+  }
+  body.pictured .front_main_content .ufld_icon_links a .fa {
+    font-size: 20px;
+    line-height: 45px;
+  }
+}
 .evo_container__header {
   margin-bottom: 30px;
 }
@@ -17,10 +69,10 @@ div.widget_core_coll_tagline {
 .secondary_area p {
   margin-top: 10px;
 }
-body.pictured .secondary_area {
+body.pictured .secondary_area footer {
   color: #666;
 }
-body.pictured .secondary_area a:not([class^=ufld_]) {
+body.pictured .secondary_area footer a {
   color: #666;
 }
 html {
@@ -473,43 +525,4 @@ body.pictured .front_main_content .ufld_icon_links a {
 body.pictured .front_main_content .ufld_icon_links a .fa {
   font-size: 30px;
   line-height: 60px;
-}
-.widget_core_org_members {
-  margin: 5em 0 30px;
-  color: #333;
-}
-.widget_core_org_members img {
-  width: 200px;
-  height: 200px;
-  display: inline-block;
-}
-.widget_core_org_members h2.page-header {
-  margin-top: 0;
-}
-.widget_core_org_members p.user_field {
-  margin-bottom: 40px;
-  line-height: 1.5;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  height: 3em;
-}
-body.pictured .secondary_area .widget_core_org_members a.user_link {
-  color: #000;
-}
-body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
-  color: #23527c;
-}
-@media (max-width: 640px) {
-  body.pictured .front_main_content .ufld_icon_links a {
-    width: 45px;
-    height: 45px;
-    margin: 5px;
-  }
-  body.pictured .front_main_content .ufld_icon_links a .fa {
-    font-size: 20px;
-    line-height: 45px;
-  }
 }

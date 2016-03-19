@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -67,6 +67,7 @@ if( $edited_Organization->ID > 0 )
 			'results_order'        => '/uorg_accepted/D',
 			'page_url'             => get_dispctrl_url( 'organizations', 'action=edit&amp;org_ID='.$edited_Organization->ID ),
 			'display_orgstatus'    => true,
+			'display_role'         => true,
 			'display_ID'           => false,
 			'display_btn_adduser'  => false,
 			'display_btn_addgroup' => false,

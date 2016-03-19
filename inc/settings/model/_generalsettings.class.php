@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -312,7 +312,7 @@ C message size exceeds',
 	 * Because the {@link $DB DB object} itself creates a connection when it gets
 	 * created "Error selecting database" occurs before we can check for it here.
 	 */
-	function GeneralSettings()
+	function __construct()
 	{
 		global $new_db_version, $DB, $demo_mode, $instance_name, $basehost;
 
@@ -322,7 +322,7 @@ C message size exceeds',
 		$DB->show_errors = false;
 
 		// Init through the abstract constructor. This should be the first DB connection.
-		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value', 0 );
+		parent::__construct( 'T_settings', array( 'set_name' ), 'set_value', 0 );
 
 		// check DB version:
 		if( $this->get( 'db_version' ) != $new_db_version )
@@ -379,7 +379,7 @@ C message size exceeds',
 	/**
 	 * Get a member param by its name
 	 *
-	 * @param mixed Name of parameter
+	 * @param string Name of parameter
 	 * @param boolean true to return param's real value
 	 * @return mixed Value of parameter
 	 */
@@ -387,22 +387,35 @@ C message size exceeds',
 	{
 		if( $real_value )
 		{
-			return parent::get( $parname );
+			return parent::getx( $parname );
 		}
 
 		switch($parname)
 		{
 			case 'allow_avatars':
-				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;
 
 			case 'upload_enabled':
-				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;
 
 			default:
-				return parent::get( $parname );
+				return parent::getx( $parname );
 		}
+	}
+
+
+	/**
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
+	 *
+	 * @param string Name of parameter
+	 * @param mixed Value
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set( $setting, $value )
+	{
+		return parent::setx( $setting, $value );
 	}
 
 }

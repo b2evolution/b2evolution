@@ -9,7 +9,7 @@
  * 
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -69,7 +69,7 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_class5.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 /**
@@ -179,8 +179,14 @@ else
 // - 'cli'     - CLI mode; Used for command line interface.
 param( 'display', 'string', 'normal' );
 
-// Force updating htaccess to new version:
-param( 'force_htaccess', 'integer', 1 );
+// How to handle htaccess:
+// - 'test'  - Default: test if htacess is supported, and try to install the file if it doesn't exist
+// - 'force' - Force updating htaccess to latest version
+// - 'skip'  - Skip this process entirely
+// pre_dump( $htaccess );
+// WARNING: be sure you do not force this in a config file (frequent on developer machines)
+param( 'htaccess', 'string', 'test' );
+// pre_dump( $htaccess );
 
 // check if we should try to connect to db if config is not done
 switch( $action )
@@ -965,12 +971,15 @@ switch( $action )
 			break;
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( false, $force_htaccess ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( false, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status
@@ -997,16 +1006,19 @@ switch( $action )
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
 		// Progress bar
-		start_install_progress_bar( T_('Uprade in progress'), get_upgrade_steps_count() );
+		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
 
-		echo '<h2>'.T_('Checking files...').'</h2>';
-		evo_flush();
-		// Check for .htaccess:
-		if( ! install_htaccess( true ) )
-		{ // Exit installation here because the .htaccess file has the some errors
-			break;
+		if( $htaccess != 'skip' )
+		{
+			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			evo_flush();
+			// Check for .htaccess:
+			if( ! install_htaccess( true, ($htaccess == 'force') ) )
+			{ // Exit installation here because the .htaccess file produced some errors
+				break;
+			}
 		}
 
 		// Update the progress bar status

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -41,9 +41,6 @@ class AdminUI extends AdminUI_general
 	function init_templates()
 	{
 		global $Messages, $debug, $Hit, $check_browser_version;
-
-		// This is included before controller specifc require_css() calls:
-		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -316,8 +313,9 @@ class AdminUI extends AdminUI_general
 					);
 
 			case 'Results':
+			case 'compact_results':
 				// Results list:
-				return array(
+				$results_template = array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
@@ -411,6 +409,18 @@ class AdminUI extends AdminUI_general
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
+				if( $name == 'compact_results' )
+				{	// Use a little different template for compact results table:
+					$results_template = array_merge( $results_template, array(
+							'before' => '<div class="results">',
+							'head_title' => '',
+							'no_results_start' => '<div class="table_scroll">'."\n"
+																		.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+							'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																		.'</tbody></table></div>'."\n\n",
+						) );
+				}
+				return $results_template;
 
 			case 'blockspan_form':
 				// Form settings for filter area:

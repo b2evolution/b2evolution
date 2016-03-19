@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -270,11 +270,6 @@ switch( $action )
 		param( 'notification_logo', 'string', '' );
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
-
-		// Large site logo url
-		param( 'notification_logo_large', 'string', '' );
-		param_check_url( 'notification_logo_large', 'http-https' );
-		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -3449,7 +3449,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$NL = "\r\n";
 
 	if( $demo_mode )
-	{ // Debug mode restriction: Sending email in debug mode is not allowed
+	{ // Debug mode restriction: Sending email in demo mode is not allowed
 		return false;
 	}
 
@@ -5391,8 +5391,12 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 			}
 			foreach( $param_list as $param )
 			{	// add each parameter to the output
-				if( !is_numeric( $param ) )
-				{	// this is a string, quote it
+				if( is_array( $param ) )
+				{	// This is an array:
+					$param = json_encode( $param );
+				}
+				elseif( !is_numeric( $param ) )
+				{	// this is a string, quote it:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
@@ -5404,14 +5408,20 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $send_as_html )
 	{	// we want to send as a html document
-		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		}
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		}
 		echo $output;
 	}
 
@@ -5706,7 +5716,7 @@ function get_active_opcode_cache()
 	{
 		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
 		$apc_info = apc_cache_info( '', true );
-		if( isset( $apc_info['num_entries'] ) && ( $apc_info['num_entries'] ) )
+		if( isset( $apc_info['num_slots'] ) && ( $apc_info['num_slots'] ) )
 		{
 			return 'APC';
 		}
@@ -6912,6 +6922,7 @@ function echo_modalwindow_js()
  *
  * @param string HTML content
  * @param string Width value in css format
+ * @param string Height value in css format
  * @param boolean TRUE - to use transparent template
  * @param string Title of modal window (Used in bootstrap)
  * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
@@ -7011,8 +7022,9 @@ var modal_window_js_initialized = false;
  * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
  * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
  * @param boolean TRUE - to clear all previous windows
+ * @param string ID of iframe where all contents
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -7070,57 +7082,18 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		jQuery( '#modal_window .modal-body' ).html( body_html );
 	}
 
-	if( use_buttons )
+	if( typeof( iframe_id ) != 'undefined' )
 	{
-		if( typeof( keep_panels ) == 'undefined' || ! keep_panels )
-		{ // Remove these elements, they are displayed as title and button of modal window
-			jQuery( '#modal_window legend' ).remove();
-			jQuery( '#modal_window #close_button' ).remove();
-			jQuery( '#modal_window .panel, #modal_window .panel-body' ).removeClass( 'panel panel-default panel-body' );
-		}
-
-		if( jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).length == 0 )
-		{ // Hide a submit button in the footer if real submit input doesn't exist
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-		}
-		else
-		{
-			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).hide();
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-		}
-
-		jQuery( '#modal_window' + button_form ).change( function()
-		{ // Find the submit inputs when html is changed
-			var input_submit = jQuery( this ).find( 'input[type=submit]' )
-			if( input_submit.length > 0 )
-			{ // Hide a real submit input and Show button of footer
-				input_submit.hide();
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-			}
-			else
-			{ // Hide button of footer if real submit input doesn't exist
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-			}
-		} );
-
-		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
-		{ // Copy a click event from real submit input to button of footer
-			jQuery( '#modal_window ' + button_form + ' input[type=submit]' ).click();
+		jQuery( '#' + iframe_id ).load( function()
+		{	// Prepare modal window only after loading full content:
+			prepareModalWindow( jQuery( this ).contents(), button_form, use_buttons, keep_panels );
+			jQuery( '#modal_window .loader_img' ).remove();
+			jQuery( '#' + iframe_id ).show();
 		} );
 	}
-
-	jQuery( '#modal_window ' + button_form + ' a.btn' ).each( function()
-	{ // Move all buttons to the footer
-		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
-			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
-			jQuery( this ).html() +
-			'</button></a>' );
-		jQuery( this ).remove();
-	} );
-
-	if( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).length > 0 )
-	{ // Change window title
-		jQuery( '#modal_window .modal-title' ).html( jQuery( '#modal_window ' + button_form + ' #current_modal_title' ).html() );
+	else
+	{
+		prepareModalWindow( '#modal_window', button_form, use_buttons, keep_panels );
 	}
 
 	// Init modal window and show
@@ -7142,6 +7115,62 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	} );
 
 	modal_window_js_initialized = true;
+}
+
+function prepareModalWindow( modal_document, button_form, use_buttons, keep_panels )
+{
+	if( use_buttons )
+	{
+		if( typeof( keep_panels ) == 'undefined' || ! keep_panels )
+		{ // Remove these elements, they are displayed as title and button of modal window
+			jQuery( 'legend', modal_document ).remove();
+			jQuery( '#close_button', modal_document ).remove();
+			jQuery( '.panel, .panel-body', modal_document ).removeClass( 'panel panel-default panel-body' );
+		}
+
+		if( jQuery( button_form + ' input[type=submit]', modal_document ).length == 0 )
+		{ // Hide a submit button in the footer if real submit input doesn't exist
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
+		}
+		else
+		{
+			jQuery( button_form + ' input[type=submit]', modal_document ).hide();
+			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
+		}
+
+		jQuery( button_form, modal_document ).change( function()
+		{ // Find the submit inputs when html is changed
+			var input_submit = jQuery( this ).find( 'input[type=submit]' )
+			if( input_submit.length > 0 )
+			{ // Hide a real submit input and Show button of footer
+				input_submit.hide();
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
+			}
+			else
+			{ // Hide button of footer if real submit input doesn't exist
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
+			}
+		} );
+
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
+		{ // Copy a click event from real submit input to button of footer
+			jQuery( button_form + ' input[type=submit]', modal_document ).click();
+		} );
+	}
+
+	jQuery( button_form + ' a.btn', modal_document ).each( function()
+	{ // Move all buttons to the footer
+		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
+			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
+			jQuery( this ).html() +
+			'</button></a>' );
+		jQuery( this ).remove();
+	} );
+
+	if( jQuery( button_form + ' #current_modal_title', modal_document ).length > 0 )
+	{ // Change window title
+		jQuery( '#modal_window .modal-title' ).html( jQuery( button_form + ' #current_modal_title', modal_document ).html() );
+	}
 }
 
 /**
@@ -7179,7 +7208,7 @@ function evo_error_handler()
 		$evo_last_handled_error = $error;
 	}
 
-	// fp> WTF?!? and what about warnings? 
+	// fp> WTF?!? and what about warnings?
 	// fp> And where do we die()? why is there not a debug_die() here?
 	// There should be ONE MILLION COMMENTS in this function to explain what we do!
 
@@ -7377,7 +7406,7 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 /**
  * Get html code of bootstrap dropdown element
- * 
+ *
  * @param array Params
  */
 function get_status_dropdown_button( $params = array() )
@@ -7554,7 +7583,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 
 /**
  * Compares two "PHP-standardized" version number strings
- * 
+ *
  * @param string First version number
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
@@ -7601,7 +7630,7 @@ function get_install_format_text( $text, $format = 'string' )
 	// Remove all new lines because we build them from requested format:
 	$text = str_replace( array( "\n", "\r" ), '', $text );
 
-	// Keep all URLs and display them 
+	// Keep all URLs and display them
 	$text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $text );
 
 	// Remove HTML tags from text:
