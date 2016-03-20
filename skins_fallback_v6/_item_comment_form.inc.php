@@ -37,9 +37,9 @@ $params = array_merge( array(
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',
-		'preview_start'        => '<div class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
+		'preview_start'        => '<article class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'preview_end'          => '</div>',
+		'preview_end'          => '</article>',
 		'preview_block_end'    => '',
 		'before_comment_error' => '<p><em>',
 		'comment_closed_text'  => '#',
