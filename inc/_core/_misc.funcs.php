@@ -5184,6 +5184,64 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 
 /**
+ * Update values of HTML tag attributes
+ *
+ * @param string HTML tag
+ * @param array Attributes
+ * @param array Actions for each attribute:
+ *              'append'  - Append to existing attribute value (Default for all)
+ *              'skip'    - Skip if attribute already exists
+ *              'replace' - Replace attribute to new value completely
+ * @return string Updated HTML tag
+ */
+function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = array() )
+{
+	if( ! preg_match( '#^<([\S]+)[^>]*>$#i', $html_tag, $tag_match ) )
+	{	// Wrong HTML tag format, Return original string:
+		return $html_tag;
+	}
+
+	$html_tag_name = $tag_match[1];
+
+	$old_attribs = array();
+	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
+	{	// Get all existing attributes:
+		foreach( $attr_matches[1] as $o => $old_attr_name )
+		{
+			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+		}
+	}
+
+	$updated_attribs = array();
+	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
+	{
+		if( isset( $old_attribs[ $new_attrib_name ] ) )
+		{	// If attribute exists in original HTML tag then Update it depending on selected action:
+			$attrib_action = isset( $attrib_actions[ $new_attrib_name ] ) ? $attrib_actions[ $new_attrib_name ] : 'append';
+			switch( $attrib_action )
+			{
+				case 'skip':
+					// Don't update old value:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ];
+					break;
+
+				case 'append':
+				default:
+					// Append new value to old:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ].' '.$new_attrib_value;
+					break;
+			}
+		}
+		// ELSE If attribute doesn't exist in original HTML tag then create new one.
+
+		$updated_attribs[] = $new_attrib_name.'="'.format_to_output( $new_attrib_value, 'formvalue' ).'"';
+	}
+
+	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>';
+}
+
+
+/**
  * Is the current page an install page?
  *
  * @return boolean
