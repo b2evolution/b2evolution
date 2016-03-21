@@ -320,7 +320,8 @@ class Backup
 				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ), PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ) );
 				if( $file_list == 0 )
 				{
-					echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+					echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'<br />'.
+						sprintf( T_('File &laquo;%s&raquo; cannot be added to ZIP archive.'), no_trailing_slash( $basepath.$included_file ) ).'</p>';
 					evo_flush();
 
 					return false;
@@ -527,7 +528,8 @@ class Backup
 			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
 			if( $file_list == 0 )
 			{
-				echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+				echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'<br />'.
+						sprintf( T_('File &laquo;%s&raquo; cannot be added to ZIP archive.'), no_trailing_slash( $backup_dirpath.$backup_sql_filename ) ).'</p>';
 				evo_flush();
 
 				return false;
