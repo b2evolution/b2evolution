@@ -1505,7 +1505,7 @@ class User extends DataObject
 			}
 			elseif( !empty($params['login_class']) )
 			{
-				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</a>';
+				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
 			}
 		}
 
