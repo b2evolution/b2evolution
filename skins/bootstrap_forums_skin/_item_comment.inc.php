@@ -67,14 +67,16 @@ if( $disp == 'single' || $disp == 'post' )
  */
 $Comment = & $params['Comment'];
 
-$comment_class = 'vs_'.$Comment->status;
-
 // Load comment's Item object:
 $Comment->get_Item();
 
 
 $Comment->anchor();
-echo '<article class="'.$comment_class.' evo_comment panel panel-default" id="comment_'.$Comment->ID.'">';
+
+echo update_html_tag_attribs( $params['comment_start'], array(
+		'class' => 'vs_'.$Comment->status, // Add style class for proper comment status
+		'id'    => 'comment_'.$Comment->ID // Add id to know what comment is used on AJAX status changing
+	), array( 'id' => 'skip' ) );
 
 // Title
 echo $params['comment_title_before'];
@@ -187,9 +189,11 @@ echo $params['comment_status_before'];
 // Status banners
 if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 { // Don't display status for previewed comments
-		$Comment->format_status( array(
-				'template' => '<div class="cell2"><div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div></div>',
+		echo '<div class="cell2">';
+		$Comment->format_statuses( array(
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 			) );
+		echo '</div>';
 		$legend_statuses[] = $Comment->status;
 }
 
