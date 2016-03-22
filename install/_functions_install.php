@@ -1136,9 +1136,9 @@ function display_install_back_link()
 {
 	global $default_locale;
 
-	echo '<ul class="pager">'
+	echo get_install_format_text( '<ul class="pager">'
 			.'<li class="previous"><a href="index.php?locale='.$default_locale.'"><span aria-hidden="true">&larr;</span> '.T_('Back to install menu').'</a></li>'
-		.'</ul>';
+		.'</ul>', 'p' );
 }
 
 
