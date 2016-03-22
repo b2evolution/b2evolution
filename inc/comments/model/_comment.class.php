@@ -552,6 +552,46 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get the vote statuses for current user
+	 *
+	 * @param string Vote type: 'spam', 'helpful'
+	 * @return boolean
+	 */
+	function get_vote_status( $type = 'spam' )
+	{
+		global $current_User, $DB, $cache_comments_vote_statuses;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in:
+			return false;
+		}
+
+		if( ! is_array( $cache_comments_vote_statuses ) )
+		{	// Initialize array first time:
+			$cache_comments_vote_statuses = array();
+		}
+
+		if( ! isset( $cache_comments_vote_statuses[ $this->ID ] ) )
+		{	// Get a vote status from DB and cache in global variable:
+			$SQL = new SQL( 'Get the vote statuses for current user and comment #'.$this->ID );
+			$SQL->SELECT( 'cmvt_spam AS spam, cmvt_helpful AS helpful' );
+			$SQL->FROM( 'T_comments__votes' );
+			$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
+			$cache_comments_vote_statuses[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+		}
+
+		if( isset( $cache_comments_vote_statuses[ $this->ID ][ $type ] ) )
+		{	// Return a vote status:
+			return $cache_comments_vote_statuses[ $this->ID ][ $type ];
+		}
+		else
+		{	// Current user didn't vote on this comment yet:
+			return false;
+		}
+	}
+
+	/**
 	 * Get the vote spam type disabled, as array.
 	 *
 	 * @param int User ID
@@ -572,19 +612,13 @@ class Comment extends DataObject
 					'spam' => 'disabled',
 			) );
 
-		$SQL = new SQL();
-		$SQL->SELECT( 'cmvt_spam' );
-		$SQL->FROM( 'T_comments__votes' );
-		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
-		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$SQL->WHERE_and( 'cmvt_spam IS NOT NULL' );
-
-		if( $vote = $DB->get_row( $SQL->get() ) )
-		{	// Get a spam vote for current comment and user
+		$vote = $this->get_vote_status( 'spam' );
+		if( $vote !== false )
+		{	// Get a spam vote for current comment and user:
 			$result['is_voted'] = true;
 			$class_disabled = 'disabled';
 			$class_voted = 'voted';
-			switch ( $vote->cmvt_spam )
+			switch ( $vote )
 			{
 				case '1': // SPAM
 					$result['icons_statuses']['spam'] = $class_voted;
@@ -623,19 +657,13 @@ class Comment extends DataObject
 					'no' => ''
 			) );
 
-		$SQL = new SQL();
-		$SQL->SELECT( 'cmvt_helpful' );
-		$SQL->FROM( 'T_comments__votes' );
-		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
-		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$SQL->WHERE_and( 'cmvt_helpful IS NOT NULL' );
-
-		if( $vote = $DB->get_row( $SQL->get() ) )
-		{	// Get a spam vote for current comment and user
+		$vote = $this->get_vote_status( 'helpful' );
+		if( $vote !== false )
+		{	// Get a helpful vote for current comment and user:
 			$result['is_voted'] = true;
 			$class_disabled = 'disabled';
 			$class_voted = 'voted';
-			switch ( $vote->cmvt_helpful )
+			switch ( $vote )
 			{
 				case '1': // YES
 					$result['icons_statuses']['yes'] = $class_voted;

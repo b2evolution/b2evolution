@@ -775,7 +775,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			return $where_condition;
 		}
 		// Select each blog
-		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs', 0, 'Get IDs of all collections' );
 		$sub_condition = '';
 		foreach( $blog_ids as $blog_id )
 		{ // create statuses where clause condition for each blog separately

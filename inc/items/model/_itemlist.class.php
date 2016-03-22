@@ -318,8 +318,8 @@ class ItemList2 extends ItemListLight
 
 		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
 
-		// Load the post read statuses if it is allowed by current collection:
-		$this->load_user_data_for_items();
+		// Load data of items from the current page at once to cache variables:
+		$this->load_list_data();
 	}
 
 
@@ -862,6 +862,40 @@ class ItemList2 extends ItemListLight
 
 		return $this->prevnext_Item[$direction][$post_navigation];
 
+	}
+
+
+	/**
+	 * Load data of items from the current page at once to cache variables
+	 *
+	 * @param array Params
+	 */
+	function load_list_data( $params = array() )
+	{
+		$params = array_merge( array(
+				'load_user_data' => true,
+				'load_postcats'  => true,
+			), $params );
+
+		$page_post_ids = $this->get_page_ID_array();
+		if( empty( $page_post_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		// Load all items of the current page in single query:
+		$ItemCache = & get_ItemCache();
+		$ItemCache->load_list( $page_post_ids );
+
+		if( $params['load_user_data'] )
+		{	// Load the user data for items:
+			$this->load_user_data_for_items();
+		}
+
+		if( $params['load_postcats'] )
+		{	// Load category associations for the items of current page:
+			postcats_get_by_IDs( $page_post_ids );
+		}
 	}
 
 

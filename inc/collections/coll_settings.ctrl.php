@@ -456,6 +456,9 @@ if( $action == 'dashboard' )
 			// Run SQL query to get results depending on current filters:
 			$CommentList->query();
 
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
+
 			// Set param prefix for URLs
 			$param_prefix = 'cmnt_fullview_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -517,7 +520,7 @@ if( $action == 'dashboard' )
 			$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
 			$chart_data[] = array(
 					'title' => T_('Posts'),
-					'value' => $post_all_counter = get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from ),
+					'value' => get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from, 'Get a count of Items metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 			// Slugs
@@ -525,7 +528,7 @@ if( $action == 'dashboard' )
 			$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
 			$chart_data[] = array(
 					'title' => T_('Slugs'),
-					'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from ),
+					'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from, 'Get a count of Slugs metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 			// Comments
@@ -533,7 +536,7 @@ if( $action == 'dashboard' )
 			$comments_sql_where = $posts_sql_where;
 			$chart_data[] = array(
 					'title' => T_('Comments'),
-					'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from ),
+					'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from, 'Get a count of Comments metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 
@@ -634,6 +637,9 @@ if( $action == 'dashboard' )
 
 			// Run SQL query to get results depending on current filters:
 			$CommentList->query();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 
 			// Set param prefix for URLs:
 			$param_prefix = 'cmnt_meta_';

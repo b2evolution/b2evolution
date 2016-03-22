@@ -1533,21 +1533,31 @@ function get_unread_messages_count( $user_ID = 0 )
 		$user_ID = $current_User->ID;
 	}
 
-	global $DB;
+	global $DB, $cache_unread_messages_count;
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'COUNT(*)' );
-	$SQL->FROM( 'T_messaging__threadstatus ts' );
-	$SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message mu
-				ON ts.tsta_first_unread_msg_ID = mu.msg_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_messaging__message mm
-				ON ts.tsta_thread_ID = mm.msg_thread_ID
-				AND mm.msg_datetime >= mu.msg_datetime' );
-	$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
-	$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= tsta_thread_leave_msg_ID' );
-	$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
+	if( ! is_array( $cache_unread_messages_count ) )
+	{	// Initialize array first time:
+		$cache_unread_messages_count = array();
+	}
 
-	return (int) $DB->get_var( $SQL->get() );
+	if( ! isset( $cache_unread_messages_count[ $user_ID ] ) )
+	{	// Get a result from DB only first time and store it in global cache array:
+		$SQL = new SQL( 'Get a count of unread messages for user #'.$user_ID );
+		$SQL->SELECT( 'COUNT(*)' );
+		$SQL->FROM( 'T_messaging__threadstatus ts' );
+		$SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message mu
+					ON ts.tsta_first_unread_msg_ID = mu.msg_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_messaging__message mm
+					ON ts.tsta_thread_ID = mm.msg_thread_ID
+					AND mm.msg_datetime >= mu.msg_datetime' );
+		$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
+		$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= tsta_thread_leave_msg_ID' );
+		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
+
+		$cache_unread_messages_count[ $user_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+	}
+
+	return $cache_unread_messages_count[ $user_ID ];
 }
 
 

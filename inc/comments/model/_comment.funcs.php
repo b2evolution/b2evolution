@@ -545,7 +545,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get number of trash comments:
-		$SQL = new SQL( 'Get number of trash comments' );
+		$SQL = new SQL( 'Get number of trash comments for open trash link' );
 		$SQL->SELECT( 'COUNT( comment_ID )' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
@@ -555,7 +555,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 		{
 			$SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $blog ) );
 		}
-		$show_recycle_bin = ( $DB->get_var( $SQL->get() ) > 0 );
+		$show_recycle_bin = ( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) > 0 );
 	}
 
 	$result = $params['before'];
