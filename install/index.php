@@ -1008,7 +1008,7 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
-		echo '<h2>'.T_('Upgrading b2evolution...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
 
 		if( $htaccess != 'skip' )
 		{
@@ -1032,7 +1032,7 @@ switch( $action )
 			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
-		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>', 'h2' );
 		evo_flush();
 
 		$is_automated_upgrade = ( $action !== 'evoupgrade' );
@@ -1060,10 +1060,8 @@ switch( $action )
 			$upgrade_result_title = T_('Upgrade completed successfully!');
 			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
 
-			?>
-			<p class="alert alert-success"><evo:success><?php echo $upgrade_result_title; ?></evo:success></p>
-			<p><?php echo $upgrade_result_body; ?></p>
-			<?php
+			echo get_install_format_text( '<p class="alert alert-success"><evo:success>'.$upgrade_result_title.'</evo:success></p>', 'p' );
+			echo get_install_format_text( '<p>'.$upgrade_result_body.'</p>', 'p' );
 
 			// Display modal window with upgrade data and instructions
 			display_install_result_window( $upgrade_result_title, $upgrade_result_body );
@@ -1077,9 +1075,7 @@ switch( $action )
 				switch_maintenance_mode( false, 'upgrade' );
 			}
 
-			?>
-			<p class="alert alert-danger" style="margin-top: 40px;"><evo:error><?php echo T_('Upgrade failed!')?></evo:error></p>
-			<?php
+			echo get_install_format_text( '<p class="alert alert-danger" style="margin-top: 40px;"><evo:error>'.T_('Upgrade failed!').'</evo:error></p>', 'p' );
 
 			// A link back to install menu
 			display_install_back_link();
@@ -1106,14 +1102,14 @@ switch( $action )
 			start_install_progress_bar( T_('Deletion in progress') );
 		}
 
-		echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $allow_evodb_reset != 1 )
 		{
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
-			echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
-			echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
+			echo get_install_format_text( '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>', 'p' );
+			echo get_install_format_text( '<p>'.T_('Then reload this page and a reset option will appear.').'</p>', 'p' );
 			// A link to back to install menu
 			display_install_back_link();
 
