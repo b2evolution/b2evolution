@@ -373,7 +373,10 @@ switch( $action )
 
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array( 'display' => true ) );
+			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
+					'display'            => true,
+					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),
+				) );
 		}
 
 		break;
