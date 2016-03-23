@@ -536,7 +536,7 @@ switch( $action )
 
 			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
-		elseif( $request_from == 'dashboard' )
+		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
 			get_comments_awaiting_moderation( $blog );
 		}
