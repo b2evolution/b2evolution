@@ -73,9 +73,10 @@ echo $params['html_tag'];
 		$js_blog_id = "\r\n		var blog_id = '".$Blog->ID."';";
 	}
 
-	add_js_headline( "// Paths used by JS functions:
+	add_js_headline( "// Paths and vars are used by JS functions:
 		var htsrv_url = '".get_samedomain_htsrv_url()."';
-		var restapi_url = '".$restapi_url."';"
+		var restapi_url = '$restapi_url';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';"
 		.$js_blog_id );
 
 	// Meta tag with generator info (Please leave this for stats)

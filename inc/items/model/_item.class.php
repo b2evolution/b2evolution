@@ -7918,6 +7918,27 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get icon of flag item
+	 *
+	 * @param array Params
+	 */
+	function get_flag_icon( $params = array() )
+	{
+		$params = array_merge( array(
+				'title_flag'   => T_('Click to flag this.'),
+				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
+			), $params );
+
+		// Get current state of flag:
+		$is_flagged = $this->get_user_data( 'item_flag' );
+
+		return get_icon( ( $is_flagged ? 'flag_on' : 'flag_off' ), 'imgtag', array(
+				'title' => ( $is_flagged ? $params['title_unflag'] : $params['title_flag'] )
+			) );
+	}
+
+
+	/**
 	 * Display button to flag item
 	 *
 	 * @param array Params
@@ -7929,8 +7950,6 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
-				'title_flag'   => T_('Click to flag this.'),
-				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
 			), $params );
 
 		if( ! $this->can_flag() )
@@ -7940,14 +7959,9 @@ class Item extends ItemLight
 
 		echo $params['before'];
 
-		// Get current state of flag:
-		$is_flagged = $this->get_user_data( 'item_flag' );
-
-		echo action_icon( '', ( $is_flagged ? 'flag_on' : 'flag_off' ), '#', '', 0, 0, array(
-				'class'   => 'action_icon evo_post_flag_btn',
-				'data-id' => $this->ID,
-			),
-			array( 'title' => ( $is_flagged ? $params['title_unflag'] : $params['title_flag'] ) ) );
+		echo '<a href="#" data-id="'.$this->ID.'" class="action_icon evo_post_flag_btn">'
+				.$this->get_flag_icon( $params )
+			.'</a>';
 
 		echo $params['after'];
 	}

@@ -99,9 +99,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		}
 
 		// Flag:
-		$Item->flag( array(
-				'after' => '',
-			) );
+		$Item->flag();
 
 		// Permalink:
 		$Item->permanent_link( array(

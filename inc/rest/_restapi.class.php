@@ -1115,6 +1115,15 @@ class RestApi
 
 		// Return current state of flag:
 		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
+
+		if( param( 'get_icon', 'integer', 0 ) )
+		{	// Get an icon of flag with new state:
+			// Use the glyph or font-awesome icons in order to get a correct icon of flag:
+			param( 'b2evo_icons_type', 'string', '' );
+
+			// Return flag icon for current state:
+			$this->add_response( 'icon', $Item->get_flag_icon() );
+		}
 	}
 
 

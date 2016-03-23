@@ -84,6 +84,8 @@ elseif( $comments_number > 25 )
 								break;
 						}
 					}
+					// Flag:
+					$Item->flag();
 					// Title:
 					$Item->title( array(
 							'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
