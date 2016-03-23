@@ -823,6 +823,125 @@ class CommentList2 extends DataObjectList2
 
 		return $Comment;
 	}
+
+
+	/**
+	 * Load data of Comments from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Comments of current list page into global $CommentCache,
+	 * Other data are loaded depending on $params, see below:
+	 *
+	 * @param array Params:
+	 *        - 'load_votes'      - use TRUE to load the votes(spam and helpful) of the current
+	 *                              logged in User for all Comments of current list page.
+	 *        - 'load_items_data' - use TRUE to load all Items of the current list page Comments
+	 *                              into global $ItemCache and category associations for these Items.
+	 *        - 'load_links'      - use TRUE to load all Links of the current list page Comments
+	 *                              into global $LinkCache, also it loads Files of these Links into global $FileCache.
+	 */
+	function load_list_data( $params = array() )
+	{
+		$params = array_merge( array(
+				'load_votes'      => true,
+				'load_items_data' => true,
+				'load_links'      => true,
+			), $params );
+
+		$page_comment_ids = $this->get_page_ID_array();
+		if( empty( $page_comment_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		// Load all comments of the current page in single query:
+		$CommentCache = & get_CommentCache();
+		$CommentCache->load_list( $page_comment_ids );
+
+		if( $params['load_votes'] )
+		{	// Load the vote statuses:
+			$this->load_vote_statuses();
+		}
+
+		if( $params['load_links'] )
+		{	// Load the links:
+			$LinkCache = & get_LinkCache();
+			$LinkCache->load_by_comment_list( $page_comment_ids );
+		}
+		
+
+		if( $params['load_items_data'] )
+		{	// Load items data:
+			$comment_items_IDs = array();
+			foreach( $CommentCache->cache as $Comment )
+			{
+				$comment_items_IDs[] = $Comment->get( 'item_ID' );
+			}
+
+			// Load all items of the current page in single query:
+			$ItemCache = & get_ItemCache();
+			$ItemCache->load_list( $comment_items_IDs );
+
+			// Load category associations for the items of current page:
+			postcats_get_by_IDs( $comment_items_IDs );
+		}
+	}
+
+
+	/**
+	 * Load the vote statuses for current user and comments of the current page list
+	 */
+	function load_vote_statuses()
+	{
+		global $current_User, $DB, $cache_comments_vote_statuses;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in:
+			return;
+		}
+
+		$page_comment_ids = $this->get_page_ID_array();
+		if( empty( $page_comment_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		if( ! is_array( $cache_comments_vote_statuses ) )
+		{	// Initialize array first time:
+			$cache_comments_vote_statuses = array();
+		}
+
+		$not_cached_comment_ids = array_diff( $page_comment_ids, array_keys( $cache_comments_vote_statuses ) );
+
+		if( empty( $not_cached_comment_ids ) )
+		{	// The vote statuses are loaded for all comments:
+			return;
+		}
+
+		// Load the vote statuses from DB and cache into global cache array:
+		$SQL = new SQL( 'Load the vote statuses for current user and comments of the current page list' );
+		$SQL->SELECT( 'cmvt_cmt_ID AS ID, cmvt_spam AS spam, cmvt_helpful AS helpful' );
+		$SQL->FROM( 'T_comments__votes' );
+		$SQL->WHERE( 'cmvt_cmt_ID IN ( '.$DB->quote( $not_cached_comment_ids ).' )' );
+		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
+		$comments_vote_statuses = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		// Load all existing votes into cache variable:
+		foreach( $comments_vote_statuses as $comments_vote_status )
+		{
+			$vote_status_comment_ID = $comments_vote_status['ID'];
+			unset( $comments_vote_status['ID'] );
+			$cache_comments_vote_statuses[ $vote_status_comment_ID ] = $comments_vote_status;
+		}
+
+		// Set all unexiting votes for requested comments in order to don't repeat SQL queries later:
+		foreach( $not_cached_comment_ids as $not_cached_comment_ID )
+		{
+			if( ! isset( $cache_comments_vote_statuses[ $not_cached_comment_ID ] ) )
+			{
+				$cache_comments_vote_statuses[ $not_cached_comment_ID ] = false;
+			}
+		}
+	}
 }
 
 ?>

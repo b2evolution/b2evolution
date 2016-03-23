@@ -975,7 +975,7 @@ function create_relations()
  */
 function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
-	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').'<br />', 'p-start-br' );
+	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' (Force='.($force_htaccess?'yes':'no').')<br />', 'p-start-br' );
 
 	if( ! $force_htaccess )
 	{	// Check if we run apache...
@@ -1136,9 +1136,9 @@ function display_install_back_link()
 {
 	global $default_locale;
 
-	echo '<ul class="pager">'
+	echo get_install_format_text( '<ul class="pager">'
 			.'<li class="previous"><a href="index.php?locale='.$default_locale.'"><span aria-hidden="true">&larr;</span> '.T_('Back to install menu').'</a></li>'
-		.'</ul>';
+		.'</ul>', 'p' );
 }
 
 

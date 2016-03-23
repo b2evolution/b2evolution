@@ -3076,6 +3076,10 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 .panel-title a.help_plugin_icon:hover {
   color: #23527c;
 }
+.panel-warning > .panel-footer {
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
 .evo_confirm_delete__title {
   margin-top: 0;
 }

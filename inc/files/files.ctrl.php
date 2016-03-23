@@ -68,6 +68,10 @@ else
 	}
 }
 
+if( $path == './' )
+{	// Fix name of root path to empty string in order to don't store this in DB before each file of root folder:
+	$path = '';
+}
 
 /*
  * Load linkable objects:

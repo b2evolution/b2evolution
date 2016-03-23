@@ -209,25 +209,86 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 
 
 /**
+ * Load category associations for requested items
+ *
+ * @param array Item IDs
+ * @return array Item categories IDs
+ */
+function postcats_get_by_IDs( $item_IDs )
+{
+	global $DB, $cache_postcats;
+
+	if( ! is_array( $cache_postcats ) )
+	{	// Initialize cache array first time:
+		$cache_postcats = array();
+	}
+
+	$not_cached_item_IDs = array_diff( $item_IDs, array_keys( $cache_postcats ) );
+
+	if( empty( $not_cached_item_IDs ) )
+	{	// The category associations are loaded for all requested items:
+		return;
+	}
+
+	// Load the category associations from DB and cache into global cache array:
+	$SQL = new SQL( 'Load the category associations for items' );
+	$SQL->SELECT( 'postcat_post_ID AS post_ID, postcat_cat_ID AS cat_ID' );
+	$SQL->FROM( 'T_postcats' );
+	$SQL->WHERE( 'postcat_post_ID IN ( '.$DB->quote( $not_cached_item_IDs ).' )' );
+	$SQL->ORDER_BY( 'postcat_post_ID, postcat_cat_ID' );
+
+	$items_postcats = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+	foreach( $items_postcats as $item_postcats )
+	{
+		if( ! isset( $cache_postcats[ $item_postcats->post_ID ] ) )
+		{
+			$cache_postcats[ $item_postcats->post_ID ] = array();
+		}
+
+		$cache_postcats[ $item_postcats->post_ID ][] = $item_postcats->cat_ID;
+	}
+
+	// Set all unexiting associations for requested items in order to don't repeat SQL queries later:
+	foreach( $not_cached_item_IDs as $not_cached_item_ID )
+	{
+		if( ! isset( $cache_postcats[ $not_cached_item_ID ] ) )
+		{
+			$cache_postcats[ $not_cached_item_ID ] = array();
+		}
+	}
+}
+
+
+/**
  * Get category associations with given item
  *
  * sam2kb> TODO: Cache item cat IDs into Item::categories property instead of global $cache_postcats
+ *
+ * @param integer Item ID
+ * @return array Item categories IDs
  */
 function postcats_get_byID( $post_ID )
 {
 	global $DB, $cache_postcats;
 
-	if( ! isset($cache_postcats[$post_ID]) )
-	{
-		$sql = 'SELECT postcat_cat_ID
-				FROM T_postcats
-				WHERE postcat_post_ID = '.$DB->quote($post_ID).'
-				ORDER BY postcat_cat_ID';
-
-		$cache_postcats[$post_ID] = $DB->get_col( $sql, 0, 'Get category associations with given item' );
+	if( ! is_array( $cache_postcats ) )
+	{	// Initialize cache array first time:
+		$cache_postcats = array();
 	}
 
-	return $cache_postcats[$post_ID];
+	if( ! isset( $cache_postcats[ $post_ID ] ) )
+	{	// Get data from DB if it is not still in cache:
+		$SQL = new SQL( 'Get category associations with given item #'.$post_ID );
+		$SQL->SELECT( 'postcat_cat_ID' );
+		$SQL->FROM( 'T_postcats' );
+		$SQL->WHERE( 'postcat_post_ID = '.$DB->quote( $post_ID ) );
+		$SQL->ORDER_BY( 'postcat_cat_ID' );
+
+		$cache_postcats[ $post_ID ] = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	}
+
+	return $cache_postcats[ $post_ID ];
 }
 
 

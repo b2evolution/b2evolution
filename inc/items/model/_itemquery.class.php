@@ -316,12 +316,11 @@ class ItemQuery extends SQL
 		// Check status permission for multiple blogs
 		if( $aggregate_coll_IDs == '*' )
 		{ // Get the status restrictions for all blogs
-			global $DB;
-			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
 			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
 			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
+			$blog_IDs = $BlogCache->get_ID_array();
 		}
 		else
 		{ // Get the status restrictions for several blogs
