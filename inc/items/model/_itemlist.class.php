@@ -866,9 +866,16 @@ class ItemList2 extends ItemListLight
 
 
 	/**
-	 * Load data of items from the current page at once to cache variables
+	 * Load data of Items from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Items of current list page into global $ItemCache,
+	 * Other data are loaded depending on $params, see below:
 	 *
-	 * @param array Params
+	 * @param array Params:
+	 *        - 'load_user_data' - use TRUE to load all data from table T_users__postreadstatus(dates of last read
+	 *                             post and comments) of the current logged in User for all Items of current list page.
+	 *                             (ONLY when a tracking unread content is enabled for the collection)
+	 *        - 'load_postcats'  - use TRUE to load all category associations for all Items of current list page.
 	 */
 	function load_list_data( $params = array() )
 	{

@@ -826,16 +826,25 @@ class CommentList2 extends DataObjectList2
 
 
 	/**
-	 * Load data of comments from the current page at once to cache variables
+	 * Load data of Comments from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Comments of current list page into global $CommentCache,
+	 * Other data are loaded depending on $params, see below:
 	 *
-	 * @param array Params
+	 * @param array Params:
+	 *        - 'load_votes'      - use TRUE to load the votes(spam and helpful) of the current
+	 *                              logged in User for all Comments of current list page.
+	 *        - 'load_items_data' - use TRUE to load all Items of the current list page Comments
+	 *                              into global $ItemCache and category associations for these Items.
+	 *        - 'load_links'      - use TRUE to load all Links of the current list page Comments
+	 *                              into global $LinkCache, also it loads Files of these Links into global $FileCache.
 	 */
 	function load_list_data( $params = array() )
 	{
 		$params = array_merge( array(
 				'load_votes'      => true,
 				'load_items_data' => true,
-				'load_links' => true,
+				'load_links'      => true,
 			), $params );
 
 		$page_comment_ids = $this->get_page_ID_array();
