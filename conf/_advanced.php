@@ -472,7 +472,7 @@ $htsrv_url_sensitive = $htsrv_url;
  *
  * @global string
  */
-$restapi_url = $baseurl.'api/v1/';
+$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request=';
 
 /**
  * Location of the XML SeRVices folder.
