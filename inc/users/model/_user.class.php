@@ -151,6 +151,13 @@ class User extends DataObject
 	var $significant_changed_values = array();
 
 	/**
+	 * TRUE if user is owner of at least one collection
+	 * @access protected
+	 * @var boolean
+	 */
+	var $is_collection_owner;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -3232,6 +3239,30 @@ class User extends DataObject
 
 
 	/**
+	 * Check if user is owner of at least one collection
+	 *
+	 * @return boolean
+	 */
+	function is_collection_owner()
+	{
+		if( is_null( $this->is_collection_owner ) )
+		{	// Get a result from DB first time and put in cache var:
+			global $DB;
+
+			$check_owner_SQL = new SQL( 'Check if user #'.$this->ID.' is owner of at least one collection' );
+			$check_owner_SQL->SELECT( 'blog_ID' );
+			$check_owner_SQL->FROM( 'T_blogs' );
+			$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
+			$check_owner_SQL->LIMIT( '1' );
+
+			$this->is_collection_owner = boolval( $DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) );
+		}
+
+		return $this->is_collection_owner;
+	}
+
+
+	/**
 	 * Get messaging possibilities between current user and $this user
 	 *
 	 * @param object Current User (the one trying to send the PM)
@@ -3240,24 +3271,7 @@ class User extends DataObject
 	 */
 	function get_msgform_possibility( $current_User = NULL, $check_level = 'PM' )
 	{
-		global $DB;
-
-		$check_owner_SQL = new SQL();
-		$check_owner_SQL->SELECT( 'blog_ID' );
-		$check_owner_SQL->FROM( 'T_blogs' );
-		$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
-		$check_owner_SQL->LIMIT( '1' );
-
-		if( $DB->get_var( $check_owner_SQL->get() ) )
-		{ // Always allow to contact this user because he is owner of at least one collection:
-			$is_collection_owner = true;
-		}
-		else
-		{
-			$is_collection_owner = false;
-		}
-
-		if( ! $is_collection_owner && ! $this->check_status( 'can_receive_any_message' ) )
+		if( ! $this->is_collection_owner() && ! $this->check_status( 'can_receive_any_message' ) )
 		{ // In case of a closed account:
 			return NULL;
 		}
@@ -3269,7 +3283,7 @@ class User extends DataObject
 				global $current_User;
 			}
 
-			if( ! $is_collection_owner && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+			if( ! $this->is_collection_owner() && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
 			{ // Contat to this user is not enabled
 				return NULL;
 			}
@@ -3284,14 +3298,14 @@ class User extends DataObject
 				}
 			}
 
-			if( $is_collection_owner || $this->accepts_email() )
+			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
 		}
 		else
 		{ // current User is not logged in
-			if( $is_collection_owner || $this->accepts_email() )
+			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}

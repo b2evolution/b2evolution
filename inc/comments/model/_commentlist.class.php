@@ -874,15 +874,20 @@ class CommentList2 extends DataObjectList2
 			$comment_items_IDs = array();
 			foreach( $CommentCache->cache as $Comment )
 			{
-				$comment_items_IDs[] = $Comment->get( 'item_ID' );
+				if( $Comment )
+				{
+					$comment_items_IDs[] = $Comment->get( 'item_ID' );
+				}
 			}
 
-			// Load all items of the current page in single query:
-			$ItemCache = & get_ItemCache();
-			$ItemCache->load_list( $comment_items_IDs );
+			if( count( $comment_items_IDs ) )
+			{	// Load all items of the current page in single query:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $comment_items_IDs );
 
-			// Load category associations for the items of current page:
-			postcats_get_by_IDs( $comment_items_IDs );
+				// Load category associations for the items of current page:
+				postcats_get_by_IDs( $comment_items_IDs );
+			}
 		}
 	}
 

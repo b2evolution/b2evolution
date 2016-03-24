@@ -421,6 +421,7 @@ if( $action == 'dashboard' )
 
 	if ( $blog )
 	{
+		$Timer->start( 'Panel: Comments Awaiting Moderation' );
 		load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 		$block_item_Widget = new Widget( 'dash_item' );
 		$nb_blocks_displayed = 0;
@@ -472,8 +473,10 @@ if( $action == 'dashboard' )
 
 		// Check if we have comments and posts to moderate
 		$have_comments_to_moderate = $user_perm_moderate_cmt && $CommentList->result_num_rows;
+		$Timer->pause( 'Panel: Comments Awaiting Moderation' );
 
 		// Posts for Moderation
+		$Timer->start( 'Panel: Posts Awaiting Moderation' );
 		$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
 		ob_start();
 		foreach( $post_moderation_statuses as $status )
@@ -485,6 +488,7 @@ if( $action == 'dashboard' )
 		}
 		$posts_awaiting_moderation_content = ob_get_contents();
 		ob_clean();
+		$Timer->pause( 'Panel: Posts Awaiting Moderation' );
 
 		// Check if we have posts that $blog_moderation
 		$have_posts_to_moderate = ! empty( $posts_awaiting_moderation_content );
@@ -499,7 +503,7 @@ if( $action == 'dashboard' )
 		echo '<div class="row browse">';
 
 		// Block Group 1
-		$Timer->start( 'Block 1' );
+		$Timer->start( 'Panel: Collection Metrics' );
 		echo '<!-- Start of Block Group 1 -->';
 		echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 
@@ -548,13 +552,12 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
-		$Timer->stop( 'Block 1' );
+		$Timer->stop( 'Panel: Collection Metrics' );
 		evo_flush();
 
 		// Block Group 2
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
-			$Timer->start( 'Block 2' );
 			echo '<!-- Start of Block Group 2 -->';
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
 
@@ -563,6 +566,7 @@ if( $action == 'dashboard' )
 			{
 				load_funcs( 'comments/model/_comment_js.funcs.php' );
 
+				$Timer->resume( 'Panel: Comments Awaiting Moderation' );
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
@@ -580,38 +584,39 @@ if( $action == 'dashboard' )
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				echo '<div id="comments_container">';
+
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 				$Timer->start( 'show_comments_awaiting_moderation' );
-
 				// erhsatingin > this takes up most of the rendering time!
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
-
 				$Timer->stop( 'show_comments_awaiting_moderation' );
+
 				echo '</div>';
 				$block_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div></div>';
 				echo '<!-- End of Comments Awaiting Moderation Block -->';
+				$Timer->stop( 'Panel: Comments Awaiting Moderation' );
 			}
 
 			// Posts Awaiting Moderation Block
 			if( !empty( $have_posts_to_moderate ) )
 			{
+				$Timer->resume( 'Panel: Posts Awaiting Moderation' );
 				echo '<!-- Start of Posts Awaiting Moderation Block -->';
 				echo '<div class="items_container evo_content_block">';
 				echo $posts_awaiting_moderation_content;
 				echo '</div>';
 				echo '<!-- End of Posts Awaiting Moderation Block -->';
+				$Timer->stop( 'Panel: Posts Awaiting Moderation' );
 			}
 
 			// The following div is required to ensure that Block Group 3 will align properly on large screen media
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
-			$Timer->stop( 'Block 2' );
 		}
 		evo_flush();
 
 		// Block Group 3
-		$Timer->start( 'Block 3' );
 		echo '<!-- Start of Block Group 3 -->';
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
@@ -626,6 +631,7 @@ if( $action == 'dashboard' )
 		{
 
 			// Latest Meta Comments Block
+			$Timer->start( 'Panel: Latest Meta Comments' );
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
@@ -683,9 +689,10 @@ if( $action == 'dashboard' )
 				echo '</div>';
 				echo '<!-- End of Latest Meta Comments Block-->';
 			}
+			$Timer->start( 'Panel: Latest Meta Comments' );
 		}
-		$Timer->stop( 'Block 3' );
 
+		$Timer->start( 'Panel: Recently Edited Post' );
 		// Recently Edited Posts Block
 		// Create empty List:
 		$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -705,6 +712,7 @@ if( $action == 'dashboard' )
 		{	// We have recent edits
 
 			$nb_blocks_displayed++;
+
 			echo '<!-- Start of Recently Edited Post Block-->';
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
@@ -788,6 +796,7 @@ if( $action == 'dashboard' )
 
 			echo '</div></div>';
 			echo '<!-- End of Recently Edited Post Block -->';
+			$Timer->stop( 'Panel: Recently Edited Post' );
 
 			$block_item_Widget->disp_template_raw( 'block_end' );
 		}

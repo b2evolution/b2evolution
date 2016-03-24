@@ -57,6 +57,9 @@ function init_MainList( $items_nb_limit )
 			// Run the query:
 			$MainList->query();
 
+			// Load data of items from the current page at once to cache variables:
+			$MainList->load_list_data();
+
 			// Old style globals for category.funcs:
 			$postIDlist = $MainList->get_page_ID_list();
 			$postIDarray = $MainList->get_page_ID_array();
