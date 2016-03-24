@@ -40,6 +40,9 @@ if( $cat > 0 )
 	$MainList->query();
 	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
 
+	// Load data of items from the current page at once to cache variables:
+	$MainList->load_list_data();
+
 	// Breadcrumbs
 	$Skin->display_breadcrumbs( $cat );
 }

@@ -317,9 +317,6 @@ class ItemList2 extends ItemListLight
 		//echo DB::format_query( $this->sql );
 
 		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
-
-		// Load data of items from the current page at once to cache variables:
-		$this->load_list_data();
 	}
 
 
