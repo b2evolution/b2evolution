@@ -51,6 +51,10 @@ switch ( $action )
 		}
 		$Settings->set( 'timeout_online', $timeout_online );
 
+		// Enable visit tracking
+		param( 'enable_visit_tracking', 'integer', 0 );
+		$Settings->set( 'enable_visit_tracking', $enable_visit_tracking );
+
 		// keep old allow_avatars setting value to check if we need to invalidate pagecaches
 		$old_allow_avatars = $Settings->get( 'allow_avatars' );
 

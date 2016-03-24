@@ -130,6 +130,9 @@ switch( $disp )
 	case 'subs':
 		require $inc_path.'users/views/_user_subscriptions.form.php';
 		break;
+	case 'visits':
+		require $inc_path.'users/views/_user_profile_visits.view.php';
+		break;
 	default:
 		debug_die( "Unknown user tab" );
 }

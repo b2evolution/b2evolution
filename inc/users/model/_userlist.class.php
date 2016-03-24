@@ -334,20 +334,20 @@ class UserList extends DataObjectList2
 		$gender_other = param( 'gender_other', 'boolean', strpos( $this->default_filters['gender'], 'O' ), true );
 		if( $gender_men || $gender_women || $gender_other )
 		{
-			if( $gender_men ) 
+			if( $gender_men )
 			{
 				$this->filters['gender'] = 'M';
 			}
-			if( $gender_women ) 
+			if( $gender_women )
 			{
 				$this->filters['gender'] .= 'F';
 			}
-			if( $gender_other ) 
+			if( $gender_other )
 			{
 				$this->filters['gender'] .= 'O';
 			}
 		}
-		
+
 		/*
 		 * Restrict by status
 		 */
@@ -514,6 +514,10 @@ class UserList extends DataObjectList2
 		{	// Filter by organization ID:
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
+		}
+		if( isset( $this->query_params['where_viewed_user'] ) )
+		{ // Filter by user profile viewed
+			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );
 		}
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users

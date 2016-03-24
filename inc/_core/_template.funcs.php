@@ -438,6 +438,7 @@ function get_request_title( $params = array() )
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
 			'subs_text'           => T_('Notifications'),
+			'visits_text'         => T_('Profile Visits'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
 			'edit_comment_text'   => T_('Editing comment'),
@@ -545,6 +546,11 @@ function get_request_title( $params = array() )
 		case 'subs':
 			// We are requesting the subscriptions screen:
 			$r[] = $params['subs_text'];
+			break;
+
+		case 'visits':
+			// We are requesting the profile visits screen:
+			$r[] = $params['visits_text'];
 			break;
 
 		case 'msgform':

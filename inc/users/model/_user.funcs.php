@@ -1153,7 +1153,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		$is_admin_tab = false;
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'report' ) ) ) )
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits', 'report' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -2409,6 +2409,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'text' => T_('Notifications'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
 
+		if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+		{
+			$users_sub_entries['visits'] = array(
+								'text' => T_('Visits'),
+								'href' => url_add_param( $base_url, $ctrl_param.'visits'.$user_param ) );
+		}
+
 		if( $is_admin )
 		{	// show this only in backoffice
 			$users_sub_entries['advanced'] = array(
@@ -2565,6 +2572,15 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
+function add_user_profile_visit( $user_ID, $visitor_user_ID )
+{
+	global $DB, $servertimenow;
+
+	$timestamp = date2mysql( $servertimenow );
+
+	return $DB->query( 'REPLACE INTO T_users__profile_visits( upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts )
+			VALUES ( '.$user_ID.', '.$visitor_user_ID.', "'.$timestamp.'" )' );
+}
 
 /**
  * Check if user can receive new email today with the given email type or the limit was already exceeded
@@ -4960,6 +4976,7 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'viewed_user'          => NULL,
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
 			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
@@ -5046,6 +5063,7 @@ function users_results_block( $params = array() )
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
+			'where_viewed_user'   => $params['viewed_user'],
 		) );
 	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
 	$UserList->title = $params['results_title'];
@@ -5177,7 +5195,7 @@ function users_results( & $UserList, $params = array() )
 			'display_regdate'    => true,
 			'display_regcountry' => true,
 			'display_update'     => true,
-			'display_lastvisit'  => true,
+			'display_lastvisit'  => false,
 			'display_lastvisit_view' => 'exact_date',
 			'display_lastvisit_cheat' => 0,
 			'display_contact'    => true,
@@ -5203,6 +5221,7 @@ function users_results( & $UserList, $params = array() )
 			'td_class_city'      => 'shrinkwrap small',
 			'th_class_lastvisit' => 'shrinkwrap small',
 			'td_class_lastvisit' => 'center small',
+			'viewed_user'        => false,
 		), $params );
 
 	if( $UserList->filters['group'] != -1 )
@@ -5598,6 +5617,17 @@ function users_results( & $UserList, $params = array() )
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
+				);
+		}
+
+		if( $params['viewed_user'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Last visit on your profile'),
+					'th_class' => 'small',
+					//'td_class' => 'shrinkwrap small',
+					'order' => 'upv_last_visit_ts',
+					'td' => '%mysql2localedate( #upv_last_visit_ts#, "M-d" )%'
 				);
 		}
 	}

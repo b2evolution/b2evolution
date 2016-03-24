@@ -213,6 +213,15 @@ $schema_queries = array(
 			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_users__profile_visits' => array(
+		'Crating table for profile visits',
+		"CREATE TABLE T_users__profile_visits (
+			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_i18n_original_string' => array(
 		'Creating table for a latest version of the POT file',
 		"CREATE TABLE T_i18n_original_string (

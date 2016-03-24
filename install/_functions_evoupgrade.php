@@ -7358,6 +7358,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11735, 'Creating table for user profile visits...' ) )
+	{	// part of 6.7.0
+		db_create_table( 'T_users__profile_visits', '
+				upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

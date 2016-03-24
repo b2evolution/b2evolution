@@ -526,13 +526,18 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
+elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
+{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
+	$disp = '403';
+	$disp_detail = '403-visit-tracking-disabled';
+}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
-		
+
 		// erhsatingin> Is this the right place to increment the download count?
 		$link_ID = param( 'download', 'integer', false);
 		$LinkCache = & get_LinkCache();
@@ -617,6 +622,12 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	$disp_detail = '404-post_not_found';
 }
 
+param( 'user_ID', 'integer', NULL );
+if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{ // add or increment to user profile visit
+	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
@@ -657,6 +668,7 @@ if( is_logged_in() && // Only for logged in users
 		// EXIT HERE
 	}
 }
+
 
 
 /*

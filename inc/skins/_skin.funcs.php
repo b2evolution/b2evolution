@@ -1220,6 +1220,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'users':
+		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
@@ -1693,6 +1694,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'      => '_profile.disp.php',
 				'disp_userprefs'      => '_profile.disp.php',
 				'disp_subs'           => '_profile.disp.php',
+				'disp_visits'         => '_profile.disp.php',
 				'disp_search'         => '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
 				'disp_sitemap'        => '_sitemap.disp.php',
@@ -2595,11 +2597,11 @@ function skin_body_attrs( $params = array() )
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	if ( ! empty($Blog) )
 	{
-		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_includes';
 		}
-		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
 		}
