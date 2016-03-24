@@ -3382,9 +3382,11 @@ class Comment extends DataObject
 		if( $just_posted )
 		{	// New comment, potentially awaiting moderation:
 
-			// Send email notification ONLY to moderators or users with "meta comments" notification:
+			// Send email notification about:
+			//   1. NORMAL comment ONLY to moderators
+			//   2. META comment ONLY to users with "meta comments" notification
 			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */ false, $executed_by_userid );
-			
+
 			if( $this->is_meta() )
 			{	// Record that processing has been done in case of this meta comment:
 				$this->set( 'notif_status', 'finished' );
@@ -3396,12 +3398,9 @@ class Comment extends DataObject
 		// SECOND: we will send notidications about published comments to everyone else (including moderators in case of status change)
 
 		if( $this->status != 'published' )
-		{ // Don't send notifications about non-published comments:
+		{	// Don't send notifications about non-published comments:
 			return;
 		}
-
-		// Get parent Item:
-		$edited_Item = & $this->get_Item();
 
 		if( $notifications_mode == 'immediate' )
 		{	// Send email notifications now!:
@@ -3410,7 +3409,6 @@ class Comment extends DataObject
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
-
 		}
 		else
 		{	// Create scheduled job to send notifications:
@@ -3462,109 +3460,111 @@ class Comment extends DataObject
 			return;
 		}
 
+		$UserCache = & get_UserCache();
+
 		$edited_Item = & $this->get_Item();
 		$edited_Blog = & $edited_Item->get_Blog();
 		$owner_User = $edited_Blog->get_owner_User();
 		$notify_users = array();
 		$moderators = array();
 
-		if( ! $this->is_meta() && ( $only_moderators || $except_moderators ) )
-		{ // we need the list of moderators:
-			$moderators_to_notify = $edited_Blog->get_comment_moderator_user_IDs();
+		if( ! $this->is_meta() )
+		{	// Get the notify users for NORMAL comments:
 
-			foreach( $moderators_to_notify as $moderator )
-			{
-				$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
-				if( $notify_moderator )
-				{ // add user to notify
-					$moderators[] = $moderator->user_ID;
-				}
-			}
-			if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
-			{ // add blog owner
-				$moderators[] = $owner_User->ID;
-			}
+			if( $only_moderators || $except_moderators )
+			{	// we need the list of moderators:
+				$moderators_to_notify = $edited_Blog->get_comment_moderator_user_IDs();
 
-			// Load all moderators, and check each edit permission on this comment
-			$UserCache = & get_UserCache();
-			$UserCache->load_list( $moderators );
-			foreach( $moderators as $index => $moderator_ID )
-			{
-				$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
-				if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
-				{ // User doesn't exists any more, or has no permission to edit this comment!
-					unset( $moderators[$index] );
-				}
-				elseif( $only_moderators )
+				foreach( $moderators_to_notify as $moderator )
 				{
-					$notify_users[$moderator_ID] = 'moderator';
+					$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
+					if( $notify_moderator )
+					{	// add user to notify:
+						$moderators[] = $moderator->user_ID;
+					}
 				}
-			}
-		}
+				if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
+				{	// add blog owner:
+					$moderators[] = $owner_User->ID;
+				}
 
-		if( ! $this->is_meta() && ! $only_moderators )
-		{ // Not only moderators needs to be notified:
-			$except_condition = '';
-
-			if( $except_moderators && ( ! empty( $moderators ) ) )
-			{ // Set except moderators condition. Exclude moderators who already got a notification email.
-				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
-			}
-
-			// Check if we need to include the item creator user:
-			$creator_User = & $edited_Item->get_creator_User();
-			if( $UserSettings->get( 'notify_published_comments', $creator_User->ID ) && ( ! empty( $creator_User->email ) )
-				&& ( ! ( in_array( $creator_User->ID, $moderators ) ) ) )
-			{ // Post creator wants to be notified, and post author is not a moderator...
-				$notify_users[$creator_User->ID] = 'creator';
-			}
-
-			// Get list of users who want to be notified about the this post comments:
-			if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
-			{ // item subscriptions is allowed
-				$sql = 'SELECT DISTINCT user_ID
-									FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
-								 WHERE isub_item_ID = '.$edited_Item->ID.'
-								   AND isub_comments <> 0
-								   AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
-				$notify_list = $DB->get_results( $sql );
-
-				// Preprocess list:
-				foreach( $notify_list as $notification )
+				// Load all moderators, and check each edit permission on this comment:
+				$UserCache->load_list( $moderators );
+				foreach( $moderators as $index => $moderator_ID )
 				{
-					if( ! isset( $notify_users[ $notification->user_ID ] ) )
-					{ // Don't rewrite a notify type if user already is notified by other type before
-						$notify_users[ $notification->user_ID ] = 'item_subscription';
+					$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+					if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
+					{	// User doesn't exists any more, or has no permission to edit this comment!
+						unset( $moderators[$index] );
+					}
+					elseif( $only_moderators )
+					{
+						$notify_users[$moderator_ID] = 'moderator';
 					}
 				}
 			}
 
-			// Get list of users who want to be notfied about this blog comments:
-			if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
-			{ // blog subscription is allowed
-				$sql = 'SELECT DISTINCT user_ID
-								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-							 WHERE sub_coll_ID = '.$edited_Blog->ID.'
-							   AND sub_comments <> 0
-							   AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
-				$notify_list = $DB->get_results( $sql );
+			if( ! $only_moderators )
+			{	// Not only moderators needs to be notified:
+				$except_condition = '';
 
-				// Preprocess list:
-				foreach( $notify_list as $notification )
-				{
-					if( ! isset( $notify_users[ $notification->user_ID ] ) )
-					{ // Don't rewrite a notify type if user already is notified by other type before
-						$notify_users[ $notification->user_ID ] = 'blog_subscription';
+				if( $except_moderators && ( ! empty( $moderators ) ) )
+				{	// Set except moderators condition. Exclude moderators who already got a notification email:
+					$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
+				}
+
+				// Check if we need to include the item creator user:
+				$creator_User = & $edited_Item->get_creator_User();
+				if( $UserSettings->get( 'notify_published_comments', $creator_User->ID ) && ( ! empty( $creator_User->email ) )
+					&& ( ! ( in_array( $creator_User->ID, $moderators ) ) ) )
+				{	// Post creator wants to be notified, and post author is not a moderator:
+					$notify_users[$creator_User->ID] = 'creator';
+				}
+
+				// Get list of users who want to be notified about the this post comments:
+				if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
+				{ // item subscriptions is allowed
+					$sql = 'SELECT DISTINCT user_ID
+										FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
+									 WHERE isub_item_ID = '.$edited_Item->ID.'
+										 AND isub_comments <> 0
+										 AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
+					$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the the post #'.$edited_Item->ID );
+
+					// Preprocess list:
+					foreach( $notify_list as $notification )
+					{
+						if( ! isset( $notify_users[ $notification->user_ID ] ) )
+						{	// Don't rewrite a notify type if user already is notified by other type before:
+							$notify_users[ $notification->user_ID ] = 'item_subscription';
+						}
+					}
+				}
+
+				// Get list of users who want to be notified about this blog comments:
+				if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
+				{	// If blog subscription is allowed:
+					$sql = 'SELECT DISTINCT user_ID
+									FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
+								 WHERE sub_coll_ID = '.$edited_Blog->ID.'
+									 AND sub_comments <> 0
+									 AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
+					$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the collection #'.$edited_Blog->ID );
+
+					// Preprocess list:
+					foreach( $notify_list as $notification )
+					{
+						if( ! isset( $notify_users[ $notification->user_ID ] ) )
+						{	// Don't rewrite a notify type if user already is notified by other type before:
+							$notify_users[ $notification->user_ID ] = 'blog_subscription';
+						}
 					}
 				}
 			}
 		}
-
-		if( $this->is_meta() )
-		{ // Meta comments have a special notification
-			$UserCache = & get_UserCache();
-
-			$meta_SQL = new SQL();
+		else
+		{	// Get the notify users for META comments:
+			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$edited_Item->ID.' meta comments and would like to recieve notifications' );
 			$meta_SQL->SELECT( 'user_ID, "meta_comment"' );
 			$meta_SQL->FROM( 'T_users' );
 			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -3572,11 +3572,11 @@ class Comment extends DataObject
 			$meta_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$edited_Blog->ID );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$edited_Blog->ID );
-			// Check if users have access to the back-office
+			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
-			// Check if the users would like to receive notifications about new meta comments
+			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
-			// Check if the users have permission to edit this Item
+			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $edited_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
 			if( $edited_Blog->get( 'advanced_perms' ) )
@@ -3601,8 +3601,8 @@ class Comment extends DataObject
 			}
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
-			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications
-			$notify_users = $DB->get_assoc( $meta_SQL->get() );
+			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
+			$notify_users = $DB->get_assoc( $meta_SQL->get(), $meta_SQL->title );
 		}
 
 		if( ( $executed_by_userid != NULL ) && isset( $notify_users[$executed_by_userid] ) )
@@ -3643,8 +3643,7 @@ class Comment extends DataObject
 			$author_user_ID = NULL;
 		}
 
-		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one
-		$UserCache = & get_UserCache();
+		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
 		$UserCache->load_list( array_keys( $notify_users ) );
 
 		// Load a list with the blocked emails  in cache
