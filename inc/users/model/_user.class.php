@@ -2346,11 +2346,12 @@ class User extends DataObject
 			$perm_target_ID = $perm_target;
 		}
 
-		if( isset($perm_target_ID)	// if it makes sense to check the cache
-			&& isset($this->cache_perms[$permname][$permlevel][$perm_target_ID]) )
-		{ // Permission in available in Cache:
-			$Debuglog->add( "Got perm [$permname][$permlevel][$perm_target_ID] from cache", 'perms' );
-			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
+		$cache_permname = $permname; // save original name because $permname can be changed below
+		$cache_target_ID = isset( $perm_target_ID ) ? $perm_target_ID : 'null';
+		if( isset( $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] ) )
+		{	// Permission is available in Cache:
+			$Debuglog->add( "Got perm [$cache_permname][$permlevel][$cache_target_ID] from cache", 'perms' );
+			return $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
 		}
 
 
@@ -2931,11 +2932,8 @@ class User extends DataObject
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:".( is_object( $perm_target ) ? get_class( $perm_target ).'('.$perm_target_ID.')' : ( is_array( $perm_target ) ? implode( ', ', $perm_target ) : $perm_target ) ).")" );
 		}
 
-		if( isset($perm_target_ID) )
-		{
-			// echo "cache_perms[$permname][$permlevel][$perm_target] = $perm;";
-			$this->cache_perms[$permname][$permlevel][$perm_target_ID] = $perm;
-		}
+		// Cache result:
+		$this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] = $perm;
 
 		return $perm;
 	}
