@@ -10,7 +10,7 @@ jQuery( document ).ready( function()
 		var item_ID = parseInt( flag_link.data( 'id' ) );
 		if( item_ID > 0 )
 		{	// Request to flag if item ID is defined:
-			evo_rest_api_request( 'items/' + item_ID + '/flag',
+			evo_rest_api_request( 'collections/' + flag_link.data( 'coll' ) + '/items/' + item_ID + '/flag',
 			{
 				'b2evo_icons_type': b2evo_icons_type,
 				'get_icon': 1,

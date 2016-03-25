@@ -7957,9 +7957,11 @@ class Item extends ItemLight
 			return;
 		}
 
+		$item_Blog = & $this->get_Blog();
+
 		echo $params['before'];
 
-		echo '<a href="#" data-id="'.$this->ID.'" class="action_icon evo_post_flag_btn">'
+		echo '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
 				.$this->get_flag_icon( $params )
 			.'</a>';
 

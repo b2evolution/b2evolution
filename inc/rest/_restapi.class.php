@@ -330,6 +330,17 @@ class RestApi
 			}
 		}
 
+		// Try to get an object ID and action for example request "<baseurl>/api/v1/collections/<collname>/items/<id>/action":
+		$object_ID = empty( $this->args[3] ) ? NULL : intval( $this->args[3] );
+		$object_action = empty( $this->args[4] ) ? NULL : $this->args[4];
+		$coll_controller_params = array();
+
+		if( $object_ID && $object_action )
+		{	// Set controller name for single object and action:
+			$coll_controller = $coll_controller.'_'.$object_action;
+			$coll_controller_params[] = $object_ID;
+		}
+
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
 		{	// Unknown controller:
 			$this->halt( 'Unknown collection controller "'.$coll_controller.'"', 'unknown_controller' );
@@ -337,7 +348,7 @@ class RestApi
 		}
 
 		// Call collection controller to prepare current request:
-		$this->{'controller_coll_'.$coll_controller}();
+		call_user_func_array( array( $this, 'controller_coll_'.$coll_controller ), $coll_controller_params );
 	}
 
 
@@ -400,7 +411,7 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'types' => '' ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
@@ -501,10 +512,8 @@ class RestApi
 	 */
 	private function controller_coll_posts()
 	{
-		global $posttypes_specialtypes;
-
 		$this->controller_coll_items( array(
-				'types' => '-'.implode( ',', $posttypes_specialtypes ), // Keep content post types, Exclude pages, intros, sidebar links and ads
+				'itemtype_usage' => NULL, // Keep content post types, Exclude pages, intros, sidebar links and ads
 			) );
 	}
 
@@ -715,6 +724,50 @@ class RestApi
 
 			// Add data of the searched thing to response:
 			$this->add_response( 'results', $result_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call item controller to flag by current user
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_items_flag( $item_ID )
+	{
+		global $Blog;
+
+		$ItemCache = & get_ItemCache();
+		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
+		{	// Item is not detected in DB by requested ID:
+			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
+			// Exit here.
+		}
+
+		if( $Item->get_blog_ID() != $Blog->ID )
+		{	// Item should be called for current collection:
+			$this->halt( 'You request item #'.$Item->ID.' from another collection "'.$Blog->get( 'urlname' ).'"', 'wrong_item_coll', 403 );
+			// Exit here.
+		}
+
+		if( ! $Item->can_flag() )
+		{	// Don't display the flag button if it is not allowed by some reason:
+			$this->halt( 'You cannot flag the item #'.$Item->ID, 'cannot_flag_item', 403 );
+		}
+
+		// Flag or unflag item for current user:
+		$Item->update_flag();
+
+		// Return current state of flag:
+		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
+
+		if( param( 'get_icon', 'integer', 0 ) )
+		{	// Get an icon of flag with new state:
+			// Use the glyph or font-awesome icons in order to get a correct icon of flag:
+			param( 'b2evo_icons_type', 'string', '' );
+
+			// Return flag icon for current state:
+			$this->add_response( 'icon', $Item->get_flag_icon() );
 		}
 	}
 
@@ -1064,68 +1117,4 @@ class RestApi
 
 
 	/**** MODULE USERS ---- END ****/
-
-
-	/**** MODULE ITEMS ---- START ****/
-
-
-	/**
-	 * Call module to prepare request for items
-	 */
-	private function module_items()
-	{
-		// Get item ID for request "POST <baseurl>/api/v1/items/<id>":
-		$item_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
-
-		// Collection controller ('view' by default):
-		$item_controller = isset( $this->args[2] ) ? $this->args[2] : 'view';
-
-		if( ! method_exists( $this, 'controller_item_'.$item_controller ) )
-		{	// Unknown controller:
-			$this->halt( 'Unknown item controller "'.$item_controller.'"', 'unknown_controller' );
-			// Exit here.
-		}
-
-		$ItemCache = & get_ItemCache();
-		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
-		{	// Item is not detected in DB by requested ID:
-			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
-			// Exit here.
-		}
-
-		// Call collection controller to prepare current request:
-		$this->{'controller_item_'.$item_controller}( $Item );
-	}
-
-
-	/**
-	 * Call item controller to flag by current user
-	 *
-	 * 
-	 */
-	private function controller_item_flag( $Item )
-	{
-		if( ! $Item->can_flag() )
-		{	// Don't display the flag button if it is not allowed by some reason:
-			$this->halt( 'You cannot flag the item #'.$Item->ID, 'cannot_flag_item', 403 );
-		}
-
-		// Flag or unflag item for current user:
-		$Item->update_flag();
-
-		// Return current state of flag:
-		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
-
-		if( param( 'get_icon', 'integer', 0 ) )
-		{	// Get an icon of flag with new state:
-			// Use the glyph or font-awesome icons in order to get a correct icon of flag:
-			param( 'b2evo_icons_type', 'string', '' );
-
-			// Return flag icon for current state:
-			$this->add_response( 'icon', $Item->get_flag_icon() );
-		}
-	}
-
-
-	/**** MODULE ITEMS ---- END ****/
 }
