@@ -3357,55 +3357,39 @@ class Comment extends DataObject
 	 *
 	 * Should be called only when a new comment was posted or when a comment status was changed to published
 	 *
-	 * @param boolean set true if the comment was posted just now, false otherwise
 	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
-	function handle_notifications( $just_posted = false, $executed_by_userid = NULL )
+	function handle_notifications( $executed_by_userid = NULL )
 	{
 		global $Settings;
 
 		// Immediate notifications? Asynchronous? Off?
-		$notifications_mode = $Settings->get('outbound_notifications_mode');
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		if( $notifications_mode == 'off' )
-		{ // Don't send notifications:
+		{	// Don't send notifications:
 			return false;
 		}
 
-		if( $this->get( 'notif_status' ) != 'noreq' )
-		{ // Notification for this comment are already done or in progress...
+		if( $this->get( 'notif_status' ) == 'finished' && $this->get( 'status' ) == 'published' )
+		{	// If users were already notified about this comment
+			// but comment status was changed to published:
+			//  1. Then we should send it again because simple users(not moderators)
+			//     receive this only when comment is published.
+			//  2. Also moderators must receive a notification when this comment
+			//     has been published by some other moderator.
+
+			// So allow to send email notifications again below depending on the mode...
+		}
+		elseif( $this->get( 'notif_status' ) != 'noreq' )
+		{	// Notification for this comment are already done or in progress, Stop here:
 			return false;
-		}
-
-		// FIRST we will send notifications to moderators and those notifications will always be immediate (fp> !?):
-
-		if( $just_posted )
-		{	// New comment, potentially awaiting moderation:
-
-			// Send email notification about:
-			//   1. NORMAL comment ONLY to moderators
-			//   2. META comment ONLY to users with "meta comments" notification
-			$this->send_email_notifications( /* $only_moderators = */ true, /* $except_moderators = */ false, $executed_by_userid );
-
-			if( $this->is_meta() )
-			{	// Record that processing has been done in case of this meta comment:
-				$this->set( 'notif_status', 'finished' );
-				$this->dbupdate();
-				return;	// No further processing for meta comments
-			}
-		}
-
-		// SECOND: we will send notidications about published comments to everyone else (including moderators in case of status change)
-
-		if( $this->status != 'published' )
-		{	// Don't send notifications about non-published comments:
-			return;
 		}
 
 		if( $notifications_mode == 'immediate' )
 		{	// Send email notifications now!:
 
-			$this->send_email_notifications( /* $only_moderators = */ false, /* $except_moderators = */ $just_posted, $executed_by_userid );
+			$this->send_email_notifications( $executed_by_userid );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
@@ -3424,7 +3408,10 @@ class Comment extends DataObject
 			$edited_Cronjob->set( 'key', 'send-comment-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
-			$edited_Cronjob->set( 'params', array( 'comment_ID' => $this->ID, 'except_moderators' => $just_posted, 'executed_by_userid' => $executed_by_userid ) );
+			$edited_Cronjob->set( 'params', array(
+					'comment_ID'         => $this->ID,
+					'executed_by_userid' => $executed_by_userid
+				) );
 
 			// Save cronjob to DB:
 			$edited_Cronjob->dbinsert();
@@ -3446,19 +3433,12 @@ class Comment extends DataObject
 	 *
 	 * efy-asimo> moderatation and subscription notifications have been separated
 	 *
-	 * @param boolean true if send only moderation email, false otherwise
-	 * @param boolean true if send for everyone else but not for moderators, because a moderation email was sent for them
 	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 */
-	function send_email_notifications( $only_moderators = false, $except_moderators = false, $executed_by_userid = NULL )
+	function send_email_notifications( $executed_by_userid = NULL )
 	{
 		global $DB, $admin_url, $baseurl, $debug, $Debuglog, $htsrv_url;
 		global $Settings, $UserSettings;
-
-		if( $only_moderators && $except_moderators )
-		{ // at least one of them must be false
-			return;
-		}
 
 		$UserCache = & get_UserCache();
 
@@ -3471,44 +3451,42 @@ class Comment extends DataObject
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
 
-			if( $only_moderators || $except_moderators )
-			{	// we need the list of moderators:
-				$moderators_to_notify = $edited_Blog->get_comment_moderator_user_IDs();
+			// Get the moderators which can be notified about this comment:
+			$moderators_to_notify = $edited_Blog->get_comment_moderator_user_IDs();
 
-				foreach( $moderators_to_notify as $moderator )
-				{
-					$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
-					if( $notify_moderator )
-					{	// add user to notify:
-						$moderators[] = $moderator->user_ID;
-					}
+			foreach( $moderators_to_notify as $moderator )
+			{
+				$notify_moderator = ( is_null( $moderator->notify_moderation ) ) ? $Settings->get( 'def_notify_comment_moderation' ) : $moderator->notify_moderation;
+				if( $notify_moderator )
+				{	// add user to notify:
+					$moderators[] = $moderator->user_ID;
 				}
-				if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
-				{	// add blog owner:
-					$moderators[] = $owner_User->ID;
-				}
+			}
+			if( $UserSettings->get( 'notify_comment_moderation', $owner_User->ID ) && is_email( $owner_User->get( 'email' ) ) )
+			{	// add blog owner:
+				$moderators[] = $owner_User->ID;
+			}
 
-				// Load all moderators, and check each edit permission on this comment:
-				$UserCache->load_list( $moderators );
-				foreach( $moderators as $index => $moderator_ID )
+			// Load all moderators, and check each edit permission on this comment:
+			$UserCache->load_list( $moderators );
+			foreach( $moderators as $index => $moderator_ID )
+			{
+				$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+				if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
+				{	// User doesn't exists any more, or has no permission to edit this comment!
+					unset( $moderators[$index] );
+				}
+				else
 				{
-					$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
-					if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
-					{	// User doesn't exists any more, or has no permission to edit this comment!
-						unset( $moderators[$index] );
-					}
-					elseif( $only_moderators )
-					{
-						$notify_users[$moderator_ID] = 'moderator';
-					}
+					$notify_users[$moderator_ID] = 'moderator';
 				}
 			}
 
-			if( ! $only_moderators )
-			{	// Not only moderators needs to be notified:
+			if( $this->get( 'status' ) == 'published' )
+			{	// Not moderators should be also notified ONLY when comment is published:
 				$except_condition = '';
 
-				if( $except_moderators && ( ! empty( $moderators ) ) )
+				if( ! empty( $moderators ) )
 				{	// Set except moderators condition. Exclude moderators who already got a notification email:
 					$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $moderators ).'" )';
 				}
@@ -3523,7 +3501,7 @@ class Comment extends DataObject
 
 				// Get list of users who want to be notified about the this post comments:
 				if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
-				{ // item subscriptions is allowed
+				{	// If item subscriptions is allowed:
 					$sql = 'SELECT DISTINCT user_ID
 										FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
 									 WHERE isub_item_ID = '.$edited_Item->ID.'
@@ -3679,7 +3657,7 @@ class Comment extends DataObject
 					   In case of full notification the first %s is blog name, the second %s is the item's title.
 					   In case of short notification the first %s is author login, the second %s is the item's title. */
 					$subject = $notify_full ? T_('[%s] New comment on "%s"') : T_( '%s posted a new comment on "%s"' );
-					if( $only_moderators )
+					if( $notify_type == 'moderator' )
 					{
 						if( $this->status == 'draft' )
 						{

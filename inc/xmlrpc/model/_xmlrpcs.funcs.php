@@ -1208,7 +1208,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
 		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
-		$Comment->handle_notifications( true, $executed_by_userid );
+		$Comment->handle_notifications( $executed_by_userid );
 	}
 	else
 	{
@@ -1285,7 +1285,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( false, $current_User->ID );
+	$edited_Comment->handle_notifications( $current_User->ID );
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );

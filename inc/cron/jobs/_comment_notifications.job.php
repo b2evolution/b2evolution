@@ -21,7 +21,6 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-$except_moderators = ( ! empty( $job_params['except_moderators'] ) ) ? $job_params['except_moderators'] : false;
 $executed_by_userid = ( ! empty( $job_params['executed_by_userid'] ) ) ? $job_params['executed_by_userid'] : NULL;
 
 $comment_ID = $job_params['comment_ID'];
@@ -47,7 +46,7 @@ $CommentCache = & get_CommentCache();
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
 // Send email notifications now!
-$edited_Comment->send_email_notifications( false, $except_moderators, $executed_by_userid );
+$edited_Comment->send_email_notifications( $executed_by_userid );
 
 // Record that processing has been done:
 $edited_Comment->set( 'notif_status', 'finished' );

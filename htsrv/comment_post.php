@@ -612,7 +612,7 @@ if( $Comment->ID )
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
 	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
-	$Comment->handle_notifications( true, $executed_by_userid );
+	$Comment->handle_notifications( $executed_by_userid );
 
 
 	// Add a message, according to the comment's status:
