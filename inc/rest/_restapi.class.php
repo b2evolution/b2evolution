@@ -400,7 +400,7 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'types' => '' ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
@@ -501,10 +501,8 @@ class RestApi
 	 */
 	private function controller_coll_posts()
 	{
-		global $posttypes_specialtypes;
-
 		$this->controller_coll_items( array(
-				'types' => '-'.implode( ',', $posttypes_specialtypes ), // Keep content post types, Exclude pages, intros, sidebar links and ads
+				'itemtype_usage' => NULL, // Keep content post types, Exclude pages, intros, sidebar links and ads
 			) );
 	}
 
