@@ -3253,7 +3253,7 @@ class User extends DataObject
 			$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
 			$check_owner_SQL->LIMIT( '1' );
 
-			$this->is_collection_owner = boolval( $DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) );
+			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) ? true : false);
 		}
 
 		return $this->is_collection_owner;
