@@ -11,13 +11,18 @@ jQuery( document ).ready( function()
 		if( item_ID > 0 )
 		{	// Request to flag if item ID is defined:
 			evo_rest_api_request( 'collections/' + flag_link.data( 'coll' ) + '/items/' + item_ID + '/flag',
-			{
-				'b2evo_icons_type': b2evo_icons_type,
-				'get_icon': 1,
-			},
 			function( data )
-			{	// Replace icon with new flag status:
-				flag_link.html( data.icon );
+			{	// Toggle icon to new flag status:
+				if( data.flag )
+				{	// If item is flagged
+					flag_link.find( 'span:first' ).show();
+					flag_link.find( 'span:last' ).hide();
+				}
+				else
+				{	// If item is unflagged
+					flag_link.find( 'span:first' ).hide();
+					flag_link.find( 'span:last' ).show();
+				}
 			} );
 		}
 
