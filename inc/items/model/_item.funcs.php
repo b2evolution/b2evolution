@@ -24,7 +24,7 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
  */
 function init_MainList( $items_nb_limit )
 {
-	global $MainList, $Blog, $Plugins;
+	global $MainList, $Blog, $Plugins, $Skin;
 	global $preview;
 	global $disp;
 	global $postIDlist, $postIDarray;
@@ -53,6 +53,21 @@ function init_MainList( $items_nb_limit )
 			// pre_dump( $MainList->filters );
 			// echo '<br/>'.( $MainList->is_filtered() ? 'filtered' : 'NOT filtered' );
 			// $MainList->dump_active_filters();
+
+			if( $disp == 'posts' && ! empty( $Skin ) && $Skin->get_template( 'cat_array_mode' ) == 'parent' )
+			{	// Get items ONLY from current category WITHOUT sub-categories:
+				global $cat;
+				// Get ID of single selected category:
+				$single_cat_ID = intval( $cat );
+
+				if( $single_cat_ID )
+				{	// Do limit if single category is selected:
+					$MainList->set_filters( array(
+							'cat_array'    => array( $single_cat_ID ),
+							'cat_modifier' => NULL,
+						), true, true );
+				}
+			}
 
 			// Run the query:
 			$MainList->query();
