@@ -451,7 +451,7 @@ if( $action == 'dashboard' )
 					'user_perm' => 'moderate',
 					'post_statuses' => array( 'published', 'community', 'protected' ),
 					'order' => 'DESC',
-					'comments' => 30,
+					'comments' => 10,
 				) );
 
 			// Run SQL query to get results depending on current filters:

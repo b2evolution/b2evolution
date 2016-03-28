@@ -426,10 +426,8 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			if( $edited_Comment->status == 'published' )
-			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications( false, $current_User->ID );
-			}
+			// Comment status was set to published or it was already published, needs to handle notifications:
+			$edited_Comment->handle_notifications( $current_User->ID );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -458,8 +456,8 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications( false, $current_User->ID );
+		// Comment status was set to published, needs to handle notifications:
+		$edited_Comment->handle_notifications( $current_User->ID );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )

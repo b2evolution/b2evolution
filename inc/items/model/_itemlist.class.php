@@ -905,6 +905,17 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
+	 *
+	 * @deprecated Use new function load_user_data_for_items() instead
+	 */
+	function load_content_read_statuses()
+	{
+		$this->load_user_data_for_items();
+	}
+
+
+	/**
+	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
 	 */
 	function load_user_data_for_items()
 	{

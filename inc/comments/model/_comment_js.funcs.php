@@ -641,7 +641,7 @@ function updateCommentsList( divid )
 	jQuery( '.dashboard_post:visible:even' ).addClass( 'dashboard_post_even' );
 	jQuery( '.dashboard_post:visible:odd' ).addClass( 'dashboard_post_odd' );
 
-	if( displayed < 12 )
+	if( displayed < 6 )
 	{ // Reload list to fill up the hidden comments list, so we always have enough comments to moderate.
 		refreshComments( 'dashboard' );
 	}

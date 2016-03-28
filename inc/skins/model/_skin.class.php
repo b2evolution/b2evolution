@@ -1714,6 +1714,12 @@ class Skin extends DataObject
 					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
+
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'children';
 		}
 
 		return array();

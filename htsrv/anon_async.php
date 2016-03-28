@@ -970,10 +970,7 @@ switch( $action )
 				$result_success = $edited_Comment->dbupdate();
 				if( $result_success !== false )
 				{
-					if( $status == 'published' )
-					{
-						$edited_Comment->handle_notifications( false, $current_User->ID );
-					}
+					$edited_Comment->handle_notifications( $current_User->ID );
 				}
 			}
 		}
