@@ -590,19 +590,23 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
-	set_param( 'p', intval( $Settings->get( 'site_terms' ) ) );
-	$c = 0; // Don't display comments
+	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
+	if( $terms_item_ID  > 0 )
+	{	// Only if item ID is defined for terms page:
+		set_param( 'p', $terms_item_ID );
+		$c = 0; // Don't display comments
 
-	$ItemCache = & get_ItemCache();
-	$Item = & $ItemCache->get_by_ID( $p, false );
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
 
-	if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
-	{	// Display the message if current user already accepted the terms:
-		$Messages->add( T_('You already accepted these terms.'), 'success' );
+		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+		{	// Display the message if current user already accepted the terms:
+			$Messages->add( T_('You already accepted these terms.'), 'success' );
+		}
+
+		// Don't redirect to permanent url of the page:
+		$redir = 'no';
 	}
-
-	// Don't redirect to permanent url of the page:
-	$redir = 'no';
 }
 
 // Check if terms & conditions should be accepted by current user:
