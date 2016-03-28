@@ -958,7 +958,7 @@ if( !$incorrect_action )
  */
 function get_comments_awaiting_moderation( $blog_ID )
 {
-	$limit = 30;
+	$limit = 10;
 
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
