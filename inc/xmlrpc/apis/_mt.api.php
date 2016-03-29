@@ -258,6 +258,9 @@ function mt_publishPost($m)
 	}
 	logIO('mt_publishPost: Permission granted');
 
+	// Is this post publishing right now?
+	$is_publishing = ( $edited_Item->get( 'status' ) != 'published' );
+
 	logIO( 'mt_publishPost: Old post status: '.$edited_Item->status );
 	$edited_Item->set( 'status', 'published' );
 	//$edited_Item->set( 'datestart', date('Y-m-d H:i:s', $localtimenow) );
@@ -270,7 +273,7 @@ function mt_publishPost($m)
 
 	// Execute or schedule notifications & pings:
 	logIO( 'mt_publishPost: Handling notifications...' );
-	$edited_Item->handle_post_processing( false, false );
+	$edited_Item->handle_post_processing( false, $is_publishing );
 
 	logIO( 'mt_publishPost: OK.' );
 

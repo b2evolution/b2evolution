@@ -5841,31 +5841,34 @@ class Item extends ItemLight
 	 *
 	 * Includes notifications & pings
 	 *
-	 * @param boolean a new post was just created or it was called after an update
-	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
+	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
+	 * @param boolean Repeat notifications and pings to already finished
+	 * @return boolean TRUE on success
 	 */
-	function handle_post_processing( $just_created, $verbose = true )
+	function handle_post_processing( $verbose = true, $repeat_finished = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 
-		if( $just_created )
-		{ // we must try to send moderation notifications for the newly created posts
-			$already_notified = $this->send_moderation_emails();
-		}
-		else
-		{ // Moderation notifications were not sent, so there are no already notified users
-			$already_notified = NULL;
-		}
-
-		$notifications_mode = $Settings->get('outbound_notifications_mode');
+		// Immediate notifications? Asynchronous? Off?
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		if( $notifications_mode == 'off' )
-		{	// Exit silently
+		{	// Don't send notifications and pings:
 			return false;
 		}
 
-		if( $this->notifications_status == 'finished' )
-		{ // pings have been done before
+		if( $repeat_finished && $this->get( 'notifications_status' ) == 'finished' )
+		{	// If users were already notified about this item
+			// but we need it again, for example when item status was changed to published:
+			//  1. Then we should send it again because simple users(not moderators)
+			//     receive this only when item is published.
+			//  2. Also moderators must receive a notification when this item
+			//     has been published by some other moderator.
+
+			// So allow to send email notifications again below depending on the mode...
+		}
+		elseif( $this->get( 'notifications_status' ) != 'noreq' )
+		{	// Pings have been done before, Skip notifications and pings:
 			if( $verbose )
 			{
 				$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
@@ -5873,61 +5876,29 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $this->notifications_status != 'noreq' )
-		{ // pings have been done before
-
-			// TODO: Check if issue_date has changed and reschedule
-			if( $verbose )
-			{
-				$Messages->add( T_('Post processing already pending...'), 'note' );
-			}
-			return false;
-		}
-
-		if( $this->status != 'published' )
-		{
-			// TODO: discard any notification that may be pending!
-			if( $verbose )
-			{
-				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
-			}
-			return false;
-		}
-
-		if( $ItemType = & $this->get_ItemType() )
-		{	// Get type usage of this item:
-			$item_type_usage = $ItemType->get( 'usage' );
-		}
-		else
-		{	// Use default item type usage:
-			$item_type_usage = 'post';
-		}
-
-		if( in_array( $item_type_usage, array( 'intro-front', 'intro-main', 'special' ) ) )
-		{
-			// TODO: discard any notification that may be pending!
-			if( $verbose )
-			{
-				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
-			}
-			return false;
-		}
-
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to do the post processing immediately:
-			// send outbound pings:
+
+			// Send outbound pings:
 			$this->send_outbound_pings( $verbose );
 
-			// Send email notifications now!
-			$this->send_email_notifications( false, $already_notified );
+			// Send email notifications to users who can moderate this item:
+			$already_notified_user_IDs = $this->send_moderation_emails();
+
+			// Send email notifications to users who want receive it on collection of this item:
+			$this->send_email_notifications( $already_notified_user_IDs );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
 		}
 		else
 		{	// We want asynchronous post processing. This applies to posts with date in future too.
-			$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
-					'href="http://b2evolution.net/man/after-each-post-settings"' ), 'warning' );
+
+			if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) > $localtimenow )
+			{	// Display this warning, because when the cron job will be executed any notification will NOT be sent:
+				$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
+					'href="http://b2evolution.net/man/after-each-post-settings" target="_blank"' ), 'warning' );
+			}
 
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
@@ -6055,12 +6026,21 @@ class Item extends ItemLight
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
 	 *
-	 * @param boolean Display notification messages or not
 	 * @param array Already notified user ids, or NULL if it is not the case
 	 */
-	function send_email_notifications( $display = true, $already_notified = NULL )
+	function send_email_notifications( $already_notified_user_IDs = NULL )
 	{
-		global $DB, $admin_url, $baseurl, $debug, $Debuglog;
+		global $DB, $debug;
+
+		if( $this->get( 'status' ) != 'published' )
+		{	// Don't send notifications about not published items:
+			return;
+		}
+
+		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
+		{	// Don't send pings of items with these item types:
+			return;
+		}
 
 		$edited_Blog = & $this->get_Blog();
 
@@ -6069,33 +6049,23 @@ class Item extends ItemLight
 			return;
 		}
 
-		if( $display )
-		{
-			echo "<div class=\"panelinfo\">\n";
-			echo '<h3>', T_('Notifying subscribed users...'), "</h3>\n";
-		}
+		// Create condition to not select already notified moderator users:
+		$except_users_condition = empty( $already_notified_user_IDs ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
 
-		// Create condition to not select already notified modertor users
-		$except_users_condition = empty( $already_notified ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified ).' )';
-
-		// Get list of users who want to be notfied:
+		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT sub_user_ID
 							FROM T_subscriptions
 						WHERE sub_coll_ID = '.$this->get_blog_ID().'
 							AND sub_items <> 0'.$except_users_condition;
-		$notify_users = $DB->get_col( $sql );
+		$notify_users = $DB->get_col( $sql, 0, 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
 
 		if( empty( $notify_users ) )
-		{ // No-one to notify:
-			if( $display )
-			{
-				echo '<p>', T_('No-one to notify.'), "</p>\n</div>\n";
-			}
-			return false;
+		{	// No-one to notify:
+			return;
 		}
 
-		// Load all users who will be notified
+		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( $notify_users );
 
@@ -6104,7 +6074,7 @@ class Item extends ItemLight
 		 */
 		$this->get_creator_User();
 
-		// Load a list with the blocked emails in cache
+		// Load a list with the blocked emails in cache:
 		load_blocked_emails( $notify_users );
 
 		// Send emails:
@@ -6113,13 +6083,13 @@ class Item extends ItemLight
 		{
 			$notify_User = $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
-			{ // skip invalid users
+			{	// skip invalid users:
 				continue;
 			}
 
 			$notify_email = $notify_User->get( 'email' );
 			if( empty( $notify_email ) )
-			{ // skip users with empty email address
+			{	// skip users with empty email address:
 				continue;
 			}
 			$notify_locale = $notify_User->get( 'locale' );
@@ -6127,7 +6097,7 @@ class Item extends ItemLight
 
 			$notify_full = $notify_user_Group->check_perm( 'post_subscription_notif', 'full' );
 			if( ! isset($cache_by_locale[$notify_locale]) )
-			{ // No message for this locale generated yet:
+			{	// No message for this locale generated yet:
 				locale_temp_switch( $notify_locale );
 
 				$cache_by_locale[$notify_locale]['subject']['short'] = sprintf( T_('%s created a new post in blog "%s"'), $this->creator_User->get( 'login' ), $edited_Blog->get('shortname') );
@@ -6145,7 +6115,6 @@ class Item extends ItemLight
 					'notify_type'    => 'subscription',
 				);
 
-			if( $display ) echo T_('Notifying:').$notify_email."<br />\n";
 			if( $debug >= 2 )
 			{
 				$message_content = mail_template( 'post_new', 'txt', $email_template_params );
@@ -6159,8 +6128,6 @@ class Item extends ItemLight
 		}
 
 		blocked_emails_display();
-
-		if( $display ) echo '<p>', T_('Done.'), "</p>\n</div>\n";
 	}
 
 
@@ -6168,10 +6135,29 @@ class Item extends ItemLight
 	 * Send outbound pings for a post
 	 *
 	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
+	 * @return boolean TRUE on success
 	 */
 	function send_outbound_pings( $verbose = true )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+
+		if( $this->get( 'status' ) != 'published' )
+		{	// Don't send outbound pings about not published items:
+			if( $verbose )
+			{
+				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
+			}
+			return false;
+		}
+
+		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
+		{	// Don't send outbound pings of items with these item types:
+			if( $verbose )
+			{
+				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
+			}
+			return false;
+		}
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 

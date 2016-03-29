@@ -1460,7 +1460,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( true );
+	$edited_Item->handle_post_processing();
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
@@ -1618,7 +1618,14 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	}
 	if( !empty($params['status']) )
 	{
+		// Is this post publishing right now?
+		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $params['status'] == 'published' );
+
 		$edited_Item->set( 'status', $params['status'] );
+	}
+	else
+	{
+		$is_publishing = false;
 	}
 	if( !empty($params['date']) )
 	{
@@ -1657,7 +1664,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_post_processing( true, $is_publishing );
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );

@@ -520,7 +520,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			pbm_msg( sprintf( ('Item created?: %s'), ( isset( $edited_Item->ID ) ? 'yes' : 'no' ) ), $cron );
 
 			// Execute or schedule notifications & pings:
-			$edited_Item->handle_post_processing( true );
+			$edited_Item->handle_post_processing();
 
 			if( !empty($pbm_item_files) )
 			{	// Attach files
