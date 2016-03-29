@@ -150,6 +150,9 @@ h2 .glyphicon {
 .edit_actions .pull-left {
   margin-right: 10px;
 }
+.edit_actions .quick-publish {
+  margin-left: 5px;
+}
 .edit_actions .html_status {
   margin-top: 14px;
   display: inline-block;
