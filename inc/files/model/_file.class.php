@@ -503,6 +503,24 @@ class File extends DataObject
 
 
 	/**
+	 * Is the File a video file?
+	 *
+	 * Tries to determine if it is and caches the info.
+	 *
+	 * @return boolean true if the object is a video file, false if not
+	 */
+	function is_video()
+	{
+		if( empty( $this->type ) )
+		{
+			$this->set_file_type();
+		}
+
+		return ( $this->type == 'video' );
+	}
+
+
+	/**
 	 * Is the file editable?
 	 *
 	 * @param mixed true/false allow locked file types? NULL value means that FileType will decide
@@ -2785,6 +2803,25 @@ class File extends DataObject
 					    in_array( $file_extension, $Filetype->get_extensions() ) )
 					{ // This is audio file
 						$this->update_file_type( 'audio' );
+						return;
+					}
+				}
+			}
+		}
+
+		// VIDEO:
+		// Load all video file types in cache
+		if( ! empty( $file_extension ) )
+		{
+			$FiletypeCache->load_where( 'ftyp_mimetype LIKE "video/%"' );
+			if( count( $FiletypeCache->cache ) )
+			{
+				foreach( $FiletypeCache->cache as $Filetype )
+				{
+					if( preg_match( '#^video/#', $Filetype->mimetype ) &&
+							in_array( $file_extension, $Filetype->get_extensions() ) )
+					{ // This is a video file
+						$this->update_file_type( 'video' );
 						return;
 					}
 				}

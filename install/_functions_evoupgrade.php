@@ -7358,6 +7358,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11735, 'Upgrade table files...' ) )
+	{
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_type ENUM( "image", "audio", "video", "other" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
