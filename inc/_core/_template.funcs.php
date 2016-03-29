@@ -1261,7 +1261,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// TODO: translation strings for colorbox buttons
 
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+				require_css( 'colorbox-regular.min.css', $relative_to );
 				break;
 		}
 		// add to list of loaded helpers

@@ -62,6 +62,10 @@ module.exports = function(grunt) {
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
+
+					// Colorbox
+					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
+					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
 				}
 			},
 
@@ -171,6 +175,12 @@ module.exports = function(grunt) {
 			skin_pureforums: {
 				src: 'skins/pureforums/pureforums.bundle.css',
 				dest: 'skins/pureforums/pureforums.bmin.css',
+			},
+			colorbox: {
+				files: {
+					'rsc/build/colorbox-regular.min.css':   'rsc/css/colorbox/colorbox-regular.css',
+					'rsc/build/colorbox-bootstrap.min.css': 'rsc/css/colorbox/colorbox-bootstrap.css',
+				}
 			},
 		},
 
