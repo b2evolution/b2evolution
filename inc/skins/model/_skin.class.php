@@ -809,7 +809,7 @@ class Skin extends DataObject
 		global $debug, $Messages, $disp, $UserSettings;
 
 		// We get the optional arg this way for PHP7 comaptibility:
-		list( $features ) = func_get_args();
+		@list( $features ) = func_get_args();
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
