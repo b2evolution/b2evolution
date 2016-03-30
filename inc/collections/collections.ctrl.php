@@ -147,7 +147,7 @@ switch( $action )
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
-			$Messages->add( T_('The new collection has been duplicated.'), 'success' );
+			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
