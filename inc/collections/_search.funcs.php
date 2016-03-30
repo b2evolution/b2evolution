@@ -1016,35 +1016,40 @@ function search_page_links( $params = array() )
 
 	if( $current_page > 1 )
 	{ // A link to previous page:
-		echo $params['page_item_before'];
+		echo add_tag_class( $params['page_item_before'], 'listnav_prev' );
 		$prev_attrs = empty( $params['prev_class'] ) ? '' : ' class="'.$params['prev_class'].'"';
 		echo '<a href="'.url_add_param( $page_url, 'page='.( $current_page - 1 ) ).'" rel="prev"'.$prev_attrs.'>'.$params['prev_text'].'</a>';
 		echo $params['page_item_after'];
 	}
 
-	if( $page_list_start > 1 )
-	{ // The pages list doesn't contain the first page
-		// Display a link to first page:
-		echo $params['page_item_before'];
-		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
-		echo $params['page_item_after'];
+	// Display a link to first page:
+	echo $params['page_item_before'];
+	echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+	echo $params['page_item_after'];
 
-		if( $page_list_start > 2 )
-		{ // Display a link to previous pages range:
-			$page_no = ceil( $page_list_start / 2 );
-			echo $params['page_item_before'];
-			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
-			echo $params['page_item_after'];
-		}
+	if( $page_list_start > 2 )
+	{ // Display a link to previous pages range:
+		$page_no = ceil( $page_list_start / 2 );
+		echo add_tag_class( $params['page_item_before'], 'listnav_prev_list' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+		echo $params['page_item_after'];
 	}
 
+	$hidden_active_distances = array( 1, 2 );
 	$page_prev_i = $current_page - 1;
 	$page_next_i = $current_page + 1;
 	$pib = add_tag_class( $params['page_item_before'], '**active_distance_**' );
 
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-
+		$active_dist = abs( $current_page - $i );
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) )
+		{
+			$page_no = ceil( $page_list_start / 2 );
+			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
+			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			echo $params['page_item_after'];
+		}
 		if( $i == $current_page )
 		{ // Current page
 			echo $params['page_item_current_before'];
@@ -1063,32 +1068,37 @@ function search_page_links( $params = array() )
 				$attr_rel = ' rel="next"';
 			}
 			//echo $params['page_item_before'];
-			$active_dist = abs( $current_page - $i );
 			echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
 			echo $params['page_item_after'];
 		}
-	}
 
-	if( $page_list_end < $total_pages )
-	{ // The pages list doesn't contain the last page
-		if( $page_list_end < $total_pages - 1 )
-		{ // Display a link to next pages range:
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $current_page ) && ( $i < ( $total_pages - 1 ) ) )
+		{
 			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
-			echo $params['page_item_before'];
+			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 			echo $params['page_item_after'];
 		}
+	}
 
-		// Display a link to last page:
-		echo $params['page_item_before'];
-		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+	if( ( $page_list_end < $total_pages ) && ( $page_list_end < $total_pages - 1 ) )
+	{ // Display a link to next pages range:
+		$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+		echo add_tag_class( $params['page_item_before'], 'listnav_next_list' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 		echo $params['page_item_after'];
 	}
 
+	// Display a link to last page:
+	echo $params['page_item_before'];
+	echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+	echo $params['page_item_after'];
+
+
 	if( $current_page < $total_pages )
 	{ // A link to next page:
-		echo $params['page_item_before'];
+		echo add_tag_class( $params['page_item_before'], 'listnav_next' );
 		$next_attrs = empty( $params['next_class'] ) ? '' : ' class="'.$params['next_class'].'"';
 		echo ' <a href="'.url_add_param( $page_url, 'page='.( $current_page + 1 ) ).'" rel="next"'.$next_attrs.'>'.$params['next_text'].'</a>';
 		echo $params['page_item_after'];

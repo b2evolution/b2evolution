@@ -2112,7 +2112,7 @@ class Results extends Table
 	 */
 	function page_list( $min, $max, $page_url = '' )
 	{
-		$hidden_active_distance = 1;
+		$hidden_active_distances = array( 1, 2 ) ;
 
 		$i = 0;
 		$list = '';
@@ -2143,7 +2143,7 @@ class Results extends Table
 		{
 			$active_dist = abs( $this->page - $i );
 
-			if( ( $active_dist == $hidden_active_distance ) && ( $i < $this->page ) && ( $i > 2 ) )
+			if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $this->page ) && ( $i > 2 ) )
 			{ // show pseudo prev_list
 				$page_no = ceil($this->first()/2);
 				if( isset( $this->params['page_item_before'] ) )
@@ -2221,7 +2221,7 @@ class Results extends Table
 				}
 			}
 
-			if( ( $active_dist == $hidden_active_distance ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
+			if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
 			{ // show pseudo next_list
 				$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
 				if( isset( $this->params['page_item_before'] ) )
