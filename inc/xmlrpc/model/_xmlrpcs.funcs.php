@@ -1208,7 +1208,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
 		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
-		$Comment->handle_notifications( $executed_by_userid );
+		$Comment->handle_notifications( $executed_by_userid, true );
 	}
 	else
 	{

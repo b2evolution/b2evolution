@@ -1148,8 +1148,9 @@ class User extends DataObject
 				}
 				$is_comment_moderator = $this->check_role( 'comment_moderator' );
 				if( $is_comment_moderator || $this->check_role( 'comment_editor' ) )
-				{ // update 'notify_comment_moderation' only if user is comment moderator/editor at least in one blog
+				{	// update 'notify_comment_moderation' and 'notify_edit_cmt_moderation' only if user is comment moderator/editor at least in one collection:
 					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_edit_cmt_moderation', param( 'edited_user_notify_edit_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
 				{ // update 'notify_meta_comments' only if edited user has a permission to back-office

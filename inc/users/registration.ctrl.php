@@ -46,6 +46,7 @@ switch ( $action )
 		param( 'notify_unread_messages', 'integer', 0 );
 		param( 'notify_published_comments', 'integer', 0 );
 		param( 'notify_comment_moderation', 'integer', 0 );
+		param( 'notify_edit_cmt_moderation', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'newsletter_news', 'integer', 0 );
@@ -116,6 +117,7 @@ switch ( $action )
 					 array( 'def_notify_unread_messages', $notify_unread_messages ),
 					 array( 'def_notify_published_comments', $notify_published_comments ),
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
+					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_newsletter_news', $newsletter_news ),

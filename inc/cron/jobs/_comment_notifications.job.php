@@ -46,10 +46,16 @@ $CommentCache = & get_CommentCache();
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
 // Send email notifications now!
-$edited_Comment->send_email_notifications( $executed_by_userid );
+$edited_Comment->send_email_notifications( $executed_by_userid, ! empty( $job_params['is_new_comment'] ) );
 
-// Record that processing has been done:
-$edited_Comment->set( 'notif_status', 'finished' );
+if( $edited_Comment->get( 'status' ) == 'published' )
+{	// Record that processing has been done only when this comment is published:
+	$edited_Comment->set( 'notif_status', 'finished' );
+}
+else
+{	// Reset notification status to send it again because normal users should still receive it when comment status will be published:
+	$edited_Comment->set( 'notif_status', 'noreq' );
+}
 
 // Save the new processing status to DB
 $edited_Comment->dbupdate();

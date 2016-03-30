@@ -104,6 +104,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
+		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_newsletter_news' => '1',
