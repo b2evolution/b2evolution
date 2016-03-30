@@ -3166,7 +3166,8 @@ class Item extends ItemLight
 		if( ! isset( $this->placeholder_FileList ) )
 		{ // Get list of attached fallback files
 			$LinkOwner = new LinkItem( $this );
-			if( ! $this->placeholder_FileList = & $LinkOwner->get_attachment_FileList( 1000 ) )
+			$attachment_FileList = $LinkOwner->get_attachment_FileList( 1000 );
+			if( ! $this->placeholder_FileList = & $attachment_FileList )
 			{ // No attached files
 				return $r;
 			}
@@ -7054,7 +7055,7 @@ class Item extends ItemLight
 		global $Plugins;
 
 		// Find all matches with inline tags
-		preg_match_all( '/\[(image|file|inline):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+		preg_match_all( '/\[(image|file|inline|video):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 		if( !empty( $inlines[0] ) )
 		{ // There are inline tags in the content
@@ -7072,7 +7073,7 @@ class Item extends ItemLight
 
 			foreach( $inlines[0] as $i => $current_link_tag )
 			{
-				$inline_type = $inlines[1][$i]; // image|file|inline
+				$inline_type = $inlines[1][$i]; // image|file|inline|video
 				$current_link_ID = (int)$inlines[2][$i];
 				if( empty( $current_link_ID ) )
 				{ // Invalid link ID, Go to next match
@@ -7090,6 +7091,13 @@ class Item extends ItemLight
 					continue;
 				}
 
+				if( $File->type != $inline_type )
+				{ // Inline tag does not match file typ
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Linked file type (%s) does not match specified inline tag (%s)!', $File->type, $inline_type ), array( 'error', 'files' ) );
+					continue;
+				}
+
 				if( ! $File->exists() )
 				{ // File doesn't exist
 					global $Debuglog;
@@ -7101,65 +7109,97 @@ class Item extends ItemLight
 				$params['Link'] = $Link;
 				$params['Item'] = $this;
 
-				$current_image_params = $params;
-				$current_file_params = array();
-				if( ! empty( $inlines[3][$i] ) )
+				switch( $inline_type )
 				{
-					// Get the inline params: caption and class
-					$inline_params = explode( ':.', $inlines[4][$i] );
+					case 'image':
+					case 'inline':
+					case 'file':
+						$current_image_params = $params;
+						$current_file_params = array();
+						if( ! empty( $inlines[3][$i] ) )
+						{
+							// Get the inline params: caption and class
+							$inline_params = explode( ':.', $inlines[4][$i] );
 
-					if( ! empty( $inline_params[0] ) )
-					{ // Image caption is set, so overwrite the image link title
-						if( $inline_params[0] == '-' )
-						{ // Image caption display is disabled
-							$current_image_params['image_link_title'] = '';
-							$current_image_params['hide_image_link_title'] = true;
+							if( ! empty( $inline_params[0] ) )
+							{ // Image caption is set, so overwrite the image link title
+								if( $inline_params[0] == '-' )
+								{ // Image caption display is disabled
+									$current_image_params['image_link_title'] = '';
+									$current_image_params['hide_image_link_title'] = true;
+								}
+								else
+								{ // New image caption was set
+									$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+								}
+
+								$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+								$current_file_params['title'] = $inline_params[0];
+							}
+
+							$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+							if( ! empty( $inline_params[ $class_index ] ) )
+							{ // A class name is set for the inline tags
+								$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+								if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+								{ // Overwrite 'before_image' setting to add an extra class name
+									$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
+									// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
+									$current_image_params['after_image'] = '</div>';
+
+									// Set class for file inline tags
+									$current_file_params['class'] = $image_extraclass;
+								}
+							}
+						}
+
+						if( ! $current_image_params['get_rendered_attachments'] )
+						{ // Save $r to temp var in order to don't get the rendered data from plugins
+							$temp_r = $r;
+						}
+
+						$temp_params = $current_image_params;
+						foreach( $current_image_params as $param_key => $param_value )
+						{ // Pass all params by reference, in order to give possibility to modify them by plugin
+							// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+							$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+						}
+
+						if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
+						{ // Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+							if( ! $current_image_params['get_rendered_attachments'] )
+							{ // Restore $r value and mark this item has the rendered attachments
+								$r = $temp_r;
+								$plugin_render_attachments = true;
+							}
+							continue;
+						}
+
+						break;
+
+					case 'video':
+						$current_video_params = $params;
+						// Create an empty dummy element where the plugin is expected to append the rendered video
+						$current_video_params['data'] = '';
+
+						foreach( $current_video_params as $param_key => $param_value )
+						{ // Pass all params by reference, in order to give possibility to modify them by plugin
+							// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+							$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+						}
+
+						if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params ) ) != 0 )
+						{
+							$video_tag = $current_video_params['data'];
 						}
 						else
-						{ // New image caption was set
-							$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+						{
+							$video_tag = $current_link_tag;
 						}
+						break;
 
-						$current_image_params['image_desc'] = $current_image_params['image_link_title'];
-						$current_file_params['title'] = $inline_params[0];
-					}
-
-					$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
-					if( ! empty( $inline_params[ $class_index ] ) )
-					{ // A class name is set for the inline tags
-						$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
-						if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-						{ // Overwrite 'before_image' setting to add an extra class name
-							$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-							// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-							$current_image_params['after_image'] = '</div>';
-
-							// Set class for file inline tags
-							$current_file_params['class'] = $image_extraclass;
-						}
-					}
-				}
-
-				if( ! $current_image_params['get_rendered_attachments'] )
-				{ // Save $r to temp var in order to don't get the rendered data from plugins
-					$temp_r = $r;
-				}
-
-				$temp_params = $current_image_params;
-				foreach( $current_image_params as $param_key => $param_value )
-				{ // Pass all params by reference, in order to give possibility to modify them by plugin
-					// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
-					$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
-				}
-
-				if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
-				{ // Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{ // Restore $r value and mark this item has the rendered attachments
-						$r = $temp_r;
-						$plugin_render_attachments = true;
-					}
-					continue;
+					default:
+						debug_die( 'Invalid inline tag' );
 				}
 
 				if( $inline_type == 'image' && $File->is_image() )
@@ -7178,6 +7218,10 @@ class Item extends ItemLight
 					{ // Display original inline tag when file is not image
 						$link_tag = $current_link_tag;
 					}
+				}
+				elseif( $inline_type == 'video' && $File->is_video() )
+				{
+					$link_tag = $video_tag;
 				}
 				else
 				{ // Display icon+caption if file is not an image
