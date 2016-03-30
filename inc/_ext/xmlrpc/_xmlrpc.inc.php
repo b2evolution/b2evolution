@@ -874,7 +874,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* @param integer $port the port the server is listening on, defaults to 80 or 443 depending on protocol used
 		* @param string $method the http protocol variant: defaults to 'http', 'https' and 'http11' can be used if CURL is installed
 		*/
-		function xmlrpc_client($path, $server='', $port='', $method='')
+		function __construct($path, $server='', $port='', $method='')
 		{
 			// allow user to specify all params in $path
 			if($server == '' and $port == '' and $method == '')
@@ -1950,7 +1950,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* NB: as of now we do not do it, since it might be either an xmlrpcval or a plain
 		* php val, or a complete xml chunk, depending on usage of xmlrpc_client::send() inside which creator is called...
 		*/
-		function xmlrpcresp($val, $fcode = 0, $fstr = '', $valtyp='')
+		function __construct($val, $fcode = 0, $fstr = '', $valtyp='')
 		{
 			if($fcode != 0)
 			{
@@ -2098,7 +2098,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		* @param string $meth the name of the method to invoke
 		* @param array $pars array of parameters to be paased to the method (xmlrpcval objects)
 		*/
-		function xmlrpcmsg($meth, $pars=0)
+		function __construct($meth, $pars=0)
 		{
 			$this->methodname=$meth;
 			if(is_array($pars) && count($pars)>0)
@@ -2723,7 +2723,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		* @param mixed $val
 		* @param string $type any valid xmlrpc type name (lowercase). If null, 'string' is assumed
 		*/
-		function xmlrpcval($val=-1, $type='')
+		function __construct($val=-1, $type='')
 		{
 			/// @todo: optimization creep - do not call addXX, do it all inline.
 			/// downside: booleans will not be coerced anymore
