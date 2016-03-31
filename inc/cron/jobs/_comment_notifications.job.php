@@ -21,8 +21,6 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-$executed_by_userid = ( ! empty( $job_params['executed_by_userid'] ) ) ? $job_params['executed_by_userid'] : NULL;
-
 $comment_ID = $job_params['comment_ID'];
 
 // Notify that we are going to take care of that comment's notifications:
@@ -45,17 +43,14 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
-// Send email notifications now!
-$edited_Comment->send_email_notifications( $executed_by_userid, ! empty( $job_params['is_new_comment'] ) );
+$executed_by_userid = empty( $job_params['executed_by_userid'] ) ? NULL : $job_params['executed_by_userid'];
+$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
 
-if( $edited_Comment->get( 'status' ) == 'published' )
-{	// Record that processing has been done only when this comment is published:
-	$edited_Comment->set( 'notif_status', 'finished' );
-}
-else
-{	// Reset notification status to send it again because normal users should still receive it when comment status will be published:
-	$edited_Comment->set( 'notif_status', 'noreq' );
-}
+// Send email notifications now!
+$edited_Comment->send_email_notifications( $executed_by_userid, $already_notified_user_IDs );
+
+// Record that processing has been done:
+$edited_Comment->set( 'notif_status', 'finished' );
 
 // Save the new processing status to DB
 $edited_Comment->dbupdate();
