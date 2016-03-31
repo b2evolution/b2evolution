@@ -1658,6 +1658,12 @@ li[class*=" listnav_distance_"] {
   li.listnav_next {
     display: inline;
   }
+  li.listnav_first > a {
+    border-radius: 0;
+  }
+  li.listnav_last > a {
+    border-radius: 0;
+  }
 }
 main .well {
   padding: 15px 15px 25px 15px;
