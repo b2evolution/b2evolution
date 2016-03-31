@@ -322,14 +322,15 @@ class LinkOwner
 	{
 
 		if( $Link = $this->get_link_by_link_ID( $link_ID ) )
-		{
+		{	// We could find the Link...
 			$Link = & $Link;
 			if( $File = & $Link->Get_File() )
-			{
+			{	// We could get the File...
 				if( $File->exists() )
-				{
+				{	// The file exists on disk...
+					// Do we want to check for a specific file type? :
 					if( ! is_null( $file_type ) )
-					{
+					{	// Check if the file type is what we want:
 						if( $File->get( 'type' ) != $file_type )
 						{
 							$Link = NULL;

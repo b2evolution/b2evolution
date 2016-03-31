@@ -7065,7 +7065,7 @@ class Item extends ItemLight
 		preg_match_all( '/\[(image|file|inline|video):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 		if( !empty( $inlines[0] ) )
-		{ // There are inline tags in the content
+		{ // There are inline tags in the content...
 
 			if( !isset( $LinkList ) )
 			{ // Get list of attached Links only first time
@@ -7074,7 +7074,7 @@ class Item extends ItemLight
 			}
 
 			if( empty( $LinkList ) )
-			{ // This Item has not the inline attached files, Exit here
+			{ // This Item has no attached files for 'inline' position, Exit here
 				return $content;
 			}
 
@@ -7082,31 +7082,35 @@ class Item extends ItemLight
 			{
 				$inline_type = $inlines[1][$i]; // image|file|inline|video
 				$current_link_ID = (int)$inlines[2][$i];
+				
 				if( empty( $current_link_ID ) )
 				{ // Invalid link ID, Go to next match
 					continue;
 				}
+				
 				if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
-				{ // Link is not found by ID
+				{ // Link ID is not part of the linked files for position "inline"
 					continue;
 				}
 
 				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
+				{ // No File object:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
 					continue;
 				}
 
-				if( $File->type != $inline_type )
-				{ // Inline tag does not match file typ
+/* fp> This seems very wrong!   (especially for [inline:] -- or also if I want to use [file:] on an image or on a video ... etc etc)
+				if( $File->type != $inline_type )   // this is comparing oranges to apples! Instead of this hack, make clean tests inside of switch/case
+				{ // Inline tag does not match file type:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'Linked file type (%s) does not match specified inline tag (%s)!', $File->type, $inline_type ), array( 'error', 'files' ) );
 					continue;
 				}
+*/
 
 				if( ! $File->exists() )
-				{ // File doesn't exist
+				{ // File doesn't exist:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 					continue;
@@ -7167,13 +7171,13 @@ class Item extends ItemLight
 
 						$temp_params = $current_image_params;
 						foreach( $current_image_params as $param_key => $param_value )
-						{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
 							// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
 							$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 						}
 
 						if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
-						{ // Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+						{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
 							if( ! $current_image_params['get_rendered_attachments'] )
 							{ // Restore $r value and mark this item has the rendered attachments
 								$r = $temp_r;
