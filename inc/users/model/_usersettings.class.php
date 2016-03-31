@@ -127,7 +127,8 @@ class UserSettings extends AbstractSettings
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
 		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
 		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
-		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
+		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
+		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,

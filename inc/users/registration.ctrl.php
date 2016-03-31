@@ -49,6 +49,7 @@ switch ( $action )
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
+		param( 'notify_edit_pst_moderation', 'integer', 0 );
 		param( 'newsletter_news', 'integer', 0 );
 		param( 'newsletter_ads', 'integer', 0 );
 		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
@@ -120,6 +121,7 @@ switch ( $action )
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
+					 array( 'def_notify_edit_pst_moderation', $notify_edit_pst_moderation ),
 					 array( 'def_newsletter_news', $newsletter_news ),
 					 array( 'def_newsletter_ads', $newsletter_ads ),
 					 array( 'def_notification_email_limit', $notification_email_limit ),
