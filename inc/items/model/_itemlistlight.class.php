@@ -173,18 +173,6 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 * Rewind resultset
-	 */
-	function restart()
-	{
-		parent::restart();
-
-		// Make sure query has executed:
-		$this->query();
-	}
-
-
-	/**
 	 * Set/Activate filterset
 	 *
 	 * This will also set back the GLOBALS !!! needed for regenerate_url().
