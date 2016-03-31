@@ -1929,9 +1929,6 @@ function xmlrpc_get_comments( $params, & $Blog )
 	// Filter list:
 	$CommentList->set_filters( $filters, false );
 
-	// Run SQL query to get results depending on current filters:
-	$CommentList->query();
-
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
 

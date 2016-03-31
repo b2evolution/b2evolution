@@ -454,9 +454,6 @@ if( $action == 'dashboard' )
 					'comments' => 10,
 				) );
 
-			// Run SQL query to get results depending on current filters:
-			$CommentList->query();
-
 			// Load data of comments from the current page at once to cache variables:
 			$CommentList->load_list_data();
 
@@ -640,9 +637,6 @@ if( $action == 'dashboard' )
 					'order' => 'DESC',
 					'comments' => 5,
 				) );
-
-			// Run SQL query to get results depending on current filters:
-			$CommentList->query();
 
 			// Load data of comments from the current page at once to cache variables:
 			$CommentList->load_list_data();

@@ -268,9 +268,6 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 				'comments' => $limit,
 			) );
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Load data of comments from the current page at once to cache variables:
 		$CommentList->load_list_data();
 
