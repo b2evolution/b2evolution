@@ -49,8 +49,7 @@ $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 // Send outbound pings:
 $edited_Item->send_outbound_pings();
 
-// Send email notifications to users who can moderate this item:
-$already_notified_user_IDs = $edited_Item->send_moderation_emails();
+$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
 
 // Send email notifications to users who want receive it on collection of the item:
 $edited_Item->send_email_notifications( $already_notified_user_IDs );

@@ -5843,10 +5843,10 @@ class Item extends ItemLight
 	 * Includes notifications & pings
 	 *
 	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
-	 * @param boolean Repeat notifications and pings to already finished
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return boolean TRUE on success
 	 */
-	function handle_post_processing( $verbose = true, $repeat_finished = false )
+	function handle_post_processing( $verbose = true, $is_new_item = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 
@@ -5858,21 +5858,32 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( $repeat_finished && $this->get( 'notifications_status' ) == 'finished' )
-		{	// If users were already notified about this item
-			// but we need it again, for example when item status was changed to published:
-			//  1. Then we should send it again because simple users(not moderators)
-			//     receive this only when item is published.
-			//  2. Also moderators must receive a notification when this item
-			//     has been published by some other moderator.
+		// Send email notifications to users who can moderate this item:
+		$already_notified_user_IDs = $this->send_moderation_emails( $is_new_item );
 
-			// So allow to send email notifications again below depending on the mode...
-		}
-		elseif( $this->get( 'notifications_status' ) != 'noreq' )
+		if( $this->get( 'notifications_status' ) != 'noreq' )
 		{	// Pings have been done before, Skip notifications and pings:
 			if( $verbose )
 			{
 				$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
+			}
+			return false;
+		}
+
+		if( $this->get( 'status' ) != 'published' )
+		{	// Don't send email notifications and outbound pings about not published items:
+			if( $verbose )
+			{
+				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
+			}
+			return false;
+		}
+
+		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
+		{	// Don't send email notifications and outbound pings of items with these item types:
+			if( $verbose )
+			{
+				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
 			}
 			return false;
 		}
@@ -5882,9 +5893,6 @@ class Item extends ItemLight
 
 			// Send outbound pings:
 			$this->send_outbound_pings( $verbose );
-
-			// Send email notifications to users who can moderate this item:
-			$already_notified_user_IDs = $this->send_moderation_emails();
 
 			// Send email notifications to users who want receive it on collection of this item:
 			$this->send_email_notifications( $already_notified_user_IDs );
@@ -5914,7 +5922,11 @@ class Item extends ItemLight
 			$edited_Cronjob->set( 'key', 'send-post-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
-			$edited_Cronjob->set( 'params', array( 'item_ID' => $this->ID ) );
+			$edited_Cronjob->set( 'params', array(
+					'item_ID'                   => $this->ID,
+					'already_notified_user_IDs' => $already_notified_user_IDs
+					
+				) );
 
 			// Save cronjob to DB:
 			$edited_Cronjob->dbinsert();
@@ -5936,9 +5948,10 @@ class Item extends ItemLight
 	/**
 	 * Send post may need moderation notifications for those users who have rights to moderate this post, and would like to receive notifications
 	 *
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_moderation_emails()
+	function send_moderation_emails( $is_new_item )
 	{
 		global $Settings, $UserSettings, $DB;
 
@@ -6143,21 +6156,13 @@ class Item extends ItemLight
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
 		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send outbound pings about not published items:
-			if( $verbose )
-			{
-				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
-			}
-			return false;
+		{	// Don't send notifications about not published items:
+			return;
 		}
 
 		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send outbound pings of items with these item types:
-			if( $verbose )
-			{
-				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
-			}
-			return false;
+		{	// Don't send pings of items with these item types:
+			return;
 		}
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
