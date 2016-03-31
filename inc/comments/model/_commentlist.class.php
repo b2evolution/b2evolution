@@ -506,8 +506,23 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -557,7 +572,7 @@ class CommentList2 extends DataObjectList2
 			$this->sql .= ' WHERE 0';
 		}
 
-		$this->run_query( false, false, false, 'CommentList2::Query() Step 2' );
+		parent::run_query( false, false, false, 'CommentList2::Query() Step 2' );
 	}
 
 

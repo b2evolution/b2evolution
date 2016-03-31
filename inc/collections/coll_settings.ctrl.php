@@ -454,9 +454,6 @@ if( $action == 'dashboard' )
 					'comments' => 10,
 				) );
 
-			// Load data of comments from the current page at once to cache variables:
-			$CommentList->load_list_data();
-
 			// Set param prefix for URLs
 			$param_prefix = 'cmnt_fullview_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -466,6 +463,9 @@ if( $action == 'dashboard' )
 
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 		}
 
 		// Check if we have comments and posts to moderate
@@ -638,9 +638,6 @@ if( $action == 'dashboard' )
 					'comments' => 5,
 				) );
 
-			// Load data of comments from the current page at once to cache variables:
-			$CommentList->load_list_data();
-
 			// Set param prefix for URLs:
 			$param_prefix = 'cmnt_meta_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -650,6 +647,9 @@ if( $action == 'dashboard' )
 
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 
 			if( $CommentList->result_num_rows )
 			{	// We have the meta comments

@@ -268,11 +268,11 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 				'comments' => $limit,
 			) );
 
-		// Load data of comments from the current page at once to cache variables:
-		$CommentList->load_list_data();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
+
+		// Load data of comments from the current page at once to cache variables:
+		$CommentList->load_list_data();
 	}
 
 	$index = 0;
