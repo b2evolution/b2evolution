@@ -1040,12 +1040,36 @@ function search_page_links( $params = array() )
 	$page_next_i = $current_page + 1;
 	$pib = add_tag_class( $params['page_item_before'], '**active_distance_**' );
 
+	// Do not include first page in the page list range
+	if( $page_list_start == 1 )
+	{
+		$page_list_start++;
+		if( ( $page_list_end + 1 ) < $total_pages )
+		{
+			$page_list_end++;
+		}
+	}
+
+	// Also, do not include last page in the page list range
+	if( $page_list_end == $total_pages )
+	{
+		$page_list_end--;
+		if( $page_list_start > 2 )
+		{
+			$page_list_start--;
+		}
+	}
+
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
 		$active_dist = abs( $current_page - $i );
 		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) )
 		{
 			$page_no = ceil( $page_list_start / 2 );
+			if( $page_no == 1 )
+			{
+				$page_no++;
+			}
 			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 			echo $params['page_item_after'];
@@ -1076,6 +1100,10 @@ function search_page_links( $params = array() )
 		if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $current_page ) && ( $i < ( $total_pages - 1 ) ) )
 		{
 			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+			if( $page_no == $total_pages )
+			{
+				$page_no--;
+			}
 			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 			echo $params['page_item_after'];

@@ -93,6 +93,15 @@ li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
 	li.listnav_prev, li.listnav_next {
 		display: inline;
 	}
+
+	// remove round corners on the first and last page
+	li.listnav_first > a {
+		border-radius: 0;
+	}
+
+	li.listnav_last > a {
+		border-radius: 0;
+	}
 }
 
 .border-radius (@radius: 4px) {

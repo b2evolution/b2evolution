@@ -2117,6 +2117,7 @@ class Results extends Table
 		$i = 0;
 		$list = '';
 
+		// Do not include first page in the page list range
 		if( $this->first() == 1 )
 		{
 			$min++;
@@ -2126,6 +2127,7 @@ class Results extends Table
 			}
 		}
 
+		// Also, do not include last page in the page list range
 		if( $this->last() == $this->total_pages )
 		{
 			$max--;
@@ -2146,6 +2148,10 @@ class Results extends Table
 			if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $this->page ) && ( $i > 2 ) )
 			{ // show pseudo prev_list
 				$page_no = ceil($this->first()/2);
+				if( $page_no == 1 )
+				{
+					$page_no++;
+				}
 				if( isset( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
@@ -2224,6 +2230,10 @@ class Results extends Table
 			if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
 			{ // show pseudo next_list
 				$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
+				if( $page_no == $this->total_pages )
+				{
+					$page_no--;
+				}
 				if( isset( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
