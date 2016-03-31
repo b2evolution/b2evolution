@@ -1599,7 +1599,8 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 
 		// Store File object into DB:
 		$newFile->dbsave();
-		report_user_upload( $newFile );
+		syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
+				$current_User->login, '[['.$newFile->get_full_path().']]', bytesreadable( $newFile->get_size(), false ) ), 'info', 'file', $newFile->ID );
 		$uploadedFiles[] = $newFile;
 	}
 

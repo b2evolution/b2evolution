@@ -7694,19 +7694,4 @@ function get_install_format_text( $text, $format = 'string' )
 
 	return $text;
 }
-
-
-/**
- * Reports user file upload by inserting system log entry
- *
- * @param object File uploaded by user
- */
-function report_user_upload( $File )
-{
-	global $current_User;
-	load_funcs( 'files/model/_file.funcs.php' );
-
-	syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
-}
 ?>

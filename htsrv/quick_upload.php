@@ -433,7 +433,6 @@ if( $upload )
 		{ // Success uploading
 			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
 			$message['status'] = 'success';
-			report_user_upload( $newFile );
 		}
 
 		$message['newname'] = $newName;
