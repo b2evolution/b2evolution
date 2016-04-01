@@ -3388,7 +3388,7 @@ class Comment extends DataObject
 		if( $notifications_mode == 'immediate' )
 		{	// Send email notifications now!:
 
-			$this->send_email_notifications( $executed_by_userid, $already_notified_user_IDs );
+			$this->send_email_notifications( $executed_by_userid, $is_new_comment, $already_notified_user_IDs );
 
 			// Record that processing has been done:
 			$this->set( 'notif_status', 'finished' );
@@ -3410,7 +3410,8 @@ class Comment extends DataObject
 			$edited_Cronjob->set( 'params', array(
 					'comment_ID'                => $this->ID,
 					'executed_by_userid'        => $executed_by_userid,
-					'already_notified_user_IDs' => $already_notified_user_IDs
+					'is_new_comment'            => $is_new_comment,
+					'already_notified_user_IDs' => $already_notified_user_IDs,
 				) );
 
 			// Save cronjob to DB:
@@ -3490,7 +3491,7 @@ class Comment extends DataObject
 		}
 
 		// Send emails to the moderators:
-		$this->send_email_messages( $notify_users );
+		$this->send_email_messages( $notify_users, $is_new_comment );
 
 		return $notify_user_IDs;
 	}
@@ -3500,9 +3501,10 @@ class Comment extends DataObject
 	 * Send email notifications to subscribed users
 	 *
 	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
+	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 * @param array The already notified user IDs
 	 */
-	function send_email_notifications( $executed_by_userid = NULL, $already_notified_user_IDs = array() )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_comment = false, $already_notified_user_IDs = array() )
 	{
 		global $DB, $Settings, $UserSettings;
 
@@ -3619,7 +3621,7 @@ class Comment extends DataObject
 			unset( $notify_users[ $executed_by_userid ] );
 		}
 
-		return $this->send_email_messages( $notify_users );
+		return $this->send_email_messages( $notify_users, $is_new_comment );
 	}
 
 
@@ -3632,8 +3634,9 @@ class Comment extends DataObject
 	 *              - 'blog_subscription'
 	 *              - 'item_subscription'
 	 *              - 'meta_comment'
+	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 */
-	function send_email_messages( $notify_users )
+	function send_email_messages( $notify_users, $is_new_comment = false )
 	{
 		global $debug, $Debuglog;
 
@@ -3646,7 +3649,6 @@ class Comment extends DataObject
 		{	// No-one to notify:
 			return;
 		}
-
 
 		/*
 		 * We have a list of user IDs to notify:
@@ -3751,6 +3753,7 @@ class Comment extends DataObject
 					'author_ID'      => $author_user_ID,
 					'notify_type'    => $notify_type,
 					'recipient_User' => $notify_User,
+					'is_new_comment' => $is_new_comment,
 				);
 
 			if( $debug )

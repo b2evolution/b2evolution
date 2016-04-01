@@ -5895,7 +5895,7 @@ class Item extends ItemLight
 			$this->send_outbound_pings( $verbose );
 
 			// Send email notifications to users who want receive it on collection of this item:
-			$this->send_email_notifications( $already_notified_user_IDs );
+			$this->send_email_notifications( $is_new_item, $already_notified_user_IDs );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
@@ -5924,6 +5924,7 @@ class Item extends ItemLight
 			// params: specify which post this job is supposed to send notifications for:
 			$edited_Cronjob->set( 'params', array(
 					'item_ID'                   => $this->ID,
+					'is_new_comment'            => $is_new_comment,
 					'already_notified_user_IDs' => $already_notified_user_IDs
 					
 				) );
@@ -6021,6 +6022,7 @@ class Item extends ItemLight
 				'Item'           => $this,
 				'recipient_User' => $moderator_User,
 				'notify_type'    => 'moderator',
+				'is_new_item'    => $is_new_item,
 			);
 
 			locale_temp_switch( $moderator_User->locale );
@@ -6042,9 +6044,10 @@ class Item extends ItemLight
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
 	 *
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
 	 */
-	function send_email_notifications( $already_notified_user_IDs = NULL )
+	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL )
 	{
 		global $DB, $debug;
 
@@ -6129,6 +6132,7 @@ class Item extends ItemLight
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
 					'notify_type'    => 'subscription',
+					'is_new_item'    => $is_new_item,
 				);
 
 			if( $debug >= 2 )
