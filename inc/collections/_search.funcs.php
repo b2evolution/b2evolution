@@ -191,7 +191,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 	switch( $type )
 	{
 		case 'item':
-			$searched_parts = array( 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords' );
+			$searched_parts = array( 'title', 'content', 'tags', 'excerpt', 'titletag' );
 			break;
 
 		case 'comment':
@@ -267,7 +267,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
-			'keyword_scope' => 'title,content,tags,excerpt,titletag,metadesc,metakeywords', // TODO: add more fields
+			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
 			'phrase'        => 'OR',
 			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
@@ -279,8 +279,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login, tag_name,'
-		.' post_excerpt, post_titletag, is_md.iset_value AS iset_metadesc, is_mk.iset_value AS iset_metakeywords'
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content,'
+		.' user_login as creator_login, tag_name, post_excerpt, post_titletag'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
 		.$search_ItemList->ItemQuery->get_where()
@@ -302,8 +302,6 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
 		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
 		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
-		$scores_map['metadesc'] = score_text( $row->iset_metadesc, $search_term, $keywords, $quoted_parts, 2 );
-		$scores_map['metakeywords'] = score_text( $row->iset_metakeywords, $search_term, $keywords, $quoted_parts, 4 );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
@@ -315,8 +313,6 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 			+ $scores_map['tags']['score']
 			+ $scores_map['excerpt']['score']
 			+ $scores_map['titletag']['score']
-			+ $scores_map['metadesc']['score']
-			+ $scores_map['metakeywords']['score']
 			+ ( isset( $scores_map['creator_login'] ) ? $scores_map['creator_login'] : 0 )
 			+ $scores_map['last_mod_date'];
 
