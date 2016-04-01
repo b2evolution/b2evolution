@@ -466,6 +466,21 @@ class File extends DataObject
 		return $this->_is_dir;
 	}
 
+	/**
+	 * Get file type
+	 *
+	 * @return string file type
+	 */
+	function get_file_type()
+	{
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
+		}
+
+		return $this->type;
+	}
+
 
 	/**
 	 * Is the File an image?

@@ -312,44 +312,6 @@ class LinkOwner
 
 
 	/**
-	 * Get link by link ID
-	 *
-	 * @param integer link ID
-	 * @param string File type: 'image', 'audio', 'video', 'other'; NULL - to select all
-	 * @return object The Link with the requested ID if it exists between this owners links, NULL otherwise
-	 */
-	function & get_linked_File( $link_ID, $file_type = NULL, $position = NULL )
-	{
-
-		if( $Link = $this->get_link_by_link_ID( $link_ID ) )
-		{	// We could find the Link...
-			$Link = & $Link;
-			if( $File = & $Link->Get_File() )
-			{	// We could get the File...
-				if( $File->exists() )
-				{	// The file exists on disk...
-					// Do we want to check for a specific file type? :
-					if( ! is_null( $file_type ) )
-					{	// Check if the file type is what we want:
-						if( $File->get( 'type' ) != $file_type )
-						{
-							$Link = NULL;
-						}
-						return $Link;
-					}
-					else
-					{
-						return $Link;
-					}
-				}
-			}
-		}
-
-		return $Link;
-	}
-
-
-	/**
 	 * Get list of attached Links
 	 *
 	 * @param integer Limit max result

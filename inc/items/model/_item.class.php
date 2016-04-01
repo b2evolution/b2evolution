@@ -5926,7 +5926,7 @@ class Item extends ItemLight
 					'item_ID'                   => $this->ID,
 					'is_new_comment'            => $is_new_comment,
 					'already_notified_user_IDs' => $already_notified_user_IDs
-					
+
 				) );
 
 			// Save cronjob to DB:
@@ -7086,12 +7086,12 @@ class Item extends ItemLight
 			{
 				$inline_type = $inlines[1][$i]; // image|file|inline|video
 				$current_link_ID = (int)$inlines[2][$i];
-				
+
 				if( empty( $current_link_ID ) )
 				{ // Invalid link ID, Go to next match
 					continue;
 				}
-				
+
 				if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
 				{ // Link ID is not part of the linked files for position "inline"
 					continue;
@@ -7103,15 +7103,6 @@ class Item extends ItemLight
 					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
 					continue;
 				}
-
-/* fp> This seems very wrong!   (especially for [inline:] -- or also if I want to use [file:] on an image or on a video ... etc etc)
-				if( $File->type != $inline_type )   // this is comparing oranges to apples! Instead of this hack, make clean tests inside of switch/case
-				{ // Inline tag does not match file type:
-					global $Debuglog;
-					$Debuglog->add( sprintf( 'Linked file type (%s) does not match specified inline tag (%s)!', $File->type, $inline_type ), array( 'error', 'files' ) );
-					continue;
-				}
-*/
 
 				if( ! $File->exists() )
 				{ // File doesn't exist:
@@ -7127,135 +7118,157 @@ class Item extends ItemLight
 				switch( $inline_type )
 				{
 					case 'image':
-					case 'inline':
-					case 'file':
-						$current_image_params = $params;
-						$current_file_params = array();
-						if( ! empty( $inlines[3][$i] ) )
+					case 'inline': // valid file type: image
+						if( $File->is_image() )
 						{
-							// Get the inline params: caption and class
-							$inline_params = explode( ':.', $inlines[4][$i] );
+							$current_image_params = $params;
+							$current_file_params = array();
 
-							if( ! empty( $inline_params[0] ) )
-							{ // Image caption is set, so overwrite the image link title
-								if( $inline_params[0] == '-' )
-								{ // Image caption display is disabled
-									$current_image_params['image_link_title'] = '';
-									$current_image_params['hide_image_link_title'] = true;
-								}
-								else
-								{ // New image caption was set
-									$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the inline params: caption and class
+								$inline_params = explode( ':.', $inlines[4][$i] );
+
+								if( ! empty( $inline_params[0] ) )
+								{ // Caption is set, so overwrite the image link title
+									if( $inline_params[0] == '-' )
+									{ // Caption display is disabled
+										$current_image_params['image_link_title'] = '';
+										$current_image_params['hide_image_link_title'] = true;
+									}
+									else
+									{ // New image caption was set
+										$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+									}
+
+									$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+									$current_file_params['title'] = $inline_params[0];
 								}
 
-								$current_image_params['image_desc'] = $current_image_params['image_link_title'];
-								$current_file_params['title'] = $inline_params[0];
+								$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+								if( ! empty( $inline_params[ $class_index ] ) )
+								{ // A class name is set for the inline tags
+									$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+									if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+									{ // Overwrite 'before_image' setting to add an extra class name
+										$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
+										// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
+										$current_image_params['after_image'] = '</div>';
+
+										// Set class for file inline tags
+										$current_file_params['class'] = $image_extraclass;
+									}
+								}
 							}
 
-							$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
-							if( ! empty( $inline_params[ $class_index ] ) )
-							{ // A class name is set for the inline tags
-								$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
-								if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-								{ // Overwrite 'before_image' setting to add an extra class name
-									$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-									// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-									$current_image_params['after_image'] = '</div>';
-
-									// Set class for file inline tags
-									$current_file_params['class'] = $image_extraclass;
-								}
-							}
-						}
-
-						if( ! $current_image_params['get_rendered_attachments'] )
-						{ // Save $r to temp var in order to don't get the rendered data from plugins
-							$temp_r = $r;
-						}
-
-						$temp_params = $current_image_params;
-						foreach( $current_image_params as $param_key => $param_value )
-						{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
-							// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
-							$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
-						}
-
-						if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
-						{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
 							if( ! $current_image_params['get_rendered_attachments'] )
-							{ // Restore $r value and mark this item has the rendered attachments
-								$r = $temp_r;
-								$plugin_render_attachments = true;
+							{ // Save $r to temp var in order to don't get the rendered data from plugins
+								$temp_r = $r;
 							}
-							continue;
-						}
 
-						break;
+							$temp_params = $current_image_params;
+							foreach( $current_image_params as $param_key => $param_value )
+							{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+								$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+							}
 
-					case 'video':
-						$current_video_params = $params;
-						// Create an empty dummy element where the plugin is expected to append the rendered video
-						$current_video_params['data'] = '';
+							if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
+							{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+								if( ! $current_image_params['get_rendered_attachments'] )
+								{ // Restore $r value and mark this item has the rendered attachments
+									$r = $temp_r;
+									$plugin_render_attachments = true;
+								}
+								continue;
+							}
 
-						foreach( $current_video_params as $param_key => $param_value )
-						{ // Pass all params by reference, in order to give possibility to modify them by plugin
-							// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
-							$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
-						}
-
-						if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params ) ) != 0 )
-						{
-							$video_tag = $current_video_params['data'];
+							if( $inline_type == 'image' )
+							{ // Generate the IMG tag with all the alt, title and desc if available
+								$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
+							}
+							elseif( $inline_type == 'inline' )
+							{ // Generate simple IMG tag with original image size
+								$link_tag = '<img src="'.$File->get_url().'"'
+									.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+									.' />';
+							}
 						}
 						else
+						{ // not an image file, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					case 'file': // valid file types: image, video, audio, other
+						$valid_file_types = array( 'image', 'video', 'audio', 'other' );
+						if( in_array( $File->get_file_type(), $valid_file_types ) )
 						{
-							$video_tag = $current_link_tag;
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the file caption
+								$caption = $inlines[4][$i];
+
+								if( ! empty( $caption ) )
+								{ // Caption is set
+									$current_file_params['title'] = strip_tags( $caption );
+								}
+							}
+
+							if( empty( $current_file_params['title'] ) )
+							{ // Use real file name as title when it is not defined for inline tag
+								$file_title = $File->get( 'title' );
+								$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+							}
+							elseif( $current_file_params['title'] == '-' )
+							{ // Don't display a title in this case, Only file icon will be displayed
+								$current_file_params['title'] = '';
+							}
+							else
+							{ // Add a space between file icon and title
+								$current_file_params['title'] = ' '.$current_file_params['title'];
+							}
+							$link_tag = '<a href="'.$File->get_url().'"'
+								.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+								.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
+						}
+						else
+						{ // not a valid file type, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					case 'video':	// valid file type: video
+						if( $File->is_video() )
+						{
+							$current_video_params = $params;
+							// Create an empty dummy element where the plugin is expected to append the rendered video
+							$current_video_params['data'] = '';
+
+							foreach( $current_video_params as $param_key => $param_value )
+							{ // Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+								$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+							}
+
+							if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params ) ) != 0 )
+							{
+								$link_tag = $current_video_params['data'];
+							}
+							else
+							{ // no plugin available or was able to render the tag
+								$link_tag = $current_link_tag;
+							}
+						}
+						else
+						{ // not a video file, do not process
+							$link_tag = $current_link_tag;
 						}
 						break;
 
 					default:
-						debug_die( 'Invalid inline tag' );
-				}
-
-				if( $inline_type == 'image' && $File->is_image() )
-				{ // Generate the IMG tag with all the alt, title and desc if available
-					$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
-				}
-				elseif( $inline_type == 'inline' )
-				{ // Generate simple IMG tag with original image size
-					if( $File->is_image() )
-					{ // Only when file is really image file
-						$link_tag = '<img src="'.$File->get_url().'"'
-							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-							.' />';
-					}
-					else
-					{ // Display original inline tag when file is not image
+						// do nothing
 						$link_tag = $current_link_tag;
-					}
-				}
-				elseif( $inline_type == 'video' && $File->is_video() )
-				{
-					$link_tag = $video_tag;
-				}
-				else
-				{ // Display icon+caption if file is not an image
-					if( empty( $current_file_params['title'] ) )
-					{ // Use real file name as title when it is not defined for inline tag
-						$file_title = $File->get( 'title' );
-						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
-					}
-					elseif( $current_file_params['title'] == '-' )
-					{ // Don't display a title in this case, Only file icon will be displayed
-						$current_file_params['title'] = '';
-					}
-					else
-					{ // Add a space between file icon and title
-						$current_file_params['title'] = ' '.$current_file_params['title'];
-					}
-					$link_tag = '<a href="'.$File->get_url().'"'
-						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
 				}
 
 				// Replace inline image tag with HTML img tag
