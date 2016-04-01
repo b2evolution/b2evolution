@@ -460,14 +460,8 @@ class CommentList2 extends DataObjectList2
 			$sql_item_IDs .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID ';
 		}
 		$sql_item_IDs .= $this->ItemQuery->get_where();
-		$item_IDs = $DB->get_col( $sql_item_IDs, 0, 'Get CommentQuery Item IDs' );
-		if( empty( $item_IDs ) )
-		{ // There is no item which belongs to the given blog and user may view it, so there are no comments either
-			parent::count_total_rows( 0 );
-			$this->CommentQuery->WHERE_and( 'FALSE' );
-			return;
-		}
-		$this->CommentQuery->where_post_ID( implode( ',', $item_IDs ) );
+		// We use a sub-query for the list of post IDs because we do not want to pass 10000 item IDs back and forth between MySQL and PHP:
+		$this->CommentQuery->WHERE_and( $this->CommentQuery->dbprefix.'item_ID IN ( '.$sql_item_IDs.' )' );
 
 		/*
 		 * Restrict to active comments by default, show expired comments only if it was requested
