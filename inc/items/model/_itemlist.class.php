@@ -208,7 +208,8 @@ class ItemList2 extends ItemListLight
 		$this->total_pages = 1;
 		$this->page = 1;
 
-		$this->run_query( false, false, false, 'PREVIEW QUERY' );
+		// Skip the function of this class and call it of the parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::preview_from_request() PREVIEW QUERY' );
 
 		// Clear cache to view new updated data of the post:
 		$this->Cache->clear();
@@ -331,7 +332,8 @@ class ItemList2 extends ItemListLight
 
 		//echo DB::format_query( $this->sql );
 
-		Results::run_query( false, false, false, 'ItemList2::Query() Step 2' );
+		// Skip the function of first parent and call it of main parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::Query() Step 2' );
 	}
 
 
