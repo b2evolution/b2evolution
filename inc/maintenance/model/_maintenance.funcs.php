@@ -300,7 +300,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 			}
 			echo '<p style="color:red">'
 					.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
-					.sprintf( T_( 'Unable to decompress "%s" ZIP archive.' ), $src_file_name )
+					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name )
 				.'</p>';
 			evo_flush();
 
