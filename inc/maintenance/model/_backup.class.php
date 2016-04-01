@@ -379,7 +379,7 @@ class Backup
 				{
 					echo '<p style="color:red">'
 							.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-							.sprintf( T_('Unable to create "%s"'), $zip_filepath )
+							.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
 						.'</p>';
 					evo_flush();
 
@@ -590,7 +590,7 @@ class Backup
 			{
 				echo '<p style="color:red">'
 						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-						.sprintf( T_('Unable to create "%s"'), $zip_filepath )
+						.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
 					.'</p>';
 				evo_flush();
 
