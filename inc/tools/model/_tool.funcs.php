@@ -502,8 +502,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 	if( count( $users ) < 2 )
 	{	// No users
 		$Messages->add( T_('At least two users must exist in DB to create the messages'), 'error' );
-		$action = 'show_create_messages';
-		break;
+		return;
 	}
 
 	$count_threads = 0;
