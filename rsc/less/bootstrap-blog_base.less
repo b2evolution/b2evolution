@@ -44,29 +44,29 @@ li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
 	}
 
 	// show only active distance 1
-	li[class^="active_distance_1"], li[class*=" active_distance_1"] {
+	li[class="active_distance_1"] {
 		display: inline;
 	}
 
 	// show pseudo previous/next list 1
-	li[class^="listnav_distance_1"], li[class*=" listnav_distance_1"] {
+	li[class="listnav_distance_1"] {
 		display: inline;
 	}
 }
 
 @media only screen and (min-width: 480px) {
 	// show active distance 2
-	li[class^="active_distance_2"], li[class*=" active_distance_2"] {
+	li[class="active_distance_2"] {
 		display: inline;
 	}
 
 	// hide pseudo previous/next 1...
-	li[class^="listnav_distance_1"], li[class*=" listnav_distance_1"] {
+	li[class="listnav_distance_1"] {
 		display: none;
 	}
 
 	// ...and show next pseudo previous/next list 2
-	li[class^="listnav_distance_2"], li[class*=" listnav_distance_2"] {
+	li[class="listnav_distance_2"] {
 		display: inline;
 	}
 }

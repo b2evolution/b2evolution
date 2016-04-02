@@ -1028,9 +1028,18 @@ function search_page_links( $params = array() )
 	}
 
 	// Display a link to first page:
-	echo $params['page_item_before'];
-	echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
-	echo $params['page_item_after'];
+	if( $current_page == 1 )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_first' );
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_first' );
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_after'];
+	}
 
 	if( $page_list_start > 2 )
 	{ // Display a link to previous pages range:
@@ -1067,8 +1076,28 @@ function search_page_links( $params = array() )
 
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-		$active_dist = abs( $current_page - $i );
-		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) )
+		if( $current_page <= 4 )
+		{
+			$a = ( $i - 4 );
+			$active_dist = $a > 0 ? $a : null;
+		}
+		elseif( $current_page > ( $total_pages - 3 ) )
+		{
+			if( $i > ( $total_pages - 3 ) )
+			{
+				$active_dist = null;
+			}
+			else
+			{
+				$active_dist = ( ( $total_pages - 3 ) - $i );
+			}
+		}
+		else
+		{
+			$active_dist = abs( $current_page - $i );
+		}
+
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) && ( $current_page > 4 ) )
 		{
 			$page_no = ceil( $page_list_start / 2 );
 			if( $page_no == 1 )
@@ -1096,8 +1125,15 @@ function search_page_links( $params = array() )
 			{ // Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
-			//echo $params['page_item_before'];
-			echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+
+			if( $active_dist )
+			{
+				echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+			}
+			else
+			{
+				echo str_replace( '**active_distance_**', '', $pib );
+			}
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
 			echo $params['page_item_after'];
 		}
@@ -1124,9 +1160,19 @@ function search_page_links( $params = array() )
 	}
 
 	// Display a link to last page:
-	echo $params['page_item_before'];
-	echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
-	echo $params['page_item_after'];
+	if( $current_page == $total_pages )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_last' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_last' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_after'];
+	}
+
 
 
 	if( $current_page < $total_pages )
