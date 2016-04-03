@@ -1599,7 +1599,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 
 		// Store File object into DB:
 		$newFile->dbsave();
-		syslog_insert( sprintf( 'File %s was uploaded', '[['.$newFile->get_name().']]' ), 'info', 'file', $newFile->ID );
+		report_user_upload( $newFile );
 		$uploadedFiles[] = $newFile;
 	}
 
@@ -1698,6 +1698,21 @@ function prepare_uploaded_image( $File, $mimetype )
 	{	// Save resized image ( and also rotated image if this operation was done )
 		save_image( $resized_imh, $File->get_full_path(), $mimetype, $thumb_quality );
 	}
+}
+
+
+/**
+ * Reports user file upload by inserting system log entry
+ *
+ * @param object File uploaded by user
+ */
+function report_user_upload( $File )
+{
+	global $current_User;
+	load_funcs( 'files/model/_file.funcs.php' );
+
+	syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
+			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
