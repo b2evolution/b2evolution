@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is WORK IN PROGRESS on version **6.7.0-alpha**.
+This is WORK IN PROGRESS on version **6.7.1-alpha**.
 
 ## A complete engine for your website !
 
