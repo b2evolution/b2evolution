@@ -164,9 +164,6 @@ class coll_comment_list_Widget extends ComponentWidget
 		// Filter list:
 		$CommentList->set_filters( $filters );
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
 

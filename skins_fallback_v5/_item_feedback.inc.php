@@ -224,9 +224,6 @@ if( $Item->can_see_comments( true ) )
 
 		$CommentList->load_from_Request();
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
 

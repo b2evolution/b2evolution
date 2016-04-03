@@ -7359,9 +7359,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11735, 'Upgrade table files...' ) )
-	{ // part of 6.7.0
+	{	// part of 6.7.0
 		$DB->query( 'ALTER TABLE T_files
 			MODIFY file_type ENUM( "image", "audio", "video", "other" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11740, 'Update table user settings for new post/comment moderation settings...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+			SELECT uset_user_ID, IF( uset_name = "notify_comment_moderation", "notify_edit_cmt_moderation", "notify_edit_pst_moderation" ), uset_value
+			  FROM T_users__usersettings
+			 WHERE uset_name IN ( "notify_comment_moderation", "notify_post_moderation" )' );
 		upg_task_end();
 	}
 

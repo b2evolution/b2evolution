@@ -844,7 +844,7 @@ class ItemQuery extends SQL
 	 * @param string Keyword search string
 	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
 	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
-	 * @param string Scope of keyword search string: 'title', 'content'
+	 * @param string Scope of keyword search string: 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords'
 	 */
 	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
@@ -883,6 +883,24 @@ class ItemQuery extends SQL
 					$this->GROUP_BY( 'post_ID' );
 					// Tags are always an EXACT match:
 					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				case 'excerpt':
+					$search_fields[] = $this->dbprefix.'excerpt';
+					break;
+
+				case 'titletag':
+					$search_fields[] = $this->dbprefix.'titletag';
+					break;
+
+				case 'metadesc':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_md ON post_ID = is_md.iset_item_ID AND is_md.iset_name = "metadesc"' );
+					$search_fields[] = 'is_md.iset_value';
+					break;
+
+				case 'metakeywords':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_mk ON post_ID = is_mk.iset_item_ID AND is_mk.iset_name = "metakeywords"' );
+					$search_fields[] = 'is_mk.iset_value';
 					break;
 
 				// TODO: add more.

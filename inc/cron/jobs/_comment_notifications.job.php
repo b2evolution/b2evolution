@@ -21,8 +21,6 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-$executed_by_userid = ( ! empty( $job_params['executed_by_userid'] ) ) ? $job_params['executed_by_userid'] : NULL;
-
 $comment_ID = $job_params['comment_ID'];
 
 // Notify that we are going to take care of that comment's notifications:
@@ -45,8 +43,12 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
+$executed_by_userid = empty( $job_params['executed_by_userid'] ) ? NULL : $job_params['executed_by_userid'];
+$is_new_comment = empty( $job_params['is_new_comment'] ) ? true : $job_params['is_new_comment'];
+$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+
 // Send email notifications now!
-$edited_Comment->send_email_notifications( $executed_by_userid );
+$edited_Comment->send_email_notifications( $executed_by_userid, $is_new_comment, $already_notified_user_IDs );
 
 // Record that processing has been done:
 $edited_Comment->set( 'notif_status', 'finished' );

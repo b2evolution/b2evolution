@@ -442,10 +442,29 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 	}
 
 	if( $link_type == 'item' && $current_File )
-	{ // Display icon to insert image into post inline
-		$type = $current_File->is_image() ? 'image' : 'file';
+	{ // Display icon to insert image|video into post inline
+		$type = $current_File->get_file_type();
+
+		// valid file types: audio, video, image, other. See @link File::set_file_type()
+		switch( $type )
+		{
+			case 'audio':
+			  // no inline audio, show file download link using [file:] short tag
+				$type = 'file';
+				break;
+
+			case 'video':
+				break;
+
+			case 'image':
+				break;
+
+			case 'other':
+				$type = 'file';
+				break;
+		}
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
-				'title'   => T_('Insert image into the post'),
+				'title'   => sprintf( T_('Insert %s into the post'), $type ),
 				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );

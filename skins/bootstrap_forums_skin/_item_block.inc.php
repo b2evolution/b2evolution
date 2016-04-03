@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User;
+global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -275,12 +275,17 @@ skin_widget( array(
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
@@ -296,6 +301,7 @@ skin_widget( array(
 				'comment_text_after'    => '</div>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 		</div><!-- .col -->

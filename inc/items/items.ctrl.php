@@ -845,7 +845,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_post_processing( $exit_after_save, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -1019,7 +1019,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save, $is_publishing );
+		$edited_Item->handle_post_processing( $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1177,9 +1177,6 @@ switch( $action )
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 		$current_User->check_perm( 'item_post!'.$status, 'edit', true, $edited_Item );
 
-		// Is this post publishing right now?
-		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $status == 'published' );
-
 		// Set new post type
 		$edited_Item->set( 'status', $status );
 
@@ -1202,7 +1199,7 @@ switch( $action )
 			$edited_Item->dbupdate();
 
 			// Execute or schedule notifications & pings:
-			$edited_Item->handle_post_processing( true, $is_publishing );
+			$edited_Item->handle_post_processing();
 
 			// Set redirect back to items list with new item type tab
 			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
@@ -1286,9 +1283,6 @@ switch( $action )
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
 
-		// Is this post publishing right now?
-		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
-
 		$edited_Item->set( 'status', $post_status );
 
 		if( $action == 'publish_now' )
@@ -1303,7 +1297,7 @@ switch( $action )
 		$edited_Item->dbupdate();
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $is_publishing );
+		$edited_Item->handle_post_processing();
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )

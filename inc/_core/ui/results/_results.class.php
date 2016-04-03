@@ -475,6 +475,22 @@ class Results extends Table
 	 * Run the query now!
 	 *
 	 * Will only run if it has not executed before.
+	 *
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it (e-g: CommentList2)
+	 *
+	 * @deprecated Use new function run_query()
+	 */
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run the query now!
+	 *
+	 * Will only run if it has not executed before.
 	 */
 	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
 										$query_title = 'Results::run_query()' )
@@ -2117,6 +2133,7 @@ class Results extends Table
 		$i = 0;
 		$list = '';
 
+		// Do not include first page in the page list range
 		if( $this->first() == 1 )
 		{
 			$min++;
@@ -2126,6 +2143,7 @@ class Results extends Table
 			}
 		}
 
+		// Also, do not include last page in the page list range
 		if( $this->last() == $this->total_pages )
 		{
 			$max--;
@@ -2141,11 +2159,35 @@ class Results extends Table
 
 		for( $i=$min; $i<=$max; $i++)
 		{
-			$active_dist = abs( $this->page - $i );
+			if( $this->page <= 4 )
+			{
+				$a = $i - 4;
+				$active_dist = $a > 0 ? $a : null;
+			}
+			elseif( $this->page > ( $this->total_pages - 3 ) )
+			{
+				if( $i > ( $this->total_pages - 3 ) )
+				{
+					$active_dist = null;
+				}
+				else
+				{
+					$active_dist = ( $this->total_pages - 3 ) - $i;
+				}
+				//$active_dist = null;
+			}
+			else
+			{
+				$active_dist = abs( $this->page - $i );
+			}
 
-			if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $this->page ) && ( $i > 2 ) )
+			if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $this->page ) && ( $i > 2 ) && ( $this->page > 4 ) )
 			{ // show pseudo prev_list
 				$page_no = ceil($this->first()/2);
+				if( $page_no == 1 )
+				{
+					$page_no++;
+				}
 				if( isset( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
@@ -2164,8 +2206,14 @@ class Results extends Table
 			}
 			elseif( isset( $this->params['page_item_before'] ) )
 			{ // other page
-				//$list .= $this->params['page_item_before'];
-				$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+				if( $active_dist )
+				{
+					$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+				}
+				else
+				{
+					$list .= str_replace( '**active_distance_**', '', $pib );
+				}
 			}
 
 			if( $i == $this->page )
@@ -2224,6 +2272,10 @@ class Results extends Table
 			if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
 			{ // show pseudo next_list
 				$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
+				if( $page_no == $this->total_pages )
+				{
+					$page_no--;
+				}
 				if( isset( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );

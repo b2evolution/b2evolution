@@ -191,7 +191,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 	switch( $type )
 	{
 		case 'item':
-			$searched_parts = array( 'title', 'content', 'tags' );
+			$searched_parts = array( 'title', 'content', 'tags', 'excerpt', 'titletag' );
 			break;
 
 		case 'comment':
@@ -267,7 +267,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
-			'keyword_scope' => 'title,content,tags', // TODO: add more fields
+			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
 			'phrase'        => 'OR',
 			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
@@ -279,7 +279,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login, tag_name'
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content,'
+		.' user_login as creator_login, tag_name, post_excerpt, post_titletag'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
 		.$search_ItemList->ItemQuery->get_where()
@@ -299,6 +300,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
 		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
 		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
+		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
+		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
@@ -308,6 +311,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
 			+ $scores_map['tags']['score']
+			+ $scores_map['excerpt']['score']
+			+ $scores_map['titletag']['score']
 			+ ( isset( $scores_map['creator_login'] ) ? $scores_map['creator_login'] : 0 )
 			+ $scores_map['last_mod_date'];
 
@@ -713,10 +718,10 @@ function search_result_block( $params = array() )
 		{	// Display counts
 			echo '<div class="text-muted">';
 			echo '<p>We found the desired saved search results in the Session:</p>';
-			echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
-			echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
-			echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
-			echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li></ul>';
+			echo '<ul><li>'.sprintf( '%d posts', empty( $search_result[0]['nr_of_items'] ) ? 0 : $search_result[0]['nr_of_items'] ).'</li>';
+			echo '<li>'.sprintf( '%d comments', empty( $search_result[0]['nr_of_comments'] ) ? 0 : $search_result[0]['nr_of_comments'] ).'</li>';
+			echo '<li>'.sprintf( '%d chapters', empty( $search_result[0]['nr_of_cats'] ) ? 0 : $search_result[0]['nr_of_cats'] ).'</li>';
+			echo '<li>'.sprintf( '%d tags', empty( $search_result[0]['nr_of_tags'] ) ? 0 : $search_result[0]['nr_of_tags'] ).'</li></ul>';
 			echo '</div>';
 		}
 
@@ -1023,9 +1028,18 @@ function search_page_links( $params = array() )
 	}
 
 	// Display a link to first page:
-	echo $params['page_item_before'];
-	echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
-	echo $params['page_item_after'];
+	if( $current_page == 1 )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_first' );
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_first' );
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_after'];
+	}
 
 	if( $page_list_start > 2 )
 	{ // Display a link to previous pages range:
@@ -1040,12 +1054,56 @@ function search_page_links( $params = array() )
 	$page_next_i = $current_page + 1;
 	$pib = add_tag_class( $params['page_item_before'], '**active_distance_**' );
 
+	// Do not include first page in the page list range
+	if( $page_list_start == 1 )
+	{
+		$page_list_start++;
+		if( ( $page_list_end + 1 ) < $total_pages )
+		{
+			$page_list_end++;
+		}
+	}
+
+	// Also, do not include last page in the page list range
+	if( $page_list_end == $total_pages )
+	{
+		$page_list_end--;
+		if( $page_list_start > 2 )
+		{
+			$page_list_start--;
+		}
+	}
+
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-		$active_dist = abs( $current_page - $i );
-		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) )
+		if( $current_page <= 4 )
+		{
+			$a = ( $i - 4 );
+			$active_dist = $a > 0 ? $a : null;
+		}
+		elseif( $current_page > ( $total_pages - 3 ) )
+		{
+			if( $i > ( $total_pages - 3 ) )
+			{
+				$active_dist = null;
+			}
+			else
+			{
+				$active_dist = ( ( $total_pages - 3 ) - $i );
+			}
+		}
+		else
+		{
+			$active_dist = abs( $current_page - $i );
+		}
+
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) && ( $current_page > 4 ) )
 		{
 			$page_no = ceil( $page_list_start / 2 );
+			if( $page_no == 1 )
+			{
+				$page_no++;
+			}
 			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 			echo $params['page_item_after'];
@@ -1067,8 +1125,15 @@ function search_page_links( $params = array() )
 			{ // Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
-			//echo $params['page_item_before'];
-			echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+
+			if( $active_dist )
+			{
+				echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+			}
+			else
+			{
+				echo str_replace( '**active_distance_**', '', $pib );
+			}
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
 			echo $params['page_item_after'];
 		}
@@ -1076,6 +1141,10 @@ function search_page_links( $params = array() )
 		if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $current_page ) && ( $i < ( $total_pages - 1 ) ) )
 		{
 			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+			if( $page_no == $total_pages )
+			{
+				$page_no--;
+			}
 			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
 			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
 			echo $params['page_item_after'];
@@ -1091,9 +1160,19 @@ function search_page_links( $params = array() )
 	}
 
 	// Display a link to last page:
-	echo $params['page_item_before'];
-	echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
-	echo $params['page_item_after'];
+	if( $current_page == $total_pages )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_last' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_last' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_after'];
+	}
+
 
 
 	if( $current_page < $total_pages )

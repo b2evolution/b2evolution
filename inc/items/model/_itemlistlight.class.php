@@ -173,18 +173,6 @@ class ItemListLight extends DataObjectList2
 
 
 	/**
-	 * Rewind resultset
-	 */
-	function restart()
-	{
-		parent::restart();
-
-		// Make sure query has executed:
-		$this->query();
-	}
-
-
-	/**
 	 * Set/Activate filterset
 	 *
 	 * This will also set back the GLOBALS !!! needed for regenerate_url().
@@ -762,13 +750,31 @@ class ItemListLight extends DataObjectList2
 	}
 
 
-  /**
+	/**
+	 * Run Query: GET DATA ROWS *** LIGHT ***
+	 *
+	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
+	 * Basically all we want is being able to generate permalinks.
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
+	 */
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
 	 * Run Query: GET DATA ROWS *** LIGHT ***
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
 	 */
-	function query()
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -797,7 +803,7 @@ class ItemListLight extends DataObjectList2
 
 		// echo DB::format_query( $this->sql );
 
-		$this->run_query( false, false, false, 'ItemListLight::query()' );
+		parent::run_query( false, false, false, 'ItemListLight::query()' );
 	}
 
 

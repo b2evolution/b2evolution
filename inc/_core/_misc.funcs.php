@@ -1197,14 +1197,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			}
 
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1220,14 +1213,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
