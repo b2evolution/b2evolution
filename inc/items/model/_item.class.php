@@ -5846,7 +5846,7 @@ class Item extends ItemLight
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return boolean TRUE on success
 	 */
-	function handle_post_processing( $verbose = true, $is_new_item = false )
+	function handle_notifications( $verbose = true, $is_new_item = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 

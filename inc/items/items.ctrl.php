@@ -845,7 +845,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save, true );
+		$edited_Item->handle_notifications( $exit_after_save, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -1019,7 +1019,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( $exit_after_save );
+		$edited_Item->handle_notifications( $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1199,7 +1199,7 @@ switch( $action )
 			$edited_Item->dbupdate();
 
 			// Execute or schedule notifications & pings:
-			$edited_Item->handle_post_processing();
+			$edited_Item->handle_notifications();
 
 			// Set redirect back to items list with new item type tab
 			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
@@ -1297,7 +1297,7 @@ switch( $action )
 		$edited_Item->dbupdate();
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing();
+		$edited_Item->handle_notifications();
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )
