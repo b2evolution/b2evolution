@@ -3430,7 +3430,7 @@ class Comment extends DataObject
 
 
 	/**
-	 * Send post may need moderation notifications for those users who have rights to moderate this comment, and would like to receive notifications
+	 * Send "comment may need moderation" notifications for those users who have permission to moderate this comment and would like to receive these notifications.
 	 *
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment

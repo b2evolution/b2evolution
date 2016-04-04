@@ -5947,7 +5947,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Send post may need moderation notifications for those users who have rights to moderate this post, and would like to receive notifications
+	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
 	 *
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
