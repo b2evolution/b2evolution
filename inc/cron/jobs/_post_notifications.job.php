@@ -1,6 +1,7 @@
 <?php
 /**
- * This file implements the post notifications Cron controller
+ * This file implements t
+ he post notifications Cron controller
  *
  * @author fplanque: Francois PLANQUE
  *
@@ -26,16 +27,17 @@ if( empty( $job_params['item_ID'] ) )
 
 $item_ID = $job_params['item_ID'];
 
-
-// Notify that we are going to take care of that post's post processing:
+// TRY TO OBTAIN A UNIQUE LOCK for processing the task.
+// This is to avoid that 2 cron jobs process the same post at the same time:
+// Notify that this is the job that is going to take care of sending notifications for this post:
 $DB->query( 'UPDATE T_items__item
 								SET post_notifications_status = "started"
 							WHERE post_ID = '.$item_ID.'
 							  AND post_notifications_status = "todo"
 							  AND post_notifications_ctsk_ID = '.$job_params['ctsk_ID'] );
 if( $DB->rows_affected != 1 )
-{	// We would not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock post #%d. It may already be processed.'), $item_ID );
+{	// We could not "lock" the requested post
+	$result_message = sprintf( T_('Could not lock post #%d. It is probably being processed or has already been processed by another scheduled task.'), $item_ID );
 	return 4;
 }
 
@@ -46,14 +48,28 @@ $ItemCache = & get_ItemCache();
  */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
-// Send outbound pings:
-$edited_Item->send_outbound_pings();
+$previous_Item_visibility_status = '';
+$current_Item_visibility_status = $edited_Item->get( 'status' );
 
-$is_new_item = empty( $job_params['is_new_item'] ) ? true : $job_params['is_new_item'];
-$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+// Make a loop here because the visibility status of the post may evolve between the beginning and the end of sending the notifications (which may last minutes or even hours...):
+while( $current_Item_visibility_status != $previous_Item_visibility_status )
+{
+	// Send outbound pings: (will only do something if visibility is 'public')
+	$edited_Item->send_outbound_pings();
 
-// Send email notifications to users who want receive it on collection of the item:
-$edited_Item->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+	// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
+	$is_new_item = empty( $job_params['is_new_item'] ) ? true : $job_params['is_new_item'];
+	$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+	$edited_Item->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+
+	// Check if visibility status has changed:
+	$previous_Item_visibility_status = $current_Item_visibility_status;
+	// Destroy current item
+	unset( $edited_Item );
+	// TODO: GET MOST RECENT ITEM FROM DB
+	$edited_Item = ...;
+	$current_Item_visibility_status = $edited_Item->get( 'status' );
+}
 
 // Record that processing has been done:
 $edited_Item->set( 'notifications_status', 'finished' );
