@@ -6102,17 +6102,47 @@ class Item extends ItemLight
 	{
 		global $DB, $debug;
 
-// TODO: different notifications for members and community
+		$notify_members = false;
+		$notify_community = false;
 
-		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send notifications about not published items:
+		if( $this->get( 'status' ) == 'members' )
+		{	// If the post is visible for members only...
+			if( ! $this->get('members_notified') )
+			{	// Members have not been notified yet, do so:
+				$notify_members = true;
+			}
+			else
+			{	// Members have already been notified, nothing to do:
+				return;
+			}
+		}
+		elseif( $this->get( 'status' ) == 'community' || $this->get( 'status' ) == 'published' )
+		{	// If the post is visible to the community or is public...
+			if( ! $this->get('members_notified') )
+			{	// Members have not been notified yet (which means teh community has not been notified either), notify them all:
+				$notify_members = true;
+				$notify_community = true;
+			}
+			elseif( ! $this->get('community_notified') )
+			{	// Community have not been notified yet, do so:
+				$notify_community = true;
+			}
+			else
+			{	// Everyone has already been notified, nothing to do:
+				return;
+			}
+		}
+		else
+		{	// All other visibility statuses are too "private" to send notifications to subscribers:
 			return;
 		}
 
+		/* fp> we have already checked this is handle_notifications() so no need to do it again here.
 		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
 		{	// Don't send pings of items with these item types:
 			return;
 		}
+		*/
 
 		$edited_Blog = & $this->get_Blog();
 
@@ -6123,6 +6153,8 @@ class Item extends ItemLight
 
 		// Create condition to not select already notified moderator users:
 		$except_users_condition = empty( $already_notified_user_IDs ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
+
+// fp> TODO: ADD conditions to select either members or non-member or both depending on $notify_members & $notify_community
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
@@ -6142,7 +6174,7 @@ class Item extends ItemLight
 		$UserCache->load_list( $notify_users );
 
 		/*
-		 * We have a list of user IDs to notify:
+		 * We have a list of User IDs to notify:
 		 */
 		$this->get_creator_User();
 
@@ -6199,6 +6231,15 @@ class Item extends ItemLight
 		}
 
 		blocked_emails_display();
+
+		if( $notify_members )
+		{	// Record that we have just notified the members:
+			$this->set( 'members_notified', true );		// DIRTY PSEUDO CODE
+		}
+		if( $notify_community )
+		{	// Record that we have just notified the members:
+			$this->set( 'community_notified', true );		// DIRTY PSEUDO CODE
+		}
 	}
 
 
