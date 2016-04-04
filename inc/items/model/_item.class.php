@@ -6212,17 +6212,22 @@ class Item extends ItemLight
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
-// TODO: check flags
-
 		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send notifications about not published items:
+		{	// Don't send notifications if item is not 'public':
 			return;
 		}
 
+		if( $this->get('pings_sent') )
+		{	// Don't send notifications if they have already been sent:
+			return;
+		}
+
+		/* fp> we have already checked this is handle_notifications() so no need to do it again here.
 		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
 		{	// Don't send pings of items with these item types:
 			return;
 		}
+		*/
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -6275,6 +6280,10 @@ class Item extends ItemLight
 				$Messages->add( implode( '<br />', $ping_messages ), 'note' );
 			}
 		}
+
+		// FP> This is complete PSEUDO code. Make this clean:
+		$this->set('pings_sent', true);
+
 		return $r;
 	}
 
