@@ -115,7 +115,7 @@ class LinkComment extends LinkOwner
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			$file_dir = $File->is_dir() ? 'Directory' : 'File';
+			$file_dir = $File->is_dir() ? T_('Directory') : T_('File');
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
