@@ -98,7 +98,7 @@ skin_widget( array(
 			) );
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '<span class="text-muted"> &ndash; '
 						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
@@ -106,7 +106,7 @@ skin_widget( array(
 				echo '</div>';
 				// Author info - shrinked:
 				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
 				echo '</div>';
 		?>
@@ -122,15 +122,15 @@ skin_widget( array(
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
 						$Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					?>
 					<?php
 						if( $Skin->get_setting( 'display_post_date' ) )
 						{ // We want to display the post date:
 							$Item->issue_time( array(
-									'before'      => '',
-									'after'       => ' &nbsp; &nbsp; ',
+									'before'      => '<span class="text-muted">',
+									'after'       => '</span> &nbsp; &nbsp; ',
 									'time_format' => 'M j, Y H:i',
 								) );
 						}
@@ -233,7 +233,7 @@ skin_widget( array(
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
