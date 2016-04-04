@@ -248,7 +248,16 @@ function syslog_object_link( $object_type, $object_ID )
 			$FileCache = & get_FileCache();
 			if( ( $File = & $FileCache->get_by_ID( $object_ID, false, false ) ) !== false )
 			{ // File exists
-				$link = $File->is_dir() ? '' : $File->get_view_link();
+				if( $File->is_dir() )
+				{
+					$url = $File->get_linkedit_url();
+					$title = T_('Locate this directory!');
+					$link = '<a href="'.$url.'" title="'.$title.'">'.$File->get_root_and_rel_path().'</a> ';
+				}
+				else
+				{
+					$link = $File->get_view_link();
+				}
 				$link .= ' '.$File->get_target_icon();
 			}
 			else
