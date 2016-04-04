@@ -5838,9 +5838,10 @@ class Item extends ItemLight
 
 
 	/**
-	 * Execute or schedule post(=after) processing tasks
-	 *
-	 * Includes notifications & pings
+	 * Execute or schedule various notifications:
+	 * - notifications for moderators
+	 * - notificatiosn for subscribers
+	 * - pings
 	 *
 	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
@@ -5854,13 +5855,19 @@ class Item extends ItemLight
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		if( $notifications_mode == 'off' )
-		{	// Don't send notifications and pings:
+		{	// Don't send any notifications nor pings:
 			return false;
 		}
 
+		// FIRST: Moderators need to be notified immediately, even if the post is a draft/review and/or has an issue_date in the future.
+		// fp> NOTE: for simplicity, for now, we will NOT make a scheduled job for this (but we will probably do so in the future)
 		// Send email notifications to users who can moderate this item:
 		$already_notified_user_IDs = $this->send_moderation_emails( $is_new_item );
 
+		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
+
+		// NEW: notifications will now happen multiple times, as the visibility status progresses, so the test below is not valid any more:
+		// fp> Instead we should check the flags: members community and pings
 		if( $this->get( 'notifications_status' ) != 'noreq' )
 		{	// Pings have been done before, Skip notifications and pings:
 			if( $verbose )
@@ -5870,6 +5877,10 @@ class Item extends ItemLight
 			return false;
 		}
 
+		// NEW: notifications will now be sent for the followign statuses: Members, Community and Public
+		// Reference: http://b2evolution.net/man/visibility-status
+		// So the following is no longer valid.
+		// fp> Instead we should check the flags: members community and pings
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send email notifications and outbound pings about not published items:
 			if( $verbose )
@@ -5879,6 +5890,9 @@ class Item extends ItemLight
 			return false;
 		}
 
+		// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+		// fp> TODO: I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+		// fp> Maybe later we can add a button to manually "force" notifications even for other usages (as long as they have a permalink)
 		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
 		{	// Don't send email notifications and outbound pings of items with these item types:
 			if( $verbose )
@@ -5888,8 +5902,10 @@ class Item extends ItemLight
 			return false;
 		}
 
+		// IMMEDIATE vs ASYNCHRONOUS sending: 
+
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
-		{	// We want to do the post processing immediately:
+		{	// We want to do the post processing immediately (can only be done if post does not have an issue_date in the future):
 
 			// Send outbound pings:
 			$this->send_outbound_pings( $verbose );
@@ -5901,15 +5917,16 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'finished' );
 		}
 		else
-		{	// We want asynchronous post processing. This applies to posts with date in future too.
+		{	// We want asynchronous post processing. (This automatically applies to posts with issue_date in the future):
 
-			if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) > $localtimenow )
-			{	// Display this warning, because when the cron job will be executed any notification will NOT be sent:
+			if( $notifications_mode == 'immediate' )
+			{	// We ended up here because the issue_date is in the future BUT notifications are not sent to asynchronoys...
+				// This means we will schedule a job but it will never get executed until the admin turns on async notifications:
 				$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
 					'href="http://b2evolution.net/man/after-each-post-settings" target="_blank"' ), 'warning' );
 			}
 
-			// CREATE OBJECT:
+			// CREATE CRON JOB OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$edited_Cronjob = new Cronjob();
 
@@ -6064,6 +6081,8 @@ class Item extends ItemLight
 	{
 		global $DB, $debug;
 
+// TODO: different notifications for members and community
+
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send notifications about not published items:
 			return;
@@ -6171,6 +6190,8 @@ class Item extends ItemLight
 	function send_outbound_pings( $verbose = true )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+
+// TODO: check flags
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send notifications about not published items:
