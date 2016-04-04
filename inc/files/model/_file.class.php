@@ -1814,12 +1814,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
-			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
-			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
