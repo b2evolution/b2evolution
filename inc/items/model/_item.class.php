@@ -325,6 +325,8 @@ class Item extends ItemLight
 				}
 			}
 			$this->set( 'locale', ( isset( $new_item_locale ) ? $new_item_locale : $default_locale ) );
+			// fp> not sure the following is the cleanest way to initialize:
+			$this->post_notifications_flags = array();
 		}
 		else
 		{
@@ -344,6 +346,8 @@ class Item extends ItemLight
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
+			// fp> not sure the following is the cleanest way to initialize:
+			$this->post_notifications_flags = split($db_row->post_notifications_flags);
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
@@ -5867,7 +5871,7 @@ class Item extends ItemLight
 		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
 
 		// NEW: notifications will now happen multiple times, as the visibility status progresses, so the test below is not valid any more:
-		// fp> Instead we should check the flags: members community and pings
+		/*
 		if( $this->get( 'notifications_status' ) != 'noreq' )
 		{	// Pings have been done before, Skip notifications and pings:
 			if( $verbose )
@@ -5876,11 +5880,12 @@ class Item extends ItemLight
 			}
 			return false;
 		}
-
+		*/
+		
 		// NEW: notifications will now be sent for the followign statuses: Members, Community and Public
 		// Reference: http://b2evolution.net/man/visibility-status
-		// So the following is no longer valid.
-		// fp> Instead we should check the flags: members community and pings
+		// So the following is no longer valid:
+		/*
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send email notifications and outbound pings about not published items:
 			if( $verbose )
@@ -5889,15 +5894,27 @@ class Item extends ItemLight
 			}
 			return false;
 		}
+		*/
 
-		// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
-		// fp> TODO: I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
-		// fp> Maybe later we can add a button to manually "force" notifications even for other usages (as long as they have a permalink)
-		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send email notifications and outbound pings of items with these item types:
+		// Instead of the above we now check the flags:
+		// fp> Maybe later we may add a "force" param to bypass this and send notifications again
+		if( count(array_diff( array('members_notified','community_notified','pings_sent'), $this->post_notifications_flags )) == 0 )
+		{	// All possible notifications have already been sent:
 			if( $verbose )
 			{
-				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
+				$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			}
+			return false;
+		}
+
+		// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+		// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+		// fp> Maybe later we can add a button to manually "force" notifications even for other usages (as long as they have a permalink)
+		if( in_array( $this->get_type_setting( 'usage' ) != 'post' ) )
+		{	// Don't send email notifications and outbound pings for items that are not regular posts
+			if( $verbose )
+			{
+				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping notifications...'), 'note' );
 			}
 			return false;
 		}
@@ -5905,12 +5922,12 @@ class Item extends ItemLight
 		// IMMEDIATE vs ASYNCHRONOUS sending: 
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
-		{	// We want to do the post processing immediately (can only be done if post does not have an issue_date in the future):
+		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
 
-			// Send outbound pings:
+			// Send outbound pings: (will only do something if visibility is 'public')
 			$this->send_outbound_pings( $verbose );
 
-			// Send email notifications to users who want receive it on collection of this item:
+			// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
 			$this->send_email_notifications( $is_new_item, $already_notified_user_IDs );
 
 			// Record that processing has been done:
@@ -5927,6 +5944,10 @@ class Item extends ItemLight
 			}
 
 			// CREATE CRON JOB OBJECT:
+
+			// Note: in case of successive edits of a post we may create many cron jobs for it.
+			// It will be the responsibility of the cron jobs to detect if another one is already running and not execute twice or more times concurrently.
+
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$edited_Cronjob = new Cronjob();
 
@@ -6337,9 +6358,23 @@ class Item extends ItemLight
 			case 't_priority':
 				return $this->priorities[ $this->priority ];
 
-			case 'pingsdone':
-				// Deprecated by fp 2006-08-21
-				return ($this->post_notifications_status == 'finished');
+			case 'members_notified':
+				// Have notifications been sent to members of the parent collection?  (should only happen when the post has visibility 'members', 'community' or 'public')
+				// fp> pseudo code:
+				return in_array( 'members_notified', $this->post_notifications_flags );
+
+			case 'community_notified':
+				// Have notifications been sent to the subscribers that are NOT members of the parent collection? (should only happen when the post has visibility 'community' or 'public')
+				// fp> pseudo code:
+				return in_array( 'community_notified', $this->post_notifications_flags );
+
+			case 'pings_sent':
+			case 'pingsdone': 
+				// Have pings been sent? (should only happen once the post has visibility 'public')
+				// return ($this->post_notifications_status == 'finished'); // Deprecated by fp 2006-08-21 -- TODO: this should now become an alias of "pings_sent"
+				// fp> pseudo code:
+				return in_array( 'pings_sent', $this->post_notifications_flags );
+
 
 			case 'excerpt':
 				return $this->get_excerpt2();
