@@ -6086,6 +6086,9 @@ class Item extends ItemLight
 			$notfied_Users[] = $moderator_ID;
 		}
 
+		// Record that we have notified the moderators (for info only):
+		$this->set( 'moderators_notified', true );	// DIRTY PSEUDO CODE
+
 		return $notfied_Users;
 	}
 

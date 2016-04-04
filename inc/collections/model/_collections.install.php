@@ -151,7 +151,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
 			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
-			post_notifications_flags    SET('members_notified','community_notified','pings_sent') NOT NULL DEFAULT '',
+			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
