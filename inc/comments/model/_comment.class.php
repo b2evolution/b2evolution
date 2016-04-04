@@ -3709,22 +3709,25 @@ class Comment extends DataObject
 					break;
 
 				default:
-					/* TRANS: Subject of the mail to send on new comments.
-					   In case of full notification the first %s is blog name, the second %s is the item's title.
-					   In case of short notification the first %s is author login, the second %s is the item's title. */
-					$subject = $notify_full ? T_('[%s] New comment on "%s"') : T_( '%s posted a new comment on "%s"' );
 					if( $notify_type == 'moderator' )
-					{
-						if( $this->status == 'draft' )
+					{	// Subject for moderators:
+						if( $this->status == 'draft' || $this->status == 'review' )
 						{
-							$subject = $notify_full ? T_('[%s] New comment awaiting moderation on "%s"') : T_('New comment awaiting moderation: ').$subject;
+							/* TRANS: Subject of the mail to send on new comments to moderators. First %s is blog name, the second %s is the item's title. */
+							$subject = T_('[%s] New comment awaiting moderation on "%s"');
 						}
 						else
 						{
-							$subject = $notify_full ? T_('[%s] New comment may need moderation on "%s"') : T_('New comment may need moderation: ').$subject;
+							/* TRANS: Subject of the mail to send on new comments to moderators. First %s is blog name, the second %s is the item's title. */
+							$subject = T_('[%s] New comment may need moderation on "%s"');
 						}
 					}
-					$subject = sprintf( $subject, $notify_full ? $edited_Blog->get('shortname') : $author_name, $edited_Item->get('title') );
+					else
+					{	// Subject for subscribed users:
+						/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+						$subject = T_('[%s] New comment on "%s"');
+					}
+					$subject = sprintf( $subject, $edited_Blog->get('shortname'), $edited_Item->get('title') );
 			}
 
 			switch( $notify_type )

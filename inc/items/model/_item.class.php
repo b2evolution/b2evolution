@@ -6026,9 +6026,22 @@ class Item extends ItemLight
 			);
 
 			locale_temp_switch( $moderator_User->locale );
-			$subject = T_('New post may need moderation:').' '.sprintf( T_('%s created a new post on "%s"'), $post_creator_User->login, $this->Blog->get('shortname') );
+
+			if( $this->status == 'draft' || $this->status == 'review' )
+			{
+				/* TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] New post awaiting moderation: "%s"');
+			}
+			else
+			{
+				/* TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] New post may need moderation: "%s"');
+			}
+			$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
+
 			// Send the email
 			send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) );
+
 			locale_restore_previous();
 
 			// A send notification email request to the user with $moderator_ID ID was processed
@@ -6119,9 +6132,8 @@ class Item extends ItemLight
 			{	// No message for this locale generated yet:
 				locale_temp_switch( $notify_locale );
 
-				$cache_by_locale[$notify_locale]['subject']['short'] = sprintf( T_('%s created a new post in blog "%s"'), $this->creator_User->get( 'login' ), $edited_Blog->get('shortname') );
-
-				$cache_by_locale[$notify_locale]['subject']['full'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
+				/* TRANS: Subject of the mail to send on new posts to subscribed users. First %s is blog name, the second %s is the item's title. */
+				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
 
 				locale_restore_previous();
 			}
@@ -6141,8 +6153,7 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$message_content</pre>";
 			}
 
-			$subject_type = $notify_full ? 'full' : 'short';
-			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'][$subject_type], 'post_new', $email_template_params );
+			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params );
 
 			blocked_emails_memorize( $notify_User->email );
 		}
