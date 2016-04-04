@@ -7184,9 +7184,12 @@ class Item extends ItemLight
 								$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 							}
 
-							if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params );
+							if( count( $r_params ) != 0 )
 							{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
-								if( ! $current_image_params['get_rendered_attachments'] )
+								if( ! $r_params['get_rendered_attachments'] )
 								{ // Restore $r value and mark this item has the rendered attachments
 									$r = $temp_r;
 									$plugin_render_attachments = true;
@@ -7262,9 +7265,12 @@ class Item extends ItemLight
 								$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
 							}
 
-							if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params ) ) != 0 )
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
+							if( count( $r_params ) != 0 )
 							{
-								$link_tag = $current_video_params['data'];
+								$link_tag = $r_params['data'];
 							}
 							else
 							{ // no plugin available or was able to render the tag
