@@ -1352,17 +1352,20 @@ function get_upgrade_steps_count()
 	// Calculate the upgrade blocks:
 	$old_db_version = get_db_version();
 	if( $new_db_version > $old_db_version )
-	{ // Only when DB must be updated
+	{	// Only when DB must be updated really:
 		$upgrade_file_name = dirname( __FILE__ ).'/_functions_evoupgrade.php';
 		if( @file_exists( $upgrade_file_name ) )
-		{ // If file exists we can parse to know how much the upgrade blocks will be executed
+		{	// If file exists we can parse to know how much the upgrade blocks will be executed:
 			$upgrade_file_content = file_get_contents( $upgrade_file_name );
-			if( preg_match_all( '#if\(\s*\$old_db_version\s*<\s*(\d+)\s*\)#i', $upgrade_file_content, $version_matches ) )
+			// Find DB versions in the upgrade blocks like:
+			//      if( $old_db_version < 11430 )
+			//      if( upg_task_start( 11440, 'Upgrading base domains table...' ) )
+			if( preg_match_all( '#if\(\s*(\$old_db_version\s*<|upg_task_start\()\s*(\d+)#i', $upgrade_file_content, $version_matches ) )
 			{
-				foreach( $version_matches[1] as $version )
+				foreach( $version_matches[2] as $version )
 				{
 					if( $old_db_version < $version && $new_db_version != $old_db_version )
-					{ // Only these blocks will be executed
+					{	// Only these new blocks will be executed:
 						$steps++;
 					}
 				}
