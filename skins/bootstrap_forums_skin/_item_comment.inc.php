@@ -26,16 +26,17 @@ $params = array_merge( array(
 		'comment_status_before' => '</h4></div>',
 		'comment_title_after'   => '</div>',
 
-		'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+		'comment_body_before'   => '<div class="panel-body">',
+		'comment_body_after'    => '</div>',
+
+		'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 		'comment_avatar_after'  => '</span>',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
 		'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 		'comment_text_after'    => '</div>',
-		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
-		'comment_info_after'    => '</small></footer></div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'          => '<figure class="evo_image_block">',
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
@@ -62,10 +63,17 @@ if( ! isset( $comment_template_counter ) )
 		$comment_template_counter++;
 	}
 }
+
 /**
  * @var Comment
  */
 $Comment = & $params['Comment'];
+
+
+/**
+ * @var Item
+ */
+$commented_Item = & $Comment->get_Item();
 
 // Load comment's Item object:
 $Comment->get_Item();
@@ -147,9 +155,9 @@ switch( $Comment->get( 'type' ) )
 		{	// Normal comment
 			$Comment->permanent_link( array(
 					'before'    => '',
-					'after'     => ' '.T_('from:').' ',
-					'text'      => T_('Comment'),
-					'class'		=> 'evo_comment_type',
+					'after'     => '',
+					'text'      => '',
+					'class'     => 'evo_comment_type',
 					'nofollow'  => true,
 				) );
 		}
@@ -163,6 +171,10 @@ switch( $Comment->get( 'type' ) )
 				'link_to'      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 				'link_text'    => $params['author_link_text'],
 			) );
+
+		echo ' <span class="text-muted">';
+		$Comment->date( 'M j, Y H:i' );
+		echo '</span>';
 
 		if( ! $Comment->get_author_User() )
 		{ // Display action icon to message only if this comment is from a visitor
@@ -208,6 +220,8 @@ if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 
 echo $params['comment_title_after'];
 
+echo $params['comment_body_before'];
+
 // Avatar:
 echo $params['comment_avatar_before'];
 $Comment->author2( array(
@@ -229,11 +243,7 @@ $Comment->content( 'htmlbody', false, true, $params );
 
 echo $params['comment_text_after'];
 
-// Info:
-echo $params['comment_info_before'];
-	$commented_Item = & $Comment->get_Item();
-	$Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
-echo $params['comment_info_after'];
+echo $params['comment_body_after'];
 
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
