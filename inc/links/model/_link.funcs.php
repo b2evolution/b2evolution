@@ -405,7 +405,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
-		$title = $current_File->is_dir() ? T_('Locate this directory!') : T_('Locate this file!');
+		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
 		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
 
