@@ -536,9 +536,10 @@ switch( $action )
 
 			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
-		elseif( $request_from == 'dashboard' )
+		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
-			get_comments_awaiting_moderation( $blog );
+			load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+			show_comments_awaiting_moderation( $blog, NULL, 10, array(), false );
 		}
 		break;
 
@@ -949,19 +950,6 @@ if( !$incorrect_action )
 	}
 
 	exit(0);
-}
-
-/**
- * Get comments awaiting moderation
- *
- * @param integer blog_ID
- */
-function get_comments_awaiting_moderation( $blog_ID )
-{
-	$limit = 30;
-
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
 }
 
 ?>

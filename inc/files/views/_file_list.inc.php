@@ -256,13 +256,13 @@ $Form->begin_form();
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
 					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
-					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
 				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
-				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
 			/****  Open in a new window  (only directories)  ****/
@@ -369,10 +369,10 @@ $Form->begin_form();
 		}
 
 		/****************  Download Count  ****************/
-		
+
 		if( $UserSettings->get('fm_showdownload') )
 		{ // Show download count
-			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead 
+			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
 		}
 

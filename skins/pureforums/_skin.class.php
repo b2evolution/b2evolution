@@ -449,6 +449,12 @@ class pureforums_Skin extends Skin
 					'note_format'       => ' <span class="notes">%s</span>',
 				);
 
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'parent';
+
 			default:
 				// Delegate to parent class:
 				return parent::get_template( $name );

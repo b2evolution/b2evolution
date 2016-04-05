@@ -304,7 +304,7 @@ elseif( ! param_errors_detected() )
 			break;
 		case 'upload_avatar':
 			// Redirect to display user profile form
-			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=profile', '&' );
+			$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=avatar', '&' );
 			break;
 	}
 	if( !empty( $redirect_to ) )

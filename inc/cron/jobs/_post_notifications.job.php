@@ -46,15 +46,14 @@ $ItemCache = & get_ItemCache();
  */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
-// send outbound pings:
-if( ! $edited_Item->send_outbound_pings() )
-{
-	$result_message = $Messages->get_string( '', '', "\n" );
-	return 5;
-}
+// Send outbound pings:
+$edited_Item->send_outbound_pings();
 
-// Send email notifications now!
-$edited_Item->send_email_notifications( false );
+$is_new_item = empty( $job_params['is_new_item'] ) ? true : $job_params['is_new_item'];
+$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+
+// Send email notifications to users who want receive it on collection of the item:
+$edited_Item->send_email_notifications( $is_new_item, $already_notified_user_IDs );
 
 // Record that processing has been done:
 $edited_Item->set( 'notifications_status', 'finished' );

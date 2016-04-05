@@ -148,7 +148,7 @@ function setCommentStatus( id, status, request_from, redirect_to )
 				jQuery( selector ).attr( 'class', class_name );
 				update_moderation_buttons( selector, statuses[1], statuses[2] );
 			}
-			else if( request_from == 'dashboard' )
+			else if( request_from == 'dashboard' || request_from == 'coll_settings' )
 			{
 				updateCommentsList( divid );
 			}
@@ -337,7 +337,7 @@ function deleteComment( commentId, request_from, comment_type )
 			var target_selector = ( comment_type == 'meta' ? '#comments' : '#recycle_bin' );
 			jQuery( selector ).effect( 'transfer', { to: jQuery( target_selector ) }, 700, function() {
 				delete modifieds[divid];
-				if( request_from == 'dashboard' ) {
+				if( request_from == 'dashboard' || request_from == 'coll_settings' ) {
 					updateCommentsList( divid );
 				} else {
 					jQuery( '#comments_container' ).html( ajax_debug_clear( result ) );
@@ -381,6 +381,19 @@ function refreshAfterBan( deleted_ids )
 	}
 	var item_id = get_itemid();
 	refresh_item_comments( item_id );
+}
+
+function updateModalAfterBan( button )
+{
+	var modal_window = jQuery( '#modal_window' );
+
+	if( modal_window.length == 0 )
+	{	// Modal windown is not found on page:
+		return;
+	}
+
+	// Add button in modal bottom:
+	jQuery( '.modal-footer', modal_window ).prepend( '<button type="button" class="' + button.class + '" onclick="location.href=\'' + button.url + '\'">' + button.title + '</button>' );
 }
 
 //Process result after publish/deprecate/delete action has been completed
@@ -485,7 +498,7 @@ function refreshComments( request_from )
 
 function startRefreshComments( request_from, item_id, currentpage, comment_type )
 {
-	if( request_from == "dashboard" ) {
+	if( request_from == "dashboard" || request_from == 'coll_settings' ) {
 		jQuery('#comments_container').slideUp('fast', refreshComments( request_from ) );
 	} else {
 		jQuery('#comments_container').fadeTo( 'slow', 0.1, function() {
@@ -628,7 +641,7 @@ function updateCommentsList( divid )
 	jQuery( '.dashboard_post:visible:even' ).addClass( 'dashboard_post_even' );
 	jQuery( '.dashboard_post:visible:odd' ).addClass( 'dashboard_post_odd' );
 
-	if( displayed < 12 )
+	if( displayed < 6 )
 	{ // Reload list to fill up the hidden comments list, so we always have enough comments to moderate.
 		refreshComments( 'dashboard' );
 	}

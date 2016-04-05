@@ -966,7 +966,7 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'except_moderators'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),

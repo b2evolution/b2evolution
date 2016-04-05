@@ -18,6 +18,17 @@ load_class( 'users/model/_group.class.php', 'Group' );
 load_class( 'users/model/_user.class.php', 'User' );
 
 
+/*
+	* Reports new user created by inserting system log entry
+	*
+	* @param object newly create user
+	*/
+function report_user_create( $User )
+{
+	syslog_insert( sprintf( T_('User %s was created'), '[['.$User->login.']]' ), 'info', 'user', $User->ID );
+}
+
+
 /**
  * Log the user out
  */
@@ -1965,56 +1976,6 @@ function get_status_permvalue( $status )
 	}
 
 	return $status_permission_map[$status];
-}
-
-
-/**
- * Load current_User post read statuses
- *
- * @param array Load only for posts with these ids
- */
-function load_user_read_statuses( $post_ids = NULL )
-{
-	global $DB, $current_User, $user_post_read_statuses;
-
-	if( !is_logged_in() )
-	{ // There are no logged in user
-		return;
-	}
-
-	if( !empty( $user_post_read_statuses ) )
-	{ // User read statuses were already set
-		return;
-	}
-	else
-	{ // Init with an empty array
-		$user_post_read_statuses = array();
-	}
-
-	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
-
-	// SELECT current User's post and comment read statuses for all post with the given ids
-	$SQL = new SQL();
-	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
-	$SQL->FROM( 'T_users__postreadstatus' );
-	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-	$SQL->WHERE_and( $post_condition );
-	// Set those post read statuses which were opened before:
-	$user_post_read_statuses = $DB->get_assoc( $SQL->get() );
-
-	if( empty( $post_ids ) )
-	{ // The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user
-		return;
-	}
-
-	// Set new posts read statuses
-	foreach( $post_ids as $post_ID )
-	{ // Make sure to set read statuses for each requested post ID
-		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
-		{ // Set each read status to 0
-			$user_post_read_statuses[ $post_ID ] = 0;
-		}
-	}
 }
 
 
@@ -5228,6 +5189,8 @@ function users_results( & $UserList, $params = array() )
 			'display_regcountry' => true,
 			'display_update'     => true,
 			'display_lastvisit'  => true,
+			'display_lastvisit_view' => 'exact_date',
+			'display_lastvisit_cheat' => 0,
 			'display_contact'    => true,
 			'display_reported'   => true,
 			'display_group'      => true,
@@ -5527,7 +5490,7 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => $params['td_class_lastvisit'],
 				'order' => 'user_lastseen_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedate( #user_lastseen_ts#, "M-d" )%',
+				'td' => '%get_lastseen_date( #user_lastseen_ts#, \''.$params['display_lastvisit_view'].'\', '.$params['display_lastvisit_cheat'].' )%',
 			);
 	}
 

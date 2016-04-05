@@ -613,6 +613,26 @@ class bootstrap_forums_Skin extends Skin
 		// Print out the button:
 		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right btn_recent_topics">'.$btn_title.'</a>';
 	}
+
+
+	/**
+	 * Those templates are used for example by the messaging screens.
+	 */
+	function get_template( $name )
+	{
+		switch( $name )
+		{
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'parent';
+
+			default:
+				// Delegate to parent class:
+				return parent::get_template( $name );
+		}
+	}
 }
 
 ?>

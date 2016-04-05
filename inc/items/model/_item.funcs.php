@@ -24,7 +24,7 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
  */
 function init_MainList( $items_nb_limit )
 {
-	global $MainList, $Blog, $Plugins;
+	global $MainList, $Blog, $Plugins, $Skin;
 	global $preview;
 	global $disp;
 	global $postIDlist, $postIDarray;
@@ -54,8 +54,26 @@ function init_MainList( $items_nb_limit )
 			// echo '<br/>'.( $MainList->is_filtered() ? 'filtered' : 'NOT filtered' );
 			// $MainList->dump_active_filters();
 
+			if( $disp == 'posts' && ! empty( $Skin ) && $Skin->get_template( 'cat_array_mode' ) == 'parent' )
+			{	// Get items ONLY from current category WITHOUT sub-categories:
+				global $cat;
+				// Get ID of single selected category:
+				$single_cat_ID = intval( $cat );
+
+				if( $single_cat_ID )
+				{	// Do limit if single category is selected:
+					$MainList->set_filters( array(
+							'cat_array'    => array( $single_cat_ID ),
+							'cat_modifier' => NULL,
+						), true, true );
+				}
+			}
+
 			// Run the query:
 			$MainList->query();
+
+			// Load data of items from the current page at once to cache variables:
+			$MainList->load_list_data();
 
 			// Old style globals for category.funcs:
 			$postIDlist = $MainList->get_page_ID_list();
@@ -775,7 +793,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			return $where_condition;
 		}
 		// Select each blog
-		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs', 0, 'Get IDs of all collections' );
 		$sub_condition = '';
 		foreach( $blog_ids as $blog_id )
 		{ // create statuses where clause condition for each blog separately
@@ -2662,9 +2680,6 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		$CommentList->restore_filterset();
 	}
 
-	// Run SQL query to get results depending on current filters:
-	$CommentList->query();
-
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
 
@@ -3864,6 +3879,56 @@ function item_inskin_display( $Item )
 	}
 
 	skin_include( '_item_list.inc.php', $params );
+}
+
+
+/**
+ * Load user data (post/comment) read statuses for current user for a list of post IDs.
+ *
+ * @param array Load only for posts with these ids
+ */
+function load_user_data_for_items( $post_ids = NULL )
+{
+	global $DB, $current_User, $user_post_read_statuses;
+
+	if( ! is_logged_in() )
+	{	// There are no logged in user:
+		return;
+	}
+
+	if( is_array( $user_post_read_statuses ) )
+	{	// User read statuses were already set:
+		return;
+	}
+	else
+	{	// Init with an empty array:
+		$user_post_read_statuses = array();
+	}
+
+	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
+
+	// SELECT current User's post and comment read statuses for all post with the given ids:
+	$SQL = new SQL( 'Load all read post date statuses for user #'.$current_User->ID );
+	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
+	$SQL->FROM( 'T_users__postreadstatus' );
+	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL->WHERE_and( $post_condition );
+	// Set those post read statuses which were opened before:
+	$user_post_read_statuses = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+	if( empty( $post_ids ) )
+	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
+		return;
+	}
+
+	// Set new posts read statuses:
+	foreach( $post_ids as $post_ID )
+	{	// Make sure to set read statuses for each requested post ID:
+		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
+		{	// Set each read status to 0:
+			$user_post_read_statuses[ $post_ID ] = 0;
+		}
+	}
 }
 
 

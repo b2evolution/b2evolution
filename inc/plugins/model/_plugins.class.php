@@ -1428,7 +1428,7 @@ class Plugins
 		$this->index_code_ID = array();
 		$this->sorted_IDs = array();
 
-		foreach( $DB->get_results( $this->sql_load_plugins_table, ARRAY_A ) as $row )
+		foreach( $DB->get_results( $this->sql_load_plugins_table, ARRAY_A, 'Loading plugins table data' ) as $row )
 		{ // Loop through installed plugins:
 			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
 			if( ! empty( $row['plug_code'] ) )

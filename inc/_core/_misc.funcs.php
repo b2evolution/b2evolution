@@ -356,6 +356,12 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = trim($content);
 			break;
 
+		case 'syslog':
+			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
+			break;
+
 		default:
 			debug_die( 'Output format ['.$format.'] not supported.' );
 	}
@@ -1191,14 +1197,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			}
 
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1214,14 +1213,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
@@ -1748,6 +1740,44 @@ function get_duration_title( $duration, $titles = array() )
 	{ // Seconds
 		return sprintf( $titles['second'], $delay_fields[ 'seconds' ] );
 	}
+}
+
+function get_lastseen_date( $date, $view = 'exact_date', $cheat = 0 )
+{
+	$result = mysql2localedate( $date );
+
+	if( $view == 'blurred_date' )
+	{
+		$result = (int)( ( ( time() - strtotime( $date ) ) / 86400 ) - $cheat);
+
+		if( $result < 0 )
+		{
+			$result = 0;
+		}
+
+		if( $result < 3 )
+		{
+			$result = T_('less than 3 days ago');
+		}
+		elseif( $result < 7 )
+		{
+			$result = T_('less than a week ago');
+		}
+		elseif( $result < 30 )
+		{
+			$result = T_('less than a month ago');
+		}
+		elseif( $result < 90 )
+		{
+			$result = T_('less than 3 months ago');
+		}
+		else
+		{
+			$result = T_('more than 3 months ago');
+		}
+	}
+
+	return $result;
 }
 
 
@@ -5140,6 +5170,64 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 
 /**
+ * Update values of HTML tag attributes
+ *
+ * @param string HTML tag
+ * @param array Attributes
+ * @param array Actions for each attribute:
+ *              'append'  - Append to existing attribute value (Default for all)
+ *              'skip'    - Skip if attribute already exists
+ *              'replace' - Replace attribute to new value completely
+ * @return string Updated HTML tag
+ */
+function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = array() )
+{
+	if( ! preg_match( '#^<([\S]+)[^>]*>$#i', $html_tag, $tag_match ) )
+	{	// Wrong HTML tag format, Return original string:
+		return $html_tag;
+	}
+
+	$html_tag_name = $tag_match[1];
+
+	$old_attribs = array();
+	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
+	{	// Get all existing attributes:
+		foreach( $attr_matches[1] as $o => $old_attr_name )
+		{
+			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+		}
+	}
+
+	$updated_attribs = array();
+	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
+	{
+		if( isset( $old_attribs[ $new_attrib_name ] ) )
+		{	// If attribute exists in original HTML tag then Update it depending on selected action:
+			$attrib_action = isset( $attrib_actions[ $new_attrib_name ] ) ? $attrib_actions[ $new_attrib_name ] : 'append';
+			switch( $attrib_action )
+			{
+				case 'skip':
+					// Don't update old value:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ];
+					break;
+
+				case 'append':
+				default:
+					// Append new value to old:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ].' '.$new_attrib_value;
+					break;
+			}
+		}
+		// ELSE If attribute doesn't exist in original HTML tag then create new one.
+
+		$updated_attribs[] = $new_attrib_name.'="'.format_to_output( $new_attrib_value, 'formvalue' ).'"';
+	}
+
+	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>';
+}
+
+
+/**
  * Is the current page an install page?
  *
  * @return boolean
@@ -5529,8 +5617,12 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 			}
 			foreach( $param_list as $param )
 			{	// add each parameter to the output
-				if( !is_numeric( $param ) )
-				{	// this is a string, quote it
+				if( is_array( $param ) )
+				{	// This is an array:
+					$param = json_encode( $param );
+				}
+				elseif( !is_numeric( $param ) )
+				{	// this is a string, quote it:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
@@ -5542,14 +5634,20 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $send_as_html )
 	{	// we want to send as a html document
-		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		}
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		}
 		echo $output;
 	}
 
@@ -7482,7 +7580,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 /**
  * Compares two "PHP-standardized" version number strings
  *
- * @param string First version number
+ * @param string First version number, Use 'current' for global $app_version
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
  *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
@@ -7492,15 +7590,21 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
  */
 function evo_version_compare( $version1, $version2, $operator = NULL )
 {
+	if( $version1 === 'current' )
+	{	// Use current version of application:
+		global $app_version;
+		$version1 = $app_version;
+	}
+
 	// Remove part after "-" from versions like "6.6.6-stable":
 	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
 
 	if( is_null( $operator ) )
-	{	// To return integer
+	{	// To return integer:
 		return version_compare( $version1, $version2 );
 	}
 	else
-	{ // To return boolean
+	{	// To return boolean:
 		return version_compare( $version1, $version2, $operator );
 	}
 }

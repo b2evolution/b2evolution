@@ -809,7 +809,7 @@ class Skin extends DataObject
 		global $debug, $Messages, $disp, $UserSettings;
 
 		// We get the optional arg this way for PHP7 comaptibility:
-		list( $features ) = func_get_args();
+		@list( $features ) = func_get_args();
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
@@ -1071,7 +1071,7 @@ class Skin extends DataObject
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1086,7 +1086,7 @@ class Skin extends DataObject
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1100,7 +1100,7 @@ class Skin extends DataObject
 				case 'disp_subs':
 					// Specific features for disp=subs:
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1133,7 +1133,7 @@ class Skin extends DataObject
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
 
-					// Activate bozo validator to don't miss the changes of the edit forms on leave page:
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
@@ -1714,6 +1714,12 @@ class Skin extends DataObject
 					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
+
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'children';
 		}
 
 		return array();

@@ -346,6 +346,11 @@ class UserCache extends DataObjectCache
 			$users_sql[] = $group_setting_SQL->get();
 		}
 
+		if( empty( $users_sql ) )
+		{	// No additional users to load as members/assignees, only collection owner has been loaded above:
+			return true;
+		}
+
 		// Union sql queries to execute one query and save an order as one list:
 		$users_sql = '( '.implode( ' ) UNION ( ', $users_sql ).' )';
 		$users_sql .= ' ORDER BY user_login';

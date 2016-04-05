@@ -126,6 +126,11 @@ class Blog extends DataObject
 	 */
 	var $favorite = 1;
 
+	/**
+	 * @var array Data of moderators which must be notified about new/edited comments
+	 */
+	var $comment_moderator_user_data;
+
 
 	/**
 	 * Constructor
@@ -738,6 +743,8 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_phone', param( 'userdir_phone', 'integer', 0 ) );
 			$this->set_setting( 'userdir_soclinks', param( 'userdir_soclinks', 'integer', 0 ) );
 			$this->set_setting( 'userdir_lastseen', param( 'userdir_lastseen', 'integer', 0 ) );
+			$this->set_setting( 'userdir_lastseen_view', param( 'userdir_lastseen_view', 'string' ) );
+			$this->set_setting( 'userdir_lastseen_cheat', param( 'userdir_lastseen_cheat', 'integer', 0 ) );
 		}
 
 		if( in_array( 'other', $groups ) )
@@ -1093,7 +1100,7 @@ class Blog extends DataObject
 								if( $error = validate_dirname($subdir) )
 								{
 									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
-									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$subdir.'</b>' ), 'warning', 'file' );
+									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$subdir.']]' ), 'warning', 'file' );
 								}
 							}
 						}
@@ -2432,7 +2439,7 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			// Reset "all_loaded" flag in order to allow get new created collection by ID:
+			// Reset "all_loaded" flag in order to allow getting new created collection by ID:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->all_loaded = false;
 
@@ -4069,6 +4076,35 @@ class Blog extends DataObject
 		$first_mainlist_Item = & $ItemList2->get_item();
 
 		return $first_mainlist_Item;
+	}
+
+
+	/**
+	 * Get data of moderators which must be notified about new/edited comment
+	 *
+	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
+	 */
+	function get_comment_moderator_user_data()
+	{
+		if( ! isset( $this->comment_moderator_user_data ) )
+		{	// Get it from DB only first time and then cache in array:
+			global $DB;
+
+			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
+			$SQL->FROM( 'T_users' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
+			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
+				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
+				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
+
+			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		}
+
+		return $this->comment_moderator_user_data;
 	}
 }
 

@@ -125,8 +125,10 @@ class UserSettings extends AbstractSettings
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
-		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation and the user has right to moderate that comment
-		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
+		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
+		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
+		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
+		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,

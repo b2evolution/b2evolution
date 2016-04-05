@@ -845,7 +845,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_post_processing( $exit_after_save, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -940,8 +940,8 @@ switch( $action )
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
 		check_perm_posttype( $item_typ_ID, $post_extracats );
 
-		// Is this post already published?
-		$was_published = $edited_Item->status == 'published';
+		// Is this post publishing right now?
+		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1019,7 +1019,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_post_processing( $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1055,8 +1055,8 @@ switch( $action )
 		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
 			$blog_redirect_setting = 'orig';
 		}
-		elseif( ! $was_published && $edited_Item->status == 'published' )
-		{ // The post's last status wasn't "published", but we're going to publish it now.
+		elseif( $is_publishing )
+		{	// The post's last status wasn't "published", but we're going to publish it now:
 			$edited_Item->load_Blog();
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 		}
@@ -1198,6 +1198,9 @@ switch( $action )
 			// Update item to set new type right now
 			$edited_Item->dbupdate();
 
+			// Execute or schedule notifications & pings:
+			$edited_Item->handle_post_processing();
+
 			// Set redirect back to items list with new item type tab
 			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
 
@@ -1275,9 +1278,11 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		$post_status = ( $action == 'publish_now' ) ? 'published' : param( 'post_status', 'string', 'published' );
+
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
+
 		$edited_Item->set( 'status', $post_status );
 
 		if( $action == 'publish_now' )
@@ -1292,7 +1297,7 @@ switch( $action )
 		$edited_Item->dbupdate();
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false );
+		$edited_Item->handle_post_processing();
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )
