@@ -327,7 +327,7 @@ switch( $action )
 
 		if( $new_User->dbinsert() )
 		{ // Insert system log about user's registration
-			//syslog_insert( 'User registration', 'info', 'user', $new_User->ID );
+			syslog_insert( 'User registration', 'info', 'user', $new_User->ID );
 			report_user_create( $new_User );
 		}
 
