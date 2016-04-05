@@ -4601,6 +4601,7 @@ class User extends DataObject
 			if( $is_new_user )
 			{
 				$Messages->add( T_('New user has been created.'), 'success' );
+				report_user_create( $this );
 			}
 			elseif( $is_password_form )
 			{

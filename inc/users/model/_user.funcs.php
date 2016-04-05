@@ -18,6 +18,17 @@ load_class( 'users/model/_group.class.php', 'Group' );
 load_class( 'users/model/_user.class.php', 'User' );
 
 
+/*
+	* Reports new user created by inserting system log entry
+	*
+	* @param object newly create user
+	*/
+function report_user_create( $User )
+{
+	syslog_insert( sprintf( T_('User %s was created'), '[['.$User->login.']]' ), 'info', 'user', $User->ID );
+}
+
+
 /**
  * Log the user out
  */
