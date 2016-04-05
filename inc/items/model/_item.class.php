@@ -5949,7 +5949,7 @@ class Item extends ItemLight
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
 		}
-		else
+		elseif( $this->get( 'notifications_status' ) != 'todo' && $this->get( 'notifications_status' ) != 'started' )
 		{	// We want asynchronous post processing. (This automatically applies to posts with issue_date in the future):
 
 			if( $notifications_mode == 'immediate' )
@@ -5978,9 +5978,8 @@ class Item extends ItemLight
 			// params: specify which post this job is supposed to send notifications for:
 			$edited_Cronjob->set( 'params', array(
 					'item_ID'                   => $this->ID,
-					'is_new_comment'            => $is_new_comment,
+					'is_new_item'               => $is_new_item,
 					'already_notified_user_IDs' => $already_notified_user_IDs
-
 				) );
 
 			// Save cronjob to DB:
