@@ -330,7 +330,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'htmlspecialchars':
 		case 'formvalue':
 			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );  // Handles &, ", ', < and >
 			break;
 
 		case 'xml':

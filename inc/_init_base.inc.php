@@ -244,12 +244,6 @@ foreach( $modules as $module )
 	require_once $inc_path.$module.'/_'.$module.'.init.php';
 }
 
-if( ! defined( 'ENT_HTML5' ) )
-{	// Define flag for function htmlspecialchars():
-	// It is available by default since php 5.4.0
-	define( 'ENT_HTML5', 48 );
-}
-
 $Timer->pause( '_init_base' );
 
 ?>
