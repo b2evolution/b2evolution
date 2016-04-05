@@ -467,6 +467,28 @@ class File extends DataObject
 	}
 
 	/**
+	 * Is the File a directory or file?
+	 *
+	 * @param string String to return if the File is a directory
+	 * @param string String to return if the File is a file
+	 * @return string specified directory string if the object is a directory, specified file string if not
+	 */
+	function dir_or_file( $dir_string = NULL, $file_string = NULL)
+	{
+		if( is_null( $dir_stirng ) )
+		{
+			$dir_string = T_('directory');
+		}
+
+		if( is_null( $file_string ) )
+		{
+			$file_string = T_('file');
+		}
+
+		return $this->is_dir() ? $dir_string : $file_string;
+	}
+
+	/**
 	 * Get file type
 	 *
 	 * @return string file type
@@ -1979,7 +2001,7 @@ class File extends DataObject
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default
-			$text = $this->get_root_and_rel_path();
+			$text = ( $this->is_dir() ? $this->get_root_and_rel_path() : $this->get_root_and_rel_path() );
 		}
 
 		if( is_null( $title ) )
@@ -1995,7 +2017,7 @@ class File extends DataObject
 
 		if( is_null( $url ) )
 		{ // Get the URL for viewing the file/dir:
-			$url = $this->get_view_url( false );
+			$url = ( $this->is_dir() ? $this->get_linkedit_url() : $this->get_view_url( false ) );
 			$ignore_popup = false;
 		}
 		else
@@ -2018,7 +2040,7 @@ class File extends DataObject
 		$rel_attr = ( ! empty( $Blog ) && $Blog->get_setting( 'download_nofollowto' ) ) ? ' rel="nofollow"' : '';
 
 		$Filetype = & $this->get_Filetype();
-		if( $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
+		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
