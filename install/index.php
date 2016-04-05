@@ -52,6 +52,12 @@ define( 'EVO_MAIN_INIT', true );
  */
 define( 'EVO_IS_INSTALLING', true );
 
+if( ! defined( 'ENT_HTML5' ) )
+{	// Define flag for function htmlspecialchars():
+	// It is available by default since php 5.4.0
+	define( 'ENT_HTML5', 48 );
+}
+
 /**
  * @global boolean Is this an install page? Use {@link is_install_page()} to query it, because it may change.
  */
