@@ -7374,6 +7374,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11745, 'Upgrading items table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_items__item', 'post_notifications_flags', "SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '' AFTER post_notifications_ctsk_ID" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

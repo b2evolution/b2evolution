@@ -183,6 +183,12 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $notifications_ctsk_ID;
+	/**
+	 * What have been notified?
+	 * Possible values, separated by comma: 'moderators_notified,members_notified,community_notified,pings_sent'
+	 * @var string
+	 */
+	var $notifications_flags;
 
 	/**
 	 * array of IDs or NULL if we don't know...
@@ -325,8 +331,6 @@ class Item extends ItemLight
 				}
 			}
 			$this->set( 'locale', ( isset( $new_item_locale ) ? $new_item_locale : $default_locale ) );
-			// fp> not sure the following is the cleanest way to initialize:
-			$this->post_notifications_flags = array();
 		}
 		else
 		{
@@ -346,8 +350,7 @@ class Item extends ItemLight
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
-			// fp> not sure the following is the cleanest way to initialize:
-			$this->post_notifications_flags = split($db_row->post_notifications_flags);
+			$this->notifications_flags = $db_row->post_notifications_flags;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
@@ -5014,6 +5017,16 @@ class Item extends ItemLight
 				}
 				break;
 
+			case 'notifications_flags':
+				$notifications_flags = $this->get( 'notifications_flags' );
+				if( ! is_array( $parvalue ) )
+				{	// Convert string to array:
+					$parvalue = array( $parvalue );
+				}
+				$notifications_flags = array_merge( $notifications_flags, $parvalue );
+				$notifications_flags = array_unique( $notifications_flags );
+				return $this->set_param( 'notifications_flags', 'string', implode( ',', $notifications_flags ), $make_null );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -5898,7 +5911,7 @@ class Item extends ItemLight
 
 		// Instead of the above we now check the flags:
 		// fp> Maybe later we may add a "force" param to bypass this and send notifications again
-		if( count(array_diff( array('members_notified','community_notified','pings_sent'), $this->post_notifications_flags )) == 0 )
+		if( $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent:
 			if( $verbose )
 			{
@@ -5910,7 +5923,7 @@ class Item extends ItemLight
 		// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
 		// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 		// fp> Maybe later we can add a button to manually "force" notifications even for other usages (as long as they have a permalink)
-		if( in_array( $this->get_type_setting( 'usage' ) != 'post' ) )
+		if( $this->get_type_setting( 'usage' ) != 'post' )
 		{	// Don't send email notifications and outbound pings for items that are not regular posts
 			if( $verbose )
 			{
@@ -5928,7 +5941,10 @@ class Item extends ItemLight
 			$this->send_outbound_pings( $verbose );
 
 			// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-			$this->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+			$notified_flags = $this->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+
+			// Record that we have just notified the members and/or community:
+			$this->set( 'notifications_flags', $notified_flags );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
@@ -5977,7 +5993,7 @@ class Item extends ItemLight
 			$this->set( 'notifications_status', 'todo' );
 		}
 
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
 		$this->dbupdate( false, false, false );
 
 		return true;
@@ -6087,7 +6103,9 @@ class Item extends ItemLight
 		}
 
 		// Record that we have notified the moderators (for info only):
-		$this->set( 'moderators_notified', true );	// DIRTY PSEUDO CODE
+		$this->set( 'notifications_flags', 'moderators_notified' );
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		$this->dbupdate( false, false, false );
 
 		return $notfied_Users;
 	}
@@ -6100,44 +6118,50 @@ class Item extends ItemLight
 	 *
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
+	 * @param array Notified flags: 'members_notified', 'community_notified'
 	 */
 	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL )
 	{
 		global $DB, $debug;
 
+		$notified_flags = array();
 		$notify_members = false;
 		$notify_community = false;
 
-		if( $this->get( 'status' ) == 'members' )
+		if( $this->get( 'status' ) == 'protected' )
 		{	// If the post is visible for members only...
-			if( ! $this->get('members_notified') )
+			if( ! $this->check_notifications_flags( 'members_notified' ) )
 			{	// Members have not been notified yet, do so:
 				$notify_members = true;
+				$notified_flags[] = 'members_notified';
 			}
 			else
 			{	// Members have already been notified, nothing to do:
-				return;
+				return $notified_flags;
 			}
 		}
 		elseif( $this->get( 'status' ) == 'community' || $this->get( 'status' ) == 'published' )
 		{	// If the post is visible to the community or is public...
-			if( ! $this->get('members_notified') )
-			{	// Members have not been notified yet (which means teh community has not been notified either), notify them all:
+			if( ! $this->check_notifications_flags( 'members_notified' ) )
+			{	// Members have not been notified yet (which means the community has not been notified either), notify them all:
 				$notify_members = true;
 				$notify_community = true;
+				$notified_flags[] = 'members_notified';
+				$notified_flags[] = 'community_notified';
 			}
-			elseif( ! $this->get('community_notified') )
+			elseif( ! $this->check_notifications_flags( 'community_notified' ) )
 			{	// Community have not been notified yet, do so:
 				$notify_community = true;
+				$notified_flags[] = 'community_notified';
 			}
 			else
 			{	// Everyone has already been notified, nothing to do:
-				return;
+				return $notified_flags;
 			}
 		}
 		else
 		{	// All other visibility statuses are too "private" to send notifications to subscribers:
-			return;
+			return $notified_flags;
 		}
 
 		/* fp> we have already checked this is handle_notifications() so no need to do it again here.
@@ -6151,30 +6175,42 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			return;
+			return $notified_flags;
 		}
-
-		// Create condition to not select already notified moderator users:
-		$except_users_condition = empty( $already_notified_user_IDs ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
-
-// fp> TODO: ADD conditions to select either members or non-member or both depending on $notify_members & $notify_community
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
-		$sql = 'SELECT DISTINCT sub_user_ID
-							FROM T_subscriptions
-						WHERE sub_coll_ID = '.$this->get_blog_ID().'
-							AND sub_items <> 0'.$except_users_condition;
-		$notify_users = $DB->get_col( $sql, 0, 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
-
-		if( empty( $notify_users ) )
-		{	// No-one to notify:
-			return;
+		$SQL = new SQL( 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
+		$SQL->SELECT( 'DISTINCT sub_user_ID' );
+		$SQL->FROM( 'T_subscriptions' );
+		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
+		$SQL->WHERE_and( 'sub_items <> 0' );
+		if( ! empty( $already_notified_user_IDs ) )
+		{	// Create condition to not select already notified moderator users:
+			$SQL->WHERE_and( 'sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )' );
 		}
+		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( $notify_users );
+
+		if( ! $notify_community )
+		{	// We should send notification only for subscribed members of the collection:
+			foreach( $notify_users as $u => $user_ID )
+			{	// Check each subscribed user:
+				$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
+				if( ! $notify_User || ! $notify_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
+				{	// The user is subscribed but he is not a member, so don't send a notification to him:
+					unset( $notify_users[ $u ] );
+				}
+			}
+		}
+
+		if( empty( $notify_users ) )
+		{	// No-one to notify:
+			return $notified_flags;
+		}
 
 		/*
 		 * We have a list of User IDs to notify:
@@ -6188,7 +6224,7 @@ class Item extends ItemLight
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID )
 		{
-			$notify_User = $UserCache->get_by_ID( $user_ID, false, false );
+			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
 			{	// skip invalid users:
 				continue;
@@ -6235,14 +6271,17 @@ class Item extends ItemLight
 
 		blocked_emails_display();
 
+		return $notified_flags;
+
+		/*
 		if( $notify_members )
 		{	// Record that we have just notified the members:
-			$this->set( 'members_notified', true );		// DIRTY PSEUDO CODE
+			$this->set( 'notifications_flags', 'members_notified' );
 		}
 		if( $notify_community )
 		{	// Record that we have just notified the members:
-			$this->set( 'community_notified', true );		// DIRTY PSEUDO CODE
-		}
+			$this->set( 'notifications_flags', 'community_notified' );
+		}*/
 	}
 
 
@@ -6261,7 +6300,7 @@ class Item extends ItemLight
 			return;
 		}
 
-		if( $this->get('pings_sent') )
+		if( $this->check_notifications_flags( 'pings_sent' ) )
 		{	// Don't send notifications if they have already been sent:
 			return;
 		}
@@ -6325,8 +6364,8 @@ class Item extends ItemLight
 			}
 		}
 
-		// FP> This is complete PSEUDO code. Make this clean:
-		$this->set('pings_sent', true);
+		// Record that we have just pinged:
+		$this->set( 'notifications_flags', 'pings_sent' );
 
 		return $r;
 	}
@@ -6411,26 +6450,16 @@ class Item extends ItemLight
 			case 't_priority':
 				return $this->priorities[ $this->priority ];
 
-			case 'members_notified':
-				// Have notifications been sent to members of the parent collection?  (should only happen when the post has visibility 'members', 'community' or 'public')
-				// fp> pseudo code:
-				return in_array( 'members_notified', $this->post_notifications_flags );
-
-			case 'community_notified':
-				// Have notifications been sent to the subscribers that are NOT members of the parent collection? (should only happen when the post has visibility 'community' or 'public')
-				// fp> pseudo code:
-				return in_array( 'community_notified', $this->post_notifications_flags );
-
-			case 'pings_sent':
 			case 'pingsdone': 
 				// Have pings been sent? (should only happen once the post has visibility 'public')
 				// return ($this->post_notifications_status == 'finished'); // Deprecated by fp 2006-08-21 -- TODO: this should now become an alias of "pings_sent"
-				// fp> pseudo code:
-				return in_array( 'pings_sent', $this->post_notifications_flags );
-
+				return $this->check_notifications_flags( 'pings_sent' );
 
 			case 'excerpt':
 				return $this->get_excerpt2();
+
+			case 'notifications_flags':
+				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
 		}
 
 		return parent::get( $parname );
@@ -8050,6 +8079,23 @@ class Item extends ItemLight
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Check what were already notified on this item
+	 *
+	 * @param array|string Flags, possible values: 'moderators_notified', 'members_notified', 'community_notified', 'pings_sent'
+	 */
+	function check_notifications_flags( $flags )
+	{
+		if( ! is_array( $flags ) )
+		{	// Convert string to array:
+			$flags = array( $flags );
+		}
+
+		// TRUE if all requested flags are in current item notifications flags:
+		return ( count( array_diff( $flags, $this->get( 'notifications_flags' ) ) ) == 0 );
 	}
 }
 ?>
