@@ -173,6 +173,9 @@ ol.breadcrumb {
 		}
 		.ft_assigned {
 			margin-top: 14px;
+			img {
+				border-radius: 50%;
+			}
 		}
 	}
 	.ft_status {
@@ -213,6 +216,15 @@ ol.breadcrumb {
 	.ft_desc, .ft_count {
 		text-align: center;
 		color: #8B96A1;
+	}
+	.ft_assignee_avatar {
+		float: left;
+		margin-right: 10px;
+		display: block;
+		.ft_assignee_avatar {
+			float: none;
+			margin-right: 0;
+		}
 	}
 	.ft_date {
 		text-align: center;
@@ -813,6 +825,12 @@ label.control-label[for=post_title] {
 	.page_title, .panel-heading h2 {
 		font-size: 170%;
 	}
+
+	.forums_list
+		.ft_assignee_avatar {
+			display: none;
+		}
+
 	.ft_date_shrinked_more {
 		display: block !important;
 		text-align: right;

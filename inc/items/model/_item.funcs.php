@@ -4569,7 +4569,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
  * @param integer Priority
  * @return string
  */
-function item_td_task_cell( $type, $Item )
+function item_td_task_cell( $type, $Item, $editable = true )
 {
 	global $current_User;
 
@@ -4608,7 +4608,7 @@ function item_td_task_cell( $type, $Item )
 			$title = '';
 	}
 
-	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) && $editable )
 	{ // Current user can edit this item
 		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
 	}

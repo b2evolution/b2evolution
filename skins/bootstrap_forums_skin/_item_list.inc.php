@@ -65,15 +65,17 @@ $Item->load_Blog();
 $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 ?>
 		<article class="container group_row posts_panel">
-			<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">
-			<div class="ft_status_topic"><i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"
+			<div class="ft_status__ft_title col-lg-<?php echo $use_workflow ? '7' : '8'; ?> col-md-8 col-sm-6 col-xs-12">
+			<div class="ft_status_topic">
+				<a href="<?php echo $Item->permanent_url();?>">
+				<i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"
 			<?php
 				if( $use_workflow )
 				{
 					$priority_color = item_priority_color( $Item->priority );
 					echo ' style="color: '.$priority_color.'; border-color: '.$priority_color.';"';
 				}
-			?>></i></div>
+			?>></i></a></div>
 				<div class="ft_title"><?php
 					echo '<div class="posts_panel_title_wrapper">';
 					echo '<div class="cell1"><div class="wrap">';
@@ -149,9 +151,17 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 			<?php
 			if( $use_workflow )
 			{
-				echo '<div class="ft_assigned col-lg-1 col-md-1 col-sm-2 col-xs-3">';
-				echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'assigned', $Item ).'</span> ';
-				echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'status', $Item ).'</span>';
+				echo '<div class="ft_assigned col-lg-2 col-md-1 col-sm-2 col-xs-3">';
+				$Item->assigned_to2( array(
+						'thumb_class' => 'ft_assignee_avatar',
+						'link_class' => 'ft_assignee_avatar',
+						'thumb_size'   => 'crop-top-32x32'
+					) );
+				$Item->assigned_to2( array(
+						'link_text' => 'name'
+					) );
+				echo '<br />';
+				echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'status', $Item, false ).'</span>';
 				echo '</div>';
 
 				echo '<div class="ft_date col-lg-2 col-md-2 col-sm-3">';

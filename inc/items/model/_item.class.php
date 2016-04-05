@@ -1016,6 +1016,28 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template function: display assignee of item with configurable params
+	 *
+	 * @params array
+	 */
+	function assigned_to2( $params = array() )
+	{
+		if( $this->get_assigned_User() )
+		{
+			$params = array_merge( array(
+				  'before' => '',
+					'after' => '',
+					'format' => 'htmlbody',
+					'link_text' => 'only_avatar',
+					'link_class' => 'ft_assignee_avatar',
+					'thumb_class' => 'ft_assignee_avatar'
+				), $params );
+			echo $params['before'].$this->assigned_User->get_identity_link( $params ).$params['after'];
+		}
+	}
+
+
+	/**
 	 * Get list of assigned user options
 	 *
 	 * @uses UserCache::get_blog_member_option_list()
