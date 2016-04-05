@@ -329,8 +329,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
 			break;
 
 		case 'xml':
