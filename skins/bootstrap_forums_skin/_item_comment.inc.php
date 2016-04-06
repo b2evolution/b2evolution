@@ -19,7 +19,7 @@ $params = array_merge( array(
 		'comment_end'           => '</article>',
 
 		'comment_post_display'	=> true,	// Do we want ot display the title of the post we're referring to?
-		'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+		'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 		'comment_post_after'    => '</h4>',
 
 		'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
@@ -101,9 +101,9 @@ switch( $Comment->get( 'type' ) )
 		{	// Normal comment
 			$Comment->permanent_link( array(
 					'before'    => '',
-					'after'     => ' '.T_('from:').' ',
-					'text'      => T_('Comment'),
-					'class'		=> 'evo_comment_type',
+					'after'     => '',
+					'text'      => '',
+					'class'     => 'evo_comment_type',
 					'nofollow'  => true,
 				) );
 		}
@@ -117,7 +117,11 @@ switch( $Comment->get( 'type' ) )
 				'link_to'      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 				'link_text'    => $params['author_link_text'],
 			) );
-			
+
+		echo ' <span class="text-muted">';
+		$Comment->date( 'M j, Y H:i' );
+		echo '</span>';
+
 		// Post title
 		if( $params['comment_post_display'] )
 		{

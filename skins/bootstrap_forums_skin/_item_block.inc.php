@@ -226,7 +226,7 @@ skin_widget( array(
 			'disp_section_title'    => false,
 			'disp_meta_comment_info' => false,
 
-			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
 			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
