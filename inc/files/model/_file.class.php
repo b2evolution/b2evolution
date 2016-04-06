@@ -475,7 +475,7 @@ class File extends DataObject
 	 */
 	function dir_or_file( $dir_string = NULL, $file_string = NULL)
 	{
-		if( is_null( $dir_stirng ) )
+		if( is_null( $dir_string ) )
 		{
 			$dir_string = T_('directory');
 		}
