@@ -170,7 +170,7 @@ ol.breadcrumb {
   margin-left: 35px;
 }
 .forums_list .posts_panel .ft_title .fa {
-  margin: 5px 5px 0px 0px;
+  margin: 0px 5px 0px 0px;
 }
 .forums_list .posts_panel .ft_title .small {
   font-size: 90%;
@@ -214,11 +214,9 @@ ol.breadcrumb {
 .forums_list .ft_status_topic {
   width: 30px;
   padding: 0px;
-  margin-top: 5px;
   float: left;
 }
 .forums_list .ft_count {
-  margin-top: 5px;
   font-size: 90%;
 }
 .forums_list .ft_count a,
@@ -246,12 +244,12 @@ ol.breadcrumb {
   text-align: center;
   color: #8B96A1;
 }
-.forums_list .ft_assignee_avatar {
+.forums_list .ft_assigned_avatar {
   float: left;
   margin-right: 10px;
   display: block;
 }
-.forums_list .ft_assignee_avatar .ft_assignee_avatar {
+.forums_list .ft_assigned_avatar .ft_assigned_avatar {
   float: none;
   margin-right: 0;
 }
@@ -633,7 +631,6 @@ label.control-label[for=post_title] {
   }
   .posts_panel .ft_status_topic {
     vertical-align: top;
-    margin-top: 5px;
   }
   .posts_panel .ft_title .floatright {
     display: inline-block;
@@ -677,7 +674,7 @@ label.control-label[for=post_title] {
     padding-left: 0px;
     padding-right: 15px;
     float: left;
-    margin-top: 4px;
+    margin-top: 14px;
   }
   .legend-item {
     margin-bottom: 5px;
@@ -748,7 +745,6 @@ label.control-label[for=post_title] {
   .table-hover .group_row .ft_assigned {
     padding-left: 0px;
     margin-top: 4px;
-    margin-left: 5px;
   }
   .table-hover .group_row .ft_date_shrinked {
     text-align: right;
@@ -799,7 +795,7 @@ label.control-label[for=post_title] {
   .panel-heading h2 {
     font-size: 170%;
   }
-  .forums_list .ft_assignee_avatar {
+  .forums_list img.ft_assigned_avatar {
     display: none;
   }
   .ft_date_shrinked_more {
