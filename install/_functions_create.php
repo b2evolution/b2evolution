@@ -1180,13 +1180,17 @@ function create_blog(
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		echo_install_log( 'TEST FEATURE: Activating username bubble tips on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
+		echo_install_log( 'TEST FEATURE: Activating gender colored usernames on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'in_skin_editing', '1' );
+		echo_install_log( 'TEST FEATURE: Activating in-skin editing on collection #'.$Blog->ID );
 
 		if( $kind == 'manual' )
 		{	// Set a posts ordering by 'post_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
+			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );
 		}
 
 		$Blog->set_setting( 'use_workflow', 1 );
@@ -2264,6 +2268,7 @@ a school bus stop where you wouldn\'t really expect it!
 [infodot:%s:104:99]cowboy and horse[enddot]
 [infodot:%s:207:28:15em]Red planet[enddot]', $photo_link_1_ID, $photo_link_2_ID, $photo_link_4_ID ) );
 			$edited_Item->dbupdate();
+			echo_install_log( 'TEST FEATURE: Adding examples for plugin "Info dots renderer" on item #'.$edited_Item->ID );
 		}
 
 		// Update the progress bar status
@@ -2868,6 +2873,7 @@ This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
 			}
 		}
+		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
 
 	task_end();
@@ -2875,6 +2881,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 
 	if( $test_install_all_features )
 	{
+		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
 		task_begin( 'Creating fake hit statistics... ' );
 		load_funcs('sessions/model/_hitlog.funcs.php');
 		load_funcs('_core/_url.funcs.php');
@@ -2989,8 +2996,10 @@ function create_default_posts_location()
 
 		$DB->query( 'UPDATE T_items__item SET
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* �le-de-France */ ).',
+			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+
+		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
 	}
 }
 

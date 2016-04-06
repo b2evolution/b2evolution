@@ -437,12 +437,15 @@ function create_default_settings( $override = array() )
 	if( $test_install_all_features )
 	{
 		$defaults['gender_colored'] = 1;
+		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
 		$defaults['registration_require_country'] = 1;
 		$defaults['registration_require_gender'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country and gender required on registration' );
 		$defaults['location_country'] = 'required';
 		$defaults['location_region'] = 'required';
 		$defaults['location_subregion'] = 'required';
 		$defaults['location_city'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country, region, sub-region and city required by default' );
 	}
 	if( !empty( $install_site_color ) )
 	{ // Set default site color
@@ -591,6 +594,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		if( $test_install_all_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
 			install_plugin( 'smilies_plugin' );
 		}
 		install_plugin( 'videoplug_plugin' );
@@ -618,6 +622,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 		if( $test_install_all_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
 			install_plugin( 'google_maps_plugin' );
 		}
 	}
@@ -632,6 +637,7 @@ function install_basic_plugins( $old_db_version = 0 )
 												 T_('What color is a carrot? orange|yellow')."\r\n".
 												 T_('What color is a tomato? red')
 				);
+			echo_install_log( 'TEST FEATURE: Creating sample questions for plugin "Captcha questions"' );
 		}
 		else
 		{
@@ -649,20 +655,44 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
 		install_plugin( 'watermark_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
+		}
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
 		install_plugin( 'escapecode_plugin' );
 		install_plugin( 'bbcode_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "BB code"' );
+		}
 		install_plugin( 'star_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Star renderer"' );
+		}
 		install_plugin( 'prism_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Prism"' );
+		}
 		install_plugin( 'code_highlight_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
+		}
 		install_plugin( 'gmcode_plugin' );
 		install_plugin( 'wacko_plugin' );
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
 		install_plugin( 'infodots_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
+		}
 		install_plugin( 'widescroll_plugin' );
 		// widget
 		install_plugin( 'facebook_plugin' );
@@ -679,6 +709,10 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 11490 )
 	{ // Upgrade to 6.7.1-stable
 		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
+		if( $test_install_all_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
+		}
 		install_plugin( 'cookie_consent_plugin', false );
 	}
 }
