@@ -1296,7 +1296,13 @@ function date2mysql( $ts )
 function mysql2timestamp( $m, $useGM = false )
 {
 	$func = $useGM ? 'gmmktime' : 'mktime';
-	return $func( substr( $m, 11, 2 ), substr( $m, 14, 2 ), substr( $m, 17, 2 ), substr( $m, 5, 2 ), substr( $m, 8, 2 ), substr( $m, 0, 4 ) );
+	return $func(
+		intval( substr( $m, 11, 2 ) ),  // hour
+		intval( substr( $m, 14, 2 ) ),  // minute
+		intval( substr( $m, 17, 2 ) ),  // second
+		intval( substr( $m, 5, 2 ) ),   // month
+		intval( substr( $m, 8, 2 ) ),   // day
+		intval( substr( $m, 0, 4 ) ) ); // year
 }
 
 /**
