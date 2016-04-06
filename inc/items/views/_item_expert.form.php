@@ -816,7 +816,7 @@ $Form->begin_form( '', '', $params );
 	echo '</p>';
 
 	// Display notification flags:
-	echo '<p>';
+	echo '<p class="small text-muted">';
 	$notifications_flags = $edited_Item->get( 'notifications_flags' );
 	if( empty( $notifications_flags ) )
 	{
