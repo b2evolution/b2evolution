@@ -3673,13 +3673,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$edoms_SQL->FROM( 'T_basedomains' );
 			$edoms_SQL->WHERE( 'dom_type = \'email\'' );
 			$email_domains = $DB->get_assoc( $edoms_SQL->get() );
-			// pre_dump( $email_domains );
 
 			foreach( $users_emails as $user_ID => $user_email )
 			{
 				if( preg_match( '#@(.+)#i', strtolower($user_email), $ematch ) )
 				{	// Get email domain from user's email address
-					$email_domain = $ematch[1];
+					$email_domain = trim( $ematch[1] );
 					$dom_ID = array_search( $email_domain, $email_domains );
 
 					if( ! $dom_ID )
