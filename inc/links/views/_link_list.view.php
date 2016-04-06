@@ -37,6 +37,7 @@ if( empty( $Blog ) )
 
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
+$sort_links = param( 'sort_links', 'integer', 0 );
 
 $SQL = $LinkOwner->get_SQL();
 
@@ -63,12 +64,29 @@ $Results->cols[] = array(
 						'td' => '%display_subtype( #link_ID# )%',
 					);
 
+/**
+ * Destination column
+ */
 
-$Results->cols[] = array(
+function link_filename_order_callback( $a, $b, $order )
+{
+	$r = strnatcmp( basename( $a->file_path ), basename( $b->file_path ) );
+	if( $order == 'DESC' )
+	{
+		$r = -$r;
+	}
+	return $r;
+}
+$dest_col = array(
 						'th' => T_('Destination'),
 						'td' => '%link_destination()%',
 						'td_class' => 'fm_filename',
 					);
+if( $sort_links )
+{
+	$dest_col['order_rows_callback'] = 'link_filename_order_callback';
+}
+$Results->cols[] = $dest_col;
 
 $Results->cols[] = array(
 						'th' => T_('Link ID'),
