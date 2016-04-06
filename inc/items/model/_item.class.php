@@ -5857,7 +5857,7 @@ class Item extends ItemLight
 	/**
 	 * Execute or schedule various notifications:
 	 * - notifications for moderators
-	 * - notificatiosn for subscribers
+	 * - notifications for subscribers
 	 * - pings
 	 *
 	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
@@ -5895,7 +5895,7 @@ class Item extends ItemLight
 		}
 		*/
 		
-		// NEW: notifications will now be sent for the followign statuses: Members, Community and Public
+		// NEW: notifications will now be sent for the following statuses: Members, Community and Public
 		// Reference: http://b2evolution.net/man/visibility-status
 		// So the following is no longer valid:
 		/*
@@ -5932,7 +5932,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// IMMEDIATE vs ASYNCHRONOUS sending: 
+		// IMMEDIATE vs ASYNCHRONOUS sending:
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
@@ -5965,28 +5965,28 @@ class Item extends ItemLight
 			// It will be the responsibility of the cron jobs to detect if another one is already running and not execute twice or more times concurrently.
 
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
-			$edited_Cronjob = new Cronjob();
+			$item_Cronjob = new Cronjob();
 
 			// start datetime. We do not want to ping before the post is effectively published:
-			$edited_Cronjob->set( 'start_datetime', $this->issue_date );
+			$item_Cronjob->set( 'start_datetime', $this->issue_date );
 
 			// no repeat.
 
 			// key:
-			$edited_Cronjob->set( 'key', 'send-post-notifications' );
+			$item_Cronjob->set( 'key', 'send-post-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
-			$edited_Cronjob->set( 'params', array(
+			$item_Cronjob->set( 'params', array(
 					'item_ID'                   => $this->ID,
 					'is_new_item'               => $is_new_item,
 					'already_notified_user_IDs' => $already_notified_user_IDs
 				) );
 
 			// Save cronjob to DB:
-			$edited_Cronjob->dbinsert();
+			$item_Cronjob->dbinsert();
 
 			// Memorize the cron job ID which is going to handle this post:
-			$this->set( 'notifications_ctsk_ID', $edited_Cronjob->ID );
+			$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
 
 			// Record that processing has been scheduled:
 			$this->set( 'notifications_status', 'todo' );
@@ -6047,8 +6047,8 @@ class Item extends ItemLight
 			return NULL;
 		}
 
-		// Collect all notified User ID in this array
-		$notfied_Users = array();
+		// Collect all notified User IDs in this array:
+		$notified_user_IDs = array();
 
 		$post_creator_level = $post_creator_User->level;
 		$UserCache = & get_UserCache();
@@ -6098,7 +6098,7 @@ class Item extends ItemLight
 			locale_restore_previous();
 
 			// A send notification email request to the user with $moderator_ID ID was processed
-			$notfied_Users[] = $moderator_ID;
+			$notified_user_IDs[] = $moderator_ID;
 		}
 
 		// Record that we have notified the moderators (for info only):
@@ -6106,7 +6106,7 @@ class Item extends ItemLight
 		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
 		$this->dbupdate( false, false, false );
 
-		return $notfied_Users;
+		return $notified_user_IDs;
 	}
 
 
@@ -6117,7 +6117,7 @@ class Item extends ItemLight
 	 *
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
-	 * @param array Notified flags: 'members_notified', 'community_notified'
+	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
 	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL )
 	{

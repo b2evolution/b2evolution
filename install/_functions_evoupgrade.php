@@ -7377,6 +7377,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11745, 'Upgrading items table...' ) )
 	{	// part of 6.7.1
 		db_add_col( 'T_items__item', 'post_notifications_flags', "SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '' AFTER post_notifications_ctsk_ID" );
+		$DB->query( 'UPDATE T_items__item
+			  SET post_notifications_flags = "moderators_notified,members_notified,community_notified,pings_sent"
+			WHERE post_notifications_status = "finished"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11750, 'Upgrading comments table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_comments', 'comment_notif_flags', "SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT ''" );
+		$DB->query( 'UPDATE T_comments
+			  SET comment_notif_flags = "moderators_notified,members_notified,community_notified"
+			WHERE comment_notif_status = "finished"' );
 		upg_task_end();
 	}
 
