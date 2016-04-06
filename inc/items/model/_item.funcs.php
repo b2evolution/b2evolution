@@ -3433,11 +3433,11 @@ function item_priority_titles( $include_null_value = true )
 function item_priority_colors()
 {
 	return array(
-			1 => 'CB4D4D', // Highest
-			2 => 'E09952', // High
-			3 => 'DBDB57', // Medium
-			4 => '34B27D', // Low
-			5 => '4D77CB', // Lowest
+			1 => 'EB5A46', // Highest
+			2 => 'FFAB4A', // High
+			3 => 'F2D600', // Medium
+			4 => '61BD4F', // Low
+			5 => '00C2E0', // Lowest
 		);
 }
 
@@ -4569,7 +4569,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
  * @param integer Priority
  * @return string
  */
-function item_td_task_cell( $type, $Item )
+function item_td_task_cell( $type, $Item, $editable = true )
 {
 	global $current_User;
 
@@ -4608,7 +4608,7 @@ function item_td_task_cell( $type, $Item )
 			$title = '';
 	}
 
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) && $editable )
 	{ // Current user can edit this item
 		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
 	}
