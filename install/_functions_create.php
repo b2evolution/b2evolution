@@ -1188,6 +1188,9 @@ function create_blog(
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
 		}
+
+		$Blog->set_setting( 'use_workflow', 1 );
+		echo_install_log( 'TEST FEATURE: Activating workflow on collection #'.$Blog->ID );
 	}
 	if( $allow_rating_items != '' )
 	{
