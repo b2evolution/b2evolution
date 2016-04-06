@@ -436,7 +436,11 @@ class Blog extends DataObject
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
-			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
+		}
+
+		if( param( 'archive_posts_per_page', 'integer', NULL ) !== NULL )
+		{	// Archive posts per page:
+			$this->set_setting( 'archive_posts_per_page', get_param( 'archive_posts_per_page' ) );
 		}
 
 		if( param( 'chapter_links', 'string', NULL ) !== NULL )
