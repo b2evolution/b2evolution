@@ -120,7 +120,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$iframe_name = 'attach_'.generate_random_key( 16 );
 	}
 
-	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
+	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
@@ -144,6 +144,17 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
 	}
+
+	$fieldset_title .= '<span class="floatright">&nbsp;'
+			.action_icon( T_('Refresh'), 'refresh', $admin_url
+					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(),
+					T_('Refresh'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
+
+			.action_icon( T_('Sort'), '', $admin_url
+					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;sort_links=1',
+					T_('Sort'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
+
+			.'</span>';
 
 	// Get a count of links in order to deny folding when there is at least one link
 	$links_count = count( $LinkOwner->get_Links() );
@@ -337,7 +348,7 @@ function link_destination()
 	// File relative path & name:
 	if( $current_File->is_dir() )
 	{ // Directory
-		$r .= $current_File->dget( '_name' );
+		$r .= $current_File->get_view_link();
 	}
 	else
 	{ // File
