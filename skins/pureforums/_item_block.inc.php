@@ -62,7 +62,7 @@ $Skin->display_breadcrumbs( $cat );
 			) );
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
 		?>
@@ -92,7 +92,7 @@ $Skin->display_breadcrumbs( $cat );
 	<tr class="ft_post_info">
 		<td><?php
 			$Item->author( array(
-				'link_text' => 'login',
+				'link_text' => 'auto',
 			) );
 		?></td>
 		<td><?php

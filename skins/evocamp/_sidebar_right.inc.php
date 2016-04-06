@@ -40,7 +40,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					// This will enclose (foot)notes:
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>

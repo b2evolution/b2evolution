@@ -21,7 +21,7 @@ $params = array_merge( array(
 		'content_mode'     => 'auto',		// 'auto' will auto select depending on $disp-detail
 		'item_class'       => 'evo_post evo_content_block',
 		'image_size'	     => 'fit-400x320',
-		'author_link_text' => 'preferredname',
+		'author_link_text' => 'auto',
 	), $params );
 
 echo '<div class="evo_content_block">'; // Beginning of post display

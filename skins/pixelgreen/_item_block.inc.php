@@ -47,7 +47,7 @@ $params = array_merge( array(
 		$Item->author( array(
 				'before'    => T_('by').' <strong>',
 				'after'     => '</strong>',
-				'link_text' => 'preferredname',
+				'link_text' => 'auto',
 			) );
 		$Item->msgform_link();
 	?></p>
@@ -140,7 +140,7 @@ $params = array_merge( array(
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

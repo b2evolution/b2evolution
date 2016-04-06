@@ -81,7 +81,7 @@ $params = array_merge( array(
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic

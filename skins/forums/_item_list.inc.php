@@ -128,7 +128,7 @@ else
 					echo $comments_number;
 				}
 			?></td>
-			<td class="row3"><?php $Item->author( array( 'link_text' => 'login' ) ); ?></td>
+			<td class="row3"><?php $Item->author( array( 'link_text' => 'auto' ) ); ?></td>
 			<td class="row2 font10"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{	// Display info about last comment
@@ -138,7 +138,7 @@ else
 							'before_user' => '<br />',
 							'after'       => ' ',
 							'after_user'  => ' ',
-							'link_text'   => 'login'
+							'link_text'   => 'auto'
 						) );
 
 					echo ' <a href="'.$latest_Comment->get_permanent_url().'"><span class="ficon latestReply" title="'.T_('View latest post').'"></span></a>';
@@ -148,7 +148,7 @@ else
 					echo $Item->get_mod_date( 'D M j, Y H:i' );
 					echo $Item->author( array(
 							'before'    => '<br />',
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					echo '<a href="'.$Item->get_permanent_url().'"><span class="ficon latestReply" title="'.T_('View latest post').'"></span></a>';
 				}

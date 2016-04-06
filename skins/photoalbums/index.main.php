@@ -236,7 +236,7 @@ if( $disp == 'single' )
 				'disp_single' => '', // We already handled this case above
 				'disp_page'   => '', // We already handled this case above
 				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text'     => 'preferredname',
+				'author_link_text'     => 'auto',
 				'login_page_before'    => '<div class="login_block"><div class="bDetails">',
 				'login_page_after'     => '</div></div>',
 				'register_page_before' => '<div class="login_block"><div class="bDetails">',

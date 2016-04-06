@@ -119,14 +119,14 @@ skin_include( '_body_header.inc.php' );
 									) );
 								$Item->author( array(
 										'before'    => T_('by '),
-										'link_text' => 'preferredname',
+										'link_text' => 'auto',
 									) );
 							}
 							else
 							{
 								$Item->author( array(
 										'before'    => T_('This entry was posted by').' ',
-										'link_text' => 'preferredname',
+										'link_text' => 'auto',
 									) );
 							}
 						?>
@@ -162,7 +162,7 @@ skin_include( '_body_header.inc.php' );
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h3>',
 						'after_section_title'  => '</h3>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.

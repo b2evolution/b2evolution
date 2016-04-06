@@ -254,7 +254,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					skin_include( '_item_feedback.inc.php', array(
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
-							'author_link_text'     => 'preferredname',
+							'author_link_text'     => 'auto',
 							'comment_image_size'   => 'fit-256x256',
 							// Pagination:
 							'pagination' => array(

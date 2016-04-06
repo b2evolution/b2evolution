@@ -74,7 +74,7 @@ $params = array_merge( array(
 	?>
 
 	<div class="post-author">
-		<span class="lead">By</span> <?php $Item->author( array( 'link_text' => 'preferredname' ) ) ?><br />
+		<span class="lead">By</span> <?php $Item->author( array( 'link_text' => 'auto' ) ) ?><br />
 
 	<?php
 		if( ! $Item->is_intro() )
