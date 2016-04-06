@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
-		'author_link_text'           => 'preferredname',
+		'author_link_text'           => 'auto',
 	), $params );
 
 
