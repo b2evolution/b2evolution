@@ -151,6 +151,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
 			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
+			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
@@ -214,6 +215,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_secret             CHAR(32) COLLATE ascii_general_ci NULL default NULL,
 			comment_notif_status       ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
+			comment_notif_flags        SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT '',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_item_ID (comment_item_ID),
 			KEY comment_date (comment_date),

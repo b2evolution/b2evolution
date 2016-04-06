@@ -815,6 +815,38 @@ $Form->begin_form( '', '', $params );
 	echo action_icon( '', 'refresh', $quick_setting_url.'reset_quick_settings', T_('Reset defaults for this screen.'), 3, 4 );
 	echo '</p>';
 
+	// Display notification flags:
+	echo '<p class="small text-muted">';
+	$notifications_flags = $edited_Item->get( 'notifications_flags' );
+	if( empty( $notifications_flags ) )
+	{
+		echo T_('No notifications sent yet');
+	}
+	else
+	{
+		$notified_user_types = array();
+		foreach( $notifications_flags as $notifications_flag )
+		{
+			switch( $notifications_flag )
+			{
+				case 'moderators_notified':
+					$notified_user_types[] = T_('moderators');
+					break;
+				case 'members_notified':
+					$notified_user_types[] = T_('members');
+					break;
+				case 'community_notified':
+					$notified_user_types[] = T_('community');
+					break;
+				case 'pings_sent':
+					$notified_user_types[] = T_('ping services');
+					break;
+			}
+		}
+		printf( T_('Notifications already sent to: %s'), implode( ', ', $notified_user_types ) );
+	}
+	echo '</p>';
+
 	?>
 
 </div>
