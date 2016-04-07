@@ -651,6 +651,58 @@ while( $Item = & $ItemList->get_item() )
 			// ========== END of links to manage subscriptions ========== //
 
 			} // / can comment
+
+			// ========== START of item workflow properties ========== //
+			if( is_logged_in() &&
+					$Blog->get_setting( 'use_workflow' ) &&
+					$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			{	// Display workflow properties if current user can edit this post:
+				$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+
+				$Form->add_crumb( 'item' );
+				$Form->hidden( 'blog', $Blog->ID );
+				$Form->hidden( 'post_ID', $Item->ID );
+				$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Blog->ID.'&p='.$Item->ID );
+
+				$Form->begin_form( 'evo_item_workflow_form' );
+
+				$Form->begin_fieldset( T_('Workflow properties') );
+
+				echo '<div class="evo_item_workflow_form__fields">';
+
+				$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+				// Load current blog members into cache:
+				$UserCache = & get_UserCache();
+				// Load only first 21 users to know when we should display an input box instead of full users list
+				$UserCache->load_blogmembers( $Blog->ID, 21, false );
+
+				if( count( $UserCache->cache ) > 20 )
+				{
+					$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+				}
+				else
+				{
+					$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'),
+															'', true, '', 'get_assigned_user_options' );
+				}
+
+				$ItemStatusCache = & get_ItemStatusCache();
+				$ItemStatusCache->load_all();
+				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
+
+				$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+
+				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
+
+				echo '</div>';
+
+				$Form->end_fieldset();
+
+				$Form->end_form();
+			}
+			// ========== END of item workflow properties ========== //
 		?>
 		</div>
 		<?php

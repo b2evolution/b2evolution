@@ -9,7 +9,6 @@
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage bootstrap_forums_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -27,6 +26,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'blog', $Blog->ID );
 	$Form->hidden( 'post_ID', $Item->ID );
+	$Form->hidden( 'redirect_to', $Item->get_permanent_url() );
 
 	$Form->begin_form( 'evo_item_workflow_form' );
 

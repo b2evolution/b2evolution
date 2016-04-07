@@ -371,8 +371,6 @@ switch( $action )
 			}
 		}
 
-		$redirect_to = $edited_Item->get_permanent_url();
-
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
 		/* EXITED */
