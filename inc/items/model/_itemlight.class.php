@@ -437,17 +437,23 @@ class ItemLight extends DataObject
 		}
 
 		$this->get_Blog();
+
+		// Special Items types/usages will have special permalink types
 		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
 		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
 		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
 		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
 		      $first_mainlist_Item->ID == $this->ID ) )
 		{ // This item is used as front specific page or as first post on the blog's home
-			$permalink_type = 'none';
+			$permalink_type = 'front';
 		}
 		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
 		{	// This is not an "in stream" post:
-			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main', 'special' ) ) )
+			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'front';
+			}
+			elseif( in_array( $item_type_usage, array( 'special' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
@@ -475,9 +481,12 @@ class ItemLight extends DataObject
 			case 'subchap':
 				return $this->get_chapter_url( $blogurl, $glue );
 
+			case 'front':
+				// Link to collection front page:
+				return $this->Blog->gen_blogurl();
+
 			case 'none':
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
-				// Link to blog home:
 				return $this->Blog->gen_blogurl();
 
 			case 'cat':
