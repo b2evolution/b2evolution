@@ -159,7 +159,6 @@ ol.breadcrumb {
 			display: none;
 		}
 		.ft_date {
-			margin-top: 14px;
 			text-align: left;
 			img {
 				border-radius: 50%;
@@ -172,7 +171,6 @@ ol.breadcrumb {
 			margin-top: 8px;
 		}
 		.ft_assigned {
-			margin-top: 14px;
 			img {
 				border-radius: 50%;
 			}
@@ -198,13 +196,30 @@ ol.breadcrumb {
 		}
 	}
 	.ft_assigned {
-		margin-top: 5px;
 		font-size: 90%;
+		line-height: 16px;
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 42px;
+		}
 	}
 	.ft_date {
-		margin-top: 17px;
 		color: #8b96a1;
 		font-size: 90%;
+		line-height: 16px;
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
 	}
 	.ft_title >	a.forumlink {
 		font-size: 21px;
@@ -229,10 +244,17 @@ ol.breadcrumb {
 	.ft_date {
 		text-align: center;
 		white-space: nowrap;
-		line-height: 16px;
 	}
 	.ft_date_shrinked, .ft_date_shrinked_more {
 		display: none;
+		line-height: 16px;
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
 	}
 	.ft_author_avatar {
 		float: left;
@@ -690,7 +712,7 @@ label.control-label[for=post_title] {
 			padding-left: 0px;
 			padding-right: 15px;
 			float: left;
-			margin-top: 14px;
+			margin-top: 4px;
 		}
 	}
 	.legend-item {
@@ -875,6 +897,9 @@ label.control-label[for=post_title] {
 		}
 		.ft_assigned {
 			font-size: 90%;
+			.ft_assigned_info {
+				padding-left: 0;
+			}
 		}
 		.ft_date_shrinked.item_list {
 			font-size: 90%;

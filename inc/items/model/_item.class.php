@@ -1036,8 +1036,6 @@ class Item extends ItemLight
 					'after' => '',
 					'format' => 'htmlbody',
 					'link_text' => 'only_avatar',
-					'link_class' => 'ft_assignee_avatar',
-					'thumb_class' => 'ft_assignee_avatar'
 				), $params );
 			echo $params['before'].$this->assigned_User->get_identity_link( $params ).$params['after'];
 		}
@@ -5916,7 +5914,7 @@ class Item extends ItemLight
 			return false;
 		}
 		*/
-		
+
 		// NEW: notifications will now be sent for the following statuses: Members, Community and Public
 		// Reference: http://b2evolution.net/man/visibility-status
 		// So the following is no longer valid:
@@ -6471,7 +6469,7 @@ class Item extends ItemLight
 			case 't_priority':
 				return $this->priorities[ $this->priority ];
 
-			case 'pingsdone': 
+			case 'pingsdone':
 				// Have pings been sent? (should only happen once the post has visibility 'public')
 				// return ($this->post_notifications_status == 'finished'); // Deprecated by fp 2006-08-21 -- TODO: this should now become an alias of "pings_sent"
 				return $this->check_notifications_flags( 'pings_sent' );

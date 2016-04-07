@@ -187,7 +187,6 @@ ol.breadcrumb {
   display: none;
 }
 .forums_list .posts_panel .ft_date {
-  margin-top: 14px;
   text-align: left;
 }
 .forums_list .posts_panel .ft_date img {
@@ -198,9 +197,6 @@ ol.breadcrumb {
 }
 .forums_list .posts_panel .ft_count {
   margin-top: 8px;
-}
-.forums_list .posts_panel .ft_assigned {
-  margin-top: 14px;
 }
 .forums_list .posts_panel .ft_assigned img {
   border-radius: 50%;
@@ -224,13 +220,32 @@ ol.breadcrumb {
   font-size: 16px;
 }
 .forums_list .ft_assigned {
-  margin-top: 5px;
   font-size: 90%;
+  line-height: 16px;
+}
+.forums_list .ft_assigned span.user.anonymous,
+.forums_list .ft_assigned span.identity_link_username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
+.forums_list .ft_assigned .ft_assigned_info {
+  padding-left: 42px;
 }
 .forums_list .ft_date {
-  margin-top: 17px;
   color: #8b96a1;
   font-size: 90%;
+  line-height: 16px;
+}
+.forums_list .ft_date span.user.anonymous,
+.forums_list .ft_date span.identity_link_username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
 }
 .forums_list .ft_title > a.forumlink {
   font-size: 21px;
@@ -256,11 +271,21 @@ ol.breadcrumb {
 .forums_list .ft_date {
   text-align: center;
   white-space: nowrap;
-  line-height: 16px;
 }
 .forums_list .ft_date_shrinked,
 .forums_list .ft_date_shrinked_more {
   display: none;
+  line-height: 16px;
+}
+.forums_list .ft_date_shrinked span.user.anonymous,
+.forums_list .ft_date_shrinked_more span.user.anonymous,
+.forums_list .ft_date_shrinked span.identity_link_username,
+.forums_list .ft_date_shrinked_more span.identity_link_username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
 }
 .forums_list .ft_author_avatar {
   float: left;
@@ -674,7 +699,7 @@ label.control-label[for=post_title] {
     padding-left: 0px;
     padding-right: 15px;
     float: left;
-    margin-top: 14px;
+    margin-top: 4px;
   }
   .legend-item {
     margin-bottom: 5px;
@@ -836,6 +861,9 @@ label.control-label[for=post_title] {
   }
   .posts_panel .ft_assigned {
     font-size: 90%;
+  }
+  .posts_panel .ft_assigned .ft_assigned_info {
+    padding-left: 0;
   }
   .posts_panel .ft_date_shrinked.item_list {
     font-size: 90%;

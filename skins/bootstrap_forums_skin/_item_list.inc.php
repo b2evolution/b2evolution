@@ -72,15 +72,7 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 		<!-- Thread icon -->
 		<div class="ft_status_topic">
 			<a href="<?php echo $Item->permanent_url(); ?>">
-				<i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"
-				<?php
-				if( $use_workflow )
-				{ // ==========================================================================================================================
-					$priority_color = item_priority_color( $Item->priority );
-					echo ' style="color: '.$priority_color.'; border-color: '.$priority_color.';"';
-				} // ==========================================================================================================================
-				?>
-				></i>
+				<i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i>
 			</a>
 		</div>
 
@@ -186,11 +178,13 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 	if( $use_workflow )
 	{ // ==========================================================================================================================
 		$assigned_User = $Item->get_assigned_User();
+		$priority_color = item_priority_color( $Item->priority );
 
 		echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+
 		if( $assigned_User )
 		{
-			echo '<span>'.T_('Assigned to:').'</span>';
+			echo '<span style="color: '.$priority_color.';">'.T_('Assigned to:').'</span>';
 			echo '<br />';
 
 			// Assigned user avatar
@@ -200,21 +194,22 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 					'thumb_size'   => 'crop-top-32x32'
 				) );
 
+			echo '<div class="ft_assigned_info">';
 			// Assigned user login
 			$Item->assigned_to2( array(
+				  'after' => '<br />',
 					'link_text' => 'name'
 				) );
-			echo '<br />';
 		}
 		else
 		{
-			echo '<span>'.T_('Not assigned').'</span>';
-			echo '<br />';
+			echo '<span style="color: '.$priority_color.';">'.T_('Not assigned').'</span>';
+			echo '<div class="ft_not_assigned">';;
 		}
 
 		// Workflow status
-		echo '<span style="white-space: nowrap;">'.item_td_task_cell( 'status', $Item, false ).'</span>';
-		echo '</div>';
+		echo '<span>'.item_td_task_cell( 'status', $Item, false ).'</span>';
+		echo '</div></div>';
 	}	// ==========================================================================================================================
 
 	echo '<!-- Last Comment Block -->';
@@ -252,21 +247,23 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 					'link_class'  => 'ft_author_avatar',
 					'thumb_class' => 'ft_author_avatar',
 				) );
+		echo '<div style="padding-left: 42px;">';
+
+		// Last comment author
+		$latest_Comment->author2( array(
+				'before'      => '',
+				'before_user' => '',
+				'after'       => '<br />',
+				'after_user'  => '<br />',
+				'link_text'   => 'auto',
+			) );
 
 		// Last comment date
 		$latest_Comment->date( $use_workflow ? 'm/d/y' : 'D M j, Y H:i' );
 
-		// Last comment author
-		$latest_Comment->author2( array(
-				'before'      => '<br />',
-				'before_user' => '<br />',
-				'after'       => '',
-				'after_user'  => '',
-				'link_text'   => 'auto'
-			) );
-
 		echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+		echo '</div>';
 	}
 	else
 	{ // No comments, Display info of post
@@ -278,13 +275,24 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 					'link_text'   => 'only_avatar',
 					'link_class'  => 'ft_author_avatar'
 				) );
-		echo $use_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
+
+		echo '<div style="padding-left: 42px;">';
+
+		// Post author
 		echo $Item->author( array(
-				'before'    => '<br />',
-				'link_text' => 'auto',
+				'before'      => '',
+				'before_user' => '',
+				'after'       => '<br />',
+				'after_user'  => '<br />',
+				'link_text'   => 'auto',
 			) );
+
+		// Last modification date
+		echo $use_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
+
 		echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
+		echo '</div>';
 	}
 	echo '</div>';
 	?>
@@ -292,22 +300,43 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 	<!-- This is shrinked date that applies on lower screen res -->
 	<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' col-xs-5' : ' col-xs-6'; ?>">
 		<?php
+		if( $use_workflow )
+		{ // ==========================================================================================================================
+			if( $comments_number == 0 && $Item->comment_status == 'disabled' )
+			{ // The comments are disabled:
+				echo T_('n.a.');
+			}
+			else if( $latest_Comment = & $Item->get_latest_Comment() )
+			{	// At least one reply exists:
+				printf( T_('%s replies'), '<a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a>' );
+			}
+			else
+			{	// No replies yet:
+				printf( T_('%s replies'), '0' );
+			}
+			echo '<br />';
+		} // ==========================================================================================================================
 		if( $latest_Comment = & $Item->get_latest_Comment() )
 		{ // Display info about last comment
-					$latest_Comment->date('m/j/y ');
 			$latest_Comment->author2( array(
-							'link_text' => 'auto'
+							'link_text' => 'auto',
+							'after' => '<br />',
+							'after_user' => '<br />'
 				) );
 
+			$latest_Comment->date('m/j/y ');
 			echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 					.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}
 		else
 		{ // No comments, Display info of post
-			echo $Item->get_mod_date( 'm/j/y' );
 			echo $Item->author( array(
 					'link_text' => 'auto',
+					'after' => '<br />',
+					'after_user' => '<br />',
 				) );
+
+			echo $Item->get_mod_date( 'm/j/y' );
 			echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').
 					'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}
