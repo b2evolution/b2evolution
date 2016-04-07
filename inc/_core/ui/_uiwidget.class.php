@@ -1135,9 +1135,9 @@ class Table extends Widget
 		// Make variable substitution for RAWS:
 		while (preg_match('!\# (\w+) \#!ix', $content, $matchesarray))
 		{ // Replace all matches to the content of the current row's cell. That means that several variables can be inserted to the class.
-			if (! empty($this->rows[$this->current_idx]->$matchesarray[1]))
+			if (! empty($this->rows[$this->current_idx]->{$matchesarray[1]}))
 			{
-				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
+				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->{$matchesarray[1]} , $content);
 			}
 			else
 			{

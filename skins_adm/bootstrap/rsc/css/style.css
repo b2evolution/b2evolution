@@ -150,6 +150,9 @@ h2 .glyphicon {
 .edit_actions .pull-left {
   margin-right: 10px;
 }
+.edit_actions .quick-publish {
+  margin-left: 5px;
+}
 .edit_actions .html_status {
   margin-top: 14px;
   display: inline-block;
@@ -264,17 +267,17 @@ div.bPost {
   background: #F5F5F5;
   border: none;
 }
-.bFeedback .form-horizontal {
+.bFeedback .bComment.form-horizontal {
   margin: 0;
   padding: 1ex;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-.bFeedback .form-horizontal.evo_form__comment_meta {
+.bFeedback .bComment.form-horizontal.evo_form__comment_meta {
   border: 2px solid #5133ab;
   background-color: #f7f4ff;
 }
-.bFeedback .form-horizontal .form_info {
+.bFeedback .bComment.form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;

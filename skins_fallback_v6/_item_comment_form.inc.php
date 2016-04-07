@@ -33,7 +33,7 @@ $params = array_merge( array(
 			'comments_disabled_after' => '</p>',
 			), 
 		'policy_text'          => '',
-		'author_link_text'     => 'name',
+		'author_link_text'     => 'auto',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',

@@ -466,6 +466,43 @@ class File extends DataObject
 		return $this->_is_dir;
 	}
 
+	/**
+	 * Is the File a directory or file?
+	 *
+	 * @param string String to return if the File is a directory
+	 * @param string String to return if the File is a file
+	 * @return string specified directory string if the object is a directory, specified file string if not
+	 */
+	function dir_or_file( $dir_string = NULL, $file_string = NULL)
+	{
+		if( is_null( $dir_string ) )
+		{
+			$dir_string = T_('directory');
+		}
+
+		if( is_null( $file_string ) )
+		{
+			$file_string = T_('file');
+		}
+
+		return $this->is_dir() ? $dir_string : $file_string;
+	}
+
+	/**
+	 * Get file type
+	 *
+	 * @return string file type
+	 */
+	function get_file_type()
+	{
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
+		}
+
+		return $this->type;
+	}
+
 
 	/**
 	 * Is the File an image?
@@ -499,6 +536,24 @@ class File extends DataObject
 		}
 
 		return ( $this->type == 'audio' );
+	}
+
+
+	/**
+	 * Is the File a video file?
+	 *
+	 * Tries to determine if it is and caches the info.
+	 *
+	 * @return boolean true if the object is a video file, false if not
+	 */
+	function is_video()
+	{
+		if( empty( $this->type ) )
+		{
+			$this->set_file_type();
+		}
+
+		return ( $this->type == 'video' );
 	}
 
 
@@ -1781,12 +1836,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
-			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
-			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
@@ -1946,7 +2001,7 @@ class File extends DataObject
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default
-			$text = $this->get_root_and_rel_path();
+			$text = ( $this->is_dir() ? $this->get_root_and_rel_path() : $this->get_root_and_rel_path() );
 		}
 
 		if( is_null( $title ) )
@@ -1962,7 +2017,7 @@ class File extends DataObject
 
 		if( is_null( $url ) )
 		{ // Get the URL for viewing the file/dir:
-			$url = $this->get_view_url( false );
+			$url = ( $this->is_dir() ? $this->get_linkedit_url() : $this->get_view_url( false ) );
 			$ignore_popup = false;
 		}
 		else
@@ -1985,7 +2040,7 @@ class File extends DataObject
 		$rel_attr = ( ! empty( $Blog ) && $Blog->get_setting( 'download_nofollowto' ) ) ? ' rel="nofollow"' : '';
 
 		$Filetype = & $this->get_Filetype();
-		if( $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
+		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
@@ -2785,6 +2840,25 @@ class File extends DataObject
 					    in_array( $file_extension, $Filetype->get_extensions() ) )
 					{ // This is audio file
 						$this->update_file_type( 'audio' );
+						return;
+					}
+				}
+			}
+		}
+
+		// VIDEO:
+		// Load all video file types in cache
+		if( ! empty( $file_extension ) )
+		{
+			$FiletypeCache->load_where( 'ftyp_mimetype LIKE "video/%"' );
+			if( count( $FiletypeCache->cache ) )
+			{
+				foreach( $FiletypeCache->cache as $Filetype )
+				{
+					if( preg_match( '#^video/#', $Filetype->mimetype ) &&
+							in_array( $file_extension, $Filetype->get_extensions() ) )
+					{ // This is a video file
+						$this->update_file_type( 'video' );
 						return;
 					}
 				}

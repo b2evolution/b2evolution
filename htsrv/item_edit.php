@@ -237,7 +237,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( $exit_after_save, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -312,7 +312,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications( $exit_after_save );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -370,8 +370,6 @@ switch( $action )
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
 			}
 		}
-
-		$redirect_to = $edited_Item->get_permanent_url();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );

@@ -460,14 +460,8 @@ class CommentList2 extends DataObjectList2
 			$sql_item_IDs .= ' INNER JOIN T_categories ON post_main_cat_ID = cat_ID ';
 		}
 		$sql_item_IDs .= $this->ItemQuery->get_where();
-		$item_IDs = $DB->get_col( $sql_item_IDs, 0, 'Get CommentQuery Item IDs' );
-		if( empty( $item_IDs ) )
-		{ // There is no item which belongs to the given blog and user may view it, so there are no comments either
-			parent::count_total_rows( 0 );
-			$this->CommentQuery->WHERE_and( 'FALSE' );
-			return;
-		}
-		$this->CommentQuery->where_post_ID( implode( ',', $item_IDs ) );
+		// We use a sub-query for the list of post IDs because we do not want to pass 10000 item IDs back and forth between MySQL and PHP:
+		$this->CommentQuery->WHERE_and( $this->CommentQuery->dbprefix.'item_ID IN ( '.$sql_item_IDs.' )' );
 
 		/*
 		 * Restrict to active comments by default, show expired comments only if it was requested
@@ -506,8 +500,23 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -557,7 +566,7 @@ class CommentList2 extends DataObjectList2
 			$this->sql .= ' WHERE 0';
 		}
 
-		$this->run_query( false, false, false, 'CommentList2::Query() Step 2' );
+		parent::run_query( false, false, false, 'CommentList2::Query() Step 2' );
 	}
 
 

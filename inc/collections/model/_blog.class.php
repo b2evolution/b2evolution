@@ -127,9 +127,9 @@ class Blog extends DataObject
 	var $favorite = 1;
 
 	/**
-	 * @var array IDs of moderators which must be notified about new comments
+	 * @var array Data of moderators which must be notified about new/edited comments
 	 */
-	var $comment_moderator_user_IDs;
+	var $comment_moderator_user_data;
 
 
 	/**
@@ -436,7 +436,11 @@ class Blog extends DataObject
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
-			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
+		}
+
+		if( param( 'archive_posts_per_page', 'integer', NULL ) !== NULL )
+		{	// Archive posts per page:
+			$this->set_setting( 'archive_posts_per_page', get_param( 'archive_posts_per_page' ) );
 		}
 
 		if( param( 'chapter_links', 'string', NULL ) !== NULL )
@@ -4080,30 +4084,31 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get IDs of moderators which must be notified about new comment
+	 * Get data of moderators which must be notified about new/edited comment
 	 *
-	 * @return array
+	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
 	 */
-	function get_comment_moderator_user_IDs()
+	function get_comment_moderator_user_data()
 	{
-		if( ! isset( $this->comment_moderator_user_IDs ) )
+		if( ! isset( $this->comment_moderator_user_data ) )
 		{	// Get it from DB only first time and then cache in array:
 			global $DB;
 
-			$SQL = new SQL( 'Get list of moderators to notify for comment for collection #'.$this->ID );
-			$SQL->SELECT( 'DISTINCT user_email, user_ID, uset_value as notify_moderation' );
+			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
 			$SQL->FROM( 'T_users' );
-			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
 
-			$this->comment_moderator_user_IDs = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 		}
 
-		return $this->comment_moderator_user_IDs;
+		return $this->comment_moderator_user_data;
 	}
 }
 

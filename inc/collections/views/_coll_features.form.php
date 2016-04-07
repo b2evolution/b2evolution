@@ -68,6 +68,13 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
 	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
 
+	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
+	array(
+			array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+			array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+			array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
+		), T_('Post contents'), true );
+
 $Form->end_fieldset();
 
 

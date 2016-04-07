@@ -329,8 +329,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
 			break;
 
 		case 'xml':
@@ -1197,14 +1204,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			}
 
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1220,14 +1220,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
@@ -1303,7 +1296,13 @@ function date2mysql( $ts )
 function mysql2timestamp( $m, $useGM = false )
 {
 	$func = $useGM ? 'gmmktime' : 'mktime';
-	return $func( substr( $m, 11, 2 ), substr( $m, 14, 2 ), substr( $m, 17, 2 ), substr( $m, 5, 2 ), substr( $m, 8, 2 ), substr( $m, 0, 4 ) );
+	return $func(
+		intval( substr( $m, 11, 2 ) ),  // hour
+		intval( substr( $m, 14, 2 ) ),  // minute
+		intval( substr( $m, 17, 2 ) ),  // second
+		intval( substr( $m, 5, 2 ) ),   // month
+		intval( substr( $m, 8, 2 ) ),   // day
+		intval( substr( $m, 0, 4 ) ) ); // year
 }
 
 /**
@@ -7594,7 +7593,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 /**
  * Compares two "PHP-standardized" version number strings
  *
- * @param string First version number
+ * @param string First version number, Use 'current' for global $app_version
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
  *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
@@ -7604,15 +7603,21 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
  */
 function evo_version_compare( $version1, $version2, $operator = NULL )
 {
+	if( $version1 === 'current' )
+	{	// Use current version of application:
+		global $app_version;
+		$version1 = $app_version;
+	}
+
 	// Remove part after "-" from versions like "6.6.6-stable":
 	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
 
 	if( is_null( $operator ) )
-	{	// To return integer
+	{	// To return integer:
 		return version_compare( $version1, $version2 );
 	}
 	else
-	{ // To return boolean
+	{	// To return boolean:
 		return version_compare( $version1, $version2, $operator );
 	}
 }

@@ -4067,13 +4067,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$edoms_SQL->FROM( 'T_basedomains' );
 			$edoms_SQL->WHERE( 'dom_type = \'email\'' );
 			$email_domains = $DB->get_assoc( $edoms_SQL->get() );
-			// pre_dump( $email_domains );
 
 			foreach( $users_emails as $user_ID => $user_email )
 			{
 				if( preg_match( '#@(.+)#i', strtolower($user_email), $ematch ) )
 				{	// Get email domain from user's email address
-					$email_domain = $ematch[1];
+					$email_domain = trim( $ematch[1] );
 					$dom_ID = array_search( $email_domain, $email_domains );
 
 					if( ! $dom_ID )
@@ -7358,8 +7357,42 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11735, 'Upgrade table user post data...' ) )
+	if( upg_task_start( 11735, 'Upgrade table files...' ) )
 	{	// part of 6.7.0
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_type ENUM( "image", "audio", "video", "other" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11740, 'Update table user settings for new post/comment moderation settings...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+			SELECT uset_user_ID, IF( uset_name = "notify_comment_moderation", "notify_edit_cmt_moderation", "notify_edit_pst_moderation" ), uset_value
+			  FROM T_users__usersettings
+			 WHERE uset_name IN ( "notify_comment_moderation", "notify_post_moderation" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11745, 'Upgrading items table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_items__item', 'post_notifications_flags', "SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '' AFTER post_notifications_ctsk_ID" );
+		$DB->query( 'UPDATE T_items__item
+			  SET post_notifications_flags = "moderators_notified,members_notified,community_notified,pings_sent"
+			WHERE post_notifications_status = "finished"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11750, 'Upgrading comments table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_comments', 'comment_notif_flags', "SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT ''" );
+		$DB->query( 'UPDATE T_comments
+			  SET comment_notif_flags = "moderators_notified,members_notified,community_notified"
+			WHERE comment_notif_status = "finished"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11755, 'Upgrade table user post data...' ) )
+	{	// part of 6.7.1
 		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
 		$DB->query( "ALTER TABLE T_items__user_data
 			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,
