@@ -1600,6 +1600,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
 				jQuery( "input.autocomplete_login" ).on( "added",function()
@@ -1622,7 +1623,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+									url: "'.get_secure_htsrv_url().'anon_async.php?action=get_login_list" + ajax_params,
 									type: "post",
 									data: { q: query, data_type: "json" },
 									dataType: "JSON",
@@ -1667,7 +1668,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: "'.get_secure_htsrv_url().'anon_async.php?action=get_login_list" + ajax_params,
 					matchHint: true,
 					autoDimentions: true
 				} );

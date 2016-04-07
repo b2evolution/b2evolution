@@ -957,7 +957,8 @@ class Skin extends DataObject
 					}
 
 					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
-					{	// Initialize date picker to select a workflow deadline date:
+					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
 					break;
@@ -1571,6 +1572,10 @@ class Skin extends DataObject
 						// This tooltips appear on mouse over user logins or on plugin help icons
 						return 'popover';
 
+					case 'autocomplete_plugin':
+						// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+						return 'typeahead';
+
 					case 'plugin_template':
 						// Template for plugins:
 						return array(
@@ -1720,6 +1725,10 @@ class Skin extends DataObject
 				//   - 'children' - Get items from current category and from all its sub-categories recirsively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
+
+			case 'autocomplete_plugin':
+				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+				return 'hintbox';
 		}
 
 		return array();
