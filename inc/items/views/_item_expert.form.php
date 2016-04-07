@@ -782,6 +782,44 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+				'pings_sent'         => T_('Public pings'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+			{	// Item type is not applicable:
+				$notif_info = T_('Not Applicable')
+					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="anyways" disabled="disabled" /> '
+					.( $notify_type == 'pings_sent' ? T_('Ping anyways') : T_('Notify anyways') );
+			}
+			elseif( $edited_Item->check_notifications_flags( $notify_type ) )
+			{	// Nofications/Pings were sent:
+				$notif_info = ( $notify_type == 'pings_sent' ? T_('Sent') : T_('Notified') )
+					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="again" disabled="disabled" /> '
+					.( $notify_type == 'pings_sent' ? T_('Send again') : T_('Notify again') );
+			}
+			else
+			{	// Nofications/Pings are not sent yet:
+				$notif_info = ( $notify_type == 'pings_sent' ? T_('To be sent') : T_('To be notified') )
+					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="skip" disabled="disabled" /> '
+					.T_('Skip');
+			}
+			$Form->info( $notify_title, $notif_info );
+		}
+
+	$Form->end_fieldset();
+
+
 	// ################### QUICK SETTINGS ###################
 
 	$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
@@ -813,38 +851,6 @@ $Form->begin_form( '', '', $params );
 	// Display a link to reset default settings for current user on this screen:
 	echo '<p>';
 	echo action_icon( '', 'refresh', $quick_setting_url.'reset_quick_settings', T_('Reset defaults for this screen.'), 3, 4 );
-	echo '</p>';
-
-	// Display notification flags:
-	echo '<p class="small text-muted">';
-	$notifications_flags = $edited_Item->get( 'notifications_flags' );
-	if( empty( $notifications_flags ) )
-	{
-		echo T_('No notifications sent yet');
-	}
-	else
-	{
-		$notified_user_types = array();
-		foreach( $notifications_flags as $notifications_flag )
-		{
-			switch( $notifications_flag )
-			{
-				case 'moderators_notified':
-					$notified_user_types[] = T_('moderators');
-					break;
-				case 'members_notified':
-					$notified_user_types[] = T_('members');
-					break;
-				case 'community_notified':
-					$notified_user_types[] = T_('community');
-					break;
-				case 'pings_sent':
-					$notified_user_types[] = T_('ping services');
-					break;
-			}
-		}
-		printf( T_('Notifications already sent to: %s'), implode( ', ', $notified_user_types ) );
-	}
 	echo '</p>';
 
 	?>
