@@ -31,6 +31,7 @@ global $Item;
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
+global $Plugins, $DB, $UserSettings;
 
 $highlight = param( 'highlight', 'integer', NULL );
 
@@ -443,7 +444,7 @@ while( $Item = & $ItemList->get_item() )
 				$expiry_statuses[] = 'expired';
 			}
 
-			global $CommentList, $UserSettings;
+			global $CommentList;
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
@@ -529,7 +530,9 @@ while( $Item = & $ItemList->get_item() )
 
 			<?php
 
-			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
+			$Comment = new Comment();
+
+			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
 
 			$Form->begin_form( 'bComment evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
 
@@ -544,10 +547,55 @@ while( $Item = & $ItemList->get_item() )
 			$Form->hidden( 'redirect_to', $ReqURI );
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
-			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment autocomplete_usernames' );
 
-			global $Plugins;
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default') , array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) ) );
+			if( $Item->can_rate() )
+			{	// Comment rating:
+				ob_start();
+				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
+				$comment_rating = ob_get_clean();
+				$Form->info_field( T_('Your vote'), $comment_rating );
+			}
+
+			// Display plugin toolbars:
+			ob_start();
+			echo '<div class="comment_toolbars">';
+			$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
+			echo '</div>';
+			$comment_toolbar = ob_get_clean();
+
+			// Message field:
+			$form_inputstart = $Form->inputstart;
+			$Form->inputstart .= $comment_toolbar;
+			$Form->textarea_input( $dummy_fields['content'], '', 12, T_('Comment text'), array(
+					'cols'  => 40,
+					'class' => 'bComment autocomplete_usernames'
+				) );
+			$Form->inputstart = $form_inputstart;
+
+			// Set b2evoCanvas for plugins:
+			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+
+			if( $Item->can_attach() )
+			{	// Display attach file input field:
+				$Form->input_field( array(
+						'label' => T_('Attach files'),
+						'note'  => get_icon( 'help', 'imgtag', array(
+								'data-toggle'    => 'tooltip',
+								'data-placement' => 'top',
+								'data-html'      => 'true',
+								'title'          => htmlspecialchars( get_upload_restriction( array(
+										'block_after'     => '',
+										'block_separator' => '<br /><br />' ) ) )
+							) ),
+						'name'  => 'uploadfile[]',
+						'type'  => 'file'
+					) );
+			}
+
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default'), array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
 
 			$Form->buttons_input( array(array('name'=>'submit', 'value'=>T_('Send comment'), 'class'=>'SaveButton' )) );
 			?>
@@ -558,6 +606,50 @@ while( $Item = & $ItemList->get_item() )
 			?>
 			<!-- ========== END of FORM to add a comment ========== -->
 			<?php
+
+			// ========== START of links to manage subscriptions ========== //
+			echo '<br /><nav class="evo_post_comment_notification">';
+
+			$notification_icon = get_icon( 'notification' );
+
+			$not_subscribed = true;
+			$creator_User = $Item->get_creator_User();
+
+			if( $Blog->get_setting( 'allow_subscriptions' ) )
+			{
+				$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
+							WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+				if( $DB->get_var( $sql ) > 0 )
+				{
+					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+					echo ' <a href="'.get_notifications_url().'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+					$not_subscribed = false;
+				}
+			}
+
+			if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
+			{
+				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' );
+				echo ' <a href="'.get_notifications_url().'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+				$not_subscribed = false;
+			}
+			if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
+			{
+				global $samedomain_htsrv_url;
+				if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+				{
+					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You will be notified by email when someone comments here.' );
+					echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+				}
+				else
+				{
+					echo '<p class="text-center"><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+				}
+			}
+
+			echo '</nav>';
+			// ========== END of links to manage subscriptions ========== //
+
 			} // / can comment
 		?>
 		</div>
