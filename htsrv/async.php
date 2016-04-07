@@ -255,28 +255,53 @@ switch( $action )
 
 					$blog_ID = param( 'blog', 'integer', true );
 
-					// Get users which are assignees of the blog:
-					$user_perms_SQL = new SQL();
-					$user_perms_SQL->SELECT( 'user_login' );
-					$user_perms_SQL->FROM( 'T_users' );
-					$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-					$user_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$user_perms_SQL->WHERE_and( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
-					$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
+					$BlogCache = & get_BlogCache();
+					$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
-					// Get users which groups are assignees of the blog:
-					$group_perms_SQL = new SQL();
-					$group_perms_SQL->SELECT( 'user_login' );
-					$group_perms_SQL->FROM( 'T_users' );
-					$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
-					$group_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$group_perms_SQL->WHERE_and( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-					$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+					if( $Blog->get( 'advanced_perms' ) )
+					{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
 
-					// Union two sql queries to execute one query and save an order as one list
-					$users_sql = '( '.$user_perms_SQL->get().' )'
-						.' UNION '
-						.'( '.$group_perms_SQL->get().' )'
+						// Get users which can be assignees of the collection:
+						$user_perms_SQL = new SQL();
+						$user_perms_SQL->SELECT( 'user_login' );
+						$user_perms_SQL->FROM( 'T_users' );
+						$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+						$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
+						$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
+						$users_sql[] = $user_perms_SQL->get();
+
+						// Get users which primary groups can be assignees of the collection:
+						$group_perms_SQL = new SQL();
+						$group_perms_SQL->SELECT( 'user_login' );
+						$group_perms_SQL->FROM( 'T_users' );
+						$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
+						$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+						$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+						$users_sql[] = $group_perms_SQL->get();
+
+						// Get users which secondary groups can be assignees of the collection:
+						$secondary_group_perms_SQL = new SQL();
+						$secondary_group_perms_SQL->SELECT( 'user_login' );
+						$secondary_group_perms_SQL->FROM( 'T_users' );
+						$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+						$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
+						$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+						$secondary_group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+						$users_sql[] = $secondary_group_perms_SQL->get();
+					}
+
+					// Get assignees which primary groups have a setting to EDIT ALL collections:
+					$group_setting_SQL = new SQL();
+					$group_setting_SQL->SELECT( 'user_login' );
+					$group_setting_SQL->FROM( 'T_users' );
+					$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+					$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
+					$users_sql[] = $group_setting_SQL->get();
+
+					// Union sql queries to execute one query and save an order as one list:
+					$users_sql = 'SELECT user_login'
+						.' FROM ( ( '.implode( ' ) UNION ( ', $users_sql ).' ) ) AS uu'
+						.' WHERE uu.user_login LIKE "'.$DB->escape( $text ).'%"'
 						.' ORDER BY user_login'
 						.' LIMIT 10';
 					break;
@@ -288,7 +313,7 @@ switch( $action )
 					$SQL->FROM( 'T_users' );
 					$SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
 					$SQL->LIMIT( '10' );
-					$SQL->ORDER_BY('user_login');
+					$SQL->ORDER_BY( 'user_login' );
 					$users_sql = $SQL->get();
 					break;
 			}
