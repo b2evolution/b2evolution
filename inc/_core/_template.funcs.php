@@ -1610,6 +1610,11 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{	// Skip this field because typeahead is initialized before:
 							return;
 						}
+						var ajax_params = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
+						{
+							ajax_params = "&user_type=assignees&blog='.$blog.'";
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1617,7 +1622,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
+									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
 									type: "post",
 									data: { q: query, data_type: "json" },
 									dataType: "JSON",
