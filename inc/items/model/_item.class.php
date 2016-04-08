@@ -6170,19 +6170,20 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add( T_('Skipping email notifications to subscribers because this is not allowed by collection setting "Email subscriptions".'), 'note' );
+			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
-		{	// Don't send notifications about items because it is not allowed:
-			$Messages->add( T_('Skipping email notifications to subscribers because this is not allowed for this item.'), 'note' );
+		{	// Don't send notifications about some post/usages like "special":
+			// Note: this is a safety but this case should never happen, so don't make translators work on this:
+			$Messages->add( 'This post type/usage cannot support notifications: skipping notifications...', 'note' );
 			return array();
 		}
 
 		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
 		{	// Don't send notifications about items with not allowed status:
-			$Messages->add( T_('Skipping email notifications to subscribers because item has no proper status.'), 'note' );
+			$Messages->add( T_('Skipping email notifications to subscribers because item is not published'), 'note' );
 			return array();
 		}
 
@@ -6211,7 +6212,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping notifications...'), 'note' );
+				$Messages->add( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note' );
 				return array();
 			}
 		}
@@ -6429,8 +6430,9 @@ class Item extends ItemLight
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
 		if( ! $this->notifications_allowed() )
-		{	// Don't send pings of items because it is not allowed:
-			$Messages->add( T_('Skipping outbound pings because this is not allowed for this item.'), 'note' );
+		{	// Don't send pings about some post/usages like "special":
+			// Note: this is a safety but this case should never happen, so don't make translators work on this:
+			$Messages->add( 'This post type/usage cannot support pings: skipping pings...', 'note' );
 			return false;
 		}
 
@@ -6463,7 +6465,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping outbound pings...'), 'note' );
+				$Messages->add( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note' );
 				return false;
 			}
 		}

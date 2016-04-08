@@ -3596,7 +3596,7 @@ class Comment extends DataObject
 
 		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
 		{	// Don't send notifications about comments with not allowed status:
-			$Messages->add( T_('Skipping email notifications to subscribers because comment has no proper status.'), 'note' );
+			$Messages->add( T_('Skipping email notifications to subscribers because comment is not published.'), 'note' );
 			return array();
 		}
 
