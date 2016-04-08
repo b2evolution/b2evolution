@@ -845,9 +845,9 @@ switch( $action )
 		}
 
 		// Get params to skip or repeat notifications and pings:
-		param( 'item_members_notified', 'string', false );
-		param( 'item_community_notified', 'string', false );
-		param( 'item_pings_sent', 'string', false );
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
 
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( true, $item_members_notified, $item_community_notified, $item_pings_sent );

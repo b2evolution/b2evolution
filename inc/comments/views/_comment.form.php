@@ -253,6 +253,41 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
 	$Form->end_fieldset();
+
+
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( $edited_Comment->check_notifications_flags( $notify_type ) )
+			{	// Nofications/Pings were sent:
+				$notify_status = T_('Notified');
+				$notify_checkbox_label = T_('Notify again');
+				$notify_checkbox_value = 'force';
+			}
+			else
+			{	// Nofications/Pings are not sent yet:
+				$notify_status = T_('To be notified');
+				$notify_checkbox_label = T_('Skip');
+				$notify_checkbox_value = 'skip';
+			}
+			$Form->info( $notify_title, $notify_status.' &nbsp; &nbsp; '
+					.'<label style="font-weight:normal">'
+						.'<input type="checkbox" name="comment_'.$notify_type.'" value="'.$notify_checkbox_value.'" /> '
+						.$notify_checkbox_label
+					.'</label>' );
+		}
+
+	$Form->end_fieldset();
 	?>
 </div>
 

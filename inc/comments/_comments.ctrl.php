@@ -426,8 +426,12 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			// Comment status was set to published or it was already published, needs to handle notifications:
-			$edited_Comment->handle_notifications( $current_User->ID );
+			// Get params to skip or repeat email notifications:
+			param( 'comment_members_notified', 'string', NULL );
+			param( 'comment_community_notified', 'string', NULL );
+
+			// Execute or schedule email notifications:
+			$edited_Comment->handle_notifications( $current_User->ID, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -456,8 +460,12 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// Comment status was set to published, needs to handle notifications:
-		$edited_Comment->handle_notifications( $current_User->ID );
+		// Get params to skip or repeat email notifications:
+		param( 'comment_members_notified', 'string', NULL );
+		param( 'comment_community_notified', 'string', NULL );
+
+		// Execute or schedule email notifications:
+		$edited_Comment->handle_notifications( $current_User->ID, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
