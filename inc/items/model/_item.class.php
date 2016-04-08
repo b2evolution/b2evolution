@@ -5880,11 +5880,16 @@ class Item extends ItemLight
 	 * - notifications for subscribers
 	 * - pings
 	 *
-	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @param boolean|string Force sending notifications for members:
+	 *                       false - Auto mode depending on current item statuses
+	 *                       'skip' - Skip notifications
+	 *                       'force' - Force notifications
+	 * @param boolean|string Force sending notifications for community (use same values of second param)
+	 * @param boolean|string Force sending outbound pings (use same values of second param)
 	 * @return boolean TRUE on success
 	 */
-	function handle_notifications( $verbose = true, $is_new_item = false )
+	function handle_notifications( $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 
@@ -5907,10 +5912,7 @@ class Item extends ItemLight
 		/*
 		if( $this->get( 'notifications_status' ) != 'noreq' )
 		{	// Pings have been done before, Skip notifications and pings:
-			if( $verbose )
-			{
-				$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
-			}
+			$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
 			return false;
 		}
 		*/
@@ -5921,34 +5923,16 @@ class Item extends ItemLight
 		/*
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send email notifications and outbound pings about not published items:
-			if( $verbose )
-			{
-				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
-			}
+			$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
 			return false;
 		}
 		*/
 
 		// Instead of the above we now check the flags:
-		// fp> Maybe later we may add a "force" param to bypass this and send notifications again
-		if( $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
-		{	// All possible notifications have already been sent:
-			if( $verbose )
-			{
-				$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
-			}
-			return false;
-		}
-
-		// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
-		// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
-		// fp> Maybe later we can add a button to manually "force" notifications even for other usages (as long as they have a permalink)
-		if( $this->get_type_setting( 'usage' ) != 'post' )
-		{	// Don't send email notifications and outbound pings for items that are not regular posts
-			if( $verbose )
-			{
-				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping notifications...'), 'note' );
-			}
+		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
+		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
+		{	// All possible notifications have already been sent and no forcing for any notification:
+			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
 			return false;
 		}
 
@@ -5958,10 +5942,10 @@ class Item extends ItemLight
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
 
 			// Send outbound pings: (will only do something if visibility is 'public')
-			$this->send_outbound_pings( $verbose );
+			$this->send_outbound_pings( $force_pings );
 
 			// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-			$notified_flags = $this->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+			$notified_flags = $this->send_email_notifications( $is_new_item, $already_notified_user_IDs, $force_members, $force_community );
 
 			// Record that we have just notified the members and/or community:
 			$this->set( 'notifications_flags', $notified_flags );
@@ -6003,13 +5987,16 @@ class Item extends ItemLight
 				) );
 
 			// Save cronjob to DB:
-			$item_Cronjob->dbinsert();
+			if( $item_Cronjob->dbinsert() )
+			{
+				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
 
-			// Memorize the cron job ID which is going to handle this post:
-			$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
+				// Memorize the cron job ID which is going to handle this post:
+				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
 
-			// Record that processing has been scheduled:
-			$this->set( 'notifications_status', 'todo' );
+				// Record that processing has been scheduled:
+				$this->set( 'notifications_status', 'todo' );
+			}
 		}
 
 		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
@@ -6027,7 +6014,7 @@ class Item extends ItemLight
 	 */
 	function send_moderation_emails( $is_new_item )
 	{
-		global $Settings, $UserSettings, $DB;
+		global $Settings, $UserSettings, $DB, $Messages;
 
 		// Select all users who are post moderators in this Item's blog
 		$blog_ID = $this->load_Blog();
@@ -6112,19 +6099,21 @@ class Item extends ItemLight
 			}
 			$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
-			// Send the email
-			send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) );
+			// Send the email:
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			{	// A send notification email request to the user with $moderator_ID ID was processed:
+				$notified_user_IDs[] = $moderator_ID;
+			}
 
 			locale_restore_previous();
-
-			// A send notification email request to the user with $moderator_ID ID was processed
-			$notified_user_IDs[] = $moderator_ID;
 		}
 
 		// Record that we have notified the moderators (for info only):
 		$this->set( 'notifications_flags', 'moderators_notified' );
 		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
 		$this->dbupdate( false, false, false );
+
+		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note' );
 
 		return $notified_user_IDs;
 	}
@@ -6137,63 +6126,119 @@ class Item extends ItemLight
 	 *
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
+	 * @param boolean|string Force sending notifications for members:
+	 *                       false - Auto mode depending on current item statuses
+	 *                       'skip' - Skip notifications
+	 *                       'force' - Force notifications
+	 * @param boolean|string Force sending notifications for community (use same values of third param)
 	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL )
+	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
 	{
-		global $DB, $debug;
-
-		$notified_flags = array();
-		$notify_members = false;
-		$notify_community = false;
-
-		if( $this->get( 'status' ) == 'protected' )
-		{	// If the post is visible for members only...
-			if( ! $this->check_notifications_flags( 'members_notified' ) )
-			{	// Members have not been notified yet, do so:
-				$notify_members = true;
-				$notified_flags[] = 'members_notified';
-			}
-			else
-			{	// Members have already been notified, nothing to do:
-				return $notified_flags;
-			}
-		}
-		elseif( $this->get( 'status' ) == 'community' || $this->get( 'status' ) == 'published' )
-		{	// If the post is visible to the community or is public...
-			if( ! $this->check_notifications_flags( 'members_notified' ) )
-			{	// Members have not been notified yet (which means the community has not been notified either), notify them all:
-				$notify_members = true;
-				$notify_community = true;
-				$notified_flags[] = 'members_notified';
-				$notified_flags[] = 'community_notified';
-			}
-			elseif( ! $this->check_notifications_flags( 'community_notified' ) )
-			{	// Community have not been notified yet, do so:
-				$notify_community = true;
-				$notified_flags[] = 'community_notified';
-			}
-			else
-			{	// Everyone has already been notified, nothing to do:
-				return $notified_flags;
-			}
-		}
-		else
-		{	// All other visibility statuses are too "private" to send notifications to subscribers:
-			return $notified_flags;
-		}
-
-		/* fp> we have already checked this is handle_notifications() so no need to do it again here.
-		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send pings of items with these item types:
-			return;
-		}
-		*/
+		global $DB, $debug, $Messages;
 
 		$edited_Blog = & $this->get_Blog();
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
+			$Messages->add( T_('Skipping email notifications to subscribers because this is not allowed by collection setting "Email subscriptions".'), 'note' );
+			return array();
+		}
+
+		if( ! $this->notifications_allowed() )
+		{	// Don't send notifications about items because it is not allowed:
+			$Messages->add( T_('Skipping email notifications to subscribers because this is not allowed for this item.'), 'note' );
+			return array();
+		}
+
+		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
+		{	// Don't send notifications about items with not allowed status:
+			$Messages->add( T_('Skipping email notifications to subscribers because item has no proper status.'), 'note' );
+			return array();
+		}
+
+		if( $force_members == 'skip' && $force_community == 'skip' )
+		{	// Skip subscriber notifications because of it is forced by param:
+			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			return array();
+		}
+
+		if( $force_members == 'force' && $force_community == 'force' )
+		{	// Force to members and community:
+			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+		}
+		elseif( $force_members == 'force' )
+		{	// Force to members only:
+			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+		}
+		elseif( $force_community == 'force' )
+		{	// Force to community only:
+			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+		}
+		else
+		{	// Check if email notifications can be sent for this item currently:
+
+			// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+			if( $this->get_type_setting( 'usage' ) != 'post' )
+			{	// Don't send outbound pings for items that are not regular posts:
+				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping notifications...'), 'note' );
+				return array();
+			}
+		}
+
+		$notify_members = false;
+		$notify_community = false;
+
+		if( $this->get( 'status' ) == 'protected' )
+		{	// If the post is visible for members only...
+			if( $force_members == 'force' || ( ! $this->check_notifications_flags( 'members_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Members have not been notified yet OR Force sending, do so:
+				$notify_members = true;
+			}
+		}
+		elseif( $this->get( 'status' ) == 'community' || $this->get( 'status' ) == 'published' )
+		{	// If the post is visible to the community or is public...
+			if( $force_members == 'force' || ( ! $this->check_notifications_flags( 'members_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Members have not been notified yet OR Force sending, do so:
+				$notify_members = true;
+			}
+			if( $force_community == 'force' || ( ! $this->check_notifications_flags( 'community_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Community have not been notified yet OR Force sending, do so:
+				$notify_community = true;
+			}
+		}
+
+		if( ! $notify_members && ! $notify_community )
+		{	// Everyone has already been notified, nothing to do:
+			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			return array();
+		}
+
+		if( $notify_members && $force_members == 'skip' )
+		{	// Skip email notifications to members because it is forced by param:
+			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$notify_members = false;
+		}
+		if( $notify_community && $force_community == 'skip' )
+		{	// Skip email notifications to community because it is forced by param:
+			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$notify_community = false;
+		}
+
+		// Set flags what really users will be notified below:
+		$notified_flags = array();
+		if( $notify_members )
+		{	// If members should be notified:
+			$notified_flags[] = 'members_notified';
+		}
+		if( $notify_community )
+		{	// If community should be notified:
+			$notified_flags[] = 'community_notified';
+		}
+
+		if( ! $notify_members && ! $notify_community )
+		{	// All notifications are skipped by requested params:
 			return $notified_flags;
 		}
 
@@ -6214,16 +6259,59 @@ class Item extends ItemLight
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( $notify_users );
 
-		if( ! $notify_community )
-		{	// We should send notification only for subscribed members of the collection:
-			foreach( $notify_users as $u => $user_ID )
-			{	// Check each subscribed user:
-				$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
-				if( ! $notify_User || ! $notify_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
-				{	// The user is subscribed but he is not a member, so don't send a notification to him:
+		$members_count = 0;
+		$community_count = 0;
+		foreach( $notify_users as $u => $user_ID )
+		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+			{	// Wrong user, Skip it:
+				unset( $notify_users[ $u ] );
+				continue;
+			}
+			// Check if the user is member of the collection:
+			$is_member = $notify_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() );
+			if( $notify_members && $notify_community )
+			{	// We can notify all subscribed users:
+				if( $is_member )
+				{	// Count subscribed member:
+					$members_count++;
+				}
+				else
+				{	// Count other subscriber:
+					$community_count++;
+				}
+			}
+			elseif( $notify_members )
+			{	// We should notify only members:
+				if( $is_member )
+				{	// Count subscribed member:
+					$members_count++;
+				}
+				else
+				{	// Skip not member:
 					unset( $notify_users[ $u ] );
 				}
 			}
+			else
+			{	// We should notify only community users:
+				if( ! $is_member )
+				{	// Count subscribed community user:
+					$community_count++;
+				}
+				else
+				{	// Skip member:
+					unset( $notify_users[ $u ] );
+				}
+			}
+		}
+
+		if( $notify_members )
+		{	// Display a message to know how much members are notified:
+			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+		}
+		if( $notify_community )
+		{	// Display a message to know how much community users are notified:
+			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
 		}
 
 		if( empty( $notify_users ) )
@@ -6291,45 +6379,61 @@ class Item extends ItemLight
 		blocked_emails_display();
 
 		return $notified_flags;
-
-		/*
-		if( $notify_members )
-		{	// Record that we have just notified the members:
-			$this->set( 'notifications_flags', 'members_notified' );
-		}
-		if( $notify_community )
-		{	// Record that we have just notified the members:
-			$this->set( 'notifications_flags', 'community_notified' );
-		}*/
 	}
 
 
 	/**
 	 * Send outbound pings for a post
 	 *
-	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
+	 * @param boolean|string Force sending outbound pings:
+	 *                       false - Auto mode depending on current item statuses
+	 *                       'skip' - Skip notifications
+	 *                       'force' - Force notifications
 	 * @return boolean TRUE on success
 	 */
-	function send_outbound_pings( $verbose = true )
+	function send_outbound_pings( $force_pings = false )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
+		if( ! $this->notifications_allowed() )
+		{	// Don't send pings of items because it is not allowed:
+			$Messages->add( T_('Skipping outbound pings because this is not allowed for this item.'), 'note' );
+			return false;
+		}
+
 		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send notifications if item is not 'public':
-			return;
+		{	// Don't send pings if item is not 'public':
+			$Messages->add( T_('Skipping outbound pings because item is not published yet.'), 'note' );
+			return false;
 		}
 
-		if( $this->check_notifications_flags( 'pings_sent' ) )
-		{	// Don't send notifications if they have already been sent:
-			return;
+		if( $force_pings == 'skip' )
+		{	// Skip pings because it is forced by param:
+			$Messages->add( T_('Skipping outbound pings.'), 'note' );
+			return false;
 		}
 
-		/* fp> we have already checked this is handle_notifications() so no need to do it again here.
-		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send pings of items with these item types:
-			return;
+		if( $force_pings == 'force' )
+		{	// Force pings:
+			$Messages->add( T_('Force sending outbound pings...'), 'note' );
 		}
-		*/
+		else
+		{	// Check if pings can be sent for this item currently:
+
+			if( $this->check_notifications_flags( 'pings_sent' ) )
+			{	// Don't send pings if they have already been sent:
+				$Messages->add( T_('Skipping outbound pings because they were already sent.'), 'note' );
+				return false;
+			}
+
+			// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+			if( $this->get_type_setting( 'usage' ) != 'post' )
+			{	// Don't send outbound pings for items that are not regular posts:
+				$Messages->add( T_('This post type/usage doesn\'t need notifications: skipping outbound pings...'), 'note' );
+				return false;
+			}
+		}
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -6344,42 +6448,44 @@ class Item extends ItemLight
 				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
 			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
 			&& empty($test_pings_for_real) )
-		{
-			if( $verbose )
-			{
-				$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
-			}
+		{	// Don't send pings from localhost:
+			$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
 			return false;
 		}
-		else foreach( $ping_plugins as $plugin_code )
-		{
-			$Plugin = & $Plugins->get_by_code($plugin_code);
+		else
+		{	// Send pings:
+			$Messages->add( T_('Trying to find plugins for sending outbound pings...'), 'note' );
 
-			if( $Plugin )
+			foreach( $ping_plugins as $plugin_code )
 			{
-				$ping_messages = array();
-				$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
-				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
+				$Plugin = & $Plugins->get_by_code($plugin_code);
 
-				$r = $r && ( $Plugin->ItemSendPing( $params ) );
-
-				if( ! empty( $params['xmlrpcresp'] ) )
+				if( $Plugin )
 				{
-					if( is_a( $params['xmlrpcresp'], 'xmlrpcresp' ) )
-					{
-						// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
-						ob_start();
-						xmlrpc_displayresult( $params['xmlrpcresp'], true );
-						$ping_messages[] = ob_get_contents();
-						ob_end_clean();
-					}
-					else
-					{
-						$ping_messages[] = $params['xmlrpcresp'];
-					}
-				}
+					$ping_messages = array();
+					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
+					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-				$Messages->add( implode( '<br />', $ping_messages ), 'note' );
+					$r = $r && ( $Plugin->ItemSendPing( $params ) );
+
+					if( ! empty( $params['xmlrpcresp'] ) )
+					{
+						if( is_a( $params['xmlrpcresp'], 'xmlrpcresp' ) )
+						{
+							// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
+							ob_start();
+							xmlrpc_displayresult( $params['xmlrpcresp'], true );
+							$ping_messages[] = ob_get_contents();
+							ob_end_clean();
+						}
+						else
+						{
+							$ping_messages[] = $params['xmlrpcresp'];
+						}
+					}
+
+					$Messages->add( implode( '<br />', $ping_messages ), 'note' );
+				}
 			}
 		}
 
@@ -8115,6 +8221,18 @@ class Item extends ItemLight
 
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notifications_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if notifications are allowed for this Item
+	 * (some item types have no permanent URL and thus cannot be sent out with a permalink)
+	 *
+	 * @return boolean TRUE if allowed
+	 */
+	function notifications_allowed()
+	{
+		return ( $this->get_type_setting( 'usage' ) != 'special' );
 	}
 }
 ?>

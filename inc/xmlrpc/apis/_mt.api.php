@@ -270,7 +270,7 @@ function mt_publishPost($m)
 
 	// Execute or schedule notifications & pings:
 	logIO( 'mt_publishPost: Handling notifications...' );
-	$edited_Item->handle_notifications( false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'mt_publishPost: OK.' );
 

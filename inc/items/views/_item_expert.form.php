@@ -784,40 +784,47 @@ $Form->begin_form( '', '', $params );
 
 	// ################### NOTIFICATIONS ###################
 
-	$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
+	if( $edited_Item->notifications_allowed() )
+	{	// Display item notifications settings only when they are allowed:
+		$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
 
-		$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+			$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
 
-		$notify_types = array(
-				'members_notified'   => T_('Members'),
-				'community_notified' => T_('Community'),
-				'pings_sent'         => T_('Public pings'),
-		);
+			$notify_types = array(
+					'members_notified'   => T_('Members'),
+					'community_notified' => T_('Community'),
+					'pings_sent'         => T_('Public pings'),
+			);
 
-		foreach( $notify_types as $notify_type => $notify_title )
-		{
-			if( $edited_Item->get_type_setting( 'usage' ) != 'post' )
-			{	// Item type is not applicable:
-				$notif_info = T_('Not Applicable')
-					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="anyways" disabled="disabled" /> '
-					.( $notify_type == 'pings_sent' ? T_('Ping anyways') : T_('Notify anyways') );
+			foreach( $notify_types as $notify_type => $notify_title )
+			{
+				if( $edited_Item->check_notifications_flags( $notify_type ) )
+				{	// Nofications/Pings were sent:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
+					$notify_checkbox_label = ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again');
+					$notify_checkbox_value = 'force';
+				}
+				elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+				{	// Item type is not applicable:
+					$notify_status = T_('Not Applicable');
+					$notify_checkbox_label = ( $notify_type == 'pings_sent' ) ? T_('Ping anyways') : T_('Notify anyways');
+					$notify_checkbox_value = 'force';
+				}
+				else
+				{	// Nofications/Pings are not sent yet:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('To be sent') : T_('To be notified');
+					$notify_checkbox_label = T_('Skip');
+					$notify_checkbox_value = 'skip';
+				}
+				$Form->info( $notify_title, $notify_status.' &nbsp; &nbsp; '
+						.'<label style="font-weight:normal">'
+							.'<input type="checkbox" name="item_'.$notify_type.'" value="'.$notify_checkbox_value.'" /> '
+							.$notify_checkbox_label
+						.'</label>' );
 			}
-			elseif( $edited_Item->check_notifications_flags( $notify_type ) )
-			{	// Nofications/Pings were sent:
-				$notif_info = ( $notify_type == 'pings_sent' ? T_('Sent') : T_('Notified') )
-					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="again" disabled="disabled" /> '
-					.( $notify_type == 'pings_sent' ? T_('Send again') : T_('Notify again') );
-			}
-			else
-			{	// Nofications/Pings are not sent yet:
-				$notif_info = ( $notify_type == 'pings_sent' ? T_('To be sent') : T_('To be notified') )
-					.' &nbsp; &nbsp; <input type="checkbox" name="item_'.$notify_type.'" value="skip" disabled="disabled" /> '
-					.T_('Skip');
-			}
-			$Form->info( $notify_title, $notif_info );
-		}
 
-	$Form->end_fieldset();
+		$Form->end_fieldset();
+	}
 
 
 	// ################### QUICK SETTINGS ###################

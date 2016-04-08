@@ -1460,7 +1460,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_notifications( true, true );
+	$edited_Item->handle_notifications( true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));

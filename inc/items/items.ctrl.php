@@ -844,8 +844,13 @@ switch( $action )
 			}
 		}
 
+		// Get params to skip or repeat notifications and pings:
+		param( 'item_members_notified', 'string', false );
+		param( 'item_community_notified', 'string', false );
+		param( 'item_pings_sent', 'string', false );
+
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( $exit_after_save, true );
+		$edited_Item->handle_notifications( true, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -1018,8 +1023,13 @@ switch( $action )
 			}
 		}
 
+		// Get params to skip or repeat notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( $exit_after_save );
+		$edited_Item->handle_notifications( false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1296,8 +1306,13 @@ switch( $action )
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
 
+		// Get params to skip or repeat notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications();
+		$edited_Item->handle_notifications( false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )
