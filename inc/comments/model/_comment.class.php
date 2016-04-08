@@ -3379,7 +3379,7 @@ class Comment extends DataObject
 	 *
 	 * Should be called only when a new comment was posted or when a comment status was changed to published
 	 *
-	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user or current logged in User
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 * @param boolean|string Force sending notifications for members:
 	 *                       false - Auto mode depending on current item statuses
@@ -3397,6 +3397,12 @@ class Comment extends DataObject
 		if( $notifications_mode == 'off' )
 		{	// Don't send notifications:
 			return false;
+		}
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
 		}
 
 		// FIRST: Moderators need to be notified immediately, even if the comment is a draft/review.
@@ -3487,13 +3493,19 @@ class Comment extends DataObject
 	/**
 	 * Send "comment may need moderation" notifications for those users who have permission to moderate this comment and would like to receive these notifications.
 	 *
-	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user or current logged in User
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 * @return array The notified user IDs
 	 */
 	function send_moderation_emails( $executed_by_userid = NULL, $is_new_comment = false )
 	{
 		global $Settings, $UserSettings, $Messages;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
 
 		$UserCache = & get_UserCache();
 
@@ -3540,7 +3552,7 @@ class Comment extends DataObject
 
 		$notified_user_IDs = array_keys( $notify_users );
 
-		if( $executed_by_userid != NULL && isset( $notify_users[ $executed_by_userid ] ) )
+		if( $executed_by_userid !== NULL && isset( $notify_users[ $executed_by_userid ] ) )
 		{	// Don't notify the user who just created/updated this comment:
 			unset( $notify_users[ $executed_by_userid ] );
 		}
@@ -3562,7 +3574,7 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to subscribed users
 	 *
-	 * @param integer the user ID who executed the action which will be notified, or NULL if it was executed by an anonymous user
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user or current logged in User
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 * @param array The already notified user IDs
 	 * @param boolean|string Force sending notifications for members:
@@ -3575,6 +3587,12 @@ class Comment extends DataObject
 	function send_email_notifications( $executed_by_userid = NULL, $is_new_comment = false, $already_notified_user_IDs = array(), $force_members = false, $force_community = false )
 	{
 		global $DB, $Settings, $UserSettings, $Messages;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
 
 		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
 		{	// Don't send notifications about comments with not allowed status:
@@ -3761,7 +3779,7 @@ class Comment extends DataObject
 			$notify_users = $DB->get_assoc( $meta_SQL->get(), $meta_SQL->title );
 		}
 
-		if( $executed_by_userid != NULL && isset( $notify_users[ $executed_by_userid ] ) )
+		if( $executed_by_userid !== NULL && isset( $notify_users[ $executed_by_userid ] ) )
 		{	// Don't notify the user who just created/updated this comment:
 			unset( $notify_users[ $executed_by_userid ] );
 		}

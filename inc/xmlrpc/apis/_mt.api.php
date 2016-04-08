@@ -230,7 +230,7 @@ $mt_publishPost_doc = 'Published a post';
  */
 function mt_publishPost($m)
 {
-	global $localtimenow, $DB;
+	global $localtimenow, $DB, $current_User;
 
 	// CHECK LOGIN:
 	/**

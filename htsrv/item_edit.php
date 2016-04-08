@@ -237,7 +237,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( true );
+		$edited_Item->handle_notifications( NULL, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 

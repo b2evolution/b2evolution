@@ -850,7 +850,7 @@ switch( $action )
 		param( 'item_pings_sent', 'string', NULL );
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( true, $item_members_notified, $item_community_notified, $item_pings_sent );
+		$edited_Item->handle_notifications( NULL, true, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -1029,7 +1029,7 @@ switch( $action )
 		param( 'item_pings_sent', 'string', NULL );
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( false, $item_members_notified, $item_community_notified, $item_pings_sent );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1312,7 +1312,7 @@ switch( $action )
 		param( 'item_pings_sent', 'string', NULL );
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( false, $item_members_notified, $item_community_notified, $item_pings_sent );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )

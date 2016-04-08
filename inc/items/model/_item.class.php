@@ -5880,6 +5880,7 @@ class Item extends ItemLight
 	 * - notifications for subscribers
 	 * - pings
 	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param boolean|string Force sending notifications for members:
 	 *                       false - Auto mode depending on current item statuses
@@ -5889,7 +5890,7 @@ class Item extends ItemLight
 	 * @param boolean|string Force sending outbound pings (use same values of second param)
 	 * @return boolean TRUE on success
 	 */
-	function handle_notifications( $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
+	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 
@@ -5901,10 +5902,16 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
+
 		// FIRST: Moderators need to be notified immediately, even if the post is a draft/review and/or has an issue_date in the future.
 		// fp> NOTE: for simplicity, for now, we will NOT make a scheduled job for this (but we will probably do so in the future)
 		// Send email notifications to users who can moderate this item:
-		$already_notified_user_IDs = $this->send_moderation_emails( $is_new_item );
+		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_item );
 
 		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
 
@@ -5945,7 +5952,7 @@ class Item extends ItemLight
 			$this->send_outbound_pings( $force_pings );
 
 			// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-			$notified_flags = $this->send_email_notifications( $is_new_item, $already_notified_user_IDs, $force_members, $force_community );
+			$notified_flags = $this->send_email_notifications( $executed_by_userid, $is_new_item, $already_notified_user_IDs, $force_members, $force_community );
 
 			// Record that we have just notified the members and/or community:
 			$this->set( 'notifications_flags', $notified_flags );
@@ -5982,6 +5989,7 @@ class Item extends ItemLight
 			// params: specify which post this job is supposed to send notifications for:
 			$item_Cronjob->set( 'params', array(
 					'item_ID'                   => $this->ID,
+					'executed_by_userid'        => $executed_by_userid,
 					'is_new_item'               => $is_new_item,
 					'already_notified_user_IDs' => $already_notified_user_IDs,
 					'force_members'             => $force_members,
@@ -6012,12 +6020,19 @@ class Item extends ItemLight
 	/**
 	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
 	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_moderation_emails( $is_new_item )
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
 	{
 		global $Settings, $UserSettings, $DB, $Messages;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
 
 		// Select all users who are post moderators in this Item's blog
 		$blog_ID = $this->load_Blog();
@@ -6043,6 +6058,10 @@ class Item extends ItemLight
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
+		if( $executed_by_userid !== NULL )
+		{	// Don't notify the user who just created/updated this post:
+			$SQL->WHERE_and( 'user_ID != '.$DB->quote( $executed_by_userid ) );
+		}
 
 		$post_moderators = $DB->get_assoc( $SQL->get() );
 
@@ -6127,6 +6146,7 @@ class Item extends ItemLight
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
 	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
 	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
 	 * @param boolean|string Force sending notifications for members:
@@ -6136,9 +6156,15 @@ class Item extends ItemLight
 	 * @param boolean|string Force sending notifications for community (use same values of third param)
 	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
 	{
 		global $DB, $debug, $Messages;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
 
 		$edited_Blog = & $this->get_Blog();
 
@@ -6255,6 +6281,10 @@ class Item extends ItemLight
 		if( ! empty( $already_notified_user_IDs ) )
 		{	// Create condition to not select already notified moderator users:
 			$SQL->WHERE_and( 'sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )' );
+		}
+		if( $executed_by_userid !== NULL )
+		{	// Don't notify the user who just created/updated this post:
+			$SQL->WHERE_and( 'sub_user_ID != '.$DB->quote( $executed_by_userid ) );
 		}
 		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
 

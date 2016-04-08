@@ -431,7 +431,7 @@ switch( $action )
 			param( 'comment_community_notified', 'string', NULL );
 
 			// Execute or schedule email notifications:
-			$edited_Comment->handle_notifications( $current_User->ID, false, $comment_members_notified, $comment_community_notified );
+			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -465,7 +465,7 @@ switch( $action )
 		param( 'comment_community_notified', 'string', NULL );
 
 		// Execute or schedule email notifications:
-		$edited_Comment->handle_notifications( $current_User->ID, false, $comment_members_notified, $comment_community_notified );
+		$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
