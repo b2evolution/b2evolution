@@ -30,6 +30,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 
 	$Form->begin_form( 'evo_item_workflow_form' );
 
+	echo '<a name="workflow_panel"></a>';
 	$Form->begin_fieldset( T_('Workflow properties') );
 
 	echo '<div class="evo_item_workflow_form__fields">';

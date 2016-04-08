@@ -19,7 +19,7 @@ $params = array_merge( array(
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
 	), $params );
 
-global $Item, $cat;
+global $Item, $cat, $disp;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -62,7 +62,11 @@ elseif( $comments_number > 25 )
 	$legend_icons['topic_popular'] = 1;
 }
 $Item->load_Blog();
-$use_workflow = $Item->Blog->get_setting( 'use_workflow' );
+$use_workflow = ( $disp == 'posts' ) &&
+    ! empty( $Item ) &&
+    is_logged_in() &&
+    $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item );
 ?>
 
 <article class="container group_row posts_panel">
@@ -179,13 +183,14 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 	{ // ==========================================================================================================================
 		$assigned_User = $Item->get_assigned_User();
 		$priority_color = item_priority_color( $Item->priority );
-
-		echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+		$url = $Item->get_permanent_url().'#workflow_panel';
 
 		if( $assigned_User )
 		{
-			echo '<span style="color: '.$priority_color.';">'.T_('Assigned to:').'</span>';
-			echo '<br />';
+			echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+			echo '<div class="ft_assigned_header">';
+			echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+			echo '</div>';
 
 			// Assigned user avatar
 			$Item->assigned_to2( array(
@@ -203,12 +208,15 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 		}
 		else
 		{
-			echo '<span style="color: '.$priority_color.';">'.T_('Not assigned').'</span>';
-			echo '<div class="ft_not_assigned">';;
+			echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-">';
+			echo '<div class="ft_assigned_header">';
+			echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
+			echo '</div>';
+			echo '<div class="ft_assigned_info">';
 		}
 
 		// Workflow status
-		echo '<span>'.item_td_task_cell( 'status', $Item, false ).'</span>';
+		echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
 		echo '</div></div>';
 	}	// ==========================================================================================================================
 
@@ -216,7 +224,7 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 	if( $use_workflow )
 	{ // ==========================================================================================================================
 		echo '<div class="ft_date col-lg-2 col-md-2 col-sm-3">';
-
+		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
 			echo T_('n.a.');
@@ -229,11 +237,11 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 		{	// No replies yet:
 			printf( T_('%s replies'), '0' );
 		}
-		echo '<br />';
+		echo '</div>';
 	} // ==========================================================================================================================
 	else
 	{ // --------------------------------------------------------------------------------------------------------------------------
-		echo '<div class="ft_date col-lg-3 col-md-3 col-sm-4">';
+		echo '<div class="ft_date col-lg-3 col-md-3 col-sm-4" style="margin-top: 12px;">';
 	} // --------------------------------------------------------------------------------------------------------------------------
 
 	if( $latest_Comment = & $Item->get_latest_Comment() )
@@ -302,6 +310,7 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 		<?php
 		if( $use_workflow )
 		{ // ==========================================================================================================================
+			echo '<div class="ft_date_header">';
 			if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 			{ // The comments are disabled:
 				echo T_('n.a.');
@@ -314,7 +323,7 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 			{	// No replies yet:
 				printf( T_('%s replies'), '0' );
 			}
-			echo '<br />';
+			echo '</div>';
 		} // ==========================================================================================================================
 		if( $latest_Comment = & $Item->get_latest_Comment() )
 		{ // Display info about last comment

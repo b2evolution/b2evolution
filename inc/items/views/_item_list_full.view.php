@@ -362,7 +362,7 @@ while( $Item = & $ItemList->get_item() )
 			if( isset($GLOBALS['files_Module']) )
 			{ // Files:
 				echo '<div class="bPostAttachments">';	// TODO
-	
+
 				/**
 				 * Needed by file display funcs
 				 * @var Item
