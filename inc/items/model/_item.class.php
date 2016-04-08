@@ -5983,7 +5983,10 @@ class Item extends ItemLight
 			$item_Cronjob->set( 'params', array(
 					'item_ID'                   => $this->ID,
 					'is_new_item'               => $is_new_item,
-					'already_notified_user_IDs' => $already_notified_user_IDs
+					'already_notified_user_IDs' => $already_notified_user_IDs,
+					'force_members'             => $force_members,
+					'force_community'           => $force_community,
+					'force_pings'               => $force_pings,
 				) );
 
 			// Save cronjob to DB:

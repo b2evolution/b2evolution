@@ -3462,6 +3462,8 @@ class Comment extends DataObject
 					'executed_by_userid'        => $executed_by_userid,
 					'is_new_comment'            => $is_new_comment,
 					'already_notified_user_IDs' => $already_notified_user_IDs,
+					'force_members'             => $force_members,
+					'force_community'           => $force_community,
 				) );
 
 			// Save cronjob to DB:

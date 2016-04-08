@@ -47,8 +47,13 @@ $ItemCache = & get_ItemCache();
  */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
-$is_new_item = empty( $job_params['is_new_item'] ) ? true : $job_params['is_new_item'];
-$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+$job_params = array_merge( array(
+		'is_new_item'               => true,
+		'already_notified_user_IDs' => NULL,
+		'force_members'             => false,
+		'force_community'           => false,
+		'force_pings'               => false,
+	), $job_params );
 
 $previous_item_visibility_status = '';
 
@@ -56,10 +61,10 @@ $previous_item_visibility_status = '';
 while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 {
 	// Send outbound pings: (will only do something if visibility is 'public')
-	$edited_Item->send_outbound_pings();
+	$edited_Item->send_outbound_pings( $job_params['force_pings'] );
 
 	// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Item->send_email_notifications( $is_new_item, $already_notified_user_IDs );
+	$notified_flags = $edited_Item->send_email_notifications( $job_params['is_new_item'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Item->set( 'notifications_flags', $notified_flags );

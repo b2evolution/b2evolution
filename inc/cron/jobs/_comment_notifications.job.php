@@ -45,9 +45,13 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
-$executed_by_userid = empty( $job_params['executed_by_userid'] ) ? NULL : $job_params['executed_by_userid'];
-$is_new_comment = empty( $job_params['is_new_comment'] ) ? true : $job_params['is_new_comment'];
-$already_notified_user_IDs = empty( $job_params['already_notified_user_IDs'] ) ? NULL : $job_params['already_notified_user_IDs'];
+$job_params = array_merge( array(
+		'executed_by_userid'        => NULL,
+		'is_new_comment'            => true,
+		'already_notified_user_IDs' => NULL,
+		'force_members'             => false,
+		'force_community'           => false,
+	), $job_params );
 
 $previous_comment_visibility_status = '';
 
@@ -55,7 +59,7 @@ $previous_comment_visibility_status = '';
 while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 {
 	// Send email notifications to users who want to receive them for the collection of this comment: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Comment->send_email_notifications( $executed_by_userid, $is_new_comment, $already_notified_user_IDs );
+	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Comment->set( 'notif_flags', $notified_flags );
@@ -73,7 +77,7 @@ while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 	$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 }
 
-$edited_Comment = $Messages->get_string( '', '', "\n" );
+$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
 	$result_message = T_('Done.');
