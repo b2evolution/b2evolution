@@ -802,7 +802,7 @@ function sort_links_by_filename( $a, $b )
 
 	if( $a_type === $b_type )
 	{
-		$r = strcmp( $a_File->_name, $b_File->_name );
+		$r = strnatcmp( $a_File->_name, $b_File->_name );
 	}
 	elseif( $a_type == 'directory' )
 	{
