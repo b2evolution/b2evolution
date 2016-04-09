@@ -1393,7 +1393,7 @@ switch( $action )
 		}
 
 		// Current user must have at least view permission to see users login:
-		//$current_User->check_perm( 'users', 'view', true );
+		$current_User->check_perm( 'users', 'view', true );
 
 		// What data type return: 'json' or as multilines by default
 		$data_type = param( 'data_type', 'string', '' );
