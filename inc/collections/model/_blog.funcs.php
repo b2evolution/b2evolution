@@ -170,8 +170,6 @@ function blog_update_perms( $blog, $context = 'user' )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
-/*
-// TODO: add secondary groups check!
 	// Unassign users that no longer can be assignees from the items of the collection:
 	$DB->query( 'UPDATE T_items__item
 			SET post_assigned_user_ID = NULL
@@ -194,6 +192,14 @@ function blog_update_perms( $blog, $context = 'user' )
 		      FROM T_users INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
 		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT sug_user_ID
+		      FROM T_users__secondary_user_groups
+		     INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID
+		     WHERE bloggroup_can_be_assignee = 1
+		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
 		  )' );
 
 	if( $DB->rows_affected > 0 )
@@ -201,8 +207,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		global $Messages;
 		$Messages->add( sprintf( '%d tasks have lost their assignee due to new permissions (this may include fixes to older inconsistencies in the DB).', $DB->rows_affected ), 'warning' );
 	}
-*/
-	
+
 	// BLOCK CACHE INVALIDATION:
 	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
 	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
