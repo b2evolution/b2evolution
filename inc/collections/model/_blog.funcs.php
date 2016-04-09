@@ -170,7 +170,9 @@ function blog_update_perms( $blog, $context = 'user' )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
-	// Unassign users from the items of the blog
+/*
+// TODO: add secondary groups check!
+	// Unassign users that no longer can be assignees from the items of the collection:
 	$DB->query( 'UPDATE T_items__item
 			SET post_assigned_user_ID = NULL
 		WHERE post_main_cat_ID IN
@@ -199,7 +201,8 @@ function blog_update_perms( $blog, $context = 'user' )
 		global $Messages;
 		$Messages->add( sprintf( '%d tasks have lost their assignee due to new permissions (this may include fixes to older inconsistencies in the DB).', $DB->rows_affected ), 'warning' );
 	}
-
+*/
+	
 	// BLOCK CACHE INVALIDATION:
 	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
 	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
