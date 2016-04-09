@@ -150,8 +150,8 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(),
 					T_('Refresh'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
 
-			.action_icon( T_('Sort'), '', $admin_url
-					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;sort_links=1',
+					.action_icon( T_('Sort'), 'ascending', $admin_url
+					.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
 					T_('Sort'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
 
 			.'</span>';
@@ -789,5 +789,30 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 	{
 		$DB->rollback();
 	}
+}
+
+
+function sort_links_by_filename( $a, $b )
+{
+	$a_File = $a->get_File();
+	$b_File = $b->get_File();
+
+	$a_type = $a_File->dir_or_file();
+	$b_type = $b_File->dir_or_file();
+
+	if( $a_type === $b_type )
+	{
+		$r = strcmp( $a_File->_name, $b_File->_name );
+	}
+	elseif( $a_type == 'directory' )
+	{
+		$r = -1;
+	}
+	else
+	{
+		$r = 1;
+	}
+
+	return $r;
 }
 ?>

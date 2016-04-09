@@ -38,7 +38,6 @@ if( empty( $Blog ) )
 // Name of the iframe we want some actions to come back to:
 $iframe_name = param( 'iframe_name', 'string', '', true );
 $link_type = param( 'link_type', 'string', 'item', true );
-$sort_links = param( 'sort_links', 'integer', 0 );
 
 $SQL = $LinkOwner->get_SQL();
 
@@ -84,45 +83,11 @@ $Results->cols[] = array(
 						'td' => '%link_add_iframe( display_subtype( #link_ID# ) )%',
 					);
 
-
-/**
- * Destination column
- */
-function link_filename_order_callback( $a, $b, $order )
-{
-	global $LinkOwner;
-
-	$link_a = $LinkOwner->get_link_by_link_ID( $a->link_ID );
-	$link_b = $LinkOwner->get_link_by_link_ID( $b->link_ID );
-	$type_a = $link_a->get_File()->dir_or_file();
-	$type_b = $link_b->get_File()->dir_or_file();
-
-	if( $type_a === $type_b )
-	{
-		$r = strnatcmp( basename( $a->file_path ), basename( $b->file_path ) );
-	}
-	else
-	{
-		$r = ( $type_a == 'directory' ? -1 : 1 ); // directories first
-	}
-
-	if( $order == 'DESC' )
-	{
-		$r = -$r;
-	}
-
-	return $r;
-}
-$dest_col = array(
+$Results->cols[] = array(
 						'th' => T_('Destination'),
 						'td' => '%link_add_iframe( link_destination() )%',
 						'td_class' => 'fm_filename',
 					);
-if( $sort_links )
-{
-	$dest_col['order_rows_callback'] = 'link_filename_order_callback';
-}
-$Results->cols[] = $dest_col;
 
 $Results->cols[] = array(
 						'th' => T_('Link ID'),
