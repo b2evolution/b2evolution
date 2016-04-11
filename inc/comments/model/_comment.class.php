@@ -3382,9 +3382,10 @@ class Comment extends DataObject
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user or current logged in User
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 * @param boolean|string Force sending notifications for members:
-	 *                       false - Auto mode depending on current item statuses
-	 *                       'skip' - Skip notifications
+	 *                       false   - Auto mode depending on current item statuses
+	 *                       'skip'  - Skip notifications
 	 *                       'force' - Force notifications
+	 *                       'mark'  - Change DB flag to "notified" but do NOT actually send notifications
 	 * @param boolean|string Force sending notifications for community (use same values of third param)
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_comment = false, $force_members = false, $force_community = false )
@@ -3411,21 +3412,24 @@ class Comment extends DataObject
 
 		// SECOND: Subscribers may be notified asynchornously...
 
-		// NEW: notifications will now happen multiple times, as the visibility status progresses, so the test below is not valid any more:
-		/*
-		if( $this->get( 'notif_status' ) != 'noreq' )
-		{	// Notification is already done for this comment, or it is in progress:
-			return false;
+		$notified_flags = array();
+		if( $force_members == 'mark' )
+		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
+			$force_members = false;
+			$notified_flags[] = 'members_notified';
+			$Messages->add( T_('Marking flag of email notifications that members have been notified.'), 'note' );
 		}
-
-		// NEW: notifications will now be sent for the following statuses: Members, Community and Public
-		// Reference: http://b2evolution.net/man/visibility-status
-		// So the following is no longer valid:
-		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send notifications about non-published comments:
-			return false;
+		if( $force_community == 'mark' )
+		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
+			$force_community = false;
+			$notified_flags[] = 'community_notified';
+			$Messages->add( T_('Marking flag of email notifications that community users have been notified.'), 'note' );
 		}
-		*/
+		if( ! empty( $notified_flags ) )
+		{	// Save the marked processing status to DB:
+			$this->set( 'notif_flags', $notified_flags );
+			$this->dbupdate();
+		}
 
 		// Instead of the above we now check the flags:
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&

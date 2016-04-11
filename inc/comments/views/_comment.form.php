@@ -269,22 +269,23 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		foreach( $notify_types as $notify_type => $notify_title )
 		{
 			if( $edited_Comment->check_notifications_flags( $notify_type ) )
-			{	// Nofications/Pings were sent:
+			{	// Nofications were sent:
 				$notify_status = T_('Notified');
-				$notify_checkbox_label = T_('Notify again');
-				$notify_checkbox_value = 'force';
+				$notify_select_options = array(
+						''      => T_('Done'),
+						'force' => T_('Notify again')
+					);
 			}
 			else
-			{	// Nofications/Pings are not sent yet:
+			{	// Nofications are not sent yet:
 				$notify_status = T_('To be notified');
-				$notify_checkbox_label = T_('Skip');
-				$notify_checkbox_value = 'skip';
+				$notify_select_options = array(
+						''     => T_('Notify on next save'),
+						'skip' => T_('Skip on next save'),
+						'mark' => T_('Mark as Notified')
+					);
 			}
-			$Form->info( $notify_title, $notify_status.' &nbsp; &nbsp; '
-					.'<label style="font-weight:normal">'
-						.'<input type="checkbox" name="comment_'.$notify_type.'" value="'.$notify_checkbox_value.'" /> '
-						.$notify_checkbox_label
-					.'</label>' );
+			$Form->select_input_array( 'comment_'.$notify_type, get_param( 'comment_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
 		}
 
 	$Form->end_fieldset();

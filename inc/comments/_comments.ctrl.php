@@ -426,7 +426,7 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			// Get params to skip or repeat email notifications:
+			// Get params to skip/force/mark email notifications:
 			param( 'comment_members_notified', 'string', NULL );
 			param( 'comment_community_notified', 'string', NULL );
 
@@ -460,7 +460,7 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// Get params to skip or repeat email notifications:
+		// Get params to skip/force/mark email notifications:
 		param( 'comment_members_notified', 'string', NULL );
 		param( 'comment_community_notified', 'string', NULL );
 
