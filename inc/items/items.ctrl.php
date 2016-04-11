@@ -719,6 +719,11 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
 
@@ -844,11 +849,6 @@ switch( $action )
 			}
 		}
 
-		// Get params to skip or repeat notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
-
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, true, $item_members_notified, $item_community_notified, $item_pings_sent );
 
@@ -922,6 +922,11 @@ switch( $action )
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
+
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -1022,11 +1027,6 @@ switch( $action )
 				trackbacks( $trackback_url, $edited_Item );
 			}
 		}
-
-		// Get params to skip or repeat notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
 
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
@@ -1306,7 +1306,7 @@ switch( $action )
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
 
-		// Get params to skip or repeat notifications and pings:
+		// Get params to skip/force/mark notifications and pings:
 		param( 'item_members_notified', 'string', NULL );
 		param( 'item_community_notified', 'string', NULL );
 		param( 'item_pings_sent', 'string', NULL );
