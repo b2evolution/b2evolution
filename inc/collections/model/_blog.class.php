@@ -419,7 +419,41 @@ class Blog extends DataObject
 
 			// Collection permissions:
 			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
+			if( $prev_allow_access != $this->get_setting( 'allow_access' ) )
+			{	// If setting "Allow access to" is changed to:
+				switch( $this->get_setting( 'allow_access' ) )
+				{	// Automatically enable/disable moderation statuses:
+					case 'public':
+						// Enable "Community" and "Members":
+						$enable_moderation_statuses = array( 'community', 'protected' );
+						break;
+					case 'users':
+						// Disable "Community" and Enable "Members":
+						$disable_moderation_statuses = array( 'community' );
+						$enable_moderation_statuses = array( 'protected' );
+						break;
+					case 'members':
+						// Disable "Community" and "Members":
+						$disable_moderation_statuses = array( 'community', 'protected' );
+						break;
+				}
+				$post_moderation_statuses = empty( $this->get_setting( 'post_moderation_statuses' ) ) ? array() : explode( ',', $this->get_setting( 'post_moderation_statuses' ) );
+				$comment_moderation_statuses = empty( $this->get_setting( 'moderation_statuses' ) ) ? array() : explode( ',', $this->get_setting( 'moderation_statuses' ) );
+				if( ! empty( $disable_moderation_statuses ) )
+				{	// Disable moderation statuses:
+					$post_moderation_statuses = array_diff( $post_moderation_statuses, $disable_moderation_statuses );
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_moderation_statuses );
+				}
+				if( ! empty( $enable_moderation_statuses ) )
+				{	// Enable moderation statuses:
+					$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
+					$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
+				}
+				$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+				$this->set_setting( 'moderation_statuses', implode( ',', $comment_moderation_statuses ) );
+			}
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
 				$this->set_setting( 'enable_sitemaps', 0 );
