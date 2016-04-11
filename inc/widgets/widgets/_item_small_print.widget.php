@@ -163,7 +163,7 @@ class item_small_print_Widget extends ComponentWidget
 					'thumb_class' => 'leftmargin',
 				) );
 
-			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
+			if( isset( $Skin ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
 						'before'      => /* TRANS: date */ T_('This entry was posted on '),

@@ -55,14 +55,12 @@ $params = array_merge( array(
 		}
 		echo "</h2>";
 
-		if( (!$Item->is_intro()) && $Skin->get_setting( 'display_post_date') )
-		{	// Display only if we're *not* displaying an intro post AND we want to see the date:
-			$Item->issue_time( array(
-					'before'      => '<small>',
-					'after'       => '</small>',
-					'time_format' => 'F jS, Y',
-				) );
-		}
+		// Display only if we're *not* displaying an intro post AND we want to see the date:
+		$Item->issue_time( array(
+				'before'      => '<small>',
+				'after'       => '</small>',
+				'time_format' => 'F jS, Y',
+			) );
 	?>
 
 	<?php

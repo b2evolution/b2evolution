@@ -114,12 +114,6 @@ class bootstrap_forums_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Forum Display Settings')
 				),
-					'display_post_date' => array(
-						'label' => T_('Post date'),
-						'note' => T_('Display the date of each post'),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-					),
 					'banner_public' => array(
 						'label' => T_('Display "Public" banner'),
 						'note' => T_('Display banner for "Public" posts (posts & comments)'),
@@ -321,13 +315,13 @@ class bootstrap_forums_Skin extends Skin
 
 		// Add custom CSS:
 		$custom_css = '';
-		
-		
+
+
 		// If sidebar == true + col-lg
 		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
 		{
 			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date { 
+				.forums_list .ft_date {
 					white-space: normal;
 					margin-top: 11px;
 				}
@@ -337,7 +331,7 @@ class bootstrap_forums_Skin extends Skin
 				\n
 			}";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{ // Function for custom_css:
 		$custom_css = '<style type="text/css">
@@ -346,7 +340,7 @@ class bootstrap_forums_Skin extends Skin
 -->
 		</style>';
 		add_headline( $custom_css );
-		}			
+		}
 	}
 
 

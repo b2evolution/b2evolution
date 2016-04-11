@@ -55,12 +55,6 @@ class pureforums_Skin extends Skin
 						array( 'square', T_('Original pictures with square corners') ) ),
 					'field_lines' => true,
 				),
-				'display_post_date' => array(
-					'label' => T_('Post date'),
-					'note' => T_('Display the date of each post'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
