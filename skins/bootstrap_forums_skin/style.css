@@ -183,9 +183,6 @@ ol.breadcrumb {
   display: inline-block;
   white-space: normal !important;
 }
-.forums_list .posts_panel .ft_author_info.shrinked {
-  display: none;
-}
 .forums_list .posts_panel .ft_date {
   text-align: left;
 }
@@ -244,6 +241,25 @@ ol.breadcrumb {
 }
 .forums_list .ft_assigned .ft_assigned_info {
   padding-left: 42px;
+}
+.forums_list .ft_not_assigned {
+  font-size: 90%;
+  line-height: 16px;
+  margin-top: 3px;
+}
+.forums_list .ft_not_assigned div.ft_assigned_header {
+  margin-bottom: 5px;
+}
+.forums_list .ft_not_assigned span.user.anonymous,
+.forums_list .ft_not_assigned span.identity_link_username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+}
+.forums_list .ft_not_assigned .ft_assigned_info {
+  padding-left: 0px;
 }
 .forums_list .ft_not_assigned {
   font-size: 90%;
@@ -348,9 +364,6 @@ ol.breadcrumb {
   font-size: 16px;
   margin: 0px;
   display: inline;
-}
-.forums_list.single_topic .panel-heading .ft_author_info.shrinked {
-  display: none;
 }
 .evo_comment_title a.permalink {
   color: #337ab7;
@@ -534,9 +547,6 @@ ul.legend span.note {
 }
 .single_page_title {
   margin-bottom: 20px;
-}
-.single_page_title .ft_author_info.shrinked {
-  display: none;
 }
 .single_topic {
   /* LATEST CHANGE
@@ -792,6 +802,10 @@ label.control-label[for=post_title] {
     padding-left: 0px;
     margin-left: 0px;
   }
+  .table-hover .group_row .ft_not_assigned {
+    padding-left: 0px;
+    margin-top: 4px;
+  }
   .table-hover .group_row .ft_assigned {
     padding-left: 0px;
     margin-top: 4px;
@@ -859,9 +873,6 @@ label.control-label[for=post_title] {
   .single_page_title .ft_author_info {
     display: none;
   }
-  .single_page_title .ft_author_info.shrinked {
-    display: block !important;
-  }
   /* Disp front */
   .front_panel .table-hover .group_row .ft_count {
     width: 77px;
@@ -897,15 +908,9 @@ label.control-label[for=post_title] {
   .posts_panel .ft_author_info {
     display: none !important;
   }
-  .posts_panel .ft_author_info.shrinked {
-    display: inline;
-  }
   /* Disp Single */
   .forums_list.single_topic section.panel .panel-body .pager {
     display: none;
-  }
-  .ft_author_info.shrinked {
-    display: block !important;
   }
   .evo_comment_avatar,
   .single_topic .evo_content_block .panel-body .ft_avatar {

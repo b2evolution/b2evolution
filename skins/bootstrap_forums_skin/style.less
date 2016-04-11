@@ -155,9 +155,7 @@ ol.breadcrumb {
 			display: inline-block;
 			white-space: normal !important;
 		}
-		.ft_author_info.shrinked {
-			display: none;
-		}
+
 		.ft_date {
 			text-align: left;
 			img {
@@ -219,6 +217,26 @@ ol.breadcrumb {
 			padding-left: 42px;
 		}
 	}
+
+	.ft_not_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_assigned_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 0px;
+		}
+	}
+
 
 	.ft_not_assigned {
 		font-size: 90%;
@@ -319,9 +337,6 @@ ol.breadcrumb {
 			font-size: 16px;
 			margin: 0px;
 			display: inline;
-		}
-		.ft_author_info.shrinked {
-			display: none;
 		}
 	}
 }
@@ -519,9 +534,6 @@ ul.legend {
 // Single topic view
 .single_page_title {
 	margin-bottom: 20px;
-		.ft_author_info.shrinked {
-			display: none;
-		}
 }
 .single_topic {
 	.ft_post_info {
@@ -814,10 +826,14 @@ label.control-label[for=post_title] {
 				margin-left: 0px;
 			}
 		}
+		.ft_not_assigned {
+			padding-left: 0px;
+			margin-top: 4px;
+		}
+
 		.ft_assigned {
 			padding-left: 0px;
 			margin-top: 4px;
-			//margin-left: 5px;
 		}
 		.ft_date_shrinked {
 			text-align: right;
@@ -889,9 +905,6 @@ label.control-label[for=post_title] {
 	.single_page_title {
 		.ft_author_info {
 			display: none;
-			&.shrinked {
-				display: block !important;
-			}
 		}
 	}
 	/* Disp front */
@@ -933,9 +946,6 @@ label.control-label[for=post_title] {
 		.ft_author_info {
 			display: none !important;
 		}
-		.ft_author_info.shrinked {
-			display: inline;
-		}
 	}
 	/* Disp Single */
 	.forums_list.single_topic section.panel {
@@ -943,9 +953,7 @@ label.control-label[for=post_title] {
 			display: none;
 		}
 	}
-	.ft_author_info.shrinked {
-		display: block !important;
-	}
+
 	.evo_comment_avatar, .single_topic .evo_content_block .panel-body .ft_avatar {
 		margin-right: 0px !important;
 		a img, span img {

@@ -135,26 +135,6 @@ $use_workflow = ( $disp == 'posts' ) &&
 		<div class="ft_author_info ellipsis">
 			<?php echo sprintf( T_('In %s'), $Item->get_chapter_links() ); ?>
 		</div>
-
-		<!-- Author -->
-		<div class="ft_author_info ellipsis">
-			<?php
-			// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
-			echo T_('Started by');
-			$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-			echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-			?>
-		</div>
-
-		<!-- Author (shrinked) -->
-		<div class="ft_author_info shrinked ellipsis">
-			<?php
-			// Super small screen size Author info:
-			echo T_('By');
-			$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-			echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
-			?>
-		</div>
 	</div>
 
 	<!-- Replies Block -->
@@ -208,7 +188,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 		}
 		else
 		{
-			echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-">';
+			echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
 			echo '<div class="ft_assigned_header">';
 			echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
 			echo '</div>';
