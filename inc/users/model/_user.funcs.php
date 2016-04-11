@@ -4679,7 +4679,7 @@ function check_access_users_list( $mode = 'normal' )
  */
 function check_access_user_profile( $user_ID, $mode = 'normal' )
 {
-	global $Blog, $baseurl, $Settings, $current_User, $Settings;
+	global $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
 
 	// Set where to redirect in case of error:
 	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );
