@@ -3594,9 +3594,20 @@ class Comment extends DataObject
 			$executed_by_userid = $current_User->ID;
 		}
 
+		$comment_Item = & $this->get_Item();
+		$comment_item_Blog = & $comment_Item->get_Blog();
+
+		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
+		{	// Subscriptions not enabled!
+			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			return array();
+		}
+
 		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
 		{	// Don't send notifications about comments with not allowed status:
-			$Messages->add( T_('Skipping email notifications to subscribers because comment is not published.'), 'note' );
+			$status_titles = get_visibility_statuses( '', array() );
+			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
+			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
 			return array();
 		}
 
@@ -3673,9 +3684,6 @@ class Comment extends DataObject
 		{	// All notifications are skipped by requested params:
 			return $notified_flags;
 		}
-
-		$comment_Item = & $this->get_Item();
-		$comment_item_Blog = & $comment_Item->get_Blog();
 
 		$notify_users = array();
 
