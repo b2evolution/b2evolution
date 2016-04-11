@@ -168,6 +168,25 @@ function skin_init( $disp )
 				header_redirect( $Item->url, true, true );
 			}
 
+			// Check if the post has 'deprecated' status:
+			if( isset( $Item->status ) && $Item->status == 'deprecated' )
+			{ // If the post is deprecated
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-deprecated-post' ;
+				break;
+			}
+
+			// Check if the post has allowed front office statuses
+			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
+			if( ! in_array( $Item->status, $allowed_statuses ) )
+			{
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-disallowed-post-status';
+				break;
+			}
+
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -2595,11 +2614,11 @@ function skin_body_attrs( $params = array() )
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	if ( ! empty($Blog) )
 	{
-		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_includes';
 		}
-		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
 		}

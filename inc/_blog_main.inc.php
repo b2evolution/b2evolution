@@ -367,11 +367,6 @@ if( !empty($p) || !empty($title) )
 		// Search item by title:
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
-		if( isset( $Item->status ) && $Item->status == 'deprecated' )
-		{ // If the post is deprecated
-			$disp = '404';
-		}
-
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
@@ -532,7 +527,7 @@ elseif( $disp == '-' && !empty($Item) )
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
-		
+
 		// erhsatingin> Is this the right place to increment the download count?
 		$link_ID = param( 'download', 'integer', false);
 		$LinkCache = & get_LinkCache();
