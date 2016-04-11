@@ -212,6 +212,12 @@ ol.breadcrumb {
   padding: 0px;
   float: left;
 }
+.forums_list .ft_status_topic .fa.fa-comments {
+  color: #000000;
+}
+.forums_list .ft_status_topic .fa.fa-comments:hover {
+  color: inherit;
+}
 .forums_list .ft_count {
   margin-top: 12px;
   font-size: 90%;
