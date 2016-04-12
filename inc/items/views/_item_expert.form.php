@@ -524,7 +524,7 @@ $Form->begin_form( '', '', $params );
 
 		// comments_container value shows, current Item ID
 		echo '<div class="evo_content_block">';
-		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
+		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
 		// display comments
 		$CommentList->display_if_empty( array(
 				'before'    => '<div class="bComment"><p>',

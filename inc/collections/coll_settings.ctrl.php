@@ -580,7 +580,7 @@ if( $action == 'dashboard' )
 				echo '<div id="comments_block" class="dashboard_comments_block">';
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 				$Timer->start( 'show_comments_awaiting_moderation' );
@@ -674,7 +674,7 @@ if( $action == 'dashboard' )
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 				// GET LATEST META COMMENTS:
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 				echo '</div>';

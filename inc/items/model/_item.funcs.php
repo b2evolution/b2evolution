@@ -2697,21 +2697,16 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 /**
  * Display a comment corresponding the given comment id
  *
- * @param int comment id
+ * @param object Comment object
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
 {
 	global $current_User, $localtimenow;
 
-	$CommentCache = & get_CommentCache();
-	/**
-	* @var Comment
-	*/
-	$Comment = $CommentCache->get_by_ID( $comment_ID );
 	$Item = & $Comment->get_Item();
 	$Blog = & $Item->get_Blog();
 
@@ -2719,8 +2714,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
-	echo '<a name="c'.$comment_ID.'"></a>';
-	echo '<div id="comment_'.$comment_ID.'" class="bComment bComment';
+	echo '<a name="c'.$Comment->ID.'"></a>';
+	echo '<div id="comment_'.$Comment->ID.'" class="bComment bComment';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
@@ -2834,45 +2829,48 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '</div>';
 		echo '</div>';
 
-		echo '<div class="CommentActionsArea">';
+		if( ! empty( $Comment->ID ) )
+		{	// Display action buttons panel only for existing Comment in DB:
+			echo '<div class="CommentActionsArea">';
 
-		echo '<div class="floatleft">';
+			echo '<div class="floatleft">';
 
-		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
+			// Display edit button if current user has the rights:
+			$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
 
-		echo '<span class="'.button_class( 'group' ).'">';
-		// Display publish NOW button if current user has the rights:
-		$link_params = array(
-			'class'        => button_class( 'text' ),
-			'save_context' => $save_context,
-			'ajax_button'  => true,
-			'redirect_to'  => $redirect_to,
-		);
-		$Comment->raise_link( $link_params );
+			echo '<span class="'.button_class( 'group' ).'">';
+			// Display publish NOW button if current user has the rights:
+			$link_params = array(
+				'class'        => button_class( 'text' ),
+				'save_context' => $save_context,
+				'ajax_button'  => true,
+				'redirect_to'  => $redirect_to,
+			);
+			$Comment->raise_link( $link_params );
 
-		// Display deprecate button if current user has the rights:
-		$Comment->lower_link( $link_params );
+			// Display deprecate button if current user has the rights:
+			$Comment->lower_link( $link_params );
 
-		$next_status_in_row = $Comment->get_next_status( false );
-		if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
-		{ // Display deprecate button if current user has the rights:
-			$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class(), '&amp;', true, true );
+			$next_status_in_row = $Comment->get_next_status( false );
+			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+			{ // Display deprecate button if current user has the rights:
+				$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class(), '&amp;', true, true );
+			}
+
+			// Display delete button if current user has the rights:
+			$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', $save_context, true, '#', $redirect_to );
+			echo '</span>';
+
+			echo '</div>';
+
+			if( ! $Comment->is_meta() )
+			{ // Display Spam Voting system
+				$Comment->vote_spam( '', '', '&amp;', $save_context, true );
+			}
+
+			echo '<div class="clear"></div>';
+			echo '</div>';
 		}
-
-		// Display delete button if current user has the rights:
-		$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', $save_context, true, '#', $redirect_to );
-		echo '</span>';
-
-		echo '</div>';
-
-		if( ! $Comment->is_meta() )
-		{ // Display Spam Voting system
-			$Comment->vote_spam( '', '', '&amp;', $save_context, true );
-		}
-
-		echo '<div class="clear"></div>';
-		echo '</div>';
 	}
 	else
 	{	// No permissions to moderate of this comment, just preview

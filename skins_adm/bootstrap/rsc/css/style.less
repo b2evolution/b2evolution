@@ -258,7 +258,7 @@ div.bPost {
 .bCommentContent, .bFeedback {
 	margin: 1ex;
 }
-#comments_container {
+.evo_comments_container {
 	border: none;
 	.bCommentAvatar {
 		border: 0;
@@ -267,16 +267,16 @@ div.bPost {
 		margin: 4px 10px 10px 0;
 		float: left;
 	}
-}
-#comments_container.full_comment_list {
-	border: none;
-	div.bComment {
-		margin-left: 0;
-		margin-right: 0;
+	&.evo_comments_container__full_list {
+		border: none;
+		div.bComment {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 }
 .bFeedback {
-	#comments_container {
+	.evo_comments_container {
 		border: none;
 		div.bComment {
 			margin-left: 0;
@@ -331,7 +331,7 @@ div.bPost {
 	}
 }
 
-#comments_container {
+.evo_comments_container {
 	div.bComment {
 		overflow: hidden;
 		padding: 0;
@@ -378,7 +378,7 @@ div.bPost {
 		margin-bottom: 5px;
 	}
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container {
 	border: none;
 	margin: 0;
 	div.bComment {
@@ -573,7 +573,7 @@ fieldset ul {
 }
 
 // Dashboard
-#comments_container, .items_container {
+.evo_comments_container, .items_container {
 	border: 1px solid #DDD;
 	.border-radius;
 	margin-bottom: 20px;
@@ -613,7 +613,7 @@ fieldset ul {
 			.border-radius(0);
 		}
 	}
-	#comments_container {
+	.evo_comments_container {
 		border: none;
 		margin: 0;
 	}

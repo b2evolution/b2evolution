@@ -101,7 +101,7 @@ load_funcs( 'comments/model/_comment_js.funcs.php' );
 // Display list of comments:
 echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 // comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
-echo '<div id="comments_container" value="-1" class="full_comment_list">';
+echo '<div id="comments_container" value="-1" class="evo_comments_container evo_comments_container__full_list">';
 require dirname(__FILE__).'/_comment_list.inc.php';
 echo '</div>';
 

@@ -31,7 +31,7 @@ global $Item;
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
-global $Plugins, $DB, $UserSettings;
+global $Plugins, $DB, $UserSettings, $Session, $Messages;
 
 $highlight = param( 'highlight', 'integer', NULL );
 
@@ -510,7 +510,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			// comments_container value shows, current Item ID
-			echo '<div id="comments_container" value="'.$Item->ID.'">';
+			echo '<div id="comments_container" value="'.$Item->ID.'" class="evo_comments_container">';
 			// display comments
 			$CommentList->display_if_empty( array(
 					'before'    => '<div class="bComment"><p>',
@@ -524,13 +524,52 @@ while( $Item = & $ItemList->get_item() )
 			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Item ) ) // User can add meta comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
+
+			// Try to get a previewed Comment and check if it is for current viewed Item:
+			$preview_Comment = $Session->get( 'core.preview_Comment' );
+			$preview_Comment = ( empty( $preview_Comment ) || $preview_Comment->item_ID != $Item->ID ) ? false : $preview_Comment;
+
+			if( $preview_Comment )
+			{	// Display a previewed comment:
+				echo '<h4>'.T_('PREVIEW Comment:').'</h4>';
+				echo '<div class="evo_comments_container">';
+				echo_comment( $preview_Comment );
+				echo '</div>';
+
+				// Display the error message again after preview of comment:
+				$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+				$Messages->display();
+			}
+
 			?>
 			<!-- ========== FORM to add a comment ========== -->
 			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 
-			$Comment = new Comment();
+			if( $preview_Comment )
+			{	// Get a Comment properties from preview request:
+				$Comment = $preview_Comment;
+
+				// Form fields:
+				$comment_content = $Comment->original_content;
+				// All file IDs that have been attached:
+				$comment_attachments = $Comment->preview_attachments;
+				// All attachment file IDs which checkbox was checked in:
+				$checked_attachments = $Comment->checked_attachments;
+				// Get what renderer checkboxes were selected on form:
+				$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
+
+				// Delete any preview comment from session data:
+				$Session->delete( 'core.preview_Comment' );
+			}
+			else
+			{	// Create new Comment:
+				$Comment = new Comment();
+				$comment_content = $Comment->get( 'content' );
+				$comment_attachments = '';
+				$comment_renderers = $Comment->get_renderers();
+			}
 
 			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
 
@@ -566,7 +605,7 @@ while( $Item = & $ItemList->get_item() )
 			// Message field:
 			$form_inputstart = $Form->inputstart;
 			$Form->inputstart .= $comment_toolbar;
-			$Form->textarea_input( $dummy_fields['content'], '', 12, T_('Comment text'), array(
+			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
 					'cols'  => 40,
 					'class' => 'bComment autocomplete_usernames'
 				) );
@@ -575,6 +614,31 @@ while( $Item = & $ItemList->get_item() )
 			// Set b2evoCanvas for plugins:
 			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
+			// Attach files:
+			if( !empty( $comment_attachments ) )
+			{	// display already attached files checkboxes
+				$FileCache = & get_FileCache();
+				$attachments = explode( ',', $comment_attachments );
+				$final_attachments = explode( ',', $checked_attachments );
+				// create attachments checklist
+				$list_options = array();
+				foreach( $attachments as $attachment_ID )
+				{
+					$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
+					if( $attachment_File )
+					{
+						// checkbox should be checked only if the corresponding file id is in the final attachments array
+						$checked = in_array( $attachment_ID, $final_attachments );
+						$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, $attachment_File->get( 'name' ), $checked, false );
+					}
+				}
+				if( !empty( $list_options ) )
+				{	// display list
+					$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
+				}
+				// memorize all attachments ids
+				$Form->hidden( 'preview_attachments', $comment_attachments );
+			}
 			if( $Item->can_attach() )
 			{	// Display attach file input field:
 				$Form->input_field( array(
@@ -592,12 +656,17 @@ while( $Item = & $ItemList->get_item() )
 					) );
 			}
 
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default'), array(
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
 					'Blog'         => & $Blog,
 					'setting_name' => 'coll_apply_comment_rendering'
 				) ) );
 
-			$Form->buttons_input( array(array('name'=>'submit', 'value'=>T_('Send comment'), 'class'=>'SaveButton' )) );
+			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+			$Form->buttons_input( array(
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
+				) );
+
 			?>
 
 				<div class="clear"></div>
