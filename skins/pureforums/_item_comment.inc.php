@@ -85,8 +85,10 @@ $comment_class = ' class="'.$comment_class.'"';
 			) );
 		?></td>
 		<td class="ft_post_info"><?php
-			// We want to display the post date:
-			$Comment->date( 'D M j, Y H:i' );
+			if( $Skin->get_setting( 'display_post_date' ) )
+			{ // We want to display the post date:
+				$Comment->date( 'D M j, Y H:i' );
+			}
 			$Comment->rating( array(
 					'before' => '',
 					'after'  => '',

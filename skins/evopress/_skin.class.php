@@ -57,6 +57,12 @@ class evopress_Skin extends Skin
 					'defaultvalue' => '#4280b6',
 					'type' => 'color',
 				),
+				'display_post_date' => array(
+					'label' => T_('Post date'),
+					'note' => T_('Display the date of each post'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
 				'sidebar_position' => array(
 					'label' => T_('Sidebar position'),
 					'note' => '',
