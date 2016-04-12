@@ -897,46 +897,6 @@ switch( $action )
 		call_user_func( $callback_function, $params );
 		break;
 
-	case 'get_recipients':
-		// Get list of users by search word
-		// Used for jQuery Tokeninput plugin ( when creating new messaging Thread )
-
-		if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Check permission: User is not allowed to view threads
-			exit(0);
-		}
-
-		if( check_create_thread_limit() )
-		{	// user has already reached his limit, don't allow to get a users list
-			exit(0);
-		}
-
-		param( 'term', 'string' );
-
-		// Clear users cache and load only possible recipients who need right now, but keep shadow
-		$where_condition = '( user_login LIKE '.$DB->quote( '%'.$term.'%' ).' ) AND ( user_ID != '.$DB->quote( $current_User->ID ).' )';
-		$UserCache = & get_UserCache();
-		$UserCache->clear( true );
-		$UserCache->load_where( $where_condition );
-
-		$result_users = array();
-		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-		{ // Iterate through UserCache
-			if( !$iterator_User->check_status( 'can_receive_pm' ) )
-			{ // this user is probably closed so don't show it
-				continue;
-			}
-			$result_users[] = array(
-				'id'       => $iterator_User->ID,
-				'title'    => $iterator_User->get( 'login' ),
-				'fullname' => $iterator_User->get( 'fullname' ),
-				'picture'  => $iterator_User->get_avatar_imgtag( 'crop-top-32x32' )
-			);
-		}
-
-		echo evo_json_encode( $result_users );
-		exit(0);
-
 	case 'set_comment_status':
 		// Used for quick moderation of comments in dashboard, item list full view, comment list and front-office screens
 
@@ -1136,39 +1096,6 @@ switch( $action )
 
 		// Display icon with new status
 		echo $accept_icon;
-
-		break;
-
-	case 'autocomplete_usernames':
-		// Get usernames by first chars for autocomplete jQuery plugin & TinyMCE autocomplete plugin
-
-		$q = param( 'q', 'string', '' );
-
-		if( ! is_valid_login( $q ) || evo_strlen( $q ) < 4 )
-		{ // Restrict a wrong request
-			debug_die( 'Wrong request' );
-		}
-		// Add backslash for special char of sql operator LIKE
-		$q = str_replace( '_', '\_', $q );
-
-		if( utf8_strlen( $q ) == 0 )
-		{ // Don't search logins with empty request
-			$usernames = array();
-		}
-		else
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'user_login' );
-			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE '.$DB->quote( $q.'%' ) );
-			$SQL->WHERE_and( 'user_status = "activated" OR user_status = "autoactivated"' );
-			$SQL->ORDER_BY( 'user_login' );
-			$usernames = $DB->get_col( $SQL->get() );
-		}
-
-		echo evo_json_encode( $usernames );
-
-		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 
 		break;
 

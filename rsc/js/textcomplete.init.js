@@ -51,7 +51,7 @@ jQuery( document ).ready( function()
 				{
 					type: "POST",
 					dataType: "JSON",
-					url: restapi_url + "users_search",
+					url: restapi_url + "users/autocomplete",
 					data: "suggest=" + term,
 					success: function( data )
 					{

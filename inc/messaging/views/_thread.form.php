@@ -151,7 +151,7 @@ jQuery( document ).ready( function()
 } );
 
 jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo $restapi_url; ?>users_search&avatar=crop-top-32x32',
+	'<?php echo $restapi_url; ?>users/recipients',
 	{
 		theme: 'facebook',
 		queryParam: 'suggest',

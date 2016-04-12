@@ -226,6 +226,35 @@ class RestApi
 
 
 	/**
+	 * Halt execution with text from $Messages
+	 *
+	 * @param integer Status code: 'wrong_route', 'unknown_module'
+	 * @param integer Status number: 404, 403
+	 * @param string Message types, separated by comma: 'success', 'warning', 'error', 'note'
+	 */
+	private function halt_with_Messages( $status_code = 'no_access', $status_number = 403, $message_types = 'error,warning' )
+	{
+		global $Messages;
+
+		$message_types = explode( ',', $message_types );
+
+		$halt_messages = array();
+		foreach( $Messages->messages_text as $m => $message_text )
+		{
+			if( in_array( $Messages->messages_type[ $m ], $message_types ) )
+			{	// Get this message for halt because of message type:
+				$halt_messages[] = $message_text;
+			}
+		}
+
+		$halt_messages = empty( $halt_messages ) ? $status_code : implode( ' ', $halt_messages );
+
+		// Halt execution:
+		$this->halt( $halt_messages, $status_code, $status_number );
+	}
+
+
+	/**
 	 * Add new element in response array
 	 *
 	 * @param string Key or Value ( if second param is NULL )
@@ -725,83 +754,6 @@ class RestApi
 
 	/**
 	 * Call module to prepare request for users
-	 * 
-	 * WARNING: THIS IS TEMP MODULE AND IT MUST BE MERGED WITH EXISTING module_users(). (was created to solve a merging conflict quickly)
-	 */
-	private function module_users_search()
-	{
-		global $DB, $thumbnail_sizes;
-
-		// Get request params:
-		$api_page = param( 'page', 'integer', 1 );
-		$api_per_page = param( 'per_page', 'integer', 0 );
-		$api_avatar = param( 'avatar', 'string', 'no' );
-		$api_suggest = param( 'suggest', 'string', '' );
-
-		// Initialize SQL to get users:
-		$users_SQL = new SQL();
-		$users_SQL->SELECT( '*' );
-		$users_SQL->FROM( 'T_users' );
-		if( ! empty( $api_suggest ) )
-		{	// Filter by login:
-			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( '%'.$api_suggest.'%' ) );
-		}
-
-		// Get a count of users:
-		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
-
-		// Set page params:
-		$count_pages = empty( $api_per_page ) ? 1 : ceil( $count_users / $api_per_page );
-		if( empty( $api_page ) )
-		{	// Force wrong page number to first:
-			$api_page = 1;
-		}
-		if( $api_page > $count_pages )
-		{	// Don't allow page number more than total pages:
-			$api_page = $count_pages;
-		}
-		if( $api_per_page > 0 )
-		{	// Limit users by current page:
-			$users_SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
-		}
-
-		// Load users in cache by SQL:
-		$UserCache = & get_UserCache();
-		$UserCache->clear();
-		$UserCache->load_by_sql( $users_SQL );
-
-		if( empty( $UserCache->cache ) )
-		{	// No users found:
-			$this->halt( 'No users found', 'no_users', 200 );
-			// Exit here.
-		}
-
-		$this->add_response( 'found', $count_users, 'integer' );
-		$this->add_response( 'page', $api_page, 'integer' );
-		$this->add_response( 'page_size', $api_per_page, 'integer' );
-		$this->add_response( 'pages_total', $count_pages, 'integer' );
-
-		foreach( $UserCache->cache as $User )
-		{
-			$user_data = array(
-					'id'       => $User->ID,
-					'login'    => $User->get( 'login' ),
-					'fullname' => $User->get( 'fullname' ),
-				);
-
-			if( isset( $thumbnail_sizes[ $api_avatar ] ) )
-			{	// Get avatar if the requested size exists in the system:
-				$user_data['avatar'] = $User->get_avatar_imgtag( $api_avatar );
-			}
-
-			// Add data of each user in separate array of response:
-			$this->add_response( 'users', $user_data, 'array' );
-		}
-	}
-
-
-	/**
-	 * Call module to prepare request for users
 	 */
 	private function module_users()
 	{
@@ -834,8 +786,14 @@ class RestApi
 
 			case 'GET':
 			default:
-				// Set controller to view the requested user profile or ALL users:
-				$user_controller = ( $user_ID > 0 ) ? 'view' : 'list';
+				if( $user_ID > 0 )
+				{	// Set controller to view the requested user profile:
+					$user_controller = 'view';
+				}
+				else
+				{	// Set controller to view all users by default or call the requested controller:
+					$user_controller = empty( $this->args[1] ) ? 'list' : $this->args[1];
+				}
 				break;
 		}
 
@@ -1135,6 +1093,153 @@ class RestApi
 			$this->halt( sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $User->get( 'login' ) ), 'delete_failed', 403 );
 			// Exit here.
 		}
+	}
+
+
+	/**
+	 * Call user controller to search recipients
+	 */
+	private function controller_user_recipients()
+	{
+		global $current_User, $DB;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+		{	// Check permission: User is not allowed to view threads
+			$this->halt( T_('You are not allowed to view recipients.'), 'no_access', 403 );
+		}
+
+		if( check_create_thread_limit( true ) )
+		{	// User has already reached his limit, don't allow to get a users list:
+			$this->halt_with_Messages();
+		}
+
+		$api_suggest = param( 'suggest', 'string', '' );
+
+		// Search users:
+		$users = $this->func_user_search( $api_suggest, array(
+				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
+				'sql_mask'  => '%$login$%',
+			) );
+
+		foreach( $users as $User )
+		{
+			if( ! $User->check_status( 'can_receive_pm' ) )
+			{	// This user is probably closed so don't show it:
+				continue;
+			}
+
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+					'avatar'   => $User->get_avatar_imgtag( 'crop-top-32x32' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call user controller to search recipients
+	 */
+	private function controller_user_autocomplete()
+	{
+		$api_suggest = param( 'suggest', 'string', '' );
+
+		if( ! is_valid_login( $api_suggest ) )
+		{	// Restrict a wrong request:
+			$this->halt( 'Wrong request', 'wrong_request', 403 );
+		}
+		// Add backslash for special char of sql operator LIKE:
+		$api_suggest = str_replace( '_', '\_', $api_suggest );
+
+		// Search users:
+		$users = $this->func_user_search( $api_suggest );
+
+		foreach( $users as $User )
+		{
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Function to search users by login
+	 *
+	 * @param string Search string
+	 * @return array Users
+	 */
+	private function func_user_search( $api_suggest, $params = array() )
+	{
+		global $DB;
+
+		$params = array_merge( array(
+				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
+				'sql_mask'  => '$login$%',
+			), $params );
+
+		// Get request params:
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 0 );
+
+		// Initialize SQL to get users:
+		$users_SQL = new SQL();
+		$users_SQL->SELECT( '*' );
+		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $api_suggest ) )
+		{	// Filter by login:
+			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $api_suggest, $params['sql_mask'] ) ) );
+		}
+		if( ! empty( $params['sql_where'] ) )
+		{	// Additional restrict:
+			$users_SQL->WHERE_and( $params['sql_where'] );
+		}
+		$users_SQL->ORDER_BY( 'user_login' );
+
+		// Get a count of users:
+		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
+
+		// Set page params:
+		$count_pages = empty( $api_per_page ) ? 1 : ceil( $count_users / $api_per_page );
+		if( empty( $api_page ) )
+		{	// Force wrong page number to first:
+			$api_page = 1;
+		}
+		if( $api_page > $count_pages )
+		{	// Don't allow page number more than total pages:
+			$api_page = $count_pages;
+		}
+		if( $api_per_page > 0 )
+		{	// Limit users by current page:
+			$users_SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+		}
+
+		// Load users in cache by SQL:
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$UserCache->load_by_sql( $users_SQL );
+
+		if( empty( $UserCache->cache ) )
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 200 );
+			// Exit here.
+		}
+
+		$this->add_response( 'found', $count_users, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
+		$this->add_response( 'pages_total', $count_pages, 'integer' );
+
+		return $UserCache->cache;
 	}
 
 
