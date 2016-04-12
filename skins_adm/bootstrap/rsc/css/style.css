@@ -200,10 +200,6 @@ div.bPost {
   margin: 0 0 1ex;
   padding: 0;
   border: 1px solid #CCC;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
   overflow: hidden;
   /* to normal view of border-radius */
@@ -240,10 +236,6 @@ div.bPost {
 }
 #comments_container .bCommentAvatar {
   border: 0;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
   padding: 0;
   margin: 4px 10px 10px 0;
@@ -279,10 +271,6 @@ div.bPost {
   margin: 0;
   padding: 1ex;
   border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .bFeedback .bComment.form-horizontal.evo_form__comment_meta {
@@ -315,10 +303,6 @@ div.bPost {
   padding: 0;
   margin: 1ex;
   border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 #comments_container div.bComment > p {
@@ -569,10 +553,6 @@ fieldset ul {
 #comments_container,
 .items_container {
   border: 1px solid #DDD;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
   margin-bottom: 20px;
 }
@@ -611,17 +591,9 @@ fieldset ul {
 }
 .dashboard_comments_block .evo_content_block a.user img,
 .dashboard_comments_block .evo_content_block img.user {
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
 }
 .dashboard_comments_block .evo_content_block .popover a.user img {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
   border-radius: 0;
 }
 .dashboard_comments_block #comments_container {
@@ -778,10 +750,6 @@ div.qq-upload-drop-area,
 div.qq-upload-drop-area-active {
   border: 2px dashed #fff;
   background: #5bc0de;
-  -webkit-border-radius: 9px;
-  -moz-border-radius: 9px;
-  -ms-border-radius: 9px;
-  -o-border-radius: 9px;
   border-radius: 9px;
 }
 div.qq-upload-button-hover,
@@ -806,10 +774,6 @@ td.fm_filename .result_error {
 div.fileman_toolbars_bottom .toolbaritem {
   border: 2px dashed #fff;
   background: #e8e8e8;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
   margin: 3px 0 0 10px;
   padding: 2px 10px;
@@ -909,11 +873,15 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
-  justify-content: space-around;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
   -webkit-justify-content: space-around;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-flex-wrap: wrap;
 }
 .tool_steps .step {
@@ -929,10 +897,6 @@ h2.user_title {
   padding: 5px;
   text-align: center;
   width: 33px;
-  -webkit-border-radius: 100%;
-  -moz-border-radius: 100%;
-  -ms-border-radius: 100%;
-  -o-border-radius: 100%;
   border-radius: 100%;
 }
 .tool_steps .step.current {
@@ -1063,10 +1027,6 @@ div#widget_settings.widget_settings_active {
 div.available_widgets {
   background: #FFF;
   border-color: #ddd;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 div.available_widgets .available_widgets_toolbar {
@@ -1253,10 +1213,6 @@ div.level3 nav .nav > li > a {
 .skinshot {
   background-color: #F5F5F5;
   border: 1px solid #E3E3E3;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
   padding: 5px;
   float: left;
@@ -1268,10 +1224,6 @@ div.level3 nav .nav > li > a {
   margin: 1ex 1ex .5ex 1ex;
   background: #FFF;
   text-align: center;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .skinshot .skinshot_placeholder .skinshot_noshot {
@@ -1482,8 +1434,150 @@ table.diff td.diff-title-addedline {
   height: 12px;
   min-width: 1px;
 }
-.red-bordered-checkbox {
-  background-color: #F00;
-  padding: 1px;
-  padding-top: 0;
+.status_color_draft {
+  color: #ffff99;
+}
+.status_color_review {
+  color: #cc0099;
+}
+.status_color_community {
+  color: #2e8bb9;
+}
+.status_color_protected {
+  color: #ff9c2a;
+}
+.status_color_private {
+  color: #dc143c;
+}
+.status_color_published {
+  color: #99ee44;
+}
+.status_color_deprecated {
+  color: #000000;
+}
+.status_color_redirected {
+  color: #663399;
+}
+.status_color_trash {
+  color: #ff6666;
+}
+.status_color_meta {
+  color: #5133ab;
+}
+.btn[class*=btn-status-] {
+  border: 1px solid #ccc;
+}
+.btn-status-draft {
+  color: #000;
+  background-color: #ffff99;
+  border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+  color: #000;
+  background-color: #f3f392;
+}
+.btn-status-review {
+  color: #fff;
+  background-color: #cc0099;
+}
+.btn-status-review:hover {
+  color: #fff;
+  background-color: #c20092;
+}
+.btn-status-community {
+  color: #fff;
+  background-color: #2e8bb9;
+}
+.btn-status-community:hover {
+  color: #fff;
+  background-color: #2c84b0;
+}
+.btn-status-protected {
+  color: #fff;
+  background-color: #ff9c2a;
+}
+.btn-status-protected:hover {
+  color: #fff;
+  background-color: #f39528;
+}
+.btn-status-private {
+  color: #fff;
+  background-color: #dc143c;
+}
+.btn-status-private:hover {
+  color: #fff;
+  background-color: #d21339;
+}
+.btn-status-published {
+  color: #000;
+  background-color: #99ee44;
+}
+.btn-status-published .glyphicon {
+  color: inherit !important;
+}
+.btn-status-published:hover {
+  color: #000;
+  background-color: #92e341;
+}
+.btn-status-deprecated {
+  color: #fff;
+  background-color: #000000;
+}
+.btn-status-deprecated:hover {
+  color: #fff;
+  background-color: #333333;
+}
+.btn-status-redirected {
+  color: #fff;
+  background-color: #663399;
+}
+.btn-status-redirected:hover {
+  color: #fff;
+  background-color: #613192;
+}
+.btn-status-trash {
+  color: #fff;
+  background-color: #ff6666;
+}
+.btn-status-trash:hover {
+  color: #fff;
+  background-color: #ff4444;
+}
+.evo_checkbox_status {
+  padding: 0 1px 1px 1px;
+  border-radius: 2px;
+}
+.evo_checkbox_status__default {
+  border: 1px solid #F00;
+  padding: 1px 1px 2px 1px;
+}
+.evo_checkbox_status__published {
+  background-color: #99ee44;
+}
+.evo_checkbox_status__community {
+  background-color: #2e8bb9;
+}
+.evo_checkbox_status__protected {
+  background-color: #ff9c2a;
+}
+.evo_checkbox_status__review {
+  background-color: #cc0099;
+}
+.evo_checkbox_status__private {
+  background-color: #dc143c;
+}
+.evo_checkbox_status__draft {
+  background-color: #ffff99;
+}
+.evo_checkbox_status__deprecated {
+  background-color: #000000;
+}
+.evo_checkbox_status__redirected {
+  background-color: #663399;
+}
+.evo_checkbox_status__trash {
+  background-color: #ff6666;
+}
+.evo_checkbox_status__meta {
+  background-color: #5133ab;
 }

@@ -125,6 +125,11 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 	}
 	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
 
+	if( $perm == 'perm_meta_comment' )
+	{	// Add class to easily identify meta status checkbox with matching color:
+		$r = '<span class="evo_checkbox_status evo_checkbox_status__meta">'.$r.'</span>';
+	}
+
 	return $r;
 }
 
@@ -252,15 +257,20 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 		}
 	}
 
-	if( $perm_status == $default_status )
+	if( $perm_status == $default_status && ! $always_enabled )
 	{
 		$title .= "\n".T_('Note: Anonymous users may create comments with this status. You will probably want to give the same permission to this user/group.');
 	}
 	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
-	if( $perm_status == $default_status )
-	{ // This is the default comment status checkbox, and user has no permission to create comment with this status ( like anonymous users ) or a higher status
-		$r = '<span class="red-bordered-checkbox">'.$r.'</span>';
+
+	// Add class to easily identify status checkbox with matching color:
+	$r = '<span class="evo_checkbox_status evo_checkbox_status__'.$perm_status.'">'.$r.'</span>';
+
+	if( $perm_status == $default_status && ! $always_enabled )
+	{	// This is the default comment status checkbox, and user has no permission to create comment with this status ( like anonymous users ) or a higher status:
+		$r = '<span class="evo_checkbox_status evo_checkbox_status__default">'.$r.'</span>';
 	}
+
 	return $r;
 }
 

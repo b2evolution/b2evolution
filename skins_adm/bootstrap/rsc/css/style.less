@@ -1559,9 +1559,43 @@ table.diff {
 	}
 }
 
-// Mark checkbox with red background color, e.g. on advanced collection permissions:
-.red-bordered-checkbox {
-	background-color: #F00;
-	padding: 1px;
-	padding-top: 0;
+// Status checkboxes, e.g. on advanced collection permissions:
+@import "../../../../rsc/less/inc/visibility_status_colors.inc.less";
+.evo_checkbox_status {
+	padding: 0 1px 1px 1px;
+	border-radius: 2px;
+}
+.evo_checkbox_status__default {
+	border: 1px solid #F00;
+	padding: 1px 1px 2px 1px;
+}
+.evo_checkbox_status__published {
+	background-color: @status_color_published;
+}
+.evo_checkbox_status__community {
+	background-color: @status_color_community;
+}
+.evo_checkbox_status__protected {
+	background-color: @status_color_protected;
+}
+.evo_checkbox_status__review {
+	background-color: @status_color_review;
+}
+.evo_checkbox_status__private {
+	background-color: @status_color_private;
+}
+.evo_checkbox_status__draft {
+	background-color: @status_color_draft;
+}
+.evo_checkbox_status__deprecated {
+	background-color: @status_color_deprecated;
+}
+.evo_checkbox_status__redirected {
+	background-color: @status_color_redirected;
+}
+.evo_checkbox_status__trash {
+	background-color: @status_color_trash;
+}
+.evo_checkbox_status__meta {
+	background-color: @status_color_meta;
 }
