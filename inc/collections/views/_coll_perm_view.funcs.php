@@ -241,7 +241,23 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 	}
 	$r .= ' name="blog_perm_'.$perm_status.'_'.$type_param.$row->{$row_id_coll}.'"';
 
-	if( $always_enabled )
+	$always_disabled = false;
+	if( ( $perm_status == 'published' || $perm_status == 'community' ) &&
+	    $edited_Blog->get_setting( 'allow_access' ) == 'members' )
+	{	// If collection is for members only then Published and Community statuses are not allowed:
+		$always_disabled = true;
+	}
+	elseif( $perm_status == 'published' &&
+	        $edited_Blog->get_setting( 'allow_access' ) == 'users' )
+	{	// If collection is for logged-in users only then Published status is not allowed:
+		$always_disabled = true;
+	}
+
+	if( $always_disabled )
+	{	// This perm option is always disabled:
+		$r .= ' disabled="disabled"';
+	}
+	elseif( $always_enabled )
 	{	// This perm option is always enabled:
 		$r .= ' checked="checked" disabled="disabled"';
 	}
