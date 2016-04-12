@@ -51,10 +51,21 @@ jQuery( document ).ready( function()
 				{
 					type: "POST",
 					dataType: "JSON",
-					url: htsrv_url + "anon_async.php",
-					data: "action=autocomplete_usernames&q=" + term,
-					success: function( db_mentions )
+					url: restapi_url + "users_search",
+					data: "suggest=" + term,
+					success: function( data )
 					{
+						if( typeof( data.users ) == 'undefined' )
+						{	// No users found:
+							return null;
+						}
+
+						var db_mentions = [];
+						for( var u in data.users )
+						{	// Set all logins in one array:
+							db_mentions.push( data.users[u].login );
+						}
+
 						db_mentions = db_mentions.concat( mentions );
 						callback( jQuery.map( db_mentions, function ( mention )
 						{ return mention.indexOf(term) === 0 ? mention : null; } ) );

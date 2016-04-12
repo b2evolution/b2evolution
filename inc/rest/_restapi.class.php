@@ -725,6 +725,83 @@ class RestApi
 
 	/**
 	 * Call module to prepare request for users
+	 * 
+	 * WARNING: THIS IS TEMP MODULE AND IT MUST BE MERGED WITH EXISTING module_users(). (was created to solve a merging conflict quickly)
+	 */
+	private function module_users_search()
+	{
+		global $DB, $thumbnail_sizes;
+
+		// Get request params:
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 0 );
+		$api_avatar = param( 'avatar', 'string', 'no' );
+		$api_suggest = param( 'suggest', 'string', '' );
+
+		// Initialize SQL to get users:
+		$users_SQL = new SQL();
+		$users_SQL->SELECT( '*' );
+		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $api_suggest ) )
+		{	// Filter by login:
+			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( '%'.$api_suggest.'%' ) );
+		}
+
+		// Get a count of users:
+		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
+
+		// Set page params:
+		$count_pages = empty( $api_per_page ) ? 1 : ceil( $count_users / $api_per_page );
+		if( empty( $api_page ) )
+		{	// Force wrong page number to first:
+			$api_page = 1;
+		}
+		if( $api_page > $count_pages )
+		{	// Don't allow page number more than total pages:
+			$api_page = $count_pages;
+		}
+		if( $api_per_page > 0 )
+		{	// Limit users by current page:
+			$users_SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+		}
+
+		// Load users in cache by SQL:
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$UserCache->load_by_sql( $users_SQL );
+
+		if( empty( $UserCache->cache ) )
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 200 );
+			// Exit here.
+		}
+
+		$this->add_response( 'found', $count_users, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
+		$this->add_response( 'pages_total', $count_pages, 'integer' );
+
+		foreach( $UserCache->cache as $User )
+		{
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+				);
+
+			if( isset( $thumbnail_sizes[ $api_avatar ] ) )
+			{	// Get avatar if the requested size exists in the system:
+				$user_data['avatar'] = $User->get_avatar_imgtag( $api_avatar );
+			}
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call module to prepare request for users
 	 */
 	private function module_users()
 	{
@@ -1062,4 +1139,64 @@ class RestApi
 
 
 	/**** MODULE USERS ---- END ****/
+
+
+	/**** MODULE TAGS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for tags
+	 */
+	private function module_tags()
+	{
+		global $DB;
+
+		$term = param( 's', 'string' );
+
+		if( substr( $term, 0, 1 ) == '-' )
+		{	// Prevent chars '-' in first position:
+			$term = preg_replace( '/^-+/', '', $term );
+		}
+
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
+		$term_is_new_tag = true;
+
+		$tags = array();
+
+		$tags_SQL = new SQL();
+		$tags_SQL->SELECT( 'tag_name AS id, tag_name AS name' );
+		$tags_SQL->FROM( 'T_items__tag' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->ORDER_BY( 'tag_name' );
+		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
+
+		// Check if current term is not an existing tag:
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
+
+		$this->add_response( 'tags', $tags );
+	}
+
+
+	/**** MODULE TAGS ---- END ****/
 }

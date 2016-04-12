@@ -2075,6 +2075,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
  */
 function echo_autocomplete_tags()
 {
+	global $restapi_url;
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2086,21 +2087,22 @@ function echo_autocomplete_tags()
 			tags = tags.split( ',' );
 			for( var t in tags )
 			{
-				tags_json.push( { id: tags[t], title: tags[t] } );
+				tags_json.push( { id: tags[t], name: tags[t] } );
 			}
 		}
 
-		jQuery( selector ).tokenInput( '<?php echo get_samedomain_htsrv_url().'anon_async.php?action=get_tags' ?>',
+		jQuery( selector ).tokenInput( '<?php echo $restapi_url.'tags' ?>',
 		{
 			theme: 'facebook',
-			queryParam: 'term',
-			propertyToSearch: 'title',
-			tokenValue: 'title',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
 			preventDuplicates: true,
 			prePopulate: tags_json,
 			hintText: '<?php echo TS_('Type in a tag') ?>',
 			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>'
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
 		} );
 	}
 
