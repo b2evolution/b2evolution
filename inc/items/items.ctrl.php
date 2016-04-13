@@ -1211,8 +1211,9 @@ switch( $action )
 			// Execute or schedule notifications & pings:
 			$edited_Item->handle_notifications();
 
-			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
+			// Set redirect back to items list with new item type tab:
+			$tab = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.( $tab ? $tab[0] : 'post' ).'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );

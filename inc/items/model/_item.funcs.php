@@ -1630,9 +1630,6 @@ function get_item_type_usage_by_tab( $tab_name )
 {
 	switch( $tab_name )
 	{
-		case 'post':
-			$type_usages = array( 'post' );
-			break;
 		case 'page':
 			$type_usages = array( 'page' );
 			break;
@@ -1641,6 +1638,10 @@ function get_item_type_usage_by_tab( $tab_name )
 			break;
 		case 'intro':
 			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+		case 'post':
+		default:
+			$type_usages = array( 'post' );
 			break;
 	}
 
