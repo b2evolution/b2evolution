@@ -49,7 +49,7 @@ jQuery( document ).ready( function()
 			{ // Also search in DB by AJAX
 				jQuery.ajax(
 				{
-					type: "POST",
+					type: "GET",
 					dataType: "JSON",
 					url: restapi_url + "users/autocomplete",
 					data: "suggest=" + term,

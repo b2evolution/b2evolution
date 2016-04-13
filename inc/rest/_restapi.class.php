@@ -1142,7 +1142,7 @@ class RestApi
 
 
 	/**
-	 * Call user controller to search recipients
+	 * Call user controller to search user for autocomplete JS plugin
 	 */
 	private function controller_user_autocomplete()
 	{
@@ -1161,9 +1161,7 @@ class RestApi
 		foreach( $users as $User )
 		{
 			$user_data = array(
-					'id'       => $User->ID,
 					'login'    => $User->get( 'login' ),
-					'fullname' => $User->get( 'fullname' ),
 				);
 
 			// Add data of each user in separate array of response:

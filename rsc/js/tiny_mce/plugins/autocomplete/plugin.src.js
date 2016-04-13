@@ -143,7 +143,7 @@
 
 					var static_options = autocomplete_data.options;
 					jQuery.ajax({
-						type: "POST",
+						type: "GET",
 						dataType: "JSON",
 						url: autocomplete_data.optionsUrl,
 						cache: false,
