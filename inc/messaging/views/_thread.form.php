@@ -154,7 +154,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
 	'<?php echo $restapi_url; ?>users/recipients',
 	{
 		theme: 'facebook',
-		queryParam: 'suggest',
+		queryParam: 'q',
 		propertyToSearch: 'login',
 		preventDuplicates: true,
 		prePopulate: <?php echo evo_json_encode( $recipients_selected ) ?>,

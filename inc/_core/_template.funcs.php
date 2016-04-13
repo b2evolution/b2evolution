@@ -1592,7 +1592,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1611,10 +1611,14 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{	// Skip this field because typeahead is initialized before:
 							return;
 						}
-						var ajax_params = "";
+						var ajax_url = "";
 						if( jQuery( this ).hasClass( "only_assignees" ) )
 						{
-							ajax_params = "&user_type=assignees&blog='.$blog.'";
+							ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
 						}
 						jQuery( this ).typeahead( null,
 						{
@@ -1623,16 +1627,16 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'anon_async.php?action=get_login_list" + ajax_params,
-									type: "post",
-									data: { q: query, data_type: "json" },
+									type: "GET",
 									dataType: "JSON",
-									success: function( logins )
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
 									{
 										var json = new Array();
-										for( var l in logins.list )
+										for( var l in data.list )
 										{
-											json.push( { login: logins.list[ l ] } );
+											json.push( { login: data.list[ l ] } );
 										}
 										cb( json );
 									}
@@ -1661,14 +1665,18 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'anon_async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
 					autoDimentions: true,
 					json: true,

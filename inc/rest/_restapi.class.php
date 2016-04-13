@@ -746,6 +746,100 @@ class RestApi
 	}
 
 
+	/**
+	 * Call collection controller to prepare request for possible assignees
+	 *
+	 * Request scheme: "<baseurl>/api/v1/collections/<collname>/assignees?q=<search login string>"
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_assignees()
+	{
+		global $current_User, $Blog, $DB;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+		{	// Check permission: Current user must has a permission to be assignee of the collection:
+			$this->halt( 'You are not allowed to view assigness of the collection "'.$Blog->get( 'name' ).'".', 'no_access', 403 );
+		}
+
+		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+
+		/**
+		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
+		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
+		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
+		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
+		 *
+		 * jQuery hintbox plugin uses "escape" function to encode URIs
+		 *
+		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
+		 */
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
+		{	// Decode UTF-8 string (PHP 5 and up)
+			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
+			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
+		}
+
+		if( empty( $api_q ) )
+		{	// Don't allow empty request:
+			$this->halt( 'Please enter at least one char to find assignees', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( $Blog->get( 'advanced_perms' ) )
+		{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
+
+			// Get users which can be assignees of the collection:
+			$user_perms_SQL = new SQL();
+			$user_perms_SQL->SELECT( 'user_login' );
+			$user_perms_SQL->FROM( 'T_users' );
+			$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+			$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
+			$users_sql[] = $user_perms_SQL->get();
+
+			// Get users which primary groups can be assignees of the collection:
+			$group_perms_SQL = new SQL();
+			$group_perms_SQL->SELECT( 'user_login' );
+			$group_perms_SQL->FROM( 'T_users' );
+			$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
+			$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+			$users_sql[] = $group_perms_SQL->get();
+
+			// Get users which secondary groups can be assignees of the collection:
+			$secondary_group_perms_SQL = new SQL();
+			$secondary_group_perms_SQL->SELECT( 'user_login' );
+			$secondary_group_perms_SQL->FROM( 'T_users' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
+			$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$secondary_group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+			$users_sql[] = $secondary_group_perms_SQL->get();
+		}
+
+		// Get assignees which primary groups have a setting to EDIT ALL collections:
+		$group_setting_SQL = new SQL();
+		$group_setting_SQL->SELECT( 'user_login' );
+		$group_setting_SQL->FROM( 'T_users' );
+		$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+		$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
+		$users_sql[] = $group_setting_SQL->get();
+
+		// Union sql queries to execute one query and save an order as one list:
+		$users_sql = 'SELECT user_login'
+			.' FROM ( ( '.implode( ' ) UNION ( ', $users_sql ).' ) ) AS uu'
+			.' WHERE uu.user_login LIKE "'.$DB->escape( $api_q ).'%"'
+			.' ORDER BY user_login'
+			.' LIMIT 10';
+
+		$user_logins = $DB->get_col( $users_sql );
+
+		// Send users logins array as response:
+		$this->add_response( 'list', $user_logins );
+	}
+
+
 	/**** MODULE COLLECTIONS ---- END ****/
 
 
@@ -1105,7 +1199,7 @@ class RestApi
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{	// Check permission: User is not allowed to view threads
-			$this->halt( T_('You are not allowed to view recipients.'), 'no_access', 403 );
+			$this->halt( 'You are not allowed to view recipients.', 'no_access', 403 );
 		}
 
 		if( check_create_thread_limit( true ) )
@@ -1113,10 +1207,10 @@ class RestApi
 			$this->halt_with_Messages();
 		}
 
-		$api_suggest = param( 'suggest', 'string', '' );
+		$api_q = param( 'q', 'string', '' );
 
 		// Search users:
-		$users = $this->func_user_search( $api_suggest, array(
+		$users = $this->func_user_search( $api_q, array(
 				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
 				'sql_mask'  => '%$login$%',
 			) );
@@ -1146,17 +1240,17 @@ class RestApi
 	 */
 	private function controller_user_autocomplete()
 	{
-		$api_suggest = param( 'suggest', 'string', '' );
+		$api_q = param( 'q', 'string', '' );
 
-		if( ! is_valid_login( $api_suggest ) )
+		if( ! is_valid_login( $api_q ) )
 		{	// Restrict a wrong request:
 			$this->halt( 'Wrong request', 'wrong_request', 403 );
 		}
 		// Add backslash for special char of sql operator LIKE:
-		$api_suggest = str_replace( '_', '\_', $api_suggest );
+		$api_q = str_replace( '_', '\_', $api_q );
 
 		// Search users:
-		$users = $this->func_user_search( $api_suggest );
+		$users = $this->func_user_search( $api_q );
 
 		foreach( $users as $User )
 		{
@@ -1171,31 +1265,84 @@ class RestApi
 
 
 	/**
+	 * Call user controller to search user for hintbox and typeahead JS plugins
+	 */
+	private function controller_user_logins()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'view' ) )
+		{	// Check permission: Current user must have at least view permission to see users login:
+			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
+		}
+
+		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+
+		/**
+		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
+		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
+		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
+		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
+		 *
+		 * jQuery hintbox plugin uses "escape" function to encode URIs
+		 *
+		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
+		 */
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
+		{	// Decode UTF-8 string (PHP 5 and up)
+			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
+			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
+		}
+
+		if( empty( $api_q ) )
+		{	// Don't allow empty request:
+			$this->halt( 'Please enter at least one char to find assignees', 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Search users:
+		$users = $this->func_user_search( $api_q, array(
+				'sql_limit' => 10,
+			) );
+
+		$user_logins = array();
+		foreach( $users as $User )
+		{
+			$user_logins[] = $User->get( 'login' );
+		}
+
+		// Send users logins array as response:
+		$this->add_response( 'list', $user_logins );
+	}
+
+
+	/**
 	 * Function to search users by login
 	 *
 	 * @param string Search string
 	 * @return array Users
 	 */
-	private function func_user_search( $api_suggest, $params = array() )
+	private function func_user_search( $search_string, $params = array() )
 	{
 		global $DB;
 
 		$params = array_merge( array(
 				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
 				'sql_mask'  => '$login$%',
+				'sql_limit' => 0,
 			), $params );
 
 		// Get request params:
 		$api_page = param( 'page', 'integer', 1 );
-		$api_per_page = param( 'per_page', 'integer', 0 );
+		$api_per_page = param( 'per_page', 'integer', $params['sql_limit'] );
 
 		// Initialize SQL to get users:
 		$users_SQL = new SQL();
 		$users_SQL->SELECT( '*' );
 		$users_SQL->FROM( 'T_users' );
-		if( ! empty( $api_suggest ) )
+		if( ! empty( $search_string ) )
 		{	// Filter by login:
-			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $api_suggest, $params['sql_mask'] ) ) );
+			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $search_string, $params['sql_mask'] ) ) );
 		}
 		if( ! empty( $params['sql_where'] ) )
 		{	// Additional restrict:

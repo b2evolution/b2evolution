@@ -52,7 +52,7 @@ jQuery( document ).ready( function()
 					type: "GET",
 					dataType: "JSON",
 					url: restapi_url + "users/autocomplete",
-					data: "suggest=" + term,
+					data: "q=" + term,
 					success: function( data )
 					{
 						if( typeof( data.users ) == 'undefined' )

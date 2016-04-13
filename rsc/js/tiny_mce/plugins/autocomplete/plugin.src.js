@@ -147,7 +147,7 @@
 						dataType: "JSON",
 						url: autocomplete_data.optionsUrl,
 						cache: false,
-						data: "suggest=" + wordLessTrigger,
+						data: "q=" + wordLessTrigger,
 						success: function (data) {
 							if( data && typeof( data.users ) != 'undefined' ) {
 								var options = [];
