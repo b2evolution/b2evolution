@@ -577,7 +577,7 @@ $Form->begin_form( '', '', $params );
 			if( count( $UserCache->cache ) > 20 )
 			{
 				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
 			}
 			else
 			{
