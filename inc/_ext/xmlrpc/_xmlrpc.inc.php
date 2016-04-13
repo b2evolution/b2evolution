@@ -2198,7 +2198,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		function addParam($par)
 		{
 			// add check: do not add to self params which are not xmlrpcvals
-			if(is_object($par) && is_a($par, 'xmlrpcval'))
+			if(is_object($par) && $par instanceof xmlrpcval)
 			{
 				$this->params[]=$par;
 				return true;
