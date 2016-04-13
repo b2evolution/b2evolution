@@ -558,7 +558,7 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{	// We want to use workflow properties for this blog:
 		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 

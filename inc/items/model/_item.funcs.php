@@ -1473,7 +1473,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 		)
 	);
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{ // We want to use workflow properties for this blog:
 		$menu_entries['tracker'] = array(
 			'text' => T_('Workflow view'),

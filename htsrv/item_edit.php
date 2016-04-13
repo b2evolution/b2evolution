@@ -348,7 +348,10 @@ switch( $action )
 		break;
 
 	case 'update_workflow':
-		// Update workflow properties from disp=single
+		// Update workflow properties from disp=single:
+
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $Blog->ID );
+
 		if( $Blog->get_setting( 'use_workflow' ) )
 		{ // Only if the workflow is enabled on collection
 			param( 'item_st_ID', 'integer', NULL );

@@ -693,11 +693,6 @@ class Item extends ItemLight
 			}
 		}
 
-		// DEADLINE:
-		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
-		}
-
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
@@ -753,17 +748,26 @@ class Item extends ItemLight
 		}
 
 		// WORKFLOW stuff:
-		param( 'item_st_ID', 'integer', NULL );
-		$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+		$item_Blog = $this->get_Blog();
+		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
+			param( 'item_st_ID', 'integer', NULL );
+			$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
 
-		$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-		$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-		$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
 
-		$item_priority = param( 'item_priority', 'integer', NULL );
-		if( $item_priority !== NULL )
-		{ // Set task priority only if it is gone from form
-			$this->set_from_Request( 'priority', 'item_priority', true );
+			$item_priority = param( 'item_priority', 'integer', NULL );
+			if( $item_priority !== NULL )
+			{ // Set task priority only if it is gone from form
+				$this->set_from_Request( 'priority', 'item_priority', true );
+			}
+
+			// DEADLINE:
+			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
+				$this->set_from_Request( 'datedeadline', 'item_deadline', true );
+			}
 		}
 
 		// FEATURED checkbox:

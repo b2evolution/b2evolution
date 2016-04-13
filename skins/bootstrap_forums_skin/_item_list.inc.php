@@ -66,6 +66,7 @@ $use_workflow = ( $disp == 'posts' ) &&
     ! empty( $Item ) &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item );
 ?>
 

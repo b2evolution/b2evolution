@@ -934,7 +934,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog;
+					global $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );
@@ -956,7 +956,7 @@ class Skin extends DataObject
 						require_js( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
+					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );

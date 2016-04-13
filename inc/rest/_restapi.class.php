@@ -760,6 +760,13 @@ class RestApi
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// Check permission: Current user must has a permission to be assignee of the collection:
 			$this->halt( 'You are not allowed to view assigness of the collection "'.$Blog->get( 'name' ).'".', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( ! $Blog->get_setting( 'use_workflow' ) )
+		{	// If workflow is not enabled for the collection:
+			$this->halt( 'The collection "'.$Blog->get( 'name' ).'" is not used for workflow.', 'no_access', 403 );
+			// Exit here.
 		}
 
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
@@ -817,6 +824,14 @@ class RestApi
 			$secondary_group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
 			$users_sql[] = $secondary_group_perms_SQL->get();
 		}
+
+		// Get collection's owner because it can be assignee by default:
+		$owner_SQL = new SQL();
+		$owner_SQL->SELECT( 'user_login' );
+		$owner_SQL->FROM( 'T_users' );
+		$owner_SQL->FROM_add( 'INNER JOIN T_blogs ON blog_owner_user_ID = user_ID' );
+		$owner_SQL->WHERE( 'blog_ID = '.$DB->quote( $Blog->ID ) );
+		$users_sql[] = $owner_SQL->get();
 
 		// Get assignees which primary groups have a setting to EDIT ALL collections:
 		$group_setting_SQL = new SQL();
@@ -1200,6 +1215,7 @@ class RestApi
 		if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{	// Check permission: User is not allowed to view threads
 			$this->halt( 'You are not allowed to view recipients.', 'no_access', 403 );
+			// Exit here.
 		}
 
 		if( check_create_thread_limit( true ) )
@@ -1245,7 +1261,9 @@ class RestApi
 		if( ! is_valid_login( $api_q ) )
 		{	// Restrict a wrong request:
 			$this->halt( 'Wrong request', 'wrong_request', 403 );
+			// Exit here.
 		}
+
 		// Add backslash for special char of sql operator LIKE:
 		$api_q = str_replace( '_', '\_', $api_q );
 
@@ -1274,6 +1292,7 @@ class RestApi
 		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'view' ) )
 		{	// Check permission: Current user must have at least view permission to see users login:
 			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
+			// Exit here.
 		}
 
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
