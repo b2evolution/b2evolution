@@ -802,32 +802,21 @@ $Form->begin_form( '', '', $params );
 			}
 			else
 			{	// Notifications are allowed for the Item:
-				if( $edited_Item->get_type_setting( 'usage' ) != 'post' )
-				{	// Item type is not applicable:
-					if( $edited_Item->check_notifications_flags( $notify_type ) )
-					{	// Nofications/Pings are not sent yet:
-						$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Pinged') : T_('Notified');
-						$notify_select_options = array(
-								''      => T_('Done'),
-								'force' => ( $notify_type == 'pings_sent' ) ? T_('Ping again') : T_('Notify again')
-							);
-					}
-					else
-					{	// Nofications/Pings were sent:
-						$notify_status = T_('Not Recommended');
-						$notify_select_options = array(
-								''      => T_('Do nothing'),
-								'force' => ( $notify_type == 'pings_sent' ) ? T_('Ping anyways') : T_('Notify anyways'),
-								'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Pinged') : T_('Mark as Notified')
-							);
-					}
-				}
-				elseif( $edited_Item->check_notifications_flags( $notify_type ) )
+				if( $edited_Item->check_notifications_flags( $notify_type ) )
 				{	// Nofications/Pings were sent:
 					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
 					$notify_select_options = array(
 							''      => T_('Done'),
 							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again')
+						);
+				}
+				elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+				{	// Item type is not applicable and Nofications/Pings are not sent yet:
+					$notify_status = T_('Not Recommended');
+					$notify_select_options = array(
+							''      => T_('Do nothing'),
+							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send anyways') : T_('Notify anyways'),
+							'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
 						);
 				}
 				else
