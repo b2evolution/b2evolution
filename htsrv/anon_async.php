@@ -48,8 +48,6 @@ $Ajaxlog = new Log();
 
 $Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
 
-$add_response_end_comment = true;
-
 $params = param( 'params', 'array', array() );
 switch( $action )
 {
@@ -1368,19 +1366,9 @@ switch( $action )
 
 			$user_logins = $DB->get_col( $users_sql );
 
-			if( $data_type == 'json' )
-			{	// Return data in JSON format:
-				echo evo_json_encode( $user_logins );
-				exit(0); // Exit here to don't break JSON data by following debug data
-			}
-			else
-			{	// Return data as multilines:
-				echo implode( "\n", $user_logins );
-			}
+			echo evo_json_encode( array( 'list' => $user_logins ) );
+			exit(0); // Exit here to don't break JSON data by following debug data
 		}
-
-		// Don't show ajax response end comment, because the result will be processed with jquery hintbox:
-		$add_response_end_comment = false;
 		break;
 
 	default:
@@ -1400,10 +1388,8 @@ if( $current_debug || $current_debug_jslog )
 						), 'ul', 'jslog' );
 }
 
-if( $add_response_end_comment )
-{	// Add ajax response end comment:
-	echo '<!-- Ajax response end -->';
-}
+// Add ajax response end comment:
+echo '<!-- Ajax response end -->';
 
 exit(0);
 

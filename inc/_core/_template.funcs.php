@@ -1630,9 +1630,9 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 									success: function( logins )
 									{
 										var json = new Array();
-										for( var l in logins )
+										for( var l in logins.list )
 										{
-											json.push( { login: logins[ l ] } );
+											json.push( { login: logins.list[ l ] } );
 										}
 										cb( json );
 									}
@@ -1670,7 +1670,8 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 				{
 					url: "'.get_secure_htsrv_url().'anon_async.php?action=get_login_list" + ajax_params,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
