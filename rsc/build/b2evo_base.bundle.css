@@ -221,16 +221,16 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
-a:hover .fa-x-flag--hover {
-  color: #7f7f7f !important;
+a:hover .fa-flag.fa-x--hover {
+  color: #F00 !important;
 }
-a:hover .fa-x-flag--hover:before {
+a:hover .fa-flag.fa-x--hover:before {
   content: "\f11d";
 }
-a:hover .fa-x-flag-o--hover {
-  color: #FAA72D !important;
+a:hover .fa-flag-o.fa-x--hover {
+  color: #F00 !important;
 }
-a:hover .fa-x-flag-o--hover:before {
+a:hover .fa-flag-o.fa-x--hover:before {
   content: "\f024";
 }
 .fa-x-external-link--nudge:before {

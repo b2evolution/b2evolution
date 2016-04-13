@@ -1019,7 +1019,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 0, 208 ),
 			'glyph' => 'flag',
-			'fa' => 'flag fa-x-flag--hover',
+			'fa' => 'flag fa-x--hover',
 			'color' => '#FAA72D'
 		);
 		case 'flag_off': return array(
@@ -1027,7 +1027,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 16, 208 ),
 			'glyph' => 'flag',
-			'fa' => 'flag-o fa-x-flag-o--hover',
+			'fa' => 'flag-o fa-x--hover',
 			'color' => '#7f7f7f'
 		);
 
