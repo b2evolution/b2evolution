@@ -6954,9 +6954,9 @@ class Item extends ItemLight
 	{
 		global $DB;
 
-		if( is_null($this->latest_Comment) )
+		if( is_null( $this->latest_Comment ) )
 		{
-			$SQL = new SQL( 'Get the latest Comment on the Item' );
+			$SQL = new SQL( 'Get the latest Comment on the Item #'.$this->ID );
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
@@ -6969,10 +6969,14 @@ class Item extends ItemLight
 				$SQL->WHERE_and( 'comment_status = '.$DB->quote( $status ) );
 			}
 
-			if( $comment_ID = $DB->get_var( $SQL->get() ) )
-			{
+			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
 				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+			}
+			else
+			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
+				$this->latest_Comment = false;
 			}
 		}
 
