@@ -138,6 +138,10 @@ siteskin_include( '_site_body_header.inc.php' );
 
 			<span class="nav_album_title">
 				<?php
+					// Flag:
+					$single_Item->flag();
+
+					// Title:
 					$single_Item->title( array(
 							'link_type' => 'permalink',
 							'before'    => '',

@@ -8173,18 +8173,41 @@ class Item extends ItemLight
 	 */
 	function flag( $params = array() )
 	{
-		global $current_User;
+		echo $this->get_flag( $params );
+	}
+
+
+	/**
+	 * Get button to flag item
+	 *
+	 * @param array Params
+	 * @return string HTML of the button
+	 */
+	function get_flag( $params = array() )
+	{
+		global $current_User, $cache_items_flag_displayed;
 
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
 				'title_flag'   => T_('Click to flag this.'),
 				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
+				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
 			), $params );
 
 		if( ! $this->can_flag() )
 		{	// Don't display the flag button if it is not allowed by some reason:
-			return;
+			return '';
+		}
+
+		if( ! isset( $cache_items_flag_displayed ) || ! is_array( $cache_items_flag_displayed ) )
+		{	// Initialize array to cache what items flags have been displayed for:
+			$cache_items_flag_displayed = array();
+		}
+
+		if( in_array( $this->ID, $cache_items_flag_displayed ) )
+		{	// Don't display the flag button because it has been already displayed before of the current page:
+			return '';
 		}
 
 		$item_Blog = & $this->get_Blog();
@@ -8192,9 +8215,14 @@ class Item extends ItemLight
 		// Get current state of flag:
 		$is_flagged = $this->get_user_data( 'item_flag' );
 
-		echo $params['before'];
+		if( $params['only_flagged'] && ! $is_flagged )
+		{	// Don't display the button because of request to display it only for the flagged items by current User:
+			return '';
+		}
 
-		echo '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
+		$r = $params['before'];
+
+		$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
 				.get_icon( 'flag_on', 'imgtag', array(
 					'title' => $params['title_flag'],
 					'style' => $is_flagged ? '' : 'display:none',
@@ -8205,7 +8233,12 @@ class Item extends ItemLight
 				) )
 			.'</a>';
 
-		echo $params['after'];
+		$r .= $params['after'];
+
+		// Cache this to don't display flag twice for the same item on the same page:
+		$cache_items_flag_displayed[] = $this->ID;
+
+		return $r;
 	}
 
 

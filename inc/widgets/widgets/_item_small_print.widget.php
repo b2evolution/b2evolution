@@ -163,6 +163,8 @@ class item_small_print_Widget extends ComponentWidget
 					'thumb_class' => 'leftmargin',
 				) );
 
+			$Item->flag();
+
 			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
@@ -209,6 +211,8 @@ class item_small_print_Widget extends ComponentWidget
 		}
 		else
 		{ // Revisions
+			$Item->flag();
+
 			$Item->author( array(
 					'before'    => T_('Created by '),
 					'after'     => ' &bull; ',

@@ -1939,6 +1939,9 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
   margin: 0 2px;
   font-weight: bold;
 }
+.action_icon.evo_post_flag_btn {
+  margin-left: 0;
+}
 .title_action_icons {
   float: right;
 }

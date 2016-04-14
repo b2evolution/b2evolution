@@ -313,6 +313,13 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 .posts_list h3 {
   display: inline-block;
 }
+.posts_list h3 .evo_post_flag_btn {
+  font-size: inherit;
+}
+.posts_list h3 .evo_post_flag_btn span.fa {
+  font-size: inherit;
+  margin-right: 5px;
+}
 .posts_list li > .btn-group {
   margin: 0 0 6px 30px;
 }

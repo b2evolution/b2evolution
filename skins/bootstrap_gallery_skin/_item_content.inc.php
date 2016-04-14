@@ -225,6 +225,12 @@ switch( $content_mode )
 			
 			// Title and number of photos in album
 			echo $params['content_title_start'];
+				// Flag:
+				$Item->flag( array(
+						'before' => '<span class="pull-left">',
+						'after'  => '</span>',
+					) );
+				// Title:
 				$Item->title( array(
 						'link_type' => 'permalink',
 						'before'    => '<h4 class="panel-title">',

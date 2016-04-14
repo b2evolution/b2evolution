@@ -98,8 +98,10 @@ $use_workflow = $Item->Blog->get_setting( 'use_workflow' );
 									break;
 							}
 						}
-					// Flag:
-					$Item->flag();
+
+						// Flag:
+						$Item->flag();
+
 						// Title:
 						$Item->title( array(
 								'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),

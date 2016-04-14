@@ -326,8 +326,13 @@ class content_hierarchy_Widget extends ComponentWidget
 			$display_params['after'] = '</i>';
 		}
 
+		// Flag:
+		$item_flag = $Item->get_flag( array(
+				'only_flagged' => true,
+			) );
+
 		// Display a permanent link to post
-		$r .= $Item->get_title( $display_params );
+		$r .= $item_flag.$Item->get_title( $display_params );
 
 		$r .= $params['item_end'];
 		return $r;
