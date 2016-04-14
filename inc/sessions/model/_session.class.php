@@ -193,7 +193,7 @@ class Session
 							$Debuglog->add( 'Session: Session data loaded.', 'request' );
 
 							// Load a Messages object from session data, if available:
-							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'Messages' ) )
+							if( ($sess_Messages = $this->get('Messages')) && $sess_Messages instanceof Messages )
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );

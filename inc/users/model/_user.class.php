@@ -3579,7 +3579,7 @@ class User extends DataObject
 															comment_author_email = '.$DB->quote( $this->get('email') ).',
 															comment_author_url = '.$DB->quote( $this->get('url') ).'
 													WHERE comment_author_user_ID = '.$this->ID );
-			if( is_a( $Log, 'log' ) )
+			if( $Log instanceof log )
 			{
 				$Log->add( 'Transforming user\'s comments to unregistered comments... '.sprintf( '(%d rows)', $ret ), 'note' );
 			}
@@ -3616,7 +3616,7 @@ class User extends DataObject
 
 		$DB->commit();
 
-		if( is_a( $Log, 'log' ) )
+		if( $Log instanceof log )
 		{
 			$Log->add( 'Deleted User.', 'note' );
 		}

@@ -706,7 +706,7 @@ function save_comment_to_session( $Comment )
 function get_comment_from_session()
 {
 	global $Session;
-	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && is_a( $mass_Comment, 'Comment' ) )
+	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && $mass_Comment instanceof Comment )
 	{
 		$Session->delete( 'core.unsaved_Comment' );
 		return $mass_Comment;

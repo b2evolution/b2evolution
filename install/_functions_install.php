@@ -735,7 +735,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
-	if( ! is_a( $edit_Plugin, 'Plugin' ) )
+	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
 		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;

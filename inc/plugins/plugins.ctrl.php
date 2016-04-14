@@ -297,7 +297,7 @@ switch( $action )
 		{ // second step:
 			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
-			if( ! is_a($edit_Plugin, 'Plugin') )
+			if( ! ( $edit_Plugin instanceof Plugin ) )
 			{
 				$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 				$action = 'list';

@@ -51,7 +51,7 @@ $Table->display_head();
 // BODY START:
 $Table->display_body_start();
 
-if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
+if( empty($AvailablePlugins) || ! ( $AvailablePlugins instanceof Plugins_admin_no_DB ) )
 { // (may have been instantiated for action 'info')
 	load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
 	$AvailablePlugins = new Plugins_admin_no_DB(); // do not load registered plugins/events from DB

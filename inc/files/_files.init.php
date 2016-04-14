@@ -316,7 +316,7 @@ class files_Module extends Module
 				}
 		}
 
-		if( $perm && isset( $permtarget ) && ( is_a( $permtarget, 'FileRoot' ) ) )
+		if( $perm && isset( $permtarget ) && ( $permtarget instanceof FileRoot ) )
 		{
 			global $current_User;
 			switch( $permtarget->type )

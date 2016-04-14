@@ -6517,7 +6517,7 @@ class Item extends ItemLight
 
 					if( ! empty( $params['xmlrpcresp'] ) )
 					{
-						if( is_a( $params['xmlrpcresp'], 'xmlrpcresp' ) )
+						if( $params['xmlrpcresp'] instanceof xmlrpcresp )
 						{
 							// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
 							ob_start();
