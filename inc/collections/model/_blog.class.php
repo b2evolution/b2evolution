@@ -439,8 +439,10 @@ class Blog extends DataObject
 						$disable_moderation_statuses = array( 'community', 'protected' );
 						break;
 				}
-				$post_moderation_statuses = empty( $this->get_setting( 'post_moderation_statuses' ) ) ? array() : explode( ',', $this->get_setting( 'post_moderation_statuses' ) );
-				$comment_moderation_statuses = empty( $this->get_setting( 'moderation_statuses' ) ) ? array() : explode( ',', $this->get_setting( 'moderation_statuses' ) );
+				$post_moderation_statuses = $this->get_setting( 'post_moderation_statuses' );
+				$post_moderation_statuses = empty( $post_moderation_statuses ) ? array() : explode( ',', $post_moderation_statuses );
+				$comment_moderation_statuses = $this->get_setting( 'moderation_statuses' );
+				$comment_moderation_statuses = empty( $comment_moderation_statuses ) ? array() : explode( ',', $comment_moderation_statuses );
 				if( ! empty( $disable_moderation_statuses ) )
 				{	// Disable moderation statuses:
 					$post_moderation_statuses = array_diff( $post_moderation_statuses, $disable_moderation_statuses );
