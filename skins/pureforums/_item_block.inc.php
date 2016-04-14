@@ -96,14 +96,12 @@ $Skin->display_breadcrumbs( $cat );
 			) );
 		?></td>
 		<td><?php
-			if( $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Item->issue_time( array(
-						'before'      => '',
-						'after'       => ' &nbsp; &nbsp; ',
-						'time_format' => 'D M j, Y H:i',
-					) );
-			}
+			// We want to display the post date:
+			$Item->issue_time( array(
+					'before'      => '',
+					'after'       => ' &nbsp; &nbsp; ',
+					'time_format' => 'D M j, Y H:i',
+				) );
 		?>
 			<a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 		</td>
