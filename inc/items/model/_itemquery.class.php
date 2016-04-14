@@ -45,6 +45,7 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
 
 	/**
@@ -967,6 +968,25 @@ class ItemQuery extends SQL
 		$search_sql = '( '.implode( ' '.$operator_sql.' ', $search_sql ).' )';
 
 		$this->WHERE_and( $search_sql );
+	}
+
+
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict:
+			return;
+		}
+
+		// Get items which are flagged by any user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID AND itud_flagged_item = 1' );
 	}
 
 

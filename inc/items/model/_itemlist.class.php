@@ -712,6 +712,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
+		$next_Query->where_flagged( $this->filters['flagged'] );
 
 		/*
 		 * ORDER BY stuff:
