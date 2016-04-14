@@ -762,7 +762,7 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:
