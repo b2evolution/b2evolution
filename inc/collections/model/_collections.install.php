@@ -71,7 +71,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
-			blog_favorite        TINYINT(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -439,6 +438,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_coll_user_favs' => array(
+		'Creating table for user favorite collections',
+		"CREATE TABLE T_coll_user_favs (
+			cufv_user_ID    int(10) unsigned NOT NULL,
+			cufv_blog_ID    int(10) unsigned NOT NULL,
+			PRIMARY KEY cufv_pk (cufv_user_ID, cufv_blog_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links' => array(

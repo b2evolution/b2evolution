@@ -7391,6 +7391,59 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11755, 'Creating collection user favorites table...' ) )
+	{ // part of 6.7.1-beta
+		db_create_table( 'T_coll_user_favs', '
+				cufv_user_ID INT(10) UNSIGNED NOT NULL,
+				cufv_blog_ID INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY cufv_pk ( cufv_user_ID, cufv_blog_ID )' );
+
+		// If system user count is less than or equal to 10, Add favorites based on previous blog_favorite settings
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$user_IDs = system_get_user_IDs();
+		$user_count = count( $user_IDs );
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->ORDER_BY( 'blog_ID' );
+		$blogs = $DB->get_results( $SQL->get() );
+
+		$SQL = 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES ';
+		$values = array();
+
+		// Collection owners will automatically favorite their collection
+		foreach( $blogs as $blog )
+		{
+			$values[] = '( '.$blog->blog_ID.', '.$blog->blog_owner_user_ID.' )';
+		}
+
+		if( $user_count <= 10 )
+		{
+			foreach( $blogs as $blog )
+			{
+				if( $blog->blog_favorite )
+				{ // currently has favorite status
+					foreach( $user_IDs as $user_ID )
+					{
+						$values[] = '( '.$blog->blog_ID.', '.$user_ID.' )';
+					}
+				}
+			}
+		}
+
+		$values = array_unique( $values );
+		if( $values )
+		{
+			$SQL .= implode( ', ', $values );
+			$DB->query( $SQL );
+		}
+
+		// Drop blog_favorite column
+		db_drop_col( 'T_blogs', 'blog_favorite' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

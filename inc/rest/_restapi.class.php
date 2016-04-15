@@ -560,13 +560,13 @@ class RestApi
 		$search_params = $Session->get( 'search_params' );
 		$search_result = $Session->get( 'search_result' );
 		$search_result_loaded = false;
-		if( empty( $search_params ) 
+		if( empty( $search_params )
 			|| ( $search_params['search_keywords'] != $search_keywords ) // We had saved search results but for a different search string
 			|| ( $search_params['search_blog'] != $Blog->ID ) // We had saved search results but for a different collection
 			|| ( $search_result === NULL ) )
 		{	// We need to perform a new search:
 			$search_params = array(
-				'search_keywords' => $search_keywords, 
+				'search_keywords' => $search_keywords,
 				'search_blog'     => $Blog->ID,
 			);
 
@@ -732,7 +732,7 @@ class RestApi
 					$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
 					break;
 
-				default: 
+				default:
 					// Other type of result is not implemented
 
 					// TODO: maybe find collections (especially in case of aggregation)? users? files?
@@ -854,6 +854,32 @@ class RestApi
 		$this->add_response( 'list', $user_logins );
 	}
 
+
+	/**
+	 * Call collection controller to toggle favorite status
+	 *
+	 */
+	private function controller_coll_favorite()
+	{
+		global $current_User, $Blog;
+
+		if( ! is_logged_in() )
+		{	// Check permission: Current user must be logged in
+			$this->halt( 'You are not allowed to set the collection "'.$Blog->get( 'name' ).'" as a favorite.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( $Blog->set_favorite( NULL, $current_User->ID ) )
+		{
+			$this->add_response( 'status', 'ok', 'string' );
+			$this->add_response( 'setting', $Blog->get_favorite() );
+		}
+		else
+		{
+			$this->add_response( 'status', 'fail', 'string' );
+			$this->add_response( 'errorMsg', 'Unable to toggle favorite status' );
+		}
+	}
 
 	/**** MODULE COLLECTIONS ---- END ****/
 

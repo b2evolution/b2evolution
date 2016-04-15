@@ -7,6 +7,9 @@
  *
  * @package admin
  */
+.fa.coll-fav {
+  font-size: 26px;
+}
 .page-content {
   margin-top: 16px;
 }
@@ -200,6 +203,10 @@ div.bPost {
   margin: 0 0 1ex;
   padding: 0;
   border: 1px solid #CCC;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   overflow: hidden;
   /* to normal view of border-radius */
@@ -236,6 +243,10 @@ div.bPost {
 }
 .evo_comments_container .bCommentAvatar {
   border: 0;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
   border-radius: 50%;
   padding: 0;
   margin: 4px 10px 10px 0;
@@ -271,6 +282,10 @@ div.bPost {
   margin: 0;
   padding: 1ex;
   border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .bFeedback .bComment.form-horizontal.evo_form__comment_meta {
@@ -303,6 +318,10 @@ div.bPost {
   padding: 0;
   margin: 1ex;
   border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .evo_comments_container div.bComment > p {
@@ -553,6 +572,10 @@ fieldset ul {
 .evo_comments_container,
 .items_container {
   border: 1px solid #DDD;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   margin-bottom: 20px;
 }
@@ -591,9 +614,17 @@ fieldset ul {
 }
 .dashboard_comments_block .evo_content_block a.user img,
 .dashboard_comments_block .evo_content_block img.user {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
   border-radius: 50%;
 }
 .dashboard_comments_block .evo_content_block .popover a.user img {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
   border-radius: 0;
 }
 .dashboard_comments_block .evo_comments_container {
@@ -750,6 +781,10 @@ div.qq-upload-drop-area,
 div.qq-upload-drop-area-active {
   border: 2px dashed #fff;
   background: #5bc0de;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  -ms-border-radius: 9px;
+  -o-border-radius: 9px;
   border-radius: 9px;
 }
 div.qq-upload-button-hover,
@@ -774,6 +809,10 @@ td.fm_filename .result_error {
 div.fileman_toolbars_bottom .toolbaritem {
   border: 2px dashed #fff;
   background: #e8e8e8;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   margin: 3px 0 0 10px;
   padding: 2px 10px;
@@ -873,15 +912,11 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
-  -ms-flex-pack: distribute;
-      justify-content: space-around;
+  justify-content: space-around;
   -webkit-justify-content: space-around;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   -webkit-flex-wrap: wrap;
 }
 .tool_steps .step {
@@ -897,6 +932,10 @@ h2.user_title {
   padding: 5px;
   text-align: center;
   width: 33px;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
   border-radius: 100%;
 }
 .tool_steps .step.current {
@@ -1027,6 +1066,10 @@ div#widget_settings.widget_settings_active {
 div.available_widgets {
   background: #FFF;
   border-color: #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 div.available_widgets .available_widgets_toolbar {
@@ -1213,6 +1256,10 @@ div.level3 nav .nav > li > a {
 .skinshot {
   background-color: #F5F5F5;
   border: 1px solid #E3E3E3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
   padding: 5px;
   float: left;
@@ -1224,6 +1271,10 @@ div.level3 nav .nav > li > a {
   margin: 1ex 1ex .5ex 1ex;
   background: #FFF;
   text-align: center;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .skinshot .skinshot_placeholder .skinshot_noshot {

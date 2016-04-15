@@ -223,6 +223,19 @@ function system_get_blog_IDs( $only_cache_enabled )
 
 
 /**
+ * Get user IDs
+ *
+ * @return array user IDs
+ */
+function system_get_user_IDs()
+{
+	global $DB;
+
+	return $DB->get_col( 'SELECT user_ID FROM T_users' );
+}
+
+
+/**
  * Check if the given blog cache directory is ready for operation
  *
  * @param mixed blog ID, or NULL to check the general cache

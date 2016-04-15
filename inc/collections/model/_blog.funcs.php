@@ -1002,7 +1002,7 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 	foreach( $statuses as $status => $status_text )
 	{	// Add a checklist option for each possible front office post/comment status:
 		if( $max_allowed_status == $status )
-		{	// This is max allowed status, Then display all next statuses with 
+		{	// This is max allowed status, Then display all next statuses with
 			$status_is_hidden = false;
 		}
 
@@ -1335,6 +1335,45 @@ function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_emp
 
 
 /**
+ * Display collection favorite icon
+ *
+ * @param integer Blog ID
+ */
+function get_coll_fav_icon( $blog_ID, $params = array() )
+{
+	global $admin_url, $current_User;
+
+	$params = array_merge( array(
+			'title' => '',
+			'class' => '',
+		), $params );
+
+	$BlogCache = & get_BlogCache();
+	$edited_Blog = $BlogCache->get_by_ID( $blog_ID );
+	if( $edited_Blog->get_favorite() > 0 )
+	{
+		$icon = 'star_on';
+		$action = 'disable_setting';
+		$title = T_('The collection is a favorite');
+	}
+	else
+	{
+		$icon = 'star_off';
+		$action = 'enable_setting';
+		$title = T_('The collection is not a favorite');
+	}
+
+	return '<a href="'.$admin_url.'?ctrl=coll_settings'
+			.'&amp;tab=general'
+			.'&amp;action='.$action
+			.'&amp;setting=fav'
+			.'&amp;blog='.$blog_ID
+			.'&amp;'.url_crumb('collection').'">'
+			.get_icon( $icon, 'imgtag', $params )
+			.'</a>';
+}
+
+/**
  * Display blogs results table
  *
  * @param array Params
@@ -1478,8 +1517,9 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_blogs.*, user_login' );
+	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:

@@ -122,11 +122,6 @@ class Blog extends DataObject
 	var $type;
 
 	/**
-	 * @var boolean TRUE if blog is favorite
-	 */
-	var $favorite = 1;
-
-	/**
 	 * @var array Data of moderators which must be notified about new/edited comments
 	 */
 	var $comment_moderator_user_data;
@@ -185,7 +180,6 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
-			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -200,6 +194,7 @@ class Blog extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
+				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
@@ -466,7 +461,6 @@ class Blog extends DataObject
 			// Lists of collections:
 			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
-			$this->set( 'favorite',  param( 'favorite', 'integer', 0 ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -1219,6 +1213,40 @@ class Blog extends DataObject
 
 
 	/**
+	 * Set favorite status of current_user
+	 *
+	 * @param integer
+	 * @param integer User ID, leave empty for current user
+	 */
+	function set_favorite( $setting = NULL, $user_ID = NULL )
+	{
+		global $DB, $current_User;
+
+		if( is_null( $setting ) )
+		{ // toggle setting
+			$setting = $this->get_favorite() ? 0: 1;
+		}
+
+		if( is_null( $user_ID ) && $current_User )
+		{
+			$user_ID = $current_User->ID;
+		}
+
+		if( $user_ID )
+		{
+			if( $setting )
+			{
+				return $DB->query( 'REPLACE INTO T_coll_user_favs ( cufv_user_ID, cufv_blog_ID ) VALUES ( '.$user_ID.', '.$this->ID.' )' );
+			}
+			else
+			{
+				return $DB->query( 'DELETE FROM T_coll_user_favs WHERE cufv_user_ID = '.$user_ID.' AND cufv_blog_ID = '.$this->ID );
+			}
+		}
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * @param string Parameter name
@@ -1917,6 +1945,38 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get favorite status of blog
+	 *
+	 * @param integer User ID, leave empty for current user
+	 * @return mixed
+	 */
+	function get_favorite( $user_ID = NULL )
+	{
+		global $current_User, $DB;
+
+		if( is_null( $user_ID ) && $current_User )
+		{
+			$user_ID = $current_User->ID;
+		}
+
+		if( $user_ID )
+		{
+			$fav_SQL = new SQL();
+			$fav_SQL->SELECT( 'COUNT(*)' );
+			$fav_SQL->FROM( 'T_coll_user_favs' );
+			$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
+			$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
+
+			return $DB->get_var( $fav_SQL->get() );
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+
+
+	/**
  	 * Get link to edit files
  	 *
  	 * @param string link (false on error)
@@ -2224,6 +2284,9 @@ class Blog extends DataObject
 					return '';
 				}
 
+			case 'favorite':
+				return $this->get_favorite();
+
 
 			default:
 				// All other params:
@@ -2511,6 +2574,22 @@ class Blog extends DataObject
 
 			// Enable default item types for the inserted collection:
 			$this->enable_default_item_types();
+
+			// Owner automatically favorite the collection
+			$this->set_favorite( 1, $this->owner_user_ID );
+
+			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
+			load_funcs( 'tools/model/_system.funcs.php' );
+			$blog_count = count( system_get_blog_IDs() );
+			$user_IDs = system_get_user_IDs();
+			$user_count = count( $user_IDs );
+			if( $blog_count < 5 && $user_count <= 10 )
+			{
+				foreach( $user_IDs as $id )
+				{
+					$this->set_favorite( 1, $id );
+				}
+			}
 
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 
@@ -3001,6 +3080,12 @@ class Blog extends DataObject
 		global $DB, $Plugins, $servertimenow;
 
 		$DB->begin();
+
+		// Favorite blog by new owner
+		if( isset( $this->dbchanges['blog_owner_user_ID'] ) )
+		{
+			$this->set_favorite( 1, $this->owner_user_ID );
+		}
 
 		parent::dbupdate();
 

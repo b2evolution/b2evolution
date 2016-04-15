@@ -39,6 +39,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
