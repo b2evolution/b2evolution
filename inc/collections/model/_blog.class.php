@@ -1263,6 +1263,9 @@ class Blog extends DataObject
 			case 'allowtrackbacks':
 				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 				break;
+			case 'favorite':
+				return $this->set_favorite( $parvalue );
+				break;
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
