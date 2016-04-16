@@ -1215,7 +1215,7 @@ class Blog extends DataObject
 	/**
 	 * Set favorite status of current_user
 	 *
-	 * @param integer
+	 * @param integer Setting, leave empty to toggle
 	 * @param integer User ID, leave empty for current user
 	 */
 	function set_favorite( $setting = NULL, $user_ID = NULL )
@@ -1232,7 +1232,7 @@ class Blog extends DataObject
 			$user_ID = $current_User->ID;
 		}
 
-		if( $user_ID )
+		if( $user_ID && $this->ID )
 		{
 			if( $setting )
 			{
@@ -1242,6 +1242,10 @@ class Blog extends DataObject
 			{
 				return $DB->query( 'DELETE FROM T_coll_user_favs WHERE cufv_user_ID = '.$user_ID.' AND cufv_blog_ID = '.$this->ID );
 			}
+		}
+		else
+		{
+			return false;
 		}
 	}
 
@@ -1962,7 +1966,7 @@ class Blog extends DataObject
 			$user_ID = $current_User->ID;
 		}
 
-		if( $user_ID )
+		if( $user_ID && $this->ID )
 		{
 			$fav_SQL = new SQL();
 			$fav_SQL->SELECT( 'COUNT(*)' );
@@ -1974,7 +1978,7 @@ class Blog extends DataObject
 		}
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
 
