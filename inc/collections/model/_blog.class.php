@@ -2587,7 +2587,7 @@ class Blog extends DataObject
 
 			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
 			load_funcs( 'tools/model/_system.funcs.php' );
-			$blog_count = count( system_get_blog_IDs() );
+			$blog_count = count( system_get_blog_IDs( false ) );
 			$user_IDs = system_get_user_IDs();
 			$user_count = count( $user_IDs );
 			if( $blog_count < 5 && $user_count <= 10 )
