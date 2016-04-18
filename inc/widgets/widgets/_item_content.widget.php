@@ -112,6 +112,13 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $Item;
+
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
@@ -158,12 +165,13 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Has the Item page changed?
 			);
 	}
 }
