@@ -81,6 +81,10 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+*[class^="listnav_distance_"],
+*[class*=" listnav_distance_"] {
+  display: none;
+}
 table.prevnext_post {
   width: 95%;
   margin: 0 auto;

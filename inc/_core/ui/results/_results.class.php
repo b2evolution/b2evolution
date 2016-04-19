@@ -2188,12 +2188,20 @@ class Results extends Table
 				{
 					$page_no++;
 				}
-				if( isset( $this->params['page_item_before'] ) )
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
 				}
-				$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
-								.$this->params['list_next_text'].'</a>';
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list_link = add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+					$list .= $list_link;
+				}
+
 				if( isset( $this->params['page_item_after'] ) )
 				{
 					$list .= $this->params['page_item_after'];
@@ -2276,12 +2284,19 @@ class Results extends Table
 				{
 					$page_no--;
 				}
-				if( isset( $this->params['page_item_before'] ) )
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
 				}
-				$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
-								.$this->params['list_next_text'].'</a>';
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list .= add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+				}
+
 				if( isset( $this->params['page_item_after'] ) )
 				{
 					$list .= $this->params['page_item_after'];
