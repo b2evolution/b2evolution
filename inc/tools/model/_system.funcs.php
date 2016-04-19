@@ -64,6 +64,7 @@ function get_system_stats()
 	$system_stats['php_xml'] = extension_loaded('xml');
 	$system_stats['php_imap'] = extension_loaded('imap');
 	$system_stats['php_opcode_cache'] = get_active_opcode_cache();
+	$system_stats['php_user_cache'] = get_active_user_cache();
 
 	// GD:
 	$system_stats['gd_version'] = system_check_gd_version();

@@ -538,6 +538,18 @@ else
 	disp_system_check( 'ok' );
 }
 
+// User cache
+$user_cache = get_active_user_cache();
+init_system_check( 'PHP user cache', $user_cache );
+if( $user_cache == 'none' )
+{
+	disp_system_check( 'warning', T_( 'Using an user cache allows all your PHP scripts to run faster by caching a "compiled" (user) version of the scripts instead of recompiling everything at every page load. Several user caches are available. We recommend APC.' ) );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
 // pre_dump( get_loaded_extensions() );
 
 $block_item_Widget->disp_template_raw( 'block_end' );

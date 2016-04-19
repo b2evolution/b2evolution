@@ -3199,7 +3199,12 @@ function debug_info( $force = false, $force_clean = false )
 		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+
+		// ================================ User caching ================================
+		echo 'User cache: '.get_active_user_cache();
+		echo $clean ? "\n" : '<p>';
 		echo '</div></div>';
+
 
 		// ================================ Memory Usage ================================
 		echo '<div class="log_container"><div>';
@@ -6017,6 +6022,33 @@ function get_active_opcode_cache()
 	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
 	{
 		return 'APCu';
+	}
+
+	return 'none';
+}
+
+
+/**
+ * Get name of active user cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
+ */
+function get_active_user_cache()
+{
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
 	}
 
 	return 'none';
