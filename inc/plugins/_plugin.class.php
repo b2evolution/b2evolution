@@ -685,15 +685,24 @@ class Plugin
 	}
 
 
-  /**
-   * Get definitions for widget specific editable params
-   *
+	/**
+	 * Get definitions for widget specific editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		return array();
+		if( ! is_array( $params ) )
+		{	// Must be array:
+			$params = array();
+		}
+
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return array_merge( $ComponentWidget->get_param_definitions( array() ), $params );
 	}
 
 
