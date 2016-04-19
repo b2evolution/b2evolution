@@ -5996,6 +5996,11 @@ function get_active_opcode_cache()
 		}
 	}
 
+	if( ini_get( 'opcache.enable' ) )
+	{
+		return 'OPCache';
+	}
+
 	return 'none';
 }
 
