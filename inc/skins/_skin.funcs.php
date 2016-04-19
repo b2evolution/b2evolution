@@ -1744,6 +1744,12 @@ function skin_include( $template_name, $params = array() )
 
 		$template_name = $disp_handlers['disp_'.$disp];
 
+		if( empty( $template_name ) )
+		{	// The caller asked not to display this handler
+			$Timer->pause( $timer_name );
+			return;
+		}
+
 		if( $template_name[0] != '#' && // if template is not handled by plugins
 		    ( $disp == 'single' || $disp == 'page' ) &&
 		    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
@@ -1759,13 +1765,6 @@ function skin_include( $template_name, $params = array() )
 				}
 			}
 		}
-
-		if( empty( $template_name ) )
-		{	// The caller asked not to display this handler
-			$Timer->pause( $timer_name );
-			return;
-		}
-
 	}
 
 
