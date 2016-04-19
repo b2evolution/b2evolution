@@ -673,7 +673,7 @@ class ComponentWidget extends DataObject
 
 		if( $this->type == 'plugin' && $this->get_Plugin() )
 		{	// Get widget cache keys from plugin:
-			return $this->Plugin->get_widget_cache_keys();
+			return $this->Plugin->get_widget_cache_keys( $this->ID );
 		}
 
 		return array(
