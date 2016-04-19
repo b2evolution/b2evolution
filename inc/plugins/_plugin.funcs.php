@@ -38,6 +38,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	global $htsrv_url;
 	static $has_array_type;
 
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( ! empty($parmeta['no_edit']) )
 	{ // this setting is not editable
 		return;
@@ -682,6 +687,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
 {
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( isset($parmeta['layout']) )
 	{ // a layout "setting"
 		return;
@@ -842,6 +852,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 function autoform_validate_param_value( $param_name, $value, $meta )
 {
 	global $Messages;
+
+	if( ! is_array( $meta ) )
+	{	// Must be array:
+		return;
+	}
 
 	if( is_array($value) && isset($meta['entries']) )
 	{
