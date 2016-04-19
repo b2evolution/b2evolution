@@ -5802,6 +5802,10 @@ function get_from_mem_cache( $key, & $success )
 	{	// eAccelerator
 		$r = eaccelerator_get( $key );
 	}
+	elseif( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5850,6 +5854,10 @@ function set_to_mem_cache( $key, $payload, $ttl = 0 )
 	{	// eAccelerator
 		$r = eaccelerator_put( $key, $payload, $ttl );
 	}
+	elseif( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
 	else
 	{	// No available cache module:
 		global $Debuglog;
@@ -5884,6 +5892,11 @@ function unset_from_mem_cache( $key )
 	if( function_exists( 'eaccelerator_rm' ) )
 	{	// eAccelerator
 		return eaccelerator_rm( gen_key_for_cache( $key ) );
+	}
+
+	if( function_exists( 'apcu_delete' ) )
+	{	// APCu
+		return apcu_delete( $key );
 	}
 }
 
@@ -5999,6 +6012,11 @@ function get_active_opcode_cache()
 	if( ini_get( 'opcache.enable' ) )
 	{
 		return 'OPCache';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
 	}
 
 	return 'none';
