@@ -5784,18 +5784,24 @@ function array_to_option_list( $array, $default = '', $allow_none = array() )
  * @param boolean success (by reference)
  * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success )
+function get_from_mem_cache( $key, & $success )
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache', false);
+	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists('apc_fetch') )
+	if( function_exists( 'apc_fetch' ) )
+	{	// APC
 		$r = apc_fetch( $key, $success );
-	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
-		$r = xcache_get($key);
-	elseif( function_exists('eaccelerator_get') )
-		$r = eaccelerator_get($key);
+	}
+	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
+		$r = xcache_get( $key );
+	}
+	elseif( function_exists( 'eaccelerator_get' ) )
+	{	// eAccelerator
+		$r = eaccelerator_get( $key );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5806,10 +5812,11 @@ function get_from_mem_cache($key, & $success )
 		$r = NULL;
 
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for reading "'.$key.'".', 'cache' );
 	}
 
-	$Timer->pause('get_from_mem_cache', false);
+	$Timer->pause( 'get_from_mem_cache', false );
+
 	return $r;
 }
 
@@ -5825,25 +5832,32 @@ function get_from_mem_cache($key, & $success )
  * @param int Time to live (seconds). Default is 0 and means "forever".
  * @return mixed
  */
-function set_to_mem_cache($key, $payload, $ttl = 0)
+function set_to_mem_cache( $key, $payload, $ttl = 0 )
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache', false);
+	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists('apc_store') )
+	if( function_exists( 'apc_store' ) )
+	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
-	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	}
+	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	elseif( function_exists('eaccelerator_put') )
+	}
+	elseif( function_exists( 'eaccelerator_put' ) )
+	{	// eAccelerator
 		$r = eaccelerator_put( $key, $payload, $ttl );
-	else {
+	}
+	else
+	{	// No available cache module:
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for writing "'.$key.'".', 'cache' );
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache', false);
+	$Timer->pause( 'set_to_mem_cache', false );
 
 	return $r;
 }
@@ -5855,16 +5869,22 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
-function unset_from_mem_cache($key)
+function unset_from_mem_cache( $key )
 {
-	if( function_exists('apc_delete') )
+	if( function_exists( 'apc_delete' ) )
+	{	// APC
 		return apc_delete( $key );
+	}
 
-	if( function_exists('xcache_unset') )
-		return xcache_unset(gen_key_for_cache($key));
+	if( function_exists( 'xcache_unset' ) )
+	{	// XCache
+		return xcache_unset( gen_key_for_cache( $key ) );
+	}
 
-	if( function_exists('eaccelerator_rm') )
-		return eaccelerator_rm(gen_key_for_cache($key));
+	if( function_exists( 'eaccelerator_rm' ) )
+	{	// eAccelerator
+		return eaccelerator_rm( gen_key_for_cache( $key ) );
+	}
 }
 
 
