@@ -441,10 +441,14 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
 
 	// Remove <code>
-	$str = preg_replace( '#<code>(.+)</code>#i', '', $str );
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
 
-	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-	$str = format_to_output( $str, 'text' );
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
 
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
