@@ -660,15 +660,20 @@ class Plugin
 	 *
 	 * Maybe be overriden by some widgets, depending on what THEY depend on..
 	 *
+	 * @param integer Widget ID
 	 * @return array of keys this widget depends on
 	 */
-	function get_widget_cache_keys()
+	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		// Load new widget to get default param definitions:
+		// Load new widget to get default cache keys:
 		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 		$ComponentWidget = new ComponentWidget();
 
-		return $ComponentWidget->get_cache_keys();
+		$widget_cache_keys = $ComponentWidget->get_cache_keys();
+
+		$widget_cache_keys['wi_ID'] = $widget_ID;
+
+		return $widget_cache_keys;
 	}
 
 
