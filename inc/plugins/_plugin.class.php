@@ -656,6 +656,23 @@ class Plugin
 
 
 	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys()
+	{
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return $ComponentWidget->get_cache_keys();
+	}
+
+
+	/**
 	 * Get the list of dependencies that the plugin has.
 	 *
 	 * This gets checked on install or uninstall of a plugin.

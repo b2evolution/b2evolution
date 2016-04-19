@@ -653,9 +653,14 @@ class ComponentWidget extends DataObject
 	{
 		global $Blog;
 
+		if( $this->type == 'plugin' && $this->get_Plugin() )
+		{	// Get widget cache keys from plugin:
+			return $this->Plugin->get_widget_cache_keys();
+		}
+
 		return array(
-				'wi_ID'   => $this->ID,				// Have the widget settings changed ?
-				'set_coll_ID' => $Blog->ID,		// Have the settings of the blog changed ? (ex: new skin)
+				'wi_ID'       => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 			);
 	}
 
