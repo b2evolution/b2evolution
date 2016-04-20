@@ -150,6 +150,21 @@ skin_include( '_body_header.inc.php' );
 			?>
 
 			<?php
+				// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+				// Display container contents:
+				skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="$wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+				) );
+				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+			?>
+
+			<?php
 				// List all tags attached to this post:
 				$Item->tags( array(
 						'before' =>         '<div class="posttags">'.T_('Tags').': ',
