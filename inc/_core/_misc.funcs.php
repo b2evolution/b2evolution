@@ -5807,10 +5807,6 @@ function get_from_mem_cache( $key, & $success )
 	{	// XCache
 		$r = xcache_get( $key );
 	}
-	elseif( function_exists( 'eaccelerator_get' ) )
-	{	// eAccelerator
-		$r = eaccelerator_get( $key );
-	}
 	elseif( function_exists( 'apcu_fetch' ) )
 	{	// APCu
 		$r = apcu_fetch( $key, $success );
@@ -5859,10 +5855,6 @@ function set_to_mem_cache( $key, $payload, $ttl = 0 )
 	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
 	}
-	elseif( function_exists( 'eaccelerator_put' ) )
-	{	// eAccelerator
-		$r = eaccelerator_put( $key, $payload, $ttl );
-	}
 	elseif( function_exists( 'apcu_store' ) )
 	{	// APCu
 		$r = apcu_store( $key, $payload, $ttl );
@@ -5896,11 +5888,6 @@ function unset_from_mem_cache( $key )
 	if( function_exists( 'xcache_unset' ) )
 	{	// XCache
 		return xcache_unset( gen_key_for_cache( $key ) );
-	}
-
-	if( function_exists( 'eaccelerator_rm' ) )
-	{	// eAccelerator
-		return eaccelerator_rm( gen_key_for_cache( $key ) );
 	}
 
 	if( function_exists( 'apcu_delete' ) )
