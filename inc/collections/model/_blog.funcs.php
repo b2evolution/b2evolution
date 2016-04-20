@@ -1369,7 +1369,7 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 			.'&amp;setting=fav'
 			.'&amp;blog='.$blog_ID
 			.'&amp;'.url_crumb('collection').'" '
-			.'onclick="return toggleFavorite( this );">'
+			.'onclick="return toggleFavorite( this, \''.$edited_Blog->urlname.'\' );">'
 			.get_icon( $icon, 'imgtag', $params )
 			.'</a>';
 }
@@ -2026,42 +2026,11 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 	switch( $setting_name )
 	{
 		case'fav':
-			// Favorite Blog
-			$title = $setting_value ?
-					T_('The blog is a favorite.') :
-					T_('The blog is not a favorite.');
-			break;
+			return get_coll_fav_icon( $blog_ID, array( 'class' => 'coll-fav' ) );
 
 		default:
 			// Incorrect setting name
 			return;
-	}
-
-	if( $setting_value )
-	{ // Setting is enabled
-		$action = 'disable_setting';
-		$icon = 'star_on';
-	}
-	else
-	{ // Setting is disabled
-		$action = 'enable_setting';
-		$icon = 'star_off';
-	}
-
-	if( $current_User->check_perm( 'blog_properties', 'false', false, $blog_ID ) )
-	{ // Link to update blog setting
-		return '<a href="'.$admin_url.'?ctrl=coll_settings'
-			.'&amp;tab=general'
-			.'&amp;action='.$action
-			.'&amp;setting='.$setting_name
-			.'&amp;blog='.$blog_ID
-			.'&amp;'.url_crumb('collection').'">'
-				.get_icon( $icon, 'imgtag', array( 'title' => $title ) )
-			.'</a>';
-	}
-	else
-	{ // Simple icon to display current value of blog setting
-		return get_icon( $icon, 'imgtag', array( 'title' => $title ) );
 	}
 }
 

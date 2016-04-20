@@ -10,12 +10,12 @@ require_js( 'functions.js', 'blog', false, true );
 ?>
 <script type="text/javascript">
 
-function toggleFavorite( obj )
+function toggleFavorite( obj, coll_urlname )
 {
 	var me = jQuery( obj );
 
 	jQuery.ajax( {
-		url: '<?php echo $restapi_url.'collections/'.$Blog->get( 'urlname' ).'/favorite'; ?>',
+		url: '<?php echo $restapi_url;?>collections/' + coll_urlname + '/favorite',
 		method: 'POST'
 	} ).done( function( data )
 		{
