@@ -90,7 +90,7 @@ else
 	foreach( $recipients_selected as $recipient )
 	{
 		$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
-		$Form->hidden( 'thrd_recipients_array[title][]', $recipient['title'] );
+		$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
 	}
 }
 
@@ -130,7 +130,7 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'title' => $thrd_recipients_array['title'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum]
 		);
 	}
 }
@@ -167,7 +167,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
 			return '<li>' +
 					user.login +
 					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
-					'<input type="hidden" name="thrd_recipients_array[title][]" value="' + user.login + '" />' +
+					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
 				'</li>';
 		},
 		resultsFormatter: function( user )
@@ -209,7 +209,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
  */
 function check_multiple_recipients()
 {
-	if( jQuery( 'input[name="thrd_recipients_array[title][]"]' ).length > 1 )
+	if( jQuery( 'input[name="thrd_recipients_array[login][]"]' ).length > 1 )
 	{
 		jQuery( '#multiple_recipients' ).show();
 	}
