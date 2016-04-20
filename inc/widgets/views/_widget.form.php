@@ -53,6 +53,11 @@ $Form->begin_fieldset( T_('Params') );
 	// Loop through all widget params:
 	foreach( $edited_ComponentWidget->get_param_definitions( $tmp_params = array('for_editing'=>true) ) as $l_name => $l_meta )
 	{
+		if( ! is_array( $l_meta ) )
+		{	// Skip wrong param definition:
+			continue;
+		}
+
 		$l_value = NULL;
 		if( $l_name == 'allow_blockcache' )
 		{

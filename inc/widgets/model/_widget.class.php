@@ -288,7 +288,6 @@ class ComponentWidget extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
-
 		$r = array();
 
 		if( $this->type == 'plugin' )
@@ -319,7 +318,7 @@ class ComponentWidget extends DataObject
 				),
 			);
 
-		return array_merge($r,$r_standart);;
+		return array_merge( $r_standart, $r );
 	}
 
 
