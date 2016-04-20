@@ -43,6 +43,7 @@ class google_maps_plugin extends Plugin
 	 */
 	var $number_of_installs = 1;
 	var $group = 'widget';
+	var $subgroup = 'infoitem';
 	var $number_of_widgets ;
 
 
