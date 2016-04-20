@@ -163,7 +163,6 @@ skin_widget( array(
 					<div class="evo_container evo_container__item_single">
 					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
