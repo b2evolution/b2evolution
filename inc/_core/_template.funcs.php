@@ -1007,6 +1007,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		return;
 	}
 
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
+		return;
+	}
+
 	if( is_admin_page() && ( $relative_to == 'blog' ) )
 	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
 		$relative_to = 'rsc_url';
