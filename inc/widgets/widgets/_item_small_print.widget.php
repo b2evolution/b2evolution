@@ -94,6 +94,8 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
@@ -110,6 +112,13 @@ class item_small_print_Widget extends ComponentWidget
 							'revision' => T_('Revisions'),
 						),
 					'defaultvalue' => 'standard',
+				),
+				'avatar_size' => array(
+					'label' => T_('Avatar Size'),
+					'note' => '',
+					'type' => 'select',
+					'options' => get_available_thumb_sizes(),
+					'defaultvalue' => 'crop-top-32x32',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -159,29 +168,29 @@ class item_small_print_Widget extends ComponentWidget
 			$Item->author( array(
 					'link_text'   => 'only_avatar',
 					'link_rel'    => 'nofollow',
-					'thumb_size'  => 'crop-top-32x32',
+					'thumb_size'  => $this->disp_params['avatar_size'],
 					'thumb_class' => 'leftmargin',
 				) );
 
 			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
-						'before'      => /* TRANS: date */ T_('This entry was posted on '),
+						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
 						'time_format' => 'F jS, Y',
 					) );
 				$Item->issue_time( array(
-						'before'      => /* TRANS: time */ T_('at '),
+						'before'      => /* TRANS: time */ T_('at').' ',
 						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
-						'before'    => T_('by '),
+						'before'    => T_('by').' ',
 						'link_text' => 'auto',
 					) );
 			}
 			else
 			{
 				$Item->author( array(
-						'before'    => T_('This entry was posted by '),
+						'before'    => T_('This entry was posted by').' ',
 						'link_text' => 'auto',
 					) );
 			}
@@ -210,14 +219,14 @@ class item_small_print_Widget extends ComponentWidget
 		else
 		{ // Revisions
 			$Item->author( array(
-					'before'    => T_('Created by '),
+					'before'    => T_('Created by').' ',
 					'after'     => ' &bull; ',
 					'link_text' => 'auto',
 				) );
 
 			$Item->lastedit_user( array(
-					'before'    => T_('Last edit by '),
-					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+					'before'    => T_('Last edit by').' ',
+					'after'     => ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
 					'link_text' => 'auto',
 				) );
 
