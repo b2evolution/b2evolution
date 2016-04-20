@@ -54,7 +54,7 @@ class whosonline_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		$r = array(
+		$r = array_merge( array(
 			'contacticons' => array(
 				'label' => T_('Contact icons'),
 				'note' => T_('Display contact icons allowing to send private messages to logged in users.'),
@@ -70,7 +70,15 @@ class whosonline_plugin extends Plugin
 					'min' => 1, // 0 would not make sense.
 				),
 			),
-		);
+		), parent::get_widget_param_definitions( $params ) );
+
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget displays the dynamic data:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
