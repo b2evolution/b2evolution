@@ -149,8 +149,9 @@ class item_small_print_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_small_print_before' => '',
-				'widget_item_small_print_after'  => '',
+				'widget_item_small_print_before'    => '',
+				'widget_item_small_print_after'     => '',
+				'widget_item_small_print_separator' => ' &bull; ',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -220,7 +221,7 @@ class item_small_print_Widget extends ComponentWidget
 		{ // Revisions
 			$Item->author( array(
 					'before'    => T_('Created by').' ',
-					'after'     => ' &bull; ',
+					'after'     => $this->disp_params['widget_item_small_print_separator'],
 					'link_text' => 'auto',
 				) );
 
@@ -231,7 +232,7 @@ class item_small_print_Widget extends ComponentWidget
 				) );
 
 			echo $Item->get_history_link( array(
-					'before'    => ' &bull; ',
+					'before'    => $this->disp_params['widget_item_small_print_separator'],
 					'link_text' => T_('View history')
 				) );
 		}
