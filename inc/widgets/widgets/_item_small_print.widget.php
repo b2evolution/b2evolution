@@ -175,14 +175,14 @@ class item_small_print_Widget extends ComponentWidget
 					) );
 				$Item->author( array(
 						'before'    => T_('by '),
-						'link_text' => 'preferredname',
+						'link_text' => 'auto',
 					) );
 			}
 			else
 			{
 				$Item->author( array(
 						'before'    => T_('This entry was posted by '),
-						'link_text' => 'preferredname',
+						'link_text' => 'auto',
 					) );
 			}
 
@@ -212,13 +212,13 @@ class item_small_print_Widget extends ComponentWidget
 			$Item->author( array(
 					'before'    => T_('Created by '),
 					'after'     => ' &bull; ',
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
 					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 
 			echo $Item->get_history_link( array(
