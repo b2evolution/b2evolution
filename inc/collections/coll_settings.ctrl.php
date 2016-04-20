@@ -497,35 +497,7 @@ if( $action == 'dashboard' )
 
 		$AdminUI->disp_payload_begin();
 		echo '<h2 class="page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).'</h2>';
-		?>
-		<script>
-			jQuery( document ).ready( function()
-			{
-				$( 'a:has( span.coll-fav )' ).on( 'click', function( event ) {
-						var me = $( this );
-						event.preventDefault();
-						$.ajax( {
-							url: '<?php echo $restapi_url.'collections/'.$Blog->get( 'urlname' ).'/favorite'; ?>',
-							method: 'POST'
-						} ).done( function( data )
-							{
-								if( data.status == 'ok' )
-								{
-									switch( parseInt( data.setting ) )
-									{
-										case 1:
-											me.html('<?php echo get_icon( 'star_on', 'imgtag', array( 'class' => 'coll-fav' ) );?>');
-											break;
-
-										default:
-											me.html('<?php echo get_icon( 'star_off', 'imgtag', array( 'class' => 'coll-fav' ) );?>');
-									}
-								}
-							});
-					});
-			} );
-		</script>
-		<?php
+		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
 
 		// Block Group 1

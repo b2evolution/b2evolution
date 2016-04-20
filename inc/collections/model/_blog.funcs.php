@@ -1368,7 +1368,8 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 			.'&amp;action='.$action
 			.'&amp;setting=fav'
 			.'&amp;blog='.$blog_ID
-			.'&amp;'.url_crumb('collection').'">'
+			.'&amp;'.url_crumb('collection').'" '
+			.'onclick="return toggleFavorite( this );">'
 			.get_icon( $icon, 'imgtag', $params )
 			.'</a>';
 }
