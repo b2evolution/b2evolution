@@ -257,7 +257,16 @@ switch( $action )
 
 		if( ! ( $email_campaign_Cronjob = & $edited_EmailCampaign->get_Cronjob() ) )
 		{	// No cron job found:
-			$action = 'create_cron';
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
+			break;
+		}
+		
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// No access to view cron jobs:
+			$Messages->add( T_('Sorry, you don\'t have an access to view scheduled jobs.' ), 'warning' );
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
 			break;
 		}
 
