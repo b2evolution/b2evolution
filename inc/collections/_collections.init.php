@@ -967,13 +967,19 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'executed_by_userid'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
-				'params' => NULL, // 'item_ID'
+				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
+			),
+			'send-email-campaign' => array( // not user schedulable
+				'name'   => T_('Send a chunk of %s emails for the campaign "%s"'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_email_campaign.job.php',
+				'params' => NULL, // 'ecmp_ID'
 			),
 			'send-unmoderated-comments-reminders' => array(
 				'name'   => T_('Send reminders about comments awaiting moderation'),

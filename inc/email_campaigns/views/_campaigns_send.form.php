@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $admin_url, $tab;
-global $current_User, $Session;
+global $current_User, $Session, $Settings;
 global $edited_EmailCampaign;
 global $template_action;
 
@@ -71,8 +71,26 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 	$buttons[] = array( 'submit', 'actionArray[test]', T_('Send test email'), 'SaveButton' );
 	if( $edited_EmailCampaign->get_users_count( 'wait' ) > 0 )
-	{ // Display message to send emails only when users exist for this campaign
-		$buttons[] = array( 'submit', 'actionArray[send]', sprintf( T_('Send campaign to %s users now'), $edited_EmailCampaign->get_users_count( 'wait' ) ), 'SaveButton' );
+	{	// Display message to send emails only when users exist for this campaign:
+		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
+		{	// Asynchronous sending mode:
+			if( $edited_EmailCampaign->get_Cronjob() )
+			{	// Cron job was already created:
+				$button_title = T_('Go to scheduler to see send jobs for this campaign');
+				$button_action = 'view_cron';
+			}
+			else
+			{	// Cron job is not created yet:
+				$button_title = sprintf( T_('Start a job to send campaign to %s users'), $edited_EmailCampaign->get_users_count( 'wait' ) );
+				$button_action = 'create_cron';
+			}
+		}
+		else
+		{	// Immediate sending mode:
+			$button_title = sprintf( T_('Send campaign to %s users now'), $edited_EmailCampaign->get_users_count( 'wait' ) );
+			$button_action = 'send';
+		}
+		$buttons[] = array( 'submit', 'actionArray['.$button_action.']', $button_title, 'SaveButton' );
 	}
 }
 

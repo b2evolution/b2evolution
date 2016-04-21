@@ -232,8 +232,14 @@ switch( $action )
 			case 'other':
 				/* Campaign sending: */
 
+				// Sending:
+				$Settings->set( 'email_campaign_send_mode', param( 'email_campaign_send_mode', 'string', 'immediate' ) );
+
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+
+				// Delay between chunks:
+				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
 				break;
 
 			default:
