@@ -324,7 +324,7 @@ switch( $action )
 		{
 			case 'fav':
 				// Favorite Blog
-				$edited_Blog->set_favorite( $setting_value );
+				$edited_Blog->favorite( $current_User->ID, $setting_value );
 				$result_message = T_('The collection setting has been updated.');
 				break;
 

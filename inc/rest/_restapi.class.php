@@ -869,15 +869,18 @@ class RestApi
 			// Exit here.
 		}
 
-		if( $Blog->set_favorite( NULL, $current_User->ID ) )
+		$setting = ( $Blog->favorite( $current_User->ID ) == 1 ? 0 : 1 );
+		$r = $Blog->favorite( $current_User->ID, $setting );
+
+		if( is_null( $r ) )
 		{
-			$this->add_response( 'status', 'ok', 'string' );
-			$this->add_response( 'setting', $Blog->get_favorite() );
+			$this->add_response( 'status', 'fail', 'string' );
+			$this->add_response( 'errorMsg', T_('Unable to set collection favorite status') );
 		}
 		else
 		{
-			$this->add_response( 'status', 'fail', 'string' );
-			$this->add_response( 'errorMsg', 'Unable to toggle favorite status' );
+			$this->add_response( 'status', 'ok', 'string' );
+			$this->add_response( 'setting', $setting );
 		}
 	}
 

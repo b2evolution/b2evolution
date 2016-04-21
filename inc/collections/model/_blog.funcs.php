@@ -1350,7 +1350,7 @@ function get_coll_fav_icon( $blog_ID, $params = array() )
 
 	$BlogCache = & get_BlogCache();
 	$edited_Blog = $BlogCache->get_by_ID( $blog_ID );
-	if( $edited_Blog->get_favorite() > 0 )
+	if( $edited_Blog->favorite() > 0 )
 	{
 		$icon = 'star_on';
 		$action = 'disable_setting';

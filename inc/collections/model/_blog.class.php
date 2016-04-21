@@ -1215,26 +1215,40 @@ class Blog extends DataObject
 	/**
 	 * Set favorite status of current_user
 	 *
-	 * @param integer Setting, leave empty to toggle
 	 * @param integer User ID, leave empty for current user
+	 * @param integer Setting, leave empty to get favorite status
+	 * @return mixed Current favorite status or if set, True if the setting was changed  else false, NULL if unable to process
 	 */
-	function set_favorite( $setting = NULL, $user_ID = NULL )
+	function favorite( $user_ID = NULL, $setting = NULL )
 	{
 		global $DB, $current_User;
 
-		if( is_null( $setting ) )
-		{ // toggle setting
-			$setting = $this->get_favorite() ? 0: 1;
-		}
-
 		if( is_null( $user_ID ) && $current_User )
 		{
-			$user_ID = $current_User->ID;
+			if( $current_User )
+			{
+				$user_ID = $current_User->ID;
+			}
+			else
+			{
+				return NULL;
+			}
 		}
 
-		if( $user_ID && $this->ID )
+		if( $this->ID && $user_ID )
 		{
-			if( $setting )
+			if( is_null( $setting ) )
+			{ // just return current favorite status
+				$fav_SQL = new SQL();
+				$fav_SQL->SELECT( 'COUNT(*)' );
+				$fav_SQL->FROM( 'T_coll_user_favs' );
+				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
+				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
+
+				return $DB->get_var( $fav_SQL->get() );
+			}
+
+			if( $setting == 1 )
 			{
 				return $DB->query( 'REPLACE INTO T_coll_user_favs ( cufv_user_ID, cufv_blog_ID ) VALUES ( '.$user_ID.', '.$this->ID.' )' );
 			}
@@ -1245,7 +1259,7 @@ class Blog extends DataObject
 		}
 		else
 		{
-			return false;
+			return NULL;
 		}
 	}
 
@@ -1266,9 +1280,6 @@ class Blog extends DataObject
 			case 'ID':
 			case 'allowtrackbacks':
 				return $this->set_param( $parname, 'number', $parvalue, $make_null );
-				break;
-			case 'favorite':
-				return $this->set_favorite( $parvalue );
 				break;
 
 			default:
@@ -1952,38 +1963,6 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get favorite status of blog
-	 *
-	 * @param integer User ID, leave empty for current user
-	 * @return mixed
-	 */
-	function get_favorite( $user_ID = NULL )
-	{
-		global $current_User, $DB;
-
-		if( is_null( $user_ID ) && $current_User )
-		{
-			$user_ID = $current_User->ID;
-		}
-
-		if( $user_ID && $this->ID )
-		{
-			$fav_SQL = new SQL();
-			$fav_SQL->SELECT( 'COUNT(*)' );
-			$fav_SQL->FROM( 'T_coll_user_favs' );
-			$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
-			$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
-
-			return $DB->get_var( $fav_SQL->get() );
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-
-	/**
  	 * Get link to edit files
  	 *
  	 * @param string link (false on error)
@@ -2291,10 +2270,6 @@ class Blog extends DataObject
 					return '';
 				}
 
-			case 'favorite':
-				return $this->get_favorite();
-
-
 			default:
 				// All other params:
 				return parent::get( $parname );
@@ -2583,7 +2558,7 @@ class Blog extends DataObject
 			$this->enable_default_item_types();
 
 			// Owner automatically favorite the collection
-			$this->set_favorite( 1, $this->owner_user_ID );
+			$this->favorite( $this->owner_user_ID, 1 );
 
 			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
 			load_funcs( 'tools/model/_system.funcs.php' );
@@ -2594,7 +2569,7 @@ class Blog extends DataObject
 			{
 				foreach( $user_IDs as $id )
 				{
-					$this->set_favorite( 1, $id );
+					$this->favorite( $id, 1 );
 				}
 			}
 
@@ -3091,7 +3066,7 @@ class Blog extends DataObject
 		// Favorite blog by new owner
 		if( isset( $this->dbchanges['blog_owner_user_ID'] ) )
 		{
-			$this->set_favorite( 1, $this->owner_user_ID );
+			$this->favorite( $this->owner_user_ID, 1 );
 		}
 
 		parent::dbupdate();
