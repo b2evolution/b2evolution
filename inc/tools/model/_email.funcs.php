@@ -930,33 +930,48 @@ function smtp_connection_test()
 
 	// Check if Swift Mailer is enabled
 	$check_smtp_result = check_smtp_mailer();
-	$message = T_( 'Check SMTP settings... ' );
+	$message = T_('Check SMTP settings...').' ';
 	if( $check_smtp_result === true )
-	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+	{	// Success:
+		$smtp_messages[] = '<b>'.$message.'</b><b class="green">OK</b>';
+		syslog_insert( $message.' OK', 'info', NULL );
 	}
 	else
-	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$check_smtp_result.'</span>';
-		syslog_insert( $message.$check_smtp_result, 'warning', NULL );
+	{	// Error:
+		$smtp_messages[] = '<b>'.$message.'</b>'.$check_smtp_result.' <b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $message.$check_smtp_result.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 		return $smtp_messages;// EXIT
 	}
 
-	// Test a connection
+	// Create SMTP transport:
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
+
+	// Register Swift plugin "ArrayLogger":
+	$Swift_Plugins_Loggers_ArrayLogger = new Swift_Plugins_Loggers_ArrayLogger();
+	$Swift_SmtpTransport->registerPlugin( new Swift_Plugins_LoggerPlugin( $Swift_Plugins_Loggers_ArrayLogger ) );
+
+	// Test SMTP connection:
 	$connection_result = test_smtp_transport( $Swift_SmtpTransport );
-	$message = T_( 'Test SMTP connection... ' );
+
+	// Get log of the connection:
+	$smtp_mail_connection_log = PHP_EOL.$Swift_Plugins_Loggers_ArrayLogger->dump();
+
+	$smtp_message = T_('Test SMTP connection...').' ';
+
+	// Set SMTP log text to display on the testing page:
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
+		.( empty( $smtp_mail_connection_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_connection_log, 'htmlspecialchars' ) ).'<br />' );
+
 	if( $connection_result === true )
 	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' OK', 'info', NULL );
 	}
 	else
 	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$connection_result.'</span>';
-		syslog_insert( $message.$connection_result, 'warning', NULL );
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
@@ -984,7 +999,7 @@ function smtp_email_sending_test()
 		// Exit here.
 	}
 
-	$smtp_message = sprintf( T_( 'Send test email message to "%s"... ' ), '<b>'.$current_User->get( 'email' ).'</b>' );
+	$smtp_message = sprintf( T_( 'Send test email message to "%s"...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY SMTP sending:
 	$Settings->set( 'email_service', 'smtp' );
@@ -995,17 +1010,17 @@ function smtp_email_sending_test()
 	$sending_result = send_mail( $current_User->get( 'email' ), $current_User->get( 'login' ), 'Test SMTP email sending', 'Hello, this is a test.' );
 
 	// Set SMTP log text to display on the testing page:
-	$smtp_mail_sending_log_html = $smtp_message
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
 		.( empty( $smtp_mail_sending_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_sending_log, 'htmlspecialchars' ) ).'<br />' );
 
 	if( $sending_result === true )
 	{	// Success:
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<span class="green">OK</span>';
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
 		syslog_insert( $smtp_message.$smtp_mail_sending_log.' OK', 'info', NULL );
 	}
 	else
 	{	// Error:
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<span class="red">'.T_('Failed').'</span>';
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
 		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
