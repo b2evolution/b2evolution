@@ -9,13 +9,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Messages;
-
-if( $Settings->get( 'outbound_notifications_mode' ) != 'cron' )
-{ // Autopruning is NOT requested
-	$result_message = T_('Post notifications are not set to run as a scheduled task.');
-	return 2;
-}
+global $Messages;
 
 // Get the ID of the post we are supposed to post-process:
 if( empty( $job_params['item_ID'] ) )
