@@ -30,6 +30,12 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = NULL;
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = false;  // true|false|'check' Set this to true for better optimization
@@ -795,7 +801,7 @@ class Skin extends DataObject
 	/**
 	 * Get ready for displaying the skin.
 	 *
-	 * This method may register some CSS or JS. 
+	 * This method may register some CSS or JS.
 	 * The default implementation can register a few common things that you may request in the $features param.
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
@@ -828,7 +834,7 @@ class Skin extends DataObject
 			// Get next feature to include:
 			$feature = $features[$i];
 
-			switch( $feature ) 
+			switch( $feature )
 			{
 				case 'jquery':
 					// Include jQuery:
@@ -900,12 +906,12 @@ class Skin extends DataObject
 						require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 					}
 					break;
-				
+
 				case 'style_css':
 					// Include the default skin style.css:
 					// You should make sure this is called ahead of any custom generated CSS.
-					if( $this->use_min_css == false 
-						|| $debug 
+					if( $this->use_min_css == false
+						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
 						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)

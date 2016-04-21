@@ -2464,13 +2464,11 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.$edited_Skin->name.'</span>';
 		echo '</div>';
 
-		if( isset( $edited_Skin->version ) )
-		{ // Skin version
-			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin version').':</label>';
-				echo '<span>'.$edited_Skin->version.'</span>';
-			echo '</div>';
-		}
+		// Skin version
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin version').':</label>';
+			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+		echo '</div>';
 
 		// Skin type
 		echo '<div class="skin_setting_row">';
@@ -2629,4 +2627,17 @@ function skin_body_attrs( $params = array() )
 	}
 }
 
+
+function get_skin_version( $skin_ID )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = $SkinCache->get_by_ID( $skin_ID );
+
+	if( isset( $Skin->version ) )
+	{
+		return $Skin->version;
+	}
+
+	return 'unknown';
+}
 ?>
