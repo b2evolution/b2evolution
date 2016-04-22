@@ -336,7 +336,11 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
 
         $encodedToken = '';
         // Split at all whitespace boundaries
-        foreach (preg_split('~(?=[\t ])~', $string) as $token) {
+        if( ! is_array( $string ) )
+        {
+            $string = preg_split('~(?=[\t ])~', $string);
+        }
+        foreach ($string as $token) {
             if ($this->tokenNeedsEncoding($token)) {
                 $encodedToken .= $token;
             } else {
