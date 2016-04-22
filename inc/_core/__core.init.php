@@ -431,8 +431,8 @@ function & get_EmailAddressCache()
 
 	if( ! isset( $EmailAddressCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
-		$EmailAddressCache = new DataObjectCache( 'EmailAddress', false, 'T_email__address', 'emadr_', 'emadr_ID', 'emadr_address' );
+		load_class( 'tools/model/_emailaddresscache.class.php', 'EmailAddressCache' );
+		$EmailAddressCache = new EmailAddressCache();
 	}
 
 	return $EmailAddressCache;
