@@ -11,8 +11,7 @@
 /**
  * Pretends messages have been sent, but just ignores them.
  *
- * @package Swift
- * @author  Fabien Potencier
+ * @author Fabien Potencier
  */
 class Swift_Transport_NullTransport implements Swift_Transport
 {
@@ -30,7 +29,7 @@ class Swift_Transport_NullTransport implements Swift_Transport
     /**
      * Tests if this Transport mechanism has started.
      *
-     * @return boolean
+     * @return bool
      */
     public function isStarted()
     {
@@ -57,7 +56,7 @@ class Swift_Transport_NullTransport implements Swift_Transport
      * @param Swift_Mime_Message $message
      * @param string[]           $failedRecipients An array of failures by-reference
      *
-     * @return integer The number of sent emails
+     * @return int The number of sent emails
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
@@ -73,7 +72,13 @@ class Swift_Transport_NullTransport implements Swift_Transport
             $this->_eventDispatcher->dispatchEvent($evt, 'sendPerformed');
         }
 
-        return 0;
+        $count = (
+            count((array) $message->getTo())
+            + count((array) $message->getCc())
+            + count((array) $message->getBcc())
+            );
+
+        return $count;
     }
 
     /**

@@ -84,6 +84,8 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 				array( 'tls', T_('TLS'), ),
 			), T_('Encryption Method') );
 
+	$Form->checkbox( 'smtp_server_accept_certificate', $Settings->get( 'smtp_server_accept_certificate' ), T_('Accept an invalid / self signed certificate') );
+
 	$Form->text_input( 'smtp_server_port', $Settings->get('smtp_server_port'), 5, T_('Port Number'), T_('Port number of your SMTP server (Defaults: SSL: 443, TLS: 587).'), array( 'maxlength' => 6 ) );
 
 	$Form->text_input( 'smtp_server_username', $Settings->get( 'smtp_server_username' ), 25,

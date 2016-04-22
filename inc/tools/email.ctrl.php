@@ -196,19 +196,22 @@ switch( $action )
 				$Settings->set( 'smtp_enabled', param( 'smtp_enabled', 'boolean', 0 ) );
 
 				// SMTP Host
-				$Settings->set( 'smtp_server_host',  param( 'smtp_server_host', 'string', '' ) );
+				$Settings->set( 'smtp_server_host', param( 'smtp_server_host', 'string', '' ) );
 
 				// Port Number
-				$Settings->set( 'smtp_server_port',  param( 'smtp_server_port', 'integer' ) );
+				$Settings->set( 'smtp_server_port', param( 'smtp_server_port', 'integer' ) );
 
 				// Encryption Method
-				$Settings->set( 'smtp_server_security',  param( 'smtp_server_security', 'string', '' ) );
+				$Settings->set( 'smtp_server_security', param( 'smtp_server_security', 'string', '' ) );
+
+				// Accept certificate
+				$Settings->set( 'smtp_server_accept_certificate', param( 'smtp_server_accept_certificate', 'boolean', 0 ) );
 
 				// SMTP Username
-				$Settings->set( 'smtp_server_username',  param( 'smtp_server_username', 'string', '' ) );
+				$Settings->set( 'smtp_server_username', param( 'smtp_server_username', 'string', '' ) );
 
 				// SMTP Password
-				$Settings->set( 'smtp_server_password',  param( 'smtp_server_password', 'string', '' ) );
+				$Settings->set( 'smtp_server_password', param( 'smtp_server_password', 'string', '' ) );
 
 				// Check if we really can use SMTP mailer
 				if( $Settings->get( 'smtp_enabled' ) && ( $smtp_error = check_smtp_mailer() ) !== true )

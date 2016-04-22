@@ -11,9 +11,7 @@
 /**
  * A basic KeyCache backed by an array.
  *
- * @package    Swift
- * @subpackage KeyCache
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
 {
@@ -47,10 +45,10 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
      *
      * @see MODE_WRITE, MODE_APPEND
      *
-     * @param string  $nsKey
-     * @param string  $itemKey
-     * @param string  $string
-     * @param integer $mode
+     * @param string $nsKey
+     * @param string $itemKey
+     * @param string $string
+     * @param int    $mode
      */
     public function setString($nsKey, $itemKey, $string, $mode)
     {
@@ -67,8 +65,8 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
                 break;
             default:
                 throw new Swift_SwiftException(
-                    'Invalid mode [' . $mode . '] used to set nsKey='.
-                    $nsKey . ', itemKey=' . $itemKey
+                    'Invalid mode ['.$mode.'] used to set nsKey='.
+                    $nsKey.', itemKey='.$itemKey
                     );
         }
     }
@@ -81,7 +79,7 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
      * @param string                 $nsKey
      * @param string                 $itemKey
      * @param Swift_OutputByteStream $os
-     * @param integer                $mode
+     * @param int                    $mode
      */
     public function importFromByteStream($nsKey, $itemKey, Swift_OutputByteStream $os, $mode)
     {
@@ -99,8 +97,8 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
                 break;
             default:
                 throw new Swift_SwiftException(
-                    'Invalid mode [' . $mode . '] used to set nsKey='.
-                    $nsKey . ', itemKey=' . $itemKey
+                    'Invalid mode ['.$mode.'] used to set nsKey='.
+                    $nsKey.', itemKey='.$itemKey
                     );
         }
     }
@@ -164,7 +162,7 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
      * @param string $nsKey
      * @param string $itemKey
      *
-     * @return boolean
+     * @return bool
      */
     public function hasKey($nsKey, $itemKey)
     {
@@ -193,8 +191,6 @@ class Swift_KeyCache_ArrayKeyCache implements Swift_KeyCache
     {
         unset($this->_contents[$nsKey]);
     }
-
-    // -- Private methods
 
     /**
      * Initialize the namespace of $nsKey if needed.

@@ -677,7 +677,7 @@ function & get_Swift_SmtpTransport()
 {
 	global $Settings;
 
-	// Load Swift Mailer functions
+	// Load Swift Mailer functions:
 	load_funcs( '_ext/swift/swift_required.php' );
 
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
@@ -686,19 +686,25 @@ function & get_Swift_SmtpTransport()
 	$smtp_server_username = $Settings->get( 'smtp_server_username' );
 	$smtp_server_password = $Settings->get( 'smtp_server_password' );
 
-	// Create the Transport
+	// Create the Transport:
 	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
-	{ // Set encryption
+	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
 	}
 	if( ! empty( $smtp_server_username ) )
-	{ // Set username if it is defined
+	{	// Set username if it is defined:
 		$Swift_SmtpTransport->setUsername( $smtp_server_username );
 	}
 	if( ! empty( $smtp_server_password ) )
-	{ // Set password if it is defined
+	{	// Set password if it is defined:
 		$Swift_SmtpTransport->setPassword( $smtp_server_password );
+	}
+
+	if( $Settings->get( 'smtp_server_accept_certificate' ) )
+	{	// Accept an invalid / self signed certificate:
+		$options = array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false ) );
+		$Swift_SmtpTransport->setStreamOptions( $options );
 	}
 
 	return $Swift_SmtpTransport;

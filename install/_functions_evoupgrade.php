@@ -4050,6 +4050,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE dom_type_name ( dom_type, dom_name )' );
 		task_end();
 
+		task_begin( 'Upgrading base domains table...' );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
+		task_end();
+
 		/*** Update user_email_dom_ID for all already existing users ***/
 		task_begin( 'Upgrading users email domains...' );
 		$DB->begin();
