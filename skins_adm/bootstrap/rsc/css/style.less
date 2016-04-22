@@ -1553,16 +1553,42 @@ table.diff {
 	}
 }
 
-// Poll option percent:
-.evo_poll__percent_bar {
-	width: 100px;
-	margin-right: 2px;
-	vertical-align: middle;
-	display: inline-block;
-	> div {
-		background: #ffcc66;
-		height: 12px;
-		min-width: 1px;
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
 	}
 }
 
