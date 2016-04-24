@@ -37,14 +37,6 @@ echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['email'].'</td></tr>'."\n";
 
-if( $params['country'] > 0 )
-{ // Country field is entered
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	$CountryCache = & get_CountryCache();
-	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
-}
-
 if( $params['firstname'] != '' )
 { // First name is entered
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('First name').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['firstname'].'</td></tr>'."\n";
@@ -79,6 +71,14 @@ if( ! empty( $params['initial_hit'] ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+}
+
+if( $params['country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$user_Country = $CountryCache->get_by_ID( $params['country'] );
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";

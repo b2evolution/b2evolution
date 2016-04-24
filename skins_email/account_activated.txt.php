@@ -37,12 +37,6 @@ echo "\n\n";
 echo T_('Login').": ".$activated_User->login."\n";
 echo T_('Email').": ".$activated_User->email."\n";
 
-if( $activated_User->ctry_ID > 0 )
-{	// Country field is defined
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo T_('Country').": ".$activated_User->get_country_name()."\n";
-}
-
 if( $activated_User->firstname != '' )
 {	// First name is defined
 	echo T_('First name').": ".$activated_User->firstname."\n";
@@ -79,6 +73,12 @@ if( !empty( $initial_blog_ID ) )
 {	// Hit info
 	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
 	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
+}
+
+if( $activated_User->ctry_ID > 0 )
+{	// Country field is defined
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	echo T_('Registration Country').": ".$activated_User->get_country_name()."\n";
 }
 
 echo "\n";

@@ -36,13 +36,6 @@ echo "\n\n";
 
 echo T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
-if( $params['country'] > 0 )
-{ // Country field is entered
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	$CountryCache = & get_CountryCache();
-	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo T_('Country').": ".$user_Country->get_name()."\n";
-}
 
 if( $params['firstname'] != '' )
 { // First name is entered
@@ -78,6 +71,14 @@ if( !empty ( $params['initial_hit'] ) )
 { // Hit info
 	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
 	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+}
+
+if( $params['country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$user_Country = $CountryCache->get_by_ID( $params['country'] );
+	echo T_('Registration Country').": ".$user_Country->get_name()."\n";
 }
 
 echo "\n";

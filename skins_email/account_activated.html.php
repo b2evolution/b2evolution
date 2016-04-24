@@ -40,12 +40,6 @@ echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->email.'</td></tr>'."\n";
 
-if( $activated_User->ctry_ID > 0 )
-{ // Country field is defined
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_country_name().'</td></tr>'."\n";
-}
-
 if( $activated_User->firstname != '' )
 { // First name is defined
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('First name').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->firstname.'</td></tr>'."\n";
@@ -82,6 +76,12 @@ if( !empty( $initial_blog_ID ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID ).'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $activated_User->ID ), '', '.a' ).'</td></tr>'."\n";
+}
+
+if( $activated_User->ctry_ID > 0 )
+{ // Country field is defined
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_country_name().'</td></tr>'."\n";
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
