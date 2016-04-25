@@ -152,57 +152,33 @@ if( isset( $edited_User ) )
 			<!-- ROOTS SELECT -->
 
 			<?php
-				$Form = new Form( NULL, 'fmbar_roots', 'post', 'none' );
-				$Form->begin_form();
-				// $Form->hidden_ctrl();
-				$Form->hiddens_by_key( get_memorized() );
-
 				$rootlist = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
-				if( count($rootlist) > 1 )
-				{ // provide list of roots to choose from
+				if( count( $rootlist ) > 1 )
+				{	// Provide list of roots to choose from:
 					?>
-					<select name="new_root" onchange="this.form.submit();">
-					<?php
-					$optgroup = '';
-					foreach( $rootlist as $l_FileRoot )
-					{
-						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+					<div class="dropdown" style="display: inline-block">
+						<button class="btn btn-default dropdown-toggle" type="button" id="new_root_dropdown_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+							<?php echo format_to_output( $fm_Filelist->_FileRoot->name ); ?> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" aria-labelledby="new_root_dropdown_menu">
+						<?php
+						$optgroup = '';
+						foreach( $rootlist as $l_FileRoot )
 						{
-							continue;
-						}
-						if( ($typegroupname = $l_FileRoot->get_typegroupname()) != $optgroup )
-						{ // We're entering a new group:
-							if( ! empty($optgroup) )
-							{
-								echo '</optgroup>';
+							if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+							{	// Skip this file root, because current user has no permissions to view it:
+								continue;
 							}
-							echo '<optgroup label="'.T_($typegroupname).'">';
-							$optgroup = $typegroupname;
+							if( ( $typegroupname = $l_FileRoot->get_typegroupname() ) != $optgroup )
+							{	// New file root group is starting:
+								echo '<li class="dropdown-header">'.T_( $typegroupname ).'</li>'."\n";
+								$optgroup = $typegroupname;
+							}
+							echo '<li><a href="'.regenerate_url( 'new_root', 'new_root='.$l_FileRoot->ID ).'">'.format_to_output( $l_FileRoot->name ).'</a></li>'."\n";
 						}
-						echo '<option value="'.$l_FileRoot->ID.'"';
-
-						if( $fm_Filelist->_FileRoot && $fm_Filelist->_FileRoot->ID == $l_FileRoot->ID )
-						{
-							echo ' selected="selected"';
-						}
-
-						echo '>'.format_to_output( $l_FileRoot->name )."</option>\n";
-					}
-					if( ! empty($optgroup) )
-					{
-						echo '</optgroup>';
-					}
-					?>
-					</select>
-					<script type="text/javascript">
-						<!--
-						// Just to have noscript tag below (which has to know what type it is not for).
-						// -->
-					</script>
-					<noscript>
-						<input class="ActionButton" type="submit" value="<?php echo T_('Change root'); ?>" />
-					</noscript>
-
+						?>
+						</ul>
+					</div>
 					<?php
 				}
 
@@ -239,7 +215,7 @@ if( isset( $edited_User ) )
 				echo ' - <a href="'.regenerate_url('', 'action=edit_settings').'" title="'
 								.T_('Edit display settings').'">'.T_('Display settings').'</a>';
 
-				$Form->end_form();
+				echo '<br />';
 
 
 		// -----------------------------------------------

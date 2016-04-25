@@ -841,9 +841,6 @@ div#fileuploader_form {
 tr#fileuploader_form td {
   background: #f5f5f5;
 }
-.file_browser {
-  overflow: hidden;
-}
 .file_browser .panel-body {
   padding: 0;
 }
