@@ -152,29 +152,46 @@ if( isset( $edited_User ) )
 			<!-- ROOTS SELECT -->
 
 			<?php
-				$rootlist = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
-				if( count( $rootlist ) > 1 )
+				$rootlist = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
+				$rootlist_count = count( $rootlist );
+				if( $rootlist_count > 1 )
 				{	// Provide list of roots to choose from:
 					?>
-					<div class="dropdown" style="display: inline-block">
+					<div id="new_root_selector" class="dropdown" style="display: inline-block">
 						<button class="btn btn-default dropdown-toggle" type="button" id="new_root_dropdown_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 							<?php echo format_to_output( $fm_Filelist->_FileRoot->name ); ?> <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu" aria-labelledby="new_root_dropdown_menu">
 						<?php
-						$optgroup = '';
+						$prev_file_root_group_name = '';
+						$prev_file_root_group_type = '';
+						$group_num = 0;
+						$root_num = 0;
 						foreach( $rootlist as $l_FileRoot )
 						{
 							if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
 							{	// Skip this file root, because current user has no permissions to view it:
 								continue;
 							}
-							if( ( $typegroupname = $l_FileRoot->get_typegroupname() ) != $optgroup )
+							if( $l_FileRoot->get_typegroupname() != $prev_file_root_group_name )
 							{	// New file root group is starting:
-								echo '<li class="dropdown-header">'.T_( $typegroupname ).'</li>'."\n";
-								$optgroup = $typegroupname;
+								if( $prev_file_root_group_type == 'user' || ( $prev_file_root_group_type == 'collection' && $group_num > 1 ) )
+								{	// Selector for more collections or users:
+									echo '<li><a href="#" data-type="'.$prev_file_root_group_type.'">'.T_('Other...').'</a></li>'."\n";
+								}
+								echo '<li class="dropdown-header">'.T_( $l_FileRoot->get_typegroupname() ).'</li>'."\n";
+								$prev_file_root_group_name = $l_FileRoot->get_typegroupname();
+								$prev_file_root_group_type = $l_FileRoot->type;
+								$group_num++;
 							}
 							echo '<li><a href="'.regenerate_url( 'new_root', 'new_root='.$l_FileRoot->ID ).'">'.format_to_output( $l_FileRoot->name ).'</a></li>'."\n";
+
+							if( ( $root_num == $rootlist_count - 1 ) &&
+							    ( $prev_file_root_group_type == 'user' || ( $prev_file_root_group_type == 'collection' && $group_num > 1 ) ) )
+							{	// Selector for more collections or users:
+								echo '<li><a href="#" data-type="'.$prev_file_root_group_type.'">'.T_('Other...').'</a></li>'."\n";
+							}
+							$root_num++;
 						}
 						?>
 						</ul>
@@ -391,4 +408,77 @@ if( typeof file_uploader_note_text != 'undefined' )
 
 	// Print JS function to allow edit file properties on modal window
 	echo_file_properties();
+
+	// JS to load more collections or user to switch file root:
+	$Form = new Form();
+	$Form->output = false;
+	$Form->hidden( 'new_root_selector_type', '$selector_type$' );
+	$new_root_selector_html = $Form->begin_form( NULL, '', array( 'id' => 'new_root_selector_form' ) );
+	$new_root_selector_html .= $Form->text_input( 'new_root_selector_field', '', 40, '$field_title$' );
+	$new_root_selector_html .= $Form->end_form( array( array( 'value' => T_('Search'), 'id' => 'new_root_selector_button', 'class' => 'SaveButton' ) ) );
+	$new_root_selector_html .= '<div id="new_root_selector_wrapper">';
+	$new_root_selector_html .= '</div>';
+	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
+	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#new_root_selector a[data-type]' ).click( function()
+	{
+		var type = jQuery( this ).data( 'type' );
+		var field_title = ( type == 'collection' ) ? '<?php echo TS_('Collection ID or short name') ?>' : '<?php echo TS_('Username'); ?>';
+		var window_title = ( type == 'collection' ) ? '<?php echo TS_('Select collection') ?>' : '<?php echo TS_('Select user'); ?>';
+
+		openModalWindow( '<?php echo $new_root_selector_html; ?>'.replace( '$field_title$', field_title ).replace( '$selector_type$', type ), 'auto', '', true, window_title, '', true );
+
+		return false;
+	} );
+
+	jQuery( document ).on( 'submit', '#new_root_selector_form', function()
+	{
+		var new_file_root_url = '<?php echo regenerate_url( 'new_root', 'new_root=' ) ?>';
+
+		if( jQuery( 'input[name=new_root_selector_type]', this ).val() == 'collection' )
+		{	// Search collections:
+			evo_rest_api_request( 'collections',
+			function( data )
+			{
+				var r = '<ul>';
+				for( var c in data )
+				{
+					var coll = data[c];
+					r += '<li><a href="' + new_file_root_url + 'collection_' + coll.id + '">' + coll.name + '</a></li>';
+				}
+				r += '</ul>';
+				jQuery( '#new_root_selector_wrapper' ).html( r );
+			} );
+		}
+		else
+		{	// Search users:
+			evo_rest_api_request( 'users',
+			{
+				'per_page': 20,
+				'filter'  : 'new',
+				'keywords': jQuery( '#new_root_selector_field' ).val()
+			},
+			function( data )
+			{
+				var r = '<p><?php echo sprintf( TS_('Displaying %s out of %s matches'), '$current_num$', '$total_num$' ); ?>:</p>'
+					.replace( '$current_num$', data.page_size < data.found ? data.page_size : data.found )
+					.replace( '$total_num$', data.found );
+				r += '<ul>';
+				for( var u in data.users )
+				{
+					var user = data.users[u];
+					r += '<li><a href="' + new_file_root_url + 'user_' + user.id + '">' + user.login + '</a></li>';
+				}
+				r += '</ul>';
+				jQuery( '#new_root_selector_wrapper' ).html( r );
+			} );
+		}
+
+		return false;
+	} );
+} );
+</script>
