@@ -691,6 +691,12 @@ function & get_Swift_SmtpTransport()
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
 	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
+
+		if( $Settings->get( 'smtp_server_novalidatecert' ) )
+		{	// Do not validate the certificate from the TLS/SSL server:
+			$options = array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false ) );
+			$Swift_SmtpTransport->setStreamOptions( $options );
+		}
 	}
 	if( ! empty( $smtp_server_username ) )
 	{	// Set username if it is defined:
@@ -699,12 +705,6 @@ function & get_Swift_SmtpTransport()
 	if( ! empty( $smtp_server_password ) )
 	{	// Set password if it is defined:
 		$Swift_SmtpTransport->setPassword( $smtp_server_password );
-	}
-
-	if( $Settings->get( 'smtp_server_accept_certificate' ) )
-	{	// Accept an invalid / self signed certificate:
-		$options = array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false ) );
-		$Swift_SmtpTransport->setStreamOptions( $options );
 	}
 
 	return $Swift_SmtpTransport;

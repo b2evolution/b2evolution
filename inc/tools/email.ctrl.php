@@ -205,7 +205,7 @@ switch( $action )
 				$Settings->set( 'smtp_server_security', param( 'smtp_server_security', 'string', '' ) );
 
 				// Accept certificate
-				$Settings->set( 'smtp_server_accept_certificate', param( 'smtp_server_accept_certificate', 'boolean', 0 ) );
+				$Settings->set( 'smtp_server_novalidatecert', param( 'smtp_server_novalidatecert', 'boolean', 0 ) );
 
 				// SMTP Username
 				$Settings->set( 'smtp_server_username', param( 'smtp_server_username', 'string', '' ) );
