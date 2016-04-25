@@ -153,10 +153,13 @@ switch( $action )
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
-				$moderation_buttons = '<p class="bubbletip_user__buttons">'
-						.'<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
-							.T_('Edit in Back-Office')
-						.'</a>';
+				$moderation_buttons = '<p class="bubbletip_user__buttons">';
+				if( ! is_admin_page() )
+				{
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
+							.T_('Edit in Back-Office').'</a>';
+				}
+
 				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 				{	// Display a button to delete a spammer only for other users and if current user can edit them:
 					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
