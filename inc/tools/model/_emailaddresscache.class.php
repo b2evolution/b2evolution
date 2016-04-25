@@ -58,7 +58,7 @@ class EmailAddressCache extends DataObjectCache
 			return $r;
 		}
 
-		$EmailAddress = & parent::get_by_name( $req_name, $halt_on_error = true, $halt_on_empty = true );
+		$EmailAddress = & parent::get_by_name( $req_name, $halt_on_error, $halt_on_empty );
 
 		return $EmailAddress;
 	}
