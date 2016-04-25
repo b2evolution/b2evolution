@@ -6947,27 +6947,28 @@ class Item extends ItemLight
 	/**
 	 * Get the latest Comment on this Item
 	 *
-	 * @param string the status of the latest comment
 	 * @return Comment
 	 */
-	function & get_latest_Comment( $status = NULL )
+	function & get_latest_Comment()
 	{
 		global $DB;
 
-		if( is_null( $this->latest_Comment ) )
+		if( $this->latest_Comment === NULL )
 		{
+			if( empty( $this->ID ) )
+			{	// New item has no comments:
+				$this->latest_Comment = false;
+				return $this->latest_Comment;
+			}
+
 			$SQL = new SQL( 'Get the latest Comment on the Item #'.$this->ID );
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'comment_type != "meta"' );
+			$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
-
-			if( $status != NULL )
-			{
-				$SQL->WHERE_and( 'comment_status = '.$DB->quote( $status ) );
-			}
 
 			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
 			{	// Load the latest Comment in cache:
