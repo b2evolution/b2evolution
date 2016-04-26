@@ -2282,9 +2282,9 @@ function pre_dump( $var__var__var__var__ )
 	{ // xdebug already does fancy displaying:
 
 		// no limits:
-		$old_var_display_max_children = ini_set('xdebug.var_display_max_children', -1); // default: 128
-		$old_var_display_max_data = ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
-		$old_var_display_max_depth = ini_set('xdebug.var_display_max_depth', -1); // default: 3
+		$old_var_display_max_children = @ini_set('xdebug.var_display_max_children', -1); // default: 128
+		$old_var_display_max_data = @ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
+		$old_var_display_max_depth = @ini_set('xdebug.var_display_max_depth', -1); // default: 3
 
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2300,13 +2300,13 @@ function pre_dump( $var__var__var__var__ )
 		echo '</div>';
 
 		// restore xdebug settings:
-		ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
-		ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
-		ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
+		@ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
+		@ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
+		@ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
 	}
 	else
 	{
-		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
+		$orig_html_errors = @ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
 		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2324,7 +2324,7 @@ function pre_dump( $var__var__var__var__ )
 			}
 		}
 		echo "</pre>\n";
-		ini_set('html_errors', $orig_html_errors);
+		@ini_set('html_errors', $orig_html_errors);
 	}
 	evo_flush();
 	return true;

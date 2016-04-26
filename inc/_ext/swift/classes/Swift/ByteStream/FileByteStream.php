@@ -84,11 +84,11 @@ class Swift_ByteStream_FileByteStream extends Swift_ByteStream_AbstractFilterabl
         $fp = $this->_getReadHandle();
         if (!feof($fp)) {
             if ($this->_quotes) {
-                ini_set('magic_quotes_runtime', 0);
+                @ini_set('magic_quotes_runtime', 0);
             }
             $bytes = fread($fp, $length);
             if ($this->_quotes) {
-                ini_set('magic_quotes_runtime', 1);
+                @ini_set('magic_quotes_runtime', 1);
             }
             $this->_offset = ftell($fp);
 
