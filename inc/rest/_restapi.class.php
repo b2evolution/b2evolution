@@ -323,11 +323,11 @@ class RestApi
 		else
 		{	// Get controller to work with collection:
 			$coll_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
-		}
 
-		if( $coll_controller == 'search' )
-		{	// Rename this controller to search collections, because the same controller name is used to search items, comments and etc. in requested collection:
-			$coll_controller = 'search_colls';
+			if( $coll_controller == 'search' )
+			{	// Rename this controller to search collections, because the same controller name is used to search items, comments and etc. in requested collection:
+				$coll_controller = 'search_colls';
+			}
 		}
 
 		if( $coll_controller != 'list' && $coll_controller != 'search_colls' )
