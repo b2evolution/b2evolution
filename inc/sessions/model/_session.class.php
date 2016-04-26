@@ -165,7 +165,7 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
-						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
+						$old_callback = @ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
 						if( $old_callback === false || is_null($old_callback) /* disabled, reported with PHP 5.2.5 */ )
 						{	// NULL if ini_set has been disabled for security reasons
 							// Brutally load all classes that we might need:
@@ -178,7 +178,7 @@ class Session
 
 						if( $old_callback !== false )
 						{	// Restore the old callback if we changed it:
-							ini_set( 'unserialize_callback_func', $old_callback );
+							@ini_set( 'unserialize_callback_func', $old_callback );
 						}
 
 						if( ! is_array($this->_data) )

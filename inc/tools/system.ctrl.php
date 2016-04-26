@@ -468,7 +468,7 @@ if( empty( $max_execution_time ) )
 }
 else
 {	// Time is limited, can we request more?:
-	$can_force_time = ini_set( 'max_execution_time', 600 ); // Try to force max_execution_time to 10 minutes
+	$can_force_time = @ini_set( 'max_execution_time', 600 ); // Try to force max_execution_time to 10 minutes
 
 	if( $can_force_time !== false )
 	{

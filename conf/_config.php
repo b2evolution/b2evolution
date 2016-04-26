@@ -157,12 +157,12 @@ if( $debug_jslog == 'pwd' )
 
 // To help debugging severe errors, you'll probably want PHP to display the errors on screen.
 if( $debug > 0 || $display_errors_on_production )
-{ // We are debugging or w want to display errors on screen production anyways:
-	ini_set( 'display_errors', 'On' );
+{	// We are debugging or we want to display errors on screen production anyways:
+	@ini_set( 'display_errors', 'On' );
 }
 else
 { // Do not display errors on screen:
-	ini_set( 'display_errors', 'Off' );
+	@ini_set( 'display_errors', 'Off' );
 }
 
 // Check compatibility. Server PHP version can't be lower then the application required PHP version.
