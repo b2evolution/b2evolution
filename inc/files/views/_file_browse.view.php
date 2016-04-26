@@ -437,18 +437,31 @@ jQuery( document ).ready( function()
 
 	jQuery( document ).on( 'submit', '#new_root_selector_form', function()
 	{
-		var new_file_root_url = '<?php echo regenerate_url( 'new_root', 'new_root=' ) ?>';
+		var new_file_root_url = '<?php echo regenerate_url( 'new_root', 'new_root=', '', '&' ); ?>';
 
 		if( jQuery( 'input[name=new_root_selector_type]', this ).val() == 'collection' )
 		{	// Search collections:
-			evo_rest_api_request( 'collections',
+			evo_rest_api_request( 'collections/search',
+			{
+				'per_page': 20,
+				'fields'  : 'id,shortname',
+				'q'       : jQuery( '#new_root_selector_field' ).val()
+			},
 			function( data )
 			{
-				var r = '<ul>';
-				for( var c in data )
+				var r = '<p><?php echo sprintf( TS_('Displaying %s out of %s matches'), '$current_num$', '$total_num$' ); ?>:</p>'
+					.replace( '$current_num$', data.page_size < data.found ? data.page_size : data.found )
+					.replace( '$total_num$', data.found );
+				r += '<ul>';
+				for( var c in data.colls )
 				{
-					var coll = data[c];
-					r += '<li><a href="' + new_file_root_url + 'collection_' + coll.id + '">' + coll.name + '</a></li>';
+					var coll = data.colls [c];
+					var coll_file_root_url = new_file_root_url + 'collection_' + coll.id;
+					if( data.found == 1 )
+					{	// If single collection is found then do redirect immediately:
+						location.href = coll_file_root_url;
+					}
+					r += '<li><a href="' + coll_file_root_url + '">' + coll.name + '</a></li>';
 				}
 				r += '</ul>';
 				jQuery( '#new_root_selector_wrapper' ).html( r );
@@ -471,7 +484,12 @@ jQuery( document ).ready( function()
 				for( var u in data.users )
 				{
 					var user = data.users[u];
-					r += '<li><a href="' + new_file_root_url + 'user_' + user.id + '">' + user.login + '</a></li>';
+					var user_file_root_url = new_file_root_url + 'user_' + user.id;
+					if( data.found == 1 )
+					{	// If single user is found then do redirect immediately:
+						location.href = user_file_root_url;
+					}
+					r += '<li><a href="' + user_file_root_url + '">' + user.login + '</a></li>';
 				}
 				r += '</ul>';
 				jQuery( '#new_root_selector_wrapper' ).html( r );

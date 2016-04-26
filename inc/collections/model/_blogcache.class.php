@@ -201,23 +201,46 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load a list of public blogs into the cache
 	 *
-	 * @param string
+	 * @param string Order By
+	 * @param string Order Direction
 	 * @return array of IDs
 	 */
 	function load_public( $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Settings, $Debuglog;
+		global $DB, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(public)</strong> into cache", 'dataobjects' );
 
+		$SQL = $this->get_public_colls_SQL( $order_by, $order_dir );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
+		{	// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Get SQL to load a list of public collections
+	 *
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return object SQL
+	 */
+	function get_public_colls_SQL( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
 		if( $order_by == '' )
-		{	// Use default value from settings
-			$order_by = $Settings->get('blogs_order_by');
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
 		}
 
 		if( $order_dir == '' )
-		{	// Use default value from settings
-			$order_dir = $Settings->get('blogs_order_dir');
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
 		}
 
 		$SQL = new SQL();
@@ -225,9 +248,9 @@ class BlogCache extends DataObjectCache
 		$SQL->FROM( $this->dbtablename );
 		$sql_where = 'blog_in_bloglist = "public"';
 		if( is_logged_in() )
-		{ // Allow the blogs that available for logged in users
+		{	// Allow the collections that available for logged in users:
 			$sql_where .= ' OR blog_in_bloglist = "logged"';
-			// Allow the blogs that available for members
+			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
 					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
@@ -237,12 +260,7 @@ class BlogCache extends DataObjectCache
 		$SQL->WHERE( '( '.$sql_where.' )' );
 		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
 
-		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
-		{	// Instantiate a custom object
-			$this->instantiate( $row );
-		}
-
-		return $DB->get_col( NULL, 0 );
+		return $SQL;
 	}
 
 

@@ -316,9 +316,21 @@ class RestApi
 		global $Blog;
 
 		// Collection controller ('list' by default):
-		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
+		if( isset( $this->args[2] ) )
+		{	// Get controller to work with requested collection:
+			$coll_controller = $this->args[2];
+		}
+		else
+		{	// Get controller to work with collection:
+			$coll_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
+		}
 
-		if( $coll_controller != 'list' )
+		if( $coll_controller == 'search' )
+		{	// Rename this controller to search collections, because the same controller name is used to search items, comments and etc. in requested collection:
+			$coll_controller = 'search_colls';
+		}
+
+		if( $coll_controller != 'list' && $coll_controller != 'search_colls' )
 		{	// Initialize data for request of the selected collection:
 
 			if( ! isset( $this->args[1] ) )
@@ -397,6 +409,96 @@ class RestApi
 					'tagline'   => $Blog->get( 'tagline' ),
 					'desc'      => $Blog->get( 'longdesc' ),
 				) );
+		}
+	}
+
+
+	/**
+	 * Call collection controller to search the collections by fields
+	 */
+	private function controller_coll_search_colls()
+	{
+		global $DB;
+
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 10 );
+		$api_q = param( 'q', 'string', '' );
+		$api_fields = param( 'fields', 'string', 'shortname' );
+
+		// SQL to get public collection for current user:
+		$BlogCache = & get_BlogCache();
+		$SQL = $BlogCache->get_public_colls_SQL();
+		$count_SQL = $BlogCache->get_public_colls_SQL();
+		$count_SQL->SELECT( 'COUNT( blog_ID )' );
+
+		if( ! empty( $api_q ) )
+		{	// Search collections by keyword:
+			$search_sql_where = array();
+			$search_fields = empty( $api_fields ) ? array( 'shortname' ) : explode( ',', $api_fields );
+			foreach( $search_fields as $search_field )
+			{
+				switch( strtolower( $search_field ) )
+				{
+					case 'id':
+						$search_sql_where[] = 'blog_ID = '.$DB->quote( $api_q );
+						break;
+
+					case 'shortname':
+						$search_sql_where[] = 'blog_shortname LIKE '.$DB->quote( '%'.$api_q.'%' );
+						break;
+				}
+			}
+
+			$search_sql_where = implode( ' OR ', $search_sql_where );
+			$SQL->WHERE_and( $search_sql_where );
+			$count_SQL->WHERE_and( $search_sql_where );
+		}
+
+		$result_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' );
+
+		// Prepare pagination:
+		$result_per_page = $api_per_page;
+		if( $result_count > $result_per_page )
+		{	// We will have multiple search result pages:
+			$current_page = $api_page;
+			if( $current_page < 1 )
+			{
+				$current_page = 1;
+			}
+			$total_pages = ceil( $result_count / $result_per_page );
+			if( $api_page > $total_pages )
+			{
+				$current_page = $total_pages;
+			}
+		}
+		else
+		{	// Only one page of results:
+			$current_page = 1;
+			$total_pages = 1;
+		}
+
+		// Set current page indexes:
+		$from = ( $current_page - 1 ) * $result_per_page;
+		$SQL->LIMIT( $from.','.$api_per_page );
+
+		$this->add_response( 'found', $result_count, 'integer' );
+		$this->add_response( 'page', $current_page, 'integer' );
+		$this->add_response( 'page_size', $result_per_page, 'integer' );
+		$this->add_response( 'pages_total', $total_pages, 'integer' );
+
+		$collections = $DB->get_results( $SQL->get(), ARRAY_A, 'Search public collections by keyword' );
+
+		foreach( $collections as $coll )
+		{	// Add each collection row in the response array:
+			$this->add_response( 'colls', array(
+					'id'        => intval( $coll['blog_ID'] ),
+					'urlname'   => $coll['blog_urlname'],
+					'kind'      => $coll['blog_type'],
+					'shortname' => $coll['blog_shortname'],
+					'name'      => $coll['blog_name'],
+					'tagline'   => $coll['blog_tagline'],
+					'desc'      => $coll['blog_longdesc'],
+				), 'array' );
 		}
 	}
 
