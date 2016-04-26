@@ -441,20 +441,20 @@ switch( $action )
 
 		// We need to ask for confirmation:
 		$fullname = $edited_User->dget( 'fullname' );
-		if ( ! empty( $fullname ) )
-		{
-			$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
-		}
-		else
-		{
-			$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
-		}
+		$del_user_name = empty( $fullname ) ? $edited_User->dget( 'login' ) : '"'.$fullname.'" ['.$edited_User->dget( 'login' ).']';
+		$msg = ( $deltype == 'spammer' ) ? T_('Delete SPAMMER %s?') : T_('Delete user %s?');
+		$msg = sprintf( $msg, $del_user_name );
 
 		$confirm_messages = array();
-		if( $deltype != 'spammer' )
-		{ // Display this note for standard deleting
-			$confirm_messages[] = array( T_('Note: this will not automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will not delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
+		if( $deltype == 'spammer' )
+		{	// Display the notes for spammer deleting:
+			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
+		}
+		else
+		{	// Display the notes for standard deleting:
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
 		}
 
 		// Find other users with the same email address
