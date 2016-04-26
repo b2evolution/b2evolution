@@ -1587,6 +1587,10 @@ class Skin extends DataObject
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1720,6 +1724,10 @@ class Skin extends DataObject
 				//   - 'children' - Get items from current category and from all its sub-categories recirsively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 		}
 
 		return array();

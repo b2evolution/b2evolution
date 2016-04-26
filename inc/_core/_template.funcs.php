@@ -1261,7 +1261,23 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// TODO: translation strings for colorbox buttons
 
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
-				require_css( 'colorbox-regular.min.css', $relative_to );
+				if( is_admin_page() )
+				{
+					global $AdminUI;
+					if( ! empty( $AdminUI ) )
+					{
+						$colorbox_css_file = $AdminUI->get_template( 'colorbox_css_file' );
+					}
+				}
+				else
+				{
+					global $Skin;
+					if( ! empty( $Skin ) )
+					{
+						$colorbox_css_file = $Skin->get_template( 'colorbox_css_file' );
+					}
+				}
+				require_css( ( empty( $colorbox_css_file ) ? 'colorbox-regular.min.css' : $colorbox_css_file ), $relative_to );
 				break;
 		}
 		// add to list of loaded helpers

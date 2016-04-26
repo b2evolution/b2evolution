@@ -123,47 +123,35 @@
 	color: #0092ef;
 	line-height: 17px;
 }
-#cboxPrevious {
+#cboxPrevious, #cboxNext, #cboxClose {
 	position: absolute;
 	bottom: 0;
-	left: 0;
-	background: url(../icons/icons_sprite.png) no-repeat -48px -272px;
+	background: url(../icons/icons_sprite.png) no-repeat;
 	width: 23px;
 	height: 23px;
 	text-indent: -9999px;
+	background-position-y: -272px;
 	&.hover {
-		background-position: -48px -296px;
+		background-position-y: -296px;
 	}
 }
+#cboxPrevious {
+	left: 0;
+	background-position-x: -48px;
+}
 #cboxNext {
-	position: absolute;
-	bottom: 0;
 	left: 27px;
-	background: url(../icons/icons_sprite.png) no-repeat -72px -272px;
-	width: 23px;
-	height: 23px;
-	text-indent: -9999px;
-	&.hover {
-		background-position: -72px -296px;
-	}
+	background-position-x: -72px;
+}
+#cboxClose {
+	right: 0;
+	background-position-x: -24px;
 }
 #cboxLoadingOverlay {
 	background: #FFF;
 }
 #cboxLoadingGraphic {
 	background: url(../img/ajax-loader/fff.gif) no-repeat center center;
-}
-#cboxClose {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	background: url(../icons/icons_sprite.png) no-repeat -24px -272px;
-	width: 23px;
-	height: 23px;
-	text-indent: -9999px;
-}
-#cboxClose.hover {
-	background-position: -24px -296px;
 }
 #cboxVoting {
 	position: relative;
@@ -175,9 +163,6 @@
 	white-space: normal;
 	-khtml-border-radius: 6px;
 	border-radius: 6px;
-}
-#cboxVoting {
-	bottom: 22px;
 	a {
 		margin: 0 10px 0 0;
 		vertical-align: middle;
