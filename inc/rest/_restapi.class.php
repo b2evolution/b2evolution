@@ -1599,4 +1599,44 @@ class RestApi
 
 
 	/**** MODULE TAGS ---- END ****/
+
+	/**** MODULE POLLS ---- START ****/
+
+	private function module_polls()
+	{
+		global $DB, $current_User;
+
+		if( is_logged_in() && $current_User )
+		{
+			$polls = array();
+
+			$perm_poll_view = $current_User->check_perm( 'polls', 'view' );
+
+			$polls_SQL = new SQL();
+			$polls_SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text' );
+			$polls_SQL->FROM( 'T_polls__question' );
+			if( ! $perm_poll_view )
+			{
+				$polls_SQL->WHERE( 'pqst_owner_user_ID = '.$DB->quote( $current_User->ID ) );
+			}
+
+			$poll_count_SQL = new SQL();
+			$poll_count_SQL->SELECT( 'COUNT( pqst_ID )' );
+			$poll_count_SQL->FROM( 'T_polls__question' );
+			if( ! $perm_poll_view )
+			{
+				$poll_count_SQL->WHERE( 'pqst_owner_user_ID = '.$DB->quote( $current_User->ID ) );
+			}
+
+			$polls = $DB->get_results( $polls_SQL->get(), ARRAY_A );
+
+			$this->add_response( 'polls', $polls );
+		}
+		else
+		{
+			$this->halt( 'You are not allowed to view polls.', 'no_access', 403 );
+		}
+	}
+
+	/**** MODULE POLLS ---- END ****/
 }
