@@ -156,6 +156,28 @@ if( isset( $edited_User ) )
 				$rootlist_count = count( $rootlist );
 				if( $rootlist_count > 1 )
 				{	// Provide list of roots to choose from:
+					$file_roots = array();
+					foreach( $rootlist as $l_FileRoot )
+					{	// Put all available file roots in grouped array:
+						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+						{	// Skip this file root, because current user has no permissions to view it:
+							continue;
+						}
+						$group_name = $l_FileRoot->get_typegroupname();
+						if( ! isset( $file_roots[ $group_name ] ) )
+						{
+							$file_roots[ $group_name ] = array();
+						}
+						$file_roots[ $group_name ][] = array(
+								'url'   => regenerate_url( 'new_root', 'new_root='.$l_FileRoot->ID ),
+								'title' => format_to_output( $l_FileRoot->name ),
+								'type'  => $l_FileRoot->type,
+							);
+					}
+					if( ! isset( $file_roots[ NT_('Collection roots') ] ) )
+					{	// If no collection file roots it means no favorite collections for current user, but we need this fake to display a selector for other collections:
+						$file_roots = array_merge( array( NT_('Collection roots') => array( array( 'type' => 'collection' ) ) ), $file_roots );
+					}
 					?>
 					<div id="new_root_selector" class="dropdown" style="display: inline-block">
 						<button class="btn btn-default dropdown-toggle" type="button" id="new_root_dropdown_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -163,35 +185,23 @@ if( isset( $edited_User ) )
 						</button>
 						<ul class="dropdown-menu" aria-labelledby="new_root_dropdown_menu">
 						<?php
-						$prev_file_root_group_name = '';
-						$prev_file_root_group_type = '';
-						$group_num = 0;
-						$root_num = 0;
-						foreach( $rootlist as $l_FileRoot )
-						{
-							if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
-							{	// Skip this file root, because current user has no permissions to view it:
-								continue;
-							}
-							if( $l_FileRoot->get_typegroupname() != $prev_file_root_group_name )
-							{	// New file root group is starting:
-								if( $prev_file_root_group_type == 'user' || ( $prev_file_root_group_type == 'collection' && $group_num > 1 ) )
-								{	// Selector for more collections or users:
-									echo '<li><a href="#" data-type="'.$prev_file_root_group_type.'">'.T_('Other...').'</a></li>'."\n";
+						foreach( $file_roots as $file_root_group_name => $file_roots_group )
+						{	// Display the file roots:
+							// Group header:
+							echo '<li class="dropdown-header">'.T_( $file_root_group_name ).'</li>'."\n";
+							foreach( $file_roots_group as $file_root )
+							{	// File root selector:
+								if( isset( $file_root['url'] ) )
+								{
+									echo '<li><a href="'.$file_root['url'].'">'.$file_root['title'].'</a></li>'."\n";
 								}
-								echo '<li class="dropdown-header">'.T_( $l_FileRoot->get_typegroupname() ).'</li>'."\n";
-								$prev_file_root_group_name = $l_FileRoot->get_typegroupname();
-								$prev_file_root_group_type = $l_FileRoot->type;
-								$group_num++;
+								$file_root_group_key = $file_root['type'];
 							}
-							echo '<li><a href="'.regenerate_url( 'new_root', 'new_root='.$l_FileRoot->ID ).'">'.format_to_output( $l_FileRoot->name ).'</a></li>'."\n";
-
-							if( ( $root_num == $rootlist_count - 1 ) &&
-							    ( $prev_file_root_group_type == 'user' || ( $prev_file_root_group_type == 'collection' && $group_num > 1 ) ) )
+							if( ( $file_root_group_key == 'user' && $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+							    || $file_root_group_key == 'collection' )
 							{	// Selector for more collections or users:
-								echo '<li><a href="#" data-type="'.$prev_file_root_group_type.'">'.T_('Other...').'</a></li>'."\n";
+								echo '<li><a href="#" data-type="'.$file_root_group_key.'">'.T_('Other...').'</a></li>'."\n";
 							}
-							$root_num++;
 						}
 						?>
 						</ul>
@@ -444,7 +454,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections/search',
 			{
 				'per_page': 20,
-				'filter'  : 'available_fileroots',
+				'restrict': 'available_fileroots',
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -473,6 +483,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
+				'restrict': 'available_fileroots',
 				'filter'  : 'new',
 				'keywords': jQuery( '#new_root_selector_field' ).val()
 			},

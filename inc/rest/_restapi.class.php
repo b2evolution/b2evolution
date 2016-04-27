@@ -424,7 +424,7 @@ class RestApi
 		$api_per_page = param( 'per_page', 'integer', 10 );
 		$api_q = param( 'q', 'string', '' );
 		$api_fields = param( 'fields', 'string', 'shortname' );
-		$api_filter = param( 'filter', 'string', '' );
+		$api_restrict = param( 'restrict', 'string', '' );
 
 		// SQL to get collections:
 		$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
@@ -461,7 +461,7 @@ class RestApi
 		}
 
 		$collections = array();
-		if( $api_filter == 'available_fileroots' && ! is_logged_in() )
+		if( $api_restrict == 'available_fileroots' && ! is_logged_in() )
 		{	// Anonymous user has no access to file roots:
 			$result_count = 0;
 		}
@@ -482,7 +482,7 @@ class RestApi
 					continue;
 				}
 
-				if( $api_filter == 'available_fileroots' )
+				if( $api_restrict == 'available_fileroots' )
 				{	// Check if file root of the collection is allowed to view by current user:
 					if( ! $current_User->check_perm( 'blogs', 'view' ) && ! $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ) )
 					{	// Skip it because current user has no access to browse the collection media:
@@ -1106,11 +1106,32 @@ class RestApi
 	{
 		global $Settings;
 
-		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
-		{	// Current user has no access to public list of the users,
-			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 403 );
-			// Exit here.
+		$api_restrict = param( 'restrict', 'string', '' );
+
+		if( $api_restrict == 'available_fileroots' )
+		{	// Check if current user has an access to file roots of other users:
+			global $current_User;
+			if( is_logged_in() )
+			{	// Check perms for logged in user:
+				if( ! ( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) ) )
+				{	// Current user has an access only to file root of own account:
+					$user_filters = array( 'userids' => array( $current_User->ID ) );
+				}
+				// otherwise current user has an access to file roots of all users
+			}
+			else
+			{	// Anonymous user has no access to file roots:
+				$user_filters = array( 'userids' => array( -1 ) );
+			}
+		}
+		else
+		{	// Default restriction:
+			if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
+			{	// Current user has no access to public list of the users,
+				// Display error message:
+				$this->halt( $access_error_message, 'no_access', 403 );
+				// Exit here.
+			}
 		}
 
 		// Get param to limit number users per page:
@@ -1121,6 +1142,11 @@ class RestApi
 		$UserList = new UserList( 'api_', $api_per_page, '' );
 
 		$UserList->load_from_Request();
+
+		if( ! empty( $user_filters ) )
+		{	// Filter list:
+			$UserList->set_filters( $user_filters, true, true );
+		}
 
 		// Execute query:
 		$UserList->query();
