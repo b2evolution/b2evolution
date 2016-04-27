@@ -2474,6 +2474,7 @@ class User extends DataObject
 			case 'blog_item_type_restricted':
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
+			case 'blog_media_browse':
 				// The owner of a collection has automatic permission to so many things:
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:

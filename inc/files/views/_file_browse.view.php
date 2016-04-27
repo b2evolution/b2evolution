@@ -444,6 +444,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections/search',
 			{
 				'per_page': 20,
+				'filter'  : 'available_fileroots',
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},

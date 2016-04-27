@@ -54,7 +54,7 @@ class FileRootCache
 
 		if( ! empty( $special_root_ID ) &&
 		    ( $special_FileRoot = & $FileRootCache->get_by_ID( $special_root_ID, true ) ) &&
-		    $current_User->check_perm( 'files', 'edit_allowed', false, $special_FileRoot ) )
+		    $current_User->check_perm( 'files', 'view', false, $special_FileRoot ) )
 		{ // Try to add special file root if current user has an access
 			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
 		}
@@ -69,7 +69,7 @@ class FileRootCache
 		if( isset($collections_Module) )
 		{	// Blog/collection media dirs:
 			$BlogCache = & get_BlogCache();
-			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID, NULL, '', '', NULL, $coll_filter );
+			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', 'view', NULL, '', '', NULL, $coll_filter );
 			foreach( $bloglist as $blog_ID )
 			{
 				if( $Root = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_ID, true ) )

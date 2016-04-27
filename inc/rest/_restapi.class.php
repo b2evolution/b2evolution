@@ -418,18 +418,24 @@ class RestApi
 	 */
 	private function controller_coll_search_colls()
 	{
-		global $DB;
+		global $DB, $Settings, $current_User;
 
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
 		$api_q = param( 'q', 'string', '' );
 		$api_fields = param( 'fields', 'string', 'shortname' );
+		$api_filter = param( 'filter', 'string', '' );
 
-		// SQL to get public collection for current user:
-		$BlogCache = & get_BlogCache();
-		$SQL = $BlogCache->get_public_colls_SQL();
-		$count_SQL = $BlogCache->get_public_colls_SQL();
+		// SQL to get collections:
+		$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->ORDER_BY( $sql_order_by );
+		$count_SQL = new SQL();
 		$count_SQL->SELECT( 'COUNT( blog_ID )' );
+		$count_SQL->FROM( 'T_blogs' );
+		$count_SQL->ORDER_BY( $sql_order_by );
 
 		if( ! empty( $api_q ) )
 		{	// Search collections by keyword:
@@ -454,18 +460,69 @@ class RestApi
 			$count_SQL->WHERE_and( $search_sql_where );
 		}
 
-		$result_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' );
+		$collections = array();
+		if( $api_filter == 'available_fileroots' && ! is_logged_in() )
+		{	// Anonymous user has no access to file roots:
+			$result_count = 0;
+		}
+		else
+		{
+			$result_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' );
+			$coll_IDs = $DB->get_col( $SQL->get(), 0, 'Search public collections by keyword' );
+
+			$BlogCache = & get_BlogCache();
+			$FileRootCache = & get_FileRootCache();
+
+			$c = 0;
+			foreach( $coll_IDs as $coll_ID )
+			{
+				if( ! ( $Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) ) )
+				{	// Skip the wrong collection:
+					$result_count--;
+					continue;
+				}
+
+				if( $api_filter == 'available_fileroots' )
+				{	// Check if file root of the collection is allowed to view by current user:
+					if( ! $current_User->check_perm( 'blogs', 'view' ) && ! $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ) )
+					{	// Skip it because current user has no access to browse the collection media:
+						$result_count--;
+						continue;
+					}
+
+					$coll_fileroot_ID = FileRoot::gen_ID( 'collection', $Blog->ID );
+					if( ! ( $coll_FileRoot = & $FileRootCache->get_by_ID( $coll_fileroot_ID, false ) ) )
+					{	// Skip it because file root is not found:
+						$result_count--;
+						continue;
+					}
+
+					if( ! $current_User->check_perm( 'files', 'view', false, $coll_FileRoot ) )
+					{	// Skip it because current user has no access to view the file root:
+						$result_count--;
+						continue;
+					}
+				}
+
+				$collections[] = $Blog;
+				$c++;
+
+				if( $c == $api_per_page )
+				{	// End of page:
+					break;
+				}
+			}
+		}
 
 		// Prepare pagination:
-		$result_per_page = $api_per_page;
-		if( $result_count > $result_per_page )
+		if( $result_count > $api_per_page )
 		{	// We will have multiple search result pages:
 			$current_page = $api_page;
 			if( $current_page < 1 )
 			{
 				$current_page = 1;
 			}
-			$total_pages = ceil( $result_count / $result_per_page );
+			$total_pages = ceil( $result_count / $api_per_page );
 			if( $api_page > $total_pages )
 			{
 				$current_page = $total_pages;
@@ -477,27 +534,21 @@ class RestApi
 			$total_pages = 1;
 		}
 
-		// Set current page indexes:
-		$from = ( $current_page - 1 ) * $result_per_page;
-		$SQL->LIMIT( $from.','.$api_per_page );
-
 		$this->add_response( 'found', $result_count, 'integer' );
 		$this->add_response( 'page', $current_page, 'integer' );
-		$this->add_response( 'page_size', $result_per_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
 		$this->add_response( 'pages_total', $total_pages, 'integer' );
 
-		$collections = $DB->get_results( $SQL->get(), ARRAY_A, 'Search public collections by keyword' );
-
-		foreach( $collections as $coll )
+		foreach( $collections as $Blog )
 		{	// Add each collection row in the response array:
 			$this->add_response( 'colls', array(
-					'id'        => intval( $coll['blog_ID'] ),
-					'urlname'   => $coll['blog_urlname'],
-					'kind'      => $coll['blog_type'],
-					'shortname' => $coll['blog_shortname'],
-					'name'      => $coll['blog_name'],
-					'tagline'   => $coll['blog_tagline'],
-					'desc'      => $coll['blog_longdesc'],
+					'id'        => intval( $Blog->ID ),
+					'urlname'   => $Blog->get( 'urlname' ),
+					'kind'      => $Blog->get( 'type' ),
+					'shortname' => $Blog->get( 'shortname' ),
+					'name'      => $Blog->get( 'name' ),
+					'tagline'   => $Blog->get( 'tagline' ),
+					'desc'      => $Blog->get( 'longdesc' ),
 				), 'array' );
 		}
 	}
