@@ -577,7 +577,7 @@ jQuery( document ).ready( function()
 
 				$gzip_file_name = explode( '/', $this->geoip_download_url );
 				$gzip_file_name = $gzip_file_name[ count( $gzip_file_name ) - 1 ];
-				$gzip_file_path = ( is_writable( $plugin_dir ) ? $plugin_dir : sys_get_temp_dir() ).'/'.$gzip_file_name;
+				$gzip_file_path = sys_get_temp_dir().'/'.$gzip_file_name;
 
 				if( ! save_to_file( $gzip_contents, $gzip_file_path, 'w' ) )
 				{ // Impossible to save file...
