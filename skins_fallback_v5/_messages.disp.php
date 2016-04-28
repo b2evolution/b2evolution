@@ -114,7 +114,7 @@ if( isset( $edited_Thread ) )
 {
 	global $action;
 	$action = !empty( $action ) ? $action : 'create';
-	require $inc_path.'messaging/views/_message_list.view.php';
+	require $inc_path.'messaging/views/_message_list_v5.view.php';
 }
 
 ?>
