@@ -801,6 +801,39 @@ div.edit_toolbars, div.message_toolbars {
 			margin-bottom: 10px;
 		}
 	}
+	.evo_private_messages_list__table {
+		margin-bottom: 20px;
+		.evo_private_messages_list__filters {
+			padding-bottom: 20px;
+		}
+		thead {
+			display: none;
+		}
+		td {
+			border: none;
+			&.firstcol {
+				a.user {
+					display: block;
+					img {
+						border-radius: 50%;
+					}
+				}
+			}
+		}
+		tr.group td {
+			border-top: 1px solid #ddd;
+			border-bottom: 1px solid #ddd;
+			background: none;
+		}
+		.evo_msg_users__read {
+			float: right;
+			img {
+				border-radius: 50%;
+				width: 16px;
+				height: 16px;
+			}
+		}
+	}
 	#msg_ajax_content {
 		max-height: 500px;
 		overflow: auto;

@@ -3344,6 +3344,37 @@ div.message_toolbars {
 .evo_private_messages_list .evo_private_messages_list__header .pull-right a {
   margin-bottom: 10px;
 }
+.evo_private_messages_list .evo_private_messages_list__table {
+  margin-bottom: 20px;
+}
+.evo_private_messages_list .evo_private_messages_list__table .evo_private_messages_list__filters {
+  padding-bottom: 20px;
+}
+.evo_private_messages_list .evo_private_messages_list__table thead {
+  display: none;
+}
+.evo_private_messages_list .evo_private_messages_list__table td {
+  border: none;
+}
+.evo_private_messages_list .evo_private_messages_list__table td.firstcol a.user {
+  display: block;
+}
+.evo_private_messages_list .evo_private_messages_list__table td.firstcol a.user img {
+  border-radius: 50%;
+}
+.evo_private_messages_list .evo_private_messages_list__table tr.group td {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  background: none;
+}
+.evo_private_messages_list .evo_private_messages_list__table .evo_msg_users__read {
+  float: right;
+}
+.evo_private_messages_list .evo_private_messages_list__table .evo_msg_users__read img {
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+}
 .evo_private_messages_list #msg_ajax_content {
   max-height: 500px;
   overflow: auto;

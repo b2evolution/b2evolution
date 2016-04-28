@@ -169,7 +169,8 @@ $select_SQL->SELECT( 'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg
 						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
 						u.user_avatar_file_ID AS msg_user_avatar_ID,
 						mm.msg_text, mm.msg_renderers,
-						'.$DB->quote( $edited_Thread->title ).' AS thread_title' );
+						'.$DB->quote( $edited_Thread->title ).' AS thread_title,
+						DATE_FORMAT( mm.msg_datetime, "%Y-%m-%d" ) AS message_day_date' );
 
 $select_SQL->FROM( 'T_messaging__message mm
 						LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
@@ -180,6 +181,7 @@ if( !empty( $leave_msg_ID ) && ( !$perm_abuse_management ) )
 	$select_SQL->WHERE_and( 'mm.msg_ID <= '.$leave_msg_ID );
 }
 
+$select_SQL->GROUP_BY( 'mm.msg_ID, message_day_date' );
 $select_SQL->ORDER_BY( 'mm.msg_datetime DESC' );
 
 // Create COUNT query:
@@ -235,6 +237,10 @@ $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
+// Grouping params:
+$Results->group_by = 'message_day_date';
+$Results->ID_col = 'msg_ID';
+
 if( is_admin_page() )
 {
 	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
@@ -258,31 +264,46 @@ $Results->filter_area = array(
 			)
 	);
 
+// Date row:
+$Results->grp_cols[] = array(
+		'td_colspan' => 4,
+		'td'         => '%col_msg_group_date( #message_day_date# )%',
+	);
+
 /**
  * Author:
  */
 $Results->cols[] = array(
-		'th' => T_('Author'),
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'center top',
-		'td' => '%col_msg_author( #msg_user_ID#, #msg_datetime#)%'
+		'th' => '',
+		'td_class' => 'shrinkwrap',
+		'td' => '%col_msg_author_avatar( #msg_author# )%'
 	);
+
 /**
  * Message:
  */
 $Results->cols[] = array(
-		'th' => T_('Message'),
-		'td_class' => 'left top message_text',
-		'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+		'th' => '',
+		'td' => '<p>%get_user_identity_link( "", #msg_user_ID#, "profile", "auto" )%</p>'
+			.'%col_msg_format_text( #msg_ID#, #msg_text# )%'
+			.'%col_msg_read_by( #msg_ID#, array('
+				.'"display_unread"      => false,'
+				.'"display_left"        => false,'
+				.'"separator"           => " ",'
+				.'"display_login"       => false,'
+				.'"display_status_icon" => false,'
+				.'"display_avatar"      => true,'
+				.'"avatar_size"         => "crop-top-32x32",'
+			.') )%',
 	);
+
 /**
- * Read?:
+ * Time:
  */
 $Results->cols[] = array(
-		'th' => T_('Read?'),
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'top',
-		'td' => '%col_msg_read_by( #msg_ID# )%',
+		'th' => '',
+		'td_class' => 'shrinkwrap',
+		'td' => '%col_msg_time( #msg_datetime# )%',
 	);
 
 /**
@@ -291,11 +312,10 @@ $Results->cols[] = array(
 if( $current_User->check_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows() > 1 ) && ( $action != 'preview' ) )
 {	// We have permission to modify and there are more than 1 message (otherwise it's better to delete the whole thread):
 	$Results->cols[] = array(
-							'th' => T_('Del'),
-							'th_class' => 'shrinkwrap',
-							'td_class' => 'shrinkwrap',
-							'td' => '%col_msg_actions( #msg_thread_ID#, #msg_ID#)%',
-						);
+			'th' => '',
+			'td_class' => 'shrinkwrap',
+			'td' => '%col_msg_actions( #msg_thread_ID#, #msg_ID#)%',
+		);
 }
 
 
@@ -305,12 +325,17 @@ if( $action == 'preview' )
 	$Messages->display();
 }
 
-// Disable rollover effect on table rows:
+// Initialize display params:
 $Results->display_init( $display_params );
-$display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
+$Results->params['before'] = '<div class="evo_private_messages_list__table">';
+$Results->params['after'] = '</div>';
+$Results->params['filters_start'] = '<div class="evo_private_messages_list__filters">';
+$Results->params['filters_end'] = '</div>';
+$Results->params['list_start'] = '<table class="table">';
+$Results->params['list_end'] = "</table>\n\n";
 
 // Dispaly message list
-$Results->display( $display_params );
+$Results->display();
 
 echo $params['messages_list_end'];
 

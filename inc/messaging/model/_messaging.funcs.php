@@ -2241,20 +2241,67 @@ function col_thread_delete_action( $thread_ID )
 	}
 }
 
+
+/**
+ * Create date group row for message list table
+ *
+ * @param string Date in format YYYY-mm-dd
+ * @return string
+ */
+function col_msg_group_date( $date )
+{
+	if( $date == date( 'Y-m-d' ) )
+	{
+		return T_('Today');
+	}
+	elseif( $date == date( 'Y-m-d', mktime( date( 'H' ), date( 'i' ), date( 's' ), date( 'm' ), date( 'd' ) - 1, date( 'Y' ) ) ) )
+	{
+		return T_('Yesterday');
+	}
+	else
+	{
+		return mysql2localedate( $date );
+	}
+}
+
+
 /**
  * Create author cell for message list table
  *
  * @param integer user ID
- * @param string login
- * @param string first name
- * @param string last name
- * @param integer avatar ID
  * @param string datetime
+ * @return string
  */
 function col_msg_author( $user_ID, $datetime )
 {
 	$author = get_user_avatar_styled( $user_ID, array( 'size' => 'crop-top-80x80' ) );
 	return $author.'<div class="note black">'.mysql2date( locale_datefmt().'<\b\r />'.str_replace( ':s', '', locale_timefmt() ), $datetime ).'</div>';
+}
+
+
+/**
+ * Create author cell for message list table
+ *
+ * @param integer user ID
+ * @param string datetime
+ * @return string
+ */
+function col_msg_author_avatar( $user_login )
+{
+	return get_avatar_imgtag( $user_login, false, true, $size = 'crop-top-48x48', '' );
+}
+
+
+/**
+ * Create author cell for message list table
+ *
+ * @param integer user ID
+ * @param string datetime
+ * @return string
+ */
+function col_msg_time( $datetime )
+{
+	return mysql2date( str_replace( ':s', '', locale_timefmt() ), $datetime );
 }
 
 
@@ -2299,19 +2346,34 @@ function col_msg_format_text( $msg_ID, $msg_text )
  * @param integer Message ID
  * @return string Authors list with red/green bullet icons
  */
-function col_msg_read_by( $message_ID )
+function col_msg_read_by( $message_ID, $params = array() )
 {
 	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
 
+	$params = array_merge( array(
+			'display_read'        => true,
+			'display_unread'      => true,
+			'display_left'        => true,
+			'separator'           => '<br />',
+			'display_login'       => true,
+			'display_status_icon' => true,
+			'display_avatar'      => false,
+			'avatar_size'         => NULL,
+		), $params );
+
 	$UserCache = & get_UserCache();
 
-	if( empty( $Blog ) )
-	{	// Set avatar size for a case when blog is not defined
-		$avatar_size = 'crop-top-32x32';
-	}
-	else
-	{	// Get avatar size from blog settings
-		$avatar_size = $Blog->get_setting('image_size_messaging');
+	$avatar_size = $params['avatar_size'];
+	if( $avatar_size === NULL )
+	{	// Get default avatar:
+		if( empty( $Blog ) )
+		{	// Set avatar size for a case when blog is not defined:
+			$avatar_size = 'crop-top-32x32';
+		}
+		else
+		{	// Get avatar size from blog settings:
+			$avatar_size = $Blog->get_setting('image_size_messaging');
+		}
 	}
 
 	$read_recipients = array();
@@ -2353,28 +2415,29 @@ function col_msg_read_by( $message_ID )
 	}
 
 	$read_by = '';
-	if( !empty( $read_recipients ) )
-	{ // There are users who have read this message
+	if( $params['display_read'] && ! empty( $read_recipients ) )
+	{	// Display users who have read this message:
 		asort( $read_recipients );
-		$read_by .= '<div>'.get_avatar_imgtags( $read_recipients, true, false, $avatar_size, '', '', true, false );
-		if( !empty ( $unread_recipients ) )
-		{
-			$read_by .= '<br />';
-		}
-		$read_by .= '</div>';
+		$read_status_icon = $params['display_status_icon'] ? true : NULL;
+		$read_by .= '<div class="evo_msg_users__read">'.get_avatar_imgtags( $read_recipients, $params['display_login'], false, $avatar_size, '', '', $read_status_icon, $params['display_avatar'], $params['separator'] ).'</div>';
 	}
 
-	if( !empty ( $unread_recipients ) )
-	{ // There are users who didn't read this message
+	if( $params['display_unread'] && ! empty ( $unread_recipients ) )
+	{	// Display users who didn't read this message:
 		asort( $unread_recipients );
-		$read_by .= '<div>'.get_avatar_imgtags( $unread_recipients, true, false, $avatar_size, '', '', false, false ).'</div>';
+		$read_status_icon = $params['display_status_icon'] ? false : NULL;
+		$read_by .= empty ( $read_by ) ? '' : '<br />';
+		$read_by .= '<div class="evo_msg_users__unread">'.get_avatar_imgtags( $unread_recipients, $params['display_login'], false, $avatar_size, '', '', $read_status_icon, $params['display_avatar'], $params['separator'] ).'</div>';
 	}
 
-	if( !empty ( $left_recipients ) )
-	{ // There are users who left the conversation before this message
+	if( $params['display_left'] && ! empty ( $left_recipients ) )
+	{	// Display users who left the conversation before this message:
 		asort( $left_recipients );
-		$read_by .= '<div>'.get_avatar_imgtags( $left_recipients, true, false, $avatar_size, '', '', 'left_message', false ).'</div>';
+		$read_status_icon = $params['display_status_icon'] ? 'left_message' : NULL;
+		$read_by .= empty ( $read_by ) ? '' : '<br />';
+		$read_by .= '<div class="evo_msg_users__left">'.get_avatar_imgtags( $left_recipients, $params['display_login'], false, $avatar_size, '', '', $read_status_icon, $params['display_avatar'], $params['separator'] ).'</div>';
 	}
+
 	return $read_by;
 }
 
