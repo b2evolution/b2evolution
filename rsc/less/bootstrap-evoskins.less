@@ -790,26 +790,20 @@ div.edit_toolbars, div.message_toolbars {
 
 // Messages list & form
 .evo_private_messages_list {
-	.messages_navigation {
-		padding: 5px;
+	.evo_private_messages_list__navigation {
+		padding: 5px 0;
 	}
-	> h2 {
-		margin-top: 0;
+	.evo_private_messages_list__header {
+		h2 {
+			margin-top: 0;
+		}
+		.pull-right a {
+			margin-bottom: 10px;
+		}
 	}
-	.messages_list_actions {
-		text-align: center;
-		padding: 10px 0;
-		p {
-			margin: 0;
-			padding: 0;
-			text-align: center;
-		}
-		a {
-			display: inline-block;
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
+	#msg_ajax_content {
+		max-height: 500px;
+		overflow: auto;
 	}
 	span.error {
 		border: 1px solid #BBB;
@@ -822,6 +816,17 @@ div.edit_toolbars, div.message_toolbars {
 		margin-bottom: 0;
 		&.results {
 			margin-bottom: 20px;
+		}
+	}
+}
+.evo_private_messages_form {
+	.evo_private_messages_form__actions {
+		float: right;
+		width: 100px;
+		input {
+			margin-bottom: 5px;
+			width: 100%;
+			display: block;
 		}
 	}
 }

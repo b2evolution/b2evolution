@@ -2285,26 +2285,18 @@ div.message_toolbars {
   font-size: 10px;
   line-height: 20px;
 }
-.evo_private_messages_list .messages_navigation {
-  padding: 5px;
+.evo_private_messages_list .evo_private_messages_list__navigation {
+  padding: 5px 0;
 }
-.evo_private_messages_list > h2 {
+.evo_private_messages_list .evo_private_messages_list__header h2 {
   margin-top: 0;
 }
-.evo_private_messages_list .messages_list_actions {
-  text-align: center;
-  padding: 10px 0;
+.evo_private_messages_list .evo_private_messages_list__header .pull-right a {
+  margin-bottom: 10px;
 }
-.evo_private_messages_list .messages_list_actions p {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-.evo_private_messages_list .messages_list_actions a {
-  display: inline-block;
-}
-.evo_private_messages_list .messages_list_actions a:last-child {
-  margin-bottom: 0;
+.evo_private_messages_list #msg_ajax_content {
+  max-height: 500px;
+  overflow: auto;
 }
 .evo_private_messages_list span.error {
   border: 1px solid #BBB;
@@ -2318,6 +2310,15 @@ div.message_toolbars {
 }
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
+}
+.evo_private_messages_form .evo_private_messages_form__actions {
+  float: right;
+  width: 100px;
+}
+.evo_private_messages_form .evo_private_messages_form__actions input {
+  margin-bottom: 5px;
+  width: 100%;
+  display: block;
 }
 @media (min-width: 768px) {
   div.coll-dashboard-block-3 {
