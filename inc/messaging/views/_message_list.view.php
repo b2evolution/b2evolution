@@ -380,10 +380,11 @@ if( $is_recipient )
 		}
 
 		$Form->switch_template_parts( array(
-				'formstart'    => '',
-				'formend'      => '',
+				'formstart'             => '',
+				'formend'               => '',
 				'no_title_no_icons_fmt' => '',
-				'labelempty'   => '',
+				'labelempty'            => '',
+				'inputstart'            => '<div class="controls col-md-10 col-sm-9">',
 			) );
 
 		$Form->begin_form();
@@ -410,7 +411,7 @@ if( $is_recipient )
 
 		// Form buttons:
 		$Form->output = false;
-		$form_buttons = '<div class="evo_private_messages_form__actions">';
+		$form_buttons = '<div class="evo_private_messages_form__actions col-md-2 col-sm-3">';
 		$form_buttons .= $Form->button( array( 'button', '', T_('Options'), 'btn-default' ) );
 		$form_buttons .= $Form->button( array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ) );
 		$form_buttons .= $Form->button( array( 'submit', 'actionArray[create]', T_('Send'), 'SaveButton' ) );

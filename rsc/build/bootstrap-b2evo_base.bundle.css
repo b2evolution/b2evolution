@@ -3396,14 +3396,23 @@ div.message_toolbars {
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
 }
-.evo_private_messages_form .evo_private_messages_form__actions {
-  float: right;
-  width: 100px;
+.evo_private_messages_form__actions {
+  padding-right: 0;
 }
-.evo_private_messages_form .evo_private_messages_form__actions input {
+.evo_private_messages_form__actions input {
   margin-bottom: 5px;
   width: 100%;
   display: block;
+}
+@media (max-width: 767px) {
+  .evo_private_messages_form__actions {
+    padding: 10px 0 0 0;
+  }
+  .evo_private_messages_form__actions input {
+    display: inline-block;
+    width: auto;
+    min-width: 100px;
+  }
 }
 @media (min-width: 768px) {
   div.coll-dashboard-block-3 {
