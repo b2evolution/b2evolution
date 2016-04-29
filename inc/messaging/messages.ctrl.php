@@ -191,6 +191,7 @@ else
 $AdminUI->set_page_manual_link( 'messages-view-thread' );
 
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_stickyrows_js( 'rsc_url' );
 
 // Display messages depending on user email status
 display_user_email_status_message();

@@ -333,6 +333,8 @@ $Results->params['filters_start'] = '<div class="evo_private_messages_list__filt
 $Results->params['filters_end'] = '</div>';
 $Results->params['list_start'] = '<table class="table">';
 $Results->params['list_end'] = "</table>\n\n";
+$Results->params['grp_line_start'] = '<tbody class="group"><tr>'."\n";
+$Results->params['grp_line_end'] = "</tr></tbody>\n\n";
 
 // Dispaly message list
 $Results->display();

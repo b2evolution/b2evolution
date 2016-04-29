@@ -997,6 +997,11 @@ class Skin extends DataObject
 					// Used to display a tooltip to the right of plugin help icon:
 					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
+					if( $this->get_css_framework() == 'bootstrap' )
+					{	// Used to stick day rows on scroll down:
+						init_stickyrows_js( 'blog' );
+					}
+
 					// Require results.css to display message query results in a table
 					if( ! in_array( 'bootstrap', $features ) )
 					{ // Only for NON-bootstrap skins

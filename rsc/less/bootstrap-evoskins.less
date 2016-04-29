@@ -809,6 +809,16 @@ div.edit_toolbars, div.message_toolbars {
 		thead {
 			display: none;
 		}
+		tbody {
+			border: none;
+			&.group {
+				tr td {
+					border-top: 1px solid #ddd;
+					border-bottom: 1px solid #ddd;
+					background: none;
+				}
+			}
+		}
 		td {
 			border: none;
 			&.firstcol {
@@ -819,11 +829,6 @@ div.edit_toolbars, div.message_toolbars {
 					}
 				}
 			}
-		}
-		tr.group td {
-			border-top: 1px solid #ddd;
-			border-bottom: 1px solid #ddd;
-			background: none;
 		}
 		.evo_msg_users__read {
 			float: right;
@@ -837,6 +842,7 @@ div.edit_toolbars, div.message_toolbars {
 	#msg_ajax_content {
 		max-height: 500px;
 		overflow: auto;
+		position: relative;
 	}
 	span.error {
 		border: 1px solid #BBB;

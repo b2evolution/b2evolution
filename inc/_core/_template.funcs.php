@@ -1718,6 +1718,34 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Registers headlines required to stick table rows on scroll
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ */
+function init_stickyrows_js( $relative_to = 'rsc_url', $params = array() )
+{
+	$params = array_merge( array(
+			'selector'  => '.evo_private_messages_list__table table.table',
+			'rows'      => '.group',
+			'container' => '#msg_ajax_content',
+		), $params );
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'jquery/jquery.stickyrows.min.js', $relative_to );
+	require_css( 'jquery/jquery.stickyrows.css', $relative_to );
+	add_js_headline( 'jQuery( document ).ready( function()
+	{
+		jQuery( "'.$params['selector'].'" ).stickyRows(
+		{
+			rows: "'.$params['rows'].'",
+			container: "'.$params['container'].'",
+			containersToSynchronize: "body",
+		} );
+	} );' );
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string

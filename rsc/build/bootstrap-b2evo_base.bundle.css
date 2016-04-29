@@ -3353,6 +3353,14 @@ div.message_toolbars {
 .evo_private_messages_list .evo_private_messages_list__table thead {
   display: none;
 }
+.evo_private_messages_list .evo_private_messages_list__table tbody {
+  border: none;
+}
+.evo_private_messages_list .evo_private_messages_list__table tbody.group tr td {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  background: none;
+}
 .evo_private_messages_list .evo_private_messages_list__table td {
   border: none;
 }
@@ -3361,11 +3369,6 @@ div.message_toolbars {
 }
 .evo_private_messages_list .evo_private_messages_list__table td.firstcol a.user img {
   border-radius: 50%;
-}
-.evo_private_messages_list .evo_private_messages_list__table tr.group td {
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  background: none;
 }
 .evo_private_messages_list .evo_private_messages_list__table .evo_msg_users__read {
   float: right;
@@ -3378,6 +3381,7 @@ div.message_toolbars {
 .evo_private_messages_list #msg_ajax_content {
   max-height: 500px;
   overflow: auto;
+  position: relative;
 }
 .evo_private_messages_list span.error {
   border: 1px solid #BBB;
