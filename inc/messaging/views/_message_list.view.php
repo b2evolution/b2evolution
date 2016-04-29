@@ -161,53 +161,48 @@ echo '</div>';
 // ---------------- Header - END ---------------- //
 
 
+// ---------------- Messages list - START ---------------- //
 // Create SELECT query:
 $select_SQL = new SQL();
 
-$select_SQL->SELECT( 'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
-						u.user_ID AS msg_user_ID, u.user_login AS msg_author,
-						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
-						u.user_avatar_file_ID AS msg_user_avatar_ID,
-						mm.msg_text, mm.msg_renderers,
-						'.$DB->quote( $edited_Thread->title ).' AS thread_title,
-						DATE_FORMAT( mm.msg_datetime, "%Y-%m-%d" ) AS message_day_date' );
+$select_SQL->SELECT( 'msg_ID, msg_author_user_ID, msg_thread_ID, msg_datetime,
+	user_ID AS msg_user_ID, user_login AS msg_author,
+	user_firstname AS msg_firstname, user_lastname AS msg_lastname,
+	user_avatar_file_ID AS msg_user_avatar_ID,
+	msg_text, msg_renderers,
+	'.$DB->quote( $edited_Thread->title ).' AS thread_title,
+	DATE_FORMAT( msg_datetime, "%Y-%m-%d" ) AS message_day_date' );
 
-$select_SQL->FROM( 'T_messaging__message mm
-						LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
+$select_SQL->FROM( 'T_messaging__message' );
+$select_SQL->FROM_add( 'LEFT OUTER JOIN T_users ON user_ID = msg_author_user_ID' );
 
-$select_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
+$select_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
 if( !empty( $leave_msg_ID ) && ( !$perm_abuse_management ) )
 {
-	$select_SQL->WHERE_and( 'mm.msg_ID <= '.$leave_msg_ID );
+	$select_SQL->WHERE_and( 'msg_ID <= '.$leave_msg_ID );
 }
-
-$select_SQL->GROUP_BY( 'mm.msg_ID, message_day_date' );
-$select_SQL->ORDER_BY( 'mm.msg_datetime DESC' );
 
 // Create COUNT query:
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'COUNT(*)' );
+$count_SQL->FROM( 'T_messaging__message' );
+$count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
 
-// Get params from request
+// Get params from request:
 $s = param( 's', 'string', '', true );
 
-if( !empty( $s ) )
-{
-	$select_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
+if( ! empty( $s ) )
+{	// Filter by search keyword:
+	$select_SQL->WHERE_and( 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
 
-	$count_SQL->FROM( 'T_messaging__message mm LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
-	$count_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
-	$count_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
-}
-else
-{
-	$count_SQL->FROM( 'T_messaging__message' );
-	$count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
+	$count_SQL->FROM_add( 'LEFT OUTER JOIN T_users ON user_ID = msg_author_user_ID' );
+	$count_SQL->WHERE_and( 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
 }
 
 $select_sql = $select_SQL->get();
+
 if( $action == 'preview' )
-{ // Init PREVIEW message
+{	// Init PREVIEW message:
 	global $localtimenow;
 
 	foreach( $recipient_status_list as $row )
@@ -218,19 +213,32 @@ if( $action == 'preview' )
 
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
-	$select_sql = '(
+	$select_sql = 'SELECT msg_ID, msg_author_user_ID, msg_thread_ID, msg_datetime,
+					msg_user_ID, msg_author, msg_firstname, msg_lastname, msg_user_avatar_ID,
+					msg_text, msg_renderers, thread_title, message_day_date
+	FROM (
 	SELECT
-		0 AS msg_ID, '.$current_User->ID.' AS msg_author_user_ID, '.$edited_Thread->ID.' AS msg_thread_ID, "'.date( 'Y-m-d H:i:s', $localtimenow ).'" AS msg_datetime,
-		'.$current_User->ID.' AS msg_user_ID, '.$DB->quote( $current_User->login ).' AS msg_author,
-		'.$DB->quote( $current_User->firstname ).' AS msg_firstname, '.$DB->quote( $current_User->lastname ).' AS msg_lastname,
+		"preview" AS msg_ID,
+		'.$current_User->ID.' AS msg_author_user_ID,
+		'.$edited_Thread->ID.' AS msg_thread_ID,
+		'.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).' AS msg_datetime,
+		'.$current_User->ID.' AS msg_user_ID,
+		'.$DB->quote( $current_User->login ).' AS msg_author,
+		'.$DB->quote( $current_User->firstname ).' AS msg_firstname,
+		'.$DB->quote( $current_User->lastname ).' AS msg_lastname,
 		'.$DB->quote( $current_User->avatar_file_ID ).' AS msg_user_avatar_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
-		'.$DB->quote( $edited_Thread->title ).' AS thread_title
-	)
+		'.$DB->quote( $edited_Message->get_prerendered_content() ).' AS msg_text,
+		'.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
+		'.$DB->quote( $edited_Thread->title ).' AS thread_title,
+		"preview" AS message_day_date
 	UNION
-	('.$select_sql.')
-	ORDER BY msg_datetime DESC';
+	'.$select_sql
+	.') AS umm';
 }
+
+$select_sql .= '
+	GROUP BY msg_ID, message_day_date
+	ORDER BY msg_datetime DESC';
 
 // Create result set:
 $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
@@ -340,6 +348,7 @@ $Results->params['grp_line_end'] = "</tr></tbody>\n\n";
 $Results->display();
 
 echo $params['messages_list_end'];
+// ---------------- Messages list - END ---------------- //
 
 
 // ---------------- Form to send new message - START ---------------- //

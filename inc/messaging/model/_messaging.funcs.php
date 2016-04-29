@@ -2258,6 +2258,10 @@ function col_msg_group_date( $date )
 	{
 		return T_('Yesterday');
 	}
+	elseif( $date == 'preview' )
+	{
+		return T_('PREVIEW').': <span class="text-danger">'.T_('This is a preview only! Do not forget to send your message!').'</span>';
+	}
 	else
 	{
 		return mysql2localedate( $date );
