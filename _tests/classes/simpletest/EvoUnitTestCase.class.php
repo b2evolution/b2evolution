@@ -76,7 +76,7 @@ class EvoUnitTestCase extends UnitTestCase
 		{	// DB tables created, but no data loaded
 			// Let's delete it and reinstall
 
-			echo '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>';
+			echo '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>';
 			evo_flush();
 
 			if( $allow_evodb_reset != 1 )

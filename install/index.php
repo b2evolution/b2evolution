@@ -952,7 +952,7 @@ switch( $action )
 			{ // A quick deletion is requested before new installation
 				require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
+				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 				evo_flush();
 
 				// Uninstall b2evolution: Delete DB & Cache files
@@ -1109,7 +1109,7 @@ switch( $action )
 			start_install_progress_bar( T_('Deletion in progress') );
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $allow_evodb_reset < 1 )
