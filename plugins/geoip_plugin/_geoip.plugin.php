@@ -192,6 +192,9 @@ class geoip_plugin extends Plugin
 				  $user_update_sql.'
 				WHERE user_ID = '.$DB->quote( $User->ID ) );
 
+		// Update current user registration country
+		$User->set( 'reg_ctry_ID', $Country->ID );
+
 		// Move user to suspect group by Country ID
 		antispam_suspect_user_by_country( $Country->ID, $User->ID );
 	}
