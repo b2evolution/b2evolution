@@ -379,7 +379,7 @@ switch( $action )
 
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
-				'country'     => $country,
+				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
