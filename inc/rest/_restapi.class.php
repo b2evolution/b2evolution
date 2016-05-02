@@ -428,8 +428,13 @@ class RestApi
 		}
 
 		$collections = array();
-		if( $api_restrict == 'available_fileroots' && ! is_logged_in() )
-		{	// Anonymous user has no access to file roots:
+		if( $api_restrict == 'available_fileroots' &&
+		    (
+		      ! is_logged_in() ||
+		      ! $current_User->check_perm( 'admin', 'restricted' ) ||
+		      ! $current_User->check_perm( 'files', 'view' )
+		    ) )
+		{	// Anonymous user has no access to file roots AND also if current use has no access to back-office or to file manager:
 			$result_count = 0;
 		}
 		else
@@ -491,12 +496,14 @@ class RestApi
 			$total_pages = 1;
 		}
 
-		// Select collections only from current page:
-		$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
-
 		$BlogCache = & get_BlogCache();
 		$BlogCache->clear();
-		$BlogCache->load_by_sql( $SQL );
+
+		if( $result_count > 0 )
+		{	// Select collections only from current page:
+			$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			$BlogCache->load_by_sql( $SQL );
+		}
 
 		$this->add_response( 'found', $result_count, 'integer' );
 		$this->add_response( 'page', $api_page, 'integer' );

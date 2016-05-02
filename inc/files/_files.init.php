@@ -350,6 +350,11 @@ class files_Module extends Module
 							$perm = true;
 							return $perm;
 						}
+						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						{	// If current user has access to view or edit all collections:
+							$perm = true;
+							return $perm;
+						}
 						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
 						if ( ! $perm )
 						{ // Check groups for permissions for this specific blog:
