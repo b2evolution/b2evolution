@@ -437,14 +437,15 @@ class RestApi
 			if( $api_restrict == 'available_fileroots' )
 			{	// Restrict collections by available file roots for current user:
 
-				// SQL analog for $current_User->check_perm( 'blogs', 'view' ):
+				// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
 				$current_User->get_Group();
-				$check_perm_blogs_view_SQL = new SQL();
-				$check_perm_blogs_view_SQL->SELECT( 'grp_ID' );
-				$check_perm_blogs_view_SQL->FROM( 'T_groups' );
-				$check_perm_blogs_view_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
-				$check_perm_blogs_view_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" )' );
-				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_SQL->get().' )';
+				$check_perm_blogs_view_files_edit_SQL = new SQL();
+				$check_perm_blogs_view_files_edit_SQL->SELECT( 'grp_ID' );
+				$check_perm_blogs_view_files_edit_SQL->FROM( 'T_groups' );
+				$check_perm_blogs_view_files_edit_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON grp_ID = gset_grp_ID AND gset_name = "perm_files"' );
+				$check_perm_blogs_view_files_edit_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
+				$check_perm_blogs_view_files_edit_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" ) OR gset_value IS NULL OR gset_value IN ( "all", "edit" )' );
+				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_files_edit_SQL->get().' )';
 
 				// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
 				$check_perm_blog_media_browse_user_SQL = new SQL();
