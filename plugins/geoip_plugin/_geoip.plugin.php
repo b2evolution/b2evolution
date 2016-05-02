@@ -185,16 +185,12 @@ class geoip_plugin extends Plugin
 		$user_update_sql = '';
 		if( $this->Settings->get( 'force_account_creation' ) )
 		{	// Force country to the country detected by GeoIP
-			$user_update_sql = ', user_ctry_ID = '.$DB->quote( $Country->ID );
 			$User->set( 'ctry_ID', $Country->ID );
 		}
-		$DB->query( 'UPDATE T_users
-				  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).
-				  $user_update_sql.'
-				WHERE user_ID = '.$DB->quote( $User->ID ) );
 
 		// Update user registration country
 		$User->set( 'reg_ctry_ID', $Country->ID );
+		$User->dbupdate();
 
 		// Move user to suspect group by Country ID
 		antispam_suspect_user_by_country( $Country->ID, $User->ID );
