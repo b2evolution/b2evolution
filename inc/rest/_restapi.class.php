@@ -316,21 +316,9 @@ class RestApi
 		global $Blog;
 
 		// Collection controller ('list' by default):
-		if( isset( $this->args[2] ) )
-		{	// Get controller to work with requested collection:
-			$coll_controller = $this->args[2];
-		}
-		else
-		{	// Get controller to work with collection:
-			$coll_controller = isset( $this->args[1] ) ? $this->args[1] : 'list';
+		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
 
-			if( $coll_controller == 'search' )
-			{	// Rename this controller to search collections, because the same controller name is used to search items, comments and etc. in requested collection:
-				$coll_controller = 'search_colls';
-			}
-		}
-
-		if( $coll_controller != 'list' && $coll_controller != 'search_colls' )
+		if( $coll_controller != 'list' )
 		{	// Initialize data for request of the selected collection:
 
 			if( ! isset( $this->args[1] ) )
@@ -383,59 +371,38 @@ class RestApi
 
 
 	/**
-	 * Call collection controller to list the public collections
+	 * Call collection controller to list the collections
 	 */
 	private function controller_coll_list()
-	{
-		// Load only public collections for current user:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->clear();
-		$BlogCache->load_public();
-
-		if( empty( $BlogCache->cache ) )
-		{	// No collections found:
-			$this->halt( 'No collections found', 'no_collections', 404 );
-			// Exit here.
-		}
-
-		foreach( $BlogCache->cache as $Blog )
-		{ // Add each collection row in the response array:
-			$this->add_response( array(
-					'id'        => intval( $Blog->ID ),
-					'urlname'   => $Blog->get( 'urlname' ),
-					'kind'      => $Blog->get( 'type' ),
-					'shortname' => $Blog->get( 'shortname' ),
-					'name'      => $Blog->get( 'name' ),
-					'tagline'   => $Blog->get( 'tagline' ),
-					'desc'      => $Blog->get( 'longdesc' ),
-				) );
-		}
-	}
-
-
-	/**
-	 * Call collection controller to search the collections by fields
-	 */
-	private function controller_coll_search_colls()
 	{
 		global $DB, $Settings, $current_User;
 
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
 		$api_q = param( 'q', 'string', '' );
-		$api_fields = param( 'fields', 'string', 'shortname' );
-		$api_restrict = param( 'restrict', 'string', '' );
+		$api_fields = param( 'fields', 'string', 'shortname' ); // 'id', 'shortname'
+		$api_restrict = param( 'restrict', 'string', '' ); // 'available_fileroots' - Load only collections with available file roots for current user
+		$api_filter = param( 'filter', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
 
-		// SQL to get collections:
-		$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
-		$SQL = new SQL();
-		$SQL->SELECT( 'blog_ID' );
-		$SQL->FROM( 'T_blogs' );
-		$SQL->ORDER_BY( $sql_order_by );
-		$count_SQL = new SQL();
-		$count_SQL->SELECT( 'COUNT( blog_ID )' );
-		$count_SQL->FROM( 'T_blogs' );
-		$count_SQL->ORDER_BY( $sql_order_by );
+		if( $api_filter == 'public' )
+		{	// SQL to get ONLY public collections:
+			$BlogCache = & get_BlogCache();
+			$SQL = $BlogCache->get_public_colls_SQL();
+			$count_SQL = $BlogCache->get_public_colls_SQL();
+			$count_SQL->SELECT( 'COUNT( blog_ID )' );
+		}
+		else
+		{	// SQL to get ALL collections:
+			$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
+			$SQL = new SQL();
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_blogs' );
+			$SQL->ORDER_BY( $sql_order_by );
+			$count_SQL = new SQL();
+			$count_SQL->SELECT( 'COUNT( blog_ID )' );
+			$count_SQL->FROM( 'T_blogs' );
+			$count_SQL->ORDER_BY( $sql_order_by );
+		}
 
 		if( ! empty( $api_q ) )
 		{	// Search collections by keyword:
@@ -467,65 +434,54 @@ class RestApi
 		}
 		else
 		{
-			$result_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' );
-			$coll_IDs = $DB->get_col( $SQL->get(), 0, 'Search public collections by keyword' );
+			if( $api_restrict == 'available_fileroots' )
+			{	// Restrict collections by available file roots for current user:
 
-			$BlogCache = & get_BlogCache();
-			$FileRootCache = & get_FileRootCache();
+				// SQL analog for $current_User->check_perm( 'blogs', 'view' ):
+				$current_User->get_Group();
+				$check_perm_blogs_view_SQL = new SQL();
+				$check_perm_blogs_view_SQL->SELECT( 'grp_ID' );
+				$check_perm_blogs_view_SQL->FROM( 'T_groups' );
+				$check_perm_blogs_view_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
+				$check_perm_blogs_view_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" )' );
+				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_SQL->get().' )';
 
-			$c = 0;
-			foreach( $coll_IDs as $coll_ID )
-			{
-				if( ! ( $Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) ) )
-				{	// Skip the wrong collection:
-					$result_count--;
-					continue;
-				}
+				// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
+				$check_perm_blog_media_browse_user_SQL = new SQL();
+				$check_perm_blog_media_browse_user_SQL->SELECT( 'bloguser_blog_ID' );
+				$check_perm_blog_media_browse_user_SQL->FROM( 'T_coll_user_perms' );
+				$check_perm_blog_media_browse_user_SQL->WHERE( 'bloguser_user_ID = '.$current_User->ID );
+				$check_perm_blog_media_browse_user_SQL->WHERE_and( 'bloguser_perm_media_browse <> 0' );
+				$check_perm_blog_media_browse_group_SQL = new SQL();
+				$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
+				$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
+				$check_perm_blog_media_browse_group_SQL->WHERE( 'bloggroup_group_ID = '.$current_User->Group->ID );
+				$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
+				$restrict_available_fileroots_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
+					.' OR ( blog_advanced_perms <> 0 AND ( '
+					.'        blog_ID IN ( '.$check_perm_blog_media_browse_user_SQL->get().' ) OR '
+					.'        blog_ID IN ( '.$check_perm_blog_media_browse_group_SQL->get().' )'
+					.'      )'
+					.'    )';
 
-				if( $api_restrict == 'available_fileroots' )
-				{	// Check if file root of the collection is allowed to view by current user:
-					if( ! $current_User->check_perm( 'blogs', 'view' ) && ! $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ) )
-					{	// Skip it because current user has no access to browse the collection media:
-						$result_count--;
-						continue;
-					}
-
-					$coll_fileroot_ID = FileRoot::gen_ID( 'collection', $Blog->ID );
-					if( ! ( $coll_FileRoot = & $FileRootCache->get_by_ID( $coll_fileroot_ID, false ) ) )
-					{	// Skip it because file root is not found:
-						$result_count--;
-						continue;
-					}
-
-					if( ! $current_User->check_perm( 'files', 'view', false, $coll_FileRoot ) )
-					{	// Skip it because current user has no access to view the file root:
-						$result_count--;
-						continue;
-					}
-				}
-
-				$collections[] = $Blog;
-				$c++;
-
-				if( $c == $api_per_page )
-				{	// End of page:
-					break;
-				}
+				$SQL->WHERE_and( $restrict_available_fileroots_sql );
+				$count_SQL->WHERE_and( $restrict_available_fileroots_sql );
 			}
+
+			$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
 		}
 
 		// Prepare pagination:
 		if( $result_count > $api_per_page )
 		{	// We will have multiple search result pages:
-			$current_page = $api_page;
-			if( $current_page < 1 )
-			{
-				$current_page = 1;
+			if( $api_page < 1 )
+			{	// Limit by min page:
+				$api_page = 1;
 			}
 			$total_pages = ceil( $result_count / $api_per_page );
 			if( $api_page > $total_pages )
-			{
-				$current_page = $total_pages;
+			{	// Limit by max page:
+				$api_page = $total_pages;
 			}
 		}
 		else
@@ -534,12 +490,19 @@ class RestApi
 			$total_pages = 1;
 		}
 
+		// Select collections only from current page:
+		$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_by_sql( $SQL );
+
 		$this->add_response( 'found', $result_count, 'integer' );
-		$this->add_response( 'page', $current_page, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
 		$this->add_response( 'page_size', $api_per_page, 'integer' );
 		$this->add_response( 'pages_total', $total_pages, 'integer' );
 
-		foreach( $collections as $Blog )
+		foreach( $BlogCache->cache as $Blog )
 		{	// Add each collection row in the response array:
 			$this->add_response( 'colls', array(
 					'id'        => intval( $Blog->ID ),

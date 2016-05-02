@@ -826,9 +826,9 @@ class shortlinks_plugin extends Plugin
 				var r = '<div id="shortlinks_colls_list">'
 					+ '<h2><?php echo TS_('Collections'); ?></h2>'
 					+ '<select class="form-control">';
-				for( var c in data )
+				for( var c in data.colls )
 				{
-					var coll = data[c];
+					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
 						+ coll.name + '</option>';

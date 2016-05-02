@@ -451,9 +451,10 @@ jQuery( document ).ready( function()
 
 		if( jQuery( 'input[name=new_root_selector_type]', this ).val() == 'collection' )
 		{	// Search collections:
-			evo_rest_api_request( 'collections/search',
+			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
+				'filter'  : 'all',
 				'restrict': 'available_fileroots',
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
