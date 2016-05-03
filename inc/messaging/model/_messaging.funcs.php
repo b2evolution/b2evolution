@@ -2337,11 +2337,11 @@ function col_msg_read_by( $message_ID )
 		}
 
 		$leave_msg_ID = $leave_status_list[ $user_ID ];
-		if( !empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
+		if( $message_ID > 0 && ! empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
 		{ // user has left the conversation and didn't receive this message
 			$left_recipients[] = $recipient_User->login;
 		}
-		elseif( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) )
+		elseif( $message_ID > 0 && ( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) ) )
 		{ // user has read all message from this thread or at least this message
 			// user didn't leave the conversation before this message
 			$read_recipients[] = $recipient_User->login;
