@@ -442,7 +442,7 @@ if( $is_recipient )
 			echo '<noscript><style type="text/css">
 					#message_options_block{ display:block !important; }
 					#message_options_button{ display: none; }
-				</style><noscript>';
+				</style></noscript>';
 		}
 
 		$Form->end_form();
