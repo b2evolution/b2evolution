@@ -1863,6 +1863,23 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to display message options
+ */
+function echo_message_options_window()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_message_options.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_message_options = \''.TS_('Message options').'\';
+		var evo_js_lang_update_options = \''.TS_('Update options').'\';
+	</script>';
+}
+
+
+/**
  * Display threads results table
  *
  * @param array Params

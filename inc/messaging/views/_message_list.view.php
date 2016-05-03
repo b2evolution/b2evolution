@@ -403,10 +403,17 @@ if( $is_recipient )
 		echo '</div>';
 		$message_toolbar = ob_get_clean();
 
+		// Get available renderer checkboxes:
+		$current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );
+		$message_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $current_renderers, array( 'setting_name' => 'msg_apply_rendering' ) );
+
 		// Form buttons:
 		$Form->output = false;
 		$form_buttons = '<div class="evo_private_messages_form__actions col-md-2 col-sm-3">';
-		$form_buttons .= $Form->button( array( 'button', '', T_('Options'), 'btn-default' ) );
+		if( ! empty( $message_renderer_checkboxes ) )
+		{	// Display the options button only when plugins renderers are displayed for message:
+			$form_buttons .= $Form->button( array( 'button', 'message_options_button', T_('Options'), 'btn-default' ) );
+		}
 		$form_buttons .= $Form->button( array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ) );
 		$form_buttons .= $Form->button( array( 'submit', 'actionArray[create]', T_('Send'), 'SaveButton' ) );
 		$form_buttons .= '</div>';
@@ -426,12 +433,11 @@ if( $is_recipient )
 		// set b2evoCanvas for plugins
 		echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
-		// Display renderers
-		$current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );
-		$message_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $current_renderers, array( 'setting_name' => 'msg_apply_rendering' ) );
-		if( !empty( $message_renderer_checkboxes ) )
-		{
+		if( ! empty( $message_renderer_checkboxes ) )
+		{	// Initialize hidden checkboxes of renderer plugins:
+			echo '<div id="message_options_block" style="display:none"><div class="form-horizontal">';
 			$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
+			echo '</div></div>';
 		}
 
 		$Form->end_form();
@@ -441,4 +447,6 @@ if( $is_recipient )
 }
 // ---------------- Form to send new message - END ---------------- //
 
+// Initialize JavaScript for AJAX loading of popup window to display message options:
+echo_message_options_window();
 ?>

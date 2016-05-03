@@ -253,14 +253,15 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js */\n'
+					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_message_options.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_contact_groups.js',
-							'rsc/js/src/evo_rest_api.js'],
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_message_options.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
@@ -286,7 +287,7 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js */\n'
+					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js, src/evo_message_options.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
@@ -300,7 +301,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
-							'rsc/js/src/evo_rest_api.js'],
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_message_options.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},
