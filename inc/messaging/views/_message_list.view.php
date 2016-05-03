@@ -152,12 +152,6 @@ if( $action == 'preview' )
 { // Init PREVIEW message
 	global $localtimenow;
 
-	foreach( $recipient_status_list as $row )
-	{ // To make the unread status for each recipient
-		$read_status_list[ $row->user_ID ] = -1;
-		$leave_status_list[ $row->user_ID ] = 0;
-	}
-
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
 	$select_sql = '(
