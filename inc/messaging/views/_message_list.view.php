@@ -438,6 +438,11 @@ if( $is_recipient )
 			echo '<div id="message_options_block" style="display:none"><div class="form-horizontal">';
 			$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
 			echo '</div></div>';
+			// If JavaScript is disabled then display standard checklist of renderer plugins without modal window:
+			echo '<noscript><style type="text/css">
+					#message_options_block{ display:block !important; }
+					#message_options_button{ display: none; }
+				</style><noscript>';
 		}
 
 		$Form->end_form();
