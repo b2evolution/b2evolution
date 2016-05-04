@@ -537,7 +537,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	global $admin_url, $current_User, $DB, $blog;
 
 	$params = array_merge( array(
-			'before' => '<div id="recycle_bin" class="floatright">',
+			'before' => '<div id="recycle_bin" class="pull-right">',
 			'after'  => ' </div>',
 			'class'  => 'action_icon btn btn-default btn-sm',
 		), $params );

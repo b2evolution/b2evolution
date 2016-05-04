@@ -120,20 +120,20 @@ $ItemList->display_nav( 'header' );
 while( $Item = & $ItemList->get_item() )
 {
 	?>
-	<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+	<div id="<?php $Item->anchor_id() ?>" class="panel panel-default evo_post evo_post__status_<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		// Load item's creator user:
 		$Item->get_creator_User();
 		?>
-		<div class="bSmallHead <?php
+		<div class="panel-heading small <?php
 		if( $Item->ID == $highlight )
 		{
 			echo 'fadeout-ffff00" id="fadeout-1';
 		}
 		?>">
 			<?php
-				echo '<div class="bSmallHeadRight">';
+				echo '<div class="pull-right">';
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => '#text#'
@@ -204,10 +204,10 @@ while( $Item = & $ItemList->get_item() )
 			?>
 		</div>
 
-		<div class="bContent">
+		<div class="panel-body">
 			<?php
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 					) );
 			?>
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
@@ -269,13 +269,13 @@ while( $Item = & $ItemList->get_item() )
 			// List all tags attached to this post:
 			$Item->tags( array(
 					'url' =>            regenerate_url( 'tag' ),
-					'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+					'before' =>         '<div class="panel-body small text-muted evo_post__tags">'.T_('Tags').': ',
 					'after' =>          '</div>',
 					'separator' =>      ', ',
 				) );
 		?>
 
-		<div class="PostActionsArea">
+		<div class="panel-footer">
 			<?php
 
 			echo '<span class="'.button_class( 'group' ).'">';
@@ -344,7 +344,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 
-			<div class="clear"></div>
+			<div class="clearfix"></div>
 		</div>
 
 		<?php
@@ -361,7 +361,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( isset($GLOBALS['files_Module']) )
 			{ // Files:
-				echo '<div class="bPostAttachments">';	// TODO
+				echo '<div class="evo_post__attachments">';	// TODO
 
 				/**
 				 * Needed by file display funcs
@@ -417,7 +417,7 @@ while( $Item = & $ItemList->get_item() )
 				<?php
 			}
 
-			echo '<div class="clear"></div>';
+			echo '<div class="clearfix"></div>';
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
 			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
@@ -467,7 +467,7 @@ while( $Item = & $ItemList->get_item() )
 
 			// Display status filter
 			?>
-			<div class="bFeedback">
+			<div class="evo_post__comments">
 			<a id="comments"></a>
 			<?php
 			if( $display_params['disp_rating_summary'] )
@@ -513,7 +513,7 @@ while( $Item = & $ItemList->get_item() )
 			echo '<div id="comments_container" value="'.$Item->ID.'" class="evo_comments_container">';
 			// display comments
 			$CommentList->display_if_empty( array(
-					'before'    => '<div class="bComment"><p>',
+					'before'    => '<div class="evo_comment"><p>',
 					'after'     => '</p></div>',
 					'msg_empty' => T_('No feedback for this post yet...'),
 				) );
@@ -531,7 +531,7 @@ while( $Item = & $ItemList->get_item() )
 
 			if( $preview_Comment )
 			{	// Display a previewed comment:
-				echo '<h4>'.T_('PREVIEW Comment:').'</h4>';
+				echo '<h4 class="text-warning">'.T_('PREVIEW Comment:').'</h4>';
 				echo '<div class="evo_comments_container">';
 				echo_comment( $preview_Comment );
 				echo '</div>';
@@ -573,7 +573,7 @@ while( $Item = & $ItemList->get_item() )
 
 			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
 
-			$Form->begin_form( 'bComment evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
+			$Form->begin_form( 'evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
 
 			if( $comment_type == 'meta' )
 			{
@@ -607,7 +607,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart .= $comment_toolbar;
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
 					'cols'  => 40,
-					'class' => 'bComment autocomplete_usernames'
+					'class' => 'autocomplete_usernames'
 				) );
 			$Form->inputstart = $form_inputstart;
 
@@ -669,7 +669,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 
-				<div class="clear"></div>
+				<div class="clearfix"></div>
 			<?php
 				$Form->end_form();
 			?>

@@ -2687,7 +2687,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	$CommentList->display_init();
 
 	$CommentList->display_if_empty( array(
-		'before'    => '<div class="bComment"><p>',
+		'before'    => '<div class="evo_comment"><p>',
 		'after'     => '</p></div>',
 		'msg_empty' => T_('No feedback for this post yet...'),
 	) );
@@ -2718,7 +2718,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
 	echo '<a name="c'.$Comment->ID.'"></a>';
-	echo '<div id="comment_'.$Comment->ID.'" class="bComment bComment';
+	echo '<div id="comment_'.$Comment->ID.'" class="panel '.( $Comment->ID > 0 ? 'panel-default' : 'panel-warning' ).' evo_comment evo_comment__status_';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
@@ -2737,7 +2737,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
 	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) )
 	{ // User can moderate this comment OR Comment is meta and current user can view it
-		echo '<div class="bSmallHead">';
+		echo '<div class="panel-heading small">';
 		echo '<div>';
 
 		if( $Comment->is_meta() )
@@ -2759,7 +2759,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( ! $Comment->is_meta() )
 		{	// Display permalink oly for normal comments:
-			echo '<div class="bSmallHeadRight">';
+			echo '<div class="pull-right">';
 			$Comment->permanent_link( array(
 					'before' => '',
 					'text'   => '#text#'
@@ -2788,7 +2788,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 			echo '<div style="padding-top:3px">';
 			if( $is_expired )
 			{
-				echo '<div class="bSmallHeadRight">';
+				echo '<div class="pull-right">';
 				echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
 				echo '</div>';
 			}
@@ -2799,11 +2799,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 		echo '</div>';
 		echo '</div>';
 
-		echo '<div class="bCommentContent">';
+		echo '<div class="panel-body">';
 		if( ! $Comment->is_meta() )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		if( ! $Comment->is_meta() )
@@ -2834,9 +2834,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( ! empty( $Comment->ID ) )
 		{	// Display action buttons panel only for existing Comment in DB:
-			echo '<div class="CommentActionsArea">';
+			echo '<div class="panel-footer">';
 
-			echo '<div class="floatleft">';
+			echo '<div class="pull-left">';
 
 			// Display edit button if current user has the rights:
 			$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
@@ -2871,16 +2871,16 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 				$Comment->vote_spam( '', '', '&amp;', $save_context, true );
 			}
 
-			echo '<div class="clear"></div>';
+			echo '<div class="clearfix"></div>';
 			echo '</div>';
 		}
 	}
 	else
 	{	// No permissions to moderate of this comment, just preview
-		echo '<div class="bSmallHead">';
+		echo '<div class="panel-heading small">';
 		echo '<div>';
 
-		echo '<div class="bSmallHeadRight">';
+		echo '<div class="pull-right">';
 		echo T_('Visibility').': ';
 		echo '<span class="bStatus">';
 		$Comment->status();
@@ -2898,7 +2898,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( $is_published )
 		{
-			echo '<div class="bCommentContent">';
+			echo '<div class="panel-body">';
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
 			echo '</div>';
@@ -4170,7 +4170,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 	if( $display_status && is_logged_in() )
 	{ // Display status
 		$col .= $Item->get_format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 			) );
 	}
 

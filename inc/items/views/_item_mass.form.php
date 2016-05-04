@@ -211,7 +211,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 <?php
 

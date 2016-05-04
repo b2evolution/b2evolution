@@ -292,7 +292,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	?>
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 

@@ -260,7 +260,7 @@ $Form->begin_form( '', '', $params );
 	echo_publish_buttons( $Form, $creating, $edited_Item );
 	echo '</div>';
 
-	echo '<div class="clear"></div>';
+	echo '<div class="clearfix"></div>';
 
 	echo '</div>';
 
@@ -527,7 +527,7 @@ $Form->begin_form( '', '', $params );
 		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
 		// display comments
 		$CommentList->display_if_empty( array(
-				'before'    => '<div class="bComment"><p>',
+				'before'    => '<div class="evo_comment"><p>',
 				'after'     => '</p></div>',
 				'msg_empty' => T_('No feedback for this post yet...'),
 			) );
@@ -872,7 +872,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 
