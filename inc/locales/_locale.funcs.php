@@ -1461,7 +1461,7 @@ function locale_insert_default()
 			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
 				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
-				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? $locales[ $a_locale ]['timefmt'] : $locales[ $a_locale ]['shorttimefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $a_locale ]['timefmt'] ) : $locales[ $a_locale ]['shorttimefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['startofweek'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['name'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['messages'] ).', '
@@ -1516,7 +1516,7 @@ function locale_restore_defaults( $restored_locales )
 		$DB->query( 'UPDATE T_locales SET
 			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
 			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
-			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? $restored_locale['timefmt'] : $restored_locale['shorttimefmt'] ).',
+			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? str_replace( ':s', '', $restored_locale['timefmt'] ) : $restored_locale['shorttimefmt'] ).',
 			loc_startofweek         = '.$DB->quote( $restored_locale['startofweek'] ).',
 			loc_name                = '.$DB->quote( $restored_locale['name'] ).',
 			loc_messages            = '.$DB->quote( $restored_locale['messages'] ).',
@@ -1587,7 +1587,7 @@ function locale_check_default()
 			.$DB->quote( $current_default_locale ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
-			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? $locales[ $current_default_locale ]['timefmt'] : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $current_default_locale ]['timefmt'] ) : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['startofweek'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['name'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['messages'] ).', '
