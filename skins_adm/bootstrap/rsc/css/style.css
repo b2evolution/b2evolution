@@ -1107,6 +1107,12 @@ nav.level1 {
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
+  background-color: #eee;
+}
+div.level3 nav .nav > li.active a,
+div.level3 nav .nav > li.active a:hover,
+div.level3 nav .nav > li.active a:focus {
+  background-color: #337ab7;
 }
 .user_header_content div.level3 {
   padding: 5px 0 15px;

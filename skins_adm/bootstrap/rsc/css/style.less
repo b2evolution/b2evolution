@@ -1187,9 +1187,17 @@ div.level2 {
 nav.level1 {
 	z-index: 1;
 }
-div.level3 nav .nav>li>a {
-	padding: 4px 10px;
-	font-size: 92%;
+div.level3 nav .nav > li {
+	> a {
+		padding: 4px 10px;
+		font-size: 92%;
+		background-color: #eee;
+	}
+	&.active a,
+	&.active a:hover,
+	&.active a:focus {
+		background-color: #337ab7;
+	}
 }
 .user_header_content {
 	div.level3 {
