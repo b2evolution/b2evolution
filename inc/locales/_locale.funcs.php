@@ -1221,7 +1221,7 @@ function init_charsets( $req_io_charset )
  */
 function locales_load_available_defs()
 {
-	global $locales_path, $locales, $locales_loaded_form_disk;
+	global $locales_path, $locales, $locales_loaded_form_disk, $Messages;
 
 	if( ! empty( $locales_loaded_form_disk ) )
 	{ // All locales have been already loaded
@@ -1250,6 +1250,11 @@ function locales_load_available_defs()
 				'basename'	=> true,
 			);
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
+		if( $locale_def_files === false )
+		{	// Impossible to read the locale folder:
+			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			continue;
+		}
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
