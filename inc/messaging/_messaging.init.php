@@ -311,7 +311,6 @@ class messaging_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $admin_url;
 		global $current_User;
-		global $unread_messages_count;
 
 		$left_entries = array();
 		$right_entries = array();
