@@ -119,7 +119,7 @@ $leave_status_list = array();
 foreach( $recipient_status_list as $row )
 {
 	$leave_status_list[ $row->tsta_user_ID ] = $row->tsta_thread_leave_msg_ID;
-	if( $row->tsta_first_unread_msg_ID === NULL )
+	if( $row->tsta_first_unread_msg_ID === NULL && $row->tsta_thread_leave_msg_ID === NULL )
 	{	// Get last message ID if user has read all messages in the thread:
 		$last_read_status_list[ $row->tsta_user_ID ] = $edited_Thread->get_last_message_ID();
 	}
