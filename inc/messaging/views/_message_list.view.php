@@ -27,7 +27,7 @@ if( !isset( $edited_Thread ) )
 	}
 }
 
-global $read_status_list, $leave_status_list;
+global $last_read_status_list, $leave_status_list;
 
 $creating = is_create_action( $action );
 
@@ -91,18 +91,42 @@ foreach( $recipient_list as $recipient_ID )
 }
 
 // Select all recipients with their statuses:
-$recipients_status_SQL = new SQL();
-$recipients_status_SQL->SELECT( 'tsta_user_ID as user_ID, tsta_first_unread_msg_ID, tsta_thread_leave_msg_ID' );
+$last_read_msg_real_SQL = new SQL( 'SUBQUERY to get what last message has been read by user which still is in thread' );
+$last_read_msg_real_SQL->SELECT( 'msg_ID' );
+$last_read_msg_real_SQL->FROM( 'T_messaging__message' );
+$last_read_msg_real_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
+$last_read_msg_real_SQL->WHERE_and( 'msg_ID < tsta_first_unread_msg_ID' ); // to get first message before first unread message
+$last_read_msg_real_SQL->ORDER_BY( 'msg_datetime DESC' );
+$last_read_msg_real_SQL->LIMIT( '1' );
+
+$last_read_msg_left_SQL = new SQL( 'SUBQUERY to get what last message has been read by user which left the thread' );
+$last_read_msg_left_SQL->SELECT( 'msg_ID' );
+$last_read_msg_left_SQL->FROM( 'T_messaging__message' );
+$last_read_msg_left_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
+$last_read_msg_left_SQL->WHERE_and( 'msg_ID <= tsta_thread_leave_msg_ID' ); // to get first message before message when user left the thread
+$last_read_msg_left_SQL->ORDER_BY( 'msg_datetime DESC' );
+$last_read_msg_left_SQL->LIMIT( '1' );
+
+$recipients_status_SQL = new SQL( 'Get read/unread/leave message IDs on thread #'.$edited_Thread->ID.' for each user' );
+$recipients_status_SQL->SELECT( 'tsta_user_ID, tsta_first_unread_msg_ID, tsta_thread_leave_msg_ID, ' );
+$recipients_status_SQL->SELECT_add( 'IF( tsta_thread_leave_msg_ID IS NULL, ('.$last_read_msg_real_SQL->get().'), ('.$last_read_msg_left_SQL->get().') ) AS last_read_msg_ID' );
 $recipients_status_SQL->FROM( 'T_messaging__threadstatus' );
 $recipients_status_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
+$recipient_status_list = $DB->get_results( $recipients_status_SQL->get(), OBJECT, $recipients_status_SQL->title );
 
-$recipient_status_list = $DB->get_results( $recipients_status_SQL->get() );
-$read_status_list = array();
+$last_read_status_list = array();
 $leave_status_list = array();
 foreach( $recipient_status_list as $row )
 {
-	$read_status_list[ $row->user_ID ] = $row->tsta_first_unread_msg_ID;
-	$leave_status_list[ $row->user_ID ] = $row->tsta_thread_leave_msg_ID;
+	$leave_status_list[ $row->tsta_user_ID ] = $row->tsta_thread_leave_msg_ID;
+	if( $row->tsta_first_unread_msg_ID === NULL )
+	{	// Get last message ID if user has read all messages in the thread:
+		$last_read_status_list[ $row->tsta_user_ID ] = $edited_Thread->get_last_message_ID();
+	}
+	else
+	{	// Get last read message ID for the user:
+		$last_read_status_list[ $row->tsta_user_ID ] = $row->last_read_msg_ID;
+	}
 }
 $is_recipient = $edited_Thread->check_thread_recipient( $current_User->ID );
 $leave_msg_ID = ( $is_recipient ? $leave_status_list[ $current_User->ID ] : NULL );
@@ -232,7 +256,7 @@ if( $action == 'preview' )
 
 $select_sql .= '
 	GROUP BY msg_ID, message_day_date
-	ORDER BY msg_datetime DESC';
+	ORDER BY msg_datetime ASC';
 
 // Create result set:
 $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
@@ -287,16 +311,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => '',
 		'td' => '<p>%get_user_identity_link( "", #msg_user_ID#, "profile", "auto" )%</p>'
-			.'%col_msg_format_text( #msg_ID#, #msg_text# )%'
-			.'%col_msg_read_by( #msg_ID#, array('
-				.'"display_unread"      => false,'
-				.'"display_left"        => false,'
-				.'"separator"           => " ",'
-				.'"display_login"       => false,'
-				.'"display_status_icon" => false,'
-				.'"display_avatar"      => true,'
-				.'"avatar_size"         => "crop-top-32x32",'
-			.') )%',
+			.'%col_msg_format_text( #msg_ID#, #msg_text# )%',
 	);
 
 /**
@@ -305,7 +320,8 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => '',
 		'td_class' => 'shrinkwrap',
-		'td' => '%col_msg_time( #msg_datetime# )%',
+		'td' => '%col_msg_time( #msg_datetime# )%'
+			.'%col_msg_read_last_users( #msg_ID# )%',
 	);
 
 /**

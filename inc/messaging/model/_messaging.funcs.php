@@ -2464,6 +2464,40 @@ function col_msg_read_by( $message_ID, $params = array() )
 
 
 /**
+ * Get authors list to display who already had read current as last message
+ *
+ * @param integer Message ID
+ * @return string Authors list
+ */
+function col_msg_read_last_users( $message_ID )
+{
+	global $last_read_status_list;
+
+	$UserCache = & get_UserCache();
+
+	foreach( $last_read_status_list as $user_ID => $last_read_msg_ID )
+	{
+		if( $message_ID > 0 && $message_ID == $last_read_msg_ID )
+		{	// This is last message what user has read in thread:
+			if( $recipient_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+			{	// If user exists:
+				$read_recipients[] = $recipient_User->login;
+			}
+		}
+	}
+
+	$read_by = '';
+	if( ! empty( $read_recipients ) )
+	{	// Display users who have read this message:
+		asort( $read_recipients );
+		$read_by .= '<br /><div class="evo_msg_users__read">'.get_avatar_imgtags( $read_recipients, false, false, 'crop-top-32x32', '', '', NULL, true, ' ' ).'</div>';
+	}
+
+	return $read_by;
+}
+
+
+/**
  *
  *
  * @param mixed $thrd_ID

@@ -577,6 +577,36 @@ class Thread extends DataObject
 		param_error( '', T_( 'The recipient(s) do not want you to contact them at this time.' ) );
 		return false;
 	}
+
+
+	/**
+	 * Get last message ID of this thread
+	 *
+	 * @return integer Message ID
+	 */
+	function get_last_message_ID()
+	{
+		if( empty( $this->ID ) )
+		{	// This thread is not created yet:
+			return 0;
+		}
+
+		global $DB;
+
+		if( ! isset( $this->last_msg_ID ) )
+		{	// Get message ID from DB and put in cache variable:
+			$last_msg_SQL = new SQL( 'Get last message ID of thread #'.$this->ID );
+			$last_msg_SQL->SELECT( 'msg_ID' );
+			$last_msg_SQL->FROM( 'T_messaging__message' );
+			$last_msg_SQL->WHERE( 'msg_thread_ID = '.$this->ID );
+			$last_msg_SQL->ORDER_BY( 'msg_datetime DESC' );
+			$last_msg_SQL->LIMIT( '1' );
+
+			$this->last_msg_ID = intval( $DB->get_var( $last_msg_SQL->get(), 0, NULL, $last_msg_SQL->title ) );
+		}
+
+		return $this->last_msg_ID;
+	}
 }
 
 ?>
