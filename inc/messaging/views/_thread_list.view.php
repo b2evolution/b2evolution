@@ -15,7 +15,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $current_User;
-global $unread_messages_count;
 global $DB, $Blog;
 global $perm_abuse_management; // TRUE if we go from Abuse Management
 
