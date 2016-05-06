@@ -311,8 +311,8 @@ $Results->cols[] = array(
  */
 $Results->cols[] = array(
 		'th' => '',
-		'td_class' => 'shrinkwrap',
-		'td' => '%col_msg_time( #msg_datetime# )%'
+		'td_class' => '',
+		'td' => '<span class="shrinkwrap">%col_msg_time( #msg_datetime# )%</span>'
 			.'%col_msg_read_last_users( #msg_ID# )%',
 	);
 
