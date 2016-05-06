@@ -1735,7 +1735,7 @@ function init_stickyrows_js( $relative_to = 'rsc_url', $params = array() )
 	require_css( 'jquery/jquery.stickyrows.css', $relative_to );
 	add_js_headline( 'jQuery( document ).ready( function()
 	{
-		jQuery( "'.$params['container'].'" ).scrollTop( jQuery( "'.$params['container'].'" ).height() );
+		jQuery( "'.$params['container'].'" ).scrollTop( jQuery( "'.$params['selector'].'" ).height() );
 		jQuery( "'.$params['selector'].'" ).stickyRows(
 		{
 			rows: "'.$params['rows'].'",
