@@ -91,25 +91,17 @@ foreach( $recipient_list as $recipient_ID )
 }
 
 // Select all recipients with their statuses:
-$last_read_msg_real_SQL = new SQL( 'SUBQUERY to get what last message has been read by user which still is in thread' );
-$last_read_msg_real_SQL->SELECT( 'msg_ID' );
-$last_read_msg_real_SQL->FROM( 'T_messaging__message' );
-$last_read_msg_real_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
-$last_read_msg_real_SQL->WHERE_and( 'msg_ID < tsta_first_unread_msg_ID' ); // to get first message before first unread message
-$last_read_msg_real_SQL->ORDER_BY( 'msg_datetime DESC' );
-$last_read_msg_real_SQL->LIMIT( '1' );
-
-$last_read_msg_left_SQL = new SQL( 'SUBQUERY to get what last message has been read by user which left the thread' );
-$last_read_msg_left_SQL->SELECT( 'msg_ID' );
-$last_read_msg_left_SQL->FROM( 'T_messaging__message' );
-$last_read_msg_left_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
-$last_read_msg_left_SQL->WHERE_and( 'msg_ID <= tsta_thread_leave_msg_ID' ); // to get first message before message when user left the thread
-$last_read_msg_left_SQL->ORDER_BY( 'msg_datetime DESC' );
-$last_read_msg_left_SQL->LIMIT( '1' );
+$last_read_msg_SQL = new SQL( 'SUBQUERY to get what last message has been read by user' );
+$last_read_msg_SQL->SELECT( 'msg_ID' );
+$last_read_msg_SQL->FROM( 'T_messaging__message' );
+$last_read_msg_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
+$last_read_msg_SQL->WHERE_and( 'msg_ID < tsta_first_unread_msg_ID' ); // to get first/previous message before first unread message
+$last_read_msg_SQL->ORDER_BY( 'msg_datetime DESC' );
+$last_read_msg_SQL->LIMIT( '1' );
 
 $recipients_status_SQL = new SQL( 'Get read/unread/leave message IDs on thread #'.$edited_Thread->ID.' for each user' );
 $recipients_status_SQL->SELECT( 'tsta_user_ID, tsta_first_unread_msg_ID, tsta_thread_leave_msg_ID, ' );
-$recipients_status_SQL->SELECT_add( 'IF( tsta_thread_leave_msg_ID IS NULL, ('.$last_read_msg_real_SQL->get().'), ('.$last_read_msg_left_SQL->get().') ) AS last_read_msg_ID' );
+$recipients_status_SQL->SELECT_add( '('.$last_read_msg_SQL->get().') AS last_read_msg_ID' );
 $recipients_status_SQL->FROM( 'T_messaging__threadstatus' );
 $recipients_status_SQL->WHERE( 'tsta_thread_ID = '.$edited_Thread->ID );
 $recipient_status_list = $DB->get_results( $recipients_status_SQL->get(), OBJECT, $recipients_status_SQL->title );
