@@ -33,6 +33,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class File extends DataObject
 {
 	/**
+	 * ID of user that created/uploaded the file
+	 * @var integer
+	 */
+	var $creator_user_ID;
+
+	/**
 	 * File type: 'image', 'audio', 'other', NULL
 	 * @var string
 	 */
@@ -324,6 +330,7 @@ class File extends DataObject
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
+				$this->creator_user_ID = $row->file_creator_user_ID;
 				$this->type  = $row->file_type;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
@@ -644,6 +651,27 @@ class File extends DataObject
 	function get_name()
 	{
 		return $this->_name;
+	}
+
+
+	/**
+	 * Get file creator
+	 *
+	 * @return object User
+	 */
+	function get_creator()
+	{
+		if( $this->creator_user_ID )
+		{
+			$UserCache = & get_UserCache();
+			$creator = $UserCache->get_by_ID( $this->creator_user_ID );
+
+			return $creator;
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 
@@ -1854,7 +1882,7 @@ class File extends DataObject
 	 */
 	function dbinsert( )
 	{
-		global $Debuglog;
+		global $Debuglog, $current_User;
 
 		if( $this->meta == 'unknown' )
 		{
@@ -1869,6 +1897,7 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
+		$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );

@@ -1828,16 +1828,46 @@ class User extends DataObject
 
 		if( is_null( $this->_num_files ) )
 		{
-			$links_SQL = new SQL();
-			$links_SQL->SELECT( 'file_type, COUNT( file_ID ) AS cnt' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->FROM_add( 'INNER JOIN T_files ON file_ID = link_file_ID' );
-			$links_SQL->WHERE( 'link_creator_user_ID = '.$this->ID );
-			$links_SQL->GROUP_BY( 'file_type' );
-			$this->_num_files = $DB->get_assoc( $links_SQL->get() );
+			$files_SQL = new SQL();
+			$files_SQL->SELECT( 'file_type, COUNT( file_ID ) AS cnt' );
+			$files_SQL->FROM( 'T_files' );
+			$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
+			$files_SQL->GROUP_BY( 'file_type' );
+			$this->_num_files = $DB->get_assoc( $files_SQL->get() );
 		}
 
 		return ! empty( $this->_num_files[ $type ] ) ? $this->_num_files[ $type ] : 0;
+	}
+
+
+	/*
+	 * Get the total size of files uploaded by the user
+	 *
+	 * @return integer total size in bytes
+	 */
+	function get_total_upload( $type = NULL )
+	{
+		global $DB;
+
+		$files_SQL = new SQL();
+		$files_SQL->SELECT( 'file_ID' );
+		$files_SQL->FROM( 'T_files' );
+		$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
+		if( ! is_null( $type ) )
+		{
+			$files_SQL->WHERE_and( 'file_type = '.$DB->quote( $type ) );
+		}
+		$files = $DB->get_col( $files_SQL->get() );
+
+		$FileCache = & get_FileCache();
+		$total_upload_size = 0;
+		foreach( $files as $file_ID )
+		{
+			$user_File = $FileCache->get_by_ID( $file_ID );
+			$total_upload_size += $user_File->get_size();
+		}
+
+		return $total_upload_size;
 	}
 
 
@@ -5909,9 +5939,10 @@ class User extends DataObject
 		$params = array_merge( array(
 				'view_type'           => 'simple', // 'simple', 'extended'
 				'file_type'           => 'image', // 'image', 'audio', 'other'
-				'text_image_simple'   => T_( '%s has posted %s photos. %s of these photos have been liked by %s different users.' ),
-				'text_image_extended' => T_( '%s has posted %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users.' ),
+				'text_image_simple'   => T_( '%s has uploaded %s photos. %s of these photos have been liked by %s different users.' ),
+				'text_image_extended' => T_( '%s has uploaded %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users.' ),
 				'text_audio'          => T_( '%s has uploaded %s audio files.' ),
+				'text_video'          => T_( '%s has uploaded %s video files.' ),
 				'text_other'          => T_( '%s has uploaded %s other files.' ),
 			), $params );
 
@@ -6006,10 +6037,40 @@ class User extends DataObject
 				// Number of audio files
 				return sprintf( $params['text_audio'], $this->login, '<b>'.$this->get_num_files( 'audio' ).'</b>' );
 
+			case 'video':
+				// Number of video files
+				return sprintf( $params['text_video'], $this->login, '<b>'.$this->get_num_files( 'video' ).'</b>' );
+
 			case 'other':
 				// Number of other files
 				return sprintf( $params['text_other'], $this->login, '<b>'.$this->get_num_files( 'other' ).'</b>' );
 		}
+	}
+
+
+	/**
+	 * Get total size of uploaded files
+	 *
+	 * @param array Params
+	 * @return string Result
+	 */
+	function get_reputation_total_upload( $params = array() )
+	{
+		$params = array_merge( array(
+				'text' => T_('%s has uploaded a total of %s')
+			), $params );
+
+		$total_upload = $this->get_total_upload();
+		if( empty( $total_upload ) )
+		{
+			$total_upload = T_('0 bytes');
+		}
+		else
+		{
+			$total_upload = bytesreadable( $total_upload );
+		}
+
+		return sprintf( $params['text'], $this->login, '<b>'.$total_upload.'</b>' );
 	}
 
 

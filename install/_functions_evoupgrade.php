@@ -7455,6 +7455,32 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11765, 'Upgrading files table...' ) )
+	{ // part of 6.7.1-beta
+		db_add_col( 'T_files', 'file_creator_user_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER file_ID' );
+
+		// Update file_creator_user_ID with the owner of the first link to a comment/post/message
+		$SQL = 'UPDATE T_files AS t1,
+				(
+					SELECT a.link_file_ID, a.link_creator_user_ID
+					FROM T_links AS a
+					INNER JOIN
+					(
+						SELECT link_file_ID, MIN( link_ID ) AS min_ID
+						FROM T_links
+						GROUP BY link_file_ID
+					) AS b
+						ON a.link_file_ID = b.link_file_ID AND a.link_ID = b.min_ID
+				) AS t2
+				SET
+					t1.file_creator_user_ID = t2.link_creator_user_ID
+				WHERE
+					t1.file_ID = t2.link_file_ID';
+		$DB->query( $SQL );
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

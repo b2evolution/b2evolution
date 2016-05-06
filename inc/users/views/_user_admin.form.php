@@ -351,7 +351,11 @@ $Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') 
 
 	$Form->info( T_('Audio'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
+	$Form->info( T_('Video'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'video' ) ).'</span>' );
+
 	$Form->info( T_('Other files'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
+
+	$Form->info( T_('Upload total'), '<span class="repuration_message">'.$edited_User->get_reputation_total_upload().'</span>' );
 
 	$Form->info( T_('Spam fighter score'), '<span class="reputation_message">'.$edited_User->get_reputation_spam().'</span>' );
 
