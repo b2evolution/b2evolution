@@ -1551,7 +1551,7 @@ function get_unread_messages_count( $user_ID = 0 )
 					ON ts.tsta_thread_ID = mm.msg_thread_ID
 					AND mm.msg_datetime >= mu.msg_datetime' );
 		$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
-		$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= tsta_thread_leave_msg_ID' );
+		$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR mm.msg_ID <= tsta_thread_leave_msg_ID' );
 		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
 
 		$cache_unread_messages_count[ $user_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
@@ -1692,11 +1692,20 @@ function mark_as_read_by_user( $thrd_ID, $user_ID )
 {
 	global $DB;
 
-	// Update user unread message status in the given thread
+	// Update user unread message status in the given thread:
+	// NOTE: If user already left a thread then first unread message ID must be either NULL or first next existing message ID
+	//       (NULL means next future message ID that is not created yet)
+	$first_unread_msg_ID_subquery = '(SELECT msg_ID
+		 FROM T_messaging__message
+		WHERE tsta_thread_ID = msg_thread_ID
+		  AND msg_ID > tsta_thread_leave_msg_ID
+		ORDER BY msg_datetime ASC
+		LIMIT 1)';
 	$DB->query( 'UPDATE T_messaging__threadstatus
-					SET tsta_first_unread_msg_ID = NULL
-					WHERE tsta_thread_ID = '.$thrd_ID.'
-					AND tsta_user_ID = '.$user_ID );
+		  SET tsta_first_unread_msg_ID = IF( tsta_thread_leave_msg_ID IS NULL, NULL, '.$first_unread_msg_ID_subquery.' )
+		WHERE tsta_thread_ID = '.$thrd_ID.'
+		  AND tsta_user_ID = '.$user_ID,
+		'Update first unread message ID in thread #'.$thrd_ID.' for user #'.$user_ID );
 }
 
 
@@ -2144,7 +2153,7 @@ function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_lea
 		if( !empty( $thrd_leave_msg_ID ) )
 		{ // Conversation is left
 			$read_icon = get_icon( 'bullet_black', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "Conversation left" ) ) );
-			if( $thrd_msg_ID > 0 )
+			if( $thrd_msg_ID > 0 && $thrd_msg_ID <= $thrd_leave_msg_ID )
 			{ // also show unread messages icon, because user has not seen all messages yet
 				$read_icon .= get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "You have unread messages" ) ) );
 			}
