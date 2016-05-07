@@ -26,7 +26,7 @@ $schema_queries['T_files'] = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
 			file_ID                  int(11) unsigned  not null AUTO_INCREMENT,
-			file_creator_user_ID     int(10) unsigned null default null,
+			file_creator_user_ID     INT(10) UNSIGNED NULL DEFAULT NULL,
 			file_type                enum('image', 'audio', 'video', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
 			file_root_type           enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute',
 			file_root_ID             int(11) unsigned not null default 0,

@@ -7457,7 +7457,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 11765, 'Upgrading files table...' ) )
 	{ // part of 6.7.1-beta
-		db_add_col( 'T_files', 'file_creator_user_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER file_ID' );
+		db_add_col( 'T_files', 'file_creator_user_ID', 'int(10) unsigned NULL default NULL AFTER file_ID' );
 
 		// Update file_creator_user_ID with the owner of the first link to a comment/post/message
 		$SQL = 'UPDATE T_files AS t1,
