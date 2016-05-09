@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language */
+/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language+normalize-whitespace */
 /**
  * prism.js default theme for JavaScript, CSS and HTML
  * Based on dabblet (http://dabblet.com)
@@ -8,9 +8,9 @@
 code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
+	background: none;
 	text-shadow: 0 1px white;
 	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-	direction: ltr;
 	text-align: left;
 	white-space: pre;
 	word-spacing: normal;
