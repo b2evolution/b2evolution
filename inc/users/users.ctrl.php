@@ -450,11 +450,13 @@ switch( $action )
 		{	// Display the notes for spammer deleting:
 			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will also delete files uploaded by this user.'), 'note' );
 		}
 		else
 		{	// Display the notes for standard deleting:
 			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.'), 'note' );
 		}
 
 		// Find other users with the same email address
