@@ -338,11 +338,6 @@ switch( $content_mode )
 		// Display location info
 		$Item->location( '<div class="item_location"><strong>'.T_('Location').': </strong>', '</div>' );
 
-		if( $disp == 'single' )
-		{	// Display custom fields
-			$Item->custom_fields();
-		}
-
 		echo $params['content_end_full'];
 
 }
