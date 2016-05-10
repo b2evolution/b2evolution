@@ -44,7 +44,7 @@ function create_default_data()
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
-	global $test_install_all_features, $create_sample_contents;
+	global $install_test_features, $create_sample_contents;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -1146,7 +1146,7 @@ function create_blog(
 	$in_bloglist = 'public',
 	$owner_user_ID = 1 )
 {
-	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
+	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
@@ -1176,7 +1176,7 @@ function create_blog(
 
 	$Blog->dbinsert();
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
@@ -1200,7 +1200,7 @@ function create_blog(
 	{
 		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
 	}
-	if( $use_inskin_login || $test_install_all_features )
+	if( $use_inskin_login || $install_test_features )
 	{
 		$Blog->set_setting( 'in_skin_login', 1 );
 	}
@@ -1367,7 +1367,7 @@ function create_demo_contents()
 	global $DB;
 	global $default_locale, $default_country;
 	global $Plugins;
-	global $test_install_all_features;
+	global $install_test_features;
 	global $user_org_IDs;
 
 	/**
@@ -1613,7 +1613,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		$blog_shortname = T_('Home');
-		$blog_home_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
@@ -1642,7 +1642,7 @@ function create_demo_contents()
 	if( $install_collection_bloga )
 	{ // Install Blog A
 		$blog_shortname = 'Blog A';
-		$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_a_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_stub = 'a';
 		$blog_a_ID = create_blog(
 			T_('Public Blog'),
@@ -1663,7 +1663,7 @@ function create_demo_contents()
 	if( $install_collection_blogb )
 	{ // Install Blog B
 		$blog_shortname = 'Blog B';
-		$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
+		$blog_b_access_type = ( $install_test_features ) ? 'index.php' : $default_blog_access_type;
 		$blog_stub = 'b';
 		$blog_b_ID = create_blog(
 			T_('Members-Only Blog'),
@@ -2250,7 +2250,7 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 		$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5 );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{ // Add examples for infodots plugin
 			$edited_Item->set_tags_from_string( 'photo,demo' );
 			$edited_Item->set( 'content', $edited_Item->get( 'content' )
@@ -2857,7 +2857,7 @@ Hello
 		create_demo_comment( $new_created_item_ID, 'draft' );
 	}
 
-	if( $test_install_all_features && count( $additional_comments_item_IDs ) )
+	if( $install_test_features && count( $additional_comments_item_IDs ) )
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
@@ -2879,7 +2879,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	task_end();
 
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
 		task_begin( 'Creating fake hit statistics... ' );
@@ -2988,9 +2988,9 @@ Admins and moderators can very quickly approve or reject comments from the colle
  */
 function create_default_posts_location()
 {
-	global $test_install_all_features;
+	global $install_test_features;
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{	// Set default location in test mode installation
 		global $DB;
 

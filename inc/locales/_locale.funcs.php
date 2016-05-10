@@ -1422,12 +1422,12 @@ function locale_file_po_percent_done( $po_file_info )
  */
 function locale_insert_default()
 {
-	global $DB, $current_locale, $locales, $test_install_all_features;
+	global $DB, $current_locale, $locales, $install_test_features;
 
 	$activate_locales = array();
 
-	if( isset( $test_install_all_features ) && $test_install_all_features )
-	{ // Activate also additional locales on install
+	if( ! empty( $install_test_features ) )
+	{	// Activate also additional locales on install:
 		$activate_locales[] = 'en-US';
 		$activate_locales[] = 'de-DE';
 		$activate_locales[] = 'fr-FR';

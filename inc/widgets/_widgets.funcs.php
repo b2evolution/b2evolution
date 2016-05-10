@@ -66,7 +66,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 {
-	global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+	global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 	// Initialize this array first time and clear after previous call of this function
 	$basic_widgets_insert_sql_rows = array();
@@ -154,7 +154,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // About Author
 		add_basic_widget( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 	}
-	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $install_test_features )
 	{ // Google Maps
 		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
 	}
@@ -188,7 +188,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	else
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			if( $kind != 'forum' && $kind != 'manual' )
 			{ // Current filters widget

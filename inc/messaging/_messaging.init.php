@@ -150,8 +150,8 @@ class messaging_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				global $test_install_all_features;
-				$perm_messaging = $test_install_all_features ? 'abuse' : 'delete';
+				global $install_test_features;
+				$perm_messaging = ! empty( $install_test_features ) ? 'abuse' : 'delete';
 				$max_new_threads = ''; // empty = no limit
 				break;
 			case 2: // Moderators group equals 2
