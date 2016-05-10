@@ -320,6 +320,7 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
+				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
@@ -3614,6 +3615,17 @@ class User extends DataObject
 			if( $Log instanceof log )
 			{
 				$Log->add( 'Transforming user\'s comments to unregistered comments... '.sprintf( '(%d rows)', $ret ), 'note' );
+			}
+		}
+
+		if( $deltype != 'spammer' )
+		{
+			$ret = $DB->query( 'UPDATE T_files
+			                    SET file_creator_user_ID = NULL
+								WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+			if( $Log instanceof log )
+			{
+				$Log->add( 'Setting user\'s uploaded files creator ID to NULL...'.sprintf( '(%d rows)', $ret ), 'note' );
 			}
 		}
 
