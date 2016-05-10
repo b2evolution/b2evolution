@@ -106,6 +106,12 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
+				'member_wrapper_class' => array(
+					'label' => T_('Member wrapper class'),
+					'note' => '',
+					'size' => 40,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 text-center',
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
@@ -230,7 +236,7 @@ class org_members_Widget extends ComponentWidget
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="evo_org_member col-lg-4 col-md-6 col-sm-6 text-center">';
+					echo '<div class="'.trim( 'evo_org_member '.$this->disp_params['member_wrapper_class'] ).'">';
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
