@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language+normalize-whitespace */
+/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language */
 var _self = (typeof window !== 'undefined')
 	? window   // if in browser
 	: (
@@ -16,8 +16,7 @@ var _self = (typeof window !== 'undefined')
 var Prism = (function(){
 
 // Private helper vars
-var lang = /\blang(?:uage)?-(\w+)\b/i;
-var uniqueId = 0;
+var lang = /\blang(?:uage)?-(?!\*)(\w+)\b/i;
 
 var _ = _self.Prism = {
 	util: {
@@ -33,13 +32,6 @@ var _ = _self.Prism = {
 
 		type: function (o) {
 			return Object.prototype.toString.call(o).match(/\[object (\w+)\]/)[1];
-		},
-
-		objId: function (obj) {
-			if (!obj['__id']) {
-				Object.defineProperty(obj, '__id', { value: ++uniqueId });
-			}
-			return obj['__id'];
 		},
 
 		// Deep clone a language definition (e.g. to extend it)
@@ -90,19 +82,19 @@ var _ = _self.Prism = {
 		insertBefore: function (inside, before, insert, root) {
 			root = root || _.languages;
 			var grammar = root[inside];
-
+			
 			if (arguments.length == 2) {
 				insert = arguments[1];
-
+				
 				for (var newToken in insert) {
 					if (insert.hasOwnProperty(newToken)) {
 						grammar[newToken] = insert[newToken];
 					}
 				}
-
+				
 				return grammar;
 			}
-
+			
 			var ret = {};
 
 			for (var token in grammar) {
@@ -122,7 +114,7 @@ var _ = _self.Prism = {
 					ret[token] = grammar[token];
 				}
 			}
-
+			
 			// Update references in other language definitions
 			_.languages.DFS(_.languages, function(key, value) {
 				if (value === root[inside] && key != inside) {
@@ -140,12 +132,12 @@ var _ = _self.Prism = {
 				if (o.hasOwnProperty(i)) {
 					callback.call(o, i, o[i], type || i);
 
-					if (_.util.type(o[i]) === 'Object' && !visited[_.util.objId(o[i])]) {
-						visited[_.util.objId(o[i])] = true;
+					if (_.util.type(o[i]) === 'Object' && !visited[o[i]]) {
+						visited[o[i]] = true;
 						_.languages.DFS(o[i], callback, null, visited);
 					}
-					else if (_.util.type(o[i]) === 'Array' && !visited[_.util.objId(o[i])]) {
-						visited[_.util.objId(o[i])] = true;
+					else if (_.util.type(o[i]) === 'Array' && !visited[o[i]]) {
+						visited[o[i]] = true;
 						_.languages.DFS(o[i], callback, i, visited);
 					}
 				}
@@ -153,19 +145,12 @@ var _ = _self.Prism = {
 		}
 	},
 	plugins: {},
-
+	
 	highlightAll: function(async, callback) {
-		var env = {
-			callback: callback,
-			selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
-		};
-
-		_.hooks.run("before-highlightall", env);
-
-		var elements = env.elements || document.querySelectorAll(env.selector);
+		var elements = document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
 
 		for (var i=0, element; element = elements[i++];) {
-			_.highlightElement(element, async === true, env.callback);
+			_.highlightElement(element, async === true, callback);
 		}
 	},
 
@@ -201,9 +186,7 @@ var _ = _self.Prism = {
 			code: code
 		};
 
-		_.hooks.run('before-sanity-check', env);
-
-		if (!env.code || !env.grammar) {
+		if (!code || !grammar) {
 			_.hooks.run('complete', env);
 			return;
 		}
@@ -277,7 +260,6 @@ var _ = _self.Prism = {
 				var pattern = patterns[j],
 					inside = pattern.inside,
 					lookbehind = !!pattern.lookbehind,
-					greedy = !!pattern.greedy,
 					lookbehindLength = 0,
 					alias = pattern.alias;
 
@@ -298,76 +280,36 @@ var _ = _self.Prism = {
 
 					pattern.lastIndex = 0;
 
-					var match = pattern.exec(str),
-					    delNum = 1;
+					var match = pattern.exec(str);
 
-					// Greedy patterns can override/remove up to two previously matched tokens
-					if (!match && greedy && i != strarr.length - 1) {
-						// Reconstruct the original text using the next two tokens
-						var nextToken = strarr[i + 1].matchedStr || strarr[i + 1],
-						    combStr = str + nextToken;
-
-						if (i < strarr.length - 2) {
-							combStr += strarr[i + 2].matchedStr || strarr[i + 2];
+					if (match) {
+						if(lookbehind) {
+							lookbehindLength = match[1].length;
 						}
 
-						// Try the pattern again on the reconstructed text
-						pattern.lastIndex = 0;
-						match = pattern.exec(combStr);
-						if (!match) {
-							continue;
+						var from = match.index - 1 + lookbehindLength,
+							match = match[0].slice(lookbehindLength),
+							len = match.length,
+							to = from + len,
+							before = str.slice(0, from + 1),
+							after = str.slice(to + 1);
+
+						var args = [i, 1];
+
+						if (before) {
+							args.push(before);
 						}
 
-						var from = match.index + (lookbehind ? match[1].length : 0);
-						// To be a valid candidate, the new match has to start inside of str
-						if (from >= str.length) {
-							continue;
+						var wrapped = new Token(token, inside? _.tokenize(match, inside) : match, alias);
+
+						args.push(wrapped);
+
+						if (after) {
+							args.push(after);
 						}
-						var to = match.index + match[0].length,
-						    len = str.length + nextToken.length;
 
-						// Number of tokens to delete and replace with the new match
-						delNum = 3;
-
-						if (to <= len) {
-							if (strarr[i + 1].greedy) {
-								continue;
-							}
-							delNum = 2;
-							combStr = combStr.slice(0, len);
-						}
-						str = combStr;
+						Array.prototype.splice.apply(strarr, args);
 					}
-
-					if (!match) {
-						continue;
-					}
-
-					if(lookbehind) {
-						lookbehindLength = match[1].length;
-					}
-
-					var from = match.index + lookbehindLength,
-					    match = match[0].slice(lookbehindLength),
-					    to = from + match.length,
-					    before = str.slice(0, from),
-					    after = str.slice(to);
-
-					var args = [i, delNum];
-
-					if (before) {
-						args.push(before);
-					}
-
-					var wrapped = new Token(token, inside? _.tokenize(match, inside) : match, alias, match, greedy);
-
-					args.push(wrapped);
-
-					if (after) {
-						args.push(after);
-					}
-
-					Array.prototype.splice.apply(strarr, args);
 				}
 			}
 		}
@@ -400,13 +342,10 @@ var _ = _self.Prism = {
 	}
 };
 
-var Token = _.Token = function(type, content, alias, matchedStr, greedy) {
+var Token = _.Token = function(type, content, alias) {
 	this.type = type;
 	this.content = content;
 	this.alias = alias;
-	// Copy of the full string this token was created from
-	this.matchedStr = matchedStr || null;
-	this.greedy = !!greedy;
 };
 
 Token.stringify = function(o, language, parent) {
@@ -472,8 +411,10 @@ if (!_self.document) {
 	return _self.Prism;
 }
 
-//Get current script and highlight
-var script = document.currentScript || [].slice.call(document.getElementsByTagName("script")).pop();
+// Get current script and highlight
+var script = document.getElementsByTagName('script');
+
+script = script[script.length - 1];
 
 if (script) {
 	_.filename = script.src;
@@ -602,10 +543,7 @@ Prism.languages.clike = {
 			lookbehind: true
 		}
 	],
-	'string': {
-		pattern: /(["'])(\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-		greedy: true
-	},
+	'string': /(["'])(\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
 	'class-name': {
 		pattern: /((?:\b(?:class|interface|extends|implements|trait|instanceof|new)\s+)|(?:catch\s+\())[a-z0-9_\.\\]+/i,
 		lookbehind: true,
@@ -631,15 +569,13 @@ Prism.languages.javascript = Prism.languages.extend('clike', {
 Prism.languages.insertBefore('javascript', 'keyword', {
 	'regex': {
 		pattern: /(^|[^/])\/(?!\/)(\[.+?]|\\.|[^/\\\r\n])+\/[gimyu]{0,5}(?=\s*($|[\r\n,.;})]))/,
-		lookbehind: true,
-		greedy: true
+		lookbehind: true
 	}
 });
 
 Prism.languages.insertBefore('javascript', 'class-name', {
 	'template-string': {
-		pattern: /`(?:\\\\|\\?[^\\])*?`/,
-		greedy: true,
+		pattern: /`(?:\\`|\\?[^`])*`/,
 		inside: {
 			'interpolation': {
 				pattern: /\$\{[^}]+\}/,
@@ -907,7 +843,7 @@ if (typeof self === 'undefined' || !self.Prism || !self.document) {
 }
 
 // The languages map is built automatically with gulp
-var Languages = /*languages_placeholder[*/{"html":"HTML","xml":"XML","svg":"SVG","mathml":"MathML","css":"CSS","clike":"C-like","javascript":"JavaScript","abap":"ABAP","actionscript":"ActionScript","apacheconf":"Apache Configuration","apl":"APL","applescript":"AppleScript","asciidoc":"AsciiDoc","aspnet":"ASP.NET (C#)","autoit":"AutoIt","autohotkey":"AutoHotkey","basic":"BASIC","csharp":"C#","cpp":"C++","coffeescript":"CoffeeScript","css-extras":"CSS Extras","fsharp":"F#","glsl":"GLSL","http":"HTTP","inform7":"Inform 7","json":"JSON","latex":"LaTeX","lolcode":"LOLCODE","matlab":"MATLAB","mel":"MEL","nasm":"NASM","nginx":"nginx","nsis":"NSIS","objectivec":"Objective-C","ocaml":"OCaml","parigp":"PARI/GP","php":"PHP","php-extras":"PHP Extras","powershell":"PowerShell","protobuf":"Protocol Buffers","jsx":"React JSX","rest":"reST (reStructuredText)","sas":"SAS","sass":"Sass (Sass)","scss":"Sass (Scss)","sql":"SQL","typescript":"TypeScript","vhdl":"VHDL","vim":"vim","wiki":"Wiki markup","yaml":"YAML"}/*]*/;
+var Languages = /*languages_placeholder[*/{"css":"CSS","clike":"C-like","javascript":"JavaScript","abap":"ABAP","actionscript":"ActionScript","apacheconf":"Apache Configuration","apl":"APL","applescript":"AppleScript","asciidoc":"AsciiDoc","aspnet":"ASP.NET (C#)","autoit":"AutoIt","autohotkey":"AutoHotkey","basic":"BASIC","csharp":"C#","cpp":"C++","coffeescript":"CoffeeScript","css-extras":"CSS Extras","fsharp":"F#","glsl":"GLSL","http":"HTTP","inform7":"Inform 7","latex":"LaTeX","lolcode":"LOLCODE","matlab":"MATLAB","mel":"MEL","nasm":"NASM","nginx":"nginx","nsis":"NSIS","objectivec":"Objective-C","ocaml":"OCaml","parigp":"PARI/GP","php":"PHP","php-extras":"PHP Extras","powershell":"PowerShell","jsx":"React JSX","rest":"reST (reStructuredText)","sas":"SAS","sass":"Sass (Sass)","scss":"Sass (Scss)","sql":"SQL","typescript":"TypeScript","vhdl":"VHDL","vim":"vim","wiki":"Wiki markup","yaml":"YAML"}/*]*/;
 Prism.hooks.add('before-highlight', function(env) {
 	var pre = env.element.parentNode;
 	if (!pre || !/pre/i.test(pre.nodeName)) {
@@ -938,174 +874,3 @@ Prism.hooks.add('before-highlight', function(env) {
 });
 
 })();
-
-(function() {
-
-if (typeof self === 'undefined' || !self.Prism || !self.document) {
-	return;
-}
-
-var assign = Object.assign || function (obj1, obj2) {
-	for (var name in obj2) {
-		if (obj2.hasOwnProperty(name))
-			obj1[name] = obj2[name];
-	}
-	return obj1;
-}
-
-function NormalizeWhitespace(defaults) {
-	this.defaults = assign({}, defaults);
-}
-
-function toCamelCase(value) {
-	return value.replace(/-(\w)/g, function(match, firstChar) {
-		return firstChar.toUpperCase();
-	});
-}
-
-function tabLen(str) {
-	var res = 0;
-	for (var i = 0; i < str.length; ++i) {
-		if (str.charCodeAt(i) == '\t'.charCodeAt(0))
-			res += 3;
-	}
-	return str.length + res;
-}
-
-NormalizeWhitespace.prototype = {
-	setDefaults: function (defaults) {
-		this.defaults = assign(this.defaults, defaults);
-	},
-	normalize: function (input, settings) {
-		settings = assign(this.defaults, settings);
-
-		for (var name in settings) {
-			var methodName = toCamelCase(name);
-			if (name !== "normalize" && methodName !== 'setDefaults' &&
-					settings[name] && this[methodName]) {
-				input = this[methodName].call(this, input, settings[name]);
-			}
-		}
-
-		return input;
-	},
-
-	/*
-	 * Normalization methods
-	 */
-	leftTrim: function (input) {
-		return input.replace(/^\s+/, '');
-	},
-	rightTrim: function (input) {
-		return input.replace(/\s+$/, '');
-	},
-	tabsToSpaces: function (input, spaces) {
-		spaces = spaces|0 || 4;
-		return input.replace(/\t/g, new Array(++spaces).join(' '));
-	},
-	spacesToTabs: function (input, spaces) {
-		spaces = spaces|0 || 4;
-		return input.replace(new RegExp(' {' + spaces + '}', 'g'), '\t');
-	},
-	removeTrailing: function (input) {
-		return input.replace(/\s*?$/gm, '');
-	},
-	// Support for deprecated plugin remove-initial-line-feed
-	removeInitialLineFeed: function (input) {
-		return input.replace(/^(?:\r?\n|\r)/, '');
-	},
-	removeIndent: function (input) {
-		var indents = input.match(/^[^\S\n\r]*(?=\S)/gm);
-
-		if (!indents || !indents[0].length)
-			return input;
-
-		indents.sort(function(a, b){return a.length - b.length; });
-
-		if (!indents[0].length)
-			return input;
-
-		return input.replace(new RegExp('^' + indents[0], 'gm'), '');
-	},
-	indent: function (input, tabs) {
-		return input.replace(/^[^\S\n\r]*(?=\S)/gm, new Array(++tabs).join('\t') + '$&');
-	},
-	breakLines: function (input, characters) {
-		characters = (characters === true) ? 80 : characters|0 || 80;
-
-		var lines = input.split('\n');
-		for (var i = 0; i < lines.length; ++i) {
-			if (tabLen(lines[i]) <= characters)
-				continue;
-
-			var line = lines[i].split(/(\s+)/g),
-			    len = 0;
-
-			for (var j = 0; j < line.length; ++j) {
-				var tl = tabLen(line[j]);
-				len += tl;
-				if (len > characters) {
-					line[j] = '\n' + line[j];
-					len = tl;
-				}
-			}
-			lines[i] = line.join('');
-		}
-		return lines.join('\n');
-	}
-};
-
-Prism.plugins.NormalizeWhitespace = new NormalizeWhitespace({
-	//'remove-trailing': true,
-	//'remove-indent': true,
-	'left-trim': true,
-	'right-trim': true,
-	/*'break-lines': 80,
-	'indent': 2,
-	'remove-initial-line-feed': false,
-	'tabs-to-spaces': 4,
-	'spaces-to-tabs': 4*/
-});
-
-Prism.hooks.add('before-highlight', function (env) {
-	var pre = env.element.parentNode;
-	if (!env.code || !pre || pre.nodeName.toLowerCase() !== 'pre' ||
-			(env.settings && env.settings['whitespace-normalization'] === false))
-		return;
-
-	var children = pre.childNodes,
-	    before = '',
-	    after = '',
-	    codeFound = false,
-	    Normalizer = Prism.plugins.NormalizeWhitespace;
-
-	// Move surrounding whitespace from the <pre> tag into the <code> tag
-	for (var i = 0; i < children.length; ++i) {
-		var node = children[i];
-
-		if (node == env.element) {
-			codeFound = true;
-		} else if (node.nodeName === "#text") {
-			if (codeFound) {
-				after += node.nodeValue;
-			} else {
-				before += node.nodeValue;
-			}
-
-			pre.removeChild(node);
-			--i;
-		}
-	}
-
-	if (!env.element.children.length || !Prism.plugins.KeepMarkup) {
-		env.code = before + env.code + after;
-		env.code = Normalizer.normalize(env.code, env.settings);
-	} else {
-		// Preserve markup for keep-markup plugin
-		var html = before + env.element.innerHTML + after;
-		env.element.innerHTML = Normalizer.normalize(html, env.settings);
-		env.code = env.element.textContent;
-	}
-});
-
-}());
