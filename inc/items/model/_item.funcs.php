@@ -39,10 +39,17 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' || $disp == 'terms' )
+			if( $disp == 'page' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
 						'itemtype_usage' => 'page' // pages
+					) );
+			}
+
+			if( $disp == 'terms' )
+			{	// Allow all post types:
+				$MainList->set_default_filters( array(
+						'itemtype_usage' => 'page,special'
 					) );
 			}
 

@@ -60,7 +60,10 @@ $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-s
 	$Form->text_input( 'notification_logo', $Settings->get( 'notification_logo' ), 50, T_( 'Small site logo (URL)' ), T_('Shared with email settings'), array( 'maxlength' => 5000 ) );
 	$Form->text_input( 'site_footer_text', $Settings->get( 'site_footer_text' ), 50, T_('Site footer text'), '', array( 'maxlength' => 5000 ) );
 	$Form->checkbox_input( 'site_skins_enabled', $Settings->get( 'site_skins_enabled' ), T_('Enable site skins'), array( 'note' => T_('Enables a sitewide header and footer') ) );
-	$Form->text_input( 'site_terms', $Settings->get( 'site_terms' ), 7, T_('Terms & Conditions'), T_('Enter ID of the page containing the terms & conditions.'), array( 'maxlength' => 11 ) );
+	$Form->begin_line( T_('Terms & Conditions'), 'site_terms_enabled' );
+		$Form->checkbox_input( 'site_terms_enabled', $Settings->get( 'site_terms_enabled' ), '' );
+		$Form->text_input( 'site_terms', $Settings->get( 'site_terms' ), 7, T_('Enable and display Post ID:'), T_('Enter ID of the page containing the terms & conditions.'), array( 'maxlength' => 11 ) );
+	$Form->end_line();
 
 $Form->end_fieldset();
 

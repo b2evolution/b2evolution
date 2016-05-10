@@ -616,7 +616,7 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
 	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
-	if( $terms_item_ID  > 0 )
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
 	{	// Only if item ID is defined for terms page:
 		set_param( 'p', $terms_item_ID );
 		$c = 0; // Don't display comments
@@ -637,6 +637,7 @@ if( $disp == 'terms' )
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
     ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 

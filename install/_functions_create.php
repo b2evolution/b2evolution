@@ -251,25 +251,155 @@ function create_default_data()
 
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
-	$DB->query( "
-		INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html,
-					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url, ityp_podcast )
-		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 1 ),
-					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional', 0 ),
-					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Standalone Page',         'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 ),
-					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 )" );
+	$post_types = array();
+	$post_types[] = array(
+			'name'           => 'Post',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Post with Custom Fields',
+		);
+	$post_types[] = array(
+			'name'           => 'Child Post',
+			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Manual Page',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Forum Topic',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
+		);
+	$post_types[] = array(
+			'name'           => 'Standalone Page',
+			'usage'          => 'page',
+			'template_name'  => 'page',
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Front',
+			'usage'          => 'intro-front',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Main',
+			'usage'          => 'intro-main',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Cat',
+			'usage'          => 'intro-cat',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Tag',
+			'usage'          => 'intro-tag',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Sub',
+			'usage'          => 'intro-sub',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-All',
+			'usage'          => 'intro-all',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Sidebar link',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'           => 'Advertisement',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'                   => 'Terms & Conditions',
+			'usage'                  => 'special',
+			'template_name'          => NULL,
+			'allow_breaks'           => 0,
+			'allow_featured'         => 0,
+			'perm_level'             => 'admin',
+			'description'            => 'Use this post type for terms & conditions of the site.',
+			'use_text'               => 'required',
+			'use_tags'               => 'never',
+			'use_excerpt'            => 'never',
+			'use_url'                => 'never',
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'never',
+			'use_meta_desc'          => 'never',
+			'use_meta_keywds'        => 'never',
+			'use_comments'           => 0,
+			'allow_closing_comments' => 0,
+			'use_comment_expiration' => 'never',
+			'use_custom_fields'      => 0,
+		);
+	// Default settings:
+	$post_type_default_settings = array(
+			'name'                   => '',
+			'description'            => NULL,
+			'usage'                  => 'post',
+			'template_name'          => 'single',
+			'perm_level'             => 'standard',
+			'allow_html'             => 1,
+			'allow_breaks'           => 1,
+			'allow_featured'         => 1,
+			'use_text'               => 'optional',
+			'use_tags'               => 'optional',
+			'use_excerpt'            => 'optional',
+			'use_url'                => 'optional',
+			'podcast'                => 0,
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'optional',
+			'use_meta_desc'          => 'optional',
+			'use_meta_keywds'        => 'optional',
+			'use_comments'           => 1,
+			'allow_closing_comments' => 1,
+			'use_comment_expiration' => 'optional',
+			'use_custom_fields'      => 1,
+		);
+	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
+	foreach( $post_types as $p => $post_type )
+	{
+		$post_type = array_merge( $post_type_default_settings, $post_type );
+		$post_types_sql .= '( '.$DB->quote( $post_type ).' )';
+		if( $p != count( $post_types ) - 1 )
+		{
+			$post_types_sql .= ',';
+		}
+	}
+	// Insert item types:
+	$DB->query( $post_types_sql );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
@@ -1366,7 +1496,7 @@ function create_demo_contents()
 	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
-	global $Plugins;
+	global $Plugins, $Settings;
 	global $install_test_features;
 	global $user_org_IDs;
 
@@ -1925,6 +2055,20 @@ function create_demo_contents()
 
 <p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
 			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
+
+		// Insert a post:
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'intro' );
+		$edited_Item->insert( $jay_moderator_ID, T_('Terms & Conditions'), '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
+
+<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Terms & Conditions' );
+		if( $edited_Item->ID > 0 )
+		{	// Use this post as default terms & conditions:
+			$Settings->set( 'site_terms', $edited_Item->ID );
+			$Settings->dbupdate();
+		}
 
 		// Update the progress bar status
 		update_install_progress_bar();

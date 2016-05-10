@@ -146,7 +146,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
 				'types' => NULL, // Filter by item type IDs (separated by comma)
-				'itemtype_usage' => 'post', // Filter by item type usage (seprated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+				'itemtype_usage' => 'post', // Filter by item type usage (separated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
 				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
 				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',

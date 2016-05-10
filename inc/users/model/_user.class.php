@@ -6608,6 +6608,11 @@ class User extends DataObject
 	{
 		global $UserSettings, $Settings;
 
+		if( ! $Settings->get( 'site_terms_enabled' ) )
+		{	// The terms are not enabled:
+			return false;
+		}
+
 		if( $UserSettings->get( 'terms_accepted', $this->ID ) )
 		{	// This user already accepted the terms:
 			return false;
