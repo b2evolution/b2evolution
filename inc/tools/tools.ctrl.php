@@ -48,7 +48,8 @@ if( ! empty($tab) )
 		}
 		else
 		{
-			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $params = array() );
+			$plugin_params = array();
+			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $plugin_params );
 		}
 	}
 	else
@@ -486,7 +487,8 @@ elseif( $tab_Plugin )
 	</div>
 
 	<?php
-	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
+	$plugin_params = array();
+	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $plugin_params );
 }
 
 
