@@ -15,3 +15,5 @@ npm-debug.log
 /nbproject/
 .idea/*
 media/blogs/a
+skins/business_skin
+conf/_local.php
