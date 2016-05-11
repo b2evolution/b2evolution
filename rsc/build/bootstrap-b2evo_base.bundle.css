@@ -1591,6 +1591,13 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
 li[class^="listnav_distance_"],
 li[class*=" listnav_distance_"] {
   display: none;
