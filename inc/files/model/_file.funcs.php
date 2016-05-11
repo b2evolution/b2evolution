@@ -2205,6 +2205,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
 			'path'             => '', // Subpath for the file/folder
+			'listElement'      => 'null',
 			'list_style'       => 'list',  // 'list' or 'table'
 			'template_button'  => '<div class="qq-uploader">'
 					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
@@ -2289,6 +2290,7 @@ function display_dragdrop_upload_button( $params = array() )
 			uploader = new qq.FileUploader(
 			{
 				element: document.getElementById( 'file-uploader' ),
+				listElement: <?php echo $params['listElement']; ?>,
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
