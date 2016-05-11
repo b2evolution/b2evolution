@@ -140,6 +140,7 @@ display_dragdrop_upload_button( array(
 		'after'  => '</div>',
 		'fileroot_ID'      => FileRoot::gen_ID( 'collection', $Blog->ID ),
 		'path'             => '/quick-uploads/'.( $LinkOwner->type == 'item' ? 'p' : 'c' ).$LinkOwner->link_Object->ID.'/',
+		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template_filerow' => '<table><tr>'
 					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'

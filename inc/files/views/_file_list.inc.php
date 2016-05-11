@@ -603,6 +603,7 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
+					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
 					'template_filerow'    => $template_filerow,
 					'display_support_msg' => false,
