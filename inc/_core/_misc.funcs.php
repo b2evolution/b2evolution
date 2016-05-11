@@ -6436,6 +6436,26 @@ function ip2int( $ip )
 
 
 /**
+ * Check if URL has a domain in IP format
+ *
+ * @param string URL
+ * @return boolean
+ */
+function is_ip_url_domain( $url )
+{
+	$url_data = parse_url( $url );
+
+	if( $url_data === false || ! isset( $url_data['host'] ) )
+	{	// Wrong url:
+		return false;
+	}
+
+	// Check if host is IP address:
+	return is_valid_ip_format( $url_data['host'] );
+}
+
+
+/**
  * Provide array_combine for older versions of PHP (< 5.0.0)
  *
  * Creates an array by using one array for keys and another for its values
