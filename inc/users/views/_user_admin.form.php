@@ -85,7 +85,7 @@ if( $edited_User->ID == 1 )
 else
 {	// Allow to change status and primary group for non-admin users:
 	$GroupCache->clear();
-	$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : ' AND ' )
+	$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' )
 		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
 	$GroupCache->all_loaded = true;
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
@@ -102,7 +102,7 @@ if( empty( $user_secondary_groups ) )
 {	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
 	$user_secondary_groups[] = 0;
 }
-$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : ' AND ' ).' grp_usage = "secondary"' );
+$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' ).' grp_usage = "secondary"' );
 $GroupCache->all_loaded = true;
 foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
