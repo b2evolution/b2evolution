@@ -2228,6 +2228,8 @@ class Item extends ItemLight
 			return;
 		}
 
+		$fields_exist = false;
+
 		if( empty( $params['fields'] ) )
 		{	// Display all fields:
 			$display_fields = array_keys( $this->custom_fields );
@@ -2235,9 +2237,8 @@ class Item extends ItemLight
 		else
 		{	// Display only the requested fields:
 			$display_fields = explode( ',', $params['fields'] );
+			$fields_exist = true;
 		}
-
-		$fields_exist = false;
 
 		$html = $params['before'];
 
@@ -2308,7 +2309,7 @@ class Item extends ItemLight
 						$field_value = $this->get_custom_fields( $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no requested fields').'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no custom fields').'</span>', $content );
 						}
 						else
 						{	// Display fields:
@@ -2366,7 +2367,7 @@ class Item extends ItemLight
 		{	// If at least one parent tag is found in content:
 			if( ! ( $parent_Item = & $this->get_parent_Item() ) )
 			{	// If parent doesn't exist:
-				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('The item parent does not exist').'</span>', $content );
+				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
 				return $content;
 			}
 
@@ -2380,7 +2381,7 @@ class Item extends ItemLight
 						$field_value = $parent_Item->get_custom_fields( $custom_fields_params );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no requested fields').'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
 						}
 						else
 						{	// Display fields:
