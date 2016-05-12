@@ -395,6 +395,10 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
+			if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+			{	// Display IP range as link to edit form if current user has the permissions:
+				$iprange_name = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$iprange_name.'</a>';
+			}
 		}
 		else
 		{ // There is no IP range in DB
@@ -403,7 +407,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		}
 		$perm_spamblacklist = $current_User->check_perm( 'spamblacklist', 'edit' );
 		$Form->begin_line( T_('IP range'), NULL, ( $perm_spamblacklist ? '' : 'info' ) );
-			$Form->info_field( T_('IP range'), $iprange_name );
+			$Form->info_field( '', $iprange_name );
 			$email_status_icon = '<div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
 			if( $perm_spamblacklist )
 			{ // User can edit IP ranges
@@ -419,20 +423,28 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
 	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
+	$user_domain_formatted = format_to_output( $user_domain );
 	$display_user_domain = ( ! empty( $user_domain ) && $current_User->check_perm( 'stats', 'list' ) );
 	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	if( $display_user_domain )
+	{	// Get Domain:
+		$DomainCache = & get_DomainCache();
+		if( $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) && $perm_stat_edit )
+		{
+			$user_domain_formatted = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">'.$user_domain_formatted.'</a>';
+		}
+	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', format_to_output( $user_domain ) );
+		$Form->info_field( '', $user_domain_formatted );
 		if( $display_user_domain )
-		{ // User can view Domains
-			// Get status of Domain
-			$DomainCache = & get_DomainCache();
-			$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
+		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
 			$domain_status_icon = '<div id="domain_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
 			if( $perm_stat_edit )
 			{ // User can edit Domain
-				$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors() ) );
+				// Link to create a new domain
+				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $user_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$user_domain.'&amp;dom_status='.$domain_status );
+				$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
 			}
 			else
 			{ // Only view status of Domain
@@ -455,10 +467,17 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
 	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
 	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $initial_referer );
+		$Domain = & get_Domain_by_url( $initial_referer );
+		$initial_referer_formatted = format_to_output( $initial_referer );
+		if( $Domain && $perm_stat_edit )
+		{
+			$initial_referer_formatted = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
+					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">'
+				.$initial_referer_formatted.'</a>';
+		}
+		$Form->info_field( '', $initial_referer_formatted );
 		if( $display_initial_referer )
 		{ // User can view Domains
-			$Domain = & get_Domain_by_url( $initial_referer );
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
 			$domain_status_icon = '<div id="initial_referer_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
 			if( $perm_stat_edit )
