@@ -701,7 +701,7 @@ jQuery( document ).ready( function()
 				{
 					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 				}
-				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
 				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
 
 
