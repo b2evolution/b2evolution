@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Universal Item List Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
- * ComponentWidget Class
+ * Universal Item List Widget Class
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
@@ -72,6 +72,25 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+/* TODO:
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => T_('How to lay out the items'),
+					'type' => 'select',
+					'options' => array( 
+							'rwd'  => T_( 'RWD Blocks' ),
+							'flow' => T_( 'Flowing Blocks' ),
+							'list' => T_( 'List' ), 
+						 ),
+					'defaultvalue' => 'list',
+				),
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
+*/
 				'item_visibility' => array(
 					'label' => T_('Item visibility'),
 					'note' => T_('What post statuses should be included in the list?'),

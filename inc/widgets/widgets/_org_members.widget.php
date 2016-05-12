@@ -106,11 +106,24 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
-				'member_wrapper_class' => array(
-					'label' => T_('Member wrapper class'),
-					'note' => '',
-					'size' => 40,
-					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 text-center',
+/* TODO:
+			'layout' => array(
+				'label' => T_('Layout'),
+				'note' => T_('How to lay out the members'),
+				'type' => 'select',
+				'options' => array( 
+						'rwd'  => T_( 'RWD Blocks' ),
+						'flow' => T_( 'Flowing Blocks' ),
+						'list' => T_( 'List' ), 
+					 ),
+				'defaultvalue' => 'rwd',
+			),
+*/
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12 text-center',
 				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
@@ -236,7 +249,7 @@ class org_members_Widget extends ComponentWidget
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="'.trim( 'evo_org_member '.$this->disp_params['member_wrapper_class'] ).'">';
+					echo '<div class="'.trim( 'evo_org_member '.$this->disp_params['rwd_block_class'] ).'">';
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 

@@ -488,8 +488,11 @@ class ComponentWidget extends DataObject
 					'flow_end' => '</div>',
 					'flow_block_start' => '<div>',
 					'flow_block_end' => '</div>',
+					'rwd_start' => '<div class="widget_rwd_blocks">',
+					'rwd_end' => '</div>',
+					'rwd_block_start' => '<div class="$wi_rwd_block_class$">',
+					'rwd_block_end' => '</div>',
 					'thumb_size' => 'crop-80x80',
-					// 'thumb_size' => 'fit-160x120',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
 					'item_selected_text_end' => '',

@@ -64,21 +64,30 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
 				'options' => array( 
+//						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
 						'list' => T_( 'List' ), 
-						'grid' => T_( 'Grid' ),
+						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
 			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 1,
-			),
+/* TODO:
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
+*/
 			'limit' => array(
 				'label' => T_( 'Max pictures' ),
 				'note' => T_( 'Maximum number of pictures to display.' ),
+				'size' => 4,
+				'defaultvalue' => 1,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
 				'size' => 4,
 				'defaultvalue' => 1,
 			),

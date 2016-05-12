@@ -92,29 +92,38 @@ class coll_media_index_Widget extends ComponentWidget
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
 				'options' => array(
-						'grid' => T_('Grid'),
+//						'rwd'  => T_( 'RWD Blocks' ),
+						'flow' => T_('Flowing Blocks'),
 						'list' => T_('List'),
-						'flow' => T_('Flowing Blocks')
+						'grid' => T_('Table'),
 					),
 				'defaultvalue' => 'flow',
+			),
+/* TODO:
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
+*/
+			'limit' => array(
+				'label' => T_( 'Max items' ),
+				'note' => T_( 'Maximum number of items to display.' ),
+				'size' => 4,
+				'defaultvalue' => 3,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
+				'size' => 4,
+				'defaultvalue' => 2,
 			),
 			'disp_image_title' => array(
 				'label' => T_( 'Display image title' ),
 				'note' => T_( 'Check this to display image title. This falls back to post title if image title is not set.' ),
 				'type' => 'checkbox',
 				'defaultvalue' => false,
-			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 2,
-			),
-			'limit' => array(
-				'label' => T_( 'Max items' ),
-				'note' => T_( 'Maximum number of items to display.' ),
-				'size' => 4,
-				'defaultvalue' => 3,
 			),
 			'order_by' => array(
 				'label' => T_('Order by'),
