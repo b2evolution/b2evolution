@@ -4199,7 +4199,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 
 	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
 	{ // The current blog can have comments:
-		$nb_comments = generic_ctp_number( $Item->ID, 'feedback' );
+		$nb_comments = generic_ctp_number( $Item->ID, 'feedback', '' );
 		$comments_url = is_admin_page() ? $item_url : url_add_tail( $item_url, '#comments' );
 		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
 		if( $nb_comments )
