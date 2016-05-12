@@ -777,6 +777,9 @@ input[type=checkbox] {
 fieldset div.notes {
   margin: 0 0 1ex 3ex;
 }
+.evo_label_inline {
+  margin-left: 2ex;
+}
 div.right_icons,
 div.fieldset_icons {
   text-align: right;
