@@ -98,30 +98,6 @@ class bootstrap_main_Skin extends Skin
 						'type' => 'text',
 						'size' => '50'
 					),
-					'pict_title_color' => array(
-						'label' => T_('Title color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#F0F0F0',
-						'type' => 'color',
-					),
-					'pict_text_color' => array(
-						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
-						'defaultvalue' => '#F0F0F0',
-						'type' => 'color',
-					),
-					'pict_link_color' => array(
-						'label' => T_('Link color'),
-						'note' => T_('E-g: #0000ff for blue'),
-						'defaultvalue' => '#F0F0F0',
-						'type' => 'color',
-					),
-					'pict_muted_color' => array(
-						'label' => T_('Muted text color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#F0F0F0',
-						'type' => 'color',
-					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -164,6 +140,12 @@ class bootstrap_main_Skin extends Skin
 							'max' => 100, // to 100%
 						),
 					),
+					'pict_title_color' => array(
+						'label' => T_('Title color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
 						'note' => T_('E-g: #00ff00 for green'),
@@ -176,6 +158,12 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
+					'pict_muted_color' => array(
+						'label' => T_('Muted text color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#F0F0F0',
+						'type' => 'color',
+					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
 						'note' => T_('E-g: #00ff00 for green'),
@@ -186,6 +174,19 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'end_fieldset',
 				),
 				'3_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Front Page Secondary Area Overlay')
+				),
+					'secondary_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#333',
+						'type' => 'color',
+					),
+				'3_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'4_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
 				),
@@ -231,10 +232,10 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'3_end' => array(
+				'4_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'4_start' => array(
+				'5_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
 				),
@@ -256,7 +257,7 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'4_end' => array(
+				'5_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -334,16 +335,6 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured .main_page_wrapper .widget_core_coll_title h1 a { color: '.$color." }\n";
 			}
 
-			if( $color = $this->get_setting( 'pict_text_color' ) )
-			{ // Custom text color:
-				$custom_css .= 'body.pictured { color: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'pict_link_color' ) )
-			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper a:not([class*=btn]) { color: '.$color." }\n";
-			}
-
 			if( $color = $this->get_setting( 'pict_muted_color' ) )
 			{ // Custom muted text color:
 				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
@@ -402,6 +393,11 @@ class bootstrap_main_Skin extends Skin
 				{
 					$custom_css .= 'div.front_main_area { float: right;'." }\n";
 				}
+			}
+
+			if( $color = $this->get_setting( 'secondary_text_color' ) )
+			{ // Custom text color on secondary area:
+				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
 
 			if( ! empty( $custom_css ) )
