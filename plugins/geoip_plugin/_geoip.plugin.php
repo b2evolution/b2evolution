@@ -882,7 +882,7 @@ function geoip_get_country_by_IP( $IP )
 			$IP = int2ip( $IP );
 		}
 
-		if( $Country = & $geoip_Plugin->get_country_by_IP( $IP ) )
+		if( $Country = $geoip_Plugin->get_country_by_IP( $IP ) )
 		{ // Get country flag + name
 			load_funcs( 'regional/model/_regional.funcs.php' );
 			$country = country_flag( $Country->get( 'code' ), $Country->get_name(), 'w16px', 'flag', '', false ).
