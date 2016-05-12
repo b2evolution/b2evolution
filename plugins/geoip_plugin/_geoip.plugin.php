@@ -98,9 +98,9 @@ class geoip_plugin extends Plugin
 		}
 		else
 		{
-			$datfile_info = '<span class="error">'.T_('Not found').'</span>';
+			$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 		}
-		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip">'.T_('Download update now!').'</a>';
+		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
 
 		return array(
 			'datfile' => array(
@@ -686,9 +686,24 @@ jQuery( document ).ready( function()
 				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
 						   get_manual_link('geoip-plugin').'</p>';
 
+				echo '<p>';
 				$Form->button( array(
 						'value' => T_('Find Registration Country for all Users NOW!')
 					) );
+				echo '</p>';
+
+				global $admin_url;
+				if( file_exists( $this->geoip_file_path ) )
+				{
+					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+				}
+				else
+				{
+					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+				}
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
+				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+
 
 				if( !empty( $this->text_from_AdminTabAction ) )
 				{	// Display a report of executed action
