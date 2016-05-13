@@ -4204,7 +4204,19 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'">';
 		if( $nb_comments )
 		{
-			$col .= get_icon( 'comments' );
+			$comments_icon_params = array();
+			$comment_moderation_statuses = $Item->Blog->get_setting( 'moderation_statuses' );
+			if( ! empty( $comment_moderation_statuses ) )
+			{	// Get a count of comments awaiting moderation:
+				$nb_comments_moderation = generic_ctp_number( $Item->ID, 'feedback', explode( ',', $comment_moderation_statuses ) );
+				if( $nb_comments_moderation > 0 )
+				{
+					$comments_icon_params['style'] = 'color:#cc0099';
+					$comments_icon_params['title'] = T_('There are come comments awaiting moderation.');
+				}
+			}
+
+			$col .= get_icon( 'comments', 'imgtag', $comments_icon_params );
 		}
 		else
 		{
