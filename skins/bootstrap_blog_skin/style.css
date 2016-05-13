@@ -1,3 +1,19 @@
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block {
+  padding: 8px;
+}
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content {
+  background-color: #fafafa;
+  padding: 8px;
+  height: 350px;
+  overflow: hidden;
+}
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img {
+  width: 100%;
+  height: auto;
+}
 div.widget_core_coll_item_list.evo_1pic__special h2,
 div.widget_core_coll_post_list.evo_1pic__special h2 {
   font-size: 30px;
@@ -25,10 +41,6 @@ div.widget_core_coll_post_list.evo_1pic__special ul li .item_first_image_placeho
   width: 80px;
   background: #f0f0f0;
   margin-right: 6px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
   border-radius: 3px;
 }
 div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder:before,
@@ -52,8 +64,8 @@ div.widget_core_coll_post_list.evo_1pic__special ul li div.item_title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-div.widget_core_coll_item_list.evo_1pic__special div.item_first_image,
-div.widget_core_coll_post_list.evo_1pic__special div.item_first_image {
+div.widget_core_coll_item_list.evo_layout_list div.item_first_image,
+div.widget_core_coll_post_list.evo_layout_list div.item_first_image {
   float: left;
   margin-right: 6px;
 }
@@ -245,6 +257,13 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
   overflow: hidden;
   -webkit-line-clamp: 2;
   height: 3em;
+}
+.widget_core_org_members .widget_rwd_blocks {
+  float: left;
+  width: 100%;
+}
+.widget_core_org_members.evo_layout_list ul li div.ufld_icon_links {
+  text-align: left;
 }
 @media (max-width: 640px) {
   body.pictured .front_main_content .ufld_icon_links a {

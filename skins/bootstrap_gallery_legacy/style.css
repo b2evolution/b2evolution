@@ -39,6 +39,13 @@
   -webkit-line-clamp: 2;
   height: 3em;
 }
+.widget_core_org_members .widget_rwd_blocks {
+  float: left;
+  width: 100%;
+}
+.widget_core_org_members.evo_layout_list ul li div.ufld_icon_links {
+  text-align: left;
+}
 @media (max-width: 640px) {
   body.pictured .front_main_content .ufld_icon_links a {
     width: 45px;

@@ -1,3 +1,19 @@
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block {
+  padding: 8px;
+}
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content {
+  background-color: #fafafa;
+  padding: 8px;
+  height: 350px;
+  overflow: hidden;
+}
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img {
+  width: 100%;
+  height: auto;
+}
 div.widget_core_coll_item_list.evo_1pic__special h2,
 div.widget_core_coll_post_list.evo_1pic__special h2 {
   font-size: 30px;
@@ -25,10 +41,6 @@ div.widget_core_coll_post_list.evo_1pic__special ul li .item_first_image_placeho
   width: 80px;
   background: #f0f0f0;
   margin-right: 6px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
   border-radius: 3px;
 }
 div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder:before,
@@ -52,8 +64,8 @@ div.widget_core_coll_post_list.evo_1pic__special ul li div.item_title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-div.widget_core_coll_item_list.evo_1pic__special div.item_first_image,
-div.widget_core_coll_post_list.evo_1pic__special div.item_first_image {
+div.widget_core_coll_item_list.evo_layout_list div.item_first_image,
+div.widget_core_coll_post_list.evo_layout_list div.item_first_image {
   float: left;
   margin-right: 6px;
 }
@@ -246,6 +258,13 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
   -webkit-line-clamp: 2;
   height: 3em;
 }
+.widget_core_org_members .widget_rwd_blocks {
+  float: left;
+  width: 100%;
+}
+.widget_core_org_members.evo_layout_list ul li div.ufld_icon_links {
+  text-align: left;
+}
 @media (max-width: 640px) {
   body.pictured .front_main_content .ufld_icon_links a {
     width: 45px;
@@ -300,10 +319,6 @@ ol.breadcrumb {
   text-align: center;
   background: #FFF;
   border: 2px solid #306595;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
   width: 21px;
   height: 21px;
@@ -335,10 +350,6 @@ ol.breadcrumb {
 }
 .forums_list .panel-heading:not(:first-child) {
   border-top: 1px solid #ddd;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
   border-radius: 0;
 }
 .forums_list .panel-heading h2 {
@@ -541,10 +552,6 @@ ol.breadcrumb {
   display: block;
 }
 .forums_list .ft_author_avatar img {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
   border-radius: 3px;
 }
 .forums_list .ft_author_avatar .ft_author_avatar {
@@ -815,10 +822,6 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar > a:before,
 body.round_avatars .single_topic .evo_content_block .ft_avatar > a,
 body.round_avatars .single_topic .evo_content_block .ft_avatar > span,
 body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
   border-radius: 50%;
 }
 .vote_spam {
@@ -1196,10 +1199,6 @@ a.to_top {
   vertical-align: middle;
 }
 .popover img {
-  -webkit-border-radius: 4px !important;
-  -moz-border-radius: 4px !important;
-  -ms-border-radius: 4px !important;
-  -o-border-radius: 4px !important;
   border-radius: 4px !important;
 }
 .forums_list.front_panel {
@@ -1223,8 +1222,6 @@ a.to_top {
   text-align: left;
 }
 .raised img {
-  -webkit-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
 }
 .thumbnail {
