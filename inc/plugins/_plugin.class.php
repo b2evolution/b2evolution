@@ -302,7 +302,7 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9. 
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9.
 		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
@@ -574,10 +574,12 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
+		/*
 		if( $this->group != 'rendering' )
 		{
 			return array();
 		}
+		*/
 
 		$render_note = '';
 		if( empty( $this->code ) )
@@ -923,7 +925,7 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
