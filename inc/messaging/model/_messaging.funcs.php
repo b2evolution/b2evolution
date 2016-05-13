@@ -338,7 +338,8 @@ function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
 		$link_tail = 'messages&thrd_ID='.$thread_ID;
 	}
 
-	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
+	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && ! empty( $User ) &&
+	    ( $msg_Blog->get_setting( 'allow_access' ) != 'members' || $User->check_perm( 'blog_ismember', 'view', false, $msg_Blog->ID ) ) )
 	{	// Link to blog that is used for messaging:
 		$message_link = url_add_param( $msg_Blog->gen_blogurl(), 'disp='.$link_tail );
 		$prefs_link = $msg_Blog->get( 'userprefsurl' );
