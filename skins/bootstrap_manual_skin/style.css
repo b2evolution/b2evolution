@@ -217,6 +217,20 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
     font-size: 18px;
   }
 }
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_block {
+  padding: 8px;
+}
+div.widget_core_coll_media_index.evo_layout_rwd img {
+  width: 100%;
+  height: auto;
+}
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_block {
+  padding: 8px;
+}
+div.widget_core_user_avatars.evo_layout_rwd img {
+  width: 100%;
+  height: auto;
+}
 .widget_core_org_members {
   margin: 5em 0 30px;
   color: #333333;
