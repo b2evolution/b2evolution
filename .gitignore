@@ -11,3 +11,4 @@ _transifex/translations
 rsc/build/testless.css
 .idea
 conf/_local.php
+plugins/geoip_plugin/GeoIP.dat
