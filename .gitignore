@@ -10,3 +10,5 @@ _transifex/messages.pot.bak
 _transifex/translations
 rsc/build/testless.css
 .idea
+conf/_local.php
+plugins/geoip_plugin/GeoIP.dat
