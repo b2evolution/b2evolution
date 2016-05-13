@@ -221,7 +221,8 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
   margin: 5em 0 30px;
   color: #333333;
 }
-.widget_core_org_members div.evo_org_member {
+.widget_core_org_members div.widget_rwd_block {
+  text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;
 }

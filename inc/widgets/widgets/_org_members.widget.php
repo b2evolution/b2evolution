@@ -121,7 +121,7 @@ class org_members_Widget extends ComponentWidget
 					'label' => T_('RWD block class'),
 					'note' => T_('Specify the responsive column classes you want to use.'),
 					'size' => 60,
-					'defaultvalue' => 'evo_org_member col-lg-4 col-md-6 col-sm-6 col-xs-12 text-center',
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
 				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
