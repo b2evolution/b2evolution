@@ -49,10 +49,18 @@ $Form->hidden( 'tab', 'plugins' );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'blog', $Blog->ID );
 
-$labelclass = $Form->labelclass;
-$Form->labelclass = 'control-label pull-left';
-$Form->select_input_array( 'plugin_group', $plugin_group, $Plugins->get_plugin_groups(), T_('Show plugins from group') );
-$Form->labelclass = $labelclass;
+echo '<div class="form-group">';
+$Form->switch_layout( 'linespan' );
+$Form->switch_template_parts( array(
+		'inputstart' => '<div class="control" style="display: inline-block;">',
+		'inputend' => '</block>',
+		'labelstart' => '<span style="padding-right: 15px;">',
+		'labelend' => '</span>',
+	) );
+$Form->select_input_array( 'plugin_group', $plugin_group, $Plugins->get_plugin_groups(), T_('Show plugins from group'), array( ) );
+echo '</div>';
+
+$Form->switch_layout( NULL );
 ?>
 <script>
 	jQuery( 'select[name="plugin_group"]' ).on( 'change', function()
