@@ -311,9 +311,23 @@ function get_messaging_url( $disp = 'threads' )
  * @param integer thread ID the corresponding thread ID to display messages, and null to display all threads
  * @return array( threads/messages url, messaging preferences url )
  */
-function get_messages_link_to( $thread_ID = NULL )
+function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
 {
 	global $Settings, $admin_url;
+
+	if( $user_ID === NULL )
+	{	// Get current user:
+		global $current_User;
+		if( is_logged_in() )
+		{
+			$User = $current_User;
+		}
+	}
+	else
+	{	// Get user by requested ID:
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+	}
 
 	if( empty( $thread_ID ) )
 	{
@@ -324,15 +338,21 @@ function get_messages_link_to( $thread_ID = NULL )
 		$link_tail = 'messages&thrd_ID='.$thread_ID;
 	}
 
-	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
-	{ // Link to blog that is used for messaging
+	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && ! empty( $User ) &&
+	    ( $msg_Blog->get_setting( 'allow_access' ) != 'members' || $User->check_perm( 'blog_ismember', 'view', false, $msg_Blog->ID ) ) )
+	{	// Link to blog that is used for messaging:
 		$message_link = url_add_param( $msg_Blog->gen_blogurl(), 'disp='.$link_tail );
 		$prefs_link = $msg_Blog->get( 'userprefsurl' );
 	}
-	else
-	{ // Link to admin messaging managment
+	elseif( ! empty( $User ) && $User->check_perm( 'admin', 'restricted' ) )
+	{	// Link to admin messaging managment:
 		$message_link = $admin_url.'?ctrl='.$link_tail;
 		$prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs';
+	}
+	else
+	{	// No links:
+		$message_link = false;
+		$prefs_link = false;
 	}
 
 	return array( $message_link, $prefs_link );

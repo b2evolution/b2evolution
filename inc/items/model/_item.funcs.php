@@ -4199,12 +4199,24 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 
 	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
 	{ // The current blog can have comments:
-		$nb_comments = generic_ctp_number( $Item->ID, 'feedback', '' );
+		$nb_comments = generic_ctp_number( $Item->ID, 'feedback', 'total' );
 		$comments_url = is_admin_page() ? $item_url : url_add_tail( $item_url, '#comments' );
-		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
+		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'">';
 		if( $nb_comments )
 		{
-			$col .= get_icon( 'comments' );
+			$comments_icon_params = array();
+			$comment_moderation_statuses = $Item->Blog->get_setting( 'moderation_statuses' );
+			if( ! empty( $comment_moderation_statuses ) )
+			{	// Get a count of comments awaiting moderation:
+				$nb_comments_moderation = generic_ctp_number( $Item->ID, 'feedback', explode( ',', $comment_moderation_statuses ) );
+				if( $nb_comments_moderation > 0 )
+				{
+					$comments_icon_params['style'] = 'color:#cc0099';
+					$comments_icon_params['title'] = T_('There are come comments awaiting moderation.');
+				}
+			}
+
+			$col .= get_icon( 'comments', 'imgtag', $comments_icon_params );
 		}
 		else
 		{
@@ -4220,7 +4232,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		{	// If at least one meta comment exists
 			$item_Blog = & $Item->get_Blog();
 			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
-					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00' ) )
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00', 'title' => T_('Meta comments') ) )
 				.'</a> ';
 		}
 	}

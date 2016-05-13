@@ -429,9 +429,11 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	if( $display_user_domain )
 	{	// Get Domain:
 		$DomainCache = & get_DomainCache();
-		if( $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) && $perm_stat_edit )
-		{
-			$user_domain_formatted = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">'.$user_domain_formatted.'</a>';
+		if( $Domain = & get_Domain_by_subdomain( $user_domain ) && $perm_stat_edit )
+		{	// Set a link to edit a top existing domain:
+			$user_domain_formatted = preg_replace( '#'.preg_quote( $Domain->get( 'name' ) ).'$#',
+				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">'.$Domain->get( 'name' ).'</a>',
+				$user_domain_formatted );
 		}
 	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
