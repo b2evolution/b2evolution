@@ -553,10 +553,12 @@ class User extends DataObject
 				{ // User can edit Domains
 					$DomainCache = & get_DomainCache();
 
+					load_funcs('sessions/model/_hitlog.funcs.php');
+
 					// Update status of Domain in DB
 					$edited_domain_status = param( 'edited_domain_status', 'string' );
 					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
-					$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
+					$Domain = & get_Domain_by_subdomain( $user_domain );
 					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
 					{ // Domain doesn't exist in DB, Create new record
 						$Domain = new Domain();
@@ -569,7 +571,6 @@ class User extends DataObject
 					}
 
 					// Update status of Initial referer in DB
-					load_funcs('sessions/model/_hitlog.funcs.php');
 					$edited_initial_referer_status = param( 'edited_initial_referer_status', 'string' );
 					$initial_referer = $UserSettings->get( 'initial_referer', $this->ID );
 					$initial_referer_domain = url_part( $initial_referer, 'host' );
