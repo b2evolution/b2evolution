@@ -831,9 +831,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'renderers' => array(
-								'text' => T_('Renderers'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$blog, ),
+							'plugins' => array(
+								'text' => T_('Plugins'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$blog, ),
 						),
 					),
 				) );
