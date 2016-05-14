@@ -113,6 +113,17 @@ class coll_item_list_Widget extends ComponentWidget
 					'options' => $item_type_options,
 					'defaultvalue' => '',
 				),
+				'featured' => array(
+					'label' => T_('Featured'),
+					'note' => T_('Do you want to restrict to featured contents?'),
+					'type' => 'radio',
+					'options' => array( 
+							array ('all', T_('All posts') ),
+							array ('featured', T_('Only featured') ),
+							array ('other', T_('Only NOT featured') ),
+						),
+					'defaultvalue' => 'all',
+				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
@@ -394,6 +405,16 @@ class coll_item_list_Widget extends ComponentWidget
 		{	// Not "default", restrict to a specific type usage (or '' for all):
 			$filters['itemtype_usage'] = $this->disp_params['item_type_usage'];
 		}
+
+		if( $this->disp_params['featured'] == 'featured' )
+		{	// Restrict to featured Items:
+			$filters['featured'] = true; 
+		}
+		elseif( $this->disp_params['featured'] == 'other' )
+		{	// Restrict to NOT featured Items:
+			$filters['featured'] = false; 
+		}
+
 
 		if( $this->disp_params['follow_mainlist'] == 'tags' )
 		{	// Restrict to Item tagged with some tag used in the Mainlist:
