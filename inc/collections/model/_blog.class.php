@@ -692,7 +692,7 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'features', $groups ) )
-		{ // we want to load the workflow checkboxes:
+		{ // we want to load the posts related features:
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
@@ -711,6 +711,9 @@ class Blog extends DataObject
 
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+
+			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
+			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );

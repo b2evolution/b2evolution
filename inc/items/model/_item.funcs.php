@@ -312,14 +312,18 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front' )
+		if( isset($Blog) )
+
+		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+			&& isset($Blog) 
+			&& $Blog->get_setting('disp_featured_above_list') )
 		{ // No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
 
 			$FeaturedList->set_filters( array(
 					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only (TODO!)
+					'featured' => 1,  // Featured posts only
 					// Types will already be reset to defaults here
 				), false /* Do NOT memorize!! */ );
 
