@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Simple Post List (Recent Posts) Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/widgets/_coll_item_list.widget.php', 'coll_item_list_Widget' );
 
 /**
- * ComponentWidget Class
+ *  Simple Post List (Recent Posts) Widget Class
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
@@ -60,12 +60,17 @@ class coll_post_list_Widget extends coll_item_list_Widget
 		$r['title']['defaultvalue'] = T_('Recent Posts');
 		$r['title_link']['no_edit'] = true;
 		$r['item_type_usage']['no_edit'] = true;
+		$r['featured']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
+		$r['item_group_by']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
-		$r['disp_excerpt']['no_edit'] = true;
-		$r['disp_teaser']['no_edit'] = true;
+		$r['disp_first_image']['no_edit'] = true;
+		$r['disp_first_image']['defaultvalue'] = 'special';
+		$r['item_pic_link_type']['no_edit'] = true;
+		// $r['disp_excerpt']['no_edit'] = true;
+		// $r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;
 		$r['widget_css_class']['no_edit'] = true;
 		$r['widget_ID']['no_edit'] = true;
