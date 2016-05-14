@@ -2148,6 +2148,7 @@ function create_demo_contents()
 		// Insert a post:
 		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->set_tags_from_string( 'photo,demo' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').$lorem_1paragraph
 	.'[teaserbreak]
@@ -2186,6 +2187,7 @@ function create_demo_contents()
 		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo,demo' );
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->insert( $jay_moderator_ID, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
@@ -2343,7 +2345,6 @@ function create_demo_contents()
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
 <p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
-		$edited_Item->set( 'featured', 1 );
 		$edited_Item->dbsave();
 		// $edited_Item->insert_update_tags( 'update' );
 
