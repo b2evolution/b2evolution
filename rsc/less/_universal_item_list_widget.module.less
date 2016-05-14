@@ -28,10 +28,11 @@ div.widget_core_coll_post_list {
 					margin: 14px 0;
 					overflow: hidden;
 					background-color: #fafafa;
+					border-radius: 4px;
 					
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
-						max-width: 100%;
+						width: 100%;
 						height: auto;
 					}
 					.item_title {
@@ -232,6 +233,9 @@ div.widget_core_coll_post_list {
 	}
 	img {
 		border-radius: 3px;
+		// Preventing images to exceed the parent's width
+		width: 100%;
+		height: auto;
 	}
 	// If grouped, bigger group title
 	&.evo_withgroup > ul > li {
