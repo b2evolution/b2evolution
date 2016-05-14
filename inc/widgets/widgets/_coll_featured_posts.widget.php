@@ -71,8 +71,10 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 		$r['attached_pics']['defaultvalue'] = 'first';
 		$r['disp_first_image']['no_edit'] = true;
 		$r['disp_first_image']['defaultvalue'] = 'special';
+		$r['thumb_size']['defaultvalue'] = 'fit-640x480';
 		$r['item_pic_link_type']['no_edit'] = true;
 		// $r['disp_excerpt']['no_edit'] = true;
+		$r['disp_teaser']['defaultvalue'] = true;
 		// $r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;
 		$r['widget_css_class']['no_edit'] = true;
