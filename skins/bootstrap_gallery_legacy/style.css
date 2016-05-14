@@ -1,12 +1,12 @@
-div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_block {
-  padding: 8px;
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
 }
 div.widget_core_coll_media_index.evo_layout_rwd img {
   width: 100%;
   height: auto;
 }
-div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_block {
-  padding: 8px;
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
 }
 div.widget_core_user_avatars.evo_layout_rwd img {
   width: 100%;
@@ -16,7 +16,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   margin: 5em 0 30px;
   color: #333333;
 }
-.widget_core_org_members div.widget_rwd_block {
+.widget_core_org_members div.widget_rwd_content {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;

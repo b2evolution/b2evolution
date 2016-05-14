@@ -1,16 +1,13 @@
-div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block,
-div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block {
-  padding: 8px;
-}
-div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content,
-div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content {
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_content,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_content {
   background-color: #fafafa;
   padding: 8px;
+  margin: 14px 0;
   height: 350px;
   overflow: hidden;
 }
-div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_block_content div.item_first_image img {
+div.widget_core_coll_item_list.evo_layout_rwd div.widget_rwd_content div.item_first_image img,
+div.widget_core_coll_post_list.evo_layout_rwd div.widget_rwd_content div.item_first_image img {
   width: 100%;
   height: auto;
 }
@@ -217,15 +214,15 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
     font-size: 18px;
   }
 }
-div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_block {
-  padding: 8px;
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
 }
 div.widget_core_coll_media_index.evo_layout_rwd img {
   width: 100%;
   height: auto;
 }
-div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_block {
-  padding: 8px;
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
 }
 div.widget_core_user_avatars.evo_layout_rwd img {
   width: 100%;
@@ -235,7 +232,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   margin: 5em 0 30px;
   color: #333333;
 }
-.widget_core_org_members div.widget_rwd_block {
+.widget_core_org_members div.widget_rwd_content {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;
