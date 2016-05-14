@@ -1,8 +1,23 @@
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
+}
+div.widget_core_coll_media_index.evo_layout_rwd img {
+  width: 100%;
+  height: auto;
+}
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
+  margin: 14px 0;
+}
+div.widget_core_user_avatars.evo_layout_rwd img {
+  width: 100%;
+  height: auto;
+}
 .widget_core_org_members {
   margin: 5em 0 30px;
   color: #333333;
 }
-.widget_core_org_members div.evo_org_member {
+.widget_core_org_members div.widget_rwd_content {
+  text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;
 }
@@ -38,6 +53,12 @@
   overflow: hidden;
   -webkit-line-clamp: 2;
   height: 3em;
+}
+.widget_core_org_members .widget_rwd_blocks {
+  width: 100%;
+}
+.widget_core_org_members.evo_layout_list ul li div.ufld_icon_links {
+  text-align: left;
 }
 @media (max-width: 640px) {
   body.pictured .front_main_content .ufld_icon_links a {
