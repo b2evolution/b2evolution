@@ -58,7 +58,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
 
 
 /**
- * Insert the widgets for the blog
+ * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
  * @param boolean should be true only when it's called after initial install
@@ -269,31 +269,45 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_title', 'core', 1 );
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_tagline', 'core', 2 );
 	}
-	$featured_intro_params = NULL;
+
+
 	if( $kind == 'main' )
 	{ // Hide a title of the front intro post
 		$featured_intro_params = array( 'disp_title' => 0 );
 	}
+	else
+	{
+		$featured_intro_params = NULL;
+	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
+
 	if( $kind == 'main' )
 	{ // Add user links widget only for main kind blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
 	}
-	$post_list_params = NULL;
+
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array(
 				'blog_ID'          => '',
 				'limit'            => 5,
-				'attached_pics'    => 'first',
-				'disp_first_image' => 'special',
+				'layout'           => 'list',
+				'thumb_size'       => 'crop-80x80',
 			);
 	}
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );
+	else
+	{
+		$post_list_params = NULL;
+	}
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_posts', 'core', 20, $post_list_params );
+
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+
 	if( $kind != 'main' )
 	{ // Don't install the "Recent Commnets" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
+
 	if( $blog_id == $blog_b_ID )
 	{	// Install widget "Poll" only for Blog B on install:
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );

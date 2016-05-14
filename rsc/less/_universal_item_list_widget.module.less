@@ -6,21 +6,57 @@
 @placeholder-icon-color: #dcdcdc; // Color of the icon inside the Placeholder element
 
 div.widget_core_coll_item_list, 
-div.widget_core_coll_post_list {
+div.widget_core_coll_featured_posts,
+div.widget_core_coll_post_list,
+div.widget_core_coll_page_list,
+div.widget_core_coll_related_post_list {
 
-	// RWD layout, very crude for now:
+	// RWD layout
 	&.evo_layout_rwd {
-		div.widget_rwd_content {
-			background-color: #fafafa;
+	
+		.widget_rwd_content {
 			padding: 8px;
 			margin: 14px 0;
-
-			height: 350px;    // very rough...
 			overflow: hidden;
-
-			div.item_first_image img {
-				width: 100%;
-				height: auto;
+			background-color: #fafafa;
+			border-radius: 4px;
+		}
+		// With teaser or with excerpt
+		&.evo_withteaser, &.evo_withexcerpt {
+			// Wrapper div
+			.widget_rwd_blocks {
+				// 
+				> div {
+					display: inline-block;
+					float: none; // We removed default bootstrap's style here because of the issue with floating divs with uneven height in multiple rows
+					vertical-align: top;
+					// zoom: 1; testing if this is necessary
+					// min-height: 200px; testing if this is necessary
+				}
+			
+				.widget_rwd_content {
+					
+					// Important for limiting the max image size to it's parent's max width
+					.item_first_image img {
+						max-width: 100%;
+						max-height: 380px;
+						width:auto;
+						height:auto;
+						margin: auto;
+					}
+					.item_title {
+						font-size: 16px;
+						font-weight: 700;
+						line-height: 1.5em;
+						margin: 10px 0 5px;
+					}
+					// testing if this is necessary
+					//.item_content {
+					//	& > p, & > a {
+					//		display: inline;
+					//	}
+					//}
+				}
 			}
 		}
 	}
@@ -144,7 +180,6 @@ div.widget_core_coll_post_list {
 	}
 	// With teaser specific layout (with "..." button)
 	&.evo_noexcerpt.evo_withteaser {
-		ul li {
 			div.item_content {
 				p {
 					margin: 0;
@@ -191,7 +226,6 @@ div.widget_core_coll_post_list {
 						text-decoration: none;
 					}
 				}
-			}
 		} 
 		// Special blockquote style for teaser layout
 		&.evo_1pic__special ul li div.item_content {
@@ -208,10 +242,20 @@ div.widget_core_coll_post_list {
 	}
 	img {
 		border-radius: 3px;
+		// Preventing images to exceed the parent's width
+		max-width: 100%;
+		max-height: 380px;
+		width:auto;
+		height:auto;
+		margin: auto;
 	}
 	// If grouped, bigger group title
 	&.evo_withgroup > ul > li {
 		font-size: 17px;
+	}
+	
+	div.item_first_image {
+		text-align: center;
 	}
 }
 

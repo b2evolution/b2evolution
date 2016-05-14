@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Related post list Widget class.
+ * This file implements the Featured Posts Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -13,16 +13,16 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/widgets/_coll_item_list.widget.php' , 'coll_item_list_Widget' );
+load_class( 'widgets/widgets/_coll_item_list.widget.php', 'coll_item_list_Widget' );
 
 /**
- * ComponentWidget Class
+ * Featured Posts Widget Class
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
  * @package evocore
  */
-class coll_related_post_list_Widget extends coll_item_list_Widget
+class coll_featured_posts_Widget extends coll_item_list_Widget
 {
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		ComponentWidget::__construct( $db_row, 'core', 'coll_related_post_list' );
+		ComponentWidget::__construct( $db_row, 'core', 'coll_featured_posts' );
 	}
 
 
@@ -57,19 +57,24 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
 		$r = parent::get_param_definitions( $params );
 		// We only change the defaults and hide some params.
-		$r['title']['defaultvalue'] = T_('Related posts');
+		$r['title']['defaultvalue'] = T_('Featured Posts');
 		$r['title_link']['no_edit'] = true;
+		$r['layout']['defaultvalue'] = 'rwd';
 		$r['item_type_usage']['no_edit'] = true;
 		$r['featured']['no_edit'] = true;
+		$r['featured']['defaultvalue'] = 'featured';
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_group_by']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
+		$r['attached_pics']['defaultvalue'] = 'first';
 		$r['disp_first_image']['no_edit'] = true;
 		$r['disp_first_image']['defaultvalue'] = 'special';
+		$r['thumb_size']['defaultvalue'] = 'fit-640x480';
 		$r['item_pic_link_type']['no_edit'] = true;
 		// $r['disp_excerpt']['no_edit'] = true;
+		$r['disp_teaser']['defaultvalue'] = true;
 		// $r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;
 		$r['widget_css_class']['no_edit'] = true;
@@ -95,7 +100,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'simple-related-posts-list-widget' );
+		return get_manual_url( 'featured-posts-widget' );
 	}
 
 
@@ -104,7 +109,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Simple Related Posts list');
+		return T_('Featured Posts');
 	}
 
 
@@ -122,7 +127,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	 */
 	function get_desc()
 	{
-		return T_('Simplified Item list for listing posts related to the Main list.');
+		return T_('Simplified Item list for listing posts.');
 	}
 
 
@@ -135,7 +140,6 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	{
 		// Force some params (because this is a simplified widget):
 		$params['item_type_usage'] = 'post';	// Use post types usage "post" only
-		$params['follow_mainlist'] = 'tags';	// Follow tags for relation
 
 		parent::init_display( $params );
 	}
