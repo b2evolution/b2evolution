@@ -80,6 +80,7 @@ $core_componentwidget_defs = array(
 			'coll_current_filters',
 		),
 	'content' => array(
+			'coll_featured_posts',    // Simplified UIL: Featured Posts
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
