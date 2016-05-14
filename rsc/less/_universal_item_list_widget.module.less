@@ -32,8 +32,11 @@ div.widget_core_coll_post_list {
 					
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
-						width: 100%;
-						height: auto;
+						max-width: 100%;
+						max-height: 380px;
+						width:auto;
+						height:auto;
+						margin: auto;
 					}
 					.item_title {
 						font-size: 16px;
@@ -234,8 +237,11 @@ div.widget_core_coll_post_list {
 	img {
 		border-radius: 3px;
 		// Preventing images to exceed the parent's width
-		width: 100%;
-		height: auto;
+		max-width: 100%;
+		max-height: 380px;
+		width:auto;
+		height:auto;
+		margin: auto;
 	}
 	// If grouped, bigger group title
 	&.evo_withgroup > ul > li {

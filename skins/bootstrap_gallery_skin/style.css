@@ -20,8 +20,11 @@ div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks 
 div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
 div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
 div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img {
-  width: 100%;
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
   height: auto;
+  margin: auto;
 }
 div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
@@ -212,8 +215,11 @@ div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.
 div.widget_core_coll_item_list img,
 div.widget_core_coll_post_list img {
   border-radius: 3px;
-  width: 100%;
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
   height: auto;
+  margin: auto;
 }
 div.widget_core_coll_item_list.evo_withgroup > ul > li,
 div.widget_core_coll_post_list.evo_withgroup > ul > li {
