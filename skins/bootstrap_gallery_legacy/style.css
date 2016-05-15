@@ -60,6 +60,10 @@ div.widget_core_user_avatars.evo_layout_rwd img {
 .widget_core_org_members.evo_layout_list ul li div.ufld_icon_links {
   text-align: left;
 }
+.widget_core_org_members.evo_layout_flow div.widget_flow_blocks div {
+  width: 100%;
+  text-align: left;
+}
 @media (max-width: 640px) {
   body.pictured .front_main_content .ufld_icon_links a {
     width: 45px;
