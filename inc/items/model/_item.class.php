@@ -5925,19 +5925,19 @@ class Item extends ItemLight
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add( T_('Marking flag of email notifications that members have been notified.'), 'note' );
+			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add( T_('Marking flag of email notifications that community users have been notified.'), 'note' );
+			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
 		}
 		if( $force_pings == 'mark' )
 		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
 			$force_pings = false;
 			$notified_flags[] = 'pings_sent';
-			$Messages->add( T_('Marking flag of email notifications that pings have been sent.'), 'note' );
+			$Messages->add( T_('Marking pings as sent.'), 'note' );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
